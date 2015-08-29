@@ -7,6 +7,25 @@ and first-party plugins use for configuration
 Constants
 ---------
 
+.. data:: window.PLAYER
+
+  Defined by stock. Static (needs page reload to update).
+  Stores information about the current player:
+
+  * ``ap``: AP the player has (string)
+  * ``available_invites``: Number of invitations this player can send
+  * ``energy``: XM the player currently holds
+  * ``min_ap_for_current_level``: AP required for the player's level (used for level progress)
+  * ``min_ap_for_next_level``: AP required for the next level (used for level progress)
+  * ``nickname``: The actual agent name
+  * ``team``: Player faction. Can be "ENLIGHTENED" or "RESISTANCE"
+  * ``verified_level``: Current player level
+
+  IITC adds a few things in :function:`~window.setupPlayerStat`:
+
+  * ``nickMatcher``: RegExp used to match the player's agent name in chat
+  * ``level``: Backwards compatibility, same as ``verified_level``.
+
 .. data:: window.REFRESH
 
   Controls how often the map should refresh, in seconds, default 30.
@@ -212,11 +231,11 @@ Variables
 
 .. data:: window.urlPortal
 
-  (?) stores the current portal’s URL (not seen used)
+  Portal GUID if the original URL had it.
 
 .. data:: window.urlPortalLL
 
-  (?) stores the current portal’s LL URL?? or the lng/lat? (not seen used)
+  Portal lng/lat if the orignial URL had it.
 
 .. data:: window.selectedPortal
 
@@ -258,6 +277,15 @@ Variables
   An object, where the keys are layer names and their values are bools true if
   the layer is enabled. Should mirror the layer selector UI.
 
+  **Note:** The variable comment states that "you should use
+  :function:`window.isLayerGroupDisplayed(name)` to check the [layer] status"
+
 .. function:: window.plugin()
 
   A noop function/namespace/"plugin framework".
+
+.. data:: window.bootPlugins
+
+  A list of hooks that should be called after IITC has finished booting.
+  Mostly used to initialise plugins. **Note:** These will not run if some
+  blacklisted plugins are detected.

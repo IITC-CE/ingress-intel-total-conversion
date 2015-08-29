@@ -20,6 +20,10 @@ import shlex
 # Project config
 
 primary_domain = 'js'
+rst_prolog = """
+.. |privfn| replace:: *This function is private. It will not be accessible from the console or other scripts.*
+.. highlight:: javascript
+"""
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

@@ -15,9 +15,10 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   
-   core
 
+   pluginapi
+   core
+   boot
 
 
 Indices and tables
