@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @id             iitc-plugin-uniqueinfo-exporter@c-schmitz
 // @name           IITC plugin: Unique Info Import/Export
 // @category       Misc
