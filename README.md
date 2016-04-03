@@ -4,3 +4,5 @@ This is an IITC plugin to export your unique captures/visits from IITC as a JSON
 The Uniques plugins and a functioning syncronisation is required, of course.
 
 The exported data consists of the Unique Portal ID, visited and captured status, all in JSON format.
+
+Please note that when saving the list of uniques any existing uniques will never be deleted, only updated.

@@ -1,9 +1,11 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @id             iitc-plugin-uniqueinfo-exporter@c-schmitz
 // @name           IITC plugin: Unique Info Import/Export
 // @category       Misc
-// @version        0.0.0.2
+// @version        0.0.0.3
 // @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
+// @updateURL      https://github.com/c-schmitz/iitc-unique-export/raw/master/IngressUniqueExporter.user.js
+// @downloadURL    https://github.com/c-schmitz/iitc-unique-export/raw/master/IngressUniqueExporter.user.js
 // @description    Import/exports the unique capture/visits info to/from a JSON file. This plugin requires the IITC Unique plugin to be installed.
 // @include        https://www.ingress.com/intel*
 // @include        http://www.ingress.com/intel*
@@ -20,6 +22,13 @@ function wrapper() {
     // base context for plugin
     window.plugin.uniqueinfo = function() {};
     var self = window.plugin.uniqueinfo;
+    self.save = function save() {
+        if (!confirm("Please only confirm this if you know what you are doing!!\nAre you sure you want to save your Unique visits/captures back to IITC?")) return;
+
+        window.plugin.uniques.uniques=$.parseJSON( $('#taUCExportImport').val() );
+        window.plugin.sync.updateMap('uniques', 'uniques', Object.keys(window.plugin.uniques.uniques));
+    }
+
     self.gen = function gen() {
 
       sExportUniqueJSON='{'+"\n";
@@ -27,18 +36,15 @@ function wrapper() {
       visited=captured=0;
       $.each(aoPortals,function(PUID){
              aPortal=window.plugin.uniques.uniques[PUID];
-             sExportUniqueJSON+='"'+PUID+'": {"visited":'+aPortal.visited+',"captured":'+aPortal.captured+"},\n";
-             i++;
              if (aPortal.visited) visited++;
              if (aPortal.captured) captured++;
       });
-      sExportUniqueJSON=sExportUniqueJSON.slice(0, -2);
-      sExportUniqueJSON+="\n"+'}'+"\n"
+      sExportUniqueJSON=JSON.stringify(window.plugin.uniques.uniques,null,4);
 
         var dialog = window.dialog({
-            title: "Ingress unique visits/cpatures JSON export",
-            html: '<span>Find all of your visited/captured portals as JSON below (visited: '+visited+' - vaptured: '+captured+'):</span>'
-            + '<textarea id="idmUnqiuesExport" style="width: 570px; height: ' + ($(window).height() - 190) + 'px; margin-top: 5px;"></textarea>'
+            title: "Ingress unique visits/captures JSON export",
+            html: '<span>Find all of your visited/captured portals as JSON below (visited: '+visited+' - captured: '+captured+'):</span>'
+            + '<textarea id="taUCExportImport" style="width: 570px; height: ' + ($(window).height() - 230) + 'px; margin-top: 5px;"></textarea><a onclick=\"window.plugin.uniqueinfo.save();\" title=\"Save unique UV/UC info to IITC.\">Save</a>'
         }).parent();
         $(".ui-dialog-buttonpane", dialog).remove();
         // width first, then centre
@@ -46,13 +52,13 @@ function wrapper() {
             "top": ($(window).height() - dialog.height()) / 2,
             "left": ($(window).width() - dialog.width()) / 2
         });
-        $("#idmUnqiuesExport").val(sExportUniqueJSON);
+        $("#taUCExportImport").val(sExportUniqueJSON);
         return dialog;
     }
     // setup function called by IITC
     self.setup = function init() {
         // add controls to toolbox
-        var link = $("<a onclick=\"window.plugin.uniqueinfo.gen();\" title=\"Export a JSON of portals and their unique visit/capture status.\">Unique visits/capture export</a>");
+        var link = $("<a onclick=\"window.plugin.uniqueinfo.gen();\" title=\"Export/import a JSON of portals and their unique visit/capture status.\">UV/UC export/import</a>");
         $("#toolbox").append(link);
         // delete setup to ensure init can't be run again
         delete self.setup;
