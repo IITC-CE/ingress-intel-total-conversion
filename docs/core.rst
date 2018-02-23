@@ -69,7 +69,7 @@ Constants
 
 .. data:: window.CHAT_SHRINKED
 
-  Controls requesting chat data if chat is collapsed, in pixels, default 60
+  Controls height of chat when chat is collapsed, in pixels, default 60
 
 .. data:: window.FIELD_MU_DISPLAY_POINT_TOLERANCE
 
