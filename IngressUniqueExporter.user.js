@@ -7,10 +7,10 @@
 // @updateURL      https://github.com/c-schmitz/iitc-unique-export/raw/master/IngressUniqueExporter.user.js
 // @downloadURL    https://github.com/c-schmitz/iitc-unique-export/raw/master/IngressUniqueExporter.user.js
 // @description    Import/exports the unique capture/visits info to/from a JSON file. This plugin requires the IITC Unique plugin to be installed.
-// @include        https://www.ingress.com/intel*
-// @include        http://www.ingress.com/intel*
-// @match          https://www.ingress.com/intel*
-// @match          http://www.ingress.com/intel*
+// @include        https://intel.ingress.com/*
+// @include        http://intel.ingress.com/*
+// @match          https://intel.ingress.com/*
+// @match          http://intel.ingress.com/*
 // @grant          none
 // ==/UserScript==
 
