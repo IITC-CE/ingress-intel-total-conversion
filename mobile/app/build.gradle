@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.cradle.iitc_mobile"
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 28
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -18,7 +18,22 @@ android {
             assets.srcDirs = ['../assets']
         }
     }
+    useLibrary 'org.apache.http.legacy'
 }
+
 dependencies {
-    compile 'com.android.support:support-v4:19.1.0'
+    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+task copyUserscripts(type: Copy)
+
+copyUserscripts {
+    description = 'Updating prebuilt plugins'
+    from '../assets'
+    into 'src/main/assets'
+    include('*')
+    include('**/*')
+}
+
+preBuild.dependsOn copyUserscripts
