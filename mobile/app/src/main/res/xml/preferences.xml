@@ -36,14 +36,14 @@
         android:key="pref_tweaks_cat"
         android:title="@string/pref_tweaks_cat">
         <PreferenceScreen
-            android:fragment="com.cradle.iitc_mobile.fragments.PluginsFragment"
+            android:fragment="org.exarhteam.iitc_mobile.fragments.PluginsFragment"
             android:key="pref_plugins"
             android:persistent="false"
             android:summary="@string/pref_plugins_sum"
             android:title="@string/pref_plugins">
             <intent
-                android:targetClass="com.cradle.iitc_mobile.prefs.PluginPreferenceActivity"
-                android:targetPackage="com.cradle.iitc_mobile"/>
+                android:targetClass="org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity"
+                android:targetPackage="org.exarhteam.iitc_mobile"/>
         </PreferenceScreen>
 
         <CheckBoxPreference
@@ -107,7 +107,7 @@
                     android:key="pref_update_plugins_interval"
                     android:title="@string/pref_update_plugins_interval"
                     android:summary="@string/pref_update_plugins_interval_sum"/>
-                <com.cradle.iitc_mobile.prefs.ForceUpdatePreference
+                <org.exarhteam.iitc_mobile.prefs.ForceUpdatePreference
                     android:key="pref_force_plugin_update"
                     android:title="@string/pref_force_plugin_update"
                     android:summary="@string/pref_force_plugin_update_sum"/>
@@ -131,7 +131,7 @@
             android:key="pref_about_screen"
             android:persistent="false"
             android:title="@string/pref_about_title">
-            <com.cradle.iitc_mobile.prefs.AboutDialogPreference
+            <org.exarhteam.iitc_mobile.prefs.AboutDialogPreference
                 android:dialogIcon="@android:drawable/ic_dialog_info"
                 android:key="pref_about"
                 android:title="@string/pref_about_title"/>

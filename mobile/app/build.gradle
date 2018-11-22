@@ -18,6 +18,10 @@ android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
 
+    lintOptions {
+        abortOnError false
+    }
+
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 28
