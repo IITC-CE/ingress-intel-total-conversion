@@ -167,10 +167,54 @@ public class IITC_WebViewClient extends WebViewClient {
         // mIitc.onReceivedLoginRequest(this, view, realm, account, args);
     }
 
-    // enable https
+    /**
+     * Notify the host application that an SSL error occurred while loading a
+     * resource. The host application must call either handler.cancel() or
+     * handler.proceed(). Note that the decision may be retained for use in
+     * response to future SSL errors. The default behavior is to cancel the
+     * load.
+     *
+     * @param view    The WebView that is initiating the callback.
+     * @param handler An SslErrorHandler object that will handle the user's
+     *                response.
+     * @param error   The SSL error object.
+     */
     @Override
-    public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
-        handler.proceed();
+    public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(mIitc);
+        String message = "SSL Certificate error.";
+        switch (error.getPrimaryError()) {
+            case SslError.SSL_UNTRUSTED:
+                message = "The certificate authority is not trusted.";
+                break;
+            case SslError.SSL_EXPIRED:
+                message = "The certificate has expired.";
+                break;
+            case SslError.SSL_IDMISMATCH:
+                message = "The certificate Hostname mismatch.";
+                break;
+            case SslError.SSL_NOTYETVALID:
+                message = "The certificate is not yet valid.";
+                break;
+        }
+        message += " Do you want to continue anyway?";
+
+        builder.setTitle("SSL Certificate Error");
+        builder.setMessage(message);
+        builder.setPositiveButton("continue", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                handler.proceed();
+            }
+        });
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                handler.cancel();
+            }
+        });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     public void reset() {
