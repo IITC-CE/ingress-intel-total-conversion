@@ -169,8 +169,8 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     }
 
     @Override
-    protected boolean isValidFragment(final String s) {
-        return true;
+    protected boolean isValidFragment(String fragmentName) {
+        return PluginsFragment.class.getName().equals(fragmentName);
     }
 
     // called by Plugins Fragment
