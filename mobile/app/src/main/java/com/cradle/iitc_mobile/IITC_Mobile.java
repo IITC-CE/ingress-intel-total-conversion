@@ -1,7 +1,6 @@
 package com.cradle.iitc_mobile;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.SearchManager;
@@ -12,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -23,6 +23,11 @@ import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +43,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,7 +65,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IITC_Mobile extends Activity
+public class IITC_Mobile extends AppCompatActivity
         implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnItemLongClickListener {
     private static final String mIntelUrl = "https://intel.ingress.com/intel";
 
@@ -104,10 +108,11 @@ public class IITC_Mobile extends Activity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         // enable progress bar above action bar
+        // must be called BEFORE calling parent method
         requestWindowFeature(Window.FEATURE_PROGRESS);
+
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
         mImageLoading = findViewById(R.id.imageLoading);
@@ -169,8 +174,12 @@ public class IITC_Mobile extends Activity
         mUserLocation = new IITC_UserLocation(this);
         mUserLocation.setLocationMode(Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0")));
 
+        // compat actionbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.iitc_toolbar);
+        setSupportActionBar(toolbar);
+
         // pass ActionBar to helper because we deprecated getActionBar
-        mNavigationHelper = new IITC_NavigationHelper(this, super.getActionBar());
+        mNavigationHelper = new IITC_NavigationHelper(this, super.getSupportActionBar(), toolbar);
 
         mMapSettings = new IITC_MapSettings(this);
 
@@ -531,7 +540,7 @@ public class IITC_Mobile extends Activity
         // Get the SearchView and set the searchable configuration
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         mSearchMenuItem = menu.findItem(R.id.menu_search);
-        final SearchView searchView = (SearchView) mSearchMenuItem.getActionView();
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
@@ -903,7 +912,7 @@ public class IITC_Mobile extends Activity
     }
 
     /**
-     * @see getNavigationHelper()
+     *
      * @deprecated ActionBar related stuff should be handled by IITC_NavigationHelper
      */
     @Deprecated
@@ -1017,5 +1026,21 @@ public class IITC_Mobile extends Activity
             popupMenu.show();
         }
         return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == IITC_UserLocation.REQ_PERMISSIONS_LOCATION && mUserLocation != null) {
+            int grantedCount = 0;
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    grantedCount++;
+                }
+            }
+            if (grantedCount > 0) {
+                mUserLocation.onRuntimePermissionsGranted();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

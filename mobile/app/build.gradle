@@ -1,28 +1,72 @@
 apply plugin: 'com.android.application'
+
+def getVersionCode = { ->
+    def git = 'git rev-list HEAD --count'
+
+    def proc = git.execute()
+    proc.waitFor()
+    def desc = "${proc.in.text}".trim()
+
+    if (desc.isEmpty()) {
+        println "ERROR setting version code"
+        return -1
+    }
+    return Integer.parseInt(desc)
+}
+
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    buildToolsVersion '28.0.3'
+
     defaultConfig {
-        applicationId "com.cradle.iitc_mobile"
         minSdkVersion 14
         targetSdkVersion 28
+        versionCode = getVersionCode()
+        versionName "0.27"
     }
+
+    signingConfigs {
+        debug {
+            storeFile file('keys/debug.keystore')
+            storePassword 'android'
+            keyAlias 'AndroidDebugKey'
+            keyPassword 'android'
+        }
+        release {
+            keyAlias rootProject.ext.signKeyAlias 
+            keyPassword rootProject.ext.signKeyPassword
+            storeFile file(rootProject.ext.signKeyStore)
+            storePassword rootProject.ext.signKeyStorePassword
+        }
+    }
+
     buildTypes {
         release {
+            apply plugin: 'idea'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            minifyEnabled false
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "${variant.applicationId}-${variant.name}.apk"
+                }
+            }
+            signingConfig signingConfigs.release
+        }
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "${variant.applicationId}-${variant.name}.apk"
+                }
+            }
         }
     }
-    sourceSets {
-        main {
-            assets.srcDirs = ['../assets']
-        }
-    }
-    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
     implementation 'com.android.support:appcompat-v7:28.+'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 

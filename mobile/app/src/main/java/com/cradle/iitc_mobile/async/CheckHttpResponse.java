@@ -7,13 +7,11 @@ import android.os.AsyncTask;
 import com.cradle.iitc_mobile.IITC_Mobile;
 import com.cradle.iitc_mobile.Log;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /*
  * this class parses the http response of a web page.
@@ -23,27 +21,26 @@ import java.io.IOException;
 public class CheckHttpResponse extends AsyncTask<String, Void, Boolean> {
 
     private final IITC_Mobile mIitc;
+    private final OkHttpClient client;
 
     public CheckHttpResponse(final IITC_Mobile iitc) {
         mIitc = iitc;
+        client = new OkHttpClient();
     }
 
     @Override
     protected Boolean doInBackground(final String... urls) {
         // check http responses and disable splash screen on error
-        HttpGet httpRequest = null;
+        Response response = null;
         try {
-            httpRequest = new HttpGet(urls[0]);
-        } catch (final IllegalArgumentException e) {
-            Log.w(e);
-            return false;
-        }
-        final HttpClient httpclient = new DefaultHttpClient();
-        HttpResponse response = null;
-        try {
-            response = httpclient.execute(httpRequest);
-            final int code = response.getStatusLine().getStatusCode();
-            if (code != HttpStatus.SC_OK) {
+            response = client.newCall(
+                    new Request.Builder()
+                            .url(urls[0])
+                            .get()
+                            .build()
+            ).execute();
+            final int code = response.code();
+            if (code != 200) {
                 Log.d("received error code: " + code);
                 mIitc.runOnUiThread(new Runnable() {
                     @Override
@@ -56,6 +53,10 @@ public class CheckHttpResponse extends AsyncTask<String, Void, Boolean> {
             }
         } catch (final IOException e) {
             Log.w(e);
+        } finally {
+            if (response != null && response.body() != null) {
+                response.body().close();
+            }
         }
         return false;
     }

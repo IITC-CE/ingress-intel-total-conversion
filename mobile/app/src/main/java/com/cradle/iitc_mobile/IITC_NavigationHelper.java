@@ -1,13 +1,14 @@
 package com.cradle.iitc_mobile;
 
-import android.app.ActionBar;
+import android.support.v7.app.ActionBar;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,9 +45,9 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     private Pane mPane = Pane.MAP;
     private String mHighlighter = null;
 
-    public IITC_NavigationHelper(final IITC_Mobile iitc, final ActionBar bar) {
+    public IITC_NavigationHelper(final IITC_Mobile iitc, final ActionBar bar, Toolbar toolbar) {
         super(iitc, (DrawerLayout) iitc.findViewById(R.id.drawer_layout),
-                R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+                toolbar, R.string.drawer_open, R.string.drawer_close);
 
         mIitc = iitc;
         mActionBar = bar;
@@ -66,6 +67,14 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
         mNotificationHelper = new IITC_NotificationHelper(mIitc);
 
         onPrefChanged(); // also calls updateActionBar()
+
+        // workaround for not working home-button on v7 toolbar
+        setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIitc.switchToPane(Pane.MAP);
+            }
+        });
 
         mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_HOWTO);
     }
@@ -92,14 +101,16 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 setDrawerIndicatorEnabled(false);
             } else {
-                mActionBar.setDisplayHomeAsUpEnabled(true); // Show "up" indicator
-                mActionBar.setHomeButtonEnabled(true);// Make icon clickable
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
                 if (mPane == Pane.MAP || mDrawerLayout.isDrawerOpen(mDrawerLeft)) {
+                    mActionBar.setDisplayHomeAsUpEnabled(false); // Hide"up" indicator
+                    mActionBar.setHomeButtonEnabled(false);// Make icon unclickable
                     setDrawerIndicatorEnabled(true);
                 } else {
                     setDrawerIndicatorEnabled(false);
+                    mActionBar.setHomeButtonEnabled(true);// Make icon clickable
+                    mActionBar.setDisplayHomeAsUpEnabled(true); // Show "up" indicator
                 }
             }
 

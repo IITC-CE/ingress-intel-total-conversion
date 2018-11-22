@@ -1,10 +1,13 @@
 package com.cradle.iitc_mobile;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.view.Surface;
 
 import com.cradle.iitc_mobile.compass.Compass;
@@ -12,6 +15,7 @@ import com.cradle.iitc_mobile.compass.CompassListener;
 
 public class IITC_UserLocation implements CompassListener, LocationListener {
     private static final int TWO_MINUTES = 1000 * 60 * 2;
+    public static final int REQ_PERMISSIONS_LOCATION = 0x0000FF01;
 
     private final Compass mCompass;
     private boolean mFollowing = false;
@@ -23,6 +27,7 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
     private double mOrientation = 0;
     private boolean mOrientationRegistered = false;
     private boolean mRunning = false;
+    private boolean mHaveRuntimePermissions = false;
 
     public IITC_UserLocation(final IITC_Mobile iitc) {
         mIitc = iitc;
@@ -35,7 +40,9 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
 
     // Checks whether two providers are the same
     private boolean isSameProvider(final String provider1, final String provider2) {
-        if (provider1 == null) { return provider2 == null; }
+        if (provider1 == null) {
+            return provider2 == null;
+        }
         return provider1.equals(provider2);
     }
 
@@ -56,7 +63,14 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
     }
 
     private void updateListeners() {
-        final boolean useLocation = mRunning && mMode != 0 && !mIitc.isLoading();
+        if (ActivityCompat.checkSelfPermission(mIitc, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(mIitc, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(mIitc, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQ_PERMISSIONS_LOCATION);
+            return;
+        } else {
+            mHaveRuntimePermissions = true;
+        }
+        final boolean useLocation = mRunning && mMode != 0 && !mIitc.isLoading() && mHaveRuntimePermissions;
         final boolean useOrientation = useLocation && mMode == 2;
 
         if (useLocation && !mLocationRegistered) {
@@ -247,5 +261,9 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
         mMode = mode;
 
         return needsReload;
+    }
+
+    public void onRuntimePermissionsGranted() {
+        updateListeners();
     }
 }

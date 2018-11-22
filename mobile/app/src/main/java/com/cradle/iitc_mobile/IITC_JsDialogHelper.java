@@ -53,7 +53,7 @@ public class IITC_JsDialogHelper {
     private final String mUrl;
 
     public IITC_JsDialogHelper(final int type, final WebView view, final String url,
-            final String message, final String defaultValue, final JsResult result) {
+                               final String message, final String defaultValue, final JsResult result) {
         mResult = result;
         mDefaultValue = defaultValue;
         mMessage = message;
