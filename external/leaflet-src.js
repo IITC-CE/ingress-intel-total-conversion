@@ -520,8 +520,7 @@ L.Mixin.Events.fire = L.Mixin.Events.fireEvent;
 
 	    mobile = typeof orientation !== undefined + '',
 	    msPointer = !window.PointerEvent && window.MSPointerEvent,
-		pointer = (window.PointerEvent && window.navigator.pointerEnabled) ||
-				  msPointer,
+		pointer = !!(window.PointerEvent || msPointer),
 	    retina = ('devicePixelRatio' in window && window.devicePixelRatio > 1) ||
 	             ('matchMedia' in window && window.matchMedia('(min-resolution:144dpi)') &&
 	              window.matchMedia('(min-resolution:144dpi)').matches),
@@ -5079,7 +5078,7 @@ L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path :
 		}
 
 		this._requestUpdate();
-		
+
 		this.fire('remove');
 		this._map = null;
 	},
@@ -5127,14 +5126,14 @@ L.Path = (L.Path.SVG && !window.L_PREFER_CANVAS) || !L.Browser.canvas ? L.Path :
 
 	_drawPath: function () {
 		var i, j, len, len2, point, drawMethod;
-		
+
         	if (this.options.dashArray) {
             		var da = typeof(this.options.dashArray) === "string" ? this.options.dashArray.split(",").map(function(el,ix,ar) { return parseInt(el); }) : this.options.dashArray;
             		this._ctx.setLineDash(da);
         	} else {
 			this._ctx.setLineDash([]);
         	}
-        	
+
 		this._ctx.beginPath();
 
 		for (i = 0, len = this._parts.length; i < len; i++) {
@@ -8160,7 +8159,7 @@ L.Control.Attribution = L.Control.extend({
 				this.addAttribution(map._layers[i].getAttribution());
 			}
 		}
-		
+
 		map
 		    .on('layeradd', this._onLayerAdd, this)
 		    .on('layerremove', this._onLayerRemove, this);
