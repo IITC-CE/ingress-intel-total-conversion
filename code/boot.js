@@ -646,7 +646,7 @@ function boot() {
       $.each(badPlugins,function(name,desc) {
         warning += '<li><b>'+name+'</b>: '+desc+'</li>';
       });
-      warning += '</ul><p>Please uninstall the problem plugins and reload the page. See this <a href="http://iitc.me/faq/#uninstall">FAQ entry</a> for help.</p><p><i>Note: It is tricky for IITC to safely disable just problem plugins</i></p>';
+      warning += '</ul><p>Please uninstall the problem plugins and reload the page. See this <a href="https://iitc.modos189.ru/faq.html">FAQ entry</a> for help.</p><p><i>Note: It is tricky for IITC to safely disable just problem plugins</i></p>';
 
       dialog({
         title: 'Plugin Warning',

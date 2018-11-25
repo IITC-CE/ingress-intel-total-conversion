@@ -1,21 +1,20 @@
 ingress intel total conversion (IITC)
 =====================================
 
-Since the [breunigs](https://github.com/breunigs/ingress-intel-total-conversion) IITC branch was deleted,
-[Jon Atkins](https://github.com/jonatkins) created this one to continue some development.
+Since the [breunigs](https://github.com/breunigs/ingress-intel-total-conversion) IITC branch was deleted and
+[Jon Atkins](https://github.com/jonatkins) has moved away from development,
+this repository was created by [modos189](https://github.com/modos189) to continue some development.
 
 ## Users
 
-Just want to download/install IITC? Go to http://iitc.me/
+Just want to download/install IITC? Go to
+https://iitc.modos189.ru/
 
-For keeping up with the latest news, release announcements, etc, Follow IITC on G+
-https://plus.google.com/105383756361375410867/posts
-
-If you have questions, need help or advice with IITC, the Google+ community is a good place to start.
-https://plus.google.com/communities/105647403088015055797
+For keeping up with the latest news, release announcements, etc, Follow IITC on Telegram channel
+https://t.me/iitc_news
 
 Want to report a bug? Post it to the issues page
-https://github.com/iitc-project/ingress-intel-total-conversion/issues
+https://github.com/IITC-CE/ingress-intel-total-conversion/issues
 
 ## Developers
 
@@ -43,3 +42,8 @@ To build the mobile app, along with python, you will need
 - The Android SDK
 
 Run `build.py mobile` to build IITC Mobile in debug mode.
+
+#### Website
+
+The source codes of the iitc.modos189.ru site are in a nearby repository:
+https://github.com/IITC-CE/iitc.modos189.ru
