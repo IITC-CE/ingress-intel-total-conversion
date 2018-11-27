@@ -52,11 +52,7 @@ window.aboutIITC = function() {
   + '  </div>'
   + '  <hr>'
   + '  <div>Version: ' + v + '</div>'
-  + '  <div>Plugins: ' + plugins + '</div>'
-  + '  <hr>'
-  + '  <div>' + attrib + '</div>'
-  + '  <hr>'
-  + '  <div>' + contrib + '</div>';
+  + '  <div>Plugins: ' + plugins + '</div>';
 
   dialog({
     title: 'IITC ' + v,

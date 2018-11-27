@@ -14,6 +14,12 @@ def getVersionCode = { ->
     return Integer.parseInt(desc)
 }
 
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyy-MM-dd_HH:mm:ss')
+    return formattedDate
+}
+
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -30,25 +36,23 @@ android {
     }
 
     signingConfigs {
-        debug {
-            storeFile file('keys/debug.keystore')
-            storePassword 'android'
-            keyAlias 'AndroidDebugKey'
-            keyPassword 'android'
-        }
-        release {
-            keyAlias rootProject.ext.signKeyAlias 
-            keyPassword rootProject.ext.signKeyPassword
-            storeFile file(rootProject.ext.signKeyStore)
-            storePassword rootProject.ext.signKeyStorePassword
+        if (project.hasProperty('signKeyStorePassword')) {
+            release {
+                keyAlias rootProject.ext.signKeyAlias
+                keyPassword rootProject.ext.signKeyPassword
+                storeFile file(rootProject.ext.signKeyStore)
+                storePassword rootProject.ext.signKeyStorePassword
+            }
         }
     }
 
     buildTypes {
         release {
             apply plugin: 'idea'
+            shrinkResources true
+            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            minifyEnabled false
+            minifyEnabled true
             applicationVariants.all { variant ->
                 variant.outputs.all {
                     outputFileName = "${variant.applicationId}-${variant.name}.apk"
@@ -57,6 +61,8 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-test" + getDate()
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             applicationVariants.all { variant ->
