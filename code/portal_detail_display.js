@@ -89,11 +89,13 @@ window.renderPortalDetails = function(guid) {
     linkDetails.push('<aside>'+mapHtml+'</aside>');
 
   }
-
+  
   $('#portaldetails')
     .html('') //to ensure it's clear
     .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
     .append(
+      '<svg title="Click to move to portal." class="material-icons icon-button" onClick="zoomToAndShowPortal(\''+guid+'\',['+data.latE6/1E6+','+data.lngE6/1E6+']);"><use xlink:href="#ic_place_24px"></use></svg>',
+      
       $('<h3>').attr({class:'title'}).text(title),
 
       $('<span>').attr({

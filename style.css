@@ -26,6 +26,21 @@ body {
   margin: 0;
 }
 
+/* Material Icons */
+.material-icons {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-button {
+  cursor: pointer;
+}
+
+i.tiny { font-size: 1rem; }
+i.small { font-size: 2rem; }
+i.medium { font-size: 4rem; }
+i.large { font-size: 6rem; }
+
 #scrollwrapper {
   overflow-x: hidden;
   overflow-y: auto;
@@ -70,14 +85,17 @@ body {
 }
 
 .enl {
+  fill: #03fe03;
   color: #03fe03 !important;
 }
 
 .res {
+  fill: #00c5ff;
   color: #00c5ff !important;
 }
 
 .none {
+  fill: #fff;
   color: #fff;
 }
 
@@ -813,6 +831,12 @@ h3 {
 #portaldetails {
   min-height: 63px;
   position: relative; /* so the below '#portaldetails .close' is relative to this */
+}
+
+#portaldetails .title {
+  width: auto;
+  display: inline-block;
+  line-height: 20px;
 }
 
 #portaldetails .close {
