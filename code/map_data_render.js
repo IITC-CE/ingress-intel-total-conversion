@@ -43,7 +43,6 @@ window.Render.prototype.clearPortalsOutsideBounds = function(bounds) {
       count++;
     }
   }
-  console.log('Render: deleted '+count+' portals by level/bounds');
 }
 
 window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
@@ -61,7 +60,6 @@ window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
       count++;
     }
   }
-  console.log('Render: deleted '+count+' links by bounds');
 }
 
 window.Render.prototype.clearFieldsOutsideBounds = function(bounds) {
@@ -79,7 +77,6 @@ window.Render.prototype.clearFieldsOutsideBounds = function(bounds) {
       count++;
     }
   }
-  console.log('Render: deleted '+count+' fields by bounds');
 }
 
 

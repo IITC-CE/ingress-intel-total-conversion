@@ -30,13 +30,12 @@ window.chat.handleTabCompletion = function() {
   for(var i = 0; i < list.length; i++) {
     if(!list[i].toLowerCase().startsWith(word)) continue;
     if(nick && nick !== list[i]) {
-      console.log('More than one nick matches, aborting. ('+list[i]+' vs '+nick+')');
+      console.warn('More than one nick matches, aborting. ('+list[i]+' vs '+nick+')');
       return;
     }
     nick = list[i];
   }
   if(!nick) {
-    console.log('No matches for ' + word);
     return;
   }
 
@@ -527,7 +526,6 @@ window.chat.backgroundChannelData = function(instance,channel,flag) {
 
 
 window.chat.request = function() {
-  console.log('refreshing chat');
   var channel = chat.tabToChannel(chat.getActive());
   if (channel == 'faction' || (window.chat.backgroundChannels && window.chat.backgroundChannels['faction'])) {
     chat.requestFaction(false);
@@ -553,9 +551,7 @@ window.chat.needMoreMessages = function() {
   var hasScrollbar = scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
   var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
   if(hasScrollbar && !nearTop) return;
-
-  console.log('No scrollbar or near top in active chat. Requesting more data.');
-
+  
   if(activeTab === 'faction')
     chat.requestFaction(true);
   else
@@ -752,7 +748,7 @@ window.chat.setupPosting = function() {
           window.chat.handleTabCompletion();
         }
       } catch(error) {
-        console.log(error);
+        console.error(error);
         debug.printStackTrace();
       }
     });
@@ -782,7 +778,7 @@ window.chat.postMsg = function() {
       throw e; // to trigger native error message
     }
     if(result !== undefined)
-      console.log(result.toString());
+      console.error(result.toString());
     return result;
   }
 

@@ -69,7 +69,7 @@ window.extractFromStock = function() {
                   }
                 }
                 if (decreasing) {
-                  console.log ('int array '+topLevel+' looks like ZOOM_TO_LEVEL: '+JSON.stringify(topObject));
+                  console.error('int array '+topLevel+' looks like ZOOM_TO_LEVEL: '+JSON.stringify(topObject));
                   window.niantic_params.ZOOM_TO_LEVEL = topObject;
                 }
               } // end if (topObject[0] == 8)
@@ -84,7 +84,7 @@ window.extractFromStock = function() {
                   }
                 }
                 if (increasing) {
-                  console.log ('int array '+topLevel+' looks like TILES_PER_EDGE: '+JSON.stringify(topObject));
+                  console.error('int array '+topLevel+' looks like TILES_PER_EDGE: '+JSON.stringify(topObject));
                   window.niantic_params.TILES_PER_EDGE = topObject;
                 }
 

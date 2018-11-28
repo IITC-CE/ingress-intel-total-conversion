@@ -12,7 +12,7 @@ window.debug.renderDetails = function() {
 
 window.debug.printStackTrace = function() {
   var e = new Error('dummy');
-  console.log(e.stack);
+  console.error(e.stack);
   return e.stack;
 }
 

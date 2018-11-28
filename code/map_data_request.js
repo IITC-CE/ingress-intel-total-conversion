@@ -586,7 +586,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   if (errorTiles.length) statusMsg += ', '+errorTiles.length+' failed';
   if (unaccountedTiles.length) statusMsg += ', '+unaccountedTiles.length+' unaccounted';
   statusMsg += '. delay '+nextQueueDelay+' seconds';
-  console.log (statusMsg);
+  console.log(statusMsg);
 
 
   // requeue any 'timeout' tiles immediately

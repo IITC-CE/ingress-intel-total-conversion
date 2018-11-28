@@ -68,7 +68,7 @@ window.dialog = function(options) {
   } else if(options.html) {
     html = options.html;
   } else {
-    console.log('window.dialog: warning: no text in dialog');
+    console.error('window.dialog: warning: no text in dialog');
     html = window.convertTextToTableMagic('');
   }
 
@@ -85,7 +85,7 @@ window.dialog = function(options) {
       selector.dialog('close');
       selector.remove();
     } catch(err) {
-      console.log('window.dialog: Tried to close nonexistent dialog ' + id);
+      console.error('window.dialog: Tried to close nonexistent dialog ' + id);
     }
   }
 
