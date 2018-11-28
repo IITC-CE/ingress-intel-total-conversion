@@ -97,6 +97,14 @@ script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(inf
 """
 
 
+pluginMetaBlock = """// @updateURL      @@UPDATEURL@@
+// @downloadURL    @@DOWNLOADURL@@
+// @namespace      https://github.com/IITC-CE/ingress-intel-total-conversion
+// @include        https://intel.ingress.com/*
+// @match          https://intel.ingress.com/*
+// @grant          none"""
+
+
 def readfile(fn):
     with io.open(fn, 'Ur', encoding='utf8') as f:
         return f.read()
@@ -130,6 +138,7 @@ def extractUserScriptMeta(var):
 def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
     script = re.sub('@@INJECTCODE@@', loadCode, script)
 
+    script = script.replace('@@METAINFO@@', pluginMetaBlock)
     script = script.replace('@@PLUGINSTART@@', pluginWrapperStart)
     script = script.replace('@@PLUGINSTART-USE-STRICT@@', pluginWrapperStartUseStrict)
     script = script.replace('@@PLUGINEND@@', pluginWrapperEnd)

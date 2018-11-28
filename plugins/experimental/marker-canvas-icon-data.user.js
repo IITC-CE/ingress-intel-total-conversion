@@ -3,15 +3,8 @@
 // @name           IITC plugin: Marker drawn using icons from canvas data URLs
 // @category       Tweaks
 // @version        0.1.0.@@DATETIMEVERSION@@
-// @namespace      https://github.com/jonatkins/ingress-intel-total-conversion
-// @updateURL      @@UPDATEURL@@
-// @downloadURL    @@DOWNLOADURL@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] EXPERIMENTAL: draw markers using individual Leaflet Icons, created from canvas elements converted to data: URLs
-// @include        https://*.ingress.com/intel*
-// @include        http://*.ingress.com/intel*
-// @match          https://*.ingress.com/intel*
-// @match          http://*.ingress.com/intel*
-// @grant          none
+@@METAINFO@@
 // ==/UserScript==
 
 @@PLUGINSTART@@
