@@ -13,9 +13,9 @@ indent_size = 2
 
 [*.py]
 indent_size = 4
-
+dashArray = [1,2];
 # Following JS code style rules do not have EditorConfig support yet:
 # - Use identity operators (===) over equality operators (==).
-# - Opening brace at end of line. e.g. "if(a) {", "} else {", "} else if (b) }"
+# - Opening brace at end of line. e.g. "if (a) {", "} else {", "} else if (b) }"
 # - No space between keyword and parentheses. "if(a)" not "if (a)"
 # - Use single-quotes for strings, and double-quotes within strings for HTML attribute values. $('<div id="#me">').

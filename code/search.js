@@ -132,7 +132,7 @@ window.search.Query.prototype.resultLayer = function(result) {
     if(result.bounds) {
       L.rectangle(result.bounds, {
         title: result.title,
-        clickable: false,
+        interactive: false,
         color: 'red',
         fill: false,
       }).addTo(result.layer);
@@ -366,7 +366,7 @@ addHook('search', function(query) {
 
       if(item.geojson) {
         result.layer = L.geoJson(item.geojson, {
-          clickable: false,
+          interactive: false,
           color: 'red',
           opacity: 0.7,
           weight: 2,

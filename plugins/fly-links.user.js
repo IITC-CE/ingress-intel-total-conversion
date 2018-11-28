@@ -250,9 +250,9 @@ window.plugin.flyLinks.updateLayer = function() {
       color: '#FF0000',
       opacity: 1,
       weight: 1.5,
-      clickable: false,
+      interactive: false,
       smoothFactor: 10,
-      dashArray: [6, 4],
+      dashArray: '6, 4',
     });
   });
   
@@ -262,7 +262,7 @@ window.plugin.flyLinks.updateLayer = function() {
       fill: true,
       fillColor: '#FF0000',
       fillOpacity: 1 - Math.pow(0.85, triangle.depth),
-      clickable: false,
+      interactive: false,
     });
   });
 }

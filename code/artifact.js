@@ -183,11 +183,10 @@ window.artifact.updateLayer = function() {
         var icon = L.icon({
           iconUrl: iconUrl,
           iconSize: [iconSize,iconSize],
-          iconAnchor: [iconSize/2,iconSize/2],
-          className: 'no-pointer-events'  // the clickable: false below still blocks events going through to the svg underneath
+          iconAnchor: [iconSize/2,iconSize/2]
         });
 
-        var marker = L.marker (latlng, {icon: icon, clickable: false, keyboard: false, opacity: opacity });
+        var marker = L.marker (latlng, {icon: icon, interactive: false, keyboard: false, opacity: opacity });
 
         artifact._layer.addLayer(marker);
 
@@ -205,7 +204,7 @@ window.artifact.updateLayer = function() {
           className: 'no-pointer-events'  // the clickable: false below still blocks events going through to the svg underneath
         });
 
-        var marker = L.marker (latlng, {icon: icon, clickable: false, keyboard: false, opacity: opacity });
+        var marker = L.marker (latlng, {icon: icon, interactive: false, keyboard: false, opacity: opacity });
 
         artifact._layer.addLayer(marker);
 

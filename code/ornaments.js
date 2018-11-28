@@ -59,7 +59,7 @@ window.ornaments.addPortal = function(portal) {
         className: 'no-pointer-events'  // the clickable: false below still blocks events going through to the svg underneath
       });
 
-      return L.marker(latlng, {icon: icon, clickable: false, keyboard: false, opacity: window.ornaments.OVERLAY_OPACITY }).addTo(layer);
+      return L.marker(latlng, {icon: icon, interactive: false, keyboard: false, opacity: window.ornaments.OVERLAY_OPACITY }).addTo(layer);
     });
   }
 };

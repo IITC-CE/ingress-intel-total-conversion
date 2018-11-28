@@ -763,7 +763,7 @@ window.plugin.missions = {
 					color: this.MISSION_COLOR,
 					fill: false,
 					dashArray: null,
-					clickable: false
+					interactive: false
 				}
 			);
 			this.missionLayer.addLayer(marker);
@@ -774,7 +774,7 @@ window.plugin.missions = {
 			color: this.MISSION_COLOR,
 			opacity: 1,
 			weight: 2,
-			clickable: false,
+			interactive: false,
 			dashArray: (mission.typeNum == 2 /* non-sequential */ ? '1,5' : undefined),
 		});
 		this.missionLayer.addLayer(line);
@@ -821,7 +821,7 @@ window.plugin.missions = {
 					color: this.MISSION_COLOR_START,
 					fill: false,
 					dashArray: null,
-					clickable: false
+					interactive: false
 				}
 			);
 			this.missionStartLayer.addLayer(this.markedStarterPortals[guid]);

@@ -643,7 +643,7 @@ window.plugin.apList.setPortalLocationIndicator = function(guid) {
     weight: 2,
     opacity: 1,
     portalRadius: portalRadius,
-    clickable: false };
+    interactive: false };
 
   if(plugin.apList.portalLocationIndicator)
     map.removeLayer(plugin.apList.portalLocationIndicator);

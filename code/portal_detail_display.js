@@ -235,13 +235,13 @@ window.setPortalIndicators = function(p) {
               color: RANGE_INDICATOR_COLOR,
               weight: 3,
               dashArray: range.isLinkable ? undefined : "10,10",
-              clickable: false })
-          : L.circle(coord, range.range, { fill: false, stroke: false, clickable: false })
+              interactive: false })
+          : L.circle(coord, range.range, { fill: false, stroke: false, interactive: false })
         ).addTo(map);
     }
 
     portalAccessIndicator = L.circle(coord, HACK_RANGE,
-      { fill: false, color: ACCESS_INDICATOR_COLOR, weight: 2, clickable: false }
+      { fill: false, color: ACCESS_INDICATOR_COLOR, weight: 2, interactive: false }
     ).addTo(map);
   }
 

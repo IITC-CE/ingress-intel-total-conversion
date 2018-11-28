@@ -43,7 +43,7 @@ window.plugin.userLocation.setup = function() {
   var marker = L.marker(new L.LatLng(0,0), {
     icon: icon,
     zIndexOffset: 300,
-    clickable: false
+    interactive: false
   });
 
   var circle = new L.Circle(new L.LatLng(0,0), 40, {
@@ -52,7 +52,7 @@ window.plugin.userLocation.setup = function() {
     fillOpacity: 1,
     fillColor: "url(#user-location-gradient)",
     weight: 1.5,
-    clickable: false
+    interactive: false
   });
 
   window.plugin.userLocation.locationLayer = new L.LayerGroup();

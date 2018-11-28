@@ -15,6 +15,7 @@
 // @match          https://*.ingress.com/mission/*
 // @match          http://*.ingress.com/mission/*
 // @grant          none
+// @run-at         document-end
 // ==/UserScript==
 
 
@@ -183,7 +184,7 @@ window.TEAM_TO_CSS = ['none', 'res', 'enl'];
 
 window.SLOT_TO_LAT = [0, Math.sqrt(2)/2, 1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2];
 window.SLOT_TO_LNG = [1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2, 0, Math.sqrt(2)/2];
-window.EARTH_RADIUS=6378137;
+window.EARTH_RADIUS=6367000;
 window.DEG2RAD = Math.PI / 180;
 
 // STORAGE ///////////////////////////////////////////////////////////

@@ -40,7 +40,7 @@ window.plugin.miniMap.setup  = function() {
   var position = isSmartphone() ? 'bottomright' : 'bottomleft';
 
   setTimeout(function() {
-    new L.Control.MiniMap(new L.Google('ROADMAP',{maxZoom:21}), {toggleDisplay: true, position: position}).addTo(window.map);
+    new L.Control.MiniMap(L.gridLayer.googleMutant('ROADMAP',{maxZoom:21}), {toggleDisplay: true, position: position}).addTo(window.map);
   }, 0);
 
   $('head').append('<style>@@INCLUDESTRING:external/Control.MiniMap.css@@</style>');

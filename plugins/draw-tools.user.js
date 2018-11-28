@@ -28,13 +28,13 @@ window.plugin.drawTools = function() {};
 
 window.plugin.drawTools.loadExternals = function() {
   try { console.log('Loading leaflet.draw JS now'); } catch(e) {}
-  @@INCLUDERAW:external/leaflet.draw.js@@
+  @@INCLUDERAW:external/leaflet.draw-src.js@@
   @@INCLUDERAW:external/spectrum/spectrum.js@@
   try { console.log('done loading leaflet.draw JS'); } catch(e) {}
 
   window.plugin.drawTools.boot();
 
-  $('head').append('<style>@@INCLUDESTRING:external/leaflet.draw.css@@</style>');
+  $('head').append('<style>@@INCLUDESTRING:external/leaflet.draw-src.css@@</style>');
   $('head').append('<style>@@INCLUDESTRING:external/spectrum/spectrum.css@@</style>');
 }
 
@@ -68,17 +68,18 @@ window.plugin.drawTools.setOptions = function() {
     weight: 4,
     opacity: 0.5,
     fill: false,
-    clickable: true
+    interactive: true
   };
 
   window.plugin.drawTools.polygonOptions = L.extend({}, window.plugin.drawTools.lineOptions, {
     fill: true,
     fillColor: null, // to use the same as 'color' for fill
-    fillOpacity: 0.2
+    fillOpacity: 0.2,
+    dashArray: ''
   });
 
   window.plugin.drawTools.editOptions = L.extend({}, window.plugin.drawTools.polygonOptions, {
-    dashArray: [10,10]
+    dashArray: '10,10'
   });
   delete window.plugin.drawTools.editOptions.color;
 
@@ -98,9 +99,9 @@ window.plugin.drawTools.setDrawColor = function(color) {
   window.plugin.drawTools.markerOptions.icon = window.plugin.drawTools.currentMarker;
 
   plugin.drawTools.drawControl.setDrawingOptions({
-    polygon:  { shapeOptions: plugin.drawTools.polygonOptions },
-    polyline: { shapeOptions: plugin.drawTools.lineOptions },
-    circle:   { shapeOptions: plugin.drawTools.polygonOptions },
+    polygon:  { shapeOptions: plugin.drawTools.polygonOptions, feet: false, nautic: false },
+    polyline: { shapeOptions: plugin.drawTools.lineOptions, feet: false, nautic: false },
+    circle:   { shapeOptions: plugin.drawTools.polygonOptions, feet: false, nautic: false },
     marker:   { icon:         plugin.drawTools.markerOptions.icon },
   });
 }
@@ -110,34 +111,19 @@ window.plugin.drawTools.addDrawControl = function() {
   var drawControl = new L.Control.Draw({
     draw: {
       rectangle: false,
+      circlemarker: false,
       polygon: {
-        title: 'Add a polygon\n\n'
-          + 'Click on the button, then click on the map to\n'
-          + 'define the start of the polygon. Continue clicking\n'
-          + 'to draw the line you want. Click the first or last\n'
-          + 'point of the line (a small white rectangle) to\n'
-          + 'finish. Double clicking also works.',
         shapeOptions: window.plugin.drawTools.polygonOptions,
         snapPoint: window.plugin.drawTools.getSnapLatLng,
       },
 
       polyline: {
-        title: 'Add a (poly) line.\n\n'
-          + 'Click on the button, then click on the map to\n'
-          + 'define the start of the line. Continue clicking\n'
-          + 'to draw the line you want. Click the <b>last</b>\n'
-          + 'point of the line (a small white rectangle) to\n'
-          + 'finish. Double clicking also works.',
         shapeOptions: window.plugin.drawTools.lineOptions,
         snapPoint: window.plugin.drawTools.getSnapLatLng,
       },
 
       circle: {
-        title: 'Add a circle.\n\n'
-          + 'Click on the button, then click-AND-HOLD on the\n'
-          + 'map where the circle’s center should be. Move\n'
-          + 'the mouse to control the radius. Release the mouse\n'
-          + 'to finish.',
+        circlemarker: false,
         shapeOptions: window.plugin.drawTools.polygonOptions,
         snapPoint: window.plugin.drawTools.getSnapLatLng,
       },
@@ -145,9 +131,6 @@ window.plugin.drawTools.addDrawControl = function() {
       // Options for marker (icon, zIndexOffset) are not set via shapeOptions,
       // so we have merge them here!
       marker: L.extend({}, window.plugin.drawTools.markerOptions, {
-        title: 'Add a marker.\n\n'
-          + 'Click on the button, then click on the map where\n'
-          + 'you want the marker to appear.',
         snapPoint: window.plugin.drawTools.getSnapLatLng,
         repeatMode: true
       }),
@@ -158,14 +141,8 @@ window.plugin.drawTools.addDrawControl = function() {
       featureGroup: window.plugin.drawTools.drawnItems,
 
       edit: {
-        title: 'Edit drawn items',
         selectedPathOptions: window.plugin.drawTools.editOptions,
       },
-
-      remove: {
-        title: 'Delete drawn items'
-      },
-
     },
 
   });
@@ -173,7 +150,6 @@ window.plugin.drawTools.addDrawControl = function() {
   window.plugin.drawTools.drawControl = drawControl;
 
   map.addControl(drawControl);
-  //plugin.drawTools.addCustomButtons();
 
   window.plugin.drawTools.setAccessKeys();
   for (var toolbarId in drawControl._toolbars) {
@@ -633,6 +609,7 @@ window.plugin.drawTools.boot = function() {
 
   //add the draw control - this references the above FeatureGroup for editing purposes
   plugin.drawTools.addDrawControl();
+  window.plugin.drawTools.setDrawColor(window.plugin.drawTools.currentColor);
 
   //start off hidden. if the layer is enabled, the below addLayerGroup will add it, triggering a 'show'
   $('.leaflet-draw-section').hide();

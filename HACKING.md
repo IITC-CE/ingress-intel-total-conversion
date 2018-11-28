@@ -29,7 +29,7 @@ Please follow the these guidelines. Some are just preference, others are good pr
 - indent using two spaces
 - opening brace on the same line: `if(blub) {`
 - else clauses: `} else if(blub) {` or `} else {`
-- there should be no space after `if`, `for`, etc. E.g. `if(true) { doStuff(); } else { dontDoStuff(); }`
+- there should be a space after `if`, `for`, etc. E.g. `if (true) { doStuff(); } else { dontDoStuff(); }`
 - comments: `// this is a comment`
 - quotes: Use single-quotes for JavaScript and double-quotes for HTML content. Example: `$('body').append('<div id="soup">Soup!</div>');`.
 - there is no length limit on lines, but try to keep them short where suitable

@@ -408,7 +408,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
     fillColor: COLORS[team],
     fillOpacity: 0.25,
     stroke: false,
-    clickable: false,
+    interactive: false,
 
     team: team,
     ent: ent,  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
@@ -474,7 +474,7 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
     color: COLORS[team],
     opacity: 1,
     weight: faked ? 1 : 2,
-    clickable: false,
+    interactive: false,
 
     team: team,
     ent: ent,  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead

@@ -14,7 +14,7 @@ window.portalMarkerScale = function() {
 window.createMarker = function(latlng, data) {
   var styleOptions = window.getMarkerStyleOptions(data);
 
-  var options = L.extend({}, data, styleOptions, { clickable: true });
+  var options = L.extend({}, data, styleOptions, { interactive: true });
 
   var marker = L.circleMarker(latlng, options);
 
@@ -56,7 +56,7 @@ window.getMarkerStyleOptions = function(details) {
   // thinner and dashed outline for placeholder portals
   if (details.team != TEAM_NONE && level==0) {
     lvlWeight = 1;
-    dashArray = [1,2];
+    dashArray = '1,2';
   }
 
   var options = {

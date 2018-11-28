@@ -214,8 +214,8 @@ window.plugin.crossLinks.showLink = function(link) {
        color: '#d22',
        opacity: 0.7,
        weight: 5,
-       clickable: false,
-       dashArray: [8,8],
+       interactive: false,
+       dashArray: '8,8',
 
        guid: link.options.guid
     });

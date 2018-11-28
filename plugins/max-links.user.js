@@ -33,8 +33,8 @@ window.plugin.maxLinks.STROKE_STYLE = {
   color: '#FF0000',
   opacity: 1,
   weight: 1.5,
-  clickable: false,
-  dashArray: [6,4],
+  interactive: false,
+  dashArray: '6,4',
   smoothFactor: 10,
 };
 window.plugin.maxLinks.layer = null;
@@ -50,7 +50,7 @@ window.plugin.maxLinks.addErrorMarker = function() {
         iconSize: [300,30],
         html: 'Tidy Links: too many portals!'
       }),
-      clickable: false
+      interactive: false
     });
 
     window.map.addLayer(window.plugin.maxLinks.errorMarker);
