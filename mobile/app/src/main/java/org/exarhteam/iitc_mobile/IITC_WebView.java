@@ -130,14 +130,8 @@ public class IITC_WebView extends WebView {
             }
             loadJS(url.substring("javascript:".length()));
         } else {
-            // force https if enabled in settings
-            final SharedPreferences sharedPref = PreferenceManager
-                    .getDefaultSharedPreferences(getContext());
-            if (sharedPref.getBoolean("pref_force_https", true)) {
-                url = url.replace("http://", "https://");
-            } else {
-                url = url.replace("https://", "http://");
-            }
+            // Niantic no longer allows connections without https
+            url = url.replace("http://", "https://");
 
             // disable splash screen if a http error code is responded
             new CheckHttpResponse(mIitc).execute(url);
