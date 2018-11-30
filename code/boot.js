@@ -501,7 +501,7 @@ window.setupLayerChooserApi = function() {
       var obj = this._layers[i];
       var layerActive = window.map.hasLayer(obj.layer);
       var info = {
-        layerId: L.stamp(obj.layer),
+        layerId: id,
         name: obj.name,
         active: layerActive
       }
