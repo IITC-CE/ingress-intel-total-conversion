@@ -49,10 +49,9 @@ android {
     buildTypes {
         release {
             apply plugin: 'idea'
-            shrinkResources true
-            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            minifyEnabled true
+            zipAlignEnabled true
+            minifyEnabled false
             applicationVariants.all { variant ->
                 variant.outputs.all {
                     outputFileName = "${variant.applicationId}-${variant.name}.apk"
