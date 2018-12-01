@@ -496,12 +496,12 @@ window.setupLayerChooserApi = function() {
   window.layerChooser.getLayers = function() {
     var baseLayers = new Array();
     var overlayLayers = new Array();
-
+    
     for (i in this._layers) {
       var obj = this._layers[i];
       var layerActive = window.map.hasLayer(obj.layer);
       var info = {
-        layerId: id,
+        layerId: i,
         name: obj.name,
         active: layerActive
       }
