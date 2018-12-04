@@ -57,7 +57,8 @@ window.plugin.portalLevelNumbers.addLabel = function(guid,latLng) {
       iconSize: [window.plugin.portalLevelNumbers.ICON_SIZE, window.plugin.portalLevelNumbers.ICON_SIZE],
       html: levelNumber
       }),
-    guid: guid
+    guid: guid,
+    interactive: false
   });
   plugin.portalLevelNumbers.levelLayers[guid] = level;
   level.addTo(plugin.portalLevelNumbers.levelLayerGroup);
