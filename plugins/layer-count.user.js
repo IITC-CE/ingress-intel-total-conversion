@@ -26,7 +26,7 @@ plugin.layerCount.onBtnClick = function(ev) {
 					L.DomUtil.addClass(layer._path, "leaflet-clickable");
 					layer._path.setAttribute("pointer-events", layer.options.pointerEventsBackup);
 					layer.options.pointerEvents = layer.options.pointerEventsBackup;
-					layer.options.clickable = true;
+					layer.options.interactive = true;
 				}
 			});
 		}
@@ -39,7 +39,7 @@ plugin.layerCount.onBtnClick = function(ev) {
 				if (layer instanceof L.GeodesicPolygon) {
 					layer.options.pointerEventsBackup = layer.options.pointerEvents;
 					layer.options.pointerEvents = null;
-					layer.options.clickable = false;
+					layer.options.interactive = false;
 					L.DomUtil.removeClass(layer._path, "leaflet-clickable");
 					layer._path.setAttribute("pointer-events", "none");
 				}
