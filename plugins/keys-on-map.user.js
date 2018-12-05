@@ -65,7 +65,8 @@ window.plugin.keysOnMap.renderKey = function(guid,latLng) {
           iconSize: [12,10],
           html: keyCount
           }),
-        guid: guid
+        guid: guid,
+        interactive: false
         });
 
       plugin.keysOnMap.keyLayers[guid] = key;
