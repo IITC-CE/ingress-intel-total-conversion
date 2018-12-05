@@ -236,7 +236,7 @@ window.plugin.farmFind.drawCircle = function(farm)
     
 	var latlng = new L.LatLng(center.lat(), center.lng());
     //console.log("latlng: " + latlng);
-    var optCircle = {color:'red',opacity:0.7,fill:true,fillColor:'red',fillOpacity:0.7,weight:15,clickable:true};
+    var optCircle = {color:'red',opacity:0.7,fill:true,fillColor:'red',fillOpacity:0.7,weight:15,interactive:true};
     var circle = new L.Circle(latlng, radius, optCircle);
     circle.bindPopup(popupMsg);
     

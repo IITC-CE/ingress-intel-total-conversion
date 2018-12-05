@@ -45,7 +45,7 @@
       var coo = d._latlng;
       var latlng = new L.LatLng(coo.lat,coo.lng);
       var portalLevel = d.options.level;
-      var optCircle = {color:'red',opacity:0.7,fillColor:'red',fillOpacity:0.1,weight:1,clickable:false, dashArray: [10,6]};
+      var optCircle = {color:'red',opacity:0.7,fillColor:'red',fillOpacity:0.1,weight:1,interactive:false, dashArray: [10,6]};
       var range = (5*portalLevel)+35;
 
       var circle = new L.Circle(latlng, range, optCircle);
