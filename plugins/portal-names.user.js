@@ -59,6 +59,7 @@ window.plugin.portalNames.addLabel = function(guid, latLng) {
         html: portalName
       }),
       guid: guid,
+      interactive: false
     });
     window.plugin.portalNames.labelLayers[guid] = label;
     label.addTo(window.plugin.portalNames.labelLayerGroup);
