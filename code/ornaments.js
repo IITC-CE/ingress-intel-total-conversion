@@ -56,7 +56,6 @@ window.ornaments.addPortal = function(portal) {
         iconUrl: "//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/" + ornament + ".png",
         iconSize: [size, size],
         iconAnchor: [size/2, size/2],
-        className: 'no-pointer-events'  // the interactive: false below still blocks events going through to the svg underneath
       });
 
       return L.marker(latlng, {icon: icon, interactive: false, keyboard: false, opacity: window.ornaments.OVERLAY_OPACITY }).addTo(layer);

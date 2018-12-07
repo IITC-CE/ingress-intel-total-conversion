@@ -201,7 +201,6 @@ window.artifact.updateLayer = function() {
           iconUrl: iconUrl,
           iconSize: [iconSize,iconSize],
           iconAnchor: [iconSize/2,iconSize/2],
-          className: 'no-pointer-events'  // the interactive: false below still blocks events going through to the svg underneath
         });
 
         var marker = L.marker (latlng, {icon: icon, interactive: false, keyboard: false, opacity: opacity });
