@@ -168,7 +168,7 @@ window.setupMap = function() {
 //    zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
-    preferCanvas: (window.L_PREFER_CANVAS ? true : false)
+    preferCanvas: true // Set to true if Leaflet should draw things using Canvas instead of SVG
   });
 
   if (L.Path.CANVAS) {

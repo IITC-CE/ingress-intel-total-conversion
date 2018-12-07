@@ -106,13 +106,6 @@ window.script_info = info;
 
 
 
-// LEAFLET PREFER CANVAS ///////////////////////////////////////////////
-// Set to true if Leaflet should draw things using Canvas instead of SVG
-// Disabled for now because it has several bugs: flickering, constant
-// CPU usage and it continuously fires the moveend event.
-
-//L_PREFER_CANVAS = false;
-
 // CONFIG OPTIONS ////////////////////////////////////////////////////
 window.REFRESH = 30; // refresh view every 30s (base time)
 window.ZOOM_LEVEL_ADJ = 5; // add 5 seconds per zoom level
