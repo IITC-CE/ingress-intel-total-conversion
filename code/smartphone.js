@@ -35,7 +35,7 @@ window.runOnSmartphonesBeforeBoot = function() {
   }
 
   window.smartphone.mapButton = $('<a>map</a>').click(function() {
-    $('#map').css('visibility', 'visible');
+    $('#map').css({'visibility': 'visible', 'opacity': '1'});
     $('#updatestatus').show();
     $('#chatcontrols a .active').removeClass('active');
     $("#chatcontrols a:contains('map')").addClass('active');
