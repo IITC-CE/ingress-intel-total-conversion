@@ -44,6 +44,14 @@ android {
                 storePassword rootProject.ext.signKeyStorePassword
             }
         }
+        if (project.hasProperty('debugSignKeyStorePassword')) {
+            debug {
+                keyAlias rootProject.ext.debugSignKeyAlias
+                keyPassword rootProject.ext.debugSignKeyPassword
+                storeFile file(rootProject.ext.debugSignKeyStore)
+                storePassword rootProject.ext.debugSignKeyStorePassword
+            }
+        }
     }
 
     buildTypes {
@@ -69,6 +77,7 @@ android {
                     outputFileName = "${variant.applicationId}-${variant.name}.apk"
                 }
             }
+            signingConfig signingConfigs.debug
         }
     }
 }

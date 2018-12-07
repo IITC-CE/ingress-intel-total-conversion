@@ -24,4 +24,9 @@ ext {
     signKeyPassword = ""
     signKeyStore = "release.jks"
     signKeyStorePassword = ""
+
+    debugSignKeyAlias = "DebugKey"
+    debugSignKeyPassword = "android"
+    debugSignKeyStore = "android-debug-key.p12"
+    debugSignKeyStorePassword = "android"
 }
