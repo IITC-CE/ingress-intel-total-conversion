@@ -99,7 +99,9 @@ window.setupStyles = function() {
       '#scrollwrapper  { width:'+(SIDEBAR_WIDTH + 2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH)+'px; right:-'+(2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH-2)+'px } ',
       '#sidebar > * { width:'+(SIDEBAR_WIDTH+1)+'px;  }'].join("\n")
     + '</style>');
-  
+}
+
+window.setupIcons = function() {
   // Material Icons
   $('body').append('<svg width="0" height="0" style="position:absolute">' +
     '<symbol viewBox="0 0 24 24" id="ic_place_24px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>' +
@@ -611,6 +613,7 @@ function boot() {
   window.setupIdle();
   window.setupTaphold();
   window.setupStyles();
+  window.setupIcons();
   window.setupDialogs();
   window.setupDataTileParams();
   window.setupMap();
