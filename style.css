@@ -1224,10 +1224,6 @@ table.artifact .portal {
 	content: "⊟";
 }
 
-.cellscore .ui-accordion-content {
-  overflow:hidden !important;
-}
-
 @-moz-document url-prefix() {
  .cellscore .logscale {
     transform: scale(0.5) translate(0,-18px);
@@ -1271,6 +1267,10 @@ g.checkpoint:hover circle {
   width: 1%;
   text-align: left;
   padding-left: 4px;
+}
+
+.checkpointtooltip {
+  min-width: 180px;
 }
 
 /* tabs */

@@ -138,14 +138,28 @@ RegionScoreboard = (function () {
     this.cycleStartTime = new Date(Math.floor(now / CYCLE_TIME) * (CYCLE_TIME));
   }
 
+
   function showDialog() {
-    // TODO: rather than just load the region scores for the center of the map, display a list of regions in the current view
-    // and let the user select one (with automatic selection when just one region, and limited to close enough zooms so list size is reasonable)
     var latLng = map.getCenter();
 
     var latE6 = Math.round(latLng.lat*1E6);
     var lngE6 = Math.round(latLng.lng*1E6);
 
+    showRegion(latE6, lngE6);
+  }
+
+
+  /*
+    function showScoreOf (region) {
+      const latlng = regionToLatLong(region);
+      const latE6 = Math.round(latLng.lat*1E6);
+      const lngE6 = Math.round(latLng.lng*1E6);
+      showRegion(latE6,lngE6);
+    }
+    */
+
+
+  function showRegion (latE6,lngE6) {
     mainDialog = dialog({title:'Region scores',html:'Loading regional scores...',width:450,minHeight:340,closeCallback:onDialogClose});
 
     window.postAjax('getRegionScoreDetails', {latE6:latE6,lngE6:lngE6},
@@ -167,9 +181,9 @@ RegionScoreboard = (function () {
       startTimer();
   }
 
+
   function updateDialog(logscale) {
 
-    // we need some divs to make the accordion work properly
     mainDialog.html('<div class="cellscore">' +
           '<b>Region scores for '+regionScore.regionName+'</b>' +
           '<div>'+createResults() + RegionScoreboard.HistoryChart.create(regionScore, logscale)+'</div>' +
@@ -195,6 +209,7 @@ RegionScoreboard = (function () {
       updateDialog(input.prop('checked'));
     });
   }
+
 
   function setupToolTips() {
     $('g.checkpoint', mainDialog).each(function(i, elem) {
@@ -227,14 +242,17 @@ RegionScoreboard = (function () {
       elem.tooltip({
         content: convertTextToTableMagic(tooltip),
         position: {my: "center bottom", at: "center top-10"},
+        tooltipClass: 'checkpointtooltip',
         show: 100
       });
     });
   }
 
+
   function onDialogClose() {
     stopTimer();
   }
+
 
   function createHistoryTable() {
 
@@ -267,6 +285,7 @@ RegionScoreboard = (function () {
     return table;
    }
 
+  
   function createAgentTable() {
       var agentTable = '<table><tr><th>#</th><th>Agent</th></tr>';
 
@@ -282,6 +301,7 @@ RegionScoreboard = (function () {
 
       return agentTable;
    }
+
 
   function createResults() {
 
@@ -364,7 +384,7 @@ RegionScoreboard = (function () {
     var nextcp = regionScore.getCheckpointEnd( regionScore.getLastCP()+1 );
     var endcp = regionScore.getCycleEnd();
 
-    return '<div><table style="margin: auto; width: 400px; padding-top: 4px"><tr><td align="left" width="33%">t- <span id="cycletimer"></span></td>' +
+    return '<div><table style="margin: auto; width: 420px; padding-top: 4px"><tr><td align="left" width="33%">t- <span id="cycletimer"></span></td>' +
           '<td align="center" width="33%">cp at: '+formatHours(nextcp) +'</td>'+
           '<td align="right" width="33%">cycle: '+formatDayHours(endcp)+'</td></tr></table></div>';
   }
