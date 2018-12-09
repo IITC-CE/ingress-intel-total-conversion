@@ -29,8 +29,6 @@ window.plugin.userLocation.follow = false;
 window.plugin.userLocation.setup = function() {
   $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:mobile/plugins/user-location.css@@').appendTo('head');
 
-  $('<div style="position:absolute; left:-9999em; top:-9999em;">').html('@@INCLUDESTRING:mobile/plugins/user-location.svg@@').prependTo('body');
-
   var cssClass = PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
 
   var icon = L.divIcon({
@@ -47,10 +45,11 @@ window.plugin.userLocation.setup = function() {
   });
 
   var circle = new L.Circle(new L.LatLng(0,0), 40, {
-    stroke: false,
-    opacity: 0.7,
-    fillOpacity: 1,
-    fillColor: "url(#user-location-gradient)",
+    stroke: true,
+    color: "#ffb900",
+    opacity: 0.5,
+    fillOpacity: 0.25,
+    fillColor: "#ffb900",
     weight: 1.5,
     interactive: false
   });
