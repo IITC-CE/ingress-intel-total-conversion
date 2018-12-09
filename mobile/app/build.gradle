@@ -36,21 +36,38 @@ android {
     }
 
     signingConfigs {
-        if (project.hasProperty('signKeyStorePassword')) {
+        if (System.getenv("TRAVIS")) {
             release {
-                keyAlias rootProject.ext.signKeyAlias
-                keyPassword rootProject.ext.signKeyPassword
-                storeFile file(rootProject.ext.signKeyStore)
-                storePassword rootProject.ext.signKeyStorePassword
+                storeFile rootProject.file('android.jks')
+                storePassword System.getenv("KEYSTORE_PASS")
+                keyAlias System.getenv("ALIAS_NAME")
+                keyPassword System.getenv("ALIAS_PASS")
             }
-        }
-        if (project.hasProperty('debugSignKeyStorePassword')) {
             debug {
-                keyAlias rootProject.ext.debugSignKeyAlias
-                keyPassword rootProject.ext.debugSignKeyPassword
-                storeFile file(rootProject.ext.debugSignKeyStore)
-                storePassword rootProject.ext.debugSignKeyStorePassword
+                storeFile rootProject.file('android.jks')
+                storePassword System.getenv("KEYSTORE_PASS")
+                keyAlias System.getenv("ALIAS_NAME")
+                keyPassword System.getenv("ALIAS_PASS")
             }
+        } else {
+
+            if (project.hasProperty('signKeyStorePassword') && new File(rootProject.ext.signKeyStore).exists()) {
+                release {
+                    keyAlias rootProject.ext.signKeyAlias
+                    keyPassword rootProject.ext.signKeyPassword
+                    storeFile file(rootProject.ext.signKeyStore)
+                    storePassword rootProject.ext.signKeyStorePassword
+                }
+            }
+            if (project.hasProperty('debugSignKeyStorePassword') && new File(rootProject.ext.debugSignKeyStore).exists()) {
+                debug {
+                    keyAlias rootProject.ext.debugSignKeyAlias
+                    keyPassword rootProject.ext.debugSignKeyPassword
+                    storeFile file(rootProject.ext.debugSignKeyStore)
+                    storePassword rootProject.ext.debugSignKeyStorePassword
+                }
+            }
+
         }
     }
 
