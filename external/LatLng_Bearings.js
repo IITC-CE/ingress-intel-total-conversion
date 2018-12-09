@@ -14,8 +14,8 @@
 
 
 L.LatLng.prototype.bearingTo = function(other) {
-    var d2r  = L.LatLng.DEG_TO_RAD;
-    var r2d  = L.LatLng.RAD_TO_DEG;
+    var d2r  = Math.PI / 180;
+    var r2d  = 180 / Math.PI;
     var lat1 = this.lat * d2r;
     var lat2 = other.lat * d2r;
     var dLon = (other.lng-this.lng) * d2r;

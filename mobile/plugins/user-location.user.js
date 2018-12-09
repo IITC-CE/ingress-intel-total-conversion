@@ -90,7 +90,7 @@ window.plugin.userLocation.locate = function(lat, lng, accuracy, persistentZoom)
   var latlng = new L.LatLng(lat, lng);
 
   var latAccuracy = 180 * accuracy / 40075017;
-  var lngAccuracy = latAccuracy / Math.cos(L.LatLng.DEG_TO_RAD * lat);
+  var lngAccuracy = latAccuracy / Math.cos(Math.PI / 180 * lat);
 
   var zoom = window.map.getBoundsZoom(L.latLngBounds(
     [lat - latAccuracy, lng - lngAccuracy],
