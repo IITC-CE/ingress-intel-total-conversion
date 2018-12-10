@@ -1,12 +1,16 @@
 package org.exarhteam.iitc_mobile.prefs;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.exarhteam.iitc_mobile.IITC_FileManager;
+import org.exarhteam.iitc_mobile.IITC_Mobile;
 import org.exarhteam.iitc_mobile.IITC_NotificationHelper;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
@@ -38,6 +43,7 @@ import java.util.TreeMap;
 public class PluginPreferenceActivity extends PreferenceActivity {
 
     private final static int COPY_PLUGIN_REQUEST = 1;
+    private static final int PERMISSION_REQUEST_CODE = 3;
 
     private List<Header> mHeaders;
     // we use a tree map to have a map with alphabetical order
@@ -135,20 +141,47 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 onBackPressed();
                 return true;
             case R.id.menu_plugins_add:
-                // create the chooser Intent
-                final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
-                // iitcm only parses *.user.js scripts
-                target.setType("file/*");
-                target.addCategory(Intent.CATEGORY_OPENABLE);
+                if (checkWriteStoragePermissionGranted()) {
+                    // create the chooser Intent
+                    final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
+                    // iitcm only parses *.user.js scripts
+                    target.setType("file/*");
+                    target.addCategory(Intent.CATEGORY_OPENABLE);
 
-                try {
-                    startActivityForResult(Intent.createChooser(target, "Choose file"), COPY_PLUGIN_REQUEST);
-                } catch (final ActivityNotFoundException e) {
-                    Toast.makeText(this, "No activity to select a file found." +
-                            "Please install a file browser of your choice!", Toast.LENGTH_LONG).show();
+                    try {
+                        startActivityForResult(Intent.createChooser(target, "Choose file"), COPY_PLUGIN_REQUEST);
+                    } catch (final ActivityNotFoundException e) {
+                        Toast.makeText(this, "No activity to select a file found." +
+                                "Please install a file browser of your choice!", Toast.LENGTH_LONG).show();
+                    }
                 }
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this,"Permission denied. You cannot add plugins.",
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
+
+    private boolean checkWriteStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            return true;
         }
     }
 

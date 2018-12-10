@@ -335,11 +335,6 @@ public class IITC_FileManager {
         final long lastUpdated = mPrefs.getLong("pref_last_plugin_update", 0);
         final long now = System.currentTimeMillis();
 
-        final IITC_Mobile iitc = (IITC_Mobile) mActivity;
-        if (!isWriteStoragePermissionGranted(iitc)) {
-            Toast.makeText(mActivity, "Permissions are required if you want to use user scripts or cache on SDCard", Toast.LENGTH_LONG).show();
-        }
-
         // return if no update wanted
         if ((now - lastUpdated < mUpdateInterval) && !force) return;
         // get the plugin preferences
@@ -362,19 +357,6 @@ public class IITC_FileManager {
 
     public void setUpdateInterval(final int interval) {
         mUpdateInterval = 1000 * 60 * 60 * 24 * interval;
-    }
-
-    private boolean isWriteStoragePermissionGranted(IITC_Mobile iitc) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (ActivityCompat.checkSelfPermission(iitc, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(iitc, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
-                return true;
-            } else {
-                return false;
-            }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            return true;
-        }
     }
 
     private class FileRequest extends WebResourceResponse implements ResponseHandler, Runnable {
