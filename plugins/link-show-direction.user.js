@@ -16,20 +16,22 @@
 window.plugin.linkShowDirection = function() {};
 window.plugin.linkShowDirection.ANIMATE_UPDATE_TIME = 1000; // 1000ms = 1s
 
+// Hack:
+// 100000 - a large enough number to be the equivalent of 100%, which is not supported Leaflet when displaying with canvas
 window.plugin.linkShowDirection.styles = {
   'Disabled': [null],
   'Static *': [
     '30,5,15,5,15,5,2,5,2,5,2,5,2,5,30,0',
   ],
   'Static near origin': [
-    '10,5,5,5,5,5,5,5,100%',
+    '10,5,5,5,5,5,5,5,100000',
   ],
   'Animate near origin': [
-    '10,5,5,5,5,5,5,5,100%',
-    '12,5,5,5,5,5,5,3,100%',
-    '14,5,5,5,5,5,5,1,100%',
-    '10,1,5,5,5,5,5,5,100%',
-    '10,3,5,5,5,5,5,5,100%',
+    '10,5,5,5,5,5,5,5,100000',
+    '12,5,5,5,5,5,5,3,100000',
+    '14,5,5,5,5,5,5,1,100000',
+    '10,1,5,5,5,5,5,5,100000',
+    '10,3,5,5,5,5,5,5,100000',
   ],
   'Animate full link': [
     '4,6,4,6,4,6,4,6',
@@ -165,16 +167,11 @@ window.plugin.linkShowDirection.setup  = function() {
     window.plugin.linkShowDirection.mode = 'Disabled';
   }
 
-  // only start the animation timer of the paths support SVG
-  if(L.Path.SVG) {
-    window.plugin.linkShowDirection.animateLinks();
+  window.plugin.linkShowDirection.animateLinks();
 
-    // set up move start/end handlers to pause animations while moving
-    map.on('movestart', function() { window.plugin.linkShowDirection.moving = true; });
-    map.on('moveend', function() { window.plugin.linkShowDirection.moving = false; });
-  } else {
-    console.warn('link-show-direction: not using SVG, visualization of link direction is not supported!');
-  }
+  // set up move start/end handlers to pause animations while moving
+  map.on('movestart', function() { window.plugin.linkShowDirection.moving = true; });
+  map.on('moveend', function() { window.plugin.linkShowDirection.moving = false; });
 };
 
 var setup =  window.plugin.linkShowDirection.setup;
