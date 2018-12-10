@@ -32,7 +32,7 @@ window.plugin.mapTileOpenCycleMap = {
     };
 
     for(var i in layers) {
-      var layer = new L.TileLayer('http://{s}.tile.thunderforest.com/' + i + '/{z}/{x}/{y}.png', ocmOpt);
+      var layer = new L.TileLayer('https://{s}.tile.thunderforest.com/' + i + '/{z}/{x}/{y}.png', ocmOpt);
       layerChooser.addBaseLayer(layer, 'Thunderforest ' + layers[i]);
     }
   },

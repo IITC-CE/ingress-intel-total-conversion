@@ -28,7 +28,7 @@ window.plugin.mapTileStamen.addLayer = function() {
     'watercolor': [ 'Watercolor', 'jpg', 1, 16 ],
   };
 
-  var baseUrl = window.location.protocol == 'https:' ? 'https://stamen-tiles-{s}.a.ssl.fastly.net/' : 'http://{s}.tile.stamen.com/';
+  var baseUrl = 'https://stamen-tiles-{s}.a.ssl.fastly.net/';
 
 
   for (var layer in types) {
