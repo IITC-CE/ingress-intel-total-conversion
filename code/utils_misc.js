@@ -35,7 +35,8 @@ window.aboutIITC = function() {
   + '  <div>Ingress Intel Total Conversion</div> '
   + '  <hr>'
   + '  <div>'
-  + '    <a href="https://iitc.modos189.ru/" target="_blank">IITC Homepage</a><br />'
+  + '    <a href="https://iitc.modos189.ru/" target="_blank">IITC Homepage</a> |' +
+    '    <a href="https://t.me/iitc_news" target="_blank">Telegram channel</a><br />'
   + '     On the script’s homepage you can:'
   + '     <ul>'
   + '       <li>Find Updates</li>'
@@ -43,9 +44,6 @@ window.aboutIITC = function() {
   + '       <li>Report Bugs</li>'
   + '       <li>Contribute!</li>'
   + '     </ul>'
-  + '  </div>'
-  + '  <div>'
-  + '    MapQuest OSM tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="https://developer.mapquest.com/content/osm/mq_logo.png">'
   + '  </div>'
   + '  <hr>'
   + '  <div>Version: ' + v + '</div>';
