@@ -30,9 +30,6 @@ window.aboutIITC = function() {
   }
   plugins += '</ul>';
 
-  var attrib = '@@INCLUDEMD:ATTRIBUTION.md@@';
-  var contrib = '@@INCLUDEMD:CONTRIBS.md@@'
-
   var a = ''
   + '  <div><b>About IITC</b></div> '
   + '  <div>Ingress Intel Total Conversion</div> '
@@ -51,8 +48,10 @@ window.aboutIITC = function() {
   + '    MapQuest OSM tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="https://developer.mapquest.com/content/osm/mq_logo.png">'
   + '  </div>'
   + '  <hr>'
-  + '  <div>Version: ' + v + '</div>'
-  + '  <div>Plugins: ' + plugins + '</div>';
+  + '  <div>Version: ' + v + '</div>';
+  if (window.bootPlugins.length > 0) {
+    a += '  <div>Plugins: ' + plugins + '</div>';
+  }
 
   dialog({
     title: 'IITC ' + v,
