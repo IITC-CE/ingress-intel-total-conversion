@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILDSTAMP=$(date -u +'%Y-%m-%d_%H-%M' -d"$(cat .build-timestamp)")
+BUILDSTAMP=$(date -u +'%Y-%m-%d_%H-%M' -d"$(cat $TRAVIS_BUILD_DIR/build/local/.build-timestamp)")
 BUILDPATH="/home/modos189/web/iitc.modos189.ru/public_html/build"
 
 ssh travis-ci-iitc@modos189.ru "mkdir -p $BUILDPATH/archive/$BUILDSTAMP"
