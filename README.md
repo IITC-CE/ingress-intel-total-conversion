@@ -1,5 +1,16 @@
-ingress intel total conversion (IITC)
+Ingress Intel Total Conversion (IITC)
 =====================================
+
+<!-- [START badges] -->
+[![Build Status](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion.svg?branch=master)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
+[![LICENSE](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
+<!-- [END badges] -->
+
+> IITC is a browser add-on that modifies the Ingress intel map. It is faster than the standard site, and offers many more features. It is available for desktop browsers, such as Firefox and Chrome, and as a mobile application.
+
+###### [Website](https://iitc.modos189.ru/) | [Telegram channel](https://teleg.run/iitc_news)
+
+---
 
 Since the [breunigs](https://github.com/breunigs/ingress-intel-total-conversion) IITC branch was deleted and
 [Jon Atkins](https://github.com/jonatkins) has moved away from development,
@@ -34,7 +45,7 @@ If all goes well, output of the build will end up in `build/local` subfolder.
 You can create a custom build settings file, `localbuildsettings.py` - look in the supplied
 `buildsettings.py` for details.
 
-#### Mobile
+### Mobile
 
 To build the mobile app, along with python, you will need
 
@@ -43,7 +54,7 @@ To build the mobile app, along with python, you will need
 
 Run `build.py mobile` to build IITC Mobile in debug mode.
 
-#### Website
+### Website
 
 The source codes of the iitc.modos189.ru site are in a nearby repository:
 https://github.com/IITC-CE/iitc.modos189.ru
