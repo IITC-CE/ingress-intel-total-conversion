@@ -108,8 +108,6 @@ window.setupIcons = function() {
     '</svg>');
 }
 
-window.bootPlugins = [];
-
 function createDefaultBaseMapLayers() {
   var baseLayers = {};
 
