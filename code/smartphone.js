@@ -71,10 +71,12 @@ window.smartphoneInfo = function(data) {
   if(!window.portals[guid]) return;
 
   var data = window.portals[selectedPortal].options.data;
+  if(typeof data.title === 'undefined') return;
+
   var details = window.portalDetail.get(guid);
 
   var lvl = data.level;
-  if(data.team === "NEUTRAL")
+  if(data.team === "N" || data.team === "NEUTRAL")
     var t = '<span class="portallevel">L0</span>';
   else
     var t = '<span class="portallevel" style="background: '+COLORS_LVL[lvl]+';">L' + lvl + '</span>';
