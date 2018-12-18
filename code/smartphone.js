@@ -71,6 +71,8 @@ window.smartphoneInfo = function(data) {
   if(!window.portals[guid]) return;
 
   var data = window.portals[selectedPortal].options.data;
+  if(typeof data.title === 'undefined') return;
+
   var details = window.portalDetail.get(guid);
 
   var lvl = data.level;
