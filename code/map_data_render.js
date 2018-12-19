@@ -339,8 +339,8 @@ window.Render.prototype.createPortalEntity = function(ent) {
     window.renderPortalDetails(e.target.options.guid);
     if (window.isSmartphone()) {
       window.show('info');
-    } else {
-      window.showSidebar('on');
+    } else if (!$('#scrollwrapper').is(':visible')) {
+      $('#sidebartoggle').click();
     }
   }
 
