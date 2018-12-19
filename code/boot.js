@@ -437,38 +437,22 @@ window.setupPlayerStat = function() {
   );
 }
 
-window.showSidebar = function(state) {
-  var sidebar = $('#scrollwrapper');
-  var visible = sidebar.is(':visible');
-  switch (state) {
-    case 'on':
-    case 'off':
-      if ((state === 'on') === visible) {
-        return;
-      }
-    case 'toggle':
-      break;
-    default:
-      //console.err('window.showSidebar: wrong argument',action)
-  }
-  var toggle = $('#sidebartoggle');
-  if(visible) {
-    sidebar.hide().css('z-index', 1);
-    $('.leaflet-right').css('margin-right','0');
-    toggle.html('<span class="toggle open"></span>');
-    toggle.css('right', '0');
-  } else {
-    sidebar.css('z-index', 1001).show();
-    $('.leaflet-right').css('margin-right', SIDEBAR_WIDTH+1+'px');
-    toggle.html('<span class="toggle close"></span>');
-    toggle.css('right', SIDEBAR_WIDTH+1+'px');
-  }
-  $('.ui-tooltip').remove();
-}
-
 window.setupSidebarToggle = function() {
   $('#sidebartoggle').on('click', function() {
-    window.showSidebar('toggle');
+    var toggle = $('#sidebartoggle');
+    var sidebar = $('#scrollwrapper');
+    if(sidebar.is(':visible')) {
+      sidebar.hide().css('z-index', 1);
+      $('.leaflet-right').css('margin-right','0');
+      toggle.html('<span class="toggle open"></span>');
+      toggle.css('right', '0');
+    } else {
+      sidebar.css('z-index', 1001).show();
+      $('.leaflet-right').css('margin-right', SIDEBAR_WIDTH+1+'px');
+      toggle.html('<span class="toggle close"></span>');
+      toggle.css('right', SIDEBAR_WIDTH+1+'px');
+    }
+    $('.ui-tooltip').remove();
   });
 }
 
