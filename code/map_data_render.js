@@ -335,9 +335,18 @@ window.Render.prototype.createPortalEntity = function(ent) {
     window.renderPortalDetails(e.target.options.guid);
     window.map.setView(e.target.getLatLng(), 17);
   }
+  function handler_portal_contextmenu (e) {
+    window.renderPortalDetails(e.target.options.guid);
+    if (window.isSmartphone()) {
+      window.show('info');
+    } else {
+      window.showSidebar('on');
+    }
+  }
 
   marker.on('click', handler_portal_click);
   marker.on('dblclick', handler_portal_dblclick);
+  marker.on('contextmenu', handler_portal_contextmenu);
 
   window.runHooks('portalAdded', {portal: marker, previousData: previousData});
 
