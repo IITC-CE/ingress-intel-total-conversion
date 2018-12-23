@@ -2,7 +2,7 @@
 // @id             iitc-plugin-show-linked-portals@fstopienski
 // @name           IITC plugin: Show linked portals
 // @category       Portal Info
-// @version        0.3.1.@@DATETIMEVERSION@@
+// @version        0.3.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Try to show the linked portals (image, name and link direction) in portal detail view and jump to linked portal on click.  Some details may not be available if the linked portal is not in the current view.
 @@METAINFO@@
 // ==/UserScript==
@@ -78,6 +78,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
         'data-guid': guid,
         'data-lat': lat,
         'data-lng': lng,
+        'data-length': length,
       })
       .appendTo('#showLinkedPortalContainer');
 
@@ -95,7 +96,9 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
   }
 
   $('#showLinkedPortalContainer')
-    .on('click', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalClick)
+    .on('click', '.showLinkedPortalLink:not(".outOfRange")', plugin.showLinkedPortal.onLinkedPortalClick)
+    .on('click', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalClick)
+    .on('mouseover', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalMouseOver)
     .on('mouseover', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOver)
     .on('mouseout', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOut);
 }
@@ -117,6 +120,17 @@ plugin.showLinkedPortal.onLinkedPortalClick = function() {
   else
     zoomToAndShowPortal(guid, position);
 };
+
+plugin.showLinkedPortal.onOutOfRangePortalClick = function() {
+  var element = $(this);
+  var guid = element.attr('data-guid');
+  var length = element.attr('data-length');
+  portalDetail.request(guid).done(function(data) {
+    plugin.showLinkedPortal.makePortalLinkInfo(element.empty().removeClass('outOfRange'),data,length);
+  });
+};
+
+plugin.showLinkedPortal.onOutOfRangePortalMouseOver = plugin.showLinkedPortal.onOutOfRangePortalClick;
 
 plugin.showLinkedPortal.onLinkedPortalMouseOver = function() {
   plugin.showLinkedPortal.removePreview();
