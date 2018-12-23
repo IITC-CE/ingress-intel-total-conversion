@@ -24,6 +24,32 @@ plugin.showLinkedPortal.previewOptions = {
   radius: 18,
 };
 
+plugin.showLinkedPortal.makePortalLinkInfo = function (div,data,length,guid) { // guid: potentially useful
+  var lengthFull = digits(Math.round(length)) + 'm';
+  var title = data && data.title || null;
+  if (title) {
+    div.append($('<img/>').attr({
+      'src': fixPortalImageUrl(data.image),
+      'class': 'minImg',
+      'alt': title,
+    }));
+  } else {
+    title = 'Go to portal';
+    var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
+    div
+      .addClass('outOfRange')
+      .append($('<span/>').html('Portal not loaded.<br>' + lengthShort));
+  }
+  div.attr('title', $('<div/>')
+    .append($('<strong/>').text(title))
+    .append($('<br/>'))
+    .append($('<span/>').text(key=='d' ? '↴ outgoing link' : '↳ incoming link'))
+    .append($('<br/>'))
+    .append($('<span/>').html(lengthFull))
+    .html());
+  return div;
+};
+
 window.plugin.showLinkedPortal.portalDetail = function (data) {
   plugin.showLinkedPortal.removePreview();
 
@@ -44,41 +70,14 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
     var lng = link[key + 'LngE6']/1E6;
 
     var length = L.latLng(link.oLatE6/1E6, link.oLngE6/1E6).distanceTo([link.dLatE6/1E6, link.dLngE6/1E6]);
-    var lengthFull = digits(Math.round(length)) + 'm';
-    var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km'
-
-    var div = $('<div>').addClass('showLinkedPortalLink showLinkedPortalLink' + c + (key=='d' ? ' outgoing' : ' incoming'));
-
-    var title;
-
     var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid) || null;
-    if(data && data.title) {
-      title = data.title;
-      div.append($('<img/>').attr({
-        'src': fixPortalImageUrl(data.image),
-        'class': 'minImg',
-        'alt': title,
-      }));
-    } else {
-      title = 'Go to portal';
-      div
-        .addClass('outOfRange')
-        .append($('<span/>')
-          .html('Portal not loaded.<br>' + lengthShort));
-    }
 
-    div
+    plugin.showLinkedPortal.makePortalLinkInfo($('<div>'),data,length,guid)
+      .addClass('showLinkedPortalLink showLinkedPortalLink' + c + (key=='d' ? ' outgoing' : ' incoming'))
       .attr({
         'data-guid': guid,
         'data-lat': lat,
         'data-lng': lng,
-        'title': $('<div/>')
-          .append($('<strong/>').text(title))
-          .append($('<br/>'))
-          .append($('<span/>').text(key=='d' ? '↴ outgoing link' : '↳ incoming link'))
-          .append($('<br/>'))
-          .append($('<span/>').html(lengthFull))
-          .html(),
       })
       .appendTo('#showLinkedPortalContainer');
 
