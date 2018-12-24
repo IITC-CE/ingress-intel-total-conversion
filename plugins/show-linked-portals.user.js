@@ -98,6 +98,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
   $('#showLinkedPortalContainer')
     .on('click', '.showLinkedPortalLink:not(".outOfRange")', plugin.showLinkedPortal.onLinkedPortalClick)
     .on('click', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalClick)
+    .on('taphold', '.showLinkedPortalLink', { duration: 900 }, plugin.showLinkedPortal.onLinkedPortalTapHold)
     .on('mouseover', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalMouseOver)
     .on('mouseover', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOver)
     .on('mouseout', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOut);
@@ -129,6 +130,11 @@ plugin.showLinkedPortal.onOutOfRangePortalClick = function() {
     plugin.showLinkedPortal.makePortalLinkInfo(element.empty().removeClass('outOfRange'),data,length);
   });
 };
+
+plugin.showLinkedPortal.onLinkedPortalTapHold = function() {
+  // close portal info in order to preview link on map
+  if(isSmartphone()) { show('map'); }
+}
 
 plugin.showLinkedPortal.onOutOfRangePortalMouseOver = plugin.showLinkedPortal.onOutOfRangePortalClick;
 
