@@ -30,9 +30,8 @@ local.properties
 
 # IntelliJ IDEA user settings
 *.iws
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/misc.xml
+*.iml
+.idea
 
 # Proguard logs
 proguard_logs/
