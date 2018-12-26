@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="iitc_blue">#ff0e3d4e</color>
+    <color name="iitc_blue_dark">#ff0b303e</color>
+    <color name="drawer_background">#990e3d4e</color>
+</resources>

@@ -274,10 +274,7 @@ if buildMobile:
             print("Error: mobile app failed to build. gradlew returned %d" % retcode)
             exit(1)  # ant may return 256, but python seems to allow only values <256
         else:
-            appId = "org.exarhteam.iitc_mobile"
-            if buildMobile == "debug":
-                appId += ".debug"
-            shutil.copy("mobile/app/build/outputs/apk/%s/%s-%s.apk" % (buildMobile, appId, buildMobile),
+            shutil.copy("mobile/app/build/outputs/apk/%s/app-%s.apk" % (buildMobile, buildMobile),
                         os.path.join(outDir, "IITC_Mobile-%s.apk" % buildMobile))
 
 # run any postBuild commands

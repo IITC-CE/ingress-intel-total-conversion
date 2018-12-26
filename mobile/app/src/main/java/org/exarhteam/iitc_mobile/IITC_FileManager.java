@@ -1,6 +1,5 @@
 package org.exarhteam.iitc_mobile;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,24 +7,20 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Base64OutputStream;
 import android.webkit.WebResourceResponse;
 import android.widget.Toast;
-import android.os.Build;
 
 import org.exarhteam.iitc_mobile.IITC_Mobile.ResponseHandler;
 import org.exarhteam.iitc_mobile.async.UpdateScript;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
-
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -64,13 +59,9 @@ public class IITC_FileManager {
     /**
      * copies the contents of a stream into another stream and (optionally) closes the output stream afterwards
      *
-     * @param inStream
-     *            the stream to read from
-     * @param outStream
-     *            the stream to write to
-     * @param closeOutput
-     *            whether to close the output stream when finished
-     *
+     * @param inStream    the stream to read from
+     * @param outStream   the stream to write to
+     * @param closeOutput whether to close the output stream when finished
      * @throws IOException
      */
     public static void copyStream(final InputStream inStream, final OutputStream outStream, final boolean closeOutput)
@@ -163,8 +154,8 @@ public class IITC_FileManager {
                     @Override
                     public void run() {
                         Toast.makeText(mActivity, "File " + mIitcPath +
-                                "dev/" + filename + " not found. " +
-                                "Disable developer mode or add iitc files to the dev folder.",
+                                        "dev/" + filename + " not found. " +
+                                        "Disable developer mode or add iitc files to the dev folder.",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });

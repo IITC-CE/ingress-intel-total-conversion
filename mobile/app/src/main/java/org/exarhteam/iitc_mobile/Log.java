@@ -15,10 +15,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Log {
-    private static final HashMap<ConsoleMessage.MessageLevel, Integer> CONSOLE_MAPPING;
+    private static final HashMap<MessageLevel, Integer> CONSOLE_MAPPING;
     @SuppressLint("SimpleDateFormat")
     private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("HH:mm:ss.SSS");
-    private static final List<Receiver> RECEIVERS = new LinkedList<Log.Receiver>();
+    private static final List<Receiver> RECEIVERS = new LinkedList<Receiver>();
     private static final Pattern URL_PATTERN;
 
     public static final String CONSOLE_TAG = "iitcm-console";
@@ -32,7 +32,7 @@ public final class Log {
     public static final int WARN = android.util.Log.WARN;
 
     static {
-        CONSOLE_MAPPING = new HashMap<ConsoleMessage.MessageLevel, Integer>();
+        CONSOLE_MAPPING = new HashMap<MessageLevel, Integer>();
         CONSOLE_MAPPING.put(MessageLevel.TIP, android.util.Log.VERBOSE);
         CONSOLE_MAPPING.put(MessageLevel.LOG, android.util.Log.INFO);
         CONSOLE_MAPPING.put(MessageLevel.WARNING, android.util.Log.WARN);
@@ -52,7 +52,7 @@ public final class Log {
         }
     }
 
-    public static void addReceiver(final Log.Receiver receiver) {
+    public static void addReceiver(final Receiver receiver) {
         RECEIVERS.add(receiver);
     }
 
@@ -186,7 +186,7 @@ public final class Log {
         return android.util.Log.println(priority, tag, msg);
     }
 
-    public static void removeReceiver(final Log.Receiver receiver) {
+    public static void removeReceiver(final Receiver receiver) {
         RECEIVERS.remove(receiver);
     }
 
