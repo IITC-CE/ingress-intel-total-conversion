@@ -2,31 +2,26 @@
 
 buildscript {
     repositories {
-        mavenCentral()
         google()
         jcenter()
+        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
+        
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
 allprojects {
     repositories {
-        mavenCentral()
         google()
         jcenter()
+        
     }
 }
 
-ext {
-    signKeyAlias = ""
-    signKeyPassword = ""
-    signKeyStore = "release.jks"
-    signKeyStorePassword = ""
-
-    debugSignKeyAlias = "DebugKey"
-    debugSignKeyPassword = "android"
-    debugSignKeyStore = "android-debug-key.p12"
-    debugSignKeyStorePassword = "android"
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

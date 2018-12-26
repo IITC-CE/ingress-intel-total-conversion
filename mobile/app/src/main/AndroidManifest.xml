@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.exarhteam.iitc_mobile"
-    android:installLocation="auto">
+        package="org.exarhteam.iitc_mobile">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -190,5 +188,4 @@
             android:name="android.app.default_searchable"
             android:value="org.exarhteam.iitc_mobile.IITC_Mobile"/>
     </application>
-
 </manifest>

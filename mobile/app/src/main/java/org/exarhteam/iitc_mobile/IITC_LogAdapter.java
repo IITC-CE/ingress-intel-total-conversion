@@ -12,7 +12,7 @@ import org.exarhteam.iitc_mobile.Log.Message;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class IITC_LogAdapter extends ArrayAdapter<Log.Message> implements Log.Receiver {
+public class IITC_LogAdapter extends ArrayAdapter<Message> implements Log.Receiver {
     private final IITC_Mobile mIitc;
     private int mObservers = 0;
 
