@@ -43,7 +43,7 @@ plugin.showLinkedPortal.makePortalLinkInfo = function (div,data,length,guid) { /
   div.attr('title', $('<div/>')
     .append($('<strong/>').text(title))
     .append($('<br/>'))
-    .append($('<span/>').text(key=='d' ? '↴ outgoing link' : '↳ incoming link'))
+    .append($('<span/>').text(div.attr('data-direction')=='outgoing' ? '↴ outgoing link' : '↳ incoming link'))
     .append($('<br/>'))
     .append($('<span/>').html(lengthFull))
     .html());
@@ -64,6 +64,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
     if(c > 16) return;
 
     var key = this; // passed by Array.prototype.forEach
+    var direction = (key=='d' ? 'outgoing' : 'incoming');
     var link = window.links[linkGuid].options.data;
     var guid = link[key + 'Guid'];
     var lat = link[key + 'LatE6']/1E6;
@@ -72,8 +73,8 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
     var length = L.latLng(link.oLatE6/1E6, link.oLngE6/1E6).distanceTo([link.dLatE6/1E6, link.dLngE6/1E6]);
     var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid) || null;
 
-    plugin.showLinkedPortal.makePortalLinkInfo($('<div>'),data,length,guid)
-      .addClass('showLinkedPortalLink showLinkedPortalLink' + c + (key=='d' ? ' outgoing' : ' incoming'))
+    plugin.showLinkedPortal.makePortalLinkInfo($('<div>').attr('data-direction', direction),data,length,guid)
+      .addClass('showLinkedPortalLink showLinkedPortalLink' + c + ' ' + direction)
       .attr({
         'data-guid': guid,
         'data-lat': lat,
