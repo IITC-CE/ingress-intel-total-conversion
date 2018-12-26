@@ -62,3 +62,19 @@
 	top: 171px;
 }
 
+.showLinkedPortalLink.incoming::before, .showLinkedPortalLink.outgoing::before {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 11px;
+    height: 15px;
+    text-shadow: 0 0 2px #000;
+}
+
+.showLinkedPortalLink.incoming::before {
+    content: "↳";
+}
+.showLinkedPortalLink.outgoing::before {
+    content: "↴";
+}
+
