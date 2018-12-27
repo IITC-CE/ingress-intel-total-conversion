@@ -24,7 +24,7 @@ plugin.showLinkedPortal.previewOptions = {
   radius: 18,
 };
 
-plugin.showLinkedPortal.makePortalLinkInfo = function (div,data,length,guid) { // guid: potentially useful
+plugin.showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) { // guid: potentially useful
   var lengthFull = digits(Math.round(length)) + 'm';
   var title = data && data.title || null;
   if (title) {
@@ -43,7 +43,7 @@ plugin.showLinkedPortal.makePortalLinkInfo = function (div,data,length,guid) { /
   div.attr('title', $('<div/>')
     .append($('<strong/>').text(title))
     .append($('<br/>'))
-    .append($('<span/>').text(div.attr('data-direction')=='outgoing' ? '↴ outgoing link' : '↳ incoming link'))
+    .append($('<span/>').text(is_outgoing ? '↴ outgoing link' : '↳ incoming link'))
     .append($('<br/>'))
     .append($('<span/>').html(lengthFull))
     .html());
@@ -73,7 +73,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
     var length = L.latLng(link.oLatE6/1E6, link.oLngE6/1E6).distanceTo([link.dLatE6/1E6, link.dLngE6/1E6]);
     var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid) || null;
 
-    plugin.showLinkedPortal.makePortalLinkInfo($('<div>').attr('data-direction', direction),data,length,guid)
+    plugin.showLinkedPortal.makePortalLinkInfo($('<div>'),guid,data,length,direction==='outgoing')
       .addClass('showLinkedPortalLink showLinkedPortalLink' + c + ' ' + direction)
       .attr({
         'data-guid': guid,
@@ -127,8 +127,10 @@ plugin.showLinkedPortal.onOutOfRangePortalClick = function() {
   var element = $(this);
   var guid = element.attr('data-guid');
   var length = element.attr('data-length');
+  var is_outgoing = element.hasClass('outgoing');
+  element.empty().removeClass('outOfRange');
   portalDetail.request(guid).done(function(data) {
-    plugin.showLinkedPortal.makePortalLinkInfo(element.empty().removeClass('outOfRange'),data,length);
+    plugin.showLinkedPortal.makePortalLinkInfo(element,guid,data,length,is_outgoing);
   });
 };
 
@@ -174,6 +176,7 @@ var setup = function () {
   window.addHook('portalDetailsUpdated', window.plugin.showLinkedPortal.portalDetail);
   $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/show-linked-portals.css@@').appendTo('head');
 }
+
 // PLUGIN END //////////////////////////////////////////////////////////
 
 @@PLUGINEND@@
