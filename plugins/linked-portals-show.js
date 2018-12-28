@@ -19,6 +19,7 @@ plugin.showLinkedPortal.previewOptions = {
 };
 
 plugin.showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) { // guid: potentially useful
+  div = div ? div.empty().removeClass('outOfRange') : $('<div>')
   var lengthFull = digits(Math.round(length)) + 'm';
   var title = data && data.title || null;
   if (title) {
@@ -67,7 +68,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
     var length = L.latLng(link.oLatE6/1E6, link.oLngE6/1E6).distanceTo([link.dLatE6/1E6, link.dLngE6/1E6]);
     var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid) || null;
 
-    plugin.showLinkedPortal.makePortalLinkInfo($('<div>'),guid,data,length,direction==='outgoing')
+    plugin.showLinkedPortal.makePortalLinkInfo(null,guid,data,length,direction==='outgoing')
       .addClass('showLinkedPortalLink showLinkedPortalLink' + c + ' ' + direction)
       .attr({
         'data-guid': guid,
@@ -122,7 +123,6 @@ plugin.showLinkedPortal.onOutOfRangePortalClick = function() {
   var guid = element.attr('data-guid');
   var length = element.attr('data-length');
   var is_outgoing = element.hasClass('outgoing');
-  element.empty().removeClass('outOfRange');
   portalDetail.request(guid).done(function(data) {
     plugin.showLinkedPortal.makePortalLinkInfo(element,guid,data,length,is_outgoing);
   });
