@@ -21,7 +21,7 @@ plugin.showLinkedPortal.previewOptions = {
 plugin.showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) { // guid: potentially useful
   div = div ? div.empty().removeClass('outOfRange') : $('<div>')
   var lengthFull = digits(Math.round(length)) + 'm';
-  var title = data && data.title || null;
+  var title = data && data.title;
   if (title) {
     div.append($('<img/>').attr({
       'src': fixPortalImageUrl(data.image),
@@ -66,7 +66,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
     var lng = link[key + 'LngE6']/1E6;
 
     var length = L.latLng(link.oLatE6/1E6, link.oLngE6/1E6).distanceTo([link.dLatE6/1E6, link.dLngE6/1E6]);
-    var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid) || null;
+    var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid);
 
     plugin.showLinkedPortal.makePortalLinkInfo(null,guid,data,length,direction==='outgoing')
       .addClass('showLinkedPortalLink showLinkedPortalLink' + c + ' ' + direction)
