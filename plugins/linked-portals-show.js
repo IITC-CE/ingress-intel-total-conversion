@@ -23,11 +23,11 @@ plugin.showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_o
   var lengthFull = digits(Math.round(length)) + 'm';
   var title = data && data.title;
   if (title) {
-    div.append($('<img/>').attr({
+    $('<img/>').attr({
       'src': fixPortalImageUrl(data.image),
       'class': 'minImg',
       'alt': title,
-    }));
+    }).appendTo(div);
   } else {
     title = 'Go to portal';
     var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
