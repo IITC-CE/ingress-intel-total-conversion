@@ -141,8 +141,16 @@ window.runOnSmartphonesAfterBoot = function() {
   // init msg of status bar. hint for the user that a tap leads to the info screen
   $('#mobileinfo').html('<div style="text-align: center"><b>tap here for info screen</b></div>');
 
-  // disable img full view
-  $('#portaldetails').off('click', '**');
+  // replace img full view handler
+  $('#portaldetails')
+    .off('click', '.imgpreview')
+    .on('click', '.imgpreview', function(e) {
+      if (e.currentTarget === e.target) { // do not fire on #level
+        $('.ui-tooltip').remove();
+        var newTop = $('.fullimg').position().top + $("#sidebar").scrollTop();
+        $("#sidebar").animate({ scrollTop: newTop }, 200);
+      }
+    });
 
   // make buttons in action bar flexible
   var l = $('#chatcontrols a:visible');
