@@ -448,6 +448,7 @@ window.setupSidebarToggle = function() {
       toggle.css('right', '0');
     } else {
       sidebar.css('z-index', 1001).show();
+      window.resetScrollOnNewPortal();
       $('.leaflet-right').css('margin-right', SIDEBAR_WIDTH+1+'px');
       toggle.html('<span class="toggle close"></span>');
       toggle.css('right', SIDEBAR_WIDTH+1+'px');
