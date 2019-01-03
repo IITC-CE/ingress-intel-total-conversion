@@ -98,12 +98,12 @@ window.renderPortalDetails = function(guid) {
       
       $('<h3>').attr({class:'title'}).text(title),
 
-      $('<span>').attr({
-        class: 'close',
-        title: 'Close [w]',
-        onclick:'renderPortalDetails(null); if(isSmartphone()) show("map");',
-        accesskey: 'w'
-      }).text('X'),
+      $('<span>', {class: 'close', title: 'Close [w]', accesskey: 'w' })
+        .click(function() {
+          renderPortalDetails(null);
+          if (isSmartphone()) { show('map'); }
+        })
+        .text('❎'), // .html('&#10062')
 
       // help cursor via ".imgpreview img"
       $('<div>')
