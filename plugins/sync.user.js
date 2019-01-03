@@ -28,6 +28,7 @@
 window.plugin.sync = function() {};
 
 window.plugin.sync.parentFolderID = null;
+window.plugin.sync.parentFolderIDrequested = false;
 window.plugin.sync.KEY_UUID = {key: 'plugin-sync-data-uuid', field: 'uuid'};
 
 // Each client has an unique UUID, to identify remote data is updated by other clients or not
@@ -413,44 +414,52 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
 
   // If not force search and have cached parentFolderID, skip this step
   if(!this.force && plugin.sync.parentFolderID) {
-    _this.initFile(assignIdCallback, failedCallback);
+    return _this.initFile(assignIdCallback, failedCallback);
   }
   
   parentAssignIdCallback = function(id) {
     plugin.sync.parentFolderID = id;
-    plugin.sync.logger.log('Create parent folder success');
+    plugin.sync.logger.log('Parent folder success initialized');
+    if (plugin.sync.parentFolderIDrequested) {
+      plugin.sync.parentFolderIDrequested = false;
+      return;
+    }
     _this.initFile(assignIdCallback, failedCallback);
   };
 
   parentFailedCallback = function(resp) {
     plugin.sync.parentFolderID = null;
+    plugin.sync.parentFolderIDrequested = false;
     plugin.sync.logger.log('Create folder operation failed: ' + (resp.error || 'unknown error'));
     failedCallback(resp);
   };
   
-  gapi.client.load('drive', 'v3').then(function () {
+  // Several plugins at the same time has requested to create a folder
+  if (!plugin.sync.parentFolderID && plugin.sync.parentFolderIDrequested) {
+    return;
+  }
+  
+  plugin.sync.parentFolderIDrequested = true;
+
+  gapi.client.load('drive', 'v3').then(function() {
   
     gapi.client.drive.files.list(
-      {q:"mimeType = 'application/vnd.google-apps.folder' and trashed = false"}
-    ).then(function(files){
-      var directory=files.result.files;
-
-      if (!directory.length) {
-        gapi.client.drive.files.insert({
-          'resource':{
-            "title": _this.parentName,
-            "description": _this.parentDescription,
-            "mimeType": _this.MIMETYPE_FOLDER
-          }
-        }).then(function(res){
+      { q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false" }
+    ).then(function(files) {
+      var directory = files.result.files;
+    
+      if(!directory.length) {
+        gapi.client.drive.files.create({
+          resource: { name: _this.parentName, description: _this.parentDescription, mimeType: _this.MIMETYPE_FOLDER }
+        }).then(function(res) {
           parentAssignIdCallback(res.result.id);
         });
       } else {
-        parentAssignIdCallback(directory[0].id);
+        parentAssignIdCallback(directory[ 0 ].id);
       }
     });
-    
-  },function(reason){
+  
+  }, function(reason) {
     parentFailedCallback(reason);
   });
 };
@@ -459,8 +468,7 @@ window.plugin.sync.DataManager.prototype.createFile = function(callback) {
   var _this = this;
   
   gapi.client.load('drive', 'v3').then(function () {
-    gapi.client.drive.files
-      .create({
+    gapi.client.drive.files.create({
         fields  : 'id',
         resource: { name: _this.fileName, description: _this.description, parents: [ plugin.sync.parentFolderID ] }
       })
@@ -490,7 +498,7 @@ window.plugin.sync.DataManager.prototype.readFile = function(needInitializeFileC
 
 window.plugin.sync.DataManager.prototype.saveFile = function(data) {
   var _this = this;
-
+  
   gapi.client.load('drive', 'v3').then(function () {
     gapi.client.request({
       path: '/upload/drive/v3/files/'+_this.fileId,
