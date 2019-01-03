@@ -44,6 +44,7 @@ window.runOnSmartphonesBeforeBoot = function() {
 
   window.smartphone.sideButton = $('<a>info</a>').click(function() {
     $('#scrollwrapper').show();
+    window.resetScrollOnNewPortal();
     $('.active').removeClass('active');
     $("#chatcontrols a:contains('info')").addClass('active');
   });
