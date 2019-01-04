@@ -40,6 +40,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -299,6 +300,10 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         if (onCreate) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                CookieManager cookieManager = CookieManager.getInstance();
+                cookieManager.setAcceptThirdPartyCookies(mIitcWebView, true);
+            }
             loadUrl(mIntelUrl);
         }
     }

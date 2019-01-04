@@ -40,9 +40,11 @@ public class IITC_WebView extends WebView {
     private int mFullscreenStatus = 0;
     private Runnable mNavHider;
     private boolean mDisableJs = false;
-    private String mDefaultUserAgent;
     private final String mDesktopUserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0)" +
             " Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
+    private final String mMobileUserAgent = "Mozilla/5.0 (Android 6.0.1; Mobile; rv:62.0)"+
+            " Gecko/62.0 Firefox/62.0";
+            
 
     // init web view
     private void iitc_init(final Context c) {
@@ -73,7 +75,6 @@ public class IITC_WebView extends WebView {
 
         addJavascriptInterface(mJsInterface, "android");
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
-        mDefaultUserAgent = mSettings.getUserAgentString();
         setUserAgent();
 
         mNavHider = new Runnable() {
@@ -276,7 +277,7 @@ public class IITC_WebView extends WebView {
 
     public void setUserAgent() {
         final String ua = mSharedPrefs.getBoolean("pref_fake_user_agent", false) ?
-                mDesktopUserAgent : mDefaultUserAgent;
+                mDesktopUserAgent : mMobileUserAgent;
         Log.d("setting user agent to: " + ua);
         mSettings.setUserAgentString(ua);
     }

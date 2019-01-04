@@ -2,7 +2,7 @@
 // @id             iitc-plugin-sync@xelio
 // @name           IITC plugin: Sync
 // @category       Misc
-// @version        0.3.0.@@DATETIMEVERSION@@
+// @version        0.3.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 @@METAINFO@@
 // ==/UserScript==
@@ -13,12 +13,12 @@
 
 ////////////////////////////////////////////////////////////////////////
 // Notice for developers:
-// 
+//
 // You should treat the data stored on Google Drive API as volatile.
-// Because if there are change in Google API client ID, Google will 
-// treat it as another application and could not access the data created 
-// by old client ID. Store any important data locally and only use this 
-// plugin as syncing function. 
+// Because if there are change in Google API client ID, Google will
+// treat it as another application and could not access the data created
+// by old client ID. Store any important data locally and only use this
+// plugin as syncing function.
 //
 // Google Drive API reference
 // https://developers.google.com/drive/api/v3/about-sdk
@@ -89,7 +89,7 @@ window.plugin.sync.RegisteredMap = function(options) {
   this.authorizer = options['authorizer'];
   this.uuid = options['uuid'];
 
-  this.timeoutID = null;
+  this.intervalID = null;
   this.map = null;
   this.lastUpdateUUID = null;
   this.dataStorage = null;
@@ -184,10 +184,10 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     _this.map = data['map'];
     _this.lastUpdateUUID = data['last-update-uuid'];
     
-    if (!_this.timeoutID) {
-      _this.timeoutID = setTimeout(function() {
+    if (!_this.intervalID) {
+      _this.intervalID = setInterval(function() {
         _this.loadDocument();
-      }, 3 * 60 * 1000); // update data every 3 minutes
+      }, 3 * 10 * 1000); // update data every 3 minutes
     }
     
     // Replace local value if data is changed by others
@@ -225,8 +225,8 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
 };
 
 window.plugin.sync.RegisteredMap.prototype.stopSync = function() {
-  clearTimeout(this.timeoutID);
-  this.timeoutID = null;
+  clearInterval(this.intervalID);
+  this.intervalID = null;
   this.map = null;
   this.lastUpdateUUID = null;
   this.initializing = false;
@@ -413,7 +413,7 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
   _this = this;
 
   // If not force search and have cached parentFolderID, skip this step
-  if(!this.force && plugin.sync.parentFolderID) {
+  if(plugin.sync.parentFolderID) {
     return _this.initFile(assignIdCallback, failedCallback);
   }
   
@@ -580,7 +580,7 @@ window.plugin.sync.Authorizer.prototype.authComplete = function() {
   }
 };
 
-window.plugin.sync.Authorizer.prototype.authorize = function(popup) {
+window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
   this.authorizing = true;
   this.authorized = false;
   var handleAuthResult, _this;
@@ -596,14 +596,36 @@ window.plugin.sync.Authorizer.prototype.authorize = function(popup) {
       plugin.sync.logger.log('Authorization error: ' + error);
       if (error === "idpiframe_initialization_failed") {
         plugin.sync.logger.log('You need enable 3rd-party cookies in your browser or allow [*.]google.com');
-      } else if (error === "popup_blocked_by_browser") {
-        plugin.sync.logger.log('You must allow pop-ups on site');
       }
     }
     _this.authComplete();
   };
 
-  gapi.auth2.authorize({'client_id': this.CLIENT_ID, 'scope': this.SCOPES, 'immediate': !popup}, handleAuthResult);
+  var GoogleAuth;
+  gapi.auth2.init({
+    'client_id': this.CLIENT_ID,
+    'scope': this.SCOPES,
+    ux_mode: 'redirect',
+    redirect_uri: 'https://intel.ingress.com/intel'
+  }).then(function() {
+    
+    GoogleAuth = gapi.auth2.getAuthInstance();
+    var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+
+    if(isSignedIn) {
+      _this.authorized = true;
+      plugin.sync.logger.log('Authorized');
+
+    } else {
+      _this.authorized = false;
+
+      if (redirect) {
+        GoogleAuth.signIn().then(handleAuthResult);
+      }
+    }
+    _this.authComplete();
+    
+  }, handleAuthResult);
 };
 //// end Authorizer
 
@@ -679,7 +701,7 @@ window.plugin.sync.storeLocal = function(mapping) {
 window.plugin.sync.loadLocal = function(mapping) {
   var objectJSON = localStorage[mapping.key];
   if(!objectJSON) return;
-  plugin.sync[mapping.field] = mapping.convertFunc 
+  plugin.sync[mapping.field] = mapping.convertFunc
                           ? mapping.convertFunc(JSON.parse(objectJSON))
                           : JSON.parse(objectJSON);
 };
