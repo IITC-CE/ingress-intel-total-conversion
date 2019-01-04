@@ -53,7 +53,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
 
   var c = 1;
 
-  $('<div>',{id:'showLinkedPortalContainer'}).appendTo('#portaldetails');
+  $('<div>',{id:'showLinkedPortalContainer'}).appendTo('.imgpreview');
 
   function renderLinkedPortal(linkGuid) {
     if(c > 16) return;

@@ -27,6 +27,10 @@
 	left: 50%;
 	margin-left:-25px;
 	cursor: default;
+	border-style: solid;
+	border-color: transparent;
+	line-height: 41px;
+	font-size: 12px;
 }
 
 .showLinkedPortalLink1, .showLinkedPortalLink2, .showLinkedPortalLink3, .showLinkedPortalLink4 {
@@ -36,24 +40,24 @@
 	right: 5px;
 }
 .showLinkedPortalLink9, .showLinkedPortalLink10, .showLinkedPortalLink11, .showLinkedPortalLink12 {
-	left: 59px;
+	left: 63px;
 }
 .showLinkedPortalLink13, .showLinkedPortalLink14, .showLinkedPortalLink15, .showLinkedPortalLink16 {
-	right: 59px
+	right: 63px
 }
 
 .showLinkedPortalLink1, .showLinkedPortalLink5, .showLinkedPortalLink9, .showLinkedPortalLink13 {
-	top: 23px;
+	top: 0px;
 }
 .showLinkedPortalLink2, .showLinkedPortalLink6, .showLinkedPortalLink10, .showLinkedPortalLink14 {
-	top: 72px;
+	top: 49px;
 }
 .showLinkedPortalLink3, .showLinkedPortalLink7, .showLinkedPortalLink11, .showLinkedPortalLink15 {
-	top: 122px;
+	bottom: 49px;
 }
 .showLinkedPortalLink4, .showLinkedPortalLink8, .showLinkedPortalLink12, .showLinkedPortalLink16,
 .showLinkedPortalOverflow {
-	top: 171px;
+	bottom: 0px;
 }
 
 .showLinkedPortalLink.incoming::before, .showLinkedPortalLink.outgoing::before {
