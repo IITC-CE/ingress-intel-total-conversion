@@ -187,7 +187,7 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     if (!_this.intervalID) {
       _this.intervalID = setInterval(function() {
         _this.loadDocument();
-      }, 3 * 10 * 1000); // update data every 3 minutes
+      }, 3 * 60 * 1000); // update data every 3 minutes
     }
     
     // Replace local value if data is changed by others
