@@ -3,13 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-IITC Unofficial Docs
+IITC Official Docs
 ====================
 
 IITC_ is a userscript for the Ingress Intel map that makes using it bearable.
 Itself it exposes a plugin API which is rich and thoroughly undocumented.
 This project aims to fix the documentation issues, but is not itself
-affiliated with Jon Atkins, or Niantic Labs.
+affiliated with Niantic Labs.
 
 Contents:
 
@@ -27,4 +27,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`search`
 
-.. _IITC: http://iitc.jonatkins.com/
+.. _IITC: https://iitc.modos189.ru/

@@ -21,7 +21,7 @@ Constants
   * ``team``: Player faction. Can be "ENLIGHTENED" or "RESISTANCE"
   * ``verified_level``: Current player level
 
-  IITC adds a few things in :function:`~window.setupPlayerStat`:
+  IITC adds a few things in :function:`~window.setupPlayerStat()`:
 
   * ``nickMatcher``: RegExp used to match the player's agent name in chat
   * ``level``: Backwards compatibility, same as ``verified_level``.
@@ -134,9 +134,9 @@ Constants
 
   ::
 
-    '//open.mapquestapi.com/nominatim/v1/search.php?format=json&polygon_geojson=1&q='
+    '//nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q='
 
-  URL to call the Nominatim (geocoder?) service, string.
+  URL to call the Nominatim geocoder service, string.
 
 .. data:: window.RESO_NRG
 
@@ -226,7 +226,7 @@ Variables
 
 .. data:: window.refreshTimeout
 
-  (?) stores the id of the timeout that kicks off the next refresh
+  Stores the id of the timeout that kicks off the next refresh
   (ie value returned by ``setTimeout()``)
 
 .. data:: window.urlPortal
@@ -278,7 +278,13 @@ Variables
   the layer is enabled. Should mirror the layer selector UI.
 
   **Note:** The variable comment states that "you should use
-  :function:`window.isLayerGroupDisplayed(name)` to check the [layer] status"
+  :function:`~window.isLayerGroupDisplayed(name)` to check the [layer] status"
+
+.. function:: window.isLayerGroupDisplayed(name)
+
+  Read layerGroup status from :data:`~window.overlayStatus` if it was added to map,
+  read from cookie if it has not added to map yet.
+  ``return 'defaultDisplay'`` if both ``overlayStatus`` and cookie didn't have the record
 
 .. function:: window.plugin()
 

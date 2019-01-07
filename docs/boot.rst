@@ -34,7 +34,12 @@ IITC. The header for the file says:
   layers being hidden and removed from the Leaflet map.
 
   **Note:** This does not actually modify the dict directly, but rather it uses
-  the :function:`window.updateDisplayedLayerGroup(name, display)` function.
+  the :function:`~window.updateDisplayedLayerGroup(name, display)` function.
+
+.. function:: window.updateDisplayedLayerGroup(name, display)
+
+  Update layerGroups display status to window.overlayStatus and localStorage
+  'ingress.intelmap.layergroupdisplayed'
 
 .. function:: window.layerChooserSetDisabledStates()
 
@@ -51,7 +56,7 @@ IITC. The header for the file says:
   Sets up the default basemap tiles: MapQuest, CartoDB, Google Ingress,
   Google Roads, Google Satellite, Google Hybrid and Google Terrain.
 
-.. function:: setupMap()
+.. function:: window.setupMap()
 
   Sets up the Leaflet map. Note that there is a TODO entry there to
   move IITC's DOM into Leaflet control areas (it is currently just
@@ -60,7 +65,7 @@ IITC. The header for the file says:
   This also sets up a few interesting event listeners. First,
   when the user moves the map, all requests that go through
   :data:`window.requests` are aborted, and the refresh timeout is cleared.
-  Second, it calls :function:`~window.layerChooserSetDisabledStates` on zoom
+  Second, it calls :function:`~window.layerChooserSetDisabledStates()` on zoom
   end. Finally, it sets up the map data requester and starts refreshing.
 
 .. function:: window.setMapBaseLayer()
@@ -71,13 +76,11 @@ IITC. The header for the file says:
 
 .. function:: window.setupPlayerStat()
 
-  From the code:
-
-    renders player details into the website. Since the player info is
-    included as inline script in the original site, the data is static
-    and cannot be updated.
-    for historical reasons IITC expects :data:`~window.PLAYER`.``level`` to
-    contain the current player level.
+  Renders player details into the website. Since the player info is
+  included as inline script in the original site, the data is static
+  and cannot be updated.
+  for historical reasons IITC expects :data:`~window.PLAYER`.``level`` to
+  contain the current player level.
 
 .. function:: window.setupSidebarToggle()
 

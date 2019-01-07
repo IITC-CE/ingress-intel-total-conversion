@@ -15,7 +15,8 @@ Most plugins follow this plan:
    if they are not set yet.
 3. Put actual plugin code inside the wrapper function, with a setup function inside
 4. Append the setup function to the :data:`window.bootPlugins` list
-5. Stringify the wrapper function and inject it into the page context as an IIFE
+5. Stringify the wrapper function and inject it into the page context as an
+   `IIFE <http://benalman.com/news/2010/11/immediately-invoked-function-expression/>`_
 
 With first-party plugins, enforcement of this plan is done by using special
 build-time syntax (yes, IITC is using a custom build/macro system).
@@ -34,10 +35,8 @@ Here is a simple "Hello, World" plugin that illustrates how IITC plugins work:
   // @version 0.0.1
   // @namespace https://tempuri.org/iitc/hello
   // @description Hello, World plugin for IITC
-  // @include http://www.ingress.com/intel*
-  // @match http://www.ingress.com/intel*
-  // @include https://www.ingress.com/intel*
-  // @match https://www.ingress.com/intel*
+  // @include https://intel.ingress.com/intel*
+  // @match https://intel.ingress.com/intel*
   // @grant none
   // ==/UserScript==
 
@@ -120,10 +119,8 @@ userscript conventions, and share some gotchas you need to keep in mind.
   // @version 0.0.1
   // @namespace https://tempuri.org/iitc/hello
   // @description Hello, World plugin for IITC
-  // @include http://www.ingress.com/intel*
-  // @match http://www.ingress.com/intel*
-  // @include https://www.ingress.com/intel*
-  // @match https://www.ingress.com/intel*
+  // @include https://intel.ingress.com/intel*
+  // @match https://intel.ingress.com/intel*
   // @grant none
   // ==/UserScript==
 
