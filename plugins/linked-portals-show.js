@@ -86,7 +86,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
 
   if(length > 16) {
     $('<div>')
-      .addClass('showLinkedPortalLink showLinkedPortalOverflow')
+      .addClass('showLinkedPortalOverflow')
       .text(length-16 + ' more')
       .appendTo('#showLinkedPortalContainer');
   }
@@ -107,8 +107,6 @@ plugin.showLinkedPortal.onLinkedPortalClick = function() {
   var guid = element.attr('data-guid');
   var lat = element.attr('data-lat');
   var lng = element.attr('data-lng');
-
-  if(!guid) return; // overflow
 
   var position = L.latLng(lat, lng);
   if(!map.getBounds().contains(position)) map.setView(position);
@@ -146,8 +144,6 @@ plugin.showLinkedPortal.onLinkedPortalMouseOver = function() {
   var element = $(this);
   var lat = element.attr('data-lat');
   var lng = element.attr('data-lng');
-
-  if(!(lat && lng)) return; // overflow
 
   var remote = L.latLng(lat, lng);
   var local = portals[selectedPortal].getLatLng();

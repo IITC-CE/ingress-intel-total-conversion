@@ -1,11 +1,10 @@
 #level {
 	text-align: center;
-	margin-right: -0.5em;
-	position: relative;
-	right: 50%;
-	width: 1em;
+	margin: auto;
+	float: none;
 }
-.showLinkedPortalLink {
+
+.showLinkedPortalLink, .showLinkedPortalOverflow {
 	cursor: pointer;
 	position: absolute;
 	height: 40px;
@@ -14,15 +13,9 @@
 	overflow: hidden;
 	text-align: center;
 	background: #0e3d4e;
-}
-.showLinkedPortalLink .minImg {
-	height: 40px;
-}
-.showLinkedPortalLink.outOfRange span {
-	display: block;
-	line-height: 13px;
 	font-size: 10px;
 }
+
 .showLinkedPortalOverflow {
 	left: 50%;
 	margin-left:-25px;
@@ -31,6 +24,10 @@
 	border-color: transparent;
 	line-height: 41px;
 	font-size: 12px;
+}
+
+.showLinkedPortalLink .minImg {
+	height: 40px;
 }
 
 .showLinkedPortalLink1, .showLinkedPortalLink2, .showLinkedPortalLink3, .showLinkedPortalLink4 {
