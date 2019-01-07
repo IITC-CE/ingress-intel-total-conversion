@@ -328,9 +328,25 @@ window.Render.prototype.createPortalEntity = function(ent) {
 
   var marker = createMarker(latlng, dataOptions);
 
-  marker.on('click', function() { window.renderPortalDetails(ent[0]); });
-  marker.on('dblclick', function() { window.renderPortalDetails(ent[0]); window.map.setView(latlng, 17); });
+  function handler_portal_click (e) {
+    window.renderPortalDetails(e.target.options.guid);
+  }
+  function handler_portal_dblclick (e) {
+    window.renderPortalDetails(e.target.options.guid);
+    window.map.setView(e.target.getLatLng(), 17);
+  }
+  function handler_portal_contextmenu (e) {
+    window.renderPortalDetails(e.target.options.guid);
+    if (window.isSmartphone()) {
+      window.show('info');
+    } else if (!$('#scrollwrapper').is(':visible')) {
+      $('#sidebartoggle').click();
+    }
+  }
 
+  marker.on('click', handler_portal_click);
+  marker.on('dblclick', handler_portal_dblclick);
+  marker.on('contextmenu', handler_portal_contextmenu);
 
   window.runHooks('portalAdded', {portal: marker, previousData: previousData});
 

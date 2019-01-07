@@ -2,8 +2,19 @@
 // main code block that renders the portal details in the sidebar and
 // methods that highlight the portal in the map view.
 
+window.resetScrollOnNewPortal = function() {
+  if (selectedPortal !== window.renderPortalDetails.lastVisible) {
+    // another portal selected so scroll position become irrelevant to new portal details
+    $("#sidebar").scrollTop(0); // NB: this works ONLY when #sidebar:visible
+  }
+};
+
 window.renderPortalDetails = function(guid) {
   selectPortal(window.portals[guid] ? guid : null);
+  if ($('#sidebar').is(':visible')) {
+    window.resetScrollOnNewPortal();
+    window.renderPortalDetails.lastVisible = guid;
+  }
 
   if (guid && !portalDetail.isFresh(guid)) {
     portalDetail.request(guid);

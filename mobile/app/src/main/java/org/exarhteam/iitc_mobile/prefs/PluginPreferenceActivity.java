@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,8 +21,9 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
 import org.exarhteam.iitc_mobile.IITC_FileManager;
-import org.exarhteam.iitc_mobile.IITC_Mobile;
 import org.exarhteam.iitc_mobile.IITC_NotificationHelper;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
@@ -165,7 +165,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this,"Permission denied. You cannot add plugins.",
+                    Toast.makeText(this, "Permission denied. You cannot add plugins.",
                             Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -187,7 +187,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch(requestCode) {
+        switch (requestCode) {
             case COPY_PLUGIN_REQUEST:
                 if (data != null && data.getData() != null) {
                     mFileManager.installPlugin(data.getData(), true);

@@ -44,6 +44,7 @@ window.runOnSmartphonesBeforeBoot = function() {
 
   window.smartphone.sideButton = $('<a>info</a>').click(function() {
     $('#scrollwrapper').show();
+    window.resetScrollOnNewPortal();
     $('.active').removeClass('active');
     $("#chatcontrols a:contains('info')").addClass('active');
   });
@@ -71,10 +72,12 @@ window.smartphoneInfo = function(data) {
   if(!window.portals[guid]) return;
 
   var data = window.portals[selectedPortal].options.data;
+  if(typeof data.title === 'undefined') return;
+
   var details = window.portalDetail.get(guid);
 
   var lvl = data.level;
-  if(data.team === "NEUTRAL")
+  if(data.team === "N" || data.team === "NEUTRAL")
     var t = '<span class="portallevel">L0</span>';
   else
     var t = '<span class="portallevel" style="background: '+COLORS_LVL[lvl]+';">L' + lvl + '</span>';
@@ -139,8 +142,16 @@ window.runOnSmartphonesAfterBoot = function() {
   // init msg of status bar. hint for the user that a tap leads to the info screen
   $('#mobileinfo').html('<div style="text-align: center"><b>tap here for info screen</b></div>');
 
-  // disable img full view
-  $('div[class=imgpreview]').off('click', '**');
+  // replace img full view handler
+  $('#portaldetails')
+    .off('click', '.imgpreview')
+    .on('click', '.imgpreview', function(e) {
+      if (e.currentTarget === e.target) { // do not fire on #level
+        $('.ui-tooltip').remove();
+        var newTop = $('.fullimg').position().top + $("#sidebar").scrollTop();
+        $("#sidebar").animate({ scrollTop: newTop }, 200);
+      }
+    });
 
   // make buttons in action bar flexible
   var l = $('#chatcontrols a:visible');
@@ -154,21 +165,6 @@ window.runOnSmartphonesAfterBoot = function() {
       android.spinnerEnabled(true);
     });
   }
-
-  // add event to portals that allows long press to switch to sidebar
-  window.addHook('portalAdded', function(data) {
-    data.portal.on('add', function() {
-      if(!this._container || this.options.addedTapHoldHandler) return;
-      this.options.addedTapHoldHandler = true;
-      var guid = this.options.guid;
-
-      // this is a hack, accessing Leaflet’s private _container is evil
-      $(this._container).on('taphold', function() {
-        window.renderPortalDetails(guid);
-        window.show('info');
-      });
-    });
-  });
 
   if(typeof android !== 'undefined' && android && android.setPermalink) {
     window.map.on('moveend', window.setAndroidPermalink);

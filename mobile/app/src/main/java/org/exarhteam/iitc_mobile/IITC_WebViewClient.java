@@ -285,6 +285,11 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("redirect to: " + uri.getQueryParameter("q"));
             return shouldOverrideUrlLoading(view, uri.getQueryParameter("q"));
         }
+        else if (url.contains("accounts.google.com/o/oauth2")) {
+            Log.d("redirect to: " + url);
+            Log.d("Authorize Sync plugin");
+            return false;
+        }
         else if (isIntelUrl(url)) {
             Log.d("intel link requested, reset app and load " + url);
             mIitc.reset();

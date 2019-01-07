@@ -15,12 +15,6 @@
 	text-align: center;
 	background: #0e3d4e;
 }
-.showLinkedPortalLink.outgoing {
-	border-style: dashed;
-}
-.showLinkedPortalLink.incoming {
-	border-style: dotted;
-}
 .showLinkedPortalLink .minImg {
 	height: 40px;
 }
@@ -62,3 +56,25 @@
 	top: 171px;
 }
 
+.showLinkedPortalLink.incoming::before, .showLinkedPortalLink.outgoing::before {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 11px;
+	height: 15px;
+	text-shadow: 0 0 2px #000;
+}
+
+.showLinkedPortalLink.incoming {
+	border-style: dotted;
+}
+.showLinkedPortalLink.incoming::before {
+	content: "↳";
+}
+
+.showLinkedPortalLink.outgoing {
+	border-style: dashed;
+}
+.showLinkedPortalLink.outgoing::before {
+	content: "↴";
+}

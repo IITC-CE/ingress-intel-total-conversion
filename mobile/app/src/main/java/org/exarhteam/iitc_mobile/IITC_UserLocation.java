@@ -7,8 +7,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.view.Surface;
+
+import androidx.core.app.ActivityCompat;
 
 import org.exarhteam.iitc_mobile.compass.Compass;
 import org.exarhteam.iitc_mobile.compass.CompassListener;
@@ -106,12 +107,10 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
     /**
      * Determines whether one Location reading is better than the current Location fix
      *
-     * @param location
-     *            The new Location that you want to evaluate
-     * @param currentBestLocation
-     *            The current Location fix, to which you want to compare the new one
-     *
-     *            code copied from http://developer.android.com/guide/topics/location/strategies.html#BestEstimate
+     * @param location            The new Location that you want to evaluate
+     * @param currentBestLocation The current Location fix, to which you want to compare the new one
+     *                            <p>
+     *                            code copied from http://developer.android.com/guide/topics/location/strategies.html#BestEstimate
      */
     protected boolean isBetterLocation(final Location location, final Location currentBestLocation) {
         if (currentBestLocation == null) {
@@ -130,7 +129,9 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
         if (isSignificantlyNewer) {
             return true;
             // If the new location is more than two minutes older, it must be worse
-        } else if (isSignificantlyOlder) { return false; }
+        } else if (isSignificantlyOlder) {
+            return false;
+        }
 
         // Check whether the new location fix is more or less accurate
         final int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
@@ -147,7 +148,9 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
             return true;
         } else if (isNewer && !isLessAccurate) {
             return true;
-        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) { return true; }
+        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+            return true;
+        }
         return false;
     }
 

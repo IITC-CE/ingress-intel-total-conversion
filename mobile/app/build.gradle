@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+final BUILD_DATE = new Date().format('yyyy-MM-dd_HH:mm:ss')
+
 def getVersionCode = { ->
     def git = 'git rev-list HEAD --count'
 
@@ -14,100 +16,74 @@ def getVersionCode = { ->
     return Integer.parseInt(desc)
 }
 
-def getDate() {
-    def date = new Date()
-    def formattedDate = date.format('yyyy-MM-dd_HH:mm:ss')
-    return formattedDate
-}
-
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.3'
-
-    lintOptions {
-        abortOnError false
-    }
+    buildToolsVersion = '28.0.3'
 
     defaultConfig {
+        applicationId "org.exarhteam.iitc_mobile"
         minSdkVersion 14
         targetSdkVersion 28
         versionCode = getVersionCode()
         versionName "0.28"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     signingConfigs {
-        if (System.getenv("TRAVIS")) {
-            release {
-                storeFile rootProject.file('android.jks')
+        debug {
+            storeFile file("../keystore/debug.keystore")
+        }
+        release {
+            if (System.getenv("TRAVIS")) {
+                storeFile file("../keystore/android.jks")
                 storePassword System.getenv("KEYSTORE_PASS")
                 keyAlias System.getenv("ALIAS_NAME")
                 keyPassword System.getenv("ALIAS_PASS")
-            }
-            debug {
-                storeFile rootProject.file('android.jks')
-                storePassword System.getenv("KEYSTORE_PASS")
-                keyAlias System.getenv("ALIAS_NAME")
-                keyPassword System.getenv("ALIAS_PASS")
-            }
-        } else {
+            } else {
+                // We use keystore.properties file for signing data.
+                def keystoreProperties = new Properties()
+                keystoreProperties.load(new FileInputStream(rootProject.file("keystore.properties")))
 
-            if (project.hasProperty('signKeyStorePassword') && new File(rootProject.ext.signKeyStore).exists()) {
-                release {
-                    keyAlias rootProject.ext.signKeyAlias
-                    keyPassword rootProject.ext.signKeyPassword
-                    storeFile file(rootProject.ext.signKeyStore)
-                    storePassword rootProject.ext.signKeyStorePassword
-                }
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
             }
-            if (project.hasProperty('debugSignKeyStorePassword') && new File(rootProject.ext.debugSignKeyStore).exists()) {
-                debug {
-                    keyAlias rootProject.ext.debugSignKeyAlias
-                    keyPassword rootProject.ext.debugSignKeyPassword
-                    storeFile file(rootProject.ext.debugSignKeyStore)
-                    storePassword rootProject.ext.debugSignKeyStorePassword
-                }
-            }
-
         }
     }
-
     buildTypes {
-        release {
-            apply plugin: 'idea'
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            zipAlignEnabled true
-            minifyEnabled false
-            applicationVariants.all { variant ->
-                variant.outputs.all {
-                    outputFileName = "${variant.applicationId}-${variant.name}.apk"
-                }
-            }
-            signingConfig signingConfigs.release
-        }
         debug {
             applicationIdSuffix ".debug"
-            versionNameSuffix "-test" + getDate()
+            versionNameSuffix "-test$BUILD_DATE"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            applicationVariants.all { variant ->
-                variant.outputs.all {
-                    outputFileName = "${variant.applicationId}-${variant.name}.apk"
-                }
-            }
             signingConfig signingConfigs.debug
         }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    applicationVariants.all { variant ->
+        variant.resValue  "string", "application_id", variant.applicationId
     }
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:28.+'
-    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
 }
 
-task copyUserscripts(type: Copy)
-
-copyUserscripts {
+task copyUserscripts(type: Copy) {
     description = 'Updating prebuilt plugins'
     from '../assets'
     into 'src/main/assets'
