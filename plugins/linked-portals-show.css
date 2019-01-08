@@ -74,9 +74,12 @@
 
 .showLinkedPortalLink.outgoing::before {
 	z-index: 1;
-	content: "↴";
+	content: "•";
 	position: absolute;
 	bottom: 0;
 	right: 0;
 	text-shadow: 0 0 2px #000;
+	color: yellow;
+	line-height: 10px;
+	font-size: 15px;
 }
