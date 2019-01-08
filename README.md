@@ -3,12 +3,13 @@ Ingress Intel Total Conversion (IITC)
 
 <!-- [START badges] -->
 [![Build Status](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion.svg?branch=master)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
+[![Docs Status](https://readthedocs.org/projects/iitc-ce/badge/?version=latest)](https://readthedocs.org/projects/iitc-ce/)
 [![LICENSE](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
 <!-- [END badges] -->
 
 > IITC is a browser add-on that modifies the Ingress intel map. It is faster than the standard site, and offers many more features. It is available for desktop browsers, such as Firefox and Chrome, and as a mobile application.
 
-###### [Website](https://iitc.modos189.ru/) | [Telegram channel](https://teleg.run/iitc_news)
+###### [Website](https://iitc.modos189.ru/) | [Documentation](http://iitc-ce.rtfd.io/) | [Telegram channel](https://teleg.run/iitc_news)
 
 ---
 
