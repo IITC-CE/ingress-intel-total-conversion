@@ -12,8 +12,13 @@
 	border-width: 1px;
 	overflow: hidden;
 	text-align: center;
-	background: #0e3d4e;
+	background-color: rgba(8,48,78,0.7);
 	font-size: 10px;
+}
+
+.showLinkedPortalLink {
+	border-radius: 5px 0 5px 0;
+	box-shadow: 0 0 10px rgba(0,0,0,0.9);
 }
 
 .showLinkedPortalOverflow {
