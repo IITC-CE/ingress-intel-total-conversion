@@ -4,7 +4,7 @@
 // @category       Info
 // @version        1.4.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Find farms by minimum level.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
 //CHANGELOG
@@ -33,11 +33,7 @@ Radius is distance from center to furthest portal (i.e., now the circle will be 
 */
 
 
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.farmFind = function() {};
@@ -338,6 +334,4 @@ var setup =  function() {
     window.addLayerGroup('Farms', window.plugin.farmFind.levelLayerGroup, true);
 };
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

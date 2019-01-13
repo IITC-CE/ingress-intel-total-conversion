@@ -4,5 +4,5 @@
 // @category       Deleted
 // @version        0.1.3.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Nokia OVI Maps was closed.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==

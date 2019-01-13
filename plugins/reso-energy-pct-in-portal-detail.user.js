@@ -4,12 +4,10 @@
 // @category       Portal Info
 // @version        0.1.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show resonator energy percentage on resonator energy bar in portal detail panel.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.resoEnergyPctInPortalDetail = function() {};
@@ -35,6 +33,4 @@ var setup =  function() {
   window.addHook('portalDetailsUpdated', window.plugin.resoEnergyPctInPortalDetail.updateMeter);
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

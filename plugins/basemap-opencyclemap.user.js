@@ -4,13 +4,10 @@
 // @category       Map Tiles
 // @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the OpenCycleMap.org map tiles as an optional layer.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.mapTileOpenCycleMap = {
@@ -40,6 +37,4 @@ window.plugin.mapTileOpenCycleMap = {
 
 var setup =  window.plugin.mapTileOpenCycleMap.addLayer;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

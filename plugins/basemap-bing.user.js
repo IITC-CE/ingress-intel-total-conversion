@@ -4,17 +4,15 @@
 // @category       Map Tiles
 // @version        0.1.3.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the maps.bing.com map layers.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 window.plugin.mapBing = function() {};
 
 window.plugin.mapBing.setupBingLeaflet = function() {
-@@INCLUDERAW:external/Bing.js@@
+// @@INCLUDERAW:external/Bing.js@@
 }
 
 
@@ -63,7 +61,4 @@ window.plugin.mapBing.setup = function() {
 
 var setup = window.plugin.mapBing.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

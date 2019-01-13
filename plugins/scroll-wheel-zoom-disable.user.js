@@ -4,14 +4,10 @@
 // @category       Tweaks
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Disable the use of mouse wheel to zoom. The map zoom controls or keyboard are still available.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.scrollWheelZoomDisable = function() {};
@@ -24,6 +20,4 @@ window.plugin.scrollWheelZoomDisable.setup = function() {
 
 var setup =  window.plugin.scrollWheelZoomDisable.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

@@ -4,12 +4,10 @@
 // @category       Tweaks
 // @version        0.0.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show correct Google Map for China user by applying offset tweaks.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.fixChinaOffset = {};
@@ -186,6 +184,4 @@ var setup = function() {
 
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

@@ -4,13 +4,10 @@
 // @category       Controls
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show scale bar on the map.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.scaleBar = function() {};
@@ -30,6 +27,4 @@ window.plugin.scaleBar.setup  = function() {
 
 var setup =  window.plugin.scaleBar.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

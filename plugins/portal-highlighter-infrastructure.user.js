@@ -4,12 +4,10 @@
 // @category       Highlighter
 // @version        0.2.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal has any infrastructure problems. Red: no picture. Yellow: potential title issue. Orange:  both of these.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.portalInfrastructure = function() {};
@@ -48,6 +46,4 @@ var setup =  function() {
   window.addPortalHighlighter('Infrastructure', window.plugin.portalInfrastructure.highlight);
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

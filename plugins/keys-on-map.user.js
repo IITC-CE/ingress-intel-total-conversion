@@ -4,12 +4,10 @@
 // @category       Keys
 // @version        0.2.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the manually entered key counts from the 'keys' plugin on the map.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.keysOnMap = function() {};
@@ -125,6 +123,4 @@ var setup =  function() {
   window.addHook('pluginKeysRefreshAll', window.plugin.keysOnMap.refreshAllKeys);
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

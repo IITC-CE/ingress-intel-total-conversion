@@ -4,12 +4,10 @@
 // @category       Tweaks
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    For use for unattended display screens only, this plugin causes idle mode to be left once per hour.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 window.plugin.periodicRefresh = function() {};
 
@@ -29,6 +27,4 @@ window.plugin.periodicRefresh.setup = function() {
 
 var setup = window.plugin.periodicRefresh.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

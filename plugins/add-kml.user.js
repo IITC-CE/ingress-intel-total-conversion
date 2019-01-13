@@ -4,19 +4,17 @@
 // @category       Layer
 // @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow users to overlay their own KML / GPX files on top of IITC.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.overlayKML = function() {};
 
 window.plugin.overlayKML.loadExternals = function() {
   try { console.log('Loading leaflet.filelayer JS now'); } catch(e) {}
-  @@INCLUDERAW:external/leaflet.filelayer.js@@
+  // @@INCLUDERAW:external/leaflet.filelayer.js@@
   try { console.log('done loading leaflet.filelayer JS'); } catch(e) {}
 
   if (window.requestFile !== undefined) {
@@ -73,11 +71,11 @@ window.plugin.overlayKML.loadExternals = function() {
   }
 
   try { console.log('Loading KML JS now'); } catch(e) {}
-  @@INCLUDERAW:external/KML.js@@
+  // @@INCLUDERAW:external/KML.js@@
   try { console.log('done loading KML JS'); } catch(e) {}
 
   try { console.log('Loading togeojson JS now'); } catch(e) {}
-  @@INCLUDERAW:external/togeojson.js@@
+  // @@INCLUDERAW:external/togeojson.js@@
   try { console.log('done loading togeojson JS'); } catch(e) {}
 
   window.plugin.overlayKML.load();
@@ -112,7 +110,4 @@ var setup =  function() {
   window.plugin.overlayKML.loadExternals();
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
-
+// @@PLUGINEND@@ //

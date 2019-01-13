@@ -76,11 +76,14 @@ plugin_info.dateTimeVersion = '@@DATETIMEVERSION@@';
 plugin_info.pluginId = '@@PLUGINNAME@@';
 //END PLUGIN AUTHORS NOTE
 
-"""
+
+// PLUGIN START //"""
 
 pluginWrapperStartUseStrict = pluginWrapperStart.replace("{\n", "{\n\"use strict\";\n", 1)
 
-pluginWrapperEnd = """
+pluginWrapperEnd = """// PLUGIN END //
+
+
 setup.info = plugin_info; //add the script info data to the function as a property
 if(!window.bootPlugins) window.bootPlugins = [];
 window.bootPlugins.push(setup);
@@ -93,7 +96,6 @@ var info = {};
 if (typeof GM_info !== 'undefined' && GM_info && GM_info.script) info.script = { version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description };
 script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(info)+');'));
 (document.body || document.head || document.documentElement).appendChild(script);
-
 """
 
 
@@ -134,16 +136,18 @@ def extractUserScriptMeta(var):
     m = re.search(r"//[ \t]*==UserScript==\n.*?//[ \t]*==/UserScript==\n", var, re.MULTILINE | re.DOTALL)
     return m.group(0)
 
+def _extend(pattern): # to match whole line, including '//'
+    return '(?://[/ ]*)?' + pattern + '[^\r\n]*'
 
 def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
-    script = re.sub('@@INJECTCODE@@', loadCode, script)
+    script = re.sub(_extend('@@INJECTCODE@@'), loadCode, script)
 
-    script = script.replace('@@METAINFO@@', pluginMetaBlock)
-    script = script.replace('@@PLUGINSTART@@', pluginWrapperStart)
-    script = script.replace('@@PLUGINSTART-USE-STRICT@@', pluginWrapperStartUseStrict)
-    script = script.replace('@@PLUGINEND@@', pluginWrapperEnd)
+    script = re.sub(_extend('@@METAINFO@@'), pluginMetaBlock, script)
+    script = re.sub(_extend('@@PLUGINSTART@@'), pluginWrapperStart, script)
+    script = re.sub(_extend('@@PLUGINSTART-USE-STRICT@@'), pluginWrapperStartUseStrict, script)
+    script = re.sub(_extend('@@PLUGINEND@@'), pluginWrapperEnd, script)
 
-    script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loaderRaw, script)
+    script = re.sub(_extend('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@'), loaderRaw, script)
     script = re.sub('@@INCLUDESTRING:([0-9a-zA-Z_./-]+)@@', loaderString, script)
     script = re.sub('@@INCLUDEIMAGE:([0-9a-zA-Z_./-]+)@@', loaderImage, script)
 

@@ -4,12 +4,10 @@
 // @category       Layer
 // @version        0.4.3.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (Max Links is a poor name, but remains for historical reasons.)
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.maxLinks = function() {};
@@ -128,7 +126,7 @@ window.plugin.maxLinks.updateLayer = function() {
 
 window.plugin.maxLinks.setup = function() {
   try { console.log('Loading delaunay JS now'); } catch(e) {}
-  @@INCLUDERAW:external/delaunay.js@@
+  // @@INCLUDERAW:external/delaunay.js@@
   try { console.log('done loading delaunay JS'); } catch(e) {}
 
   window.plugin.maxLinks.layer = L.layerGroup([]);
@@ -160,6 +158,4 @@ window.plugin.maxLinks.setup = function() {
 }
 var setup = window.plugin.maxLinks.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

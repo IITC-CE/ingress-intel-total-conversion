@@ -4,13 +4,10 @@
 // @category       Layer
 // @version        0.0.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] A companion to the Cross Links plugin. Highlights any links that match existing draw-tools line/polygon edges
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 window.plugin.doneLinks = function() {};
 
@@ -182,6 +179,4 @@ var setup = function() {
     
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

@@ -4,20 +4,17 @@
 // @category       Controls
 // @version        0.1.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a panning control on the map.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.panControl = function() {};
 
 window.plugin.panControl.setup  = function() {
   try { console.log('Loading Leaflet.Pancontrol JS now'); } catch(e) {}
-  @@INCLUDERAW:external/L.Control.Pan.js@@
+  // @@INCLUDERAW:external/L.Control.Pan.js@@
   try { console.log('done loading Leaflet.Pancontrol JS'); } catch(e) {}
 
   // prevent Pancontrol from being activated by default (e.g. in minimap)
@@ -40,6 +37,4 @@ window.plugin.panControl.setup  = function() {
 
 var setup =  window.plugin.panControl.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

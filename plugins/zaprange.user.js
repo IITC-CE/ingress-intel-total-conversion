@@ -4,12 +4,10 @@
 // @category       Layer
 // @version        0.1.4.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Shows the maximum range of attack by the portals.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ///////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
   // use own namespace for plugin
   window.plugin.zaprange = function() {};
@@ -111,6 +109,4 @@
     window.plugin.zaprange.showOrHide();
   }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

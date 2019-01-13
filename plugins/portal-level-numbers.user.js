@@ -4,16 +4,13 @@
 // @category       Layer
 // @version        0.1.5.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show portal level numbers on map.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
-window.plugin.portalLevelNumbers = function() {
-};
+window.plugin.portalLevelNumbers = function() {};
 
 window.plugin.portalLevelNumbers.ICON_SIZE = 12;
 window.plugin.portalLevelNumbers.MOBILE_SCALE = 1.5;
@@ -171,6 +168,4 @@ var setup = function() {
 
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

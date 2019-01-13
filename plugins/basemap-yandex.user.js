@@ -4,13 +4,10 @@
 // @category       Map Tiles
 // @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add Yandex.com (Russian/Русский) map layers
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.mapTileYandex = function() {};
@@ -18,7 +15,7 @@ window.plugin.mapTileYandex = function() {};
 window.plugin.mapTileYandex.leafletSetup = function() {
 
 //include Yandex.js start
-@@INCLUDERAW:external/Yandex.js@@
+//@@INCLUDERAW:external/Yandex.js@@
 //include Yandex.js end
 
 }
@@ -65,6 +62,4 @@ window.plugin.mapTileYandex.setup = function() {
 
 var setup =  window.plugin.mapTileYandex.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

@@ -4,16 +4,14 @@
 // @category       Tweaks
 // @version        0.2.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the direction of links on the map by adding short dashes to the line at the origin portal.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.linkShowDirection = function() {};
+
 window.plugin.linkShowDirection.ANIMATE_UPDATE_TIME = 1000; // 1000ms = 1s
 
 // Hack:
@@ -176,6 +174,4 @@ window.plugin.linkShowDirection.setup  = function() {
 
 var setup =  window.plugin.linkShowDirection.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

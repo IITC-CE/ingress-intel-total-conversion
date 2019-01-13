@@ -4,13 +4,10 @@
 // @category       Tweaks
 // @version        0.3.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Vastly reduce the detail level when zoomed out to level 11 or less (L4+ portals), to significantly reduce data usage when viewing large areas.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.showLessPortalsZoomedOut = function() {};
@@ -25,6 +22,4 @@ window.plugin.showLessPortalsZoomedOut.setup  = function() {
 
 var setup =  window.plugin.showLessPortalsZoomedOut.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

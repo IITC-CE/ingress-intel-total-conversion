@@ -4,11 +4,10 @@
 // @category       Misc
 // @version        0.2.4.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-//PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 //use own namespace for plugin
 window.plugin.uniques = function() {};
@@ -584,6 +583,4 @@ var setup = function() {
 	}
 }
 
-//PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

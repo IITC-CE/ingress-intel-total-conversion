@@ -4,13 +4,10 @@
 // @category       Map Tiles
 // @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.mapTileStamen = function() {};
@@ -56,6 +53,4 @@ window.plugin.mapTileStamen.addLayer = function() {
 
 var setup =  window.plugin.mapTileStamen.addLayer;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

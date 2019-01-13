@@ -4,19 +4,16 @@
 // @category       Layer
 // @version        0.1.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the local scoring regions on the map. No actual scores - just the region areas.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.regions = function() {};
 
 window.plugin.regions.setup  = function() {
-  @@INCLUDERAW:external/s2geometry.js@@
+  // @@INCLUDERAW:external/s2geometry.js@@
 
   window.plugin.regions.regionLayer = L.layerGroup();
 
@@ -306,6 +303,4 @@ window.plugin.regions.drawCell = function(cell) {
 
 var setup =  window.plugin.regions.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

@@ -4,12 +4,10 @@
 // @category       Debug
 // @version        0.2.4.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Developer debugging aid: Add a link to the portal details to show the raw data of a portal.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.rawdata = function() {};
@@ -91,7 +89,4 @@ var setup = function () {
     '</style>');
 }
 
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

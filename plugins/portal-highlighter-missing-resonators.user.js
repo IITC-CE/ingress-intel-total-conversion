@@ -4,12 +4,10 @@
 // @category       Highlighter
 // @version        0.1.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal is missing resonators. 
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.portalsMissingResonators = function() {};
@@ -37,6 +35,4 @@ var setup =  function() {
   window.addPortalHighlighter('Portals Missing Resonators', window.plugin.portalsMissingResonators.highlight);
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

@@ -4,13 +4,10 @@
 // @category       Controls
 // @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a mini map on the corner of the map.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.miniMap = function() {};
@@ -18,7 +15,7 @@ window.plugin.miniMap = function() {};
 window.plugin.miniMap.setup  = function() {
 
   try { console.log('Loading leaflet.draw JS now'); } catch(e) {}
-  @@INCLUDERAW:external/Control.MiniMap.js@@
+  // @@INCLUDERAW:external/Control.MiniMap.js@@
   try { console.log('done loading leaflet.draw JS'); } catch(e) {}
 
   // we can't use the same TileLayer as the main map uses - it causes issues.
@@ -37,6 +34,4 @@ window.plugin.miniMap.setup  = function() {
 
 var setup =  window.plugin.miniMap.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

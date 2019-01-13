@@ -4,20 +4,17 @@
 // @category       Controls
 // @version        0.1.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a zoom slider on the map instead of the zoom buttons.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.zoomSlider = function() {};
 
 window.plugin.zoomSlider.setup  = function() {
   try { console.log('Loading Leaflet.zoomslider JS now'); } catch(e) {}
-  @@INCLUDERAW:external/L.Control.Zoomslider.js@@
+  // @@INCLUDERAW:external/L.Control.Zoomslider.js@@
   try { console.log('done loading Leaflet.zoomslider JS'); } catch(e) {}
 
   // prevent Zoomslider from being activated by default (e.g. in minimap)
@@ -35,6 +32,4 @@ window.plugin.zoomSlider.setup  = function() {
 
 var setup = window.plugin.zoomSlider.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

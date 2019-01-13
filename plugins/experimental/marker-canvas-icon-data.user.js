@@ -4,13 +4,10 @@
 // @category       Tweaks
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] EXPERIMENTAL: draw markers using individual Leaflet Icons, created from canvas elements converted to data: URLs
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.markerIconCanvasUrl = function() {};
@@ -103,6 +100,4 @@ window.plugin.markerIconCanvasUrl.setup  = function() {
 
 var setup =  window.plugin.markerIconCanvasUrl.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

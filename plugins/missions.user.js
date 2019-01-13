@@ -4,13 +4,10 @@
 // @category       Info
 // @version        0.1.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 var decodeWaypoint = function(data) {
 	var result = {
@@ -1084,6 +1081,4 @@ window.plugin.missions = {
 
 var setup = window.plugin.missions.setup.bind(window.plugin.missions);
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

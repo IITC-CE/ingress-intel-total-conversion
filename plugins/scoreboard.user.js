@@ -4,12 +4,10 @@
 // @version        0.2.0.@@DATETIMEVERSION@@
 // @category       Info
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
-    
-	
-	@@PLUGINSTART@@
-    // PLUGIN START //
+
+    // @@PLUGINSTART@@ //
     
     // use own namespace for plugin
     window.plugin.scoreboard = function() {};
@@ -274,7 +272,4 @@
     }
     
     
-    // PLUGIN END //////////////////////////////////////////////////////////
-    @@PLUGINEND@@
-
-    
+    // @@PLUGINEND@@ //

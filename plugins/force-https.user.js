@@ -4,5 +4,5 @@
 // @category       Deleted
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Niantic no longer allows connections without https.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==

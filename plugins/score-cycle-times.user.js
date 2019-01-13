@@ -4,13 +4,10 @@
 // @category       Info
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the times used for the septicycle and checkpoints for regional scoreboards.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.scoreCycleTimes = function() {};
@@ -73,6 +70,4 @@ window.plugin.scoreCycleTimes.update = function() {
 
 var setup =  window.plugin.scoreCycleTimes.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

@@ -4,13 +4,10 @@
 // @category       Portal Info
 // @version        0.1.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allows your current location to be set manually, then shows the distance to the selected portal. Useful when managing portal keys.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.distanceToPortal = function() {};
@@ -113,7 +110,7 @@ window.plugin.distanceToPortal.setupPortalsList = function() {
 
 window.plugin.distanceToPortal.setup  = function() {
   // https://github.com/gregallensworth/Leaflet/
-  @@INCLUDERAW:external/LatLng_Bearings.js@@
+  // @@INCLUDERAW:external/LatLng_Bearings.js@@
 
   try {
     window.plugin.distanceToPortal.currentLoc = L.latLng(JSON.parse(localStorage['plugin-distance-to-portal']));
@@ -133,6 +130,4 @@ window.plugin.distanceToPortal.setup  = function() {
 
 var setup =  window.plugin.distanceToPortal.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

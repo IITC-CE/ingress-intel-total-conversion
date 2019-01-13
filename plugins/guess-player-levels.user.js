@@ -4,15 +4,14 @@
 // @category       Info
 // @version        0.5.7.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Try to determine player levels from the data available in the current view.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.guessPlayerLevels = function() {};
+
 window.plugin.guessPlayerLevels.BURSTER_RANGES = [0, 42, 48, 58, 72, 90, 112, 138, 168];
 
 // we prepend a hash sign (#) in front of the player name in storage in order to prevent accessing a pre-defined property
@@ -540,6 +539,4 @@ var setup =  function() {
   window.plugin.guessPlayerLevels.setupChatNickHelper();
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

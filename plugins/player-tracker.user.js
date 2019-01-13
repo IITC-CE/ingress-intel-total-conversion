@@ -4,12 +4,11 @@
 // @category       Layer
 // @version        0.11.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
+// @@PLUGINSTART@@ //
 
-// PLUGIN START ////////////////////////////////////////////////////////
 window.PLAYER_TRACKER_MAX_TIME = 3*60*60*1000; // in milliseconds
 window.PLAYER_TRACKER_MIN_ZOOM = 9;
 window.PLAYER_TRACKER_MIN_OPACITY = 0.3;
@@ -562,6 +561,4 @@ window.plugin.playerTracker.setupUserSearch = function() {
 
 var setup = plugin.playerTracker.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

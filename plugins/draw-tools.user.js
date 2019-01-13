@@ -4,21 +4,18 @@
 // @category       Layer
 // @version        0.7.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow drawing things onto the current map so you may plan your next move.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
 
 window.plugin.drawTools.loadExternals = function() {
   try { console.log('Loading leaflet.draw JS now'); } catch(e) {}
-  @@INCLUDERAW:external/leaflet.draw-src.js@@
-  @@INCLUDERAW:external/spectrum/spectrum.js@@
+  // @@INCLUDERAW:external/leaflet.draw-src.js@@
+  // @@INCLUDERAW:external/spectrum/spectrum.js@@
   try { console.log('done loading leaflet.draw JS'); } catch(e) {}
 
   window.plugin.drawTools.boot();
@@ -669,6 +666,4 @@ window.plugin.drawTools.boot = function() {
 
 var setup =  window.plugin.drawTools.loadExternals;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

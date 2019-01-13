@@ -4,13 +4,10 @@
 // @category       Cache
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Cache the details of recently viewed portals and use this to populate the map when possible
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.cachePortalDetailsOnMap = function() {};
@@ -46,6 +43,4 @@ window.plugin.cachePortalDetailsOnMap.setup  = function() {
 
 var setup =  window.plugin.cachePortalDetailsOnMap.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

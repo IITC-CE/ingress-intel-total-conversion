@@ -4,13 +4,10 @@
 // @category       Tweaks
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] EXPERIMENTAL: draw markers using individual Leaflet DivIcons, as SVG
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 
 // use own namespace for plugin
 window.plugin.markerDivIconSvg = function() {};
@@ -67,6 +64,4 @@ window.plugin.markerDivIconSvg.setup  = function() {
 
 var setup =  window.plugin.markerDivIconSvg.setup;
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

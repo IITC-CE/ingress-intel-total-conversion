@@ -4,12 +4,11 @@
 // @category       Controls
 // @version        0.2.12.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Save your favorite Maps and Portals and move the intel map with a click. Works with sync.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
+// @@PLUGINSTART@@ //
 
-// PLUGIN START ////////////////////////////////////////////////////////
 /***********************************************************************
 
   HOOKS:
@@ -18,7 +17,6 @@
   - pluginBkmrksSyncEnd: fired when the sync is finished;
 
 ***********************************************************************/
-////////////////////////////////////////////////////////////////////////
 
   // use own namespace for plugin
   window.plugin.bookmarks = function() {};
@@ -1318,6 +1316,4 @@
     }
   }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

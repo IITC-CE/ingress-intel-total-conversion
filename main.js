@@ -205,7 +205,7 @@ window.overlayStatus = {};
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
 
-@@INJECTCODE@@
+// @@INJECTCODE@@
 
 
 } // end of wrapper

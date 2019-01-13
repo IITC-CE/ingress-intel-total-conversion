@@ -4,13 +4,10 @@
 // @category       Info
 // @version        0.4.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Displays the per-team AP gains available in the current view.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+// @@PLUGINSTART@@ //
 // use own namespace for plugin
 window.plugin.compAPStats = function() {};
 
@@ -161,6 +158,4 @@ var setup =  function() {
   window.plugin.compAPStats.setupCallback();
 }
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //

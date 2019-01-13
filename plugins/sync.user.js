@@ -4,12 +4,10 @@
 // @category       Misc
 // @version        0.3.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
-@@METAINFO@@
+// @@METAINFO@@
 // ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @@PLUGINSTART@@ //
 
 ////////////////////////////////////////////////////////////////////////
 // Notice for developers:
@@ -793,6 +791,4 @@ var setup = function() {
   });
 };
 
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
+// @@PLUGINEND@@ //
