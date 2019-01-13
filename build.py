@@ -62,10 +62,9 @@ gradleOptions = settings.get('gradleOptions', '')
 gradleBuildFile = settings.get('gradleBuildFile', 'mobile/build.gradle')
 
 # plugin wrapper code snippets. handled as macros, to ensure that
-# 1. indentation caused by the "function wrapper()" doesn't apply to the plugin code body
-# 2. the wrapper is formatted correctly for removal by the IITC Mobile android app
+# indentation caused by the wrapper IIFE doesn't apply to the plugin code body
 pluginWrapperStart = """
-function wrapper(plugin_info) {
+;(function(plugin_info){
 // ensure plugin framework is there, even if iitc is not yet loaded
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
@@ -86,13 +85,8 @@ if(!window.bootPlugins) window.bootPlugins = [];
 window.bootPlugins.push(setup);
 // if IITC has already booted, immediately run the 'setup' function
 if(window.iitcLoaded && typeof setup === 'function') setup();
-} // wrapper end
-// inject code into site context
-var script = document.createElement('script');
-var info = {};
-if (typeof GM_info !== 'undefined' && GM_info && GM_info.script) info.script = { version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description };
-script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(info)+');'));
-(document.body || document.head || document.documentElement).appendChild(script);
+})({script: GM_info && GM_info.script && {version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description}})
+// wrapper end
 
 """
 

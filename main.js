@@ -95,10 +95,9 @@ document.body.innerHTML = ''
   // avoid error by stock JS
   + '<div id="play_button"></div>';
 
-// putting everything in a wrapper function that in turn is placed in a
-// script tag on the website allows us to execute in the site’s context
-// instead of in the Greasemonkey/Extension/etc. context.
-function wrapper(info) {
+
+// anonymous function wrapper for the code - any variables/functions not placed into 'window' will be private
+(function(info){
 // a cut-down version of GM_info is passed as a parameter to the script
 // (not the full GM_info - it contains the ENTIRE script source!)
 window.script_info = info;
@@ -208,11 +207,12 @@ if(typeof window.plugin !== 'function') window.plugin = function() {};
 @@INJECTCODE@@
 
 
-} // end of wrapper
-
-// inject code into site context
-var script = document.createElement('script');
-var info = { buildName: '@@BUILDNAME@@', dateTimeVersion: '@@DATETIMEVERSION@@' };
-if (this.GM_info && this.GM_info.script) info.script = { version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description };
-script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(info)+');'));
-(document.body || document.head || document.documentElement).appendChild(script);
+})({
+  buildName: '@@BUILDNAME@@',
+  dateTimeVersion: '@@DATETIMEVERSION@@',
+  script: this.GM_info && this.GM_info.script && {
+    version: GM_info.script.version,
+    name: GM_info.script.name,
+    description: GM_info.script.description,
+  }
+}); // end of wrapper
