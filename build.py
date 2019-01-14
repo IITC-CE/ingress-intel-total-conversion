@@ -122,8 +122,7 @@ def loaderRaw(var):
 
 def loaderImage(var):
     fn = var.group(1)
-    return 'data:image/png;base64,{0}'.format(
-        base64.b64encode(open(fn, 'rb').read()).decode('utf8'))
+    return 'data:image/png;base64,' + base64.b64encode(open(fn, 'rb').read()).decode('utf8')
 
 
 def loadCode(ignore):
