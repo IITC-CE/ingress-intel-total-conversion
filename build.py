@@ -106,7 +106,7 @@ pluginMetaBlock = """// @updateURL      @@UPDATEURL@@
 
 
 def readfile(fn):
-    with io.open(fn, 'Ur', encoding='utf8') as f:
+    with io.open(fn, 'r', encoding='utf8') as f:
         return f.read()
 
 
@@ -123,7 +123,7 @@ def loaderRaw(var):
 def loaderImage(var):
     fn = var.group(1)
     return 'data:image/png;base64,{0}'.format(
-        base64.encodestring(open(fn, 'rb').read()).decode('utf8').replace('\n', ''))
+        base64.b64encode(open(fn, 'rb').read()).decode('utf8'))
 
 
 def loadCode(ignore):
