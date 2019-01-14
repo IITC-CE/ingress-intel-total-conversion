@@ -112,7 +112,7 @@ def readfile(fn):
 
 def loaderString(var):
     fn = var.group(1)
-    return readfile(fn).replace('\\', '\\\\').replace('\n', '\\n').replace('\'', '\\\'')
+    return readfile(fn).replace('\\', '\\\\').replace('\n', '\\\n').replace('\'', '\\\'')
 
 
 def loaderRaw(var):
