@@ -119,7 +119,7 @@ def loaderString(var):
 
 def loaderRaw(var):
     fn = var.group(1)
-    return readfile(fn)
+    return '// include ' + fn + ':\n' + readfile(fn)
 
 
 def loaderImage(var):
