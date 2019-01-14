@@ -126,6 +126,10 @@ def loaderImage(var):
         base64.encodestring(open(fn, 'rb').read()).decode('utf8').replace('\n', ''))
 
 
+def loaderSVG(var):
+    return 'data:svg+xml;utf8,' + loaderString(var)
+
+
 def loadCode(ignore):
     return '\n\n;\n\n'.join(map(readfile, sorted(glob.glob('code/*.js'))))
 
@@ -146,6 +150,7 @@ def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
     script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loaderRaw, script)
     script = re.sub('@@INCLUDESTRING:([0-9a-zA-Z_./-]+)@@', loaderString, script)
     script = re.sub('@@INCLUDEIMAGE:([0-9a-zA-Z_./-]+)@@', loaderImage, script)
+    script = re.sub('@@INCLUDESVG:([0-9a-zA-Z_./-]+)@@', loaderSVG, script)
 
     script = script.replace('@@BUILDDATE@@', buildDate)
     script = script.replace('@@DATETIMEVERSION@@', dateTimeVersion)
