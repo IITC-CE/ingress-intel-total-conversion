@@ -147,12 +147,12 @@
         window.plugin.mapTileGaode.addLayer();
 
         if (!localStorage['iitc-base-map-gaode-alert'] || localStorage['iitc-base-map-gaode-alert'] != 1 ){
-            alert('第一次调用高德地图后，由于需要修正偏移，请手动刷新一下。目前修正了portal、link、field及 player tracker plugin的坐标，但对于原来收藏的portal需要手动重新添加一次，并且收藏的数据坐标将会是新坐标，切换至其它地图将会有偏移。由于苹果机上的iitc-mobile在新版IITC不能选择图层了，插件在启用后将会将把用户的默认地图切换成高德路网，如果想使用其它地图，请将本插件禁用。Map tiles by autonavi.com，plugin written by GMOogway。');
+            alert('After the first use this plugin, please refresh it manually due to the need to correct the offset. At present, the coordinates of portal, link, field and player tracker plugin have been fixed. Because iitc-mobile on iPhone can't select the layer in the new version of IITC, please remove the following comments before adding to user script. If you want to use other maps, disable this plugin. Map tiles by autonavi.com, plugin written by (TG)GMOogway.');
             localStorage['iitc-base-map-gaode-alert'] = 1;
         }
 
-        // for iitc-mobile on ios
-        localStorage['iitc-base-map'] = '高德 路网';
+        // if you use iitc-mobile on IOS, remove the comments below.
+        //localStorage['iitc-base-map'] = '高德 路网';
 
         var newpos;
 
