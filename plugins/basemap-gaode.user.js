@@ -1,9 +1,9 @@
 // ==UserScript==
-// @id             iitc-plugin-basemap-yandex@jonatkins
-// @name           IITC plugin: Yandex maps
+// @id             iitc-plugin-basemap-gaode@jonatkins
+// @name           IITC plugin: Map layers from GAODE by GMOogway
 // @category       Map Tiles
-// @version        0.2.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add Yandex.com (Russian/Русский) map layers
+// @version        0.1.0.@@DATETIMEVERSION@@
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add autonavi.com (China) map layers
 @@METAINFO@@
 // ==/UserScript==
 
