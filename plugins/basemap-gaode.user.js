@@ -147,7 +147,7 @@
         window.plugin.mapTileGaode.addLayer();
 
         if (!localStorage['iitc-base-map-gaode-alert'] || localStorage['iitc-base-map-gaode-alert'] != 1 ){
-            alert('After the first use this plugin, please refresh it manually due to the need to correct the offset. At present, the coordinates of portal, link, field and player tracker plugin have been fixed. Because iitc-mobile on iPhone can't select the layer in the new version of IITC, please remove the following comments before adding to user script. If you want to use other maps, disable this plugin. Map tiles by autonavi.com, plugin written by (TG)GMOogway.');
+            alert('After the first use this plugin, please refresh it manually due to the need to correct the offset. At present, the coordinates of portal, link, field and player tracker plugin have been fixed. Because iitc-mobile on iPhone can\'t select the layer in the new version of IITC, please remove the following comments before adding to user script. If you want to use other maps, disable this plugin. Map tiles by autonavi.com, plugin written by (TG)GMOogway.');
             localStorage['iitc-base-map-gaode-alert'] = 1;
         }
 
