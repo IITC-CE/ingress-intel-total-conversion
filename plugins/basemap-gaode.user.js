@@ -189,6 +189,7 @@
             window.plugin.playerTracker.getPortalLink = function(data) {
                 var position = data.latlngs[0];
                 newpos = PRCoords.gcjObfs(L.latLng(position[0], position[1]));
+                position = L.latLng(newpos.lat, newpos.lng);
                 var ll = [newpos.lat, newpos.lng].join(',');
                 return $('<a>')
                     .addClass('text-overflow-ellipsis')
