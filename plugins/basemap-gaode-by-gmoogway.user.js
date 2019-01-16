@@ -1,8 +1,8 @@
 // ==UserScript==
-// @id             iitc-plugin-basemap-gaode@jonatkins
+// @id             iitc-plugin-basemap-gaode-by-gmoogway
 // @name           IITC plugin: Map layers from GAODE by GMOogway
 // @category       Map Tiles
-// @version        0.1.0.@@DATETIMEVERSION@@
+// @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add autonavi.com (China) map layers
 @@METAINFO@@
 // ==/UserScript==
@@ -78,7 +78,7 @@
         /// @const
         var GCJ_A = 6378245
         var GCJ_EE = 0.00669342162296594323 // f = 1/298.3; e^2 = 2*f - f**2
-        var gcjObfs = function(wgs) {
+        var gcjObfs = function(wgs, resetting = false) {
             if (!isInGoogle(wgs)) {
                 return wgs
             }
@@ -95,11 +95,18 @@
             // Arc lengths per degree, on the wrong ellipsoid
             var lat_deg_arclen = (Math.PI / 180) * (GCJ_A * (1 - GCJ_EE)) * Math.pow(magic, 1.5)
             var lon_deg_arclen = (Math.PI / 180) * (GCJ_A * Math.cos(radLat) / Math.sqrt(magic))
-
-            return {
-                lat: wgs.lat + (dLat_m / lat_deg_arclen),
-                lng: wgs.lng + (dLon_m / lon_deg_arclen),
+            if (resetting){
+                return {
+                    lat: wgs.lat - (dLat_m / lat_deg_arclen),
+                    lng: wgs.lng - (dLon_m / lon_deg_arclen),
+                }
+            }else{
+                return {
+                    lat: wgs.lat + (dLat_m / lat_deg_arclen),
+                    lng: wgs.lng + (dLon_m / lon_deg_arclen),
+                }
             }
+
         }
 
         return {
@@ -142,22 +149,28 @@
 
     };
 
+    window.plugin.mapTileGaode.drawbutton = function() {
+
+    }
+
     var setup = function() {
 
         window.plugin.mapTileGaode.addLayer();
 
+        window.plugin.mapTileGaode.drawbutton();
+
         if (!localStorage['iitc-base-map-gaode-alert'] || localStorage['iitc-base-map-gaode-alert'] != 1 ){
-            alert('After the first use this plugin, please refresh it manually due to the need to correct the offset. At present, the coordinates of portal, link, field and player tracker plugin have been fixed. Because iitc-mobile on iPhone can\'t select the layer in the new version of IITC, please remove the following comments before adding to user script. If you want to use other maps, disable this plugin. Map tiles by autonavi.com, plugin written by (TG)GMOogway.');
+            alert('After the first use this plugin, please refresh it manually due to the need to correct the offset. At present, the coordinates of portal, link, field, PlayerTracker, BookMarks have been fixed. Because iitc-mobile on iPhone can\'t select the layer in the new version of IITC, please remove the following comments before adding to user script. If you want to use other maps, disable this plugin. Map tiles by autonavi.com, plugin written by (TG)GMOogway.');
             localStorage['iitc-base-map-gaode-alert'] = 1;
         }
 
-        // if you use iitc-mobile on IOS, remove the comments below.
+        // for iitc-mobile on ios
         //localStorage['iitc-base-map'] = '高德 路网';
 
         var newpos;
 
         var PluginBookmarksExist = false;
-        var PluginPlayerTracker = false;
+        var PluginPlayerTrackerExist = false;
         if (window.bootPlugins) {
             for (var i in bootPlugins) {
                 var info = bootPlugins[i].info;
@@ -167,13 +180,13 @@
                         PluginBookmarksExist = true;
                     }
                     if (pname.indexOf('Player tracker') != -1) {
-                        PluginPlayerTracker = true;
+                        PluginPlayerTrackerExist = true;
                     }
                 }
             }
 
         }
-        if (PluginPlayerTracker){
+        if (PluginPlayerTrackerExist){
             window.plugin.playerTracker.getLatLngFromEvent = function(ev) {
                 //TODO? add weight to certain events, or otherwise prefer them, to give better locations?
                 var lats = 0;
@@ -213,9 +226,52 @@
             }
         }
         if (PluginBookmarksExist) {
-            window.plugin.bookmarks.addStar_remove = function(guid, latlng, lbl) {
-                newpos = PRCoords.gcjObfs(L.latLng(latlng[0], latlng[1]));
+            window.plugin.bookmarks.addPortalBookmark = function(guid, latlng, label) {
+                newpos = PRCoords.gcjObfs(L.latLng(latlng.split(',')[0], latlng.split(',')[1]), true);
+                var ID = window.plugin.bookmarks.generateID();
+                // Add bookmark in the localStorage
+                //window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {"guid":guid,"latlng":latlng,"label":label};
+                window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {"guid":guid,"latlng":newpos.lat+','+newpos.lng,"label":label};
+                window.plugin.bookmarks.saveStorage();
+                window.plugin.bookmarks.refreshBkmrks();
+                //window.runHooks('pluginBkmrksEdit', {"target": "portal", "action": "add", "id": ID, "guid": guid});
+                console.log('BOOKMARKS: added portal '+ID);
+            }
+            window.plugin.bookmarks.findByGuid = function(guid) {
+                var list = window.plugin.bookmarks.bkmrksObj['portals'];
+                for(var idFolders in list) {
+                    for(var idBkmrk in list[idFolders]['bkmrk']) {
+                        var portalGuid = list[idFolders]['bkmrk'][idBkmrk]['guid'];
+                        var protalLatlng = list[idFolders]['bkmrk'][idBkmrk]['latlng'];
+                        var protalLabel = list[idFolders]['bkmrk'][idBkmrk]['label'];
+                        if(guid === portalGuid) {
+                            return {"id_folder":idFolders,"id_bookmark":idBkmrk,"id_latlng":protalLatlng,"id_label":protalLabel}; //here
+                        }
+                    }
+                }
+                return;
+            }
+            window.plugin.bookmarks.updateStarPortal = function() {
+                var guid = window.selectedPortal;
+                $('.bkmrksStar').removeClass('favorite');
+                $('.bkmrk a.bookmarksLink.selected').removeClass('selected');
+                //window.plugin.bookmarks.removeStar(guid);
+                //window.plugin.bookmarks.resetAllStars();
+                // If current portal is into bookmarks: select bookmark portal from portals list and select the star
+                if(localStorage[window.plugin.bookmarks.KEY_STORAGE].search(guid) != -1) {
+                    var bkmrkData = window.plugin.bookmarks.findByGuid(guid);
+                    if(bkmrkData) {
+                        //$('.bkmrk#'+bkmrkData['id_bookmark']+' a.bookmarksLink').addClass('selected');
+                        $('.bkmrksStar').addClass('favorite');
+                        if (!window.plugin.bookmarks.starLayers[guid])
+                            window.plugin.bookmarks.addStar(guid, L.latLng(bkmrkData['id_latlng'].split(',')[0], bkmrkData['id_latlng'].split(',')[1]), bkmrkData['id_label']);
+                    }
+                }
+            }
+            window.plugin.bookmarks.addStar = function(guid, latlng, lbl) {
+                newpos = PRCoords.gcjObfs(latlng);
                 latlng = [newpos.lat, newpos.lng];
+                console.log(latlng);
                 var star = L.marker(latlng, {
                     title: lbl,
                     icon: L.icon({
@@ -228,6 +284,18 @@
                 star.on('spiderfiedclick', function() { renderPortalDetails(guid); });
                 window.plugin.bookmarks.starLayers[guid] = star;
                 star.addTo(window.plugin.bookmarks.starLayerGroup);
+            }
+            window.plugin.bookmarks.addAllStars = function() {
+                var list = window.plugin.bookmarks.bkmrksObj.portals;
+                for(var idFolders in list) {
+                    for(var idBkmrks in list[idFolders]['bkmrk']) {
+                        //var latlng = list[idFolders]['bkmrk'][idBkmrks].latlng.split(",");
+                        var latlng = L.latLng(list[idFolders]['bkmrk'][idBkmrks].latlng.split(",")[0], list[idFolders]['bkmrk'][idBkmrks].latlng.split(",")[1]);
+                        var guid = list[idFolders]['bkmrk'][idBkmrks].guid;
+                        var lbl = list[idFolders]['bkmrk'][idBkmrks].label;
+                        window.plugin.bookmarks.addStar(guid, latlng, lbl);
+                    }
+                }
             }
         }
 
