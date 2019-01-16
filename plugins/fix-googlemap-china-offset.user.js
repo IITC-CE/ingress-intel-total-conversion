@@ -235,58 +235,55 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function(){
 
 /////////// end WGS84 to GCJ-02 obfuscator /////////
 
-/////////// begin overwrited L.GridLayer.GoogleMutant /////////
+/////////// begin overwrited L.GridLayer /////////
 window.plugin.fixChinaOffset.L = {};
-window.plugin.fixChinaOffset.L.GridLayer = {};
-window.plugin.fixChinaOffset.L.GridLayer.GoogleMutant = {
-  
-	_update: function () {
-		// zoom level check needs to happen before super's implementation (tile addition/creation)
-		// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
-		if (this._mutant) {
-			var center = this._map.getCenter();
-      ///// modified here ///
-      var _center = window.plugin.fixChinaOffset.getLatLng(center, this._type);
-      ///////////////////////
+window.plugin.fixChinaOffset.L.GridLayer = {
 
-			this._mutant.setCenter(_center);
-			var zoom = this._map.getZoom();
-			var fractionalLevel = zoom !== Math.round(zoom);
-			var mutantZoom = this._mutant.getZoom();
-
-			//ignore fractional zoom levels
-			if (!fractionalLevel && (zoom != mutantZoom)) {
-				this._mutant.setZoom(zoom);
-
-				if (this._mutantIsReady) this._checkZoomLevels();
-				//else zoom level check will be done later by 'idle' handler
-			}
+	_setView: function (center, zoom, noPrune, noUpdate) {
+    center = window.plugin.fixChinaOffset.getLatLng(center, this._type);
+		var tileZoom = this._clampZoom(Math.round(zoom));
+		if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
+		    (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
+			tileZoom = undefined;
 		}
 
-		L.GridLayer.prototype._update.call(this);
-	},
+		var tileZoomChanged = this.options.updateWhenZooming && (tileZoom !== this._tileZoom);
 
-	_handleZoomAnim: function () {
-		if (!this._mutant) return;
-		var center = this._map.getCenter();
-      ///// modified here ///
-      var _center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
-      ///////////////////////
+		if (!noUpdate || tileZoomChanged) {
 
-		this._mutant.setCenter(_center);
-		this._mutant.setZoom(Math.round(this._map.getZoom()));
+			this._tileZoom = tileZoom;
+
+			if (this._abortLoading) {
+				this._abortLoading();
+			}
+
+			this._updateLevels();
+			this._resetGrid();
+
+			if (tileZoom !== undefined) {
+				this._update(center);
+			}
+
+			if (!noPrune) {
+				this._pruneTiles();
+			}
+
+			// Flag to prevent _updateOpacity from pruning tiles during
+			// a zoom anim or a pinch gesture
+			this._noPrune = !!noPrune;
+		}
+
+		this._setZoomTransforms(center, zoom);
 	}
-
 }
-/////////// end overwrited L.Google /////////
+/////////// end overwrited L.GridLayer /////////
 
-window.plugin.fixChinaOffset.getLatLng = function(pos, type) {
+window.plugin.fixChinaOffset.getLatLng = function(pos, typetype) {
   // No offsets in satellite and hybrid maps
   if(type !== 'satellite' && type !== 'hybrid') {
-    var newPos = PRCoords.gcjObfs(pos);
-    return new google.maps.LatLng(newPos.lat, newPos.lng);
+    return PRCoords.gcjObfs(pos);
   } else {
-    return new google.maps.LatLng(pos.lat, pos.lng);
+    return pos;
   }
 };
 
@@ -302,7 +299,7 @@ window.plugin.fixChinaOffset.overwrite = function(dest, src) {
 
 var setup = function() {
 
-  window.plugin.fixChinaOffset.overwrite(L.GridLayer.GoogleMutant.prototype, window.plugin.fixChinaOffset.L.GridLayer.GoogleMutant);
+  window.plugin.fixChinaOffset.overwrite(L.GridLayer.prototype, window.plugin.fixChinaOffset.L.GridLayer);
 
 }
 
