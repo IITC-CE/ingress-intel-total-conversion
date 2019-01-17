@@ -249,7 +249,7 @@ plugin.fixChinaOffset.process = function (wgs) {
 L.GridLayer.prototype._getTiledPixelBounds = (function () {
   return function (center) {
   /// modified here ///
-    center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
+    center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
     /////////////////////
     var map = this._map,
       mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
@@ -263,22 +263,44 @@ L.GridLayer.prototype._getTiledPixelBounds = (function () {
 
 L.GridLayer.prototype._setZoomTransform = (function (original) {
   return function (level, center, zoom) {
-    center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
+    center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
     original.apply(this, [level, center, zoom]);
   };
 })(L.GridLayer.prototype._setZoomTransform);
 
 L.GridLayer.GoogleMutant.prototype._update = (function (original) {
   return function () {
-    var center = this._map.getCenter();
-    center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
-    original.apply(this, [center]);
+    this.options.needFixChinaOffset = true;
+    // zoom level check needs to happen before super's implementation (tile addition/creation)
+    // otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
+    if (this._mutant) {
+      var center = this._map.getCenter();
+      /// modified here ///
+      center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
+      /////////////////////
+      var _center = new google.maps.LatLng(center.lat, center.lng);
+
+      this._mutant.setCenter(_center);
+      var zoom = this._map.getZoom();
+      var fractionalLevel = zoom !== Math.round(zoom);
+      var mutantZoom = this._mutant.getZoom();
+
+      //ignore fractional zoom levels
+      if (!fractionalLevel && (zoom != mutantZoom)) {
+        this._mutant.setZoom(zoom);
+
+        if (this._mutantIsReady) this._checkZoomLevels();
+        //else zoom level check will be done later by 'idle' handler
+      }
+    }
+
+    L.GridLayer.prototype._update.call(this);
   };
 })(L.GridLayer.GoogleMutant.prototype._update);
 
-window.plugin.fixChinaOffset.getLatLng = function (pos, type) {
+window.plugin.fixChinaOffset.getLatLng = function (pos, options) {
   // No offsets in satellite and hybrid maps
-  if (type !== 'satellite' && type !== 'hybrid') {
+  if (options.needFixChinaOffset === true && options.type !== 'satellite' && options.type !== 'hybrid') {
     return plugin.fixChinaOffset.process(pos);
   }
   return pos;
