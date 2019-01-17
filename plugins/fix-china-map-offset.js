@@ -1,5 +1,5 @@
 // ==UserScript==
-// @id             iitc-plugin-fix-china-offset
+// @id             iitc-plugin-fix-china-map-offset
 // @name           IITC plugin: Fix maps offsets in China
 // @category       Tweaks
 // @version        0.2.0.@@DATETIMEVERSION@@
