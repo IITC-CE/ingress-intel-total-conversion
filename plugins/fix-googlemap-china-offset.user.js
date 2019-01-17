@@ -52,6 +52,10 @@ window.plugin.fixChinaOffset = {};
 // the requesting bounds of Ingress objects because we cannot transform GCJ-02 to
 // WGS-84. As a result, the Ingress objects on maps would be incomplete.
 //
+// The algorithm of transforming WGS-84 to GCJ-02 comes from:
+// https://on4wp7.codeplex.com/SourceControl/changeset/view/21483#353936
+// There is no official algorithm because it is classified information.
+//
 // Here we use the PRCoords implementation of this algorithm, which contains
 // a more careful yet still rough "China area" check in "insane_is_in_china.js".
 // Comments and code style have been adapted, mainly to remove profanity.
@@ -236,49 +240,32 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function(){
 /////////// end WGS84 to GCJ-02 obfuscator /////////
 
 /////////// begin overwrited L.GridLayer /////////
-window.plugin.fixChinaOffset.L = {};
-window.plugin.fixChinaOffset.L.GridLayer = {
 
-	_setView: function (center, zoom, noPrune, noUpdate) {
-    center = window.plugin.fixChinaOffset.getLatLng(center, this._type);
-		var tileZoom = this._clampZoom(Math.round(zoom));
-		if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
-		    (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
-			tileZoom = undefined;
-		}
+L.GridLayer.prototype._getTiledPixelBounds = (function (original) {
+	return function (center) {
+	  // >> edited here
+    center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
+    //
+		var map = this._map,
+		    mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
+		    scale = map.getZoomScale(mapZoom, this._tileZoom),
+		    pixelCenter = map.project(center, this._tileZoom).floor(),
+		    halfSize = map.getSize().divideBy(scale * 2);
 
-		var tileZoomChanged = this.options.updateWhenZooming && (tileZoom !== this._tileZoom);
-
-		if (!noUpdate || tileZoomChanged) {
-
-			this._tileZoom = tileZoom;
-
-			if (this._abortLoading) {
-				this._abortLoading();
-			}
-
-			this._updateLevels();
-			this._resetGrid();
-
-			if (tileZoom !== undefined) {
-				this._update(center);
-			}
-
-			if (!noPrune) {
-				this._pruneTiles();
-			}
-
-			// Flag to prevent _updateOpacity from pruning tiles during
-			// a zoom anim or a pinch gesture
-			this._noPrune = !!noPrune;
-		}
-
-		this._setZoomTransforms(center, zoom);
+		return new L.Bounds(pixelCenter.subtract(halfSize), pixelCenter.add(halfSize));
 	}
-}
+})(L.GridLayer.prototype._getTiledPixelBounds);
+
+L.GridLayer.prototype._setZoomTransform = (function (original) {
+	return function (level, center, zoom) {
+    center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
+		original.apply(this, arguments);
+	}
+})(L.GridLayer.prototype._setZoomTransform);
+
 /////////// end overwrited L.GridLayer /////////
 
-window.plugin.fixChinaOffset.getLatLng = function(pos, typetype) {
+window.plugin.fixChinaOffset.getLatLng = function(pos, type) {
   // No offsets in satellite and hybrid maps
   if(type !== 'satellite' && type !== 'hybrid') {
     return PRCoords.gcjObfs(pos);
@@ -287,21 +274,7 @@ window.plugin.fixChinaOffset.getLatLng = function(pos, typetype) {
   }
 };
 
-window.plugin.fixChinaOffset.overwrite = function(dest, src) {
-  
-  for(var key in src) {
-    if(src.hasOwnProperty(key)) {
-      dest[key] = src[key];
-    }
-  }
-
-}
-
-var setup = function() {
-
-  window.plugin.fixChinaOffset.overwrite(L.GridLayer.prototype, window.plugin.fixChinaOffset.L.GridLayer);
-
-}
+var setup = function() {}
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
