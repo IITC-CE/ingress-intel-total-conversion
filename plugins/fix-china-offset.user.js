@@ -1,5 +1,5 @@
 // ==UserScript==
-// @id             iitc-plugin-fix-china-offset@breezewish
+// @id             iitc-plugin-fix-china-offset
 // @name           IITC plugin: Fix maps offsets in China
 // @category       Tweaks
 // @version        0.2.0.@@DATETIMEVERSION@@
@@ -65,8 +65,7 @@ window.plugin.fixChinaOffset = {};
 //   needFixChinaOffset: true
 // in options. For an example of work, see Leaflet.GoogleMutant.js
 
-// ///////// begin WGS84 to GCJ-02 obfuscator /////////
-var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function () {
+plugin.fixChinaOffset.isInGoogle = (function () { // insane_is_in_china
   // This set of points roughly illustrates the scope of Google's
   // distortion. It has nothing to do with national borders etc.
   // Points around Hong Kong/Shenzhen are mapped with a little more precision,
@@ -146,12 +145,11 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function () {
     107.730505, 18.193406,
     110.669856, 17.754550,
   ];
-  // var HK_LENGTH = 12; // for future use (e.g. with Baidu)
   var lats = POINTS.filter(function (_, idx) { return idx % 2 === 1; });
   var lngs = POINTS.filter(function (_, idx) { return idx % 2 === 0; });
   POINTS = null; // not needed anyway...
 
-  // / *** pnpoly *** ///
+  /// *** pnpoly *** ///
   // Wm. Franklin's 8-line point-in-polygon C program
   // Copyright (c) 1970-2003, Wm. Randolph Franklin
   // Copyright (c) 2017, Mingye Wang (js translation)
@@ -189,7 +187,7 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function () {
     }
     return !!inside;
   };
-  // / ^^^ pnpoly ^^^ ///
+  /// ^^^ pnpoly ^^^ ///
 
   var isInGoogle = function (coords) {
     // Yank out South China Sea as it's not distorted.
@@ -198,15 +196,16 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function () {
            pnpoly(lats, lngs, coords.lat, coords.lng);
   };
 
-  // / Krasovsky 1940 ellipsoid
-  // / @const
+  return isInGoogle;
+})();
+
+plugin.fixChinaOffset.gcjObfs = (function () {
+  /// Krasovsky 1940 ellipsoid
+  /// @const
   var GCJ_A = 6378245;
   var GCJ_EE = 0.00669342162296594323; // f = 1/298.3; e^2 = 2*f - f**2
 
   var gcjObfs = function (wgs) {
-    if (!isInGoogle(wgs)) {
-      return wgs;
-    }
 
     var x = wgs.lng - 105,
       y = wgs.lat - 35;
@@ -236,22 +235,23 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function () {
     };
   };
 
-  return {
-    gcjObfs: gcjObfs,
-    isInGoogle: isInGoogle,
-  };
+  return gcjObfs;
 })();
 
-///////// end WGS84 to GCJ-02 obfuscator /////////
+plugin.fixChinaOffset.process = function (wgs) {
+  return plugin.fixChinaOffset.isInGoogle(wgs)
+    ? plugin.fixChinaOffset.gcjObfs(wgs)
+    : wgs;
+};
 
 ///////// begin overwrited L.GridLayer /////////
 
 L.GridLayer.prototype._getTiledPixelBounds = (function () {
-	return function (center) {
-	  ///// modified here ///
+  return function (center) {
+  /// modified here ///
     center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
-    ///////////////////////
-		var map = this._map,
+    /////////////////////
+    var map = this._map,
       mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
       scale = map.getZoomScale(mapZoom, this._tileZoom),
       pixelCenter = map.project(center, this._tileZoom).floor(),
@@ -272,17 +272,16 @@ L.GridLayer.GoogleMutant.prototype._update = (function (original) {
   return function () {
     var center = this._map.getCenter();
     center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
-		original.apply(this, [center]);
-	}
+    original.apply(this, [center]);
+  };
 })(L.GridLayer.GoogleMutant.prototype._update);
 
 window.plugin.fixChinaOffset.getLatLng = function (pos, type) {
   // No offsets in satellite and hybrid maps
   if (type !== 'satellite' && type !== 'hybrid') {
-    return PRCoords.gcjObfs(pos);
+    return plugin.fixChinaOffset.process(pos);
   }
   return pos;
-
 };
 
 var setup = function () {};
