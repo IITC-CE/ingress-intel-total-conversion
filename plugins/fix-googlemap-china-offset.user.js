@@ -243,9 +243,9 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function(){
 
 L.GridLayer.prototype._getTiledPixelBounds = (function (original) {
 	return function (center) {
-	  // >> edited here
+	  ///// modified here ///
     center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
-    //
+    ///////////////////////
 		var map = this._map,
 		    mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
 		    scale = map.getZoomScale(mapZoom, this._tileZoom),
@@ -263,6 +263,13 @@ L.GridLayer.prototype._setZoomTransform = (function (original) {
 	}
 })(L.GridLayer.prototype._setZoomTransform);
 
+L.GridLayer.GoogleMutant.prototype._update = (function (original) {
+	return function () {
+    var center = this._map.getCenter();
+    center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
+		original.apply(this, [center]);
+	}
+})(L.GridLayer.GoogleMutant.prototype._update);
 /////////// end overwrited L.GridLayer /////////
 
 window.plugin.fixChinaOffset.getLatLng = function(pos, type) {
