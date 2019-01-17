@@ -238,16 +238,16 @@ var PRCoords = window.plugin.fixChinaOffset.PRCoords = (function () {
   };
 })();
 
-// ///////// end WGS84 to GCJ-02 obfuscator /////////
+///////// end WGS84 to GCJ-02 obfuscator /////////
 
-// ///////// begin overwrited L.GridLayer /////////
+///////// begin overwrited L.GridLayer /////////
 
 L.GridLayer.prototype._getTiledPixelBounds = (function () {
-  return function (center) {
-    // >> edited here
+	return function (center) {
+	  ///// modified here ///
     center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
-    //
-    var map = this._map,
+    ///////////////////////
+		var map = this._map,
       mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
       scale = map.getZoomScale(mapZoom, this._tileZoom),
       pixelCenter = map.project(center, this._tileZoom).floor(),
@@ -260,11 +260,17 @@ L.GridLayer.prototype._getTiledPixelBounds = (function () {
 L.GridLayer.prototype._setZoomTransform = (function (original) {
   return function (level, center, zoom) {
     center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
-    original.apply(this, arguments);
+    original.apply(this, [level, center, zoom]);
   };
 })(L.GridLayer.prototype._setZoomTransform);
 
-// ///////// end overwrited L.GridLayer /////////
+L.GridLayer.GoogleMutant.prototype._update = (function (original) {
+  return function () {
+    var center = this._map.getCenter();
+    center = window.plugin.fixChinaOffset.getLatLng(center, this.options.type);
+		original.apply(this, [center]);
+	}
+})(L.GridLayer.GoogleMutant.prototype._update);
 
 window.plugin.fixChinaOffset.getLatLng = function (pos, type) {
   // No offsets in satellite and hybrid maps
