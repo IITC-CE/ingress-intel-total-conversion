@@ -278,6 +278,7 @@ L.GridLayer.GoogleMutant.prototype._update = (function () {
       /// modified here ///
       center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
       /////////////////////
+      /* eslint-disable */
       var _center = new google.maps.LatLng(center.lat, center.lng);
 
       this._mutant.setCenter(_center);
