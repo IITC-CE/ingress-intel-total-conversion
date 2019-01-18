@@ -293,6 +293,7 @@ L.GridLayer.GoogleMutant.prototype._update = (function () {
         if (this._mutantIsReady) this._checkZoomLevels();
         //else zoom level check will be done later by 'idle' handler
       }
+      /* eslint-enable */
     }
 
     L.GridLayer.prototype._update.call(this);
