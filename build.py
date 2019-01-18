@@ -65,7 +65,7 @@ gradleBuildFile = settings.get('gradleBuildFile', 'mobile/build.gradle')
 # 1. indentation caused by the "function wrapper()" doesn't apply to the plugin code body
 # 2. the wrapper is formatted correctly for removal by the IITC Mobile android app
 pluginWrapperStart = """
-function wrapper(plugin_info) {
+function wrapper(plugin_info) { 'use strict';
 // ensure plugin framework is there, even if iitc is not yet loaded
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
