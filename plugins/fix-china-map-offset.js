@@ -268,7 +268,7 @@ L.GridLayer.prototype._setZoomTransform = (function (original) {
   };
 })(L.GridLayer.prototype._setZoomTransform);
 
-L.GridLayer.GoogleMutant.prototype._update = (function (original) {
+L.GridLayer.GoogleMutant.prototype._update = (function () {
   return function () {
     this.options.needFixChinaOffset = true;
     // zoom level check needs to happen before super's implementation (tile addition/creation)
