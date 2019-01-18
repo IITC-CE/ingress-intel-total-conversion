@@ -78,8 +78,6 @@ plugin_info.pluginId = '@@PLUGINNAME@@';
 
 """
 
-pluginWrapperStartUseStrict = pluginWrapperStart.replace("{\n", "{\n\"use strict\";\n", 1)
-
 pluginWrapperEnd = """
 setup.info = plugin_info; //add the script info data to the function as a property
 if(!window.bootPlugins) window.bootPlugins = [];
@@ -143,7 +141,6 @@ def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
 
     script = script.replace('@@METAINFO@@', pluginMetaBlock)
     script = script.replace('@@PLUGINSTART@@', pluginWrapperStart)
-    script = script.replace('@@PLUGINSTART-USE-STRICT@@', pluginWrapperStartUseStrict)
     script = script.replace('@@PLUGINEND@@', pluginWrapperEnd)
 
     script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loaderRaw, script)
