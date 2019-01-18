@@ -69,6 +69,10 @@ function wrapper(plugin_info) {
 // ensure plugin framework is there, even if iitc is not yet loaded
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
+"""
+
+pluginWrapperEnd = """
+
 //PLUGIN AUTHORS: writing a plugin outside of the IITC build environment? if so, delete these lines!!
 //(leaving them in place might break the 'About IITC' page or break update checks)
 plugin_info.buildName = '@@BUILDNAME@@';
@@ -76,9 +80,6 @@ plugin_info.dateTimeVersion = '@@DATETIMEVERSION@@';
 plugin_info.pluginId = '@@PLUGINNAME@@';
 //END PLUGIN AUTHORS NOTE
 
-"""
-
-pluginWrapperEnd = """
 setup.info = plugin_info; //add the script info data to the function as a property
 if(!window.bootPlugins) window.bootPlugins = [];
 window.bootPlugins.push(setup);
