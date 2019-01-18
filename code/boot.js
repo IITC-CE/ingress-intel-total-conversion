@@ -589,6 +589,24 @@ window.setupLayerChooserApi = function() {
   }
 }
 
+function MonkeyPatching_Leaflet() {
+  var iconDefImage = '@@INCLUDEIMAGE:images/marker-icon.png@@';
+  var iconDefRetImage = '@@INCLUDEIMAGE:images/marker-icon-2x.png@@';
+  
+  L.Icon.Default = L.Icon.extend({
+    options: {
+      iconUrl      : iconDefImage,
+      iconRetinaUrl: iconDefRetImage,
+      iconSize     : new L.Point(25, 41),
+      iconAnchor   : new L.Point(12, 41),
+      popupAnchor  : new L.Point(1, -34)
+    },
+    _getIconUrl: function (name) {
+      return L.Icon.prototype._getIconUrl.call(this, name);
+    }
+  });
+}
+
 // BOOTING ///////////////////////////////////////////////////////////
 
 function boot() {
@@ -599,16 +617,7 @@ function boot() {
   if(window.deviceID) console.log('Your device ID: ' + window.deviceID);
   window.runOnSmartphonesBeforeBoot();
 
-  var iconDefImage = '@@INCLUDEIMAGE:images/marker-icon.png@@';
-  var iconDefRetImage = '@@INCLUDEIMAGE:images/marker-icon-2x.png@@';
-
-  L.Icon.Default = L.Icon.extend({options: {
-    iconUrl: iconDefImage,
-    iconRetinaUrl: iconDefRetImage,
-    iconSize: new L.Point(25, 41),
-    iconAnchor: new L.Point(12, 41),
-    popupAnchor: new L.Point(1, -34),
-  }});
+  MonkeyPatching_Leaflet();
 
   window.extractFromStock();
   window.setupIdle();
