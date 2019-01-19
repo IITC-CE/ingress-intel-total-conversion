@@ -64,9 +64,10 @@ gradleBuildFile = settings.get('gradleBuildFile', 'mobile/build.gradle')
 # plugin wrapper code snippets. handled as macros, to ensure that
 # indentation caused by the wrapper IIFE doesn't apply to the plugin code body
 pluginWrapperStart = """
-;(function(plugin_info){
+if (typeof window.plugin !== 'function') window.plugin = function() {};
+(function wrapper (plugin_info){
 // ensure plugin framework is there, even if iitc is not yet loaded
-if(typeof window.plugin !== 'function') window.plugin = function() {};
+if (typeof window.plugin !== 'function') window.plugin = function() {};
 
 //PLUGIN AUTHORS: writing a plugin outside of the IITC build environment? if so, delete these lines!!
 //(leaving them in place might break the 'About IITC' page or break update checks)
@@ -81,12 +82,12 @@ pluginWrapperStartUseStrict = pluginWrapperStart.replace("{\n", "{\n\"use strict
 
 pluginWrapperEnd = """
 setup.info = plugin_info; //add the script info data to the function as a property
-if(!window.bootPlugins) window.bootPlugins = [];
+if (!window.bootPlugins) window.bootPlugins = [];
 window.bootPlugins.push(setup);
-// if IITC has already booted, immediately run the 'setup' function
-if(window.iitcLoaded && typeof setup === 'function') setup();
-})({script: GM_info && GM_info.script && {version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description}})
-// wrapper end
+if (window.iitcLoaded && typeof setup === 'function') setup();
+})({ script: typeof GM_info !== 'undefined' && GM_info.script && {
+  version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description
+}})// wrapper end
 
 """
 

@@ -209,7 +209,7 @@ public class IITC_FileManager {
         final HashMap<String, String> info = getScriptInfo(content);
 
         final JSONObject jObject = new JSONObject(info);
-        final String gmInfo = "var GM_info={\"script\":" + jObject.toString() + "};";
+        final String gmInfo = "var GM_info = { \"script\":" + jObject.toString() + " };";
 
         return new ByteArrayInputStream((gmInfo + content).getBytes());
     }

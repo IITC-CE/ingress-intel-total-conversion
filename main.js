@@ -98,9 +98,6 @@ document.body.innerHTML = ''
 
 // anonymous function wrapper for the code - any variables/functions not placed into 'window' will be private
 (function(info){
-// a cut-down version of GM_info is passed as a parameter to the script
-// (not the full GM_info - it contains the ENTIRE script source!)
-window.script_info = info;
 
 
 
@@ -201,18 +198,21 @@ window.overlayStatus = {};
 
 // plugin framework. Plugins may load earlier than iitc, so don’t
 // overwrite data
-if(typeof window.plugin !== 'function') window.plugin = function() {};
+if (typeof window.plugin !== 'function') window.plugin = function() {};
+
+// (not saving the full GM_info - it contains the ENTIRE script source!)
+window.script_info = info;
+if (typeof GM_info !== 'undefined') {
+  info.script = {
+    version: GM_info.script.version,
+    name: GM_info.script.name,
+    description: GM_info.script.description,
+  };
+}
 
 
 @@INJECTCODE@@
 
 
-})({
-  buildName: '@@BUILDNAME@@',
-  dateTimeVersion: '@@DATETIMEVERSION@@',
-  script: this.GM_info && this.GM_info.script && {
-    version: GM_info.script.version,
-    name: GM_info.script.name,
-    description: GM_info.script.description,
-  }
-}); // end of wrapper
+})({ buildName: '@@BUILDNAME@@', dateTimeVersion: '@@DATETIMEVERSION@@' });
+// end of wrapper
