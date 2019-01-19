@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @id             iitc-plugin-fix-china-map-offset
 // @name           IITC plugin: Fix maps offsets in China
 // @category       Tweaks
@@ -13,6 +13,16 @@
 
 // use own namespace for plugin
 window.plugin.fixChinaOffset = {};
+
+// When this plugin is active then offset correction applied to maps
+// that have custom parameter `needFixChinaOffset` set to `true`.
+// Example: see boot.js for googleMutant.
+//
+// Exception: for maps' type 'satellite' and 'hybrid' no correction needed.
+//
+// * The parameter could be used for any map that suffers from the same offset problem.
+// * 'Baidu' map requires special correction, so set `needFixChinaOffset: 'Baidu'`.
+
 
 // Before understanding how this plugin works, you should know 3 points:
 //
@@ -60,18 +70,71 @@ window.plugin.fixChinaOffset = {};
 // a more careful yet still rough "China area" check in "insane_is_in_china.js".
 // Comments and code style have been adapted, mainly to remove profanity.
 // https://github.com/Artoria2e5/PRCoords
-//
-// Correction is made for maps that have the parameter
-//   needFixChinaOffset: true
-// in options. For an example of work, see Leaflet.GoogleMutant.js
+// (more info: https://github.com/iitc-project/ingress-intel-total-conversion/pull/1188)
 
-plugin.fixChinaOffset.isInGoogle = (function () { // insane_is_in_china
+var insane_is_in_china = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/misc/insane_is_in_china.js
+  /* eslint-disable */
+  'use strict';
+
+  /// *** pnpoly *** ///
+  // Wm. Franklin's 8-line point-in-polygon C program
+  // Copyright (c) 1970-2003, Wm. Randolph Franklin
+  // Copyright (c) 2017, Mingye Wang (js translation)
+  //
+  // Permission is hereby granted, free of charge, to any person obtaining
+  // a copy of this software and associated documentation files (the
+  // "Software"), to deal in the Software without restriction, including
+  // without limitation the rights to use, copy, modify, merge, publish,
+  // distribute, sublicense, and/or sell copies of the Software, and to
+  // permit persons to whom the Software is furnished to do so, subject to
+  // the following conditions:
+  //
+  //   1. Redistributions of source code must retain the above copyright
+  //      notice, this list of conditions and the following disclaimers.
+  //   2. Redistributions in binary form must reproduce the above
+  //      copyright notice in the documentation and/or other materials
+  //      provided with the distribution.
+  //   3. The name of W. Randolph Franklin may not be used to endorse or
+  //      promote products derived from this Software without specific
+  //      prior written permission.
+  //
+  // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+  // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+  // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+  // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  var pnpoly = function (xs, ys, x, y) {
+    if (!(xs.length === ys.length)) { throw new Error('pnpoly: assert(xs.length === ys.length)'); }
+    var inside = 0;
+    // j records previous value. Also handles wrapping around.
+    for (var i = 0, j = xs.length - 1; i < xs.length; j = i++) {
+      inside ^= ys[i] > y !== ys[j] > y &&
+                x < (xs[j] - xs[i]) * (y - ys[i]) / (ys[j] - ys[i]) + xs[i];
+    }
+    // Let's make js as magical as C. Yay.
+    return !!inside;
+  };
+  /// ^^^ pnpoly ^^^ ///
+
   // This set of points roughly illustrates the scope of Google's
   // distortion. It has nothing to do with national borders etc.
   // Points around Hong Kong/Shenzhen are mapped with a little more precision,
   // in hope that it will make agents work a bit more smoothly there.
   //
   // Edits around these points are welcome.
+
+  // We will need to filter out these points for Baidu.
+  // (We will need South China Sea too.)
+  // var is_near_hkmo = function (lat, lon) {
+  //   return 22 <= lat && lat <= 22.7 && 113.5 <= lon && lon <= 114.5
+  // }
+  //
+  // Well we now have indices for HK/MO.
+  var HK_LENGTH = 12;
+
+  // lon, lat
   var POINTS = [
     // start hkmo
     114.433722, 22.064310,
@@ -145,82 +208,55 @@ plugin.fixChinaOffset.isInGoogle = (function () { // insane_is_in_china
     107.730505, 18.193406,
     110.669856, 17.754550,
   ];
+
   var lats = POINTS.filter(function (_, idx) { return idx % 2 === 1; });
-  var lngs = POINTS.filter(function (_, idx) { return idx % 2 === 0; });
-  POINTS = null; // not needed anyway...
+  var lons = POINTS.filter(function (_, idx) { return idx % 2 === 0; });
+  var bdlats = lats.slice(HK_LENGTH);
+  var bdlons = lons.slice(HK_LENGTH);
 
-  /// *** pnpoly *** ///
-  // Wm. Franklin's 8-line point-in-polygon C program
-  // Copyright (c) 1970-2003, Wm. Randolph Franklin
-  // Copyright (c) 2017, Mingye Wang (js translation)
-  //
-  // Permission is hereby granted, free of charge, to any person obtaining
-  // a copy of this software and associated documentation files (the
-  // "Software"), to deal in the Software without restriction, including
-  // without limitation the rights to use, copy, modify, merge, publish,
-  // distribute, sublicense, and/or sell copies of the Software, and to
-  // permit persons to whom the Software is furnished to do so, subject to
-  // the following conditions:
-  //
-  //   1. Redistributions of source code must retain the above copyright
-  //      notice, this list of conditions and the following disclaimers.
-  //   2. Redistributions in binary form must reproduce the above
-  //      copyright notice in the documentation and/or other materials
-  //      provided with the distribution.
-  //   3. The name of W. Randolph Franklin may not be used to endorse or
-  //      promote products derived from this Software without specific
-  //      prior written permission.
-  //
-  // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-  // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-  // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-  // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-  // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-  // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-  // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  var pnpoly = function (xs, ys, x, y) {
-    if (!(xs.length === ys.length)) { throw new Error('pnpoly: assert(xs.length === ys.length)'); }
-    var inside = 0;
-    for (var i = 0, j = xs.length - 1; i < xs.length; j = i++) {
-      inside ^= ys[i] > y !== ys[j] > y &&
-                x < (xs[j] - xs[i]) * (y - ys[i]) / (ys[j] - ys[i]) + xs[i];
-    }
-    return !!inside;
-  };
-  /// ^^^ pnpoly ^^^ ///
-
-  var isInGoogle = function (coords) {
+  function isInChina (lat, lon, isBaidu) {
     // Yank out South China Sea as it's not distorted.
-    return coords.lat >= 17.754 && coords.lat <= 55.8271 &&
-           coords.lng >= 72.004 && coords.lng <= 137.8347 &&
-           pnpoly(lats, lngs, coords.lat, coords.lng);
-  };
+    if (lat >= 17.754 && lat <= 55.8271 &&
+        lon >= 72.004 && lon <= 137.8347) {
+      return isBaidu ? pnpoly(bdlats, bdlons, lat, lon)
+                     : pnpoly(lats, lons, lat, lon);
+    }
+  }
 
-  return isInGoogle;
+  return { isInChina: isInChina };
+  /* eslint-enable */
 })();
 
-plugin.fixChinaOffset.gcjObfs = (function () {
+plugin.fixChinaOffset.isInChina = insane_is_in_china.isInChina;
+
+var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
+  /* eslint-disable */
+  'use strict';
+
   /// Krasovsky 1940 ellipsoid
   /// @const
   var GCJ_A = 6378245;
   var GCJ_EE = 0.00669342162296594323; // f = 1/298.3; e^2 = 2*f - f**2
 
-  var gcjObfs = function (wgs) {
+  function wgs_gcj (wgs) {
 
-    var x = wgs.lng - 105,
-      y = wgs.lat - 35;
+    var x = wgs.lng - 105, // mod: lon->lng
+        y = wgs.lat - 35;
+
     // These distortion functions accept (x = lon - 105, y = lat - 35).
     // They return distortions in terms of arc lengths, in meters.
-    var dLat_m = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x)) +
-      20 / 3 * (
+    var dLat_m = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y +
+      0.2 * Math.sqrt(Math.abs(x)) + (
         2 * Math.sin(x * 6 * Math.PI) + 2 * Math.sin(x * 2 * Math.PI) +
         2 * Math.sin(y * Math.PI) + 4 * Math.sin(y / 3 * Math.PI) +
-        16 * Math.sin(y / 12 * Math.PI) + 32 * Math.sin(y / 30 * Math.PI));
-    var dLon_m = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x)) +
-      20 / 3 * (
+        16 * Math.sin(y / 12 * Math.PI) + 32 * Math.sin(y / 30 * Math.PI)
+      ) * 20 / 3;
+    var dLon_m = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y +
+      0.1 * Math.sqrt(Math.abs(x)) + (
         2 * Math.sin(x * 6 * Math.PI) + 2 * Math.sin(x * 2 * Math.PI) +
         2 * Math.sin(x * Math.PI) + 4 * Math.sin(x / 3 * Math.PI) +
-        15 * Math.sin(x / 12 * Math.PI) + 30 * Math.sin(x / 30 * Math.PI));
+        15 * Math.sin(x / 12 * Math.PI) + 30 * Math.sin(x / 30 * Math.PI)
+      ) * 20 / 3;
 
     var radLat = wgs.lat / 180 * Math.PI;
     var magic = 1 - GCJ_EE * Math.pow(Math.sin(radLat), 2); // just a common expr
@@ -231,24 +267,55 @@ plugin.fixChinaOffset.gcjObfs = (function () {
 
     return {
       lat: wgs.lat + dLat_m / lat_deg_arclen,
-      lng: wgs.lng + dLon_m / lon_deg_arclen,
+      lng: wgs.lng + dLon_m / lon_deg_arclen, // mod: lon->lng
     };
-  };
+  }
 
-  return gcjObfs;
+  /// Baidu's artificial deviations
+  /// @const
+  var BD_DLAT = 0.0060;
+  var BD_DLON = 0.0065;
+
+  function gcj_bd (gcj) {
+    var x = gcj.lng; // mod: lon->lng
+    var y = gcj.lat;
+
+    // trivia: pycoordtrans actually describes how these values are calculated
+    var r = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * Math.PI * 3000 / 180);
+    var θ = Math.atan2(y, x) + 0.000003 * Math.cos(x * Math.PI * 3000 / 180);
+
+    // Hard-coded default deviations again!
+    return {
+      lat: r * Math.sin(θ) + BD_DLAT,
+      lng: r * Math.cos(θ) + BD_DLON, // mod: lon->lng
+    };
+  }
+
+  function wgs_bd (wgs) {
+    return gcj_bd(wgs_gcj(wgs));
+  }
+
+  return { wgs_gcj: wgs_gcj, gcj_bd: gcj_bd, wgs_bd: wgs_bd };
+  /* eslint-enable */
 })();
 
-plugin.fixChinaOffset.process = function (wgs) {
-  return plugin.fixChinaOffset.isInGoogle(wgs)
-    ? plugin.fixChinaOffset.gcjObfs(wgs)
-    : wgs;
+plugin.fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
+plugin.fixChinaOffset.wgs_bd = PRCoords.wgs_bd;
+
+plugin.fixChinaOffset.process = function (wgs, option) {
+  var isBaidu = option==='Baidu';
+  if (plugin.fixChinaOffset.isInChina(wgs.lat,wgs.lng,isBaidu)) {
+    return isBaidu
+      ? plugin.fixChinaOffset.wgs_bd(wgs)
+      : plugin.fixChinaOffset.wgs_gcj(wgs);
+  }
 };
 
 ///////// begin overwrited L.GridLayer /////////
 
 L.GridLayer.prototype._getTiledPixelBounds = (function () {
   return function (center) {
-  /// modified here ///
+    /// modified here ///
     center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
     /////////////////////
     var map = this._map,
@@ -302,8 +369,8 @@ L.GridLayer.GoogleMutant.prototype._update = (function () {
 
 window.plugin.fixChinaOffset.getLatLng = function (pos, options) {
   // No offsets in satellite and hybrid maps
-  if (options.needFixChinaOffset === true && options.type !== 'satellite' && options.type !== 'hybrid') {
-    return plugin.fixChinaOffset.process(pos);
+  if (options.needFixChinaOffset && options.type !== 'satellite' && options.type !== 'hybrid') {
+    return plugin.fixChinaOffset.process(pos,options.needFixChinaOffset) || pos;
   }
   return pos;
 };
