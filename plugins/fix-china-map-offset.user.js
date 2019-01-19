@@ -214,12 +214,13 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
   var bdlats = lats.slice(HK_LENGTH);
   var bdlons = lons.slice(HK_LENGTH);
 
-  function isInChina (lat, lon, isBaidu) {
+  function isInChina (lat, lon, inclHongKong) {
     // Yank out South China Sea as it's not distorted.
     if (lat >= 17.754 && lat <= 55.8271 &&
         lon >= 72.004 && lon <= 137.8347) {
-      return isBaidu ? pnpoly(bdlats, bdlons, lat, lon)
-                     : pnpoly(lats, lons, lat, lon);
+      return inclHongKong
+             ? pnpoly(lats, lons, lat, lon)
+             : pnpoly(bdlats, bdlons, lat, lon);
     }
   }
 
@@ -304,7 +305,8 @@ plugin.fixChinaOffset.wgs_bd = PRCoords.wgs_bd;
 
 plugin.fixChinaOffset.process = function (wgs, option) {
   var isBaidu = option==='Baidu';
-  if (plugin.fixChinaOffset.isInChina(wgs.lat,wgs.lng,isBaidu)) {
+  var inclHongKong = !isBaidu; // fixme: need some option
+  if (plugin.fixChinaOffset.isInChina(wgs.lat, wgs.lng, inclHongKong)) {
     return isBaidu
       ? plugin.fixChinaOffset.wgs_bd(wgs)
       : plugin.fixChinaOffset.wgs_gcj(wgs);
@@ -368,7 +370,7 @@ L.GridLayer.GoogleMutant.prototype._update = (function () {
 })(L.GridLayer.GoogleMutant.prototype._update);
 
 window.plugin.fixChinaOffset.getLatLng = function (pos, options) {
-  // No offsets in satellite and hybrid maps
+  // No offsets in satellite and hybrid maps // fixme: need some option
   if (options.needFixChinaOffset && options.type !== 'satellite' && options.type !== 'hybrid') {
     return plugin.fixChinaOffset.process(pos,options.needFixChinaOffset) || pos;
   }
