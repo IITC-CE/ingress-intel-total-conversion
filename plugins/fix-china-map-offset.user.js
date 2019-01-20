@@ -303,14 +303,19 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
 plugin.fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
 plugin.fixChinaOffset.wgs_bd = PRCoords.wgs_bd;
 
-plugin.fixChinaOffset.process = function (wgs, option) {
-  var isBaidu = option==='Baidu';
-  var inclHongKong = isBaidu; // fixme: need some option
+plugin.fixChinaOffset.transform = function (wgs, options) {
+  if (options.type === 'satellite' || options.type === 'hybrid') {
+    return wgs; 
+  }
+  if (!options.needFixChinaOffset) { return wgs; }
+  var isBaidu = options.needFixChinaOffset === 'Baidu';
+  var inclHongKong = isBaidu;
   if (plugin.fixChinaOffset.isInChina(wgs.lat, wgs.lng, inclHongKong)) {
     return isBaidu
       ? plugin.fixChinaOffset.wgs_bd(wgs)
       : plugin.fixChinaOffset.wgs_gcj(wgs);
   }
+  return wgs;
 };
 
 ///////// begin overwrited L.GridLayer /////////
@@ -318,7 +323,7 @@ plugin.fixChinaOffset.process = function (wgs, option) {
 L.GridLayer.prototype._getTiledPixelBounds = (function () {
   return function (center) {
     /// modified here ///
-    center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
+    center = plugin.fixChinaOffset.transform(center, this.options);
     /////////////////////
     var map = this._map,
       mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
@@ -332,7 +337,7 @@ L.GridLayer.prototype._getTiledPixelBounds = (function () {
 
 L.GridLayer.prototype._setZoomTransform = (function (original) {
   return function (level, center, zoom) {
-    center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
+    center = plugin.fixChinaOffset.transform(center, this.options);
     original.apply(this, [level, center, zoom]);
   };
 })(L.GridLayer.prototype._setZoomTransform);
@@ -345,7 +350,7 @@ L.GridLayer.GoogleMutant.prototype._update = (function () {
     if (this._mutant) {
       var center = this._map.getCenter();
       /// modified here ///
-      center = window.plugin.fixChinaOffset.getLatLng(center, this.options);
+      center = plugin.fixChinaOffset.transform(center, this.options);
       /////////////////////
       /* eslint-disable */
       var _center = new google.maps.LatLng(center.lat, center.lng);
@@ -368,14 +373,6 @@ L.GridLayer.GoogleMutant.prototype._update = (function () {
     L.GridLayer.prototype._update.call(this);
   };
 })(L.GridLayer.GoogleMutant.prototype._update);
-
-window.plugin.fixChinaOffset.getLatLng = function (pos, options) {
-  // No offsets in satellite and hybrid maps // fixme: need some option
-  if (options.needFixChinaOffset && options.type !== 'satellite' && options.type !== 'hybrid') {
-    return plugin.fixChinaOffset.process(pos,options.needFixChinaOffset) || pos;
-  }
-  return pos;
-};
 
 var setup = function () {};
 
