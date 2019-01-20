@@ -318,60 +318,53 @@ plugin.fixChinaOffset.transform = function (wgs, options) {
   return wgs;
 };
 
-///////// begin overwrited L.GridLayer /////////
-
-L.GridLayer.prototype._getTiledPixelBounds = (function () {
-  return function (center) {
-    /// modified here ///
-    center = plugin.fixChinaOffset.transform(center, this.options);
-    /////////////////////
-    var map = this._map,
-      mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
-      scale = map.getZoomScale(mapZoom, this._tileZoom),
-      pixelCenter = map.project(center, this._tileZoom).floor(),
-      halfSize = map.getSize().divideBy(scale * 2);
-
-    return new L.Bounds(pixelCenter.subtract(halfSize), pixelCenter.add(halfSize));
-  };
-})(L.GridLayer.prototype._getTiledPixelBounds);
-
-L.GridLayer.prototype._setZoomTransform = (function (original) {
-  return function (level, center, zoom) {
-    center = plugin.fixChinaOffset.transform(center, this.options);
-    original.apply(this, [level, center, zoom]);
-  };
-})(L.GridLayer.prototype._setZoomTransform);
-
-L.GridLayer.GoogleMutant.prototype._update = (function () {
-  return function () {
-    this.options.needFixChinaOffset = true;
-    // zoom level check needs to happen before super's implementation (tile addition/creation)
-    // otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
-    if (this._mutant) {
-      var center = this._map.getCenter();
-      /// modified here ///
+// redefine L.GridLayer methods
+(function (_getTiledPixelBounds, _setZoomTransform) {
+  L.GridLayer.include({
+    _getTiledPixelBounds: function (center) {
       center = plugin.fixChinaOffset.transform(center, this.options);
-      /////////////////////
-      /* eslint-disable */
-      var _center = new google.maps.LatLng(center.lat, center.lng);
-
-      this._mutant.setCenter(_center);
-      var zoom = this._map.getZoom();
-      var fractionalLevel = zoom !== Math.round(zoom);
-      var mutantZoom = this._mutant.getZoom();
-
-      //ignore fractional zoom levels
-      if (!fractionalLevel && (zoom != mutantZoom)) {
-        this._mutant.setZoom(zoom);
-
-        if (this._mutantIsReady) this._checkZoomLevels();
-        //else zoom level check will be done later by 'idle' handler
-      }
-      /* eslint-enable */
+      return _getTiledPixelBounds.call(this, center);
+    },
+    _setZoomTransform: function (level, center, zoom) {
+      center = plugin.fixChinaOffset.transform(center, this.options);
+      _setZoomTransform.call(this, level, center, zoom);
     }
+  })
+}(L.GridLayer.prototype._getTiledPixelBounds,L.GridLayer.prototype._setZoomTransform));
 
-    L.GridLayer.prototype._update.call(this);
-  };
+// redefine L.GridLayer.GoogleMutant method
+(function () {
+  L.GridLayer.GoogleMutant.include({
+    _update: function () {
+      this.options.needFixChinaOffset = true;
+      // zoom level check needs to happen before super's implementation (tile addition/creation)
+      // otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
+      if (this._mutant) {
+        var center = this._map.getCenter();
+        /// modified here ///
+        center = plugin.fixChinaOffset.transform(center, this.options);
+        /////////////////////
+        /* eslint-disable */
+        var _center = new google.maps.LatLng(center.lat, center.lng);
+
+        this._mutant.setCenter(_center);
+        var zoom = this._map.getZoom();
+        var fractionalLevel = zoom !== Math.round(zoom);
+        var mutantZoom = this._mutant.getZoom();
+
+        //ignore fractional zoom levels
+        if (!fractionalLevel && (zoom != mutantZoom)) {
+          this._mutant.setZoom(zoom);
+
+          if (this._mutantIsReady) this._checkZoomLevels();
+          //else zoom level check will be done later by 'idle' handler
+        }
+        /* eslint-enable */
+      }
+
+      L.GridLayer.prototype._update.call(this);
+    }
+  })
 })(L.GridLayer.GoogleMutant.prototype._update);
 
 var setup = function () {};
