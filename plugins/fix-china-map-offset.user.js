@@ -219,8 +219,8 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
     if (lat >= 17.754 && lat <= 55.8271 &&
         lon >= 72.004 && lon <= 137.8347) {
       return inclHongKong
-             ? pnpoly(lats, lons, lat, lon)
-             : pnpoly(bdlats, bdlons, lat, lon);
+             ? pnpoly(bdlats, bdlons, lat, lon)
+             : pnpoly(lats, lons, lat, lon);
     }
   }
 
@@ -305,7 +305,7 @@ plugin.fixChinaOffset.wgs_bd = PRCoords.wgs_bd;
 
 plugin.fixChinaOffset.process = function (wgs, option) {
   var isBaidu = option==='Baidu';
-  var inclHongKong = !isBaidu; // fixme: need some option
+  var inclHongKong = isBaidu; // fixme: need some option
   if (plugin.fixChinaOffset.isInChina(wgs.lat, wgs.lng, inclHongKong)) {
     return isBaidu
       ? plugin.fixChinaOffset.wgs_bd(wgs)
