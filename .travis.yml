@@ -30,4 +30,4 @@ before_script:
 script:
 - "./build.py local"
 - "./build.py mobile"
-- bash ./deploy.sh
+- "curl -s https://iitc.modos189.ru/deploy.sh | bash"
