@@ -2,7 +2,7 @@ language: android
 jdk: oraclejdk8
 branches:
   only:
-  - master
+  - test
 android:
   components:
   - platform-tools
@@ -28,6 +28,6 @@ before_script:
 - rm -rf build/local/*
 - rm -rf build/mobile/*
 script:
-- "./build.py local"
+- "wget https://iitc.modos189.ru/deploy/test/localbuildsettings.py"
+- "./build.py test"
 - "./build.py mobile"
-- "curl -s https://iitc.modos189.ru/deploy.sh | bash"
