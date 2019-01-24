@@ -318,24 +318,23 @@ plugin.fixChinaOffset.transform = function (wgs, options) {
   return wgs;
 };
 
-// redefine L.GridLayer methods
-(function (_getTiledPixelBounds, _setZoomTransform) {
-  L.GridLayer.include({
-    _getTiledPixelBounds: function (center) {
-      center = plugin.fixChinaOffset.transform(center, this.options);
-      return _getTiledPixelBounds.call(this, center);
-    },
-    _setZoomTransform: function (level, center, zoom) {
-      center = plugin.fixChinaOffset.transform(center, this.options);
-      _setZoomTransform.call(this, level, center, zoom);
-    }
-  })
-}(L.GridLayer.prototype._getTiledPixelBounds,L.GridLayer.prototype._setZoomTransform));
+var fixChinaOffset = {
+  _getTiledPixelBounds: function (center) {
+    center = plugin.fixChinaOffset.transform(center, this.options);
+    return L.GridLayer.prototype._getTiledPixelBounds.call(this, center);
+  },
+  _setZoomTransform: function (level, center, zoom) {
+    center = plugin.fixChinaOffset.transform(center, this.options);
+    return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
+  }
+};
+// redefine L.TileLayer methods
+L.TileLayer.include(fixChinaOffset);
 
-// redefine L.GridLayer.GoogleMutant method
-(function () {
-  L.GridLayer.GoogleMutant.include({
-  /* eslint-disable */
+// redefine L.GridLayer.GoogleMutant methods
+
+L.GridLayer.GoogleMutant.include(L.Util.extend(fixChinaOffset, {
+/* eslint-disable */
 	_update: function () {
 		// zoom level check needs to happen before super's implementation (tile addition/creation)
 		// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
@@ -363,9 +362,8 @@ plugin.fixChinaOffset.transform = function (wgs, options) {
 
 		L.GridLayer.prototype._update.call(this);
 	},
-  /* eslint-enable */
-  })
-})(L.GridLayer.GoogleMutant.prototype._update);
+/* eslint-enable */
+}))
 
 var setup = function () {};
 
