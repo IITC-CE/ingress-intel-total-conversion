@@ -304,9 +304,6 @@ plugin.fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
 plugin.fixChinaOffset.wgs_bd = PRCoords.wgs_bd;
 
 plugin.fixChinaOffset.transform = function (wgs, options) {
-  if (options.type === 'satellite' || options.type === 'hybrid') {
-    return wgs; 
-  }
   if (!options.needFixChinaOffset) { return wgs; }
   var isBaidu = options.needFixChinaOffset === 'Baidu';
   var inclHongKong = isBaidu;
@@ -343,7 +340,6 @@ L.GridLayer.GoogleMutant.include(L.Util.extend(fixChinaOffset, {
 			var _center = new google.maps.LatLng(center.lat, center.lng);
 			/// modified here ///
 			center = plugin.fixChinaOffset.transform(center, this.options);
-			this.options.needFixChinaOffset = true;
 			/////////////////////
 
 			this._mutant.setCenter(_center);
