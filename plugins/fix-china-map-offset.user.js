@@ -335,35 +335,35 @@ plugin.fixChinaOffset.transform = function (wgs, options) {
 // redefine L.GridLayer.GoogleMutant method
 (function () {
   L.GridLayer.GoogleMutant.include({
-    _update: function () {
-      this.options.needFixChinaOffset = true;
-      // zoom level check needs to happen before super's implementation (tile addition/creation)
-      // otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
-      if (this._mutant) {
-        var center = this._map.getCenter();
-        /// modified here ///
-        center = plugin.fixChinaOffset.transform(center, this.options);
-        /////////////////////
-        /* eslint-disable */
-        var _center = new google.maps.LatLng(center.lat, center.lng);
+  /* eslint-disable */
+	_update: function () {
+		// zoom level check needs to happen before super's implementation (tile addition/creation)
+		// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
+		if (this._mutant) {
+			var center = this._map.getCenter();
+			var _center = new google.maps.LatLng(center.lat, center.lng);
+			/// modified here ///
+			center = plugin.fixChinaOffset.transform(center, this.options);
+			this.options.needFixChinaOffset = true;
+			/////////////////////
 
-        this._mutant.setCenter(_center);
-        var zoom = this._map.getZoom();
-        var fractionalLevel = zoom !== Math.round(zoom);
-        var mutantZoom = this._mutant.getZoom();
+			this._mutant.setCenter(_center);
+			var zoom = this._map.getZoom();
+			var fractionalLevel = zoom !== Math.round(zoom);
+			var mutantZoom = this._mutant.getZoom();
 
-        //ignore fractional zoom levels
-        if (!fractionalLevel && (zoom != mutantZoom)) {
-          this._mutant.setZoom(zoom);
+			//ignore fractional zoom levels
+			if (!fractionalLevel && (zoom != mutantZoom)) {
+				this._mutant.setZoom(zoom);
 
-          if (this._mutantIsReady) this._checkZoomLevels();
-          //else zoom level check will be done later by 'idle' handler
-        }
-        /* eslint-enable */
-      }
+				if (this._mutantIsReady) this._checkZoomLevels();
+				//else zoom level check will be done later by 'idle' handler
+			}
+		}
 
-      L.GridLayer.prototype._update.call(this);
-    }
+		L.GridLayer.prototype._update.call(this);
+	},
+  /* eslint-enable */
   })
 })(L.GridLayer.GoogleMutant.prototype._update);
 
