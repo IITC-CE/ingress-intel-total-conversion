@@ -315,6 +315,7 @@ plugin.fixChinaOffset.transform = function (wgs, options) {
   return wgs;
 };
 
+// redefine L.TileLayer methods
 var fixChinaOffset = {
   _getTiledPixelBounds: function (center) {
     center = plugin.fixChinaOffset.transform(center, this.options);
@@ -325,12 +326,9 @@ var fixChinaOffset = {
     return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
   }
 };
-// redefine L.TileLayer methods
-L.TileLayer.include(fixChinaOffset);
 
 // redefine L.GridLayer.GoogleMutant methods
-
-L.GridLayer.GoogleMutant.include(L.Util.extend(fixChinaOffset, {
+var fixGoogleMutant = L.Util.extend(fixChinaOffset, {
 /* eslint-disable */
 	_update: function () {
 		// zoom level check needs to happen before super's implementation (tile addition/creation)
@@ -359,9 +357,12 @@ L.GridLayer.GoogleMutant.include(L.Util.extend(fixChinaOffset, {
 		L.GridLayer.prototype._update.call(this);
 	},
 /* eslint-enable */
-}))
+});
 
-var setup = function () {};
+function setup () {
+  L.TileLayer.include(fixChinaOffset);
+  L.GridLayer.GoogleMutant.include(fixGoogleMutant);
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
