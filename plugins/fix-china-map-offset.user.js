@@ -362,6 +362,13 @@ var fixGoogleMutant = L.Util.extend(fixChinaOffset, {
 function setup () {
   L.TileLayer.include(fixChinaOffset);
   L.GridLayer.GoogleMutant.include(fixGoogleMutant);
+
+  layerChooser._layers.forEach(function (item) {
+    if (item.layer._GAPIPromise) {
+      var o = item.layer.options;
+      o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybride';
+    }
+  });
 }
 
 // PLUGIN END //////////////////////////////////////////////////////////

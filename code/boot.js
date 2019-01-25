@@ -142,15 +142,14 @@ function createDefaultBaseMapLayers() {
           { featureType:"poi", stylers:[{visibility:"off"}]},
           { featureType:"transit", elementType:"all", stylers:[{visibility:"off"}] }
         ],
-      needFixChinaOffset: true // managed by fix-china-map-offset plugin
     });
-  baseLayers['Google Roads'] = L.gridLayer.googleMutant({type:'roadmap', maxZoom: 21, needFixChinaOffset: true});
-  var trafficMutant = L.gridLayer.googleMutant({type:'roadmap', maxZoom: 21, needFixChinaOffset: true});
+  baseLayers['Google Roads'] = L.gridLayer.googleMutant({type:'roadmap', maxZoom: 21});
+  var trafficMutant = L.gridLayer.googleMutant({type:'roadmap', maxZoom: 21});
   trafficMutant.addGoogleLayer('TrafficLayer');
   baseLayers['Google Roads + Traffic'] = trafficMutant;
   baseLayers['Google Satellite'] = L.gridLayer.googleMutant({type:'satellite', maxZoom: 21});
   baseLayers['Google Hybrid'] = L.gridLayer.googleMutant({type:'hybrid', maxZoom: 21});
-  baseLayers['Google Terrain'] = L.gridLayer.googleMutant({type:'terrain', maxZoom: 21, needFixChinaOffset: true});
+  baseLayers['Google Terrain'] = L.gridLayer.googleMutant({type:'terrain', maxZoom: 21});
 
 
   return baseLayers;
