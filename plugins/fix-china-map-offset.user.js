@@ -16,7 +16,7 @@ window.plugin.fixChinaOffset = {};
 
 // When this plugin is active then offset correction applied to maps
 // that have custom parameter `needFixChinaOffset` set to `true`.
-// Example: see boot.js for googleMutant.
+// Example: see boot.js for googleMutant. <to be continued>
 //
 // Exception: for maps' type 'satellite' and 'hybrid' no correction needed.
 //
@@ -73,7 +73,7 @@ window.plugin.fixChinaOffset = {};
 // (more info: https://github.com/iitc-project/ingress-intel-total-conversion/pull/1188)
 
 var insane_is_in_china = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/misc/insane_is_in_china.js
-  /* eslint-disable */
+/* eslint-disable */
   'use strict';
 
   /// *** pnpoly *** ///
@@ -225,13 +225,13 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
   }
 
   return { isInChina: isInChina };
-  /* eslint-enable */
+/* eslint-enable */
 })();
 
 plugin.fixChinaOffset.isInChina = insane_is_in_china.isInChina;
 
 var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
-  /* eslint-disable */
+/* eslint-disable */
   'use strict';
 
   /// Krasovsky 1940 ellipsoid
@@ -297,7 +297,7 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
   }
 
   return { wgs_gcj: wgs_gcj, gcj_bd: gcj_bd, wgs_bd: wgs_bd };
-  /* eslint-enable */
+/* eslint-enable */
 })();
 
 plugin.fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
