@@ -14,14 +14,12 @@
 // use own namespace for plugin
 window.plugin.fixChinaOffset = {};
 
-// When this plugin is active then offset correction applied to maps
-// that have custom parameter `needFixChinaOffset` set to `true`.
-// Example: see boot.js for googleMutant. <to be continued>
+// This plugin is intended to fix offset problem of Google maps in China.
 //
-// Exception: for maps' type 'satellite' and 'hybrid' no correction needed.
+// When the plugin is active then the same correction method is applying
+// to any map that has custom TileLayer option `needFixChinaOffset: true`.
 //
-// * The parameter could be used for any map that suffers from the same offset problem.
-// * 'Baidu' map requires special correction, so set `needFixChinaOffset: 'Baidu'`.
+// Example: basemap-gaode.user.js
 
 
 // Before understanding how this plugin works, you should know 3 points:
@@ -125,15 +123,6 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
   //
   // Edits around these points are welcome.
 
-  // We will need to filter out these points for Baidu.
-  // (We will need South China Sea too.)
-  // var is_near_hkmo = function (lat, lon) {
-  //   return 22 <= lat && lat <= 22.7 && 113.5 <= lon && lon <= 114.5
-  // }
-  //
-  // Well we now have indices for HK/MO.
-  var HK_LENGTH = 12;
-
   // lon, lat
   var POINTS = [
     // start hkmo
@@ -211,16 +200,12 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
 
   var lats = POINTS.filter(function (_, idx) { return idx % 2 === 1; });
   var lons = POINTS.filter(function (_, idx) { return idx % 2 === 0; });
-  var bdlats = lats.slice(HK_LENGTH);
-  var bdlons = lons.slice(HK_LENGTH);
 
-  function isInChina (lat, lon, inclHongKong) {
+  function isInChina (lat, lon) {
     // Yank out South China Sea as it's not distorted.
     if (lat >= 17.754 && lat <= 55.8271 &&
         lon >= 72.004 && lon <= 137.8347) {
-      return inclHongKong
-             ? pnpoly(bdlats, bdlons, lat, lon)
-             : pnpoly(lats, lons, lat, lon);
+      return pnpoly(lats, lons, lat, lon);
     }
   }
 
@@ -272,45 +257,15 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
     };
   }
 
-  /// Baidu's artificial deviations
-  /// @const
-  var BD_DLAT = 0.0060;
-  var BD_DLON = 0.0065;
-
-  function gcj_bd (gcj) {
-    var x = gcj.lng; // mod: lon->lng
-    var y = gcj.lat;
-
-    // trivia: pycoordtrans actually describes how these values are calculated
-    var r = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * Math.PI * 3000 / 180);
-    var θ = Math.atan2(y, x) + 0.000003 * Math.cos(x * Math.PI * 3000 / 180);
-
-    // Hard-coded default deviations again!
-    return {
-      lat: r * Math.sin(θ) + BD_DLAT,
-      lng: r * Math.cos(θ) + BD_DLON, // mod: lon->lng
-    };
-  }
-
-  function wgs_bd (wgs) {
-    return gcj_bd(wgs_gcj(wgs));
-  }
-
-  return { wgs_gcj: wgs_gcj, gcj_bd: gcj_bd, wgs_bd: wgs_bd };
+  return { wgs_gcj: wgs_gcj };
 /* eslint-enable */
 })();
 
 plugin.fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
-plugin.fixChinaOffset.wgs_bd = PRCoords.wgs_bd;
 
 plugin.fixChinaOffset.transform = function (wgs, options) {
-  if (!options.needFixChinaOffset) { return wgs; }
-  var isBaidu = options.needFixChinaOffset === 'Baidu';
-  var inclHongKong = isBaidu;
-  if (plugin.fixChinaOffset.isInChina(wgs.lat, wgs.lng, inclHongKong)) {
-    return isBaidu
-      ? plugin.fixChinaOffset.wgs_bd(wgs)
-      : plugin.fixChinaOffset.wgs_gcj(wgs);
+  if (options.needFixChinaOffset && plugin.fixChinaOffset.isInChina(wgs.lat, wgs.lng)) {
+    return plugin.fixChinaOffset.wgs_gcj(wgs);
   }
   return wgs;
 };
