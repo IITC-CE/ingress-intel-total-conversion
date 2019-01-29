@@ -599,16 +599,12 @@ function boot() {
   if(window.deviceID) console.log('Your device ID: ' + window.deviceID);
   window.runOnSmartphonesBeforeBoot();
 
-  var iconDefImage = '@@INCLUDEIMAGE:images/marker-icon.png@@';
-  var iconDefRetImage = '@@INCLUDEIMAGE:images/marker-icon-2x.png@@';
-
-  L.Icon.Default = L.Icon.extend({options: {
-    iconUrl: iconDefImage,
-    iconRetinaUrl: iconDefRetImage,
-    iconSize: new L.Point(25, 41),
-    iconAnchor: new L.Point(12, 41),
-    popupAnchor: new L.Point(1, -34),
-  }});
+  L.Icon.Default.mergeOptions({
+    iconUrl: '@@INCLUDEIMAGE:images/marker-ingress.png@@',
+    iconRetinaUrl: '@@INCLUDEIMAGE:images/marker-ingress-2x.png@@',
+    shadowUrl: '@@INCLUDEIMAGE:images/marker-shadow.png@@'
+  });
+  L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
 
   window.extractFromStock();
   window.setupIdle();

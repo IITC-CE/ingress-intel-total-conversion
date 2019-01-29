@@ -463,8 +463,8 @@
 }
 
 /* Default icon URLs */
-.leaflet-default-icon-path {
-    background-image: url(@@INCLUDEIMAGE:images/marker-icon.png@@);
+.leaflet-default-icon-path { /* IITC: Is's dummy style used in Icon.Default._detectIconPath */
+    background-image: url(images/marker-icon.png); /* IITC: No need to patch it here */
 }
 
 /* attribution and scale controls */
