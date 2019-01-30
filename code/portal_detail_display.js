@@ -105,18 +105,18 @@ window.renderPortalDetails = function(guid) {
     .html('') //to ensure it's clear
     .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
     .append(
-      $('<svg><use xlink:href="#ic_place_24px"></use></svg>')
-        .attr({
-          title: 'Click to move to portal',
-          class: 'material-icons  icon-button',
-        })
-        .click(function() {
-          zoomToAndShowPortal(guid,[data.latE6/1E6,data.lngE6/1E6]);
-          if (isSmartphone()) { show('map') };
-        }),
-      
       $('<h3>', { class:'title' })
-        .text(title),
+        .text(title)
+        .prepend(
+          $('<svg><use xlink:href="#ic_place_24px"/><title>Click to move to portal</title></svg>')
+            .attr({
+              class: 'material-icons icon-button',
+              style: 'float: left'
+            })
+            .click(function() {
+              zoomToAndShowPortal(guid,[data.latE6/1E6,data.lngE6/1E6]);
+              if (isSmartphone()) { show('map') };
+            })),
 
       $('<span>').attr({
         class: 'close',
@@ -147,7 +147,7 @@ window.renderPortalDetails = function(guid) {
       statusDetails,
 
       $('<div>', { class: 'linkdetails' })
-        .text(linkDetails.join(''))
+        .html(linkDetails.join(''))
     );
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data

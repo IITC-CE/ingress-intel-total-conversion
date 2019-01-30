@@ -596,18 +596,13 @@ input[type="search"], input[type="url"] {
 
 
 /* portal title and image */
-h3 {
-  font-size: 16px;
-  padding: 0 4px;
-  margin:0;
-  height: 23px;
-  width: 100%;
+h3.title {
+  padding-right: 17px; /* to not overlap with close button */
+  margin: 2px 0;
+  line-height: 24px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
 }
 
 .imgpreview {
@@ -821,12 +816,6 @@ h3 {
 #portaldetails {
   min-height: 63px;
   position: relative; /* so the below '#portaldetails .close' is relative to this */
-}
-
-#portaldetails .title {
-  width: auto;
-  display: inline-block;
-  line-height: 24px;
 }
 
 #portaldetails .close {
