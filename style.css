@@ -824,7 +824,7 @@ h3 {
 }
 
 #portaldetails .title {
-  width: auto;
+  width: calc(100% - 55px);
   display: inline-block;
   line-height: 24px;
 }
