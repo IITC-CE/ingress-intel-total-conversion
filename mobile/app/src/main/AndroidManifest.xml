@@ -143,13 +143,7 @@
             android:exported="false"
             android:icon="@drawable/ic_action_copy"
             android:label="@string/activity_share_to_clipboard"
-            android:noHistory="false">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-
-                <data android:mimeType="text/plain"/>
-            </intent-filter>
-        </activity>
+            android:noHistory="false"/>
 
         <activity
             android:name="org.exarhteam.iitc_mobile.share.SaveToFile"
