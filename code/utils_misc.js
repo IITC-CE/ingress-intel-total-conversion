@@ -451,7 +451,7 @@ window.getGenericMarkerIcon = function(color) { // used in draw-tools
   return L.divIcon({
     iconSize: [25, 41],
     iconAnchor: [12, 41],
-    html: '<svg width="25px" height="41px" style="fill: ' + color + '"><use xlink:href="#marker-icon"/></svg>',
+    html: '<svg style="fill: ' + color + '"><use xlink:href="#marker-icon"/></svg>',
     className: 'leaflet-div-icon-iitc-generic-marker', // actually any name, just to prevent default
                                                        // (as it's inappropriately styled)
     // for draw-tools:
