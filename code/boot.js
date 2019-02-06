@@ -103,14 +103,6 @@ window.setupStyles = function() {
 
 window.setupIcons = function() {
   $(['<svg>',
-      // search.js, distance-to-portal.user.js, draw-tools.user.js
-      '<symbol id="marker-icon" viewBox="0 0 25 41">',
-        '<path d="M1.36241844765,18.67488124675 A12.5,12.5 0 1,1 23.63758155235,18.67488124675 L12.5,40.5336158073 Z" style="stroke:none;" />',
-        '<path d="M1.80792170975,18.44788599685 A12,12 0 1,1 23.19207829025,18.44788599685 L12.5,39.432271175 Z" style="stroke:#000000; stroke-width:1px; stroke-opacity: 0.15; fill: none;" />',
-        '<path d="M2.921679865,17.8803978722 A10.75,10.75 0 1,1 22.078320135,17.8803978722 L12.5,36.6789095943 Z" style="stroke:#ffffff; stroke-width:1.5px; stroke-opacity: 0.35; fill: none;" />',
-        '<path d="M19.86121593215,17.25 L12.5,21.5 L5.13878406785,17.25 L5.13878406785,8.75 L12.5,4.5 L19.86121593215,8.75 Z M7.7368602792,10.25 L17.2631397208,10.25 L12.5,18.5 Z M12.5,13 L7.7368602792,10.25 M12.5,13 L17.2631397208,10.25 M12.5,13 L12.5,18.5 M19.86121593215,17.25 L16.39711431705,15.25 M5.13878406785,17.25 L8.60288568295,15.25 M12.5,4.5 L12.5,8.5" style="stroke:#ffffff; stroke-width:1.25px; stroke-opacity: 1; fill: none;" />',
-      '</symbol>',
-
       // Material Icons
 
       // portal_detail_display.js
@@ -601,6 +593,60 @@ window.setupLayerChooserApi = function() {
   }
 }
 
+window.extendLeaflet() {
+  L.Icon.Default.mergeOptions({
+    iconUrl: '@@INCLUDEIMAGE:images/marker-ingress.png@@',
+    iconRetinaUrl: '@@INCLUDEIMAGE:images/marker-ingress-2x.png@@',
+    shadowUrl: '@@INCLUDEIMAGE:images/marker-shadow.png@@'
+  });
+  L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
+
+  $(['<svg>',
+      // search.js, distance-to-portal.user.js, draw-tools.user.js
+      '<symbol id="marker-icon" viewBox="0 0 25 41">',
+        '<path d="M1.36241844765,18.67488124675 A12.5,12.5 0 1,1 23.63758155235,18.67488124675 L12.5,40.5336158073 Z" style="stroke:none;" />',
+        '<path d="M1.80792170975,18.44788599685 A12,12 0 1,1 23.19207829025,18.44788599685 L12.5,39.432271175 Z" style="stroke:#000000; stroke-width:1px; stroke-opacity: 0.15; fill: none;" />',
+        '<path d="M2.921679865,17.8803978722 A10.75,10.75 0 1,1 22.078320135,17.8803978722 L12.5,36.6789095943 Z" style="stroke:#ffffff; stroke-width:1.5px; stroke-opacity: 0.35; fill: none;" />',
+        '<path d="M19.86121593215,17.25 L12.5,21.5 L5.13878406785,17.25 L5.13878406785,8.75 L12.5,4.5 L19.86121593215,8.75 Z M7.7368602792,10.25 L17.2631397208,10.25 L12.5,18.5 Z M12.5,13 L7.7368602792,10.25 M12.5,13 L17.2631397208,10.25 M12.5,13 L12.5,18.5 M19.86121593215,17.25 L16.39711431705,15.25 M5.13878406785,17.25 L8.60288568295,15.25 M12.5,4.5 L12.5,8.5" style="stroke:#ffffff; stroke-width:1.25px; stroke-opacity: 1; fill: none;" />',
+      '</symbol>',
+    '</svg>'].join('\\n')).appendTo('body');
+
+  L.Marker.ColoredSvg = L.Marker.extend({
+    createGenericMarkerIcon: function(color) {
+      color = color || '#a24ac3';
+      return L.divIcon({
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        html: '<svg style="fill: ' + color + '"><use xlink:href="#marker-icon"/></svg>',
+        className: 'leaflet-div-icon-iitc-generic-marker', // actually any name, just to prevent default
+                                                           // (as it's inappropriately styled)
+        // for draw-tools:
+        // L.divIcon does not use the option color, but we store it here to
+        // be able to simply retrieve the color for serializing markers
+        color: color
+      });
+    },
+    initialize: function (latlng, color, options) {
+      L.Marker.prototype.initialize.call(this, latlng, options);
+      this.options.icon = this.createGenericMarkerIcon(color);
+    }
+  });
+
+  L.marker.coloredSvg = function (latlng, color, options) {
+    return new L.Marker.ColoredSvg (latlng, color, options);
+  };
+
+  // Fix Leaflet: handle touchcancel events in Draggable
+  L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
+  L.Draggable.prototype._onDown = function(e) {
+    L.Draggable.prototype._onDownOrig.apply(this, arguments);
+
+    if(e.type === "touchstart") {
+      L.DomEvent.on(document, "touchcancel", this._onUp, this);
+    }
+  };
+};
+
 // BOOTING ///////////////////////////////////////////////////////////
 
 function boot() {
@@ -610,14 +656,7 @@ function boot() {
   console.log('loading done, booting. Built: @@BUILDDATE@@');
   if(window.deviceID) console.log('Your device ID: ' + window.deviceID);
   window.runOnSmartphonesBeforeBoot();
-
-  L.Icon.Default.mergeOptions({
-    iconUrl: '@@INCLUDEIMAGE:images/marker-ingress.png@@',
-    iconRetinaUrl: '@@INCLUDEIMAGE:images/marker-ingress-2x.png@@',
-    shadowUrl: '@@INCLUDEIMAGE:images/marker-shadow.png@@'
-  });
-  L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
-
+  window.extendLeaflet();
   window.extractFromStock();
   window.setupIdle();
   window.setupTaphold();

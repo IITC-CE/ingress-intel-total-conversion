@@ -435,7 +435,6 @@ window.clampLng = function(lng) {
   return lng;
 }
 
-
 window.clampLatLng = function(latlng) {
   return new L.LatLng ( clampLat(latlng.lat), clampLng(latlng.lng) );
 }
@@ -446,41 +445,5 @@ window.clampLatLngBounds = function(bounds) {
 
 // todo refactor draw-tools to use L.marker.coloredSvg
 window.getGenericMarkerIcon = function(color) { // used in draw-tools
-  color = color || '#a24ac3';
-  return L.divIcon({
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    html: '<svg style="fill: ' + color + '"><use xlink:href="#marker-icon"/></svg>',
-    className: 'leaflet-div-icon-iitc-generic-marker', // actually any name, just to prevent default
-                                                       // (as it's inappropriately styled)
-    // for draw-tools:
-    // L.divIcon does not use the option color, but we store it here to
-    // be able to simply retrieve the color for serializing markers
-    color: color
-  });
-}
-
-L.Marker.ColoredSvg = L.Marker.extend({
-  createGenericMarkerIcon: window.getGenericMarkerIcon,
-  initialize: function (latlng, color, options) {
-    L.Marker.prototype.initialize.call(this, latlng, options);
-    this.options.icon = this.createGenericMarkerIcon(color);
-  }
-});
-
-L.marker.coloredSvg = function (latlng, color, options) {
-  return new L.Marker.ColoredSvg (latlng, color, options);
-}
-
-
-
-// Fix Leaflet: handle touchcancel events in Draggable
-L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
-L.Draggable.prototype._onDown = function(e) {
-  L.Draggable.prototype._onDownOrig.apply(this, arguments);
-
-  if(e.type === "touchstart") {
-    L.DomEvent.on(document, "touchcancel", this._onUp, this);
-  }
-}
-
+  return L.Marker.ColoredSvg.prototype.createGenericMarkerIcon(color)
+};
