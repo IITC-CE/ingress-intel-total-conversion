@@ -450,12 +450,18 @@ window.getGenericMarkerSvg = function(color) {
   return markerTemplate.replace(/%COLOR%/g, color);
 }
 
-window.getGenericMarkerIcon = function(color,className) {
+window.getGenericMarkerIcon = function(color) { // used in draw-tools
+  color = color || '#a24ac3';
   return L.divIcon({
-    iconSize: new L.Point(25, 41),
-    iconAnchor: new L.Point(12, 41),
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
     html: getGenericMarkerSvg(color),
-    className: className || 'leaflet-iitc-divicon-generic-marker'
+    className: 'leaflet-div-icon-iitc-generic-marker', // actually any name, just to prevent default
+                                                       // (as it's inappropriately styled)
+    // for draw-tools:
+    // L.divIcon does not use the option color, but we store it here to
+    // be able to simply retrieve the color for serializing markers
+    color: color
   });
 }
 
