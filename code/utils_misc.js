@@ -444,8 +444,7 @@ window.clampLatLngBounds = function(bounds) {
   return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
 }
 
-
-
+// todo refactor draw-tools to use L.marker.coloredSvg
 window.getGenericMarkerIcon = function(color) { // used in draw-tools
   color = color || '#a24ac3';
   return L.divIcon({
@@ -461,14 +460,16 @@ window.getGenericMarkerIcon = function(color) { // used in draw-tools
   });
 }
 
-window.createGenericMarker = function(ll,color,options) {
-  options = options || {};
+L.Marker.ColoredSvg = L.Marker.extend({
+  createGenericMarkerIcon: window.getGenericMarkerIcon,
+  initialize: function (latlng, color, options) {
+    L.Marker.prototype.initialize.call(this, latlng, options);
+    this.options.icon = this.createGenericMarkerIcon(color);
+  }
+});
 
-  var markerOpt = $.extend({
-    icon: getGenericMarkerIcon(color || '#a24ac3')
-  }, options);
-
-  return L.marker(ll, markerOpt);
+L.marker.coloredSvg = function (latlng, color, options) {
+  return new L.Marker.ColoredSvg (latlng, color, options);
 }
 
 

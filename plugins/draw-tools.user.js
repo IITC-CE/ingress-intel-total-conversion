@@ -31,7 +31,7 @@ window.plugin.drawTools.getMarkerIcon = function(color) {
   if (!color) {
     console.warn('Color is not set (default #a24ac3 will be used)');
   }
-
+  // todo: refactor to use L.marker.coloredSvg(color)
   return window.getGenericMarkerIcon(color);
 }
 
