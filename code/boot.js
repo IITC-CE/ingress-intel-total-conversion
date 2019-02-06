@@ -102,10 +102,14 @@ window.setupStyles = function() {
 }
 
 window.setupIcons = function() {
-  // Material Icons
-  $('body').append('<svg width="0" height="0" style="position:absolute">' +
-    '<symbol viewBox="0 0 24 24" id="ic_place_24px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>' +
-    '</svg>');
+  $(['<svg>',
+      // Material Icons
+
+      // portal_detail_display.js
+      '<symbol id="ic_place_24px" viewBox="0 0 24 24">',
+        '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
+      '</symbol>',
+    '</svg>'].join('\\n')).appendTo('body');
 }
 
 function createDefaultBaseMapLayers() {
