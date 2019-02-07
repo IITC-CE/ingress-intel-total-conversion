@@ -593,7 +593,7 @@ window.setupLayerChooserApi = function() {
   }
 }
 
-window.extendLeaflet() {
+window.extendLeaflet = function() {
   L.Icon.Default.mergeOptions({
     iconUrl: '@@INCLUDEIMAGE:images/marker-ingress.png@@',
     iconRetinaUrl: '@@INCLUDEIMAGE:images/marker-ingress-2x.png@@',
@@ -612,14 +612,16 @@ window.extendLeaflet() {
     '</svg>'].join('\\n')).appendTo('body');
 
   L.Marker.ColoredSvg = L.Marker.extend({
-    createGenericMarkerIcon: function(color) {
+    createGenericMarkerIcon: function (color,className) {
       color = color || '#a24ac3';
+      className = className || 'leaflet-div-icon-iitc-generic-marker';
+                             // ^ actually any name, just to prevent default
+                             // ^ (as it's inappropriately styled)
       return L.divIcon({
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         html: '<svg style="fill: ' + color + '"><use xlink:href="#marker-icon"/></svg>',
-        className: 'leaflet-div-icon-iitc-generic-marker', // actually any name, just to prevent default
-                                                           // (as it's inappropriately styled)
+        className: className,
         // for draw-tools:
         // L.divIcon does not use the option color, but we store it here to
         // be able to simply retrieve the color for serializing markers
@@ -628,7 +630,7 @@ window.extendLeaflet() {
     },
     initialize: function (latlng, color, options) {
       L.Marker.prototype.initialize.call(this, latlng, options);
-      this.options.icon = this.createGenericMarkerIcon(color);
+      this.options.icon = this.createGenericMarkerIcon(color, options && options.className);
     }
   });
 
