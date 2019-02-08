@@ -442,8 +442,3 @@ window.clampLatLng = function(latlng) {
 window.clampLatLngBounds = function(bounds) {
   return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
 }
-
-// todo refactor draw-tools to use L.marker.coloredSvg
-window.getGenericMarkerIcon = function(color) { // used in draw-tools
-  return L.Marker.ColoredSvg.prototype.createGenericMarkerIcon(color)
-};

@@ -611,31 +611,29 @@ window.extendLeaflet = function() {
       '</symbol>',
     '</svg>'].join('\\n')).appendTo('body');
 
-  L.Marker.ColoredSvg = L.Marker.extend({
-    createGenericMarkerIcon: function (color,className) {
-      color = color || '#a24ac3';
-      className = className || 'leaflet-div-icon-iitc-generic-marker';
-                             // ^ actually any name, just to prevent default
-                             // ^ (as it's inappropriately styled)
-      return L.divIcon({
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        html: '<svg style="fill: ' + color + '"><use xlink:href="#marker-icon"/></svg>',
-        className: className,
-        // for draw-tools:
-        // L.divIcon does not use the option color, but we store it here to
-        // be able to simply retrieve the color for serializing markers
-        color: color
-      });
+  L.DivIcon.ColoredSvg = L.DivIcon.extend({
+    options: {
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      className: 'leaflet-div-icon-iitc-generic-marker',
+               // ^ actually any name, just to prevent default
+               // ^ (as it's inappropriately styled)
+      svgTemplate: '<svg style="fill: {color}"><use xlink:href="#marker-icon"/></svg>',
+      color: '#a24ac3' // for draw-tools:
+      // L.divIcon does not use the option `color`, but we store it here to
+      // be able to simply retrieve the color for serializing markers
     },
-    initialize: function (latlng, color, options) {
-      L.Marker.prototype.initialize.call(this, latlng, options);
-      this.options.icon = this.createGenericMarkerIcon(color, options && options.className);
+    initialize: function (color, options) {
+      L.DivIcon.prototype.initialize.call(this, options);
+      if (color) { this.options.color = color; }
+      this.options.html = L.Util.template(
+        this.options.svgTemplate,
+        { color: this.options.color }
+      );
     }
   });
-
-  L.marker.coloredSvg = function (latlng, color, options) {
-    return new L.Marker.ColoredSvg (latlng, color, options);
+  L.divIcon.coloredSvg = function (color, options) {
+    return new L.DivIcon.ColoredSvg(color, options);
   };
 
   // Fix Leaflet: handle touchcancel events in Draggable

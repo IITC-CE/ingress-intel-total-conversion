@@ -124,7 +124,8 @@ window.search.Query.prototype.resultLayer = function(result) {
     result.layer = L.layerGroup();
 
     if(result.position) {
-      L.marker.coloredSvg(result.position, 'red', {
+      L.marker(result.position, {
+        icon: L.divIcon.coloredSvg('red'),
         title: result.title
       }).addTo(result.layer);
     }
@@ -372,7 +373,10 @@ addHook('search', function(query) {
           weight: 2,
           fill: false,
           pointToLayer: function(featureData,latLng) {
-            return L.marker.coloredSvg(latLng, 'red', { title: item.display_name });
+            return L.marker(latLng, {
+              icon: L.divIcon.coloredSvg('red'),
+              title: item.display_name
+            });
           }
         });
       }
