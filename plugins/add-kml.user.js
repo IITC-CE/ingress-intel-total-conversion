@@ -88,14 +88,12 @@ var _fileLayerLoad = null;
 window.plugin.overlayKML.load = function() {
   // Provide popup window allow user to select KML to overlay
 	
-  L.Icon.Default.imagePath = '@@INCLUDEIMAGE:images/marker-icon.png@@';
-  var KMLIcon = L.icon({
-    iconUrl: '@@INCLUDEIMAGE:images/marker-icon.png@@',
-
-    iconSize:     [16, 24], // size of the icon
-    iconAnchor:   [8, 24], // point of the icon which will correspond to marker's location
-    popupAnchor:  [-3, 16] // point from which the popup should open relative to the iconAnchor
-  });
+  var KMLIcon = L.icon(L.extend({},L.Icon.Default.prototype.options,{
+    iconSize:     [16, 24],
+    iconAnchor:   [8, 24],
+    popupAnchor:  [-3, 16],
+    shadowSize:   [24, 24]
+  }));
   
   L.Control.FileLayerLoad.LABEL = '<img src="@@INCLUDEIMAGE:images/open-folder-icon_sml.png@@" alt="Open" />';
   _fileLayerLoad = L.Control.fileLayerLoad({
