@@ -115,6 +115,10 @@ def loaderString(var):
     return readfile(fn).replace('\\', '\\\\').replace('\n', '\\\n').replace('\'', '\\\'')
 
 
+def loaderCSS(fn):
+    return re.sub('(?<=url\()([^)#]+)(?=\))', loaderImage, loaderString(fn))
+
+
 def loaderRaw(var):
     fn = var.group(1)
     return readfile(fn)
@@ -148,6 +152,7 @@ def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
 
     script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loaderRaw, script)
     script = re.sub('@@INCLUDESTRING:([0-9a-zA-Z_./-]+)@@', loaderString, script)
+    script = re.sub('@@INCLUDECSS:([0-9a-zA-Z_./-]+)@@', loaderCSS, script)
     script = re.sub('@@INCLUDEIMAGE:([0-9a-zA-Z_./-]+)@@', loaderImage, script)
     script = re.sub('@@INCLUDESVG:([0-9a-zA-Z_./-]+)@@', loaderSVG, script)
 
