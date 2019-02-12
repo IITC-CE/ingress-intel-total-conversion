@@ -169,11 +169,6 @@ window.TEAM_RES = 1;
 window.TEAM_ENL = 2;
 window.TEAM_TO_CSS = ['none', 'res', 'enl'];
 
-window.SLOT_TO_LAT = [0, Math.sqrt(2)/2, 1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2];
-window.SLOT_TO_LNG = [1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2, 0, Math.sqrt(2)/2];
-window.EARTH_RADIUS=6367000;
-window.DEG2RAD = Math.PI / 180;
-
 // STORAGE ///////////////////////////////////////////////////////////
 // global variables used for storage. Most likely READ ONLY. Proper
 // way would be to encapsulate them in an anonymous function and write
@@ -193,8 +188,6 @@ var portalsFactionLayers, linksFactionLayers, fieldsFactionLayers;
 window.portals = {};
 window.links = {};
 window.fields = {};
-
-window.resonators = {};
 
 // contain current status(on/off) of overlay layerGroups.
 // But you should use isLayerGroupDisplayed(name) to check the status
