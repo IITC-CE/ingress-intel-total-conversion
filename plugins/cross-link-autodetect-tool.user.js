@@ -14,7 +14,7 @@
 // use own namespace for plugin
 window.plugin.CLADT = function() {};
 
-window.plugin.CLADT.IS_DEBUG = true;
+window.plugin.CLADT.IS_DEBUG = false;
 window.plugin.CLADT.DELAY = 2000;
 window.plugin.CLADT.MAP_READY = false;
 window.plugin.CLADT.STATUS = 'stop';
