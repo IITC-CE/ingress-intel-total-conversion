@@ -29,7 +29,7 @@ window.plugin.portalNames.setupCSS = function() {
     +'overflow:hidden;'
 // could try this if one-line names are used
 //    +'white-space: nowrap;text-overflow:ellipsis;'
-    +'text-shadow:1px 1px #000,1px -1px #000,-1px 1px #000,-1px -1px #000, 0 0 5px #000;'
+    +'text-shadow: 1px 1px 2px black, 0 0 1em black, 0 0 0.2em black;'
     +'pointer-events:none;'
   +'}'
   ).appendTo("head");
