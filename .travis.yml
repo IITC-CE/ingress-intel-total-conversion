@@ -56,3 +56,4 @@ deploy:
     repo: IITC-CE/ingress-intel-total-conversion
     tags: true
     all_branches: true
+    condition: $TRAVIS_BRANCH != test-deploy
