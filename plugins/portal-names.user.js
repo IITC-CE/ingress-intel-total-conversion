@@ -29,6 +29,12 @@ window.plugin.portalNames.setupCSS = function() {
     +'overflow:hidden;'
 // could try this if one-line names are used
 //    +'white-space: nowrap;text-overflow:ellipsis;'
+
+    // webkit-only multiline ellipsis
+    +'display: -webkit-box;'
+    +'-webkit-line-clamp: 2;'
+    +'-webkit-box-orient: vertical;'
+
     +'text-shadow: 1px 1px 2px black, 0 0 1em black, 0 0 0.2em black;'
     +'pointer-events:none;'
   +'}'
