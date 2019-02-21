@@ -15,6 +15,12 @@ L.PortalMarker = L.CircleMarker.extend({
     L.CircleMarker.initialize.call(this,latlng,options);
     highlightPortal(this);
   },
+
+  setStyle: function (style) { // stub for highlighters
+    L.Util.setOptions(this, style);
+    return this;
+  },
+
 });
 
 L.portalMarker = function (latlng, data) {
@@ -33,20 +39,11 @@ window.portalMarkerScale = function() {
 window.createMarker = L.portalMarker;
 
 window.setMarkerStyle = function(marker, selected) {
-
-  var styleOptions = window.getMarkerStyleOptions(marker.options);
-
-  marker.setStyle(styleOptions);
-
-  // FIXME? it's inefficient to set the marker style (above), then do it again inside the highlighter
-  // the highlighter API would need to be changed for this to be improved though. will it be too slow?
+  var style = getMarkerStyleOptions(marker.options);
+  L.Util.setOptions(marker,style);
   highlightPortal(marker);
-
-  if (selected) {
-    marker.setStyle ({color: COLOR_SELECTED_PORTAL});
-  }
-}
-
+  L.Path.prototype.setStyle.call(marker,selected && { color: COLOR_SELECTED_PORTAL });
+};
 
 window.getMarkerStyleOptions = function(details) {
   var scale = window.portalMarkerScale();
