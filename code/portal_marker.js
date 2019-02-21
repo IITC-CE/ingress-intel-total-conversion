@@ -1,6 +1,25 @@
 // PORTAL MARKER //////////////////////////////////////////////
 // code to create and update a portal marker
 
+L.PortalMarker = L.CircleMarker.extend({
+
+  options: {
+    interactive: true
+  },
+
+  initialize: function (latlng, data) {
+    var options = getMarkerStyleOptions(data);
+    // 'data' contain the IITC-specific entity data to be stored in the object options
+    options = L.extend(options,data);
+    // this.data = data;
+    L.CircleMarker.initialize.call(this,latlng,options);
+    highlightPortal(this);
+  },
+});
+
+L.portalMarker = function (latlng, data) {
+  return new L.PortalMarker(latlng,data);
+};
 
 window.portalMarkerScale = function() {
   var zoom = map.getZoom();
@@ -11,18 +30,7 @@ window.portalMarkerScale = function() {
 }
 
 // create a new marker. 'data' contain the IITC-specific entity data to be stored in the object options
-window.createMarker = function(latlng, data) {
-  var styleOptions = window.getMarkerStyleOptions(data);
-
-  var options = L.extend({}, data, styleOptions, { interactive: true });
-
-  var marker = L.circleMarker(latlng, options);
-
-  highlightPortal(marker);
-
-  return marker;
-}
-
+window.createMarker = L.portalMarker;
 
 window.setMarkerStyle = function(marker, selected) {
 
