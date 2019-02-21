@@ -21,6 +21,23 @@ L.PortalMarker = L.CircleMarker.extend({
     return this;
   },
 
+  setMarkerStyle: function (style) {
+    style = L.extend(getMarkerStyleOptions(this.options), style);
+    L.Util.setOptions(this,style);
+    highlightPortal(this);
+    var selected = this._selected && { color: COLOR_SELECTED_PORTAL };
+    return L.Path.prototype.setStyle.call(this,selected);
+  },
+
+  setSelected: function (action) {
+    var same = this._selected === action;
+    this._selected = action;
+    if (!same || this._selected) { window.setMarkerStyle(this,this._selected); }
+    if (this._selected) {
+      if (map.hasLayer(this)) { this.bringToFront(); }
+    }
+  }
+
 });
 
 L.portalMarker = function (latlng, data) {
