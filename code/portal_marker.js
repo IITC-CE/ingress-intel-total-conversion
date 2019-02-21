@@ -32,7 +32,7 @@ L.PortalMarker = L.CircleMarker.extend({
   setSelected: function (action) {
     var same = this._selected === action;
     this._selected = action;
-    if (!same || this._selected) { window.setMarkerStyle(this,this._selected); }
+    if (!same || this._selected) { this.setMarkerStyle(); }
     if (this._selected) {
       if (map.hasLayer(this)) { this.bringToFront(); }
     }
@@ -44,25 +44,15 @@ L.portalMarker = function (latlng, data) {
   return new L.PortalMarker(latlng,data);
 };
 
-window.portalMarkerScale = function() {
+window.portalMarkerScale = function () {
   var zoom = map.getZoom();
   if (L.Browser.mobile)
     return zoom >= 16 ? 1.5 : zoom >= 14 ? 1.2 : zoom >= 11 ? 1.0 : zoom >= 8 ? 0.65 : 0.5;
   else
     return zoom >= 14 ? 1 : zoom >= 11 ? 0.8 : zoom >= 8 ? 0.65 : 0.5;
-}
-
-// create a new marker. 'data' contain the IITC-specific entity data to be stored in the object options
-window.createMarker = L.portalMarker;
-
-window.setMarkerStyle = function(marker, selected) {
-  var style = getMarkerStyleOptions(marker.options);
-  L.Util.setOptions(marker,style);
-  highlightPortal(marker);
-  L.Path.prototype.setStyle.call(marker,selected && { color: COLOR_SELECTED_PORTAL });
 };
 
-window.getMarkerStyleOptions = function(details) {
+window.getMarkerStyleOptions = function (details) {
   var scale = window.portalMarkerScale();
 
   //   portal level      0  1  2  3  4  5  6  7  8
@@ -76,23 +66,33 @@ window.getMarkerStyleOptions = function(details) {
 
   var dashArray = null;
   // thinner and dashed outline for placeholder portals
-  if (details.team != TEAM_NONE && level==0) {
+  if (details.team !== TEAM_NONE && level===0) {
     lvlWeight = 1;
     dashArray = '1,2';
   }
 
   var options = {
-    radius: lvlRadius,
     stroke: true,
-    color: COLORS[details.team],
-    weight: lvlWeight,
     opacity: 1,
     fill: true,
-    fillColor: COLORS[details.team],
+    fillColor: null, // same as color by default
     fillOpacity: 0.5,
+
+    radius: lvlRadius,
+    color: COLORS[details.team],
+    weight: lvlWeight,
     dashArray: dashArray
   };
 
   return options;
-}
+};
 
+// deprecated functions (subject to remove):
+
+// create a new marker. 'data' contain the IITC-specific entity data to be stored in the object options
+window.createMarker = L.portalMarker;
+
+// eslint-disable-next-line no-unused-vars
+window.setMarkerStyle = function (marker, selected) {
+  marker.setMarkerStyle()
+};
