@@ -1,5 +1,6 @@
 package org.exarhteam.iitc_mobile;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,8 +8,10 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
@@ -43,7 +46,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import androidx.core.app.ActivityCompat;
+
 public class IITC_FileManager {
+    private static final int PERMISSION_REQUEST_CODE = 3;
+
     private static final WebResourceResponse EMPTY =
             new WebResourceResponse("text/plain", "UTF-8", new ByteArrayInputStream("".getBytes()));
     private static final String WRAPPER_NEW = "wrapper(info);";
@@ -249,7 +256,7 @@ public class IITC_FileManager {
     }
 
     public void installPlugin(final Uri uri, final boolean invalidateHeaders) {
-        if (uri != null) {
+        if (uri != null && checkWriteStoragePermissionGranted()) {
             String text = mActivity.getString(R.string.install_dialog_msg);
             text = String.format(text, uri);
 
@@ -348,6 +355,19 @@ public class IITC_FileManager {
 
     public void setUpdateInterval(final int interval) {
         mUpdateInterval = 1000 * 60 * 60 * 24 * interval;
+    }
+
+    public boolean checkWriteStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                ActivityCompat.requestPermissions(mActivity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            return true;
+        }
     }
 
     private class FileRequest extends WebResourceResponse implements ResponseHandler, Runnable {
