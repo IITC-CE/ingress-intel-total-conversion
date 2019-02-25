@@ -1131,7 +1131,7 @@
 /***************************************************************************************************************************************************************/
 
   window.plugin.bookmarks.setupCSS = function() {
-    $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/bookmarks-by-zaso.css@@').appendTo('head');
+    $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/bookmarks.css@@').appendTo('head');
   }
 
   window.plugin.bookmarks.setupPortalsList = function() {
