@@ -1,9 +1,9 @@
 // ==UserScript==
-// @id             max-links@boombuler
-// @name           IITC plugin: Max Links
+// @id             tidy-links@boombuler
+// @name           IITC plugin: Tidy Links
 // @category       Layer
 // @version        0.4.3.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (Max Links is a poor name, but remains for historical reasons.)
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (former `Max Links`)
 @@METAINFO@@
 // ==/UserScript==
 
@@ -12,14 +12,14 @@
 // PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
-window.plugin.maxLinks = function() {};
+window.plugin.tidyLinks = function() {};
 
 // const values
-window.plugin.maxLinks.MAX_PORTALS_TO_LINK = 200;
+window.plugin.tidyLinks.MAX_PORTALS_TO_LINK = 200;
 // zoom level used for projecting points between latLng and pixel coordinates. may affect precision of triangulation
-window.plugin.maxLinks.PROJECT_ZOOM = 16;
+window.plugin.tidyLinks.PROJECT_ZOOM = 16;
 
-window.plugin.maxLinks.STROKE_STYLE = {
+window.plugin.tidyLinks.STROKE_STYLE = {
   color: '#FF0000',
   opacity: 1,
   weight: 1.5,
@@ -27,40 +27,40 @@ window.plugin.maxLinks.STROKE_STYLE = {
   dashArray: '6,4',
   smoothFactor: 10,
 };
-window.plugin.maxLinks.layer = null;
-window.plugin.maxLinks.errorMarker = null;
+window.plugin.tidyLinks.layer = null;
+window.plugin.tidyLinks.errorMarker = null;
 
 
 
-window.plugin.maxLinks.addErrorMarker = function() {
-  if (window.plugin.maxLinks.errorMarker == null) {
-    window.plugin.maxLinks.errorMarker = L.marker (window.map.getCenter(), {
+window.plugin.tidyLinks.addErrorMarker = function() {
+  if (window.plugin.tidyLinks.errorMarker == null) {
+    window.plugin.tidyLinks.errorMarker = L.marker (window.map.getCenter(), {
       icon: L.divIcon({
-        className: 'max-links-error',
+        className: 'tidy-links-error',
         iconSize: [300,30],
         html: 'Tidy Links: too many portals!'
       }),
       interactive: false
     });
 
-    window.map.addLayer(window.plugin.maxLinks.errorMarker);
+    window.map.addLayer(window.plugin.tidyLinks.errorMarker);
   }
 
 }
 
-window.plugin.maxLinks.clearErrorMarker = function() {
-  if (window.plugin.maxLinks.errorMarker != null) {
-    window.map.removeLayer(window.plugin.maxLinks.errorMarker);
-    window.plugin.maxLinks.errorMarker = null;
+window.plugin.tidyLinks.clearErrorMarker = function() {
+  if (window.plugin.tidyLinks.errorMarker != null) {
+    window.map.removeLayer(window.plugin.tidyLinks.errorMarker);
+    window.plugin.tidyLinks.errorMarker = null;
   }
 }
 
 
-window.plugin.maxLinks.updateLayer = function() {
-  if (!window.map.hasLayer(window.plugin.maxLinks.layer))
+window.plugin.tidyLinks.updateLayer = function() {
+  if (!window.map.hasLayer(window.plugin.tidyLinks.layer))
     return;
 
-  window.plugin.maxLinks.layer.clearLayers();
+  window.plugin.tidyLinks.layer.clearLayers();
 
   var locations = [];
 
@@ -68,14 +68,14 @@ window.plugin.maxLinks.updateLayer = function() {
   $.each(window.portals, function(guid, portal) {
     var ll = portal.getLatLng();
     if (bounds.contains(ll)) {
-      var p = map.project (portal.getLatLng(), window.plugin.maxLinks.PROJECT_ZOOM);
+      var p = map.project (portal.getLatLng(), window.plugin.tidyLinks.PROJECT_ZOOM);
       locations.push(p);
-      if (locations.length > window.plugin.maxLinks.MAX_PORTALS_TO_LINK) return false; //$.each break
+      if (locations.length > window.plugin.tidyLinks.MAX_PORTALS_TO_LINK) return false; //$.each break
     }
   });
 
-  if (locations.length > window.plugin.maxLinks.MAX_PORTALS_TO_LINK) {
-    window.plugin.maxLinks.addErrorMarker();
+  if (locations.length > window.plugin.tidyLinks.MAX_PORTALS_TO_LINK) {
+    window.plugin.tidyLinks.addErrorMarker();
     return;
   }
 
@@ -110,11 +110,11 @@ window.plugin.maxLinks.updateLayer = function() {
       drawnLinks[a][b] = null;
 
       // convert back from x/y coordinates to lat/lng for drawing
-      var alatlng = map.unproject (a, window.plugin.maxLinks.PROJECT_ZOOM);
-      var blatlng = map.unproject (b, window.plugin.maxLinks.PROJECT_ZOOM);
+      var alatlng = map.unproject (a, window.plugin.tidyLinks.PROJECT_ZOOM);
+      var blatlng = map.unproject (b, window.plugin.tidyLinks.PROJECT_ZOOM);
 
-      var poly = L.polyline([alatlng, blatlng], window.plugin.maxLinks.STROKE_STYLE);
-      poly.addTo(window.plugin.maxLinks.layer);
+      var poly = L.polyline([alatlng, blatlng], window.plugin.tidyLinks.STROKE_STYLE);
+      poly.addTo(window.plugin.tidyLinks.layer);
       drawnLinkCount++;
     }
   }
@@ -126,39 +126,39 @@ window.plugin.maxLinks.updateLayer = function() {
   });
 }
 
-window.plugin.maxLinks.setup = function() {
+window.plugin.tidyLinks.setup = function() {
   try { console.log('Loading delaunay JS now'); } catch(e) {}
   @@INCLUDERAW:external/delaunay.js@@
   try { console.log('done loading delaunay JS'); } catch(e) {}
 
-  window.plugin.maxLinks.layer = L.layerGroup([]);
+  window.plugin.tidyLinks.layer = L.layerGroup([]);
 
   window.addHook('mapDataRefreshEnd', function(e) {
-    window.plugin.maxLinks.updateLayer();
+    window.plugin.tidyLinks.updateLayer();
   });
 
   window.addHook('mapDataRefreshStart', function(e) {
-    window.plugin.maxLinks.clearErrorMarker();
+    window.plugin.tidyLinks.clearErrorMarker();
   });
 
   window.map.on('layeradd', function(e) {
-    if (e.layer === window.plugin.maxLinks.layer)
-      window.plugin.maxLinks.updateLayer();
+    if (e.layer === window.plugin.tidyLinks.layer)
+      window.plugin.tidyLinks.updateLayer();
   });
   window.map.on('layerremove', function(e) {
-    if (e.layer === window.plugin.maxLinks.layer)
-      window.plugin.maxLinks.clearErrorMarker();
+    if (e.layer === window.plugin.tidyLinks.layer)
+      window.plugin.tidyLinks.clearErrorMarker();
   });
 
-  window.addLayerGroup('Tidy Links (was Max Links)', window.plugin.maxLinks.layer, false);
+  window.addLayerGroup('Tidy Links', window.plugin.tidyLinks.layer, false);
 
   $('head').append('<style>'+
-    '.max-links-error { color: #F88; font-size: 20px; font-weight: bold; text-align: center; text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000; background-color: rgba(0,0,0,0.6); border-radius: 5px; }'+
+    '.tidy-links-error { color: #F88; font-size: 20px; font-weight: bold; text-align: center; text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000; background-color: rgba(0,0,0,0.6); border-radius: 5px; }'+
     '</style>');
 
 
 }
-var setup = window.plugin.maxLinks.setup;
+var setup = window.plugin.tidyLinks.setup;
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
