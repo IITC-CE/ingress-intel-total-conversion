@@ -110,31 +110,26 @@ window.getDataZoomForMapZoom = function(zoom) {
     zoom = 21;
   }
 
+  // to improve the cacheing performance, we try and limit the number of zoom levels we retrieve data for
+  // to avoid impacting server load, we keep ourselves restricted to a zoom level with the sane number
+  // of tilesPerEdge and portal levels visible
 
-  if (!window.CONFIG_ZOOM_DEFAULT_DETAIL_LEVEL) {
+  var origTileParams = getMapZoomTileParameters(zoom);
 
-    // to improve the cacheing performance, we try and limit the number of zoom levels we retrieve data for
-    // to avoid impacting server load, we keep ourselves restricted to a zoom level with the sane numbre
-    // of tilesPerEdge and portal levels visible
+  while (zoom > MIN_ZOOM) {
+    var newTileParams = getMapZoomTileParameters(zoom-1);
 
-    var origTileParams = getMapZoomTileParameters(zoom);
-
-    while (zoom > MIN_ZOOM) {
-      var newTileParams = getMapZoomTileParameters(zoom-1);
-
-      if ( newTileParams.tilesPerEdge != origTileParams.tilesPerEdge
-        || newTileParams.hasPortals != origTileParams.hasPortals
-        || newTileParams.level*newTileParams.hasPortals != origTileParams.level*origTileParams.hasPortals  // multiply by 'hasPortals' bool - so comparison does not matter when no portals available
-      ) {
-        // switching to zoom-1 would result in a different detail level - so we abort changing things
-        break;
-      } else {
-        // changing to zoom = zoom-1 results in identical tile parameters - so we can safely step back
-        // with no increase in either server load or number of requests
-        zoom = zoom-1;
-      }
+    if ( newTileParams.tilesPerEdge != origTileParams.tilesPerEdge
+      || newTileParams.hasPortals != origTileParams.hasPortals
+      || newTileParams.level*newTileParams.hasPortals != origTileParams.level*origTileParams.hasPortals  // multiply by 'hasPortals' bool - so comparison does not matter when no portals available
+    ) {
+      // switching to zoom-1 would result in a different detail level - so we abort changing things
+      break;
+    } else {
+      // changing to zoom = zoom-1 results in identical tile parameters - so we can safely step back
+      // with no increase in either server load or number of requests
+      zoom = zoom-1;
     }
-
   }
 
   return zoom;
