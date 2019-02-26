@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             iitc-plugin-keys@xelio
 // @name           IITC plugin: Keys
-// @category       Keys
+// @category       Misc
 // @version        0.3.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow manual entry of key counts for each portal. Use the 'keys-on-map' plugin to show the numbers on the map, and 'sync' to share between multiple browsers or desktop/mobile.
 @@METAINFO@@

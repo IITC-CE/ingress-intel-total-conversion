@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             iitc-plugin-keys-on-map@xelio
 // @name           IITC plugin: Keys on map
-// @category       Keys
+// @category       Layer
 // @version        0.2.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the manually entered key counts from the 'keys' plugin on the map.
 @@METAINFO@@

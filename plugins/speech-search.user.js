@@ -1,6 +1,7 @@
 // ==UserScript==
 // @id             iitc-plugin-speech-search
 // @name           IITC Plugin: Speech Search
+// @category       Misc
 // @version        0.0.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow speech input for location search (webkit only for now - NOT Firefox).
 @@METAINFO@@

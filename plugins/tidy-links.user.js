@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             tidy-links@boombuler
 // @name           IITC plugin: Tidy Links
-// @category       Layer
+// @category       Draw
 // @version        0.4.3.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (former `Max Links`)
 @@METAINFO@@
