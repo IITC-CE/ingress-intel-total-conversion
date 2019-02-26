@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             layer-count@fkloft
-// @name           IITC plugin: layer count
+// @name           IITC plugin: Layer count
 // @category       Info
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow users to count nested fields

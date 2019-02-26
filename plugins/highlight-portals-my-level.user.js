@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-highlight-portals-my-level@vita10gy
-// @name           IITC plugin: highlight portals by my level
+// @name           IITC plugin: Highlight portals by my level
 // @category       Highlighter
 // @version        0.1.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal is either at and above, or at and below your level.

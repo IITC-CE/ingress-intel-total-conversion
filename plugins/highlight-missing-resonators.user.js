@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-highlight-portals-missing-resonators@vita10gy
-// @name           IITC plugin: highlight portals missing resonators
+// @name           IITC plugin: Highlight portals missing resonators
 // @category       Highlighter
 // @version        0.1.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal is missing resonators. 
