@@ -284,7 +284,7 @@ var fixChinaOffset = {
 };
 
 // redefine L.GridLayer.GoogleMutant methods
-var fixGoogleMutant = L.Util.extend(fixChinaOffset, {
+var fixGoogleMutant = {
 /* eslint-disable */
 	_update: function () {
 		// zoom level check needs to happen before super's implementation (tile addition/creation)
@@ -313,14 +313,17 @@ var fixGoogleMutant = L.Util.extend(fixChinaOffset, {
 		L.GridLayer.prototype._update.call(this);
 	},
 /* eslint-enable */
-});
+};
 
 function setup () {
+  // add support of `needFixChinaOffset` property to any TileLayer
   L.TileLayer.include(fixChinaOffset);
-  L.GridLayer.GoogleMutant.include(fixGoogleMutant);
 
+  // GoogleMutant needs additional support
+  L.GridLayer.GoogleMutant.include(fixChinaOffset);
+  L.GridLayer.GoogleMutant.include(fixGoogleMutant);
   layerChooser._layers.forEach(function (item) {
-    if (item.layer._GAPIPromise) {
+    if (item.layer._GAPIPromise) { // Google layer
       var o = item.layer.options;
       o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybride';
     }
