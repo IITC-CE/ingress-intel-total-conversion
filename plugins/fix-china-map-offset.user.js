@@ -12,8 +12,8 @@
 // PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
-var fixChinaOffset = {};
-window.plugin.fixChinaOffset = fixChinaOffset;
+var fixChinaMapOffset = {};
+window.plugin.fixChinaMapOffset = fixChinaMapOffset;
 
 // This plugin is intended to fix offset problem of Google maps in China.
 //
@@ -214,7 +214,7 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
 /* eslint-enable */
 })();
 
-fixChinaOffset.isInChina = insane_is_in_china.isInChina;
+fixChinaMapOffset.isInChina = insane_is_in_china.isInChina;
 
 var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
 /* eslint-disable */
@@ -262,11 +262,11 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
 /* eslint-enable */
 })();
 
-fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
+fixChinaMapOffset.wgs_gcj = PRCoords.wgs_gcj;
 
-fixChinaOffset.transform = function (wgs, options) {
-  if (options.needFixChinaOffset && fixChinaOffset.isInChina(wgs.lat, wgs.lng)) {
-    return fixChinaOffset.wgs_gcj(wgs);
+fixChinaMapOffset.transform = function (wgs, options) {
+  if (options.needFixChinaOffset && fixChinaMapOffset.isInChina(wgs.lat, wgs.lng)) {
+    return fixChinaMapOffset.wgs_gcj(wgs);
   }
   return wgs;
 };
@@ -274,11 +274,11 @@ fixChinaOffset.transform = function (wgs, options) {
 // redefine L.TileLayer methods
 var fixChinaOffset = {
   _getTiledPixelBounds: function (center) {
-    center = fixChinaOffset.transform(center, this.options);
+    center = fixChinaMapOffset.transform(center, this.options);
     return L.GridLayer.prototype._getTiledPixelBounds.call(this, center);
   },
   _setZoomTransform: function (level, center, zoom) {
-    center = fixChinaOffset.transform(center, this.options);
+    center = fixChinaMapOffset.transform(center, this.options);
     return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
   }
 };
@@ -293,7 +293,7 @@ var fixGoogleMutant = {
 			var center = this._map.getCenter();
 			var _center = new google.maps.LatLng(center.lat, center.lng);
 			/// modified here ///
-			center = fixChinaOffset.transform(center, this.options);
+			center = fixChinaMapOffset.transform(center, this.options);
 			/////////////////////
 
 			this._mutant.setCenter(_center);
