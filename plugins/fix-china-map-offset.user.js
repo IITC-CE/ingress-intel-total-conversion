@@ -12,7 +12,8 @@
 // PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
-window.plugin.fixChinaOffset = {};
+var fixChinaOffset = {};
+window.plugin.fixChinaOffset = fixChinaOffset;
 
 // This plugin is intended to fix offset problem of Google maps in China.
 //
@@ -213,7 +214,7 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
 /* eslint-enable */
 })();
 
-plugin.fixChinaOffset.isInChina = insane_is_in_china.isInChina;
+fixChinaOffset.isInChina = insane_is_in_china.isInChina;
 
 var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
 /* eslint-disable */
@@ -261,11 +262,11 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
 /* eslint-enable */
 })();
 
-plugin.fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
+fixChinaOffset.wgs_gcj = PRCoords.wgs_gcj;
 
-plugin.fixChinaOffset.transform = function (wgs, options) {
-  if (options.needFixChinaOffset && plugin.fixChinaOffset.isInChina(wgs.lat, wgs.lng)) {
-    return plugin.fixChinaOffset.wgs_gcj(wgs);
+fixChinaOffset.transform = function (wgs, options) {
+  if (options.needFixChinaOffset && fixChinaOffset.isInChina(wgs.lat, wgs.lng)) {
+    return fixChinaOffset.wgs_gcj(wgs);
   }
   return wgs;
 };
@@ -273,11 +274,11 @@ plugin.fixChinaOffset.transform = function (wgs, options) {
 // redefine L.TileLayer methods
 var fixChinaOffset = {
   _getTiledPixelBounds: function (center) {
-    center = plugin.fixChinaOffset.transform(center, this.options);
+    center = fixChinaOffset.transform(center, this.options);
     return L.GridLayer.prototype._getTiledPixelBounds.call(this, center);
   },
   _setZoomTransform: function (level, center, zoom) {
-    center = plugin.fixChinaOffset.transform(center, this.options);
+    center = fixChinaOffset.transform(center, this.options);
     return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
   }
 };
@@ -292,7 +293,7 @@ var fixGoogleMutant = L.Util.extend(fixChinaOffset, {
 			var center = this._map.getCenter();
 			var _center = new google.maps.LatLng(center.lat, center.lng);
 			/// modified here ///
-			center = plugin.fixChinaOffset.transform(center, this.options);
+			center = fixChinaOffset.transform(center, this.options);
 			/////////////////////
 
 			this._mutant.setCenter(_center);
