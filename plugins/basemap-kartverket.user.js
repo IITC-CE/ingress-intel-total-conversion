@@ -22,10 +22,11 @@
     };
     
     let layers = {
-      'topo4'        : 'Norway Topo',
-      'topo4graatone': 'Norway Topo Grayscale',
-      'toporaster3'  : 'Norway Topo Raster',
-      'europa'       : 'Norway Europa',
+      'topo4'         : 'Norway Topo',
+      'topo4graatone' : 'Norway Topo Grayscale',
+      'toporaster3'   : 'Norway Topo Raster',
+      'sjokartraster' : 'Norway Nautical Raster',
+      'europa'        : 'Norway Europa',
     };
     
     for(let i in layers) {
