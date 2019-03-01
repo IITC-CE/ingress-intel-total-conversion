@@ -24,8 +24,7 @@
     let layers = {
       'topo4'        : 'Norway Topo',
       'topo4graatone': 'Norway Topo Grayscale',
-      'kartdata2'    : 'Norway Kartdata2',
-      'toporaster3'  : 'Norway Toporaster3',
+      'toporaster3'  : 'Norway Topo Raster',
       'europa'       : 'Norway Europa',
     };
     
@@ -41,4 +40,3 @@ let setup = window.plugin.mapTileKartverketMap.addLayer;
 // PLUGIN END //////////////////////////////////////////////////////////
 
 @@PLUGINEND@@
-
