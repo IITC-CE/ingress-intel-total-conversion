@@ -35,7 +35,7 @@ window.plugin.portalNames.setupCSS = function() {
     +'-webkit-line-clamp: 2;'
     +'-webkit-box-orient: vertical;'
 
-    +'text-shadow: 1px 1px 2px black, 0 0 1em black, 0 0 0.2em black;'
+    +'text-shadow: 0 0 1px black, 0 0 1em black, 0 0 0.2em black;'
     +'pointer-events:none;'
   +'}'
   ).appendTo("head");
