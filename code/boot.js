@@ -141,7 +141,8 @@ function createDefaultBaseMapLayers() {
             stylers: [{visibility:"on"}, {hue:"#005eff"}, {invert_lightness:true}] },
           { featureType:"poi", stylers:[{visibility:"off"}]},
           { featureType:"transit", elementType:"all", stylers:[{visibility:"off"}] }
-        ]});
+        ],
+    });
   baseLayers['Google Roads'] = L.gridLayer.googleMutant({type:'roadmap', maxZoom: 21});
   var trafficMutant = L.gridLayer.googleMutant({type:'roadmap', maxZoom: 21});
   trafficMutant.addGoogleLayer('TrafficLayer');
