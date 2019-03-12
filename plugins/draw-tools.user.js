@@ -18,13 +18,13 @@ window.plugin.drawTools = function() {};
 window.plugin.drawTools.loadExternals = function() {
   try { console.log('Loading leaflet.draw JS now'); } catch(e) {}
   @@INCLUDERAW:external/leaflet.draw-src.js@@
-  @@INCLUDERAW:external/spectrum/spectrum.js@@
+  @@INCLUDERAW:external/spectrum.js@@
   try { console.log('done loading leaflet.draw JS'); } catch(e) {}
 
   window.plugin.drawTools.boot();
 
   $('head').append('<style>@@INCLUDESTRING:external/leaflet.draw-src.css@@</style>');
-  $('head').append('<style>@@INCLUDESTRING:external/spectrum/spectrum.css@@</style>');
+  $('head').append('<style>@@INCLUDESTRING:external/spectrum.css@@</style>');
 }
 
 window.plugin.drawTools.getMarkerIcon = function(color) {
