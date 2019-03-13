@@ -787,7 +787,7 @@ try { console.log('Loading included JS now'); } catch(e) {}
 @@INCLUDERAW:external/leaflet-src.js@@
 @@INCLUDERAW:external/L.Geodesic.js@@
 @@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
-@@INCLUDERAW:external/autolink.js@@
+@@INCLUDERAW:external/autolink-min.js@@
 @@INCLUDERAW:external/oms.min.js@@
 
 @@INCLUDERAW:external/jquery-3.3.1.min.js@@
