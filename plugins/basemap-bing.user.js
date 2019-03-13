@@ -2,7 +2,7 @@
 // @id             iitc-plugin-bing-maps
 // @name           IITC plugin: Bing maps
 // @category       Map Tiles
-// @version        0.1.3.@@DATETIMEVERSION@@
+// @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the maps.bing.com map layers.
 @@METAINFO@@
 // ==/UserScript==

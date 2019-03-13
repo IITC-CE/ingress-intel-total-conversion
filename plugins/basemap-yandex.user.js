@@ -2,7 +2,7 @@
 // @id             iitc-plugin-basemap-yandex@jonatkins
 // @name           IITC plugin: Yandex maps
 // @category       Map Tiles
-// @version        0.2.0.@@DATETIMEVERSION@@
+// @version        0.2.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add Yandex.com (Russian/Русский) map layers
 @@METAINFO@@
 // ==/UserScript==
