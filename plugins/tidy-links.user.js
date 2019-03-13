@@ -2,7 +2,7 @@
 // @id             tidy-links@boombuler
 // @name           IITC plugin: Tidy Links
 // @category       Draw
-// @version        0.4.3.@@DATETIMEVERSION@@
+// @version        0.5.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (former `Max Links`)
 @@METAINFO@@
 // ==/UserScript==
@@ -79,7 +79,7 @@ window.plugin.tidyLinks.updateLayer = function() {
     return;
   }
 
-  var triangles = window.delaunay.triangulate(locations);
+  var triangles = window.delaunay.triangulate(locations.map(function (p) { return [p.x,p.y] }));
 
   var drawnLinkCount = 0;
 
@@ -119,16 +119,20 @@ window.plugin.tidyLinks.updateLayer = function() {
     }
   }
 
-  $.each(triangles, function(idx, triangle) {
-    drawLink(triangle.a,triangle.b);
-    drawLink(triangle.b,triangle.c);
-    drawLink(triangle.c,triangle.a);
-  });
+  for (var i = 0; i<triangles.length;) {
+    var a = locations[triangles[i++]],
+        b = locations[triangles[i++]],
+        c = locations[triangles[i++]];
+    drawLink(a,b);
+    drawLink(b,c);
+    drawLink(c,a);
+  }
 }
 
 window.plugin.tidyLinks.setup = function() {
   try { console.log('Loading delaunay JS now'); } catch(e) {}
   @@INCLUDERAW:external/delaunay.js@@
+  window.delaunay = Delaunay;
   try { console.log('done loading delaunay JS'); } catch(e) {}
 
   window.plugin.tidyLinks.layer = L.layerGroup([]);
