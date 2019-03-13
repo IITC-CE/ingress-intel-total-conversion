@@ -110,18 +110,22 @@ def readfile(fn):
         return f.read()
 
 
-def loaderString(var):
-    fn = var.group(1)
-    return readfile(fn).replace('\\', '\\\\').replace('\n', '\\\n').replace('\'', '\\\'')
-
-
-def loaderCSS(fn):
-    return re.sub('(?<=url\()([^)#]+)(?=\))', loaderImage, loaderString(fn))
-
-
 def loaderRaw(var):
     fn = var.group(1)
     return readfile(fn)
+
+
+def MultiLine(Str):
+    return Str.replace('\\', '\\\\').replace('\n', '\\\n').replace('\'', '\\\'')
+
+
+def loaderString(var):
+    return MultiLine(loaderRaw(var))
+
+
+def loaderCSS(var):
+    Str =  re.sub('(?<=url\()["\']?([^)#]+?)["\']?(?=\))', loaderImage, loaderRaw(var))
+    return MultiLine(Str)
 
 
 def loaderImage(var):
