@@ -19,7 +19,7 @@ window.plugin.grayGMaps.addLayer = function() {
     styles: [
       {featureType:"landscape.natural",stylers:[{visibility:"simplified"},{saturation:-100},{lightness:-80},{gamma:2.44}]},
       {featureType:"road",stylers:[{visibility:"simplified"},{color:"#bebebe"},{weight:.6}]},
-      {featureType:"poi",stylers:[{saturation:-100},{visibility:"on"},{gamma:.14}]},
+      {featureType:"poi",stylers:[{saturation:-100},{visibility:"on"},{gamma:.34}]},
       {featureType:"water",stylers:[{color:"#32324f"}]},
       {featureType:"transit",stylers:[{visibility:"off"}]},
       {featureType:"road",elementType:"labels",stylers:[{visibility:"off"}]},
