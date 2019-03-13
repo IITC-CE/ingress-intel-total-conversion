@@ -2,7 +2,7 @@
 // @id             iitc-plugin-pan-control@fragger
 // @name           IITC plugin: Pan control
 // @category       Controls
-// @version        0.1.1.@@DATETIMEVERSION@@
+// @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a panning control on the map.
 @@METAINFO@@
 // ==/UserScript==
@@ -35,7 +35,7 @@ window.plugin.panControl.setup  = function() {
     window.map.addControl(window.map.zoomControl);
   }
 
-  $('head').append('<style>@@INCLUDESTRING:external/L.Control.Pan.css@@</style>');
+  $('head').append('<style>@@INCLUDECSS:external/L.Control.Pan.css@@</style>');
 };
 
 var setup =  window.plugin.panControl.setup;
