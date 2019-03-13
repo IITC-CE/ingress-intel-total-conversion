@@ -321,7 +321,7 @@
           $('#updatestatus .bkmrksStar').attr('title', '');
         }
 
-        $('#portaldetails > h3.title').before(plugin.bookmarks.htmlStar);
+        $('#portaldetails > h3.title').prepend(plugin.bookmarks.htmlStar);
         window.plugin.bookmarks.updateStarPortal();
       }, 0);
     }

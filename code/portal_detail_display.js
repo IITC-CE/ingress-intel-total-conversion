@@ -105,30 +105,49 @@ window.renderPortalDetails = function(guid) {
     .html('') //to ensure it's clear
     .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
     .append(
-      '<svg title="Click to move to portal." class="material-icons icon-button" onClick="zoomToAndShowPortal(\''+guid+'\',['+data.latE6/1E6+','+data.lngE6/1E6+']); if(isSmartphone()) show(\'map\');"><use xlink:href="#ic_place_24px"></use></svg>',
-      
-      $('<h3>').attr({class:'title'}).text(title),
+      $('<h3>', { class:'title' })
+        .text(title)
+        .prepend(
+          $('<svg><use xlink:href="#ic_place_24px"/><title>Click to move to portal</title></svg>')
+            .attr({
+              class: 'material-icons icon-button',
+              style: 'float: left'
+            })
+            .click(function() {
+              zoomToAndShowPortal(guid,[data.latE6/1E6,data.lngE6/1E6]);
+              if (isSmartphone()) { show('map') };
+            })),
 
       $('<span>').attr({
         class: 'close',
         title: 'Close [w]',
-        onclick:'renderPortalDetails(null); if(isSmartphone()) show("map");',
         accesskey: 'w'
-      }).text('X'),
+      }).text('X')
+        .click(function () {
+          renderPortalDetails(null);
+          if (isSmartphone()) { show('map') };
+        }),
 
       // help cursor via ".imgpreview img"
       $('<div>')
-      .attr({class:'imgpreview', title:imgTitle, style:"background-image: url('"+img+"')"})
-      .append(
-        $('<span>').attr({id:'level', title: levelDetails}).text(levelInt),
-        $('<img>').attr({class:'hide', src:img})
-      ),
+        .attr({
+          class: 'imgpreview',
+          title: imgTitle,
+          style: 'background-image: url("' + img + '")'
+        })
+        .append(
+          $('<span>', { id: 'level', title: levelDetails })
+            .text(levelInt),
+          $('<img>', { class: 'hide', src:img })
+        ),
 
       modDetails,
       miscDetails,
       resoDetails,
       statusDetails,
-      '<div class="linkdetails">' + linkDetails.join('') + '</div>'
+
+      $('<div>', { class: 'linkdetails' })
+        .html(linkDetails.join(''))
     );
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
