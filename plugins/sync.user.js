@@ -209,15 +209,23 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
 
   // Stop the sync if any error occur and try to re-authorize
   handleError = function(e) {
-    plugin.sync.logger.log('Drive API Error: ' + e.type);
+    var error_type = e.type;
+    
+    if(e.error.message === "A network error occurred, and the request could not be completed.") {
+      error_type = "network error";
+    }
+    
+    plugin.sync.logger.log('Drive API Error: ' + error_type);
     _this.stopSync();
-    if(e.status === 401) { // Unauthorized
+    if(error_type === "network error") {
+      setTimeout(function() {_this.authorizer.authorize();}, 50*1000);
+    } else if(e.status === 401) { // Unauthorized
       _this.authorizer.authorize();
     } else if(e.status === 404) { // Not found
       _this.forceFileSearch = true;
       _this.initFile()
     } else {
-      alert('Plugin Sync error: ' + e.type + ', ' + e.message);
+      alert('Plugin Sync error: ' + error_type + ', ' + e.message);
     }
   };
 
