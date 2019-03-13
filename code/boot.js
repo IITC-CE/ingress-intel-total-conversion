@@ -485,15 +485,6 @@ window.setupTooltips = function(element) {
   }
 }
 
-window.setupTaphold = function() {
-  @@INCLUDERAW:external/taphold.js@@
-}
-
-
-window.setupQRLoadLib = function() {
-  @@INCLUDERAW:external/jquery.qrcode.min.js@@
-}
-
 window.setupLayerChooserApi = function() {
   // hide layer chooser if booted with the iitcm android app
   if (typeof android !== 'undefined' && android && android.setLayers) {
@@ -690,7 +681,6 @@ function boot() {
   window.extendLeaflet();
   window.extractFromStock();
   window.setupIdle();
-  window.setupTaphold();
   window.setupStyles();
   window.setupIcons();
   window.setupDialogs();
@@ -708,7 +698,6 @@ function boot() {
   window.setupTooltips();
   window.chat.setup();
   window.portalDetail.setup();
-  window.setupQRLoadLib();
   window.setupLayerChooserSelectOne();
   window.setupLayerChooserStatusRecorder();
   // read here ONCE, so the URL is only evaluated one time after the
@@ -781,17 +770,59 @@ function boot() {
 
 }
 
-@@INCLUDERAW:external/load.js@@
+/*
+OMS doesn't cancel the original click event, so the topmost marker will get a click event while spiderfying.
+Also, OMS only supports a global callback for all managed markers. Therefore, we will use a custom event that gets fired
+for each marker.
+*/
+
+window.setupOMS = function() {
+  window.oms = new OverlappingMarkerSpiderfier(map, {
+    keepSpiderfied: true,
+    legWeight: 3.5,
+    legColors: {
+      usual: '#FFFF00',
+      highlighted: '#FF0000'
+    }
+  });
+
+  window.oms.addListener('click', function(marker) {
+    map.closePopup();
+    marker.fireEvent('spiderfiedclick', {target: marker});
+  });
+  window.oms.addListener('spiderfy', function(markers) {
+    map.closePopup();
+  });
+  map._container.addEventListener("keypress", function(ev) {
+    if(ev.keyCode === 27) // Esc
+      window.oms.unspiderfy();
+  }, false);
+}
+
+window.registerMarkerForOMS = function(marker) {
+  marker.on('add', function () {
+    window.oms.addMarker(marker);
+  });
+  marker.on('remove', function () {
+    window.oms.removeMarker(marker);
+  });
+  if(marker._map) // marker has already been added
+    window.oms.addMarker(marker);
+}
 
 try { console.log('Loading included JS now'); } catch(e) {}
+@@INCLUDERAW:external/load.js@@
+@@INCLUDERAW:external/autolink-min.js@@
+
 @@INCLUDERAW:external/leaflet-src.js@@
 @@INCLUDERAW:external/L.Geodesic.js@@
 @@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
-@@INCLUDERAW:external/autolink-min.js@@
 @@INCLUDERAW:external/oms.min.js@@
 
 @@INCLUDERAW:external/jquery-3.3.1.min.js@@
 @@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@
+@@INCLUDERAW:external/taphold.js@@
+@@INCLUDERAW:external/jquery.qrcode.min.js@@
 
 try { console.log('done loading included JS'); } catch(e) {}
 
