@@ -91,17 +91,14 @@ i.large { font-size: 6rem; }
 }
 
 .enl {
-  fill: #03fe03;
   color: #03fe03 !important;
 }
 
 .res {
-  fill: #00c5ff;
   color: #00c5ff !important;
 }
 
 .none {
-  fill: #fff;
   color: #fff;
 }
 
@@ -1325,3 +1322,8 @@ g.checkpoint:hover circle {
 	cursor: pointer;
 }
 
+svg {
+	fill: currentColor;
+	width: inherit;
+	height: inherit;
+}

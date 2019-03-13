@@ -85,7 +85,11 @@ window.plugin.distanceToPortal.setLocation = function() {
     window.plugin.distanceToPortal.currentLoc = map.getCenter();
   }
 
-  window.plugin.distanceToPortal.currentLocMarker = createGenericMarker (window.plugin.distanceToPortal.currentLoc,'#444',{draggable:true});
+  window.plugin.distanceToPortal.currentLocMarker = L.marker(window.plugin.distanceToPortal.currentLoc, {
+    icon: L.divIcon.coloredSvg('#444'),
+    draggable: true,
+    title: 'Drag to change current location'
+  });
 
   window.plugin.distanceToPortal.currentLocMarker.on('drag', function(e) {
     window.plugin.distanceToPortal.currentLoc = window.plugin.distanceToPortal.currentLocMarker.getLatLng();

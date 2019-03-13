@@ -28,26 +28,14 @@ window.plugin.drawTools.loadExternals = function() {
 }
 
 window.plugin.drawTools.getMarkerIcon = function(color) {
-  if (typeof(color) === 'undefined') {
-    console.warn('Color is not set or not a valid color. Using default color as fallback.');
-    color = '#a24ac3';
+  if (!color) {
+    console.warn('Color is not set (default #a24ac3 will be used)');
   }
-
-  var svgIcon = window.plugin.drawTools.markerTemplate.replace(/%COLOR%/g, color);
-
-  return L.divIcon({
-    iconSize: new L.Point(25, 41),
-    iconAnchor: new L.Point(12, 41),
-    html: svgIcon,
-    className: 'leaflet-iitc-custom-icon',
-    // L.divIcon does not use the option color, but we store it here to
-    // be able to simply retrieve the color for serializing markers
-    color: color
-  });
+  // todo: refactor to get rid of getMarkerIcon
+  return L.divIcon.coloredSvg(color);
 }
 
 window.plugin.drawTools.currentColor = '#a24ac3';
-window.plugin.drawTools.markerTemplate = '@@INCLUDESTRING:images/marker-icon.svg.template@@';
 
 window.plugin.drawTools.setOptions = function() {
 

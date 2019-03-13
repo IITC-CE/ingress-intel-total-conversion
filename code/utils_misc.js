@@ -435,7 +435,6 @@ window.clampLng = function(lng) {
   return lng;
 }
 
-
 window.clampLatLng = function(latlng) {
   return new L.LatLng ( clampLat(latlng.lat), clampLng(latlng.lng) );
 }
@@ -443,41 +442,3 @@ window.clampLatLng = function(latlng) {
 window.clampLatLngBounds = function(bounds) {
   return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
 }
-
-window.getGenericMarkerSvg = function(color) {
-  var markerTemplate = '@@INCLUDESTRING:images/marker-icon.svg.template@@';
-
-  return markerTemplate.replace(/%COLOR%/g, color);
-}
-
-window.getGenericMarkerIcon = function(color,className) {
-  return L.divIcon({
-    iconSize: new L.Point(25, 41),
-    iconAnchor: new L.Point(12, 41),
-    html: getGenericMarkerSvg(color),
-    className: className || 'leaflet-iitc-divicon-generic-marker'
-  });
-}
-
-window.createGenericMarker = function(ll,color,options) {
-  options = options || {};
-
-  var markerOpt = $.extend({
-    icon: getGenericMarkerIcon(color || '#a24ac3')
-  }, options);
-
-  return L.marker(ll, markerOpt);
-}
-
-
-
-// Fix Leaflet: handle touchcancel events in Draggable
-L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
-L.Draggable.prototype._onDown = function(e) {
-  L.Draggable.prototype._onDownOrig.apply(this, arguments);
-
-  if(e.type === "touchstart") {
-    L.DomEvent.on(document, "touchcancel", this._onUp, this);
-  }
-}
-
