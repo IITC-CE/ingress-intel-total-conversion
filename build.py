@@ -51,8 +51,6 @@ settings = buildSettings[buildName]
 
 utcTime = time.gmtime()
 buildDate = time.strftime('%Y-%m-%d-%H%M%S', utcTime)
-# userscripts have specific specifications for version numbers - the above date format doesn't match
-dateTimeVersion = time.strftime('%Y%m%d.', utcTime) + time.strftime('%H%M%S', utcTime).lstrip('0')
 
 # extract required values from the settings entry
 resourceUrlBase = settings.get('resourceUrlBase')
@@ -138,7 +136,7 @@ def extractUserScriptMeta(var):
     return m.group(0)
 
 
-def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
+def doReplacements(script, updateUrl, downloadUrl, pluginName=None, dateTimeVersion=0):
     script = re.sub('@@INJECTCODE@@', loadCode, script)
 
     script = script.replace('@@METAINFO@@', pluginMetaBlock)
@@ -186,6 +184,11 @@ def saveScriptAndMeta(script, ourDir, filename, oldDir=None):
             f.write(meta)
 
 
+def getDateTimeVersion(path):
+    last_modification_time = os.path.getmtime(path)
+    return time.strftime('%Y%m%d.%H%M%S', time.gmtime(last_modification_time))
+
+
 outDir = os.path.join('build', buildName)
 
 # create the build output
@@ -216,7 +219,7 @@ main = readfile('main.js')
 
 downloadUrl = distUrlBase and distUrlBase + '/total-conversion-build.user.js' or 'none'
 updateUrl = distUrlBase and distUrlBase + '/total-conversion-build.meta.js' or 'none'
-main = doReplacements(main, downloadUrl=downloadUrl, updateUrl=updateUrl)
+main = doReplacements(main, downloadUrl=downloadUrl, updateUrl=updateUrl, dateTimeVersion=getDateTimeVersion('main.js'))
 
 saveScriptAndMeta(main, outDir, 'total-conversion-build.user.js', oldDir)
 
@@ -232,7 +235,7 @@ for fn in glob.glob("plugins/*.user.js"):
     downloadUrl = distUrlBase and distUrlBase + '/' + fn.replace("\\", "/") or 'none'
     updateUrl = distUrlBase and downloadUrl.replace('.user.js', '.meta.js') or 'none'
     pluginName = os.path.splitext(os.path.splitext(os.path.basename(fn))[0])[0]
-    script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName=pluginName)
+    script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName=pluginName, dateTimeVersion=getDateTimeVersion(fn))
 
     saveScriptAndMeta(script, outDir, fn, oldDir)
 
@@ -246,7 +249,7 @@ if buildMobile:
     script = readfile("mobile/plugins/" + fn)
     downloadUrl = distUrlBase and distUrlBase + '/' + fn.replace("\\", "/") or 'none'
     updateUrl = distUrlBase and downloadUrl.replace('.user.js', '.meta.js') or 'none'
-    script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName='user-location')
+    script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName='user-location', dateTimeVersion=getDateTimeVersion("mobile/plugins/" + fn))
 
     saveScriptAndMeta(script, outDir, fn)
 
