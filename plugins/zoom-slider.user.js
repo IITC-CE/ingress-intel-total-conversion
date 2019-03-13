@@ -2,7 +2,7 @@
 // @id             iitc-plugin-zoom-slider@fragger
 // @name           IITC plugin: Zoom slider
 // @category       Controls
-// @version        0.1.1.@@DATETIMEVERSION@@
+// @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a zoom slider on the map instead of the zoom buttons.
 @@METAINFO@@
 // ==/UserScript==
