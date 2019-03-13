@@ -2,7 +2,7 @@
 // @id             iitc-plugin-minimap@breunigs
 // @name           IITC plugin: Mini map
 // @category       Controls
-// @version        0.2.0.@@DATETIMEVERSION@@
+// @version        0.3.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a mini map on the corner of the map.
 @@METAINFO@@
 // ==/UserScript==
@@ -32,7 +32,7 @@ window.plugin.miniMap.setup  = function() {
     new L.Control.MiniMap(L.gridLayer.googleMutant('ROADMAP',{maxZoom:21}), {toggleDisplay: true, position: position}).addTo(window.map);
   }, 0);
 
-  $('head').append('<style>@@INCLUDESTRING:external/Control.MiniMap.css@@</style>');
+  $('head').append('<style>@@INCLUDECSS:external/Control.MiniMap.css@@</style>');
 };
 
 var setup =  window.plugin.miniMap.setup;
