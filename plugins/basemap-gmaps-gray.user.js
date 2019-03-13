@@ -2,7 +2,7 @@
 // @id             iitc-plugin-basemap-gmaps-gray@jacob1123
 // @name           IITC plugin: Gray Google Roads
 // @category       Map Tiles
-// @version        0.1.2.@@DATETIMEVERSION@@
+// @version        0.1.3.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add a simplified gray Version of Google map tiles as an optional layer.
 @@METAINFO@@
 // ==/UserScript==
@@ -15,11 +15,11 @@
 window.plugin.grayGMaps = function() {};
 window.plugin.grayGMaps.addLayer = function() {
   var grayGMapsOptions = {
-    backgroundColor: '#0e3d4e', //or #dddddd ? - that's the Google tile layer default
+    maxZoom: 21,
     styles: [
       {featureType:"landscape.natural",stylers:[{visibility:"simplified"},{saturation:-100},{lightness:-80},{gamma:2.44}]},
       {featureType:"road",stylers:[{visibility:"simplified"},{color:"#bebebe"},{weight:.6}]},
-      {featureType:"poi",stylers:[{saturation:-100},{visibility:"on"},{gamma:.14}]},
+      {featureType:"poi",stylers:[{saturation:-100},{visibility:"on"},{gamma:.34}]},
       {featureType:"water",stylers:[{color:"#32324f"}]},
       {featureType:"transit",stylers:[{visibility:"off"}]},
       {featureType:"road",elementType:"labels",stylers:[{visibility:"off"}]},
@@ -30,7 +30,7 @@ window.plugin.grayGMaps.addLayer = function() {
     ]
   };
 
-  var grayGMaps = new L.Google('ROA#DMAP',{maxZoom:21, mapOptions: grayGMapsOptions});
+  var grayGMaps = L.gridLayer.googleMutant(grayGMapsOptions);
 
   layerChooser.addBaseLayer(grayGMaps, "Google Gray");
 };
