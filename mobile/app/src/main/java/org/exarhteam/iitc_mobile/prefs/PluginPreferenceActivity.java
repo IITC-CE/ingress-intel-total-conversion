@@ -141,7 +141,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 onBackPressed();
                 return true;
             case R.id.menu_plugins_add:
-                if (checkWriteStoragePermissionGranted()) {
+                if (mFileManager.checkWriteStoragePermissionGranted()) {
                     // create the chooser Intent
                     final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
                     // iitcm only parses *.user.js scripts
@@ -167,21 +167,11 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission denied. You cannot add plugins.",
                             Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Permission granted. Please repeat the action.",
+                            Toast.LENGTH_LONG).show();
                 }
                 break;
-        }
-    }
-
-    private boolean checkWriteStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-                return false;
-            }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            return true;
         }
     }
 
