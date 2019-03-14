@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             fly-links@fly
 // @name           IITC plugin: Fly Links
-// @category       Layer
+// @category       Draw
 // @version        0.2.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 @@METAINFO@@

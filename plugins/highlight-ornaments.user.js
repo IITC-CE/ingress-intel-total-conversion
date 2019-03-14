@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-highlight-ornaments@jonatkins
-// @name           IITC plugin: hightlight portals with ornaments
+// @name           IITC plugin: Highlight portals with ornaments
 // @category       Highlighter
 // @version        0.0.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote portals with additional 'ornament' markers. e.g. Anomaly portals

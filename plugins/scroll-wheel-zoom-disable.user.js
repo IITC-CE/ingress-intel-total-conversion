@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-scroll-wheel-zoom-disable@jonatkins
-// @name           IITC plugin: disable mouse wheel zoom
+// @name           IITC plugin: Disable mouse wheel zoom
 // @category       Tweaks
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Disable the use of mouse wheel to zoom. The map zoom controls or keyboard are still available.

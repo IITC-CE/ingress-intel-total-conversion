@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-basemap-openstreetpam@jonatkins
-// @name           IITC plugin: OpenStreetMap.org map tiles
+// @name           IITC plugin: OpenStreetMap.org map
 // @category       Map Tiles
 // @version        0.1.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the native OpenStreetMap.org map tiles as an optional layer.

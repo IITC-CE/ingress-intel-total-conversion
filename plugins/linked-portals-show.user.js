@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-show-linked-portals@fstopienski
-// @name           IITC plugin: Show linked portals
+// @name           IITC plugin: Linked portals
 // @category       Portal Info
 // @version        0.3.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Try to show the linked portals (image, name and link direction) in portal detail view and jump to linked portal on click.  Some details may not be available if the linked portal is not in the current view.
@@ -174,7 +174,7 @@ plugin.showLinkedPortal.removePreview = function() {
 
 var setup = function () {
   window.addHook('portalDetailsUpdated', window.plugin.showLinkedPortal.portalDetail);
-  $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/show-linked-portals.css@@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/linked-portals-show.css@@').appendTo('head');
 }
 
 // PLUGIN END //////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             iitc-plugin-done-links@jonatkins
-// @name           IITC plugin: done links
-// @category       Layer
+// @name           IITC plugin: Done links
+// @category       Draw
 // @version        0.0.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] A companion to the Cross Links plugin. Highlights any links that match existing draw-tools line/polygon edges
 @@METAINFO@@

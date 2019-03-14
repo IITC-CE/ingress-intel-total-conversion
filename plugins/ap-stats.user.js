@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-compute-ap-stats@Hollow011
-// @name           IITC plugin: Compute AP statistics
+// @name           IITC plugin: Available AP statistics
 // @category       Info
 // @version        0.4.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Displays the per-team AP gains available in the current view.

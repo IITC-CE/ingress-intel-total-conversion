@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             iitc-plugin-cross-links@mcben
-// @name           IITC plugin: cross links
-// @category       Layer
+// @name           IITC plugin: Cross links
+// @category       Draw
 // @version        1.1.2.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] EXPERIMENTAL: Checks for existing links that cross planned links. Requires draw-tools plugin.
 @@METAINFO@@

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-basemap-gmaps-gray@jacob1123
-// @name           IITC plugin: Gray Google Roads
+// @name           IITC plugin: Gray Google map
 // @category       Map Tiles
 // @version        0.1.3.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add a simplified gray Version of Google map tiles as an optional layer.

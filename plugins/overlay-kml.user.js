@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             overlay-kml@danielatkins
-// @name           IITC plugin: overlay KML
+// @name           IITC plugin: Overlay KML
 // @category       Layer
 // @version        0.2.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow users to overlay their own KML / GPX files on top of IITC.

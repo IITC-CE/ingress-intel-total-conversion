@@ -1,6 +1,7 @@
 // ==UserScript==
 // @id             iitc-plugin-privacy-view@Scrool
 // @name           IITC plugin: Privacy view on Intel
+// @category       Misc
 // @version        1.0.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Hide info from intel which shouldn't leak to players of the other faction.
 @@METAINFO@@

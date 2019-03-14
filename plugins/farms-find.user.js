@@ -1,9 +1,9 @@
 // ==UserScript==
 // @id             iitc-plugin-farms@949
-// @name           IITC plugin: Show farms by level
-// @category       Info
+// @name           IITC plugin: Find farms on map
+// @category       Layer
 // @version        1.4.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Find farms by minimum level.
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show farms by minimum level
 @@METAINFO@@
 // ==/UserScript==
 

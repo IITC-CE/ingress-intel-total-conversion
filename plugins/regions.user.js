@@ -1,9 +1,9 @@
 // ==UserScript==
 // @id             iitc-plugin-regions@jonatkins
-// @name           IITC plugin: Show the local score regions
+// @name           IITC plugin: Ingress scoring regions
 // @category       Layer
 // @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the local scoring regions on the map. No actual scores - just the region areas.
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the regional scoring cells grid on the map
 @@METAINFO@@
 // ==/UserScript==
 

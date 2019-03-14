@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-pan-control@fragger
-// @name           IITC plugin: pan control
+// @name           IITC plugin: Pan control
 // @category       Controls
 // @version        0.1.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a panning control on the map.

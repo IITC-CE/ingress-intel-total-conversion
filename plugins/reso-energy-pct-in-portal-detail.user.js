@@ -1,9 +1,9 @@
 // ==UserScript==
 // @id             iitc-plugin-reso-energy-pct-in-portal-detail@xelio
-// @name           IITC plugin: reso energy pct in portal detail
+// @name           IITC plugin: Reso energy % in portal details
 // @category       Portal Info
 // @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show resonator energy percentage on resonator energy bar in portal detail panel.
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show resonator energy percentage on resonator energy bar in portal details panel.
 @@METAINFO@@
 // ==/UserScript==
 

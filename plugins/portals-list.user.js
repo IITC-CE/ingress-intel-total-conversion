@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-portals-list@teo96
-// @name           IITC plugin: show list of portals
+// @name           IITC plugin: Portals list
 // @category       Info
 // @version        0.2.1.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Display a sortable list of all visible portals with full details about the team, resonators, links, etc.

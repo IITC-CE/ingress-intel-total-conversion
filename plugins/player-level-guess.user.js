@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-guess-player-levels@breunigs
-// @name           IITC plugin: guess player level
+// @name           IITC plugin: Player level guess
 // @category       Info
 // @version        0.5.7.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Try to determine player levels from the data available in the current view.

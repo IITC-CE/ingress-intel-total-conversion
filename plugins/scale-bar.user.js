@@ -1,6 +1,6 @@
 // ==UserScript==
 // @id             iitc-plugin-scale-bar@breunigs
-// @name           IITC plugin: scale bar
+// @name           IITC plugin: Scale bar
 // @category       Controls
 // @version        0.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show scale bar on the map.
