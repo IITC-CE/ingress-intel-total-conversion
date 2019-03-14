@@ -31,6 +31,7 @@ jobs:
       env: BUILD_TYPE=release
 
 before_script:
+- git fetch --unshallow
 - openssl aes-256-cbc -K $encrypted_460819c10bef_key -iv $encrypted_460819c10bef_iv
   -in deploy_rsa.enc -out /tmp/deploy_rsa -d
 - chmod 600 /tmp/deploy_rsa
