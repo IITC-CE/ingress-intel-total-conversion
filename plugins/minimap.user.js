@@ -2,7 +2,7 @@
 // @id             iitc-plugin-minimap@breunigs
 // @name           IITC plugin: Mini map
 // @category       Controls
-// @version        0.2.0.@@DATETIMEVERSION@@
+// @version        0.3.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a mini map on the corner of the map.
 @@METAINFO@@
 // ==/UserScript==
@@ -11,31 +11,43 @@
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
-
 // use own namespace for plugin
-window.plugin.miniMap = function() {};
+var miniMap = {};
+window.plugin.miniMap = miniMap;
 
-window.plugin.miniMap.setup  = function() {
-
-  try { console.log('Loading leaflet.draw JS now'); } catch(e) {}
-  @@INCLUDERAW:external/Control.MiniMap.js@@
-  try { console.log('done loading leaflet.draw JS'); } catch(e) {}
-
-  // we can't use the same TileLayer as the main map uses - it causes issues.
-  // stick with the Google tiles for now
-
+miniMap.options = {
   // desktop mode - bottom-left, so it doesn't clash with the sidebar
   // mobile mode - bottom-right - so it floats above the map copyright text
-  var position = isSmartphone() ? 'bottomright' : 'bottomleft';
+  position: window.isSmartphone() ? 'bottomright' : 'bottomleft',
+  toggleDisplay: true
 
-  setTimeout(function() {
-    new L.Control.MiniMap(L.gridLayer.googleMutant('ROADMAP',{maxZoom:21}), {toggleDisplay: true, position: position}).addTo(window.map);
-  }, 0);
-
-  $('head').append('<style>@@INCLUDESTRING:external/Control.MiniMap.css@@</style>');
+  // more: https://github.com/Norkart/Leaflet-MiniMap#available-options
 };
 
-var setup =  window.plugin.miniMap.setup;
+// miniMap.baselayer = ... // could be customized
+
+function setup () {
+  try {
+    // https://github.com/Norkart/Leaflet-MiniMap
+    @@INCLUDERAW:external/Control.MiniMap.js@@
+    $('<style>').html('@@INCLUDECSS:external/Control.MiniMap.css@@').appendTo('head');
+
+  } catch(e) {
+    console.error('Control.MiniMap.js loading failed');
+    throw e;
+  }
+
+  // hide attribution
+  $('<style>').html('div.gm-style .gmnoprint, div.gm-style img { display: none; }').appendTo('head');
+
+  setTimeout(function() { // delay minimap initialization in order to let customization by other plugins
+
+    // we can't use the same TileLayer as the main map uses - it causes issues.
+    // stick with the Google tiles for now
+    miniMap.baselayer = miniMap.baselayer || L.gridLayer.googleMutant({ type:'roadmap', maxZoom: 21 });
+    miniMap.MiniMap = new L.Control.MiniMap(miniMap.baselayer, miniMap.options).addTo(window.map);
+  }, 0);
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
