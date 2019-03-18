@@ -11,29 +11,49 @@
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
-
 // use own namespace for plugin
-window.plugin.zoomSlider = function() {};
+var zoomSlider = {};
+window.plugin.zoomSlider = zoomSlider;
 
-window.plugin.zoomSlider.setup  = function() {
-  try { console.log('Loading Leaflet.zoomslider JS now'); } catch(e) {}
-  @@INCLUDERAW:external/L.Control.Zoomslider.js@@
-  try { console.log('done loading Leaflet.zoomslider JS'); } catch(e) {}
+zoomSlider.options = {
+  // Height of zoom-slider.png in px
+  //stepHeight: 8,
 
-  // prevent Zoomslider from being activated by default (e.g. in minimap)
-  L.Map.mergeOptions({
-    zoomsliderControl: false
-  });
+  // Height of the knob div in px (including border)
+  //knobHeight: 6,
 
-  if(map.zoomControl._map) {
-    window.map.removeControl(map.zoomControl);
-  }
-  window.map.addControl(L.control.zoomslider());
-
-  $('head').append('<style>@@INCLUDESTRING:external/L.Control.Zoomslider.css@@</style>');
+  //styleNS: 'leaflet-control-zoomslider'
 };
 
-var setup = window.plugin.zoomSlider.setup;
+function setup () {
+  loadLeafletZoomslider();
+
+  var map = window.map;
+  if (map.zoomControl._map) {
+    map.zoomControl.remove();
+  }
+  zoomSlider.control = L.control.zoomslider(zoomSlider.options).addTo(map);
+
+  // L.Control.Zoomslider.css defines non-standard border for `.leaflet-control-zoomslider`
+  // which makes zoomslider not aligning with other leaflet controls
+  // Here we are trying to unset it (make the same as general `.leaflet-control`)
+  // (adapted from https://github.com/kartena/Leaflet.zoomslider/pull/74)
+  $('<style>')
+    .html('.leaflet-touch .leaflet-control-zoomslider { border: 2px solid rgba(0,0,0,0.2) }')
+    .appendTo('head');
+}
+
+function loadLeafletZoomslider () {
+  try {
+    // https://github.com/kartena/Leaflet.zoomslider
+    @@INCLUDERAW:external/L.Control.Zoomslider.js@@
+    $('<style>').html('@@INCLUDESTRING:external/L.Control.Zoomslider.css@@').appendTo('head');
+
+  } catch (e) {
+    console.error('L.Control.Zoomslider.js loading failed');
+    throw e;
+  }
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
