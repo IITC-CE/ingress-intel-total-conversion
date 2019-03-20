@@ -15,18 +15,6 @@
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
 
-window.plugin.drawTools.loadExternals = function() {
-  try { console.log('Loading leaflet.draw JS now'); } catch(e) {}
-  @@INCLUDERAW:external/leaflet.draw-src.js@@
-  @@INCLUDERAW:external/spectrum.js@@
-  try { console.log('done loading leaflet.draw JS'); } catch(e) {}
-
-  window.plugin.drawTools.boot();
-
-  $('head').append('<style>@@INCLUDESTRING:external/leaflet.draw-src.css@@</style>');
-  $('head').append('<style>@@INCLUDESTRING:external/spectrum.css@@</style>');
-}
-
 window.plugin.drawTools.getMarkerIcon = function(color) {
   if (!color) {
     console.warn('Color is not set (default #a24ac3 will be used)');
@@ -654,8 +642,32 @@ window.plugin.drawTools.boot = function() {
 
 }
 
+function setup () {
+  loadExternals();
+  window.plugin.drawTools.boot();
+}
 
-var setup =  window.plugin.drawTools.loadExternals;
+function loadExternals () {
+  try {
+    // https://github.com/Leaflet/Leaflet.draw
+    @@INCLUDERAW:external/leaflet.draw-src.js@@
+    $('<style>').html('@@INCLUDESTRING:external/leaflet.draw-src.css@@').appendTo('head');
+
+  } catch (e) {
+    console.error('leaflet.draw-src.js loading failed');
+    throw e;
+  }
+
+  try {
+    // https://github.com/bgrins/spectrum
+    @@INCLUDERAW:external/spectrum.js@@
+    $('<style>').html('@@INCLUDESTRING:external/spectrum.css@@').appendTo('head');
+
+  } catch (e) {
+    console.error('spectrum.js loading failed');
+    throw e;
+  }
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
