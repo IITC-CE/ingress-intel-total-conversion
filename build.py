@@ -65,7 +65,7 @@ gradleBuildFile = settings.get('gradleBuildFile', 'mobile/build.gradle')
 # 1. indentation caused by the "function wrapper()" doesn't apply to the plugin code body
 # 2. the wrapper is formatted correctly for removal by the IITC Mobile android app
 pluginWrapperStart = """
-function wrapper(plugin_info) {
+function wrapper(plugin_info) { 'use strict';
 // ensure plugin framework is there, even if iitc is not yet loaded
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
@@ -77,8 +77,6 @@ plugin_info.pluginId = '@@PLUGINNAME@@';
 //END PLUGIN AUTHORS NOTE
 
 """
-
-pluginWrapperStartUseStrict = pluginWrapperStart.replace("{\n", "{\n\"use strict\";\n", 1)
 
 pluginWrapperEnd = """
 setup.info = plugin_info; //add the script info data to the function as a property
@@ -147,7 +145,6 @@ def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
 
     script = script.replace('@@METAINFO@@', pluginMetaBlock)
     script = script.replace('@@PLUGINSTART@@', pluginWrapperStart)
-    script = script.replace('@@PLUGINSTART-USE-STRICT@@', pluginWrapperStartUseStrict)
     script = script.replace('@@PLUGINEND@@', pluginWrapperEnd)
 
     script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loaderRaw, script)
