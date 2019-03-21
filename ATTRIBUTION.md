@@ -10,7 +10,6 @@
 - [taphold.js by Rich Adams; unknown](https://github.com/richadams/jquery-taphold)
 - [L.Control.Pan.js by Kartena AB; same as Leaflet](https://github.com/kartena/Leaflet.Pancontrol)
 - [L.Control.Zoomslider.js by Kartena AB; same as Leaflet](https://github.com/kartena/Leaflet.zoomslider)
-- [KML.js by shramov; same as Leaflet](https://github.com/shramov/leaflet-plugins)
 - [leaflet.filelayer.js by Makina Corpus; MIT](https://github.com/makinacorpus/Leaflet.FileLayer)
 - [togeojson.js by Mapbox; BSD-2-Clause](https://github.com/mapbox/togeojson)
 - StackOverflow-CopyPasta is attributed in the source; [CC-Wiki](https://creativecommons.org/licenses/by-sa/3.0/)
