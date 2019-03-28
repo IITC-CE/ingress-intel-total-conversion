@@ -211,7 +211,7 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
   handleError = function(e) {
     var error_type = e.type;
     
-    if(e.error.message === "A network error occurred, and the request could not be completed.") {
+    if(e.result.error.message === "A network error occurred, and the request could not be completed.") {
       error_type = "network error";
     }
     
