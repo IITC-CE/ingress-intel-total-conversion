@@ -12,157 +12,120 @@
 // PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
-window.plugin.tidyLinks = function() {};
+var tidyLinks = {};
+window.plugin.tidyLinks = tidyLinks;
 
-// const values
-window.plugin.tidyLinks.MAX_PORTALS_TO_LINK = 200;
+tidyLinks.MAX_PORTALS_TO_LINK = 200; // N.B.: this limit is not about performance
+
 // zoom level used for projecting points between latLng and pixel coordinates. may affect precision of triangulation
-window.plugin.tidyLinks.PROJECT_ZOOM = 16;
+tidyLinks.PROJECT_ZOOM = 16;
 
-window.plugin.tidyLinks.STROKE_STYLE = {
-  color: '#FF0000',
+tidyLinks.STROKE_STYLE = { // https://leafletjs.com/reference-1.4.0.html#polyline-stroke
+  color: 'red',
   opacity: 1,
   weight: 1.5,
-  interactive: false,
   dashArray: '6,4',
-  smoothFactor: 10,
+  interactive: false
 };
-window.plugin.tidyLinks.layer = null;
-window.plugin.tidyLinks.errorMarker = null;
 
+tidyLinks.errorMarkerIconOptions = { // https://leafletjs.com/reference-1.4.0.html#divicon-html
+  className: 'tidy-links-error',
+  iconSize: [300,30],
+  html: 'Tidy Links: too many portals!'
+};
 
+var map, errorMarker;
 
-window.plugin.tidyLinks.addErrorMarker = function() {
-  if (window.plugin.tidyLinks.errorMarker == null) {
-    window.plugin.tidyLinks.errorMarker = L.marker (window.map.getCenter(), {
-      icon: L.divIcon({
-        className: 'tidy-links-error',
-        iconSize: [300,30],
-        html: 'Tidy Links: too many portals!'
-      }),
-      interactive: false
-    });
-
-    window.map.addLayer(window.plugin.tidyLinks.errorMarker);
-  }
-
-}
-
-window.plugin.tidyLinks.clearErrorMarker = function() {
-  if (window.plugin.tidyLinks.errorMarker != null) {
-    window.map.removeLayer(window.plugin.tidyLinks.errorMarker);
-    window.plugin.tidyLinks.errorMarker = null;
-  }
-}
-
-
-window.plugin.tidyLinks.updateLayer = function() {
-  if (!window.map.hasLayer(window.plugin.tidyLinks.layer))
-    return;
-
-  window.plugin.tidyLinks.layer.clearLayers();
-
+function updateLayer () {
   var locations = [];
-
   var bounds = map.getBounds();
-  $.each(window.portals, function(guid, portal) {
+  $.each(window.portals, function (guid, portal) {
     var ll = portal.getLatLng();
     if (bounds.contains(ll)) {
-      var p = map.project (portal.getLatLng(), window.plugin.tidyLinks.PROJECT_ZOOM);
-      locations.push(p);
-      if (locations.length > window.plugin.tidyLinks.MAX_PORTALS_TO_LINK) return false; //$.each break
+      locations.push(ll);
+      return locations.length <= tidyLinks.MAX_PORTALS_TO_LINK; // $.each break
     }
   });
 
-  if (locations.length > window.plugin.tidyLinks.MAX_PORTALS_TO_LINK) {
-    window.plugin.tidyLinks.addErrorMarker();
+  if (locations.length > tidyLinks.MAX_PORTALS_TO_LINK) {
+    errorMarker.setLatLng(map.getCenter()).addTo(tidyLinks.layer);
     return;
   }
 
-  var triangles = window.delaunay.triangulate(locations.map(function (p) { return [p.x,p.y] }));
+  var triangles = tidyLinks.Delaunay.triangulate(locations.map(function (latlng) {
+    var point = map.project(latlng, tidyLinks.PROJECT_ZOOM);
+    return [point.x,point.y];
+  }));
 
-  var drawnLinkCount = 0;
+  tidyLinks.layer.clearLayers();
 
-  var orderedPoints = function(a,b) {
-    if(a.x<b.x) return [a,b];
-    if(a.x==b.x && a.y<b.y) return [a,b];
-    return [b,a];
-  }
   var drawnLinks = {};
 
-  //draw a link, but only if it hasn't already been drawn
-  var drawLink = function(a,b) {
-    //order the points, so a pair of coordinates in any order is handled in one direction only
-    var points = orderedPoints(a,b);
-    a=points[0];
-    b=points[1];
+  // draw a link, but only if it hasn't already been drawn
+  function drawLink (a,b) {
+    // order the points, so a pair of coordinates in any order is handled in one direction only
+    if (a>b) { b = [a, a = b][0]; } // swap
 
-    //do we have a line already drawn from a to b?
-    if(!(a in drawnLinks)) {
-      //no lines from a to anywhere yet - create an empty target array
+    if (!(a in drawnLinks)) { // no lines from a to anywhere yet
       drawnLinks[a] = {};
     }
 
-    if (!(b in drawnLinks[a])) {
-      //no line from a to b yet
-
-      //using drawnLinks[a] as a set - so the stored value is of no importance
-      drawnLinks[a][b] = null;
-
-      // convert back from x/y coordinates to lat/lng for drawing
-      var alatlng = map.unproject (a, window.plugin.tidyLinks.PROJECT_ZOOM);
-      var blatlng = map.unproject (b, window.plugin.tidyLinks.PROJECT_ZOOM);
-
-      var poly = L.polyline([alatlng, blatlng], window.plugin.tidyLinks.STROKE_STYLE);
-      poly.addTo(window.plugin.tidyLinks.layer);
-      drawnLinkCount++;
+    if (!(b in drawnLinks[a])) { // no line from a to b yet
+      drawnLinks[a][b] = true;
+      L.polyline([locations[a], locations[b]], tidyLinks.STROKE_STYLE).addTo(tidyLinks.layer);
     }
   }
-
   for (var i = 0; i<triangles.length;) {
-    var a = locations[triangles[i++]],
-        b = locations[triangles[i++]],
-        c = locations[triangles[i++]];
+    var a = triangles[i++],
+        b = triangles[i++],
+        c = triangles[i++];
     drawLink(a,b);
     drawLink(b,c);
     drawLink(c,a);
   }
 }
 
-window.plugin.tidyLinks.setup = function() {
-  try { console.log('Loading delaunay JS now'); } catch(e) {}
-  @@INCLUDERAW:external/delaunay.js@@
-  window.delaunay = Delaunay;
-  try { console.log('done loading delaunay JS'); } catch(e) {}
+function setup () {
+  tidyLinks.Delaunay = loadDelaunay();
 
-  window.plugin.tidyLinks.layer = L.layerGroup([]);
+  map = window.map;
+  var icon = L.divIcon(tidyLinks.errorMarkerIconOptions);
+  errorMarker = L.marker([0,0], { icon: icon, interactive: false });
+  tidyLinks.layer = L.layerGroup([])
+    .on('add', function () {
+      updateLayer();
+      window.addHook('mapDataRefreshEnd', updateLayer);
+    })
+    .on('remove', function () {
+      window.removeHook('mapDataRefreshEnd', updateLayer);
+    });
 
-  window.addHook('mapDataRefreshEnd', function(e) {
-    window.plugin.tidyLinks.updateLayer();
-  });
+  window.addLayerGroup('Tidy Links', tidyLinks.layer, false);
 
-  window.addHook('mapDataRefreshStart', function(e) {
-    window.plugin.tidyLinks.clearErrorMarker();
-  });
-
-  window.map.on('layeradd', function(e) {
-    if (e.layer === window.plugin.tidyLinks.layer)
-      window.plugin.tidyLinks.updateLayer();
-  });
-  window.map.on('layerremove', function(e) {
-    if (e.layer === window.plugin.tidyLinks.layer)
-      window.plugin.tidyLinks.clearErrorMarker();
-  });
-
-  window.addLayerGroup('Tidy Links', window.plugin.tidyLinks.layer, false);
-
-  $('head').append('<style>'+
-    '.tidy-links-error { color: #F88; font-size: 20px; font-weight: bold; text-align: center; text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000; background-color: rgba(0,0,0,0.6); border-radius: 5px; }'+
-    '</style>');
-
-
+  $('<style>').html('\
+    .tidy-links-error {\
+      color: #F88;\
+      font-size: 20px;\
+      font-weight: bold;\
+      text-align: center;\
+      text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000;\
+      background-color: rgba(0,0,0,0.6);\
+      border-radius: 5px;\
+    }\
+  ').appendTo('head');
 }
-var setup = window.plugin.tidyLinks.setup;
+
+function loadDelaunay () {
+  try {
+    // https://github.com/ironwallaby/delaunay
+    @@INCLUDERAW:external/delaunay.js@@
+
+    return Delaunay;
+  } catch (e) {
+    console.error('delaunay.js loading failed');
+    throw e;
+  }
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
