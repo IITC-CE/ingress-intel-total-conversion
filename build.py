@@ -9,8 +9,6 @@ import sys
 import os
 import shutil
 import json
-import shelve
-import hashlib
 
 try:
     import urllib2
@@ -23,10 +21,8 @@ from buildsettings import buildSettings
 # load option local settings file
 try:
     from localbuildsettings import buildSettings as localBuildSettings
-
-    buildSettings.update(localBuildSettings)
 except ImportError:
-    pass
+    localBuildSettings = {}
 
 # load default build
 try:
@@ -34,32 +30,6 @@ try:
 except ImportError:
     defaultBuild = None
 
-buildName = defaultBuild
-
-# build name from command line
-if len(sys.argv) == 2:  # argv[0] = program, argv[1] = buildname, len=2
-    buildName = sys.argv[1]
-
-if buildName is None or buildName not in buildSettings:
-    print("Usage: build.py buildname")
-    print(" available build names: %s" % ', '.join(buildSettings.keys()))
-    sys.exit(1)
-
-settings = buildSettings[buildName]
-
-# set up vars used for replacements
-
-utcTime = time.gmtime()
-buildDate = time.strftime('%Y-%m-%d-%H%M%S', utcTime)
-# userscripts have specific specifications for version numbers - the above date format doesn't match
-dateTimeVersion = time.strftime('%Y%m%d.', utcTime) + time.strftime('%H%M%S', utcTime).lstrip('0')
-
-# extract required values from the settings entry
-resourceUrlBase = settings.get('resourceUrlBase')
-distUrlBase = settings.get('distUrlBase')
-buildMobile = settings.get('buildMobile')
-gradleOptions = settings.get('gradleOptions', '')
-gradleBuildFile = settings.get('gradleBuildFile', 'mobile/build.gradle')
 
 # plugin wrapper code snippets. handled as macros, to ensure that
 # 1. indentation caused by the "function wrapper()" doesn't apply to the plugin code body
@@ -110,51 +80,51 @@ def readfile(fn):
         return f.read()
 
 
-def loaderString(var):
+def loader_string(var):
     fn = var.group(1)
     return readfile(fn).replace('\\', '\\\\').replace('\n', '\\\n').replace('\'', '\\\'')
 
 
-def loaderCSS(fn):
-    return re.sub('(?<=url\()([^)#]+)(?=\))', loaderImage, loaderString(fn))
+def loader_css(fn):
+    return re.sub('(?<=url\()([^)#]+)(?=\))', loader_image, loader_string(fn))
 
 
-def loaderRaw(var):
+def loader_raw(var):
     fn = var.group(1)
     return readfile(fn)
 
 
-def loaderImage(var):
+def loader_image(var):
     fn = var.group(1)
     return 'data:image/png;base64,' + base64.b64encode(open(fn, 'rb').read()).decode('utf8')
 
 
-def loaderSVG(var):
-    return 'data:svg+xml;utf8,' + loaderString(var)
+def loader_svg(var):
+    return 'data:svg+xml;utf8,' + loader_string(var)
 
 
-def loadCode(ignore):
+def load_code(ignore):
     return '\n\n;\n\n'.join(map(readfile, sorted(glob.glob('code/*.js'))))
 
 
-def extractUserScriptMeta(var):
+def extract_userscript_meta(var):
     m = re.search(r"//[ \t]*==UserScript==\n.*?//[ \t]*==/UserScript==\n", var, re.MULTILINE | re.DOTALL)
     return m.group(0)
 
 
-def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
-    script = re.sub('@@INJECTCODE@@', loadCode, script)
+def do_replacements(script, update_url, download_url, plugin_name=None):
+    script = re.sub('@@INJECTCODE@@', load_code, script)
 
     script = script.replace('@@METAINFO@@', pluginMetaBlock)
     script = script.replace('@@PLUGINSTART@@', pluginWrapperStart)
     script = script.replace('@@PLUGINSTART-USE-STRICT@@', pluginWrapperStartUseStrict)
     script = script.replace('@@PLUGINEND@@', pluginWrapperEnd)
 
-    script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loaderRaw, script)
-    script = re.sub('@@INCLUDESTRING:([0-9a-zA-Z_./-]+)@@', loaderString, script)
-    script = re.sub('@@INCLUDECSS:([0-9a-zA-Z_./-]+)@@', loaderCSS, script)
-    script = re.sub('@@INCLUDEIMAGE:([0-9a-zA-Z_./-]+)@@', loaderImage, script)
-    script = re.sub('@@INCLUDESVG:([0-9a-zA-Z_./-]+)@@', loaderSVG, script)
+    script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loader_raw, script)
+    script = re.sub('@@INCLUDESTRING:([0-9a-zA-Z_./-]+)@@', loader_string, script)
+    script = re.sub('@@INCLUDECSS:([0-9a-zA-Z_./-]+)@@', loader_css, script)
+    script = re.sub('@@INCLUDEIMAGE:([0-9a-zA-Z_./-]+)@@', loader_image, script)
+    script = re.sub('@@INCLUDESVG:([0-9a-zA-Z_./-]+)@@', loader_svg, script)
 
     script = script.replace('@@BUILDDATE@@', buildDate)
     script = script.replace('@@DATETIMEVERSION@@', dateTimeVersion)
@@ -167,127 +137,160 @@ def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
 
     script = script.replace('@@BUILDNAME@@', buildName)
 
-    script = script.replace('@@UPDATEURL@@', updateUrl)
-    script = script.replace('@@DOWNLOADURL@@', downloadUrl)
+    script = script.replace('@@UPDATEURL@@', update_url)
+    script = script.replace('@@DOWNLOADURL@@', download_url)
 
-    if (pluginName):
-        script = script.replace('@@PLUGINNAME@@', pluginName)
+    if plugin_name:
+        script = script.replace('@@PLUGINNAME@@', plugin_name)
 
     return script
 
 
-def saveScriptAndMeta(script, ourDir, filename, oldDir=None):
-    # TODO: if oldDir is set, compare files. if only data/time-based version strings are different
+def save_script_and_meta(script, out_dir, filename):
     # copy from there instead of saving a new file
 
-    fn = os.path.join(outDir, filename)
+    fn = os.path.join(out_dir, filename)
     with io.open(fn, 'w', encoding='utf8') as f:
         f.write(script)
 
     metafn = fn.replace('.user.js', '.meta.js')
     if metafn != fn:
         with io.open(metafn, 'w', encoding='utf8') as f:
-            meta = extractUserScriptMeta(script)
+            meta = extract_userscript_meta(script)
             f.write(meta)
 
 
-outDir = os.path.join('build', buildName)
+def main():
+    out_dir = os.path.join('build', buildName)
 
-# create the build output
+    # create the build output
 
-# first, delete any existing build - but keep it in a temporary folder for now
-oldDir = None
-if os.path.exists(outDir):
-    oldDir = outDir + '~'
-    if os.path.exists(oldDir):
-        shutil.rmtree(oldDir)
-    os.rename(outDir, oldDir)
+    # first, delete any existing build - but keep it in a temporary folder for now
+    old_dir = None
+    if os.path.exists(out_dir):
+        old_dir = out_dir + '~'
+        if os.path.exists(old_dir):
+            shutil.rmtree(old_dir)
+        os.rename(out_dir, old_dir)
 
-# copy the 'dist' folder, if it exists
-if os.path.exists('dist'):
-    # this creates the target directory (and any missing parent dirs)
-    # FIXME? replace with manual copy, and any .css and .js files are parsed for replacement tokens?
-    shutil.copytree('dist', outDir)
-else:
-    # no 'dist' folder - so create an empty target folder
-    os.makedirs(outDir)
+    # copy the 'dist' folder, if it exists
+    if os.path.exists('dist'):
+        # this creates the target directory (and any missing parent dirs)
+        # FIXME? replace with manual copy, and any .css and .js files are parsed for replacement tokens?
+        shutil.copytree('dist', out_dir)
+    else:
+        # no 'dist' folder - so create an empty target folder
+        os.makedirs(out_dir)
 
-# run any preBuild commands
-for cmd in settings.get('preBuild', []):
-    os.system(cmd)
+    # run any preBuild commands
+    for cmd in settings.get('preBuild', []):
+        os.system(cmd)
 
-# load main.js, parse, and create main total-conversion-build.user.js
-main = readfile('main.js')
+    # load main.js, parse, and create main total-conversion-build.user.js
+    main_script = readfile('main.js')
 
-downloadUrl = distUrlBase and distUrlBase + '/total-conversion-build.user.js' or 'none'
-updateUrl = distUrlBase and distUrlBase + '/total-conversion-build.meta.js' or 'none'
-main = doReplacements(main, downloadUrl=downloadUrl, updateUrl=updateUrl)
+    download_url = distUrlBase and distUrlBase + '/total-conversion-build.user.js' or 'none'
+    update_url = distUrlBase and distUrlBase + '/total-conversion-build.meta.js' or 'none'
+    main_script = do_replacements(main_script, download_url, update_url)
 
-saveScriptAndMeta(main, outDir, 'total-conversion-build.user.js', oldDir)
+    save_script_and_meta(main_script, out_dir, 'total-conversion-build.user.js')
 
-with io.open(os.path.join(outDir, '.build-timestamp'), 'w') as f:
-    f.write(u"" + time.strftime('%Y-%m-%d %H:%M:%S UTC', utcTime))
+    with io.open(os.path.join(out_dir, '.build-timestamp'), 'w') as f:
+        f.write(u"" + time.strftime('%Y-%m-%d %H:%M:%S UTC', utcTime))
 
-# for each plugin, load, parse, and save output
-os.mkdir(os.path.join(outDir, 'plugins'))
+    # for each plugin, load, parse, and save output
+    os.mkdir(os.path.join(out_dir, 'plugins'))
 
-for fn in glob.glob("plugins/*.user.js"):
-    script = readfile(fn)
+    for fn in glob.glob("plugins/*.user.js"):
+        script = readfile(fn)
 
-    downloadUrl = distUrlBase and distUrlBase + '/' + fn.replace("\\", "/") or 'none'
-    updateUrl = distUrlBase and downloadUrl.replace('.user.js', '.meta.js') or 'none'
-    pluginName = os.path.splitext(os.path.splitext(os.path.basename(fn))[0])[0]
-    script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName=pluginName)
+        download_url = distUrlBase and distUrlBase + '/' + fn.replace("\\", "/") or 'none'
+        update_url = distUrlBase and download_url.replace('.user.js', '.meta.js') or 'none'
+        plugin_name = os.path.splitext(os.path.splitext(os.path.basename(fn))[0])[0]
+        script = do_replacements(script, download_url, update_url, plugin_name)
 
-    saveScriptAndMeta(script, outDir, fn, oldDir)
+        save_script_and_meta(script, out_dir, fn)
 
-# if we're building mobile too
-if buildMobile:
-    if buildMobile not in ['debug', 'release', 'copyonly']:
-        raise Exception("Error: buildMobile must be 'debug' or 'release' or 'copyonly'")
+    # if we're building mobile too
+    if buildMobile:
+        if buildMobile not in ['debug', 'release', 'copyonly']:
+            raise Exception("Error: buildMobile must be 'debug' or 'release' or 'copyonly'")
 
-    # compile the user location script
-    fn = "user-location.user.js"
-    script = readfile("mobile/plugins/" + fn)
-    downloadUrl = distUrlBase and distUrlBase + '/' + fn.replace("\\", "/") or 'none'
-    updateUrl = distUrlBase and downloadUrl.replace('.user.js', '.meta.js') or 'none'
-    script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName='user-location')
+        # compile the user location script
+        fn = "user-location.user.js"
+        script = readfile("mobile/plugins/" + fn)
+        download_url = distUrlBase and distUrlBase + '/' + fn.replace("\\", "/") or 'none'
+        update_url = distUrlBase and download_url.replace('.user.js', '.meta.js') or 'none'
+        script = do_replacements(script, download_url, update_url, 'user-location')
 
-    saveScriptAndMeta(script, outDir, fn)
+        save_script_and_meta(script, out_dir, fn)
 
-    # copy the IITC script into the mobile folder. create the folder if needed
-    try:
-        os.makedirs("mobile/assets")
-    except:
-        pass
-    shutil.copy(os.path.join(outDir, "total-conversion-build.user.js"), "mobile/assets/total-conversion-build.user.js")
-    # copy the user location script into the mobile folder.
-    shutil.copy(os.path.join(outDir, "user-location.user.js"), "mobile/assets/user-location.user.js")
-    # also copy plugins
-    try:
-        shutil.rmtree("mobile/assets/plugins")
-    except:
-        pass
-    shutil.copytree(os.path.join(outDir, "plugins"), "mobile/assets/plugins",
-                    # do not include desktop-only plugins to mobile assets
-                    ignore=shutil.ignore_patterns('*.meta.js',
-                                                  'force-https*', 'speech-search*', 'basemap-cloudmade*',
-                                                  'scroll-wheel-zoom-disable*'))
+        # copy the IITC script into the mobile folder. create the folder if needed
+        try:
+            os.makedirs("mobile/assets")
+        except OSError:
+            pass
+        shutil.copy(os.path.join(out_dir, "total-conversion-build.user.js"), "mobile/assets/total-conversion-build.user.js")
+        # copy the user location script into the mobile folder.
+        shutil.copy(os.path.join(out_dir, "user-location.user.js"), "mobile/assets/user-location.user.js")
+        # also copy plugins
+        try:
+            shutil.rmtree("mobile/assets/plugins")
+        except OSError:
+            pass
+        shutil.copytree(os.path.join(out_dir, "plugins"), "mobile/assets/plugins",
+                        # do not include desktop-only plugins to mobile assets
+                        ignore=shutil.ignore_patterns('*.meta.js',
+                                                      'force-https*', 'speech-search*', 'basemap-cloudmade*',
+                                                      'scroll-wheel-zoom-disable*'))
 
-    if buildMobile != 'copyonly':
-        # now launch 'ant' to build the mobile project
-        buildAction = "assemble" + buildMobile.capitalize()
-        retcode = os.system("mobile/gradlew %s -b %s %s" % (gradleOptions, gradleBuildFile, buildAction))
+        if buildMobile != 'copyonly':
+            # now launch 'ant' to build the mobile project
+            buildAction = "assemble" + buildMobile.capitalize()
+            retcode = os.system("mobile/gradlew %s -b %s %s" % (gradleOptions, gradleBuildFile, buildAction))
 
-        if retcode != 0:
-            print("Error: mobile app failed to build. gradlew returned %d" % retcode)
-            exit(1)  # ant may return 256, but python seems to allow only values <256
-        else:
-            shutil.copy("mobile/app/build/outputs/apk/%s/app-%s.apk" % (buildMobile, buildMobile),
-                        os.path.join(outDir, "IITC_Mobile-%s.apk" % buildMobile))
+            if retcode != 0:
+                print("Error: mobile app failed to build. gradlew returned %d" % retcode)
+                exit(1)  # ant may return 256, but python seems to allow only values <256
+            else:
+                shutil.copy("mobile/app/build/outputs/apk/%s/app-%s.apk" % (buildMobile, buildMobile),
+                            os.path.join(out_dir, "IITC_Mobile-%s.apk" % buildMobile))
 
-# run any postBuild commands
-for cmd in settings.get('postBuild', []):
-    os.system(cmd)
+    # run any postBuild commands
+    for cmd in settings.get('postBuild', []):
+        os.system(cmd)
+
+
+if __name__ == '__main__':
+
+    buildSettings.update(localBuildSettings)
+    buildName = defaultBuild
+
+    # build name from command line
+    if len(sys.argv) == 2:  # argv[0] = program, argv[1] = buildname, len=2
+        buildName = sys.argv[1]
+
+    if buildName is None or buildName not in buildSettings:
+        print("Usage: build.py buildname")
+        print(" available build names: %s" % ', '.join(buildSettings.keys()))
+        sys.exit(1)
+
+    settings = buildSettings[buildName]
+
+    # set up vars used for replacements
+
+    utcTime = time.gmtime()
+    buildDate = time.strftime('%Y-%m-%d-%H%M%S', utcTime)
+    # userscripts have specific specifications for version numbers - the above date format doesn't match
+    dateTimeVersion = time.strftime('%Y%m%d.', utcTime) + time.strftime('%H%M%S', utcTime).lstrip('0')
+
+    # extract required values from the settings entry
+    resourceUrlBase = settings.get('resourceUrlBase')
+    distUrlBase = settings.get('distUrlBase')
+    buildMobile = settings.get('buildMobile')
+    gradleOptions = settings.get('gradleOptions', '')
+    gradleBuildFile = settings.get('gradleBuildFile', 'mobile/build.gradle')
+
+    main()
 
 # vim: ai si ts=4 sw=4 sts=4 et
