@@ -79,6 +79,8 @@ public class IITC_Mobile extends AppCompatActivity
     private IITC_MapSettings mMapSettings;
     private IITC_DeviceAccountLogin mLogin;
     private final Vector<ResponseHandler> mResponseHandlers = new Vector<ResponseHandler>();
+    private boolean mDexRunning = false;
+    private boolean mDexDesktopMode = true;
     private boolean mDesktopMode = false;
     private Set<String> mAdvancedMenu;
     private MenuItem mSearchMenuItem;
@@ -95,6 +97,7 @@ public class IITC_Mobile extends AppCompatActivity
     private final Stack<String> mDialogStack = new Stack<String>();
     private String mPermalink = null;
     private String mSearchTerm = "";
+    private IntentFilter mDesktopFilter;
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -108,8 +111,43 @@ public class IITC_Mobile extends AppCompatActivity
         }
     };
 
+    // Setup receiver to detect if Samsung DeX mode has been changed
+	private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
+		@Override
+    	public void onReceive(Context context, Intent intent) {
+        	String action = intent.getAction();
+
+        	if ("android.app.action.ENTER_KNOX_DESKTOP_MODE".equals(action)) {
+            	// Samsung DeX Mode has been entered
+            	mDexRunning = true;
+            	mNavigationHelper.onDexModeChanged(true);
+        	} else if ("android.app.action.EXIT_KNOX_DESKTOP_MODE".equals(action)) {
+            	// Samsung DeX mode has been exited
+            	mDexRunning = false;
+            	mNavigationHelper.onDexModeChanged(false);
+        	}
+    	}
+	};
+	
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+
+        // get status of Samsung DeX Mode at creation
+        Configuration config = getResources().getConfiguration();
+        try {
+            Class configClass = config.getClass();
+            if(configClass.getField("SEM_DESKTOP_MODE_ENABLED").getInt(configClass)
+                    == configClass.getField("semDesktopModeEnabled").getInt(config)) {
+                mDexRunning = true; // Samsung DeX mode enabled
+            }
+        } catch(NoSuchFieldException e) {
+            //Handle the NoSuchFieldException
+        } catch(IllegalAccessException e) {
+            //Handle the IllegalAccessException
+        } catch(IllegalArgumentException e) {
+            //Handle the IllegalArgumentException
+        }
+
         // enable progress bar above action bar
         // must be called BEFORE calling parent method
         requestWindowFeature(Window.FEATURE_PROGRESS);
@@ -157,6 +195,9 @@ public class IITC_Mobile extends AppCompatActivity
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
+        // enable/disable mDexDesktopMode mode on menu create and url load
+        mDexDesktopMode = mSharedPrefs.getBoolean("pref_dex_desktop", true);
+
         // enable/disable mDesktopMode mode on menu create and url load
         mDesktopMode = mSharedPrefs.getBoolean("pref_force_desktop", false);
 
@@ -188,6 +229,12 @@ public class IITC_Mobile extends AppCompatActivity
         // Clear the back stack
         mBackStack.clear();
 
+        // Setup Samsung DeX Desktop detection
+        mDesktopFilter = new IntentFilter();
+        mDesktopFilter.addAction("UiModeManager.SEM_ACTION_ENTER_KNOX_DESKTOP_MODE");
+        mDesktopFilter.addAction("UiModeManager.SEM_ACTION_EXIT_KNOX_DESKTOP_MODE");
+        registerReceiver(mDesktopModeReceiver, mDesktopFilter);
+
         // receive downloadManagers downloadComplete intent
         // afterwards install iitc update
         registerReceiver(mBroadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
@@ -200,8 +247,11 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-        if (key.equals("pref_force_desktop")) {
-            mDesktopMode = sharedPreferences.getBoolean("pref_force_desktop", false);
+		if (key.equals("pref_force_desktop")) {
+			mDesktopMode = sharedPreferences.getBoolean("pref_force_desktop", false);
+            mNavigationHelper.onPrefChanged();
+        } else if (key.equals("pref_dex_desktop")) {
+            mDexDesktopMode = sharedPreferences.getBoolean( "pref_dex_desktop", true);
             mNavigationHelper.onPrefChanged();
         } else if (key.equals("pref_user_location_mode")) {
             final int mode = Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0"));
@@ -522,7 +572,7 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     public void switchToPane(final Pane pane) {
-        if (mDesktopMode) return;
+        if ((mDesktopMode) || (mDexRunning && mDexDesktopMode)) return;
         mIitcWebView.loadUrl("javascript: window.show('" + pane.name + "');");
     }
 
@@ -699,7 +749,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     // vp=f enables mDesktopMode mode...vp=m is the default mobile view
     private String addUrlParam(final String url) {
-        return url + (url.contains("?") ? '&' : '?') + "vp=" + (mDesktopMode ? 'f' : 'm');
+        return url + (url.contains("?") ? '&' : '?') + "vp=" + (((mDesktopMode) || (mDexRunning && mDexDesktopMode)) ? 'f' : 'm');
     }
 
     public void reset() {

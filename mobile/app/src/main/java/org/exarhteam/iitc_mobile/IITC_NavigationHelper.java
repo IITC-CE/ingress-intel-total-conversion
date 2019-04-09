@@ -42,6 +42,8 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     private final View mDrawerRight;
     private final IITC_NotificationHelper mNotificationHelper;
 
+    private boolean mDexRunning = false;
+    private boolean mDexDesktopMode = true;
     private boolean mDesktopMode = false;
     private Pane mPane = Pane.MAP;
     private String mHighlighter = null;
@@ -88,7 +90,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
             mDrawerLeft.setItemChecked(mDrawerLeft.getCheckedItemPosition(), false);
         }
 
-        if (mDesktopMode) {
+        if ((mDesktopMode) || (mDexRunning && mDexDesktopMode)) {
             mActionBar.setDisplayHomeAsUpEnabled(false); // Hide "up" indicator
             mActionBar.setHomeButtonEnabled(false); // Make icon unclickable
             mActionBar.setTitle(mIitc.getString(R.string.app_name));
@@ -221,7 +223,14 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
         syncState();
     }
 
+    // Samsung DeX mode has been changed
+    public void onDexModeChanged(boolean activity) {
+        mDexRunning = activity;
+        updateViews();
+    }
+
     public void onPrefChanged() {
+        mDexDesktopMode = mPrefs.getBoolean( "pref_dex_desktop", true);
         mDesktopMode = mPrefs.getBoolean("pref_force_desktop", false);
         updateViews();
     }

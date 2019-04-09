@@ -31,6 +31,12 @@
             android:key="pref_force_desktop"
             android:summary="@string/pref_force_desktop_sum"
             android:title="@string/pref_force_desktop"/>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_dex_desktop"
+            android:summary="@string/pref_dex_desktop_sum"
+            android:title="@string/pref_dex_desktop"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_tweaks_cat"

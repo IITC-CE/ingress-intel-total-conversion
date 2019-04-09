@@ -113,6 +113,8 @@
         Note: IITCm can still be controlled via the Navigation Drawers</string>
     <string name="pref_force_desktop">Force desktop mode</string>
     <string name="pref_force_desktop_sum">Nice for tablets, looks awful on smartphones</string>
+    <string name="pref_dex_desktop">Force DeX desktop mode</string>
+    <string name="pref_dex_desktop_sum">Force desktop mode when DeX mode is active</string>
     <string name="pref_external_storage">Move tiles cache to external storage</string>
     <string name="pref_external_storage_sum">Restart required! Write cache to sdCard.
         External storage has to be mounted.</string>
