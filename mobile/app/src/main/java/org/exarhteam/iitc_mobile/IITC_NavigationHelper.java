@@ -90,7 +90,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
             mDrawerLeft.setItemChecked(mDrawerLeft.getCheckedItemPosition(), false);
         }
 
-        if ((mDesktopMode) || (mDexRunning && mDexDesktopMode)) {
+        if (isDesktopActive()) {
             mActionBar.setDisplayHomeAsUpEnabled(false); // Hide "up" indicator
             mActionBar.setHomeButtonEnabled(false); // Make icon unclickable
             mActionBar.setTitle(mIitc.getString(R.string.app_name));
@@ -124,7 +124,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
             }
         }
 
-        final boolean mapVisible = (mDesktopMode || (mDexRunning && mDexDesktopMode)) || mPane == Pane.MAP;
+        final boolean mapVisible = isDesktopActive() || mPane == Pane.MAP;
         if ("No Highlights".equals(mHighlighter) || isDrawerOpened() || mIitc.isLoading() || !mapVisible) {
             mActionBar.setSubtitle(null);
         } else {
@@ -167,6 +167,10 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
 
     public boolean isDrawerOpened() {
         return mDrawerLayout.isDrawerOpen(mDrawerLeft) || mDrawerLayout.isDrawerOpen(mDrawerRight);
+    }
+
+    public boolean isDesktopActive() {
+        return (mDesktopMode || (mDexRunning && mDexDesktopMode));
     }
 
     @Override

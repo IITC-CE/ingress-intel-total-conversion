@@ -572,7 +572,7 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     public void switchToPane(final Pane pane) {
-        if ((mDesktopMode) || (mDexRunning && mDexDesktopMode)) return;
+        if (mNavigationHelper.isDesktopActive()) return;
         mIitcWebView.loadUrl("javascript: window.show('" + pane.name + "');");
     }
 
@@ -749,7 +749,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     // vp=f enables mDesktopMode mode...vp=m is the default mobile view
     private String addUrlParam(final String url) {
-        return url + (url.contains("?") ? '&' : '?') + "vp=" + (((mDesktopMode) || (mDexRunning && mDexDesktopMode)) ? 'f' : 'm');
+        return url + (url.contains("?") ? '&' : '?') + "vp=" + (mNavigationHelper.isDesktopActive() ? 'f' : 'm');
     }
 
     public void reset() {
