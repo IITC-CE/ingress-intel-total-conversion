@@ -57,6 +57,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
         mDrawerLeft = (ListView) iitc.findViewById(R.id.left_drawer);
         mDrawerRight = iitc.findViewById(R.id.right_drawer);
         mDrawerLayout = (DrawerLayout) iitc.findViewById(R.id.drawer_layout);
+        mDexRunning = mIitc.isDexRunning();
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(iitc);
 

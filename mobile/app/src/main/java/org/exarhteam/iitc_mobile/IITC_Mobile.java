@@ -576,6 +576,10 @@ public class IITC_Mobile extends AppCompatActivity
         mIitcWebView.loadUrl("javascript: window.show('" + pane.name + "');");
     }
 
+    public boolean isDexRunning() {
+        return mDexRunning;
+    }
+
     @Override
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
