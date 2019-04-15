@@ -28,15 +28,9 @@ tidyLinks.STROKE_STYLE = { // https://leafletjs.com/reference-1.4.0.html#polylin
   interactive: false
 };
 
-tidyLinks.errorMarkerIconOptions = { // https://leafletjs.com/reference-1.4.0.html#divicon-html
-  className: 'tidy-links-error',
-  iconSize: [300,30],
-  html: 'Tidy Links: too many portals!'
-};
+var map;
 
-var map, errorMarker;
-
-function updateLayer () {
+tidyLinks.draw = function () {
   var locations = [];
   var bounds = map.getBounds();
   $.each(window.portals, function (guid, portal) {
@@ -47,10 +41,7 @@ function updateLayer () {
     }
   });
 
-  if (locations.length > tidyLinks.MAX_PORTALS_TO_LINK) {
-    errorMarker.setLatLng(map.getCenter()).addTo(tidyLinks.layer);
-    return;
-  }
+  if (locations.length > tidyLinks.MAX_PORTALS_TO_LINK) { return; }
 
   var triangles = tidyLinks.Delaunay.triangulate(locations.map(function (latlng) {
     var point = map.project(latlng, tidyLinks.PROJECT_ZOOM);
@@ -83,22 +74,34 @@ function updateLayer () {
     drawLink(b,c);
     drawLink(c,a);
   }
-}
+  return true;
+};
+
+tidyLinks.setOverflow = function (isOveflowed) {
+  tidyLinks.layer[isOveflowed ? 'openTooltip' : 'closeTooltip']();
+};
+
+tidyLinks.update = function () {
+  tidyLinks.setOverflow(!tidyLinks.draw());
+};
 
 function setup () {
   tidyLinks.Delaunay = loadDelaunay();
 
   map = window.map;
-  var icon = L.divIcon(tidyLinks.errorMarkerIconOptions);
-  errorMarker = L.marker([0,0], { icon: icon, interactive: false });
   tidyLinks.layer = L.layerGroup([])
     .on('add', function () {
-      updateLayer();
-      window.addHook('mapDataRefreshEnd', updateLayer);
+      tidyLinks.update();
+      window.addHook('mapDataRefreshEnd', tidyLinks.update);
     })
     .on('remove', function () {
-      window.removeHook('mapDataRefreshEnd', updateLayer);
+      window.removeHook('mapDataRefreshEnd', tidyLinks.update);
+    })
+    .bindTooltip('Tidy Links: too many portals!', {
+      className: 'tidy-links-error',
+      direction: 'center'
     });
+  tidyLinks.layer.getCenter = function () { return map.getCenter(); }; // for tooltip position
 
   window.addLayerGroup('Tidy Links', tidyLinks.layer, false);
 
@@ -110,7 +113,8 @@ function setup () {
       text-align: center;\
       text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000;\
       background-color: rgba(0,0,0,0.6);\
-      border-radius: 5px;\
+      width: 300px;\
+      border: none;\
     }\
   ').appendTo('head');
 }
