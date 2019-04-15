@@ -118,6 +118,10 @@ public class IITC_Mobile extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
+        if (Build.VERSION.SDK_INT >= 21) {
+            WebView.enableSlowWholeDocumentDraw();
+            Log.w("WebView.enableSlowWholeDocumentDraw()");
+        }
         setContentView(R.layout.activity_main);
         mImageLoading = findViewById(R.id.imageLoading);
         mIitcWebView = (IITC_WebView) findViewById(R.id.iitc_webview);
@@ -171,6 +175,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         // get fullscreen status from settings
         mIitcWebView.updateFullscreenStatus();
+        mIitcWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
