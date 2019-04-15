@@ -37,6 +37,12 @@ if (typeof(PLAYER)!="object" || typeof(PLAYER.nickname) != "string") {
     throw("Page doesn't have player data, but you are logged in.");
   }
   // FIXME: handle nia takedown in progress
+  
+  // add login form stylesheet
+  headHTML = document.getElementsByTagName('head')[0].innerHTML;
+  headHTML += '<style>@@INCLUDESTRING:login.css@@</style>';
+  document.getElementsByTagName('head')[0].innerHTML = headHTML;
+  
   throw("Couldn't retrieve player data. Are you logged in?");
 }
 

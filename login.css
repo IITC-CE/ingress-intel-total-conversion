@@ -1,0 +1,24 @@
+html, body {
+    background: #0b303e;
+}
+
+#dashboard_container {
+    display: flex;
+    flex-direction: column;
+}
+
+.button {
+    margin: 5px 10px;
+    padding: 0;
+}
+
+#dashboard_container a {
+    display: block;
+    padding: 10px 15px;
+}
+
+@media (min-width: 970px) {
+    .button {
+        margin: 5px 10%;
+    }
+}
