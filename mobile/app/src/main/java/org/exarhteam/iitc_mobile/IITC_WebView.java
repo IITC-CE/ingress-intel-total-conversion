@@ -75,6 +75,12 @@ public class IITC_WebView extends WebView {
 
         addJavascriptInterface(mJsInterface, "android");
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
+
+        // Hack to work Google login page in old browser
+        if (Build.VERSION.SDK_INT < 21 &&
+                !mSharedPrefs.getBoolean("pref_fake_user_agent", false))
+            mSharedPrefs.edit().putBoolean("pref_fake_user_agent", true).apply();
+
         setUserAgent();
 
         mNavHider = new Runnable() {
