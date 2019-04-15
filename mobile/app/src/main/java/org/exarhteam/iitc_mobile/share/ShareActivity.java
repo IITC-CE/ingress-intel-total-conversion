@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 
@@ -112,6 +113,9 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
 
         final ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
         final Intent intent = getIntent();
         final String type = intent.getStringExtra(EXTRA_TYPE);
