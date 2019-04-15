@@ -5,6 +5,8 @@ import io
 import sys
 import os
 import json
+from time import sleep
+from threading import Thread
 
 # load settings file
 from buildsettings import buildSettings
@@ -54,7 +56,6 @@ def parse_user_script(text):
 
         line = line.strip()
         sp = line.split()
-        print(sp)
         data[sp[1]] = ' '.join(sp[2:])
 
 
@@ -87,25 +88,41 @@ def readfile(fn):
         return f.read()
 
 
-def main():
+def update_meta():
+    build_timestamp = ''
     folder = "build/%s/" % buildName
-    info = parse_user_script(readfile(folder + "total-conversion-build.user.js"))
-    iitc_version = info['@version']
 
-    plugins = os.listdir(folder + "plugins")
-    plugins = filter(lambda x: x.endswith('.meta.js'), plugins)
-    meta = {}
-    for filename in plugins:
-        script = readfile(folder + "plugins/" + filename)
-        meta = add_plugin_to_meta(meta, filename, script)
+    while 1:
+        new_build_timestamp = readfile(folder + ".build-timestamp")
+        if build_timestamp != new_build_timestamp:
 
-    data = {
-        buildName+'_plugins': meta,
-        buildName+'_iitc_version': iitc_version
-    }
+            build_timestamp = new_build_timestamp
+            print("Last generation of categories: %s" % build_timestamp)
 
-    with open(buildName+'.json', 'w') as fp:
-        json.dump(data, fp)
+            info = parse_user_script(readfile(folder + "total-conversion-build.user.js"))
+            iitc_version = info['@version']
+
+            plugins = os.listdir(folder + "plugins")
+            plugins = filter(lambda x: x.endswith('.meta.js'), plugins)
+            meta = {}
+            for filename in plugins:
+                script = readfile(folder + "plugins/" + filename)
+                meta = add_plugin_to_meta(meta, filename, script)
+
+            data = {
+                buildName+'_plugins': meta,
+                buildName+'_iitc_version': iitc_version
+            }
+
+            with open(buildName+'.json', 'w') as fp:
+                json.dump(data, fp)
+
+        sleep(5)
+
+
+if __name__ == '__main__':
+    worker = Thread(target=update_meta, daemon=True)
+    worker.start()
 
     print('Update channel "%s" opened. Start a web server on port %i' % (buildName, startWebServerPort))
 
@@ -118,7 +135,3 @@ def main():
         # Python 3
         from http.server import test, SimpleHTTPRequestHandler
         test(HandlerClass=SimpleHTTPRequestHandler, port=startWebServerPort)
-
-
-if __name__ == '__main__':
-    main()
