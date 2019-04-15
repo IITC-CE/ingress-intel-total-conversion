@@ -35,23 +35,13 @@ except ImportError:
     defaultBuild = None
 
 buildName = defaultBuild
-startWebServer = False
-startWebServerPort = 8000
 
 # build name from command line
 if len(sys.argv) == 2:  # argv[0] = program, argv[1] = buildname, len=2
     buildName = sys.argv[1]
-if len(sys.argv) == 3 and sys.argv[2].startswith('--webserver'):  # argv[0] = program, argv[1] = buildname, argv[2] = start web server, len=3
-    buildName = sys.argv[1]
-    startWebServer = True
-    port = sys.argv[2].split('=')
-    if len(port) == 2:
-        startWebServerPort = int(port[1])
 
 if buildName is None or buildName not in buildSettings:
     print("Usage: build.py buildname")
-    print("or")
-    print("Usage: build.py buildname --webserver=8000")
     print(" available build names: %s" % ', '.join(buildSettings.keys()))
     sys.exit(1)
 
@@ -201,43 +191,6 @@ def saveScriptAndMeta(script, ourDir, filename, oldDir=None):
             f.write(meta)
 
 
-def parseUserScript(file):
-    data = {}
-    for line in file.split('\n'):
-        if "==UserScript==" in line:
-            continue
-        if "==/UserScript==" in line:
-            return data
-
-        line = line.strip()
-        sp = line.split()
-        data[sp[1]] = ' '.join(sp[2:])
-
-
-def addPluginToMeta(meta, filename, script):
-    info = parseUserScript(script)
-    category = info.get('@category')
-    if category:
-        category = re.sub('[^A-z0-9 -]', '', category).strip()
-    else:
-        category = "Misc"
-
-    if category not in meta:
-        meta[category] = {
-            'name': category,
-            'desc': "",
-            'plugins': []}
-
-    meta[category]['plugins'].append({
-        'name': info['@name'].replace("IITC plugin: ", "").replace("IITC Plugin: ", ""),
-        'id': info['@id'],
-        'version': info['@version'],
-        'filename': filename+'.user.js',
-        'desc': info['@description'],
-    })
-    return meta
-
-
 outDir = os.path.join('build', buildName)
 
 # create the build output
@@ -278,7 +231,6 @@ with io.open(os.path.join(outDir, '.build-timestamp'), 'w') as f:
 # for each plugin, load, parse, and save output
 os.mkdir(os.path.join(outDir, 'plugins'))
 
-meta = {}
 for fn in glob.glob("plugins/*.user.js"):
     script = readfile(fn)
 
@@ -288,9 +240,6 @@ for fn in glob.glob("plugins/*.user.js"):
     script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName=pluginName)
 
     saveScriptAndMeta(script, outDir, fn, oldDir)
-
-    if startWebServer:
-        meta = addPluginToMeta(meta, pluginName, script)
 
 # if we're building mobile too
 if buildMobile:
@@ -340,25 +289,5 @@ if buildMobile:
 # run any postBuild commands
 for cmd in settings.get('postBuild', []):
     os.system(cmd)
-
-if startWebServer:
-    data = {
-        buildName+'_plugin': meta,
-        buildName+'_iitc_version': dateTimeVersion
-    }
-    with open(buildName+'.json', 'w') as fp:
-        json.dump(data, fp)
-
-    print('Update channel "%s" opened. Start a web server on port %i' % (buildName, startWebServerPort))
-
-    try:
-        # Python 2
-        from SimpleHTTPServer import test
-        sys.argv[1] = startWebServerPort
-        test()
-    except ImportError:
-        # Python 3
-        from http.server import test, SimpleHTTPRequestHandler
-        test(HandlerClass=SimpleHTTPRequestHandler, port=startWebServerPort)
 
 # vim: ai si ts=4 sw=4 sts=4 et
