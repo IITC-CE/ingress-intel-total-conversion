@@ -25,7 +25,7 @@ document.body.onload = function() {};
 //originally code here parsed the <Script> tags from the page to find the one that defined the PLAYER object
 //however, that's already been executed, so we can just access PLAYER - no messing around needed!
 
-var PLAYER = window.PLAYER || (unsafeWindow && unsafeWindow.PLAYER);
+var PLAYER = window.PLAYER || (typeof unsafeWindow !== 'undefined' && unsafeWindow.PLAYER);
 if (typeof(PLAYER)!="object" || typeof(PLAYER.nickname) != "string") {
   // page doesn’t have a script tag with player information.
   if(document.getElementById('header_email')) {
