@@ -30,25 +30,24 @@ tidyLinks.STROKE_STYLE = { // https://leafletjs.com/reference-1.4.0.html#polylin
 
 var map;
 
-tidyLinks.draw = function () {
+tidyLinks.getLocations = function (limit) {
   var locations = [];
   var bounds = map.getBounds();
-  $.each(window.portals, function (guid, portal) {
-    var ll = portal.getLatLng();
-    if (bounds.contains(ll)) {
-      locations.push(ll);
-      return locations.length <= tidyLinks.MAX_PORTALS_TO_LINK; // $.each break
-    }
-  });
+  for (var guid in window.portals) {
+    if (limit && locations.length > limit) { return; }
+    var ll = window.portals[guid].getLatLng();
+    if (bounds.contains(ll)) { locations.push(ll); }
+  }
+  return locations;
+};
 
-  if (locations.length > tidyLinks.MAX_PORTALS_TO_LINK) { return; }
-
+tidyLinks.draw = function (locations, layer) {
   var triangles = tidyLinks.Delaunay.triangulate(locations.map(function (latlng) {
     var point = map.project(latlng, tidyLinks.PROJECT_ZOOM);
     return [point.x,point.y];
   }));
 
-  tidyLinks.layer.clearLayers();
+  layer.clearLayers();
 
   var drawnLinks = {};
 
@@ -63,7 +62,7 @@ tidyLinks.draw = function () {
 
     if (!(b in drawnLinks[a])) { // no line from a to b yet
       drawnLinks[a][b] = true;
-      L.polyline([locations[a], locations[b]], tidyLinks.STROKE_STYLE).addTo(tidyLinks.layer);
+      L.polyline([locations[a], locations[b]], tidyLinks.STROKE_STYLE).addTo(layer);
     }
   }
   for (var i = 0; i<triangles.length;) {
@@ -74,7 +73,6 @@ tidyLinks.draw = function () {
     drawLink(b,c);
     drawLink(c,a);
   }
-  return true;
 };
 
 tidyLinks.setOverflow = function (isOveflowed) {
@@ -82,7 +80,9 @@ tidyLinks.setOverflow = function (isOveflowed) {
 };
 
 tidyLinks.update = function () {
-  tidyLinks.setOverflow(!tidyLinks.draw());
+  var locations = tidyLinks.getLocations(tidyLinks.MAX_PORTALS_TO_LINK);
+  if (locations) { tidyLinks.draw(locations, tidyLinks.layer); }
+  tidyLinks.setOverflow(!locations);
 };
 
 function setup () {
