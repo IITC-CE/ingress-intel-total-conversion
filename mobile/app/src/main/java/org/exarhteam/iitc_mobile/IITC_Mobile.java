@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -956,20 +957,13 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     private void sendScreenshot() {
-        Bitmap bitmap = mIitcWebView.getDrawingCache();
-        if (bitmap == null) {
-            mIitcWebView.buildDrawingCache();
-            bitmap = mIitcWebView.getDrawingCache();
-            if (bitmap == null) {
-                Log.e("could not get bitmap!");
-                return;
-            }
-            bitmap = Bitmap.createBitmap(bitmap);
-            if (!mIitcWebView.isDrawingCacheEnabled()) mIitcWebView.destroyDrawingCache();
-        }
-        else {
-            bitmap = Bitmap.createBitmap(bitmap);
-        }
+        Bitmap bitmap = Bitmap.createBitmap(mIitcWebView.getMeasuredWidth(),
+                mIitcWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas bigcanvas = new Canvas(bitmap);
+        int iHeight = bitmap.getHeight();
+        bigcanvas.drawBitmap(bitmap, 0, iHeight, null);
+        mIitcWebView.draw(bigcanvas);
 
         try {
             final File cache = getExternalCacheDir();
