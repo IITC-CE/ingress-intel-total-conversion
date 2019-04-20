@@ -162,6 +162,8 @@ window.COMPLETION_BONUS = 250; //AP for deploying all resonators on portal
 window.UPGRADE_ANOTHERS_RESONATOR = 65; //AP for upgrading another's resonator
 window.MAX_PORTAL_LEVEL = 8;
 window.MAX_RESO_PER_PLAYER = [0, 8, 4, 4, 4, 2, 2, 1, 1];
+window.CYCLE_MAX_CHECKPOINTS = 35;
+window.CHECKPOINT_DURATION_MS = 5*60*60*1000;
 
 // OTHER MORE-OR-LESS CONSTANTS //////////////////////////////////////
 window.TEAM_NONE = 0;

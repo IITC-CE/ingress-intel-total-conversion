@@ -128,20 +128,77 @@ function regionScoreboardScoreHistoryChart(result, logscale) {
 
 function regionScoreboardScoreHistoryTable(result) {
   var history = result.scoreHistory;
-  var table = '<table class="checkpoint_table"><thead><tr><th>Checkpoint</th><th>Enlightened</th><th>Resistance</th></tr></thead>';
+  var max_i = history.length - 1;
 
-  var sum = [0, 0];
+  var html = '';
 
-  for(var i=0; i<history.length; i++) {
-    sum[0] +=  parseInt(history[i][1]);
-    sum[1] +=  parseInt(history[i][2]);
-    table += '<tr><td>' + history[i][0] + '</td><td>' + digits(history[i][1]) + '</td><td>' + digits(history[i][2]) + '</td></tr>';
+  // Summatories and diffs calculation
+  var summatory = [];
+  var diffs = [];
+  
+  summatory[max_i] = [parseInt(history[max_i][1]), parseInt(history[max_i][2])]
+  diffs[max_i] = [0, 0];
+  for (var i = max_i - 1; i >= 0; i--) {
+    summatory[i] = [];
+    summatory[i][0] = summatory[i+1][0] + parseInt(history[i][1]);
+    summatory[i][1] = summatory[i+1][1] + parseInt(history[i][2]);
+
+    diffs[i] = [];
+    diffs[i][0] = parseInt(history[i][1]) - parseInt(history[i+1][1]);
+    diffs[i][1] = parseInt(history[i][2]) - parseInt(history[i+1][2]);
   }
 
-  table = '<div class="scores_total">Total: <span><span class="enl">' + digits(sum[0]) + '</span><span class="res">' + digits(sum[1]) + '</span></div>' + table;
+  // cycle and checkpoint times calculation
+  var nextCP, endCycle, remainingCP, diff;
+  nextCP = new Date(new Date().getTime() + result.timeToEndOfBaseCycleMs);
+  nextCP.setMilliseconds(0);
+  nextCP.setSeconds(0);
+  nextCP.setMinutes(0);
+  nextCP.setMinutes(0);
+
+  remainingCP = CYCLE_MAX_CHECKPOINTS - max_i - 2;
+  endCycle = new Date(nextCP.getTime() + remainingCP * CHECKPOINT_DURATION_MS);
   
-  table += '</table>';
-  return table;
+  // summary build
+  diff = summatory[0][0] - summatory[0][1];
+  html += '<div class="cycleSummary"><div>';
+  if (diff > 0)
+    html += '<span class="enl">ENL</span> leads by <span class="enl">' + digits(diff) + '</span>';
+  else if (diff < 0)
+    html += '<span class="res">RES</span> leads by <span class="res">' + digits(Math.abs(diff)) + '</span>';
+  else
+    html += '<span>Both teams are tied.</span>';
+  // Checkpoint and cycle stats
+  html += '</div><div>' + remainingCP + ' checkpoints remaining.</div>';
+  html += '<div>Next checkpoint: <span class="sep12px"></span>' + nextCP.toLocaleString() + '</div>';
+  html += '<div>Cycle ends: <span class="sep12px"></span>' + endCycle.toLocaleString() + '</div>';
+  html += '</div><br>';
+
+  // table build
+  html += '<div><table class="checkpoint_table"><thead><tr><th>CP.</th><th colspan="2">Enlightened</th><th colspan="2">Resistance</th></tr>';
+  html += '<tr><th></th><th>Sum.</th><th>Score</th><th>Diff.</th><th>Sum.</th><th>Score</th><th>Diff.</th></tr></thead>'
+  for(var i=0; i<history.length; i++) {
+
+    // Checkpoint column
+    html += '<tr><td>' + history[i][0] + '</td>';
+
+    // For each team
+    for (var t = 0; t < 2; t++) {
+      // Summatory
+      html += '<td>' + digits(summatory[i][t].toString()) + '</td>';
+
+      // Score
+      html += '<td>' + digits(history[i][t+1]) + '</td>';
+
+      // Difference
+      if (i < max_i)
+        html += '<td>' + (diffs[i][t] > 0? '+' : '') + digits(diffs[i][t].toString()) + '</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</table></div>';
+  
+  return html;
 }
 
 function regionScoreboardSuccess(data,dlg,logscale) {
@@ -179,7 +236,7 @@ function regionScoreboardSuccess(data,dlg,logscale) {
          +'<div><table>'+teamRow[first]+teamRow[1-first]+'</table>'
          +regionScoreboardScoreHistoryChart(data.result, logscale)+'</div>'
          +'<b>Checkpoint overview</b>'
-         +'<div>'+regionScoreboardScoreHistoryTable(data.result)+'</div>'
+         +'<div class="notOverflowHidden">'+regionScoreboardScoreHistoryTable(data.result)+'</div>'
          +'<b>Top agents</b>'
          +'<div>'+agentTable+'</div>'
          +'</div>');

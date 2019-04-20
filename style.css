@@ -1223,7 +1223,7 @@ table.artifact .portal {
 .cellscore .ui-accordion-header-active:before {
 	content: "⊟";
 }
-.cellscore .ui-accordion-content {
+.cellscore .ui-accordion-content:not(.notOverflowHidden) {
   overflow:hidden !important;
 }
 @-moz-document url-prefix() {
@@ -1235,17 +1235,6 @@ table.artifact .portal {
 g.checkpoint:hover circle {
   fill-opacity: 1;
   stroke-width: 2px;
-}
-.checkpoint_table {
-	border-collapse: collapse;
-}
-.checkpoint_table td {
-	text-align: right;
-	padding-left: 10px;
-}
-
-.scores_total span {
-    padding: 0 1.5em;
 }
 
 .text-overflow-ellipsis {
@@ -1316,3 +1305,30 @@ svg {
 	width: inherit;
 	height: inherit;
 }
+
+.cycleSummary > div {
+  padding: 2px 5px;
+}
+
+.checkpoint_table {
+	border-collapse: collapse;
+}
+
+.checkpoint_table td {
+	text-align: right;
+	padding-left: 10px;
+}
+
+.checkpoint_table tbody td:nth-child(4), .checkpoint_table tbody td:nth-child(7) {
+  text-align: left;
+}
+
+.checkpoint_table tbody td:nth-child(3) {
+  color: #03fe03;
+}
+
+.checkpoint_table tbody td:nth-child(6) {
+  color: #00c5ff;
+}
+
+.sep12px {display: inline-block; width: 12px;}
