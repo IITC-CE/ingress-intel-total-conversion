@@ -55,6 +55,11 @@ To build the mobile app, along with python, you will need
 
 Run `build.py mobile` to build IITC Mobile in debug mode.
 
+### IITC-Button
+
+The source codes of the IITC-Button browser extension are in a nearby repository:
+https://github.com/IITC-CE/IITC-Button
+
 ### Website
 
 The source codes of the iitc.modos189.ru site are in a nearby repository:
