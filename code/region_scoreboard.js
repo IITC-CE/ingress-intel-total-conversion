@@ -175,7 +175,7 @@ function regionScoreboardScoreHistoryTable(result) {
   html += '</div><br>';
 
   // table build
-  html += '<div><table class="checkpoint_table"><thead><tr><th>CP.</th><th colspan="2">Enlightened</th><th colspan="2">Resistance</th></tr>';
+  html += '<div><table class="checkpoint_table"><thead><tr><th>CP.</th><th colspan="3">Enlightened</th><th colspan="3">Resistance</th></tr>';
   html += '<tr><th></th><th>Sum.</th><th>Score</th><th>Diff.</th><th>Sum.</th><th>Score</th><th>Diff.</th></tr></thead>'
   for(var i=0; i<history.length; i++) {
 
