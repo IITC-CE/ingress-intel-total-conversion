@@ -667,6 +667,64 @@ window.extendLeaflet = function() {
     return new L.DivIcon.ColoredSvg(style, options);
   };
 
+  L.Marker.Styled = L.Marker.extend({
+    options: {
+      icon: L.divIcon.defaultSvg()
+    },
+    initialize: function (latlng, style, options) { //?? or style can be prop in options
+      L.Marker.prototype.initialize.call(this, latlng, options);
+      this.setStyle(style);
+    },
+    _symbolStrokeMap: symbolStrokeMap,
+    setStyle: function (style) { // 'color' or { color: 'color'} or { fillColor: 'color', strokeColor: 'symbol-color' }
+      if (typeof style === 'undefined') {
+        return this;
+      }
+      if (typeof style !== 'object') {
+        style = { color: style };
+      }
+      if (style.color) { // apply default mapping
+        style.fillColor = style.color;
+        var mapping = this._symbolStrokeMap[style.color];
+        if (typeof mapping !== 'undefined') {
+          style.strokeColor = mapping;
+        }
+      } else if (style.fillColor) { // keep synchronized
+        style.color = style.fillColor;
+      }
+      if (!this.options.style) {
+        this.options.style = {};
+      }
+      L.extend(this.options.style, style);
+      if (this._icon) {
+        this._updateStyle();
+      }
+      return this;
+    },
+    _styleMap: {
+      fillColor: 'fill',
+      strokeColor: 'stroke'
+    },
+    _updateStyle: function () {
+      var style = this.options.style;
+      if (!style) { return; }
+      var divStyle = this._icon.style;
+      for (var key in style) {
+        var prop = this._styleMap[key];
+        if (prop) {
+          divStyle[prop] = style[key];
+        }
+      }
+    },
+    _initIcon: function () {
+      L.Marker.prototype._initIcon.call(this);
+      this._updateStyle();
+    }
+  });
+  L.marker.styled = function (latlng, style, options) {
+    return new L.Marker.Styled(latlng, style, options);
+  };
+
   /* !!This block is commented out as it's unclear if we really need this patch
 
   // See https://github.com/IITC-CE/ingress-intel-total-conversion/issues/122
