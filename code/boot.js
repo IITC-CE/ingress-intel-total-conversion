@@ -604,38 +604,125 @@ window.extendLeaflet = function() {
   L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
 
   $(['<svg>',
-      // search.js, distance-to-portal.user.js, draw-tools.user.js
+      // search.js, distance-to-portal.user.js, draw-tools.user.js, overlay-kml.user.js
       '<symbol id="marker-icon" viewBox="0 0 25 41">',
-        '<path d="M1.36241844765,18.67488124675 A12.5,12.5 0 1,1 23.63758155235,18.67488124675 L12.5,40.5336158073 Z" style="stroke:none;" />',
-        '<path d="M1.80792170975,18.44788599685 A12,12 0 1,1 23.19207829025,18.44788599685 L12.5,39.432271175 Z" style="stroke:#000000; stroke-width:1px; stroke-opacity: 0.15; fill: none;" />',
-        '<path d="M2.921679865,17.8803978722 A10.75,10.75 0 1,1 22.078320135,17.8803978722 L12.5,36.6789095943 Z" style="stroke:#ffffff; stroke-width:1.5px; stroke-opacity: 0.35; fill: none;" />',
-        '<path d="M19.86121593215,17.25 L12.5,21.5 L5.13878406785,17.25 L5.13878406785,8.75 L12.5,4.5 L19.86121593215,8.75 Z M7.7368602792,10.25 L17.2631397208,10.25 L12.5,18.5 Z M12.5,13 L7.7368602792,10.25 M12.5,13 L17.2631397208,10.25 M12.5,13 L12.5,18.5 M19.86121593215,17.25 L16.39711431705,15.25 M5.13878406785,17.25 L8.60288568295,15.25 M12.5,4.5 L12.5,8.5" style="stroke:#ffffff; stroke-width:1.25px; stroke-opacity: 1; fill: none;" />',
+        '<path d="M1.36241844765,18.67488124675 A12.5,12.5 0 1,1 23.63758155235,18.67488124675 L12.5,40.5336158073 Z" stroke="none" fill="inherit" />',
+        '<path d="M1.80792170975,18.44788599685 A12,12 0 1,1 23.19207829025,18.44788599685 L12.5,39.432271175 Z" fill="none" stroke="#000000" stroke-opacity="0.15" />',
+        '<path d="M2.921679865,17.8803978722 A10.75,10.75 0 1,1 22.078320135,17.8803978722 L12.5,36.6789095943 Z" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.35" />',
+        '<path d="M19.86121593215,17.25 L12.5,21.5 L5.13878406785,17.25 L5.13878406785,8.75 L12.5,4.5 L19.86121593215,8.75 Z M7.7368602792,10.25 L17.2631397208,10.25 L12.5,18.5 Z M12.5,13 L7.7368602792,10.25 M12.5,13 L17.2631397208,10.25 M12.5,13 L12.5,18.5 M19.86121593215,17.25 L16.39711431705,15.25 M5.13878406785,17.25 L8.60288568295,15.25 M12.5,4.5 L12.5,8.5" fill="none" stroke-width="1.25" stroke="inherit" />',
       '</symbol>',
     '</svg>'].join('\\n')).appendTo('body');
 
-  L.DivIcon.ColoredSvg = L.DivIcon.extend({
+  var defaultSizes = {};
+  ['iconSize', 'iconAnchor', 'popupAnchor', 'tooltipAnchor'].forEach(function (key) {
+    defaultSizes[key] = L.Icon.Default.prototype.options[key];
+  });
+  L.DivIcon.DefaultSvg = L.DivIcon.extend({
+    options: L.extend({
+      className: 'leaflet-iitc-generic-marker', // style.css
+      html: '<svg><use xlink:href="#marker-icon"/></svg>',
+    }, defaultSizes),
+  });
+  L.divIcon.defaultSvg = function (options) {
+    return new L.DivIcon.DefaultSvg(options);
+  };
+
+  var symbolStrokeMap = { // pairs fill: stroke
+    'white':   'lightblue',
+    '#ffffff': 'lightblue',
+    'yellow':  'orange',
+    '#ffff00': 'orange'
+  };
+  L.DivIcon.ColoredSvg = L.DivIcon.DefaultSvg.extend({
     options: {
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      className: 'leaflet-div-icon-iitc-generic-marker',
-               // ^ actually any name, just to prevent default
-               // ^ (as it's inappropriately styled)
-      svgTemplate: '<svg style="fill: {color}"><use xlink:href="#marker-icon"/></svg>',
-      color: '#a24ac3' // for draw-tools:
-      // L.divIcon does not use the option `color`, but we store it here to
-      // be able to simply retrieve the color for serializing markers
+      color: '#a24ac3', // for draw-tools:
+      // L.divIcon does not use the option `color`, but we store it here
+      // to be able to simply retrieve the color for serializing markers
     },
-    initialize: function (color, options) {
+    _symbolStrokeMap: symbolStrokeMap,
+    initialize: function (style, options) {
       L.DivIcon.prototype.initialize.call(this, options);
-      if (color) { this.options.color = color; }
-      this.options.html = L.Util.template(
-        this.options.svgTemplate,
-        { color: this.options.color }
-      );
+      if (style) {
+        if (typeof style === 'string') {
+          style = { fill: style };
+          if (style in this._symbolStrokeMap) {
+            style.stroke = this.symbolStrokeMap[style];
+          }
+        }
+        this.options.style = style;
+        this.options.color = style.fill;
+      }
+    },
+    _setIconStyles: function (div, name) {
+      L.Icon.prototype._setIconStyles.call(this, div, name);
+      var style = this.options.style;
+      if (style) {
+        for (var prop in style) {
+          div.style[prop] = style[prop];
+        }
+      }
     }
   });
-  L.divIcon.coloredSvg = function (color, options) {
-    return new L.DivIcon.ColoredSvg(color, options);
+  L.divIcon.coloredSvg = function (style, options) {
+    return new L.DivIcon.ColoredSvg(style, options);
+  };
+
+  L.Marker.Styled = L.Marker.extend({
+    options: {
+      icon: L.divIcon.defaultSvg()
+    },
+    initialize: function (latlng, style, options) { //?? or style can be prop in options
+      L.Marker.prototype.initialize.call(this, latlng, options);
+      this.setStyle(style);
+    },
+    _symbolStrokeMap: symbolStrokeMap,
+    setStyle: function (style) { // 'color' or { color: 'color'} or { fillColor: 'color', strokeColor: 'symbol-color' }
+      if (typeof style === 'undefined') {
+        return this;
+      }
+      if (typeof style !== 'object') {
+        style = { color: style };
+      }
+      if (style.color) { // apply default mapping
+        style.fillColor = style.color;
+        var mapping = this._symbolStrokeMap[style.color];
+        if (typeof mapping !== 'undefined') {
+          style.strokeColor = mapping;
+        }
+      } else if (style.fillColor) { // keep synchronized
+        style.color = style.fillColor;
+      }
+      if (!this.options.style) {
+        this.options.style = {};
+      }
+      L.extend(this.options.style, style);
+      if (this._icon) {
+        this._updateStyle();
+      }
+      return this;
+    },
+    _styleMap: {
+      fillColor: 'fill',
+      strokeColor: 'stroke'
+    },
+    _updateStyle: function () {
+      var style = this.options.style;
+      if (!style) { return; }
+      var divStyle = this._icon.style;
+      for (var key in style) {
+        var prop = this._styleMap[key];
+        if (prop) {
+          divStyle[prop] = style[key];
+        }
+      }
+    },
+    _initIcon: function () {
+      L.Marker.prototype._initIcon.call(this);
+      this._updateStyle();
+    }
+  });
+  L.marker.styled = function (latlng, style, options) {
+    return new L.Marker.Styled(latlng, style, options);
   };
 
   /* !!This block is commented out as it's unclear if we really need this patch

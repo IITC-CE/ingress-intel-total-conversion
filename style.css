@@ -1311,8 +1311,16 @@ g.checkpoint:hover circle {
 	cursor: pointer;
 }
 
-svg {
-	fill: currentColor;
-	width: inherit;
+div.leaflet-marker-icon>svg {
 	height: inherit;
+	width: inherit;
+}
+
+div.leaflet-iitc-generic-marker {
+	fill: #a24ac3;
+	stroke: #ffffff;
+}
+
+svg.icon-button {
+	fill: currentColor;
 }
