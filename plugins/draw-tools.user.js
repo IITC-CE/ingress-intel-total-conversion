@@ -100,7 +100,6 @@ window.plugin.drawTools.addDrawControl = function() {
       },
 
       circle: {
-        circlemarker: false,
         shapeOptions: window.plugin.drawTools.polygonOptions,
         snapPoint: window.plugin.drawTools.getSnapLatLng,
       },
@@ -583,7 +582,22 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
+window.plugin.drawTools.drawstart = function (e) {
+  var mouseActive = L.Browser.touch && matchMedia('(hover:hover)').matches; // workaround for https://github.com/IITC-CE/ingress-intel-total-conversion/issues/162
+  if (mouseActive || e.layerType === 'circle' || e.layerType === 'rectangle') {
+    e.target.touchExtend.enable()
+  } else {
+    e.target.touchExtend.disable()
+  };
+}
+
 window.plugin.drawTools.boot = function() {
+  // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
+  map.addHandler('touchExtend', L.Map.TouchExtend);
+
+  // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
+  map.on('draw:drawstart', plugin.drawTools.drawstart);
+
   // add a custom hook for draw tools to share it's activity with other plugins
   pluginCreateHook('pluginDrawTools');
 
