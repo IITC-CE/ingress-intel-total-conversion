@@ -2779,8 +2779,8 @@ L.Edit.Circle = L.Edit.CircleMarker.extend({
 	},
 
 	_getResizeMarkerPoint: function (latlng) {
-		var latRadius = (this._shape.getRadius() / 40075017) * 360;
-		return L.latLng(latlng.lat+latRadius,latlng.lng);
+		var bounds = this._shape.getBounds(); // geodesic circle stores precalculated bounds
+		return L.latLng(bounds.getNorth(), latlng.lng);
 	},
 
 	_resize: function (latlng) {
