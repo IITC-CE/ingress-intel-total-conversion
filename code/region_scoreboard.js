@@ -1,4 +1,4 @@
-RegionScoreboard = (function() {
+var RegionScoreboard = (function() {
 
   var mainDialog;
   var regionScore;
@@ -200,7 +200,7 @@ RegionScoreboard = (function() {
 
     setupToolTips();
 
-    tooltip = createResultTooltip();
+    var tooltip = createResultTooltip();
     $('#overview', mainDialog).tooltip({
       content: convertTextToTableMagic(tooltip)
     });
@@ -366,7 +366,7 @@ RegionScoreboard = (function() {
 
     function estimatedScore() {
       var res ='<hr>Estimated:\n';
-      total = e_res + e_enl;
+      var total = e_res + e_enl;
       for (var t=0; t<2; t++) {
         var faction = order[t];
         var score = regionScore.getAvgScoreAtCP(faction,regionScore.MAX_CYCLES);
