@@ -819,7 +819,7 @@ try { console.log('Loading included JS now'); } catch(e) {}
 @@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
 @@INCLUDERAW:external/oms.min.js@@
 
-@@INCLUDERAW:external/jquery-3.3.1.min.js@@
+@@INCLUDERAW:external/jquery-3.4.1.min.js@@
 @@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@
 @@INCLUDERAW:external/taphold.js@@
 @@INCLUDERAW:external/jquery.qrcode.min.js@@

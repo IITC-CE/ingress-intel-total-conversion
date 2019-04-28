@@ -1,12 +1,12 @@
 ### jQuery-related components:
 
 * https://jquery.com/
-  3.3.1
-  jquery-3.3.1.min.js
+  3.4.1
+  https://code.jquery.com/jquery-3.4.1.min.js
 
 * https://jqueryui.com/
   1.12.1
-  jquery-ui-1.12.1.min.js
+  http://code.jquery.com/ui/1.12.1/jquery-ui.min.js
 
 * https://github.com/jeromeetienne/jquery-qrcode
   jquery.qrcode.min.js: 2b253c58f4f23f7c522c9f24627d4a51412f8588
