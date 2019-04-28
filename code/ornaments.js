@@ -45,7 +45,7 @@ window.ornaments.addPortal = function(portal) {
   if (portal.options.data.ornaments) {
     window.ornaments._portals[guid] = portal.options.data.ornaments.map(function(ornament) {
       var layer = window.ornaments._layer;
-      if (ornament.startsWith("ap")) {
+      if (ornament.startsWith("ap") && ornament.length === 3) {
         var color = "#000000";
         switch (ornament) {
           case 'ap1':
