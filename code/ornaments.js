@@ -45,6 +45,29 @@ window.ornaments.addPortal = function(portal) {
   if (portal.options.data.ornaments) {
     window.ornaments._portals[guid] = portal.options.data.ornaments.map(function(ornament) {
       var layer = window.ornaments._layer;
+      if (ornament.startsWith("ap")) {
+        var color = "#000000";
+        switch (ornament) {
+          case 'ap1':
+            color = "#ff9136"; break;
+          case 'ap2':
+            color = "#ff52e7"; break;
+          case 'ap3':
+            color = "#9e5aff"; break;
+          case 'ap4':
+            color = "#d74545"; break;
+          case 'ap5':
+            color = "#fff100"; break;
+          case 'ap6':
+            color = "#a6ffe6"; break;
+          case 'ap7':
+            color = "#929497"; break;
+          default:
+            console.warn('unknown ornament: '+ornament);
+        }
+        return L.circleMarker(latlng, {color: color, interactive: false, keyboard: false, opacity: window.ornaments.OVERLAY_OPACITY }).addTo(layer);
+      }
+      
       if (ornament.startsWith("pe")) {
         if (ornament === "peFRACK") {
           layer = window.ornaments._frackers;
