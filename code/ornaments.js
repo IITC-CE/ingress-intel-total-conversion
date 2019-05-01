@@ -31,34 +31,28 @@ window.ornaments = {
   },
 
   addPortal: function (portal) {
-    var guid = portal.options.guid;
-
     this.removePortal(portal);
 
-    var size = this.OVERLAY_SIZE;
-    var latlng = portal.getLatLng();
-
-    if (portal.options.data.ornaments && portal.options.data.ornaments.length) {
-      this._portals[guid] = portal.options.data.ornaments.map(function (ornament) {
+    var ornaments = portal.options.data.ornaments;
+    if (ornaments && ornaments.length) {
+      this._portals[portal.options.guid] = ornaments.map(function (ornament) {
         var layer = this._layer;
         if (ornament.startsWith('pe')) {
-          if (ornament === 'peFRACK') {
-            layer = this._frackers;
-          } else {
-            layer = this._beacons;
-          }
+          layer = ornament === 'peFRACK'
+            ? this._frackers
+            : this._beacons;
         }
-        var icon = L.icon({
-          iconUrl: '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png',
-          iconSize: [size, size],
-          iconAnchor: [size/2, size/2]
-        });
-
-        return L.marker(latlng, {
-          icon: icon,
+        var size = this.OVERLAY_SIZE;
+        return L.marker(portal.getLatLng(), {
+          icon: L.icon({
+            iconUrl: '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png',
+            iconSize: [size, size],
+            iconAnchor: [size/2, size/2]
+          }),
           interactive: false,
           keyboard: false,
-          opacity: this.OVERLAY_OPACITY
+          opacity: this.OVERLAY_OPACITY,
+          layer: layer
         }).addTo(layer);
       }, this);
     }
@@ -68,10 +62,8 @@ window.ornaments = {
     var guid = portal.options.guid;
     if (this._portals[guid]) {
       this._portals[guid].forEach(function (marker) {
-        this._layer.removeLayer(marker);
-        this._beacons.removeLayer(marker);
-        this._frackers.removeLayer(marker);
-      }, this);
+        marker.options.layer.removeLayer(marker);
+      });
       delete this._portals[guid];
     }
   }
