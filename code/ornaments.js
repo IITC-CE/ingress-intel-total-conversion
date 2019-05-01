@@ -22,9 +22,14 @@ window.ornaments = {
 
   setup: function () {
     this._portals = {};
-    this._layer = L.layerGroup();
-    this._beacons = L.layerGroup();
-    this._frackers = L.layerGroup();
+    var layerGroup = L.layerGroup;
+    if (window.map.options.preferCanvas && L.Browser.canvas) {
+      layerGroup = L.canvasIconLayer;
+      L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
+    }
+    this._layer = layerGroup();
+    this._beacons = layerGroup();
+    this._frackers = layerGroup();
     window.addLayerGroup('Ornaments', this._layer, true);
     window.addLayerGroup('Beacons', this._beacons, true);
     window.addLayerGroup('Frackers', this._frackers, true);
@@ -47,7 +52,7 @@ window.ornaments = {
           icon: L.icon({
             iconUrl: '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png',
             iconSize: [size, size],
-            iconAnchor: [size/2, size/2]
+            iconAnchor: [size/2, size/2] // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4
           }),
           interactive: false,
           keyboard: false,
