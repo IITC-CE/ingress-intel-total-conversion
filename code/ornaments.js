@@ -42,7 +42,7 @@ window.ornaments.addPortal = function(portal) {
   var size = window.ornaments.OVERLAY_SIZE;
   var latlng = portal.getLatLng();
 
-  if (portal.options.data.ornaments) {
+  if (portal.options.data.ornaments && portal.options.data.ornaments.length) {
     window.ornaments._portals[guid] = portal.options.data.ornaments.map(function(ornament) {
       var layer = window.ornaments._layer;
       if (ornament.startsWith("pe")) {
