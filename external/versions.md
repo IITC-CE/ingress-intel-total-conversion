@@ -24,7 +24,7 @@
 ### Leaflet-related components:
 
 * https://github.com/Leaflet/Leaflet
-  1.4.0
+  1.5.1
   leaflet-src.js
 
 * https://github.com/Leaflet/Leaflet.draw
