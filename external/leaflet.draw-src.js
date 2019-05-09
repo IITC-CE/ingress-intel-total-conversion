@@ -855,7 +855,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		var markerCount = this._markers.length;
 		// The last marker should have a click handler to close the polyline
 		if (markerCount > 1) {
-			this._markers[markerCount - 1].on('click', this._finishShape, this);
+			//this._markers[markerCount - 1].on('click', this._finishShape, this); // workaround for https://github.com/Leaflet/Leaflet.draw/issues/789
 		}
 
 		// Remove the old marker click handler (as only the last point should close the polyline)
@@ -1128,7 +1128,7 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 
 		// The first marker should have a click handler to close the polygon
 		if (markerCount === 1) {
-			this._markers[0].on('click', this._finishShape, this);
+			//this._markers[0].on('click', this._finishShape, this); // workaround for https://github.com/Leaflet/Leaflet.draw/issues/789
 		}
 
 		// Add and update the double click handler
