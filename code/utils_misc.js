@@ -313,11 +313,7 @@ window.prettyEnergy = function(nrg) {
 }
 
 window.setPermaLink = function(elm) {
-  var c = map.getCenter();
-  var lat = Math.round(c.lat*1E6)/1E6;
-  var lng = Math.round(c.lng*1E6)/1E6;
-  var qry = 'll='+lat+','+lng+'&z=' + map.getZoom();
-  $(elm).attr('href',  '/intel?' + qry);
+  $(elm).attr('href', window.makePermalink(null,true));
 }
 
 window.uniqueArray = function(arr) {
@@ -442,3 +438,23 @@ window.clampLatLng = function(latlng) {
 window.clampLatLngBounds = function(bounds) {
   return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
 }
+
+// @function makePermalink(latlng?: LatLng, mapView?: Boolean): String
+// Makes the permalink for the portal with specified latlng, incluging current map view.
+// At least one of the parameters have to be present.
+window.makePermalink = function(latlng, mapView) {
+  function ll2str (ll) { return ll[0] + ',' + ll[1]; }
+  function round (ll) { // ensures that lat,lng are with same precision as in stock intel permalinks
+    return ll.map(function (n) { return Math.trunc(n*1e6)/1e6; });
+  }
+  var args = [];
+  if (mapView) {
+    var c = window.map.getCenter();
+    args.push('ll='+ll2str(round([c.lat,c.lng])), 'z='+window.map.getZoom())
+  }
+  if (latlng) {
+    if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
+    args.push('pll='+ll2str(latlng));
+  }
+  return '/intel?' + args.join('&');
+};
