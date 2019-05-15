@@ -1273,6 +1273,33 @@ g.checkpoint:hover circle {
   min-width: 180px;
 }
 
+.cycleSummary > div {
+  padding: 2px 5px;
+}
+
+ .checkpoint_table {
+	border-collapse: collapse;
+}
+
+ .checkpoint_table td {
+	text-align: right;
+	padding-left: 10px;
+}
+
+ .checkpoint_table tbody td:nth-child(4), .checkpoint_table tbody td:nth-child(7) {
+  text-align: left;
+}
+
+ .checkpoint_table tbody td:nth-child(3) {
+  color: #03fe03;
+}
+
+ .checkpoint_table tbody td:nth-child(6) {
+  color: #00c5ff;
+}
+
+ .sep12px {display: inline-block; width: 12px;} 
+
 /* tabs */
 .ui-tabs-nav {
 	display: block;

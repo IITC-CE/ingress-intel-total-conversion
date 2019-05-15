@@ -13,7 +13,10 @@ var RegionScoreboard = (function() {
     this.median=[-1,-1,-1];
     this.MAX_CYCLES = 35;
 
+    // arrays where index is the RegionScore's cp number (starting at 1)
     this.checkpoints = [];
+    this.summatory = [];
+    this.diff = [];
 
     this.hasNoTopAgents = function() {
       return this.topAgents.length===0;
@@ -31,6 +34,14 @@ var RegionScoreboard = (function() {
       return this.checkpoints[cp];
     };
 
+    this.getCPSummatory = function(cp) {
+      return this.summatory[cp];
+    };
+
+    this.getCPDiff = function(cp) {
+      return this.diff[cp];
+    };
+
     this.getScoreMax = function(min_value) {
       var max = min_value || 0;
       for (var i=1; i<this.checkpoints.length; i++) {
@@ -40,6 +51,7 @@ var RegionScoreboard = (function() {
       return max;
     };
 
+    // TODO: remove references, sums are calculated on object construction
     this.getCPSum = function() {
       var sums=[0,0];
       for (var i=1; i<this.checkpoints.length; i++) {
@@ -49,7 +61,6 @@ var RegionScoreboard = (function() {
 
       return sums;
     };
-
 
     this.getAvgScoreAtCP = function(faction, cp_idx) {
       var idx = faction===TEAM_RES? 1:0;
@@ -71,7 +82,6 @@ var RegionScoreboard = (function() {
 
       return Math.floor(score / cp_idx);
     };
-
 
     this.getScoreMedian = function(faction) {
       if (this.median[faction]<0) {
@@ -127,9 +137,28 @@ var RegionScoreboard = (function() {
       return end;
     };
 
+    // scores parsing from response
     for (var i=0; i<serverResult.scoreHistory.length; i++) {
       var h = serverResult.scoreHistory[i];
       this.checkpoints[parseInt(h[0])] = [parseInt(h[1]), parseInt(h[2])];
+    }
+
+    // summatory and diff calculation
+    for (var cp in this.checkpoints) {
+      if (cp == 1) {
+        this.summatory[cp] = [ this.checkpoints[cp][0], this.checkpoints[cp][1] ];
+        this.diff[cp] = [0, 0];
+      }
+      else {
+        this.summatory[cp] = [
+          this.summatory[cp-1][0] + this.checkpoints[cp][0],
+          this.summatory[cp-1][1] + this.checkpoints[cp][1]
+        ];
+        this.diff[cp] = [
+          this.checkpoints[cp][0] - this.checkpoints[cp-1][0],
+          this.checkpoints[cp][1] - this.checkpoints[cp-1][1],
+        ];
+      }
     }
 
     var now = new Date().getTime();
@@ -147,7 +176,6 @@ var RegionScoreboard = (function() {
     showRegion(latE6, lngE6);
   }
 
-
   /*
     function showScoreOf (region) {
       const latlng = regionToLatLong(region);
@@ -155,8 +183,7 @@ var RegionScoreboard = (function() {
       const lngE6 = Math.round(latLng.lng*1E6);
       showRegion(latE6,lngE6);
     }
-    */
-
+  */
 
   function showRegion(latE6,lngE6) {
     mainDialog = dialog({
@@ -260,7 +287,7 @@ var RegionScoreboard = (function() {
   }
 
 
-  function createHistoryTable() {
+  /*function createHistoryTable() {
 
     var order_name = (PLAYER.team === 'RESISTANCE' ? [TEAM_RES,TEAM_ENL]:[TEAM_ENL,TEAM_RES]);
     var order_team = (PLAYER.team === 'RESISTANCE' ? [1,0]:[0,1]);
@@ -293,8 +320,64 @@ var RegionScoreboard = (function() {
 
     table += '</table>';
     return table;
-  }
+  }*/
 
+
+  function createHistoryTable() {
+    var html = '';
+  
+    // cycle and checkpoint times calculation
+    var nextCP, endCycle, remainingCP, scoreDifference;
+    nextCP = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1);
+    remainingCP = regionScore.MAX_CYCLES - regionScore.getLastCP();
+    endCycle = regionScore.getCheckpointEnd(regionScore.MAX_CYCLES);
+    
+    // summary build
+    scoreDifference = regionScore.getCPSummatory(regionScore.getLastCP())[0] - regionScore.getCPSummatory(regionScore.getLastCP())[1];
+    html += '<div class="cycleSummary"><div>';
+    if (scoreDifference > 0)
+      html += '<span class="enl">ENL</span> leads by <span class="enl">' + digits(scoreDifference) + '</span>';
+    else if (scoreDifference < 0)
+      html += '<span class="res">RES</span> leads by <span class="res">' + digits(Math.abs(scoreDifference)) + '</span>';
+    else
+      html += '<span>Both teams are tied.</span>';
+
+    // Checkpoint and cycle stats
+    html += '</div><div>' + remainingCP + ' checkpoints remaining.</div>';
+    html += '<div>Next checkpoint: <span class="sep12px"></span>' + nextCP.toLocaleString() + '</div>';
+    html += '<div>Cycle ends: <span class="sep12px"></span>' + endCycle.toLocaleString() + '</div>';
+    html += '</div><br>';
+  
+    // table build
+    html += '<div><table class="checkpoint_table"><thead><tr><th>CP.</th><th colspan="3">Enlightened</th><th colspan="3">Resistance</th></tr>';
+    html += '<tr><th></th><th>Sum.</th><th>Score</th><th>Diff.</th><th>Sum.</th><th>Score</th><th>Diff.</th></tr></thead>';
+
+    var diff, summatory, scores;
+    for(var cp = regionScore.getLastCP(); cp>0; cp--) {
+      diff = regionScore.getCPDiff(cp);
+      summatory = regionScore.getCPSummatory(cp);
+      score = regionScore.getCPScore(cp);
+
+      // Checkpoint column
+      html += '<tr><td>' + cp + '</td>';
+  
+      // For each team
+      for (var team = 0; team < 2; team++) {
+        // Summatory
+        html += '<td>' + digits(summatory[team].toString()) + '</td>';
+  
+        // Score
+        html += '<td>' + digits(score[team]) + '</td>';
+  
+        // Difference
+        html += '<td>' + (diff[team] > 0? '+' : '') + digits(diff[team].toString()) + '</td>';
+      }
+      html += '</tr>';
+    }
+    html += '</table></div>';
+    
+    return html;
+  }
 
   function createAgentTable() {
     var agentTable = '<table><tr><th>#</th><th>Agent</th></tr>';
