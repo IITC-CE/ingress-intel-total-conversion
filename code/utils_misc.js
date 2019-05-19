@@ -1,62 +1,88 @@
 // UTILS + MISC  ///////////////////////////////////////////////////////
 
 window.aboutIITC = function() {
-  var v = (script_info.script && script_info.script.version || script_info.dateTimeVersion) + ' ['+script_info.buildName+']';
-  if (typeof android !== 'undefined' && android && android.getVersionName) {
-    v += '[IITC Mobile '+android.getVersionName()+']';
-  }
-
-  if (window.bootPlugins) {
-    var plugins = '<ul>';
-    for(var i in bootPlugins) {
-      var info = bootPlugins[ i ].info;
-      if(info) {
-        var pname = info.script && info.script.name || info.pluginId;
-        if(pname.substr(0, 13) == 'IITC plugin: ' || pname.substr(0, 13) == 'IITC Plugin: ') {
-          pname = pname.substr(13);
-        }
-        var pvers = info.script && info.script.version || info.dateTimeVersion;
-      
-        var ptext = pname + ' - ' + pvers;
-        if(info.buildName != script_info.buildName) {
-          ptext += ' [' + (info.buildName || '<i>non-standard plugin</i>') + ']';
-        }
-      
-        plugins += '<li>' + ptext + '</li>';
+  var pluginsInfo = window.bootPlugins.info;
+  var iitc = script_info;
+  var iitcVersion = iitc.script.version + ' [' + iitc.buildName + ']';
+  var verRE = /^([\d.]+?)(?:\.(2\d{7}\.\d*))?$/;
+  var descRE = /^\[.+?\-2\d\d\d\-\d\d\-\d\d\-\d+\] /; // regexps to match 'garbage' parts
+  function prepData (info,idx) {
+    var data = {
+      build: info.buildName ? ' [' + info.buildName + ']' : '',
+      date: '',
+      error: info.error,
+      standard: info.buildName === iitc.buildName && info.dateTimeVersion === iitc.dateTimeVersion,
+      version: ''
+    };
+    var script = info.script;
+    if (!script.name) {
+      data.name = '[unknown plugin: index ' + idx + ']';
+      data.description = "this plugin does not have proper wrapper; report to it's author";
+      return data;
+    }
+    data.name = script.name.substring(0, 13) === 'IITC plugin: '
+      ? script.name.substring(13)
+      : script.name;
+    data.description = script.description
+      ? script.description.replace(descRE,'') // remove buildname component from description
+      : '';
+    if (script.version) {
+      var ver = script.version.match(verRE);
+      if (ver) {
+        data.version = ver[1] || ver[2]; // remove date component from version
+        data.date = ver[1] && ver[2] || '';
       } else {
-        // no 'info' property of the plugin setup function - old plugin wrapper code
-        // could attempt to find the "window.plugin.NAME = function() {};" line it's likely to have..?
-        plugins += '<li>(unknown plugin: index ' + i + ')</li>';
+        data.version = script.version;
       }
     }
-    plugins += '</ul>';
+    return data;
   }
 
-  var a = ''
-  + '  <div><b>About IITC</b></div> '
-  + '  <div>Ingress Intel Total Conversion</div> '
-  + '  <hr>'
-  + '  <div>'
-  + '    <a href="https://iitc.modos189.ru/" target="_blank">IITC Homepage</a> |' +
-    '    <a href="https://t.me/iitc_news" target="_blank">Telegram channel</a><br />'
-  + '     On the script’s homepage you can:'
-  + '     <ul>'
-  + '       <li>Find Updates</li>'
-  + '       <li>Get Plugins</li>'
-  + '       <li>Report Bugs</li>'
-  + '       <li>Contribute!</li>'
-  + '     </ul>'
-  + '  </div>'
-  + '  <hr>'
-  + '  <div>Version: ' + v + '</div>';
-  if (window.bootPlugins && window.bootPlugins.length > 0) {
-    a += '  <div>Plugins: ' + plugins + '</div>';
+  var plugins = pluginsInfo.map(prepData)
+    .sort(function (a,b) { return a.name > b.name ? 1 : -1; })
+    .map(function (p) {
+      p.style = '';
+      p.title = p.description;
+      if (p.error) {
+        p.style += 'text-decoration:line-through;';
+        p.title = p.error;
+      } else if (p.standard) {
+        p.style += 'color:darkgray;';
+      }
+      p.sep = p.version ? ' - ' : '';
+      return L.Util.template('<li style="{style}" title="{title}">{name}{sep}<code title="{date}{build}">{version}</code></li>', p);
+    })
+    .join('\n');
+
+  var html = ''
+  + '<div><b>About IITC</b></div> '
+  + '<div>Ingress Intel Total Conversion</div> '
+  + '<hr>'
+  + '<div>'
+  + '  <a href="https://iitc.modos189.ru/" target="_blank">IITC Homepage</a> |' +
+    '  <a href="https://t.me/iitc_news" target="_blank">Telegram channel</a><br />'
+  + '   On the script’s homepage you can:'
+  + '   <ul>'
+  + '     <li>Find Updates</li>'
+  + '     <li>Get Plugins</li>'
+  + '     <li>Report Bugs</li>'
+  + '     <li>Contribute!</li>'
+  + '   </ul>'
+  + '</div>'
+  + '<hr>'
+  + '<div>Version: ' + iitcVersion + '</div>';
+
+  if (typeof android !== 'undefined' && android.getVersionName) {
+    html += '<div>IITC Mobile ' + android.getVersionName() + '</div>';
+  }
+  if (plugins) {
+    html += '<div><p>Plugins:</p><ul>' + plugins + '</ul></div>';
   }
 
   dialog({
-    title: 'IITC ' + v,
+    title: 'IITC ' + iitcVersion,
     id: 'iitc-about',
-    html: a,
+    html: html,
     dialogClass: 'ui-dialog-aboutIITC'
   });
 }
