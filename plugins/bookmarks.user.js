@@ -1308,13 +1308,8 @@
     window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.editStar);
     window.addHook('pluginBkmrksSyncEnd', window.plugin.bookmarks.resetAllStars);
 
-    if(window.plugin.portalslist) {
+    if (window.plugin.portalslist) {
       window.plugin.bookmarks.setupPortalsList();
-    } else {
-      setTimeout(function() {
-        if(window.plugin.portalslist)
-          window.plugin.bookmarks.setupPortalsList();
-      }, 500);
     }
   }
 

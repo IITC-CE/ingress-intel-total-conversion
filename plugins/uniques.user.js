@@ -421,7 +421,6 @@ window.plugin.uniques.setupContent = function() {
 }
 
 window.plugin.uniques.setupPortalsList = function() {
-	if(!window.plugin.portalslist) return;
 
 	window.addHook('pluginUniquesUpdateUniques', function(data) {
 		var info = plugin.uniques.uniques[data.guid];
@@ -572,13 +571,8 @@ var setup = function() {
 	window.addHook('plugin-missions-mission-changed', window.plugin.uniques.onMissionChanged);
 	window.addHook('plugin-missions-loaded-mission', window.plugin.uniques.onMissionLoaded);
 	
-	if(window.plugin.portalslist) {
+	if (window.plugin.portalslist) {
 		window.plugin.uniques.setupPortalsList();
-	} else {
-		setTimeout(function() {
-			if(window.plugin.portalslist)
-				window.plugin.uniques.setupPortalsList();
-		}, 500);
 	}
 }
 
