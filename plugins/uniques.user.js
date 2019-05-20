@@ -566,7 +566,7 @@ var setup = function() {
 	window.addPortalHighlighter('Uniques', window.plugin.uniques.highlighter);
 	window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
 	window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
-	window.addHook('iitcLoaded', window.plugin.uniques.registerFieldForSyncing);
+	window.plugin.uniques.registerFieldForSyncing();
 	
 	// to mark mission portals as visited
 	window.addHook('plugin-missions-mission-changed', window.plugin.uniques.onMissionChanged);

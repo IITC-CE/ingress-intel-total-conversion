@@ -1294,7 +1294,7 @@
 
     // Sync
     window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.syncBkmrks);
-    window.addHook('iitcLoaded', window.plugin.bookmarks.registerFieldForSyncing);
+    window.plugin.bookmarks.registerFieldForSyncing();
 
     // Highlighter - bookmarked portals
     window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.highlightRefresh);

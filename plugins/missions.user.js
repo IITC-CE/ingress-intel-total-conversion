@@ -860,11 +860,6 @@ window.plugin.missions = {
 				this.zoomToMission(mission);
 			}.bind(this));
 		}
-		
-		if(window.plugin.sync) {
-			window.plugin.sync.registerMapForSync('missions', 'checkedMissions', this.syncCallback.bind(this), this.syncInitialed.bind(this));
-			window.plugin.sync.registerMapForSync('missions', 'checkedWaypoints', this.syncCallback.bind(this), this.syncInitialed.bind(this));
-		}
 	},
 
 	// called after local or remote change uploaded
@@ -1078,6 +1073,11 @@ window.plugin.missions = {
 		window.addHook('plugin-missions-missions-refreshed',  this.onMissionsRefreshed.bind(this));
 		window.addHook('plugin-missions-waypoint-changed',    this.onWaypointChanged.bind(this));
 		window.addHook('plugin-missions-waypoints-refreshed', this.onWaypointsRefreshed.bind(this));
+		
+		if(window.plugin.sync) {
+			window.plugin.sync.registerMapForSync('missions', 'checkedMissions', this.syncCallback.bind(this), this.syncInitialed.bind(this));
+			window.plugin.sync.registerMapForSync('missions', 'checkedWaypoints', this.syncCallback.bind(this), this.syncInitialed.bind(this));
+		}
 
 		window.addHook('iitcLoaded', this.onIITCLoaded.bind(this));
 	}

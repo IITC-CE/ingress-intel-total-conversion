@@ -241,7 +241,7 @@ var setup =  function() {
   window.plugin.keys.loadLocal(plugin.keys.UPDATE_QUEUE);
   window.plugin.keys.loadKeys();
   window.addHook('portalDetailsUpdated', window.plugin.keys.addToSidebar);
-  window.addHook('iitcLoaded', window.plugin.keys.registerFieldForSyncing);
+  window.plugin.keys.registerFieldForSyncing();
 
   if(window.plugin.portalslist) {
     window.plugin.keys.setupPortalsList();
