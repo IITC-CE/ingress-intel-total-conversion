@@ -232,10 +232,9 @@ window.plugin.keys.setupPortalsList = function() {
 }
 
 var setup =  function() {
-  if($.inArray('pluginKeysUpdateKey', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysUpdateKey');
-  if($.inArray('pluginKeysRefreshAll', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysRefreshAll');
+  // HOOKS:
+  // - pluginKeysUpdateKey
+  // - pluginKeysRefreshAll
 
   window.plugin.keys.setupCSS();
   window.plugin.keys.setupContent();

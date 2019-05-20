@@ -1245,12 +1245,12 @@
   var setup = function() {
     window.plugin.bookmarks.isSmart = window.isSmartphone();
 
-    // Fired when a bookmarks/folder is removed, added or sorted, also when a folder is opened/closed.
-    if($.inArray('pluginBkmrksEdit', window.VALID_HOOKS) < 0) { window.VALID_HOOKS.push('pluginBkmrksEdit'); }
-    // Fired when the "Bookmarks Options" panel is opened (you can add new options);
-    if($.inArray('pluginBkmrksOpenOpt', window.VALID_HOOKS) < 0) { window.VALID_HOOKS.push('pluginBkmrksOpenOpt'); }
-    // Fired when the sync is finished;
-    if($.inArray('pluginBkmrksSyncEnd', window.VALID_HOOKS) < 0) { window.VALID_HOOKS.push('pluginBkmrksSyncEnd'); }
+    // HOOKS:
+    // - pluginBkmrksEdit:    fired when a bookmarks/folder is removed, added or sorted,
+    //                        also when a folder is opened/closed.
+    // - pluginBkmrksOpenOpt: fired when the "Bookmarks Options" panel is opened
+    //                        (you can add new options);
+    // - pluginBkmrksSyncEnd: fired when the sync is finished;
 
     // If the storage not exists or is a old version
     window.plugin.bookmarks.createStorage();

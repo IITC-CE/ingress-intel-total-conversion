@@ -556,13 +556,10 @@ window.plugin.uniques.checkMissionWaypoints = function(mission) {
 
 
 var setup = function() {
-	window.pluginCreateHook('pluginUniquesUpdateUniques');
-	window.pluginCreateHook('pluginUniquesRefreshAll');
-	
-	// to mark mission portals as visited
-	window.pluginCreateHook('plugin-missions-mission-changed');
-	window.pluginCreateHook('plugin-missions-loaded-mission');
-	
+	// HOOKS:
+	// - pluginUniquesUpdateUniques
+	// - pluginUniquesRefreshAll
+
 	window.plugin.uniques.setupCSS();
 	window.plugin.uniques.setupContent();
 	window.plugin.uniques.loadLocal('uniques');
@@ -571,6 +568,7 @@ var setup = function() {
 	window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
 	window.addHook('iitcLoaded', window.plugin.uniques.registerFieldForSyncing);
 	
+	// to mark mission portals as visited
 	window.addHook('plugin-missions-mission-changed', window.plugin.uniques.onMissionChanged);
 	window.addHook('plugin-missions-loaded-mission', window.plugin.uniques.onMissionLoaded);
 	

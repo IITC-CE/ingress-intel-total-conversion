@@ -57,21 +57,14 @@
 //              by plugins
 // artifactsUpdated: called when the set of artifacts (including targets)
 //              has changed. Parameters names are old, new.
+// nicknameClicked:
+// geoSearch:
+// search:
 
 window._hooks = {}
-window.VALID_HOOKS = [
-  'portalSelected', 'portalDetailsUpdated', 'artifactsUpdated',
-  'mapDataRefreshStart', 'mapDataEntityInject', 'mapDataRefreshEnd',
-  'portalAdded', 'linkAdded', 'fieldAdded',
-  'portalRemoved', 'linkRemoved', 'fieldRemoved',
-  'publicChatDataAvailable', 'factionChatDataAvailable',
-  'requestFinished', 'nicknameClicked',
-  'geoSearch', 'search', 'iitcLoaded',
-  'portalDetailLoaded', 'paneChanged'];
+window.VALID_HOOKS = []; // stub for compatibility
 
 window.runHooks = function(event, data) {
-  if(VALID_HOOKS.indexOf(event) === -1) throw('Unknown event type: ' + event);
-
   if(!_hooks[event]) return true;
   var interrupted = false;
   $.each(_hooks[event], function(ind, callback) {
@@ -88,20 +81,9 @@ window.runHooks = function(event, data) {
   return !interrupted;
 }
 
-// helper method to allow plugins to create new hooks
-window.pluginCreateHook = function(event) {
-  if($.inArray(event, window.VALID_HOOKS) < 0) {
-    window.VALID_HOOKS.push(event);
-  }
-}
-
+window.pluginCreateHook = function() {}; // stub for compatibility
 
 window.addHook = function(event, callback) {
-  if(VALID_HOOKS.indexOf(event) === -1) {
-    console.error('addHook: Unknown event type: ' + event + ' - ignoring');
-    debugger;
-    return;
-  }
 
   if(typeof callback !== 'function') throw('Callback must be a function.');
 

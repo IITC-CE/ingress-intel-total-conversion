@@ -114,12 +114,6 @@ var setup =  function() {
   window.plugin.keysOnMap.setupCSS();
   window.plugin.keysOnMap.setupLayer();
 
-  // Avoid error if this plugin load first
-  if($.inArray('pluginKeysUpdateKey', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysUpdateKey');
-  if($.inArray('pluginKeysRefreshAll', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysRefreshAll');
-
   window.addHook('portalAdded', window.plugin.keysOnMap.portalAdded);
   window.addHook('pluginKeysUpdateKey', window.plugin.keysOnMap.keyUpdate);
   window.addHook('pluginKeysRefreshAll', window.plugin.keysOnMap.refreshAllKeys);
