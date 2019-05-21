@@ -2,7 +2,7 @@
 // @id             iitc-plugin-basemap-yandex@jonatkins
 // @name           IITC plugin: Yandex maps
 // @category       Map Tiles
-// @version        0.2.0.@@DATETIMEVERSION@@
+// @version        0.3.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add Yandex.com (Russian/Русский) map layers
 @@METAINFO@@
 // ==/UserScript==
@@ -18,7 +18,7 @@ window.plugin.mapTileYandex = function() {};
 window.plugin.mapTileYandex.leafletSetup = function() {
 
 //include Yandex.js start
-@@INCLUDERAW:external/Yandex.js@@
+@@INCLUDERAW:external/YandexMutant.js@@
 //include Yandex.js end
 
 }
@@ -49,7 +49,7 @@ window.plugin.mapTileYandex.setup = function() {
     window.plugin.mapTileYandex.leafletSetup();
     var yOpt = {maxZoom: 18};
     $.each(layers, function(key,layer) {
-      var yMap = new L.Yandex(key, yOpt);
+      var yMap = L.gridLayer.yandexMutant(L.extend({type: key}, yOpt));
       layer.addLayer(yMap);
     });
   }
