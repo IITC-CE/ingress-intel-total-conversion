@@ -1,23 +1,20 @@
-// Based on https://gitlab.com/IvanSanchez/Leaflet.GridLayer.GoogleMutant
-// and on https://github.com/shramov/leaflet-plugins
+// Based on https://github.com/shramov/leaflet-plugins
 // GridLayer like https://avinmathew.com/leaflet-and-google-maps/ , but using MutationObserver instead of jQuery
 
 
-
-// 🍂class GridLayer.GoogleMutant
+// 🍂class GridLayer.YandexMutant
 // 🍂extends GridLayer
 L.GridLayer.YandexMutant = L.GridLayer.extend({
-	includes: L.Mixin.Events,
-
 	options: {
 		minZoom: 0,
-		maxZoom: 18,
-		// The mutant container will add its own attribution anyways.
-		attribution: '',	
+		maxZoom: 23,
+		attribution: '',	// The mutant container will add its own attribution anyways.
 		opacity: 1,
-		traffic: false,
 		noWrap: false,
-		type: 'yandex#map'
+		// 🍂option type: String
+		// Yandex map type. Valid values see in `possibleShortMapTypes`.
+		type: 'yandex#map',
+		maxNativeZoom: 18
 	},
 
 	possibleShortMapTypes: {
@@ -27,7 +24,7 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 		publicMap: 'publicMap',
 		publicMapInHybridView: 'publicMapHybrid'
 	},
-	
+
 	_getPossibleMapType: function (mapType) {
 		var result = 'yandex#map';
 		if (typeof mapType !== 'string') {
@@ -44,7 +41,7 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 		}
 		return result;
 	},
-	
+
 	initialize: function (options) {
 		if (options && options.type) {
 			options.type = this._getPossibleMapType(options.type);
@@ -52,7 +49,7 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 		L.GridLayer.prototype.initialize.call(this, options);
 
 		this._ready = !!window.ymaps && !!window.ymaps.Map;
-		
+
 		this._YAPIPromise = this._ready ? Promise.resolve(window.ymaps) : new Promise(function (resolve, reject) {
 			var checkCounter = 0;
 			var intervalId = null;
@@ -65,7 +62,7 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 					clearInterval(intervalId);
 					if (ymaps.Map === undefined) {
 						return ymaps.load(['package.map'], resolve, ymaps);
-					}
+				}
 					else {
 						return resolve(window.ymaps);
 					}
@@ -79,7 +76,8 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 		this._freshTiles = {};	// Tiles from the mutant which haven't been requested yet
 
 		this._imagesPerTile = 1;
-		this.createTile = this._createSingleTile;
+
+		this._boundOnMutatedImage = this._onMutatedImage.bind(this);
 	},
 
 	onAdd: function (map) {
@@ -89,15 +87,27 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 		this._YAPIPromise.then(function () {
 			this._ready = true;
 			this._map = map;
-			
+
 			this._initMutant();
-			
+
 			map.on('viewreset', this._reset, this);
-			map.on('move', this._update, this);
+			if (this.options.updateWhenIdle) {
+				map.on('moveend', this._update, this);
+			} else {
+				map.on('move', this._update, this);
+			}
 			map.on('zoomend', this._handleZoomAnim, this);
 			map.on('resize', this._resize, this);
-			
-			map._controlCorners.bottomright.style.marginBottom = '4em';
+
+			//handle layer being added to a map for which there are no Google tiles at the given zoom
+			google.maps.event.addListenerOnce(this._mutant, 'idle', function () {
+				this._checkZoomLevels();
+				this._mutantIsReady = true;
+			}.bind(this));
+
+			//20px instead of 1em to avoid a slight overlap with google's attribution
+			map._controlCorners.bottomright.style.marginBottom = '20px';
+			map._controlCorners.bottomleft.style.marginBottom = '20px';
 
 			this._reset();
 			this._update();
@@ -106,26 +116,25 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 
 	onRemove: function (map) {
 		L.GridLayer.prototype.onRemove.call(this, map);
+		this._observer.disconnect();
 		map._container.removeChild(this._mutantContainer);
-		this._mutantContainer = undefined;
 
+		google.maps.event.clearListeners(map, 'idle');
+		google.maps.event.clearListeners(this._mutant, 'idle');
 		map.off('viewreset', this._reset, this);
 		map.off('move', this._update, this);
+		map.off('moveend', this._update, this);
 		map.off('zoomend', this._handleZoomAnim, this);
 		map.off('resize', this._resize, this);
 
-		map._controlCorners.bottomright.style.marginBottom = '0em';
+		if (map._controlCorners) {
+			map._controlCorners.bottomright.style.marginBottom = '0em';
+			map._controlCorners.bottomleft.style.marginBottom = '0em';
+		}
 	},
 
 	getAttribution: function () {
 		return this.options.attribution;
-	},
-
-	setOpacity: function (opacity) {
-		this.options.opacity = opacity;
-		if (opacity < 1) {
-			L.DomUtil.setOpacity(this._mutantContainer, opacity);
-		}
 	},
 
 	setElementSize: function (e, size) {
@@ -133,15 +142,18 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 		e.style.height = size.y + 'px';
 	},
 
+
 	_initMutantContainer: function () {
 		if (!this._mutantContainer) {
 			this._mutantContainer = L.DomUtil.create('div', 'leaflet-yandex-mutant leaflet-top leaflet-left');
 			this._mutantContainer.id = '_MutantContainer_' + L.Util.stamp(this._mutantContainer);
-			this._mutantContainer.style.zIndex = 'auto';
+			this._mutantContainer.style.zIndex = '300'; //leaflet map pane at 400, controls at 1000
 			this._mutantContainer.style.pointerEvents = 'none';
 
-			this._map.getContainer().appendChild(this._mutantContainer);
+			L.DomEvent.off(this._mutantContainer);
+
 		}
+		this._map.getContainer().appendChild(this._mutantContainer);
 
 		this.setOpacity(this.options.opacity);
 		this.setElementSize(this._mutantContainer, this._map.getSize());
@@ -151,9 +163,15 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 
 	_initMutant: function () {
 		if (!this._ready || !this._mutantContainer) return;
+
+		if (this._mutant) {
+			// reuse old _mutant, just make sure it has the correct size
+			this._resize();
+			return;
+		}
+
 		this._mutantCenter = [0, 0];
 
-		// If traffic layer is requested check if control.TrafficControl is ready
 		if (this.options.traffic) {
 			if (ymaps.control === undefined ||
 					ymaps.control.TrafficControl === undefined) {
@@ -161,7 +179,7 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 					this._initMutant, this);
 			}
 		}
-		
+
 		var map = new ymaps.Map(this._mutantContainer, {
 			center: this._mutantCenter,
 			zoom: 0,
@@ -183,8 +201,15 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 			map.container.getElement().style.background = 'transparent';
 		}
 		map.setType(this.options.type);
-		
+
 		this._mutant = map;
+
+		google.maps.event.addListenerOnce(map, 'idle', function () {
+			var nodes = this._mutantContainer.querySelectorAll('a');
+			for (var i = 0; i < nodes.length; i++) {
+				nodes[i].style.pointerEvents = 'auto';
+			}
+		}.bind(this));
 
 		// 🍂event spawned
 		// Fired when the mutant has been created.
@@ -192,10 +217,20 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 	},
 
 	_attachObserver: function _attachObserver (node) {
-		var observer = new MutationObserver(this._onMutations.bind(this));
+// 		console.log('Gonna observe', node);
+
+		if (!this._observer)
+			this._observer = new MutationObserver(this._onMutations.bind(this));
 
 		// pass in the target node, as well as the observer options
-		observer.observe(node, { childList: true, subtree: true });
+		this._observer.observe(node, { childList: true, subtree: true });
+
+		// if we are reusing an old _mutantContainer, we must manually detect
+		// all existing tiles in it
+		Array.prototype.forEach.call(
+			node.querySelectorAll('img'),
+			this._boundOnMutatedImage
+		);
 	},
 
 	_onMutations: function _onMutations (mutations) {
@@ -207,7 +242,32 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 				if (node instanceof HTMLImageElement) {
 					this._onMutatedImage(node);
 				} else if (node instanceof HTMLElement) {
-					Array.prototype.forEach.call(node.querySelectorAll('img'), this._onMutatedImage.bind(this));
+					Array.prototype.forEach.call(
+						node.querySelectorAll('img'),
+						this._boundOnMutatedImage
+					);
+
+					// Check for, and remove, the "Google Maps can't load correctly" div.
+					// You *are* loading correctly, you dumbwit.
+					if (node.style.backgroundColor === 'white') {
+						L.DomUtil.remove(node);
+					}
+
+					// Check for, and remove, the "For development purposes only" divs on the aerial/hybrid tiles.
+					if (node.textContent.indexOf('For development purposes only') === 0) {
+						L.DomUtil.remove(node);
+					}
+
+					// Check for, and remove, the "Sorry, we have no imagery here"
+					// empty <div>s. The [style*="text-align: center"] selector
+					// avoids matching the attribution notice.
+					// This empty div doesn't have a reference to the tile
+					// coordinates, so it's not possible to mark the tile as
+					// failed.
+					Array.prototype.forEach.call(
+						node.querySelectorAll('div[draggable=false][style*="text-align: center"]'),
+						L.DomUtil.remove
+					);
 				}
 			}
 		}
@@ -226,9 +286,13 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 	_staticRegExp: /StaticMapService\.GetMapImage/,
 
 	_onMutatedImage: function _onMutatedImage (imgNode) {
+// 		if (imgNode.src) {
+// 			console.log('caught mutated image: ', imgNode.src);
+// 		}
+
 		var coords;
 		var match = imgNode.src.match(this._roadRegexp);
-		var sublayer, parent;
+		var sublayer = 0;
 
 		if (match) {
 			coords = {
@@ -236,8 +300,10 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 				x: match[2],
 				y: match[3]
 			};
-			if (this._imagesPerTile > 1) { imgNode.style.zIndex = 1; }
-			sublayer = 1;
+			if (this._imagesPerTile > 1) {
+				imgNode.style.zIndex = 1;
+				sublayer = 1;
+			}
 		} else {
 			match = imgNode.src.match(this._satRegexp);
 			if (match) {
@@ -247,80 +313,100 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 					z: match[3]
 				};
 			}
+// 			imgNode.style.zIndex = 0;
 			sublayer = 0;
 		}
 
 		if (coords) {
-			var key = this._tileCoordsToKey(coords);
-			if (this._imagesPerTile > 1) { key += '/' + sublayer; }
+			var tileKey = this._tileCoordsToKey(coords);
+			imgNode.style.position = 'absolute';
+			imgNode.style.visibility = 'hidden';
+
+			var key = tileKey + '/' + sublayer;
+			// console.log('mutation for tile', key)
+			//store img so it can also be used in subsequent tile requests
+			this._freshTiles[key] = imgNode;
+
 			if (key in this._tileCallbacks && this._tileCallbacks[key]) {
 // console.log('Fullfilling callback ', key);
+				//fullfill most recent tileCallback because there maybe callbacks that will never get a
+				//corresponding mutation (because map moved to quickly...)
 				this._tileCallbacks[key].pop()(imgNode);
 				if (!this._tileCallbacks[key].length) { delete this._tileCallbacks[key]; }
 			} else {
-// console.log('Caching for later', key);
-				parent = imgNode.parentNode;
-				if (parent) {
-					parent.removeChild(imgNode);
-					parent.removeChild = L.Util.falseFn;
-// 					imgNode.parentNode.replaceChild(L.DomUtil.create('img'), imgNode);
-				}
-				if (key in this._freshTiles) {
-					this._freshTiles[key].push(imgNode);
-				} else {
-					this._freshTiles[key] = [imgNode];
+				if (this._tiles[tileKey]) {
+					//we already have a tile in this position (mutation is probably a google layer being added)
+					//replace it
+					var c = this._tiles[tileKey].el;
+					var oldImg = (sublayer === 0) ? c.firstChild : c.firstChild.nextSibling;
+					var cloneImgNode = this._clone(imgNode);
+					c.replaceChild(cloneImgNode, oldImg);
 				}
 			}
 		} else if (imgNode.src.match(this._staticRegExp)) {
-			parent = imgNode.parentNode;
-			if (parent) {
-				// Remove the image, but don't store it anywhere.
-				// Image needs to be replaced instead of removed, as the container
-				// seems to be reused.
-				imgNode.parentNode.replaceChild(L.DomUtil.create('img'), imgNode);
-			}
+			imgNode.style.visibility = 'hidden';
 		}
 	},
 
-	// This will be used as this.createTile for 'map', 'satellite'
-	_createSingleTile: function createTile (coords, done) {
+
+	createTile: function (coords, done) {
 		var key = this._tileCoordsToKey(coords);
-// console.log('Need:', key);
 
-		if (key in this._freshTiles) {
-			var tile = this._freshTiles[key].pop();
-			if (!this._freshTiles[key].length) { delete this._freshTiles[key]; }
-			L.Util.requestAnimFrame(done);
-// 			console.log('Got ', key, ' from _freshTiles');
-			return tile;
-		} else {
-			var tileContainer = L.DomUtil.create('div');
-			this._tileCallbacks[key] = this._tileCallbacks[key] || [];
-			this._tileCallbacks[key].push( (function (c/*, k*/) {
-				return function (imgNode) {
-					var parent = imgNode.parentNode;
-					if (parent) {
-						parent.removeChild(imgNode);
-						parent.removeChild = L.Util.falseFn;
-// 						imgNode.parentNode.replaceChild(L.DomUtil.create('img'), imgNode);
-					}
-					c.appendChild(imgNode);
-					done();
-// 					console.log('Sent ', k, ' to _tileCallbacks');
-				}.bind(this);
-			}.bind(this))(tileContainer/*, key*/) );
+		var tileContainer = L.DomUtil.create('div');
+		tileContainer.dataset.pending = this._imagesPerTile;
+		done = done.bind(this, null, tileContainer);
 
-			return tileContainer;
+		for (var i = 0; i < this._imagesPerTile; i++) {
+			var key2 = key + '/' + i;
+			if (key2 in this._freshTiles) {
+				var imgNode = this._freshTiles[key2];
+				tileContainer.appendChild(this._clone(imgNode));
+				tileContainer.dataset.pending--;
+// 				console.log('Got ', key2, ' from _freshTiles');
+			} else {
+				this._tileCallbacks[key2] = this._tileCallbacks[key2] || [];
+				this._tileCallbacks[key2].push( (function (c/*, k2*/) {
+					return function (imgNode) {
+						c.appendChild(this._clone(imgNode));
+						c.dataset.pending--;
+						if (!parseInt(c.dataset.pending)) { done(); }
+// 						console.log('Sent ', k2, ' to _tileCallbacks, still ', c.dataset.pending, ' images to go');
+					}.bind(this);
+				}.bind(this))(tileContainer/*, key2*/) );
+			}
 		}
+
+		if (!parseInt(tileContainer.dataset.pending)) {
+			L.Util.requestAnimFrame(done);
+		}
+		return tileContainer;
+	},
+
+	_clone: function (imgNode) {
+		var clonedImgNode = imgNode.cloneNode(true);
+		clonedImgNode.style.visibility = 'visible';
+		return clonedImgNode;
 	},
 
 	_checkZoomLevels: function () {
 		//setting the zoom level on the Google map may result in a different zoom level than the one requested
 		//(it won't go beyond the level for which they have data).
-		// verify and make sure the zoom levels on both Leaflet and Google maps are consistent
-		if ((this._map.getZoom() !== undefined) && (this._mutant.getZoom() !== this._map.getZoom())) {
-			//zoom levels are out of sync. Set the leaflet zoom level to match the google one
-			this._map.setZoom(this._mutant.getZoom());
+		var zoomLevel = this._map.getZoom();
+		var gMapZoomLevel = this._mutant.getZoom();
+		if (!zoomLevel || !gMapZoomLevel) return;
+
+
+		if ((gMapZoomLevel !== zoomLevel) || //zoom levels are out of sync, Google doesn't have data
+			(gMapZoomLevel > this.options.maxNativeZoom)) { //at current location, Google does have data (contrary to maxNativeZoom)
+			//Update maxNativeZoom
+			this._setMaxNativeZoom(gMapZoomLevel);
+		}
+	},
+
+	_setMaxNativeZoom: function (zoomLevel) {
+		if (zoomLevel != this.options.maxNativeZoom) {
+			this.options.maxNativeZoom = zoomLevel;
+			this._resetView();
 		}
 	},
 
@@ -329,17 +415,27 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 	},
 
 	_update: function () {
-		L.GridLayer.prototype._update.call(this);
-		if (!this._mutant) return;
+		// zoom level check needs to happen before super's implementation (tile addition/creation)
+		// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
+		if (this._mutant) {
+			var center = this._map.getCenter();
+			var _center = [center.lat, center.lng];
 
-		var center = this._map.getCenter();
-		var _center = [center.lat, center.lng];
+			this._mutant.setCenter(_center);
+			var zoom = this._map.getZoom();
+			var fractionalLevel = zoom !== Math.round(zoom);
+			var mutantZoom = this._mutant.getZoom();
 
-		this._mutant.setCenter(_center);
-		var zoom = this._map.getZoom();
-		if (zoom !== undefined) {
-			this._mutant.setZoom(Math.round(this._map.getZoom()));
+			//ignore fractional zoom levels
+			if (!fractionalLevel && (zoom != mutantZoom)) {
+				this._mutant.setZoom(zoom);
+
+				if (this._mutantIsReady) this._checkZoomLevels();
+				//else zoom level check will be done later by 'idle' handler
+			}
 		}
+
+		L.GridLayer.prototype._update.call(this);
 	},
 
 	_resize: function () {
@@ -353,6 +449,7 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 	},
 
 	_handleZoomAnim: function () {
+		if (!this._mutant) return;
 		var center = this._map.getCenter();
 		var _center = [center.lat, center.lng];
 
@@ -365,26 +462,36 @@ L.GridLayer.YandexMutant = L.GridLayer.extend({
 	// YMaps, so that YMaps makes two requests but Leaflet only consumes one,
 	// polluting _freshTiles with stale data.
 	_removeTile: function (key) {
-		if (this._imagesPerTile > 1) {
-			for (var i=0; i<this._imagesPerTile; i++) {
-				var key2 = key + '/' + i;
-				if (key2 in this._freshTiles) { delete this._freshTiles[key2]; }
-// 				console.log('Pruned spurious hybrid _freshTiles');
-			}
-		} else {
-			if (key in this._freshTiles) {
-				delete this._freshTiles[key];
-// 				console.log('Pruned spurious _freshTiles', key);
-			}
-		}
+		if (!this._mutant) return;
+
+		//give time for animations to finish before checking it tile should be pruned
+		setTimeout(this._pruneTile.bind(this, key), 1000);
+
 
 		return L.GridLayer.prototype._removeTile.call(this, key);
+	},
+
+	_pruneTile: function (key) {
+		var yZoom = this._mutant.getZoom();
+		var tileZoom = key.split(':')[2];
+		var yMapBounds = L.latLngBounds(this._mutant.getBounds());
+
+		for (var i=0; i<this._imagesPerTile; i++) {
+			var key2 = key + '/' + i;
+			if (key2 in this._freshTiles) {
+				var tileBounds = this._map && this._keyToBounds(key);
+				var stillVisible = this._map && tileBounds.overlaps(yMapBounds) && (tileZoom == yZoom);
+
+				if (!stillVisible) delete this._freshTiles[key2];
+//				console.log('Prunning of ', key, (!stillVisible))
+			}
+		}
 	}
 });
 
 
-// 🍂factory gridLayer.googleMutant(options)
-// Returns a new `GridLayer.GoogleMutant` given its options
+// 🍂factory gridLayer.yandexMutant(options)
+// Returns a new `GridLayer.YandexMutant` given its options
 L.gridLayer.yandexMutant = function (options) {
 	return new L.GridLayer.YandexMutant(options);
 };

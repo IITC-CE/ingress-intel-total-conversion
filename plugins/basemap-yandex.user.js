@@ -57,7 +57,7 @@ window.plugin.mapTileYandex.setup = function() {
 
 //a few options on language are available, including en-US. Oddly, the detail available on the maps varies
 //depending on the language
-  var yandexApiJs = '//api-maps.yandex.ru/2.0-stable/?load=package.standard&lang=ru-RU'
+  var yandexApiJs = '//api-maps.yandex.ru/2.1/?load=package.standard&lang=ru-RU'
 
   load(yandexApiJs).thenRun(callback);
 }
