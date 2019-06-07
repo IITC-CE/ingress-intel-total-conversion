@@ -2,7 +2,7 @@
 // @id             iitc-plugin-bing-maps
 // @name           IITC plugin: Bing maps
 // @category       Map Tiles
-// @version        0.2.0.@@DATETIMEVERSION@@
+// @version        0.3.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the maps.bing.com map layers.
 @@METAINFO@@
 // ==/UserScript==
@@ -17,7 +17,6 @@ window.plugin.mapBing.setupBingLeaflet = function() {
 @@INCLUDERAW:external/Bing.js@@
 }
 
-
 window.plugin.mapBing.setup = function() {
   window.plugin.mapBing.setupBingLeaflet();
 
@@ -30,35 +29,13 @@ window.plugin.mapBing.setup = function() {
     'AerialWithLabels': "Aerial with labels",
   };
 
-  // bing maps has an annual usage limit, which will likely be hit in 6 months at this time.
-  // it seems that the usage is counted on initialising the L.BingLayer, when the metadata is retrieved.
-  // so, we'll create some dummy layers and add those to the map, then, the first time a layer is added,
-  // create the L.BingLayer. This will eliminate all usage for users who install but don't use the map,
-  // and only create usage for the map layers actually selected in use
-
-  var bingMapContainers = [];
-
-  for (type in bingTypes) {
-    var name = bingTypes[type];
-
-    bingMapContainers[type] = new L.LayerGroup();
-    layerChooser.addBaseLayer(bingMapContainers[type], 'Bing '+name);
+  for (var type in bingTypes) {
+    layerChooser.addBaseLayer(new L.BingLayer(bingApiKey, {
+      type: type,
+      maxNativeZoom: 19,
+      maxZoom: 21
+    }), 'Bing ' + bingTypes[type]);
   }
-
-  // now a leaflet event to catch base layer changes and create a L.BingLayer when needed
-  map.on('baselayerchange', function(e) {
-    for (type in bingMapContainers) {
-      if (e.layer == bingMapContainers[type]) {
-        if (bingMapContainers[type].getLayers().length == 0) {
-          // dummy layer group is empty - create the bing layer
-          console.log('basemap-bing: creating '+type+' layer');
-          var bingMap = new L.BingLayer (bingApiKey, {type: type, maxNativeZoom: 19, maxZoom: 21});
-          bingMapContainers[type].addLayer(bingMap);
-        }
-      }
-    }
-  });
-
 };
 
 var setup = window.plugin.mapBing.setup;
