@@ -43,8 +43,7 @@ function clone (layer) {
   //       so we may need to add options cloning in order to support them
   var options = layer.options;
   if (L.BingLayer && layer instanceof L.BingLayer) {
-    options.minZoom = options.minZoom || 1;
-    return L.bingLayer(layer._key, options);
+    return L.bingLayer(options);
   } else if (L.Yandex && layer instanceof L.Yandex) {
     return new L.Yandex(layer._type, options);
   } else if (layer instanceof L.TileLayer) {
