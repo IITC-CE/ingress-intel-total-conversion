@@ -16,24 +16,20 @@ window.plugin.mapBing = mapBing;
 
 mapBing.sets = {
   Road: {
-    type: 'RoadOnDemand'
+    imagerySet: 'RoadOnDemand'
   },
   Dark: {
-    type: 'CanvasDark'
+    imagerySet: 'CanvasDark'
   },
   Aerial: {
-    maxNativeZoom: 19,
-    type: 'Aerial'
+    imagerySet: 'Aerial'
   },
   Hybrid: {
-    maxNativeZoom: 19,
-    type: 'AerialWithLabelsOnDemand'
+    imagerySet: 'AerialWithLabelsOnDemand'
   }
 };
 
 mapBing.options = {
-  minZoom: 1,
-  maxZoom: 21,
   //set this to your API key
   key: 'ArR2hTa2C9cRQZT-RmgrDkfvh3PwEVRl0gB34OO4wJI7vQNElg3DDWvbo5lfUs3p'
 }
@@ -43,7 +39,7 @@ function setup () {
 
   for (var name in mapBing.sets) {
     var options = L.extend({}, mapBing.options, mapBing.sets[name]);
-    layerChooser.addBaseLayer(L.bingLayer(options.key, options), 'Bing ' + name);
+    layerChooser.addBaseLayer(L.bingLayer(options), 'Bing ' + name);
   }
 };
 
@@ -51,6 +47,9 @@ function setupBingLeaflet () {
   try {
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.js
     @@INCLUDERAW:external/Bing.js@@
+
+    // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.addon.applyMaxNativeZoom.js
+    @@INCLUDERAW:external/Bing.addon.applyMaxNativeZoom.js@@
 
     } catch (e) {
       console.error('Bing.js loading failed');
