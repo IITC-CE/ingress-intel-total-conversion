@@ -9,8 +9,6 @@ import sys
 import os
 import shutil
 import json
-import shelve
-import hashlib
 
 try:
     import urllib2
@@ -191,6 +189,48 @@ def saveScriptAndMeta(script, ourDir, filename, oldDir=None):
             f.write(meta)
 
 
+def parse_user_script(text):
+    data = {}
+    for line in text.split('\n'):
+        if "==UserScript==" in line:
+            continue
+        if "==/UserScript==" in line:
+            return data
+
+        line = line.strip()
+        sp = line.split()
+        data[sp[1]] = ' '.join(sp[2:])
+
+
+def get_iitc_version(script):
+    info = parse_user_script(script)
+    return info['@version']
+
+
+def add_plugin_to_meta(meta, filename, script):
+    info = parse_user_script(script)
+    category = info.get('@category')
+    if category:
+        category = re.sub('[^A-z0-9 -]', '', category).strip()
+    else:
+        category = "Misc"
+
+    if category not in meta:
+        meta[category] = {
+            'name': category,
+            'desc': "",
+            'plugins': []}
+
+    meta[category]['plugins'].append({
+        'name': info['@name'].replace("IITC plugin: ", "").replace("IITC Plugin: ", ""),
+        'id': info['@id'],
+        'version': info['@version'],
+        'filename': filename,
+        'desc': info['@description'],
+    })
+    return meta
+
+
 outDir = os.path.join('build', buildName)
 
 # create the build output
@@ -222,6 +262,7 @@ main = readfile('main.js')
 downloadUrl = distUrlBase and distUrlBase + '/total-conversion-build.user.js' or 'none'
 updateUrl = distUrlBase and distUrlBase + '/total-conversion-build.meta.js' or 'none'
 main = doReplacements(main, downloadUrl=downloadUrl, updateUrl=updateUrl)
+iitc_version = get_iitc_version(main)
 
 saveScriptAndMeta(main, outDir, 'total-conversion-build.user.js', oldDir)
 
@@ -231,6 +272,7 @@ with io.open(os.path.join(outDir, '.build-timestamp'), 'w') as f:
 # for each plugin, load, parse, and save output
 os.mkdir(os.path.join(outDir, 'plugins'))
 
+meta = {}
 for fn in glob.glob("plugins/*.user.js"):
     script = readfile(fn)
 
@@ -238,6 +280,7 @@ for fn in glob.glob("plugins/*.user.js"):
     updateUrl = distUrlBase and downloadUrl.replace('.user.js', '.meta.js') or 'none'
     pluginName = os.path.splitext(os.path.splitext(os.path.basename(fn))[0])[0]
     script = doReplacements(script, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName=pluginName)
+    meta = add_plugin_to_meta(meta, pluginName, script)
 
     saveScriptAndMeta(script, outDir, fn, oldDir)
 
@@ -285,6 +328,13 @@ if buildMobile:
         else:
             shutil.copy("mobile/app/build/outputs/apk/%s/app-%s.apk" % (buildMobile, buildMobile),
                         os.path.join(outDir, "IITC_Mobile-%s.apk" % buildMobile))
+
+data = {
+    'categories': meta,
+    'iitc_version': iitc_version
+}
+with open(os.path.join(outDir, 'meta.json'), 'w') as fp:
+    json.dump(data, fp)
 
 # run any postBuild commands
 for cmd in settings.get('postBuild', []):
