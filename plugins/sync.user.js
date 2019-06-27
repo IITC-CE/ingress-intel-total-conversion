@@ -203,21 +203,22 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     _this.initialized = true;
     _this.initializing = false;
     plugin.sync.logger.log('Data loaded: ' + _this.pluginName + '[' + _this.fieldName + ']');
-    if(callback) callback();
+    if(_this.callback) _this.callback();
     if(_this.initializedCallback) _this.initializedCallback(_this.pluginName, _this.fieldName);
   };
 
   // Stop the sync if any error occur and try to re-authorize
   handleError = function(e) {
-    var error_type = e.type;
+    var isNetworkError = e.type;
+    var errorMessage = (e.error !== undefined) ? e.error.message : e.result.error.message;
     
-    if(e.error.message === "A network error occurred, and the request could not be completed.") {
-      error_type = "network error";
+    if(errorMessage === "A network error occurred, and the request could not be completed.") {
+      isNetworkError = true;
     }
     
-    plugin.sync.logger.log('Drive API Error: ' + error_type);
+    plugin.sync.logger.log('Drive API Error: ' + errorMessage);
     _this.stopSync();
-    if(error_type === "network error") {
+    if(isNetworkError === true) {
       setTimeout(function() {_this.authorizer.authorize();}, 50*1000);
     } else if(e.status === 401) { // Unauthorized
       _this.authorizer.authorize();
@@ -225,7 +226,7 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
       _this.forceFileSearch = true;
       _this.initFile()
     } else {
-      alert('Plugin Sync error: ' + error_type + ', ' + e.message);
+      alert('Plugin Sync error: ' + errorMessage + ', ' + e.message);
     }
   };
 
