@@ -41,6 +41,8 @@ window.plugin.sync.authorizer = null;
 window.plugin.sync.registeredPluginsFields = null;
 window.plugin.sync.logger = null;
 
+window.plugin.sync.checkInterval = 3 * 60 * 1000; // update data every 3 minutes
+
 // Other plugin call this function to push update to Google Drive API
 // example:
 // plugin.sync.updateMap('keys', 'keysdata', ['guid1', 'guid2', 'guid3'])
@@ -175,6 +177,7 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
 
     _this.dataStorage.saveFile(_this.prepareFileData());
     plugin.sync.logger.log(_this.getFileName(), 'Model initialized');
+    setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
   };
 
   // this function called when the document is loaded
@@ -187,7 +190,7 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     if (!_this.intervalID) {
       _this.intervalID = setInterval(function() {
         _this.loadDocument();
-      }, 3 * 60 * 1000); // update data every 3 minutes
+      }, window.plugin.sync.checkInterval);
     }
     
     // Replace local value if data is changed by others
@@ -223,7 +226,8 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
       _this.authorizer.authorize();
     } else if(e.status === 404) { // Not found
       _this.forceFileSearch = true;
-      _this.initFile()
+      _this.initFile();
+      setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
     } else {
       alert('Plugin Sync error: ' + errorMessage + ', ' + e.message);
     }
