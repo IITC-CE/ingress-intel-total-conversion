@@ -217,7 +217,6 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     }
     
     plugin.sync.logger.log('Drive API Error: ' + errorMessage);
-    _this.stopSync();
     if(isNetworkError === true) {
       setTimeout(function() {_this.authorizer.authorize();}, 50*1000);
     } else if(e.status === 401) { // Unauthorized
@@ -231,16 +230,6 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
   };
 
   this.dataStorage.readFile(initializeFile, onFileLoaded, handleError);
-};
-
-window.plugin.sync.RegisteredMap.prototype.stopSync = function() {
-  clearInterval(this.intervalID);
-  this.intervalID = null;
-  this.map = null;
-  this.lastUpdateUUID = null;
-  this.initializing = false;
-  this.initialized = false;
-  plugin.sync.registeredPluginsFields.addToWaitingInitialize(this.pluginName, this.fieldName);
 };
 //// end RegisteredMap
 
@@ -275,19 +264,6 @@ window.plugin.sync.RegisteredPluginsFields.prototype.add = function(registeredMa
   this.waitingInitialize[registeredMap.getFileName()] = registeredMap;
 
   this.initializeWorker();
-};
-
-window.plugin.sync.RegisteredPluginsFields.prototype.addToWaitingInitialize = function(pluginName, fieldName) {
-  var registeredMap, _this;
-  _this = this;
-
-  registeredMap = this.get(pluginName, fieldName);
-  if(!registeredMap) return;
-  this.waitingInitialize[registeredMap.getFileName()] = registeredMap;
-
-  clearTimeout(this.timer);
-  this.timer = setTimeout(function() {_this.initializeWorker()}, 10000);
-  plugin.sync.logger.log('Retry in 10 sec.: ' +  pluginName + '[' + fieldName + ']');
 };
 
 window.plugin.sync.RegisteredPluginsFields.prototype.get = function(pluginName, fieldName) {
