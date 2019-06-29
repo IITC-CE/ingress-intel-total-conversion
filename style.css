@@ -1235,13 +1235,6 @@ g.checkpoint:hover circle {
   fill-opacity: 1;
   stroke-width: 2px;
 }
-.checkpoint_table {
-	border-collapse: collapse;
-}
-.checkpoint_table td {
-	text-align: right;
-	padding-left: 10px;
-}
 
 .text-overflow-ellipsis {
 	display: inline-block;
@@ -1277,28 +1270,41 @@ g.checkpoint:hover circle {
   padding: 2px 5px;
 }
 
- .checkpoint_table {
-	border-collapse: collapse;
+.checkpoint_table {
+  border-collapse: collapse;
+  width: 100%;
 }
 
- .checkpoint_table td {
+.checkpoint_table thead > tr:first-child th:not(:first-child) {
+  text-align: left;
+  padding-left: 92px;
+}
+
+.checkpoint_table thead > tr:last-child th {
+  text-align: right;
+}
+
+.checkpoint_table td {
 	text-align: right;
 	padding-left: 10px;
 }
 
- .checkpoint_table tbody td:nth-child(4), .checkpoint_table tbody td:nth-child(7) {
-  text-align: left;
+.checkpoint_table tbody td:not(:first-child) {
+  width: 24%;
 }
 
- .checkpoint_table tbody td:nth-child(3) {
+.checkpoint_table tbody td:nth-child(3) {
   color: #03fe03;
 }
 
- .checkpoint_table tbody td:nth-child(6) {
+.checkpoint_table tbody td:nth-child(5) {
   color: #00c5ff;
 }
 
- .sep12px {display: inline-block; width: 12px;} 
+.sep12px {
+  display: inline-block;
+  width: 12px;
+} 
 
 /* tabs */
 .ui-tabs-nav {
