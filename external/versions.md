@@ -38,7 +38,8 @@
   3.3.0
   * Bing.js, Bing.addon.applyMaxNativeZoom.js: a1f517a9d78c18c04ae8d9f59264b4e61fb319d1
     used in: basemap-bing
-  * Yandex.js: 21998f069d00952807ae070fb5b5c9992e7a6c1f
+  * Yandex.js: efd0a870496fa55fd51904fff781b6d214e09fa6
+    Yandex.addon.LoadApi.js: ed47982c0c2c9037d74557ae46783e0f294a201b
     used in: basemap-yandex
 
 * https://github.com/makinacorpus/Leaflet.FileLayer
