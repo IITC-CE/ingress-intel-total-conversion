@@ -794,9 +794,9 @@ var setup = function() {
   window.plugin.sync.registeredPluginsFields = new window.plugin.sync.RegisteredPluginsFields({
     'authorizer': window.plugin.sync.authorizer
   });
-  
+
   var GOOGLEAPI = 'https://apis.google.com/js/api.js';
-  load(GOOGLEAPI).thenRun(function() {
+  $.getScript(GOOGLEAPI).done(function () {
     gapi.load('client:auth2', window.plugin.sync.authorizer.authorize);
   });
 };

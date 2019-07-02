@@ -101,9 +101,6 @@
   delaunay.js: dfc747e3dc850c928d720bcdf2a93c42d5a42712
   used in: tidy-links
 
-* https://github.com/chriso/load.js
-  load.js: f8b9e2efbabfad19869e1fe6d4575d72e7b6dd53
-
 * https://github.com/jonatkins/s2-geometry-javascript/
   s2geometry.js: 5e20625eb5d2c0d6a8fd0aeaa5cc91dddd8b306a
   modified: 42ed6566e49dcfa81ae3be0b3bdee9ebd586e53f, 6f8fbe60d38b01782b8d92bdc20fa4470645f186

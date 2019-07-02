@@ -811,7 +811,6 @@ window.registerMarkerForOMS = function(marker) {
 }
 
 try { console.log('Loading included JS now'); } catch(e) {}
-@@INCLUDERAW:external/load.js@@
 @@INCLUDERAW:external/autolink-min.js@@
 
 @@INCLUDERAW:external/leaflet-src.js@@
