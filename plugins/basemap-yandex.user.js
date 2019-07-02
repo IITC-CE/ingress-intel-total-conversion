@@ -2,7 +2,7 @@
 // @id             iitc-plugin-basemap-yandex@jonatkins
 // @name           IITC plugin: Yandex maps
 // @category       Map Tiles
-// @version        0.2.1.@@DATETIMEVERSION@@
+// @version        0.3.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add Yandex.com (Russian/Русский) map layers
 @@METAINFO@@
 // ==/UserScript==
@@ -13,57 +13,48 @@
 
 
 // use own namespace for plugin
-window.plugin.mapTileYandex = function() {};
+var mapYandex = {};
+window.plugin.mapYandex = mapYandex;
 
-window.plugin.mapTileYandex.leafletSetup = function() {
+mapYandex.types = {
+  map: {
+    type: 'map'
+  },
+  satellite: {
+    type: 'satellite'
+  },
+  hybrid: {
+    type: 'hybrid'
+  },
+};
 
-//include Yandex.js start
-@@INCLUDERAW:external/Yandex.js@@
-//include Yandex.js end
+mapYandex.options = {
+  //set this to your API key
+  apiParams: '<your API-key>'
+};
 
-}
+function setup () {
+  setupYandexLeaflet();
 
-
-
-window.plugin.mapTileYandex.setup = function() {
-
-  var yStyles = {
-    'map': "Map",
-    'satellite': "Satellite",
-    'hybrid': "Hybrid",
-//    'publicMap': "Public Map",
-//    'publicMapHybrid': "Public Hybrid",
-  };
-
-
-  // we can't directly create the L.Yandex object, as we need to async load the yandex map API
-  // so we'll add empty layer groups, then in the callback we can add the yandex layers to the layer groups
-  var layers = {};
-
-  $.each(yStyles, function(key,value) {
-    layers[key] = new L.LayerGroup();
-    layerChooser.addBaseLayer(layers[key], 'Yandex '+value);
-  });
-
-  var callback = function() {
-    window.plugin.mapTileYandex.leafletSetup();
-    var yOpt = {maxZoom: 18};
-    $.each(layers, function(key,layer) {
-      var yMap = new L.Yandex(key, yOpt);
-      layer.addLayer(yMap);
-    });
+  for (var name in mapYandex.types) {
+    var options = L.extend({}, mapYandex.options, mapYandex.types[name]);
+    layerChooser.addBaseLayer(L.yandex(options), 'Yandex ' + name);
   }
+};
 
+function setupYandexLeaflet () {
 
-//a few options on language are available, including en-US. Oddly, the detail available on the maps varies
-//depending on the language
-  var yandexApiJs = '//api-maps.yandex.ru/2.0-stable/?load=package.standard&lang=ru-RU'
+  try {
+    // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Yandex.js
+    @@INCLUDERAW:external/Yandex.js@@
 
-  load(yandexApiJs).thenRun(callback);
+    @@INCLUDERAW:external/Yandex.addon.LoadApi.js@@
+    
+    } catch (e) {
+      console.error('Yandex.js loading failed');
+      throw e;
+    }
 }
-
-
-var setup =  window.plugin.mapTileYandex.setup;
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
