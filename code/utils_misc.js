@@ -230,15 +230,6 @@ window.androidCopy = function(text) {
   return false;
 }
 
-window.androidPermalink = function() {
-  if(typeof android === 'undefined' || !android || !android.intentPosLink)
-    return true; // i.e. execute other actions
-
-  var center = map.getCenter();
-  android.intentPosLink(center.lat, center.lng, map.getZoom(), "Selected map view", false);
-  return false;
-}
-
 window.getCurrentZoomTileParameters = function() {
   var zoom = getDataZoomForMapZoom( map.getZoom() );
   var tileParams = getMapZoomTileParameters(zoom);
@@ -310,10 +301,6 @@ window.escapeHtmlSpecialChars = function(str) {
 
 window.prettyEnergy = function(nrg) {
   return nrg> 1000 ? Math.round(nrg/1000) + ' k': nrg;
-}
-
-window.setPermaLink = function(elm) {
-  $(elm).attr('href', window.makePermalink(null,true));
 }
 
 window.uniqueArray = function(arr) {
@@ -458,3 +445,18 @@ window.makePermalink = function(latlng, mapView) {
   }
   return '/intel?' + args.join('&');
 };
+
+window.setPermaLink = function(elm) { // deprecated
+  $(elm).attr('href', window.makePermalink(null,true));
+}
+
+window.androidPermalink = function() { // deprecated
+  if(typeof android === 'undefined' || !android || !android.intentPosLink)
+    return true; // i.e. execute other actions
+
+  var center = map.getCenter();
+  android.intentPosLink(center.lat, center.lng, map.getZoom(), "Selected map view", false);
+  return false;
+}
+
+// todo refactor main.js to get rid of setPermaLink and androidPermalink
