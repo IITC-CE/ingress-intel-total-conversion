@@ -315,11 +315,11 @@ var RegionScoreboard = (function() {
 	 * Table build
 	 */
 	// Headers
-	html += '<div><table class="checkpoint_table time"><thead>';
+	html += '<div style="margin-top: 12px;"><table class="checkpoint_table time"><thead>';
 	html += '<tr><th>CP.</th><th class="time"></th><th class="sum"><th>' + window.TEAM_NAMES[order_name[0]] + '</th><th class="sum"><th>' + window.TEAM_NAMES[order_name[1]] + '</th></tr>';
 
 	// Totals
-	html += '<tr class="totals"><th colspan="2" style="text-align:center">Total</th></th>' +
+	html += '<tr class="totals"><th colspan="2" style="text-align: right">Total</th></th>' +
 				'</th><th class="' + window.TEAM_TO_CSS[order_name[0]] + '">' + digits(total[order_team[0]]) + '</th>' +
 				'<th class="sum"></th><th class="' + window.TEAM_TO_CSS[order_name[1]] + '">' + digits(total[order_team[1]]) + '</th></tr>';
 	html += '<tr><th></th><th class="time">Time</th><th class="sum">Sum.</th><th>Score</th><th class="sum">Sum.</th><th>Score</th></tr></thead><tbody>';

@@ -1280,11 +1280,15 @@ g.checkpoint:hover circle {
 }
 
 .checkpoint_table thead > tr:last-child th {
-  text-align: right;
+  text-align: left;
 }
 
-.checkpoint_table td {
-	text-align: right;
+tr.totals th {
+  padding-bottom: 6px;
+}
+
+.checkpoint_table tr > *:not(:first-child) {
+	text-align: left;
 	padding-left: 10px;
 }
 
