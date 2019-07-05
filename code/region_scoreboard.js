@@ -229,7 +229,23 @@ var RegionScoreboard = (function() {
     $('input.logscale', mainDialog).change(function() {
       var input = $(this);
       updateDialog(input.prop('checked'));
-    });
+	});
+	
+	$('#sumsToggler').click(function() {
+		let table = $('.checkpoint_table', mainDialog);
+		let isTime = table.hasClass('time');
+
+		if (isTime) {
+			table.removeClass('time')
+				.addClass('sum');
+			$(this).text('Show CP times');
+		}
+		else {
+			table.removeClass('sum')
+				.addClass('time');
+			$(this).text('Show CP sums');
+		}
+	});
   }
 
 
@@ -275,41 +291,62 @@ var RegionScoreboard = (function() {
   }
 
   function createHistoryTable() {
-	var scoreDifference, summatory,
-		html = '';
+    var scoreDifference, summatory,
+    html = '';
+    
+    const order_name = (PLAYER.team === 'RESISTANCE' ? [TEAM_RES,TEAM_ENL]:[TEAM_ENL,TEAM_RES]);
+	const order_team = (PLAYER.team === 'RESISTANCE' ? [1,0]:[0,1]);
+	const total = regionScore.getCPSummatory(regionScore.getLastCP());
 
-    // summary build
+    // Difference build
     scoreDifference = regionScore.getCPSummatory(regionScore.getLastCP())[0] - regionScore.getCPSummatory(regionScore.getLastCP())[1];
     html += '<div class="cycleSummary"><div>';
     if (scoreDifference > 0)
-      html += '<span class="enl">ENL</span> leads by <span class="enl">' + digits(scoreDifference) + '</span>';
+    	html += '<span class="enl">ENL</span> leads by <span class="enl">' + digits(scoreDifference) + '</span>';
     else if (scoreDifference < 0)
-      html += '<span class="res">RES</span> leads by <span class="res">' + digits(Math.abs(scoreDifference)) + '</span>';
+    	html += '<span class="res">RES</span> leads by <span class="res">' + digits(Math.abs(scoreDifference)) + '</span>';
     else
-      html += '<span>Both teams are tied.</span>';
+    	html += '<span>Both teams are tied.</span>';
 
-    // table build
-    html += '<div><table class="checkpoint_table"><thead><tr><th>CP.</th><th colspan="2">Enlightened</th><th colspan="2">Resistance</th></tr>';
-    html += '<tr><th></th><th>Sum.</th><th>Score</th><th>Sum.</th><th>Score</th></tr></thead>';
+	// Switch button
+	html += '<button id="sumsToggler">Show CP sums</button>';
+	
+    /**
+	 * Table build
+	 */
+	// Headers
+	html += '<div><table class="checkpoint_table time"><thead>';
+	html += '<tr><th>CP.</th><th class="time"></th><th class="sum"><th>' + window.TEAM_NAMES[order_name[0]] + '</th><th class="sum"><th>' + window.TEAM_NAMES[order_name[1]] + '</th></tr>';
 
+	// Totals
+	html += '<tr class="totals"><th colspan="2" style="text-align:center">Total</th></th>' +
+				'</th><th class="' + window.TEAM_TO_CSS[order_name[0]] + '">' + digits(total[order_team[0]]) + '</th>' +
+				'<th class="sum"></th><th class="' + window.TEAM_TO_CSS[order_name[1]] + '">' + digits(total[order_team[1]]) + '</th></tr>';
+	html += '<tr><th></th><th class="time">Time</th><th class="sum">Sum.</th><th>Score</th><th class="sum">Sum.</th><th>Score</th></tr></thead><tbody>';
+	
+	// Cps
     for(var cp = regionScore.getLastCP(); cp>0; cp--) {
-      summatory = regionScore.getCPSummatory(cp);
-      score = regionScore.getCPScore(cp);
+		summatory = regionScore.getCPSummatory(cp);
+		score = regionScore.getCPScore(cp);
 
-      // Checkpoint column
-      html += '<tr><td>' + cp + '</td>';
-  
-      // For each team
-      for (var team = 0; team < 2; team++) {
-        // Summatory
-        html += '<td>' + digits(summatory[team].toString()) + '</td>';
-  
-        // Score
-        html += '<td>' + digits(score[team]) + '</td>';
-      }
-      html += '</tr>';
+		// Checkpoint column
+		html += '<tr><td>' + cp + '</td>';
+		
+		// Time column
+		html += '<td class="time">' + formatDayHours(regionScore.getCheckpointEnd(cp)) + '</td>';
+
+		// For each team
+		for (let t = 0; t < 2; t++) {
+			let team = order_team[t];
+			// Summatory
+			html += '<td class="sum">' + digits(summatory[team].toString()) + '</td>';
+
+			// Score
+			html += '<td>' + digits(score[team]) + '</td>';
+		}
+		html += '</tr>';
     }
-    html += '</table></div></div></div>';
+    html += '</tbody></table></div></div></div>';
     
     return html;
   }
@@ -410,7 +447,7 @@ var RegionScoreboard = (function() {
 
   function createTimers() {
     var nextcp = regionScore.getCheckpointEnd( regionScore.getLastCP() + 1 ),
-    	endcp = regionScore.getCycleEnd();
+        endcp = regionScore.getCycleEnd();
 
     return '<div><table style="margin: auto; width: 420px; padding-top: 4px">' +
       '<tr>' +

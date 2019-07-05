@@ -1275,9 +1275,8 @@ g.checkpoint:hover circle {
   width: 100%;
 }
 
-.checkpoint_table thead > tr:first-child th:not(:first-child) {
+.checkpoint_table thead > tr:first-child th:not(:first-child), .checkpoint_table thead > tr.totals th:not(:first-child) {
   text-align: left;
-  padding-left: 92px;
 }
 
 .checkpoint_table thead > tr:last-child th {
@@ -1289,15 +1288,18 @@ g.checkpoint:hover circle {
 	padding-left: 10px;
 }
 
-.checkpoint_table tbody td:not(:first-child) {
-  width: 24%;
+.checkpoint_table tbody td:nth-child(2) {
+  width: 15px;
+}
+.checkpoint_table tbody td:nth-child(2) {
+  width: 80px;
 }
 
-.checkpoint_table tbody td:nth-child(3) {
+.checkpoint_table tbody td:nth-child(4) {
   color: #03fe03;
 }
 
-.checkpoint_table tbody td:nth-child(5) {
+.checkpoint_table tbody td:nth-child(6) {
   color: #00c5ff;
 }
 
@@ -1305,6 +1307,17 @@ g.checkpoint:hover circle {
   display: inline-block;
   width: 12px;
 } 
+
+.cycleSummary #sumsToggler {
+  float: right;
+}
+
+.checkpoint_table.time .sum {
+  display: none;
+}
+.checkpoint_table.sum .time {
+  display: none;
+}
 
 /* tabs */
 .ui-tabs-nav {
