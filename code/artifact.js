@@ -27,8 +27,14 @@ window.artifact.setup = function() {
   artifact._layer = new L.LayerGroup();
   addLayerGroup ('Artifacts', artifact._layer, true);
 
-  $('#toolbox').append(' <a onclick="window.artifact.showArtifactList()" title="Show artifact portal list">Artifacts</a>');
-
+  $('<a>')
+    .html('Artifacts')
+    .attr({
+      id: 'artifacts-toolbox-link',
+      title: 'Show artifact portal list'
+    })
+    .click(window.artifact.showArtifactList)
+    .appendTo('#toolbox');
 }
 
 window.artifact.requestData = function() {
