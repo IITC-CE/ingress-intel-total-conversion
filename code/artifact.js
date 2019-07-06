@@ -292,13 +292,11 @@ window.artifact.showArtifactList = function() {
     html += '</table>';
   });
 
-
-  html += "<hr />"
-        + "<p>In Summer 2015, Niantic changed the data format for artifact portals. We no longer know:</p>"
-        + "<ul><li>Which team each target portal is for - only that it is a target</li>"
-        + "<li>Which shards are at each portal, just that it has one or more shards</li></ul>"
-        + "<p>You can select a portal and the detailed data contains the list of shard numbers, but there's still no"
-        + " more information on targets.</p>";
+  // In Summer 2015, Niantic changed the data format for artifact portals. We no longer know:
+  // - Which team each target portal is for - only that it is a target
+  // - Which shards are at each portal, just that it has one or more shards
+  // You can select a portal and the detailed data contains the list of shard numbers, but there's still no
+  // more information on targets
 
   dialog({
     title: 'Artifacts',
