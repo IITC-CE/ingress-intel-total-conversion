@@ -220,7 +220,9 @@ window.plugin.scoreboard.portalTable = function() {
 
   html += '</table>';
 
-  html += '<div class="disclaimer"><b>Zoom in for a more accurate scoreboard!</b></div>';
+  if (map.getZoom() < 15) {
+    html += '<div class="disclaimer"><b>Zoom in for a more accurate scoreboard!</b></div>';
+  }
 
   return html;
 }
