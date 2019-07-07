@@ -1,13 +1,13 @@
 // ==UserScript==
 // @id             iitc-plugin-scoreboard@Costaspap
 // @name           IITC plugin: Localized scoreboard
-// @version        0.2.0.@@DATETIMEVERSION@@
+// @version        0.3.0.@@DATETIMEVERSION@@
 // @category       Info
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
-// @@METAINFO@@
+@@METAINFO@@
 // ==/UserScript==
 
-// @@PLUGINSTART@@
+@@PLUGINSTART@@
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
@@ -227,8 +227,14 @@ window.plugin.scoreboard.portalTable = function() {
 
 var setup = function() {
   if (window.useAndroidPanes()) { // use android panes,texture and style
-    android.addPane('plugin-Scoreboard', 'Scoreboard', 'ic_action_paste');
-    addHook('paneChanged', window.plugin.scoreboard.onPaneChanged);
+    android.addPane('plugin-Scoreboard', 'Scoreboard', 'ic_action_view_as_list_compact');
+    addHook('paneChanged', function (pane) {
+      if (pane === 'plugin-Scoreboard') {
+        window.plugin.scoreboard.displayScoreboard();
+      } else {
+        $('#scoreboard').remove();
+      }
+    });
   } else {
     $('#toolbox').append('<a onclick="window.plugin.scoreboard.displayScoreboard()" title="Display a dynamic scoreboard in the current view">Scoreboard</a>');
   }
@@ -249,4 +255,4 @@ var setup = function() {
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
-// @@PLUGINEND@@
+@@PLUGINEND@@
