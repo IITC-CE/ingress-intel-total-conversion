@@ -159,13 +159,19 @@ window.RegionScoreboard = (function() {
 
 
   function showRegion(latE6,lngE6) {
-    mainDialog = dialog({
-      title: 'Region scores',
-      html: 'Loading regional scores...',
-      width: 450,
-      minHeight: 340,
-      closeCallback: onDialogClose
-    });
+    var text = 'Loading regional scores...';
+    if (window.useAndroidPanes()) {
+      var style = 'position: absolute; top: 0; width: 100%; max-width: 412px';
+      mainDialog = $('<div>',{style: style}).html(text).appendTo(document.body);
+    } else {
+      mainDialog = dialog({
+        title: 'Region scores',
+        html: text,
+        width: 450,
+        minHeight: 340,
+        closeCallback: onDialogClose
+      });
+    }
 
     window.postAjax('getRegionScoreDetails', {latE6:latE6, lngE6:lngE6},
       onRequestSuccess,
@@ -446,11 +452,22 @@ window.RegionScoreboard = (function() {
   }
 
   function setup() {
-    $('<a>')
-      .html('Region scores')
-      .attr('title','View regional scoreboard')
-      .click(showDialog)
-      .appendTo('#toolbox');
+    if (window.useAndroidPanes()) {
+      android.addPane('regionScoreboard', 'Region scores', 'ic_action_view_as_list');
+      addHook('paneChanged', function (pane) {
+        if (pane === 'regionScoreboard') {
+          showDialog();
+        } else if (mainDialog) {
+          mainDialog.remove();
+        }
+      });
+    } else {
+      $('<a>')
+        .html('Region scores')
+        .attr('title','View regional scoreboard')
+        .click(showDialog)
+        .appendTo('#toolbox');
+    }
   }
 
   return {
