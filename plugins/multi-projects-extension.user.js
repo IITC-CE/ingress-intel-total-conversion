@@ -2,25 +2,19 @@
 // @id             iitc-plugin-multi-projects-extension@Zaso
 // @name           IITC plugin: Multi Projects Extension
 // @category       Control
-// @version        0.0.6.20180217.123738
+// @version        0.0.6.@@DATETIMEVERSION@@
 // @namespace      http://www.giacintogarcea.com/ingress/items/
 // @updateURL      http://www.giacintogarcea.com/ingress/iitc/multi-projects-extension-by-zaso.meta.js
 // @downloadURL    http://www.giacintogarcea.com/ingress/iitc/multi-projects-extension-by-zaso.user.js
-// @description    Create separated projects in some plugins.
-// @include        https://*.ingress.com/intel*
-// @include        http://*.ingress.com/intel*
-// @match          https://*.ingress.com/intel*
-// @match          http://*.ingress.com/intel*
-// @include        https://*.ingress.com/mission/*
-// @include        http://*.ingress.com/mission/*
-// @match          https://*.ingress.com/mission/*
-// @match          http://*.ingress.com/mission/*
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Create separated projects in some plugins.
+// @match          https://intel.ingress.com/*
 // @grant          none
+@@METAINFO@@
 // ==/UserScript==
-
-function wrapper(){
-// ensure plugin framework is there, even if iitc is not yet loaded
-if(typeof window.plugin !== 'function') window.plugin = function(){};
+@@PLUGINSTART@@
+// function wrapper(){
+// // ensure plugin framework is there, even if iitc is not yet loaded
+// if(typeof window.plugin !== 'function') window.plugin = function(){};
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
@@ -533,16 +527,18 @@ if(typeof window.plugin !== 'function') window.plugin = function(){};
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
-if(window.iitcLoaded && typeof setup === 'function'){
-	setup();
-}else{
-	if(window.bootPlugins)
-		window.bootPlugins.push(setup);
-	else
-		window.bootPlugins = [setup];
-}
-} // wrapper end
-// inject code into site context
-var script = document.createElement('script');
-script.appendChild(document.createTextNode('('+ wrapper +')();'));
-(document.body || document.head || document.documentElement).appendChild(script);
+@@PLUGINEND@@
+
+// if(window.iitcLoaded && typeof setup === 'function'){
+// 	setup();
+// }else{
+// 	if(window.bootPlugins)
+//		window.bootPlugins.push(setup);
+//	else
+//		window.bootPlugins = [setup];
+// }
+// } // wrapper end
+// // inject code into site context
+// var script = document.createElement('script');
+// script.appendChild(document.createTextNode('('+ wrapper +')();'));
+// (document.body || document.head || document.documentElement).appendChild(script);
