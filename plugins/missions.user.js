@@ -600,9 +600,10 @@ window.plugin.missions = {
 	},
 	
 	onWaypointsRefreshed: function() {
+		var checkedWaypoints = this.checkedWaypoints;
 		$('[data-mission_mwpid]').each(function(i, element) {
 			var mwpid = element.dataset['mission_mwpid'];
-			var checked = !!this.checkedWaypoints[mwpid];
+			var checked = !!checkedWaypoints[mwpid];
 			element.checked = checked;
 		});
 	},
@@ -629,9 +630,10 @@ window.plugin.missions = {
 	},
 	
 	onMissionsRefreshed: function() {
+		var checkedMissions = this.checkedMissions;
 		$('[data-mission_mid]').each(function(i, element) {
 			var mid = element.dataset['mission_mid'];
-			var checked = !!this.checkedMissions[mid];
+			var checked = !!checkedMissions[mid];
 			$(element).toggleClass('checked', checked);
 		});
 	},
@@ -973,7 +975,7 @@ window.plugin.missions = {
 			}
 			
 			query.addResult(result);
-		}.bind(this));
+		}, this);
 	},
 
 	onSearchResultSelected: function(result, event) {
