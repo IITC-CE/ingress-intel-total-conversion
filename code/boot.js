@@ -3,9 +3,9 @@
 // created a basic framework. All of these functions should only ever
 // be run once.
 
-window.setupLargeImagePreview = function() {
-  $('#portaldetails').on('click', '.imgpreview', function() {
-    var img = $(this).find('img')[0];
+window.setupLargeImagePreview = function () {
+  $('#portaldetails').on('click', '.imgpreview', function (e) {
+    var img = this.querySelector('img');
     var details = $(this).find('div.portalDetails')[0];
     //dialogs have 12px padding around the content
     var dlgWidth = Math.max(img.naturalWidth+24,500);
@@ -15,22 +15,17 @@ window.setupLargeImagePreview = function() {
     // To support that, we'd need a unique key per portal.  Example, guid.
     // So that would have to be in the html fetched into details.
 
-    var title = $(this).parent().find('h3.title')[0].innerText;
+    var preview = '<div style="text-align: center">' + img.outerHTML + '</div>';
+    var title = e.delegateTarget.querySelector('.title').innerText;
     if (details) {
-      dialog({
-        html: '<div style="text-align: center">' + img.outerHTML + '</div>' + details.outerHTML,
-        title: title,
-        id: 'iitc-portal-image',
-        width: dlgWidth,
-      });
-    } else {
-      dialog({
-        html: '<div style="text-align: center">' + img.outerHTML + '</div>',
-        title: title,
-        id: 'iitc-portal-image',
-        width: dlgWidth,
-      });
+      preview += details.outerHTML;
     }
+    dialog({
+      html: preview,
+      title: title,
+      id: 'iitc-portal-image',
+      width: dlgWidth,
+    });
   });
 }
 
