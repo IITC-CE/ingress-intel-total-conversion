@@ -6,7 +6,6 @@
 window.setupLargeImagePreview = function () {
   $('#portaldetails').on('click', '.imgpreview', function (e) {
     var img = this.querySelector('img');
-    var details = $(this).find('div.portalDetails')[0];
     //dialogs have 12px padding around the content
     var dlgWidth = Math.max(img.naturalWidth+24,500);
     // This might be a case where multiple dialogs make sense, for example
@@ -17,9 +16,6 @@ window.setupLargeImagePreview = function () {
 
     var preview = '<div style="text-align: center">' + img.outerHTML + '</div>';
     var title = e.delegateTarget.querySelector('.title').innerText;
-    if (details) {
-      preview += details.outerHTML;
-    }
     dialog({
       html: preview,
       title: title,
