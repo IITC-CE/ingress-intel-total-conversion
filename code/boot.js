@@ -14,7 +14,9 @@ window.setupLargeImagePreview = function () {
     // To support that, we'd need a unique key per portal.  Example, guid.
     // So that would have to be in the html fetched into details.
 
-    var preview = '<div style="text-align: center">' + img.outerHTML + '</div>';
+    var preview = new Image(img.width, img.height);
+    preview.src = img.src;
+    preview.style = 'margin: auto; display: block';
     var title = e.delegateTarget.querySelector('.title').innerText;
     dialog({
       html: preview,
