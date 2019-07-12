@@ -14,17 +14,19 @@ window.setupLargeImagePreview = function() {
     // usually we only want to show one version of each image.
     // To support that, we'd need a unique key per portal.  Example, guid.
     // So that would have to be in the html fetched into details.
+
+    var title = $(this).parent().find('h3.title')[0].innerText;
     if (details) {
       dialog({
         html: '<div style="text-align: center">' + img.outerHTML + '</div>' + details.outerHTML,
-        title: $(this).parent().find('h3.title').text(),
+        title: title,
         id: 'iitc-portal-image',
         width: dlgWidth,
       });
     } else {
       dialog({
         html: '<div style="text-align: center">' + img.outerHTML + '</div>',
-        title: $(this).parent().find('h3.title').text(),
+        title: title,
         id: 'iitc-portal-image',
         width: dlgWidth,
       });
