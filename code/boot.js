@@ -498,14 +498,12 @@ window.setupLayerChooserApi = function() {
   //hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
   //WARNING: does depend on internals of the L.Control.Layers code
   window.layerChooser.getLayers = function() {
-    var baseLayers = new Array();
-    var overlayLayers = new Array();
-    
-    for (i in this._layers) {
-      var obj = this._layers[i];
+    var baseLayers = [];
+    var overlayLayers = [];
+    this._layers.forEach(function (obj,idx) {
       var layerActive = window.map.hasLayer(obj.layer);
       var info = {
-        layerId: i,
+        layerId: idx,
         name: obj.name,
         active: layerActive
       }
@@ -514,7 +512,7 @@ window.setupLayerChooserApi = function() {
       } else {
         baseLayers.push(info);
       }
-    }
+    });
 
     var overlayLayersJSON = JSON.stringify(overlayLayers);
     var baseLayersJSON = JSON.stringify(baseLayers);
