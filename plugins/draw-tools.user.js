@@ -2,18 +2,21 @@
 // @id             iitc-plugin-draw-tools@breunigs
 // @name           IITC plugin: Draw tools
 // @category       Draw
-// @version        0.7.0.@@DATETIMEVERSION@@
+// @version        2.1.0.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow drawing things onto the current map so you may plan your next move.
 @@METAINFO@@
 // ==/UserScript==
-
 @@PLUGINSTART@@
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
+// 2019.07.30 2.1.0 EDF & Merge imported from Zaso's Draw-Tools-Plus imported
+//                  changed namespace from constant to variable
 
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
+
+window.plugin.drawTools.KEY_STORAGE = 'plugin-draw-tools-layer';
 
 window.plugin.drawTools.loadExternals = function() {
   try { console.log('Loading leaflet.draw JS now'); } catch(e) {}
@@ -218,15 +221,14 @@ window.plugin.drawTools.save = function() {
 
     data.push(item);
   });
-
-  localStorage['plugin-draw-tools-layer'] = JSON.stringify(data);
+  localStorage[window.plugin.drawTools.KEY_STORAGE] = JSON.stringify(data);
 
   console.log('draw-tools: saved to localStorage');
 }
 
 window.plugin.drawTools.load = function() {
   try {
-    var dataStr = localStorage['plugin-draw-tools-layer'];
+	var dataStr = localStorage[window.plugin.drawTools.KEY_STORAGE];
     if (dataStr === undefined) return;
 
     var data = JSON.parse(dataStr);
@@ -285,6 +287,8 @@ window.plugin.drawTools.manualOpt = function() {
            + '<div class="drawtoolsSetbox">'
            + '<a onclick="window.plugin.drawTools.optCopy();" tabindex="0">Copy Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optPaste();return false;" tabindex="0">Paste Drawn Items</a>'
+           + '<a onclick="window.plugin.drawTools.optMerge();return false;" tabindex="0">Merge Drawn Items</a>'
+
            + (window.requestFile != undefined
              ? '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>' : '')
            + ((typeof android !== 'undefined' && android && android.saveFile)
@@ -317,6 +321,7 @@ window.plugin.drawTools.manualOpt = function() {
 //    move: function(color) { window.plugin.drawTools.setDrawColor(color.toHexString()); },
     color: window.plugin.drawTools.currentColor,
   });
+//  	runHooks('pluginDrawTools',{event: 'openOpt'});  // check if needed
 }
 
 window.plugin.drawTools.optAlert = function(message) {
@@ -325,11 +330,22 @@ window.plugin.drawTools.optAlert = function(message) {
 }
 
 window.plugin.drawTools.optCopy = function() {
-    if (typeof android !== 'undefined' && android && android.shareString) {
-        android.shareString(localStorage['plugin-draw-tools-layer']);
+	if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
+		dialog({
+			html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
+			width: 250,
+			dialogClass: 'ui-dialog-drawtools-message',
+			title: 'Draw Tools Message'
+		});
+		return;
+	}
+
+    if(typeof android !== 'undefined' && android && android.shareString){
+    	android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
     } else {
       var stockWarnings = {};
       var stockLinks = [];
+
       window.plugin.drawTools.drawnItems.eachLayer( function(layer) {
         if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
           stockWarnings.noCircle = true;
@@ -365,10 +381,29 @@ window.plugin.drawTools.optCopy = function() {
       if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
       if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
 
-      var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+localStorage['plugin-draw-tools-layer']+'</textarea>'
+/*      var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
                 +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
                 +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
+*/
+      		// Export Normal draw
+		var html = ''
+			+'<p style="margin:0 0 6px;">Normal export:</p>'
+			+'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+			+'<textarea readonly onclick="event.target.select();" style="height:70px;">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>';
+
+		// Export draw (polygons as lines)
+		html += '<hr/>'
+			+'<p style="margin:0 0 6px;">or export with polygons as lines (not filled):</p>'
+			+'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+			+'<textarea readonly onclick="event.target.select();" style="height:70px;">'+window.plugin.drawTools.getDrawAsLines()+'</textarea>';
+
+		// Export for intel stock URL (only lines)
+		html += '<hr/>'
+			+'<p style="margin:0 0 6px;">or export as a link for the standard intel map (for non IITC users):</p>'
+			+'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'input\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+			+'<input onclick="event.target.select();" type="text" size="49" value="'+stockUrl+'"/>';
+
       if (stockWarnTexts.length>0) {
         html += '<ul><li>'+stockWarnTexts.join('</li><li>')+'</li></ul>';
       }
@@ -383,60 +418,70 @@ window.plugin.drawTools.optCopy = function() {
     }
 }
 
-window.plugin.drawTools.optExport = function() {
-  if(typeof android !== 'undefined' && android && android.saveFile) {
-    android.saveFile('IITC-drawn-items.json', 'application/json', localStorage['plugin-draw-tools-layer']);
-  }
+window.plugin.drawTools.optExport = function(){
+	if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
+		dialog({
+			html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
+			width: 250,
+			dialogClass: 'ui-dialog-drawtools-message',
+			title: 'Draw Tools Message'
+		});
+		return;
+	}
+	if(typeof android !== 'undefined' && android && android.saveFile){
+		android.saveFile('IITC-drawn-items.json', 'application/json', window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
+	}
 }
 
-window.plugin.drawTools.optPaste = function() {
-  var promptAction = prompt('Press CTRL+V to paste (draw-tools data or stock intel URL).', '');
-  if(promptAction !== null && promptAction !== '') {
-    try {
-      // first see if it looks like a URL-format stock intel link, and if so, try and parse out any stock drawn items
-      // from the pls parameter
-      if (promptAction.match(new RegExp("^(https?://)?(www\.)|(intel\.)?ingress\\.com/intel.*[?&]pls="))) {
-        //looks like a ingress URL that has drawn items...
-        var items = promptAction.split(/[?&]/);
-        var foundAt = -1;
-        for (var i=0; i<items.length; i++) {
-          if (items[i].substr(0,4) == "pls=") {
-            foundAt = i;
-          }
-        }
 
-        if (foundAt == -1) throw ("No drawn items found in intel URL");
+// *********************************************************************************************************
 
-        var newLines = [];
-        var linesStr = items[foundAt].substr(4).split('_');
-        for (var i=0; i<linesStr.length; i++) {
-          var floats = linesStr[i].split(',').map(Number);
-          if (floats.length != 4) throw("URL item not a set of four floats");
-          for (var j=0; j<floats.length; j++) {
-            if (isNaN(floats[j])) throw("URL item had invalid number");
-          }
-          var layer = L.geodesicPolyline([[floats[0],floats[1]],[floats[2],floats[3]]], window.plugin.drawTools.lineOptions);
-          newLines.push(layer);
-        }
-
-        // all parsed OK - clear and insert
-        window.plugin.drawTools.drawnItems.clearLayers();
-        for (var i=0; i<newLines.length; i++) {
-          window.plugin.drawTools.drawnItems.addLayer(newLines[i]);
-        }
-        runHooks('pluginDrawTools', {event: 'import'});
-
-        console.log('DRAWTOOLS: reset and imported drawn items from stock URL');
-        window.plugin.drawTools.optAlert('Import Successful.');
+window.plugin.drawTools.paste = function(dataStringImported){
+	try{
 
 
+		// first see if it looks like a URL-format stock intel link, and if so, try and parse out any stock drawn items
+		// from the pls parameter
+		if (dataStringImported.match(new RegExp("^(https?://)?(www\\.)ingress\\.com/intel.*[?&]pls="))) {
+			//looks like a ingress URL that has drawn items...
+			var items = dataStringImported.split(/[?&]/);
+			var foundAt = -1;
+			for (var i=0; i<items.length; i++) {
+				if (items[i].substr(0,4) == "pls=") {
+					foundAt = i;
+				}
+			}
+
+			if (foundAt == -1) throw ("No drawn items found in intel URL");
+
+			var newLines = [];
+			var linesStr = items[foundAt].substr(4).split('_');
+			for (var i=0; i<linesStr.length; i++) {
+				var floats = linesStr[i].split(',').map(Number);
+				if (floats.length != 4) throw("URL item not a set of four floats");
+				for (var j=0; j<floats.length; j++) {
+				if (isNaN(floats[j])) throw("URL item had invalid number");
+			  }
+				var layer = L.geodesicPolyline([[floats[0],floats[1]],[floats[2],floats[3]]], window.plugin.drawTools.lineOptions);
+				newLines.push(layer);
+			}
+
+			// all parsed OK - clear and insert
+			window.plugin.drawTools.drawnItems.clearLayers();
+			for (var i=0; i<newLines.length; i++) {
+				window.plugin.drawTools.drawnItems.addLayer(newLines[i]);
+			}
+			runHooks('pluginDrawTools', {event: 'import'});
+
+			console.log('DRAWTOOLS: reset and imported drawn items from stock URL');
+			window.plugin.drawTools.optAlert('Import Successful.');
       } else {
         var data;
           try{
-            data = JSON.parse(promptAction);
+            data = JSON.parse(dataStringImported);
           } catch(e) {
             // invalid json, filter out any leading or trailing text and try again
-            var mutatedPromptAction = promptAction;
+            var mutatedPromptAction = dataStringImported;
             if(!mutatedPromptAction.match(new RegExp('^\\[\\{'))) {
               mutatedPromptAction = mutatedPromptAction.slice(mutatedPromptAction.indexOf('[{'));
             }
@@ -445,20 +490,35 @@ window.plugin.drawTools.optPaste = function() {
             }
             data = JSON.parse(mutatedPromptAction); // throws a new exception if we still didn't get good data, which is handled by the outer enclosure
         }
-        window.plugin.drawTools.drawnItems.clearLayers();
-        window.plugin.drawTools.import(data);
-        console.log('DRAWTOOLS: reset and imported drawn items');
-        window.plugin.drawTools.optAlert('Import Successful.');
-      }
 
-      // to write back the data to localStorage
-      window.plugin.drawTools.save();
-    } catch(e) {
-      console.warn('DRAWTOOLS: failed to import data: '+e);
-      window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
-    }
-  }
+            window.plugin.drawTools.drawnItems.clearLayers();
+			window.plugin.drawTools.import(data);
+			console.log('DRAWTOOLS: reset and imported drawn items');
+			window.plugin.drawTools.optAlert('Import Successful.');
+		}
+
+		// to write back the data to localStorage
+		window.plugin.drawTools.save();
+	} catch(e) {
+		console.warn('DRAWTOOLS: failed to import data: '+e);
+		window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
+	}
+
 }
+// ****************************************************************************************
+// the following function should match draw-tools-plus/window.plugin.drawToolsPlus.optPaste
+// Does it exist for compatibility with other Plugins ??
+// ****************************************************************************************
+window.plugin.drawTools.optPaste = function(){
+	var promptAction = prompt('Press CTRL+V to paste (draw-tools data or stock intel URL).', '');
+	if(promptAction !== null && promptAction !== ''){
+		window.plugin.drawTools.paste(promptAction);
+	}
+}
+
+// *********************************************************************************************************
+// *********************************************************************************************************
+// *********************************************************************************************************
 
 window.plugin.drawTools.optImport = function() {
   if (window.requestFile === undefined) return;
@@ -482,10 +542,10 @@ window.plugin.drawTools.optImport = function() {
 window.plugin.drawTools.optReset = function() {
   var promptAction = confirm('All drawn items will be deleted. Are you sure?', '');
   if(promptAction) {
-    delete localStorage['plugin-draw-tools-layer'];
+	localStorage[window.plugin.drawTools.KEY_STORAGE] = '[]';
     window.plugin.drawTools.drawnItems.clearLayers();
     window.plugin.drawTools.load();
-    console.log('DRAWTOOLS: reset all drawn items');
+    console.log('DRAWTOOLS: reset all drawn items (OptReset)');
     window.plugin.drawTools.optAlert('Reset Successful. ');
     runHooks('pluginDrawTools', {event: 'clear'});
   }
@@ -653,10 +713,300 @@ window.plugin.drawTools.boot = function() {
         '</style>');
 
 }
+// ---------------------------------------------------------------------------------
+// New draw functions for empty fields (imported from Zaso's DrawToolsPlus)
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.fireDraw = function(layer, layerType){
+	map.fire('draw:created', {
+		layer: layer,
+		layerType: layerType
+	});
+}
 
+window.plugin.drawTools.drawPolyline = function(arrCoordArr, color){
+	if(color !== undefined){
+		var oldColor = window.plugin.drawTools.currentColor;
+		window.plugin.drawTools.setDrawColor(color);
+	}
+	var drawOpt = window.plugin.drawTools.lineOptions;
 
-var setup =  window.plugin.drawTools.loadExternals;
+	var layer = L.geodesicPolyline(arrCoordArr, drawOpt);
+	var layerType = 'polyline';
+	window.plugin.drawTools.fireDraw(layer, layerType);
+
+	if(color !== undefined){ window.plugin.drawTools.setDrawColor(oldColor); }
+
+	return layer;
+/*
+	var drawOpt = window.plugin.drawTools.lineOptions;
+	var arrCoordArr = [[42.447585,13.285419],[41.692902,13.418577]];
+//        var layer = L.polyline(arrCoordArr, drawOpt);
+	var layer = L.geodesicPolyline(arrCoordArr, drawOpt);
+	var layerType = 'polyline';
+	window.plugin.drawTools.fireDraw(layer, layerType);
+*/
+}
+window.plugin.drawTools.drawPolygon = function(arrCoordArr, color){
+	if(color !== undefined){
+		var oldColor = window.plugin.drawTools.currentColor;
+		window.plugin.drawTools.setDrawColor(color);
+	}
+	var drawOpt = window.plugin.drawTools.polygonOptions;
+
+	var layer = L.geodesicPolygon(arrCoordArr, drawOpt);
+	var layerType = 'polygon';
+	window.plugin.drawTools.fireDraw(layer, layerType);
+
+	if(color !== undefined){ window.plugin.drawTools.setDrawColor(oldColor); }
+
+	return layer;
+}
+window.plugin.drawTools.drawCircle = function(coord, radius, color){
+	if(color !== undefined){
+		var oldColor = window.plugin.drawTools.currentColor;
+		window.plugin.drawTools.setDrawColor(color);
+	}
+	var drawOpt = window.plugin.drawTools.polygonOptions;
+
+	var layer = L.geodesicCircle(coord, radius, drawOpt);
+	var layerType = 'circle';
+	window.plugin.drawTools.fireDraw(layer, layerType);
+
+	if(color !== undefined){ window.plugin.drawTools.setDrawColor(oldColor); }
+
+	return layer;
+}
+window.plugin.drawTools.drawMarker = function(coord, color){
+	if(color !== undefined){
+		var oldColor = window.plugin.drawTools.currentColor;
+		window.plugin.drawTools.setDrawColor(color);
+	}
+	var drawOpt = window.plugin.drawTools.markerOptions;
+
+	var layer = L.marker(coord, drawOpt);
+	var layerType = 'marker';
+	window.plugin.drawTools.fireDraw(layer, layerType);
+
+	if(color !== undefined){ window.plugin.drawTools.setDrawColor(oldColor); }
+
+	return layer;
+}
+// IMPORT (MERGE)
+window.plugin.drawTools.merge = function(dataStringImported){
+	try{
+		// first see if it looks like a URL-format stock intel link, and if so, try and parse out any stock drawn items
+		// from the pls parameter
+		if(dataStringImported.match(new RegExp("^(https?://)?(www\\.)ingress\\.com/intel.*[?&]pls="))){
+			//looks like a ingress URL that has drawn items...
+			var items = dataStringImported.split(/[?&]/);
+			var foundAt = -1;
+			for(var i=0; i<items.length; i++){
+				if(items[i].substr(0,4) == "pls="){
+					foundAt = i;
+				}
+			}
+
+			if(foundAt == -1) throw("No drawn items found in intel URL");
+
+			var newLines = [];
+			var linesStr = items[foundAt].substr(4).split('_');
+			for(var i=0; i<linesStr.length; i++){
+				var floats = linesStr[i].split(',').map(Number);
+				if(floats.length != 4) throw("URL item not a set of four floats");
+				for(var j=0; j<floats.length; j++){
+					if(isNaN(floats[j])) throw("URL item had invalid number");
+				}
+				var layer = L.geodesicPolyline([[floats[0],floats[1]],[floats[2],floats[3]]], window.plugin.drawTools.lineOptions);
+				newLines.push(layer);
+			}
+
+			// all parsed OK - clear and insert
+			window.plugin.drawTools.drawnItems.clearLayers();
+			for(var i=0; i<newLines.length; i++){
+				window.plugin.drawTools.drawnItems.addLayer(newLines[i]);
+			}
+			window.runHooks('pluginDrawTools',{event: 'import'});
+
+			console.log('DRAWTOOLS: merge drawn items from stock URL');
+			window.plugin.drawTools.optAlert('Merge Successful.');
+		}else{
+			dataStringImported = (typeof(
+				window.localStorage[window.plugin.drawTools.KEY_STORAGE]) !== 'undefined' &&
+				window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
+					? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0,-1) + ',' + dataStringImported.slice(1) : dataStringImported);
+			var data = JSON.parse(dataStringImported);
+
+			window.plugin.drawTools.drawnItems.clearLayers();
+			window.plugin.drawTools.import(data);
+			console.log('DRAWTOOLS: merge drawn items');
+			window.plugin.drawTools.optAlert('Merge Successful.');
+		}
+
+		// to write back the data to localStorage
+		window.plugin.drawTools.save();
+	}catch(e){
+		console.warn('DRAWTOOLS: failed to merge data: '+e);
+		window.plugin.drawTools.optAlert('<span style="color: #f88">Merge Failed</span>');
+	}
+}
+window.plugin.drawTools.optMerge = function (){
+	var promptAction = prompt('Press CTRL+V to paste items to merge (draw-tools data or stock intel URL).', '');
+	if(promptAction !== null && promptAction !== ''){
+		window.plugin.drawTools.merge(promptAction);
+	}
+}
+
+// ---------------------------------------------------------------------------------
+// EXPORT (POLYS AS LINES)
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.getDrawAsLines = function(){
+	var rawDraw = JSON.parse(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
+	var draw = [];
+
+	for(i in rawDraw){
+		var elemDraw = rawDraw[i];
+
+		if(elemDraw.type === 'polygon'){
+			var convElemDraw = {};
+			convElemDraw.color = elemDraw.color;
+			convElemDraw.type = 'polyline';
+			convElemDraw.latLngs = [];
+
+			var v = elemDraw.latLngs.length;
+			for(j in elemDraw.latLngs){
+				var ll = elemDraw.latLngs[j];
+				convElemDraw.latLngs.push(ll);
+			}
+			convElemDraw.latLngs.push(elemDraw.latLngs[0]);
+
+			draw.push(convElemDraw);
+		}else{
+			draw.push(elemDraw);
+		}
+	}
+
+	return JSON.stringify(draw);
+}
+
+// ---------------------------------------------------------------------------------
+// EMPTY POLYGONS (EMPTY DRAWN FIELDS)
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.edf = {};
+window.plugin.drawTools.edf.storage = {};
+window.plugin.drawTools.edf.draw = {};
+window.plugin.drawTools.edf.obj = {};
+window.plugin.drawTools.edf.action = {};
+window.plugin.drawTools.edf.ui = {};
+
+window.plugin.drawTools.edf.boot = function(){
+	window.addHook('pluginDrawTools', window.plugin.drawTools.edf.hookManagement);
+
+	window.plugin.drawTools.edf.ui.setupCSS();
+
+	window.plugin.drawTools.edf.storage.check();
+	window.plugin.drawTools.edf.storage.restore();
+
+	window.addHook('iitcLoaded', function(){
+		if(window.plugin.drawTools.edf.obj.status){
+			window.plugin.drawTools.edf.draw.toggleOpacityOpt();
+			window.plugin.drawTools.edf.draw.clearAndDraw();
+		}
+	});
+};
+
+window.plugin.drawTools.edf.obj.status = false;
+window.plugin.drawTools.edf.obj.toggle = function(){
+	var status = window.plugin.drawTools.edf.obj.status;
+	status = Boolean(!status);
+	window.plugin.drawTools.edf.obj.status = status;
+}
+
+window.plugin.drawTools.edf.storage.NAME = 'plugin-draw-tools-edf';
+window.plugin.drawTools.edf.storage.save = function(){
+	window.localStorage[window.plugin.drawTools.edf.storage.NAME] = JSON.stringify(window.plugin.drawTools.edf.obj.status);
+}
+window.plugin.drawTools.edf.storage.restore = function(){
+	window.plugin.drawTools.edf.obj.status = JSON.parse(window.localStorage[window.plugin.drawTools.edf.storage.NAME]);
+}
+window.plugin.drawTools.edf.storage.check = function(){
+	if(!window.localStorage[window.plugin.drawTools.edf.storage.NAME]){
+		window.plugin.drawTools.edf.storage.save();
+	}
+}
+
+window.plugin.drawTools.edf.draw.toggleOpacityOpt = function(){
+	if(window.plugin.drawTools.edf.obj.status){
+		window.plugin.drawTools.polygonOptions.fillOpacity = 0.0;
+	}else{
+		window.plugin.drawTools.polygonOptions.fillOpacity = 0.2;
+	}
+}
+window.plugin.drawTools.edf.draw.clearAndDraw = function(){
+	window.plugin.drawTools.drawnItems.clearLayers();
+	window.plugin.drawTools.load();
+	console.log('DRAWTOOLS: reset all drawn items');
+}
+
+window.plugin.drawTools.edf.action.toggle = function(){
+	window.plugin.drawTools.edf.obj.toggle();
+	window.plugin.drawTools.edf.draw.toggleOpacityOpt();
+	window.plugin.drawTools.edf.storage.save();
+	window.plugin.drawTools.edf.draw.clearAndDraw();
+}
+
+window.plugin.drawTools.edf.hookManagement = function(data){
+	if(data.event === 'openOpt'){
+		window.plugin.drawTools.edf.ui.appendBtnToBox();
+	}else if(data.event == 'layerCreated'){
+		if(window.plugin.drawTools.edf.obj.status){
+//				window.plugin.drawTools.edf.draw.toggleOpacityOpt();
+			window.plugin.drawTools.edf.draw.clearAndDraw();
+		}
+	}
+}
+
+window.plugin.drawTools.edf.ui.appendBtnToBox = function(){
+	var statusCheck = '';
+	if(window.plugin.drawTools.edf.obj.status){
+		statusCheck = 'checked';
+	}
+
+	$('#dialog-plugin-drawtools-options .drawtoolsSetbox').append(
+		'<label id="edfToggle"><input type="checkbox" '+statusCheck+' name="edf" onchange="window.plugin.drawTools.edf.action.toggle();return false;" />Not fill the polygon(s)<label>'
+	);
+}
+window.plugin.drawTools.edf.ui.setupCSS = function(){
+	$("<style>").prop("type", "text/css").html(''
+		+'#edfToggle{cursor:pointer;display:block;margin-bottom:10px;text-align:center;margin-top:-4px;color:#ffce00;}'
+		+'#edfToggle input{position:relative;top:2px;}'
+	).appendTo("head");
+}
+
+window.plugin.drawTools.setupCSS = function(){
+	$("<style>").prop("type", "text/css").html(''
+		+'.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);}'
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar{box-shadow:none;}'
+		+'.leaflet-draw{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px;}'
+
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top a:last-child{border-bottom:2px solid #999;}'
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar a{border-radius:0;}'
+
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar{border-radius:0 0 4px 4px;overflow:hidden;margin-top:0;}'
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top{border-radius:4px 4px 0 0;}'
+	).appendTo("head");
+}
+
+var setup = function(){
+		window.pluginCreateHook('pluginDrawTools');
+		window.plugin.drawTools.loadExternals();
+/*  Obsolete code? need to check with Zaso after adding new functions.
+		window.addHook('iitcLoaded', function(){
+			$('#toolbox a:contains(\'DrawTools Opt\')').addClass('list-group-item').prepend('<i class="fa fa-pencil"></i>');
+		});
+*/
+		window.plugin.drawTools.setupCSS();
+		window.plugin.drawTools.edf.boot();
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
-
 @@PLUGINEND@@
