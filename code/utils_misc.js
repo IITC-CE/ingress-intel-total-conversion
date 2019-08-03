@@ -208,7 +208,7 @@ window.showPortalPosLinks = function(lat, lng, name) {
     var gmaps = '<a href="https://maps.google.com/maps?ll='+lat+','+lng+'&q='+lat+','+lng+'%20('+encoded_name+')">Google Maps</a>';
     var bingmaps = '<a href="https://www.bing.com/maps/?v=2&cp='+lat+'~'+lng+'&lvl=16&sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps</a>';
     var osm = '<a href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lng+'&zoom=16">OpenStreetMap</a>';
-    var latLng = '<span>&lt;' + lat + ',' + lng +'&gt;</span>';
+    var latLng = '<span>' + lat + ',' + lng +'</span>';
     dialog({
       html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
       title: name,
