@@ -176,7 +176,7 @@ window.potentialPortalLevel = function(d) {
         }
       }
     }
-    //console.log(resonator_levels);
+    //log.log(resonator_levels);
     potential_level = resonator_levels.reduce(function(a, b) {return a + b;}) / 8;
   }
   return(potential_level);

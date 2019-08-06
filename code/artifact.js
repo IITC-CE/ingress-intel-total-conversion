@@ -66,7 +66,7 @@ window.artifact.handleFailure = function(data) {
 window.artifact.processData = function(data) {
 
   if (data.error || !data.result) {
-    console.warn('Failed to find result in getArtifactPortals response');
+    log.warn('Failed to find result in getArtifactPortals response');
     return;
   }
 

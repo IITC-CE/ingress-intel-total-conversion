@@ -29,7 +29,7 @@ window.extractFromStock = function() {
 
               var match = reVersion.exec(funcStr);
               if (match) {
-                console.log('Found former CURRENT_VERSION in '+topLevel+'.prototype.'+secLevel);
+                log.log('Found former CURRENT_VERSION in '+topLevel+'.prototype.'+secLevel);
                 niantic_params.CURRENT_VERSION = match[1];
               }
             }
@@ -105,8 +105,8 @@ window.extractFromStock = function() {
            +'<p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.</p>',
     });
 
-    console.log('Discovered parameters');
-    console.log(JSON.stringify(window.niantic_params,null,2));
+    log.log('Discovered parameters');
+    log.log(JSON.stringify(window.niantic_params,null,2));
 
     throw('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
   }

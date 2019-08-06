@@ -101,7 +101,7 @@ window.MapDataRequest.prototype.start = function() {
 
 
 window.MapDataRequest.prototype.mapMoveStart = function() {
-  console.log('refresh map movestart');
+  log.log('refresh map movestart');
 
   this.setStatus('paused');
   this.clearTimeout();
@@ -137,7 +137,7 @@ window.MapDataRequest.prototype.idleResume = function() {
   // if we have no timer set and there are no active requests, refresh has gone idle and the timer needs restarting
 
   if (this.idle) {
-    console.log('refresh map idle resume');
+    log.log('refresh map idle resume');
     this.idle = false;
     this.setStatus('idle restart', undefined, -1);
     this.refreshOnTimeout(this.IDLE_RESUME_REFRESH);
@@ -148,7 +148,7 @@ window.MapDataRequest.prototype.idleResume = function() {
 window.MapDataRequest.prototype.clearTimeout = function() {
 
   if (this.timer) {
-    console.log('cancelling existing map refresh timer');
+    log.log('cancelling existing map refresh timer');
     clearTimeout(this.timer);
     this.timer = undefined;
   }
@@ -157,7 +157,7 @@ window.MapDataRequest.prototype.clearTimeout = function() {
 window.MapDataRequest.prototype.refreshOnTimeout = function(seconds) {
   this.clearTimeout();
 
-  console.log('starting map refresh in '+seconds+' seconds');
+  log.log('starting map refresh in '+seconds+' seconds');
 
   // 'this' won't be right inside the callback, so save it
   // also, double setTimeout used to ensure the delay occurs after any browser-related rendering/updating/etc
@@ -184,7 +184,7 @@ window.MapDataRequest.prototype.refresh = function() {
 
   // if we're idle, don't refresh
   if (window.isIdle()) {
-    console.log('suspending map refresh - is idle');
+    log.log('suspending map refresh - is idle');
     this.setStatus ('idle');
     this.idle = true;
     return;
@@ -251,7 +251,7 @@ window.MapDataRequest.prototype.refresh = function() {
   logMessage += ' (L'+tileParams.level+'+ portals';
   logMessage += ', '+tileParams.tilesPerEdge+' tiles per global edge), map zoom is '+mapZoom;
 
-  console.log(logMessage);
+  log.log(logMessage);
 
 
   this.cachedTileCount = 0;
@@ -327,7 +327,7 @@ window.MapDataRequest.prototype.refresh = function() {
   // so as far as plugins are concerned, it should be treated as a finished request
   window.runHooks('requestFinished', {success: true});
 
-  console.log ('done request preparation (cleared out-of-bounds and invalid for zoom, and rendered cached data)');
+  log.log ('done request preparation (cleared out-of-bounds and invalid for zoom, and rendered cached data)');
 
   if (Object.keys(this.queuedTiles).length > 0) {
     // queued requests - don't start processing the download queue immediately - start it after a short delay
@@ -371,7 +371,7 @@ window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
     }
   }
 
-//  console.log('- request state: '+Object.keys(this.requestedTiles).length+' tiles in '+this.activeRequestCount+' active requests, '+pendingTiles.length+' tiles queued');
+//  log.log('- request state: '+Object.keys(this.requestedTiles).length+' tiles in '+this.activeRequestCount+' active requests, '+pendingTiles.length+' tiles queued');
 
   var requestBuckets = this.MAX_REQUESTS - this.activeRequestCount;
   if (pendingTiles.length > 0 && requestBuckets > 0) {
@@ -430,7 +430,7 @@ window.MapDataRequest.prototype.sendTileRequest = function(tiles) {
     if (id in this.queuedTiles) {
       tilesList.push (id);
     } else {
-      console.warn('no queue entry for tile id '+id);
+      log.warn('no queue entry for tile id '+id);
     }
   }
 
@@ -502,7 +502,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   var unaccountedTiles = tiles.slice(0); // Clone
 
   if (!success || !data || !data.result) {
-    console.warn('Request.handleResponse: request failed - requeuing...'+(data && data.error?' error: '+data.error:''));
+    log.warn('Request.handleResponse: request failed - requeuing...'+(data && data.error?' error: '+data.error:''));
 
     //request failed - requeue all the tiles(?)
 
@@ -543,7 +543,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
           // TIMEOUT errors for individual tiles are quite common. used to be unlimited retries, but not any more
           timeoutTiles.push (id);
         } else {
-          console.warn('map data tile '+id+' failed: error=='+val.error);
+          log.warn('map data tile '+id+' failed: error=='+val.error);
           errorTiles.push (id);
           this.debugTiles.setState (id, 'tile-fail');
         }
@@ -587,7 +587,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   if (errorTiles.length) statusMsg += ', '+errorTiles.length+' failed';
   if (unaccountedTiles.length) statusMsg += ', '+unaccountedTiles.length+' unaccounted';
   statusMsg += '. delay '+nextQueueDelay+' seconds';
-  console.log(statusMsg);
+  log.log(statusMsg);
 
 
   // requeue any 'timeout' tiles immediately
@@ -721,7 +721,7 @@ window.MapDataRequest.prototype.processRenderQueue = function() {
     var endTime = new Date().getTime();
     var duration = (endTime - this.refreshStartTime)/1000;
 
-    console.log('finished requesting data! (took '+duration+' seconds to complete)');
+    log.log('finished requesting data! (took '+duration+' seconds to complete)');
 
     window.runHooks ('mapDataRefreshEnd', {});
 

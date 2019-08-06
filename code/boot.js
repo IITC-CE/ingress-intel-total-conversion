@@ -332,7 +332,7 @@ window.setupMap = function() {
     var z = map.getZoom();
     if (z != parseInt(z))
     {
-      console.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
+      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
       map.setZoom(parseInt(z), {animate:false});
     }
   });
@@ -577,10 +577,10 @@ window.setupLayerChooserApi = function() {
   window.layerChooser._update = function() {
     // update layer menu in IITCm
     try {
-      if(typeof android != 'undefined')
+      if (typeof android !== 'undefined')
         window.layerChooser.getLayers();
-    } catch(e) {
-      console.error(e);
+    } catch (e) {
+      log.error(e);
     }
     // call through
     return _update.apply(this, arguments);
@@ -588,10 +588,10 @@ window.setupLayerChooserApi = function() {
   // as this setupLayerChooserApi function is called after the layer menu is populated, we need to also get they layers once
   // so they're passed through to the android app
   try {
-    if(typeof android != 'undefined')
+    if (typeof android !== 'undefined')
       window.layerChooser.getLayers();
-  } catch(e) {
-    console.error(e);
+  } catch (e) {
+    log.error(e);
   }
 }
 
@@ -684,8 +684,10 @@ function boot() {
   if(!isSmartphone()) // TODO remove completely?
     window.debug.console.overwriteNativeIfRequired();
 
-  console.log('loading done, booting. Built: @@BUILDDATE@@');
-  if(window.deviceID) console.log('Your device ID: ' + window.deviceID);
+  log.log('loading done, booting. Built: @@BUILDDATE@@');
+  if (window.deviceID) {
+    log.log('Your device ID: ' + window.deviceID);
+  }
   window.runOnSmartphonesBeforeBoot();
   window.extendLeaflet();
   window.extractFromStock();
@@ -756,7 +758,7 @@ function boot() {
         try {
           ref();
         } catch(err) {
-          console.error("error starting plugin: index "+ind+", error: "+err);
+          log.error("error starting plugin: index "+ind+", error: "+err);
           debugger;
         }
       });
@@ -783,7 +785,7 @@ function boot() {
 
 @@INCLUDERAW:external/load.js@@
 
-try { console.log('Loading included JS now'); } catch(e) {}
+try { log.log('Loading included JS now'); } catch(e) {}
 @@INCLUDERAW:external/leaflet-src.js@@
 @@INCLUDERAW:external/L.Geodesic.js@@
 @@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
@@ -793,6 +795,6 @@ try { console.log('Loading included JS now'); } catch(e) {}
 @@INCLUDERAW:external/jquery-3.3.1.min.js@@
 @@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@
 
-try { console.log('done loading included JS'); } catch(e) {}
+try { log.log('done loading included JS'); } catch(e) {}
 
 $(boot);

@@ -138,6 +138,7 @@ def wrapInIIFE(fn):
     name,_ = os.path.splitext(os.path.split(fn)[1])
     return '\n// *** module: ' + fn + ' ***\n' +\
         '(function () {\n' +\
+        "var log = ulog('" + name + "');\n" +\
         module +\
         '\n})();\n'
 

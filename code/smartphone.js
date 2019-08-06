@@ -19,7 +19,7 @@ window.smartphone = function() {};
 
 window.runOnSmartphonesBeforeBoot = function() {
   if(!isSmartphone()) return;
-  console.warn('running smartphone pre boot stuff');
+  log.warn('running smartphone pre boot stuff');
 
   // add smartphone stylesheet
   headHTML = document.getElementsByTagName('head')[0].innerHTML;
@@ -132,7 +132,7 @@ window.smartphoneInfo = function(data) {
 
 window.runOnSmartphonesAfterBoot = function() {
   if(!isSmartphone()) return;
-  console.warn('running smartphone post boot stuff');
+  log.warn('running smartphone post boot stuff');
 
   window.show('map');
 

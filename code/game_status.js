@@ -23,9 +23,9 @@ window.updateGameScore = function(data) {
     // help cursor via “#gamestat span”
     $('#gamestat').attr('title', 'Resistance:\t'+r+' MindUnits\nEnlightened:\t'+e+' MindUnits');
   } else if (data && data.error) {
-    console.warn('game score failed to load: '+data.error);
+    log.warn('game score failed to load: '+data.error);
   } else {
-    console.warn('game score failed to load - unknown reason');
+    log.warn('game score failed to load - unknown reason');
   }
 
   // TODO: idle handling - don't refresh when IITC is idle!

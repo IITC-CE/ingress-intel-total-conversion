@@ -112,7 +112,7 @@ window.eraseCookie = function(name) {
 window.convertCookieToLocalStorage = function(name) {
   var cookie=readCookie(name);
   if(cookie !== undefined) {
-    console.log('converting cookie '+name+' to localStorage');
+    log.log('converting cookie '+name+' to localStorage');
     if(localStorage[name] === undefined) {
       localStorage[name] = cookie;
     }
