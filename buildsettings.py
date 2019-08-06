@@ -8,6 +8,7 @@
 # buildMobile - optional - if set, mobile builds are built with 'gradle'. requires the Android SDK and appropriate mobile/local.properties file configured
 # preBuild - optional - an array of strings to run as commands, via os.system, before building the scripts
 # postBuild - optional - an array of string to run as commands, via os.system, after all builds are complete
+# pluginWrapper - optional - name of module to import custom plugin wrapper from
 
 
 buildSettings = {
