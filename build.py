@@ -20,19 +20,18 @@ except ImportError:
 # load settings file
 from buildsettings import buildSettings
 
-# load option local settings file
-try:
+defaultBuild = None
+if os.path.isfile('./localbuildsettings.py'):
+    # load optional local settings file
     from localbuildsettings import buildSettings as localBuildSettings
 
     buildSettings.update(localBuildSettings)
-except ImportError:
-    pass
 
-# load default build
-try:
-    from localbuildsettings import defaultBuild
-except ImportError:
-    defaultBuild = None
+    # load default build
+    try:
+        from localbuildsettings import defaultBuild
+    except ImportError:
+        pass
 
 buildName = defaultBuild
 
