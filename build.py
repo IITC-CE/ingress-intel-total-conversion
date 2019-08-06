@@ -133,8 +133,17 @@ def loaderSVG(var):
     return 'data:svg+xml;utf8,' + loaderString(var)
 
 
+def wrapInIIFE(fn):
+    module = readfile(fn)
+    name,_ = os.path.splitext(os.path.split(fn)[1])
+    return '\n// *** module: ' + fn + ' ***\n' +\
+        '(function () {\n' +\
+        module +\
+        '\n})();\n'
+
+
 def loadCode(ignore):
-    return '\n\n;\n\n'.join(map(readfile, sorted(glob.glob('code/*.js'))))
+    return '\n\n;\n\n'.join(map(wrapInIIFE, sorted(glob.glob('code/*.js'))))
 
 
 def extractUserScriptMeta(var):
