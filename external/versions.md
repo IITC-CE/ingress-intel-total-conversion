@@ -72,8 +72,9 @@
   L.Control.Zoomslider.js: 061a7455fa8a49961363ba63d9811be01989c093
   used in: zoom-slider
 
-* origin (abandoned): https://github.com/Fragger/Leaflet.Geodesic
-  modified a lot: https://github.com/IITC-CE/ingress-intel-total-conversion/commits/master/external/L.Geodesic.js
+* https://github.com/IITC-CE/Leaflet.Geodesic/
+  L.Geodesic.js: 95e8bb77e344ec2894f92820aabbc0afcb930a50
+  (https://github.com/IITC-CE/Leaflet.Geodesic/pull/3/)
 
 * https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet
   v0.2.6

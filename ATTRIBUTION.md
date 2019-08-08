@@ -19,7 +19,8 @@ Parts imported from other projects remain under their respective licenses:
 - https://github.com/kartena © [_Kartena AB_](http://www.kartena.se/)
   - [**Leaflet.Pancontrol**](https://github.com/kartena/Leaflet.Pancontrol): [[BSD-2-Clause](https://github.com/kartena/Leaflet.Pancontrol/blob/master/LICENSE)]
   - [**Leaflet.zoomslider**](https://github.com/kartena/Leaflet.zoomslider): [[BSD-2-Clause](https://github.com/kartena/Leaflet.zoomslider/blob/master/LICENSE)]
-- [**Leaflet.Geodesic**](http://fragger.github.io/Leaflet.Geodesic/) © _Kevin Brasier_: [[BSD-2-Clause](https://github.com/Fragger/Leaflet.Geodesic/blob/master/LICENSE)]
+- [**Leaflet.Geodesic**](https://github.com/IITC-CE/Leaflet.Geodesic) © _Kevin Brasier_: [[BSD-2-Clause](https://github.com/IITC-CE/Leaflet.Geodesic/blob/master/LICENSE)]
+  (forked from https://github.com/Fragger/Leaflet.Geodesic)
 - [**Overlapping Marker Spiderfier**](https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet) © [_George MacKerron_](http://mackerron.com/): [[MIT](https://opensource.org/licenses/mit-license.php)]
 - [**LatLng_Bearings.js**](https://github.com/gregallensworth/Leaflet) © _Greg Allensworth_: [No licence]
 
