@@ -651,7 +651,15 @@ function loadExternals () {
   try {
     // https://github.com/Leaflet/Leaflet.draw
     @@INCLUDERAW:external/leaflet.draw-src.js@@
-    $('<style>').html('@@INCLUDESTRING:external/leaflet.draw-src.css@@').appendTo('head');
+    $('<style>').html('@@INCLUDECSS:external/leaflet.draw-src.css@@').appendTo('head');
+
+    $('<style>').html('@@INCLUDECSS:external/leaflet.draw-fix.css@@').appendTo('head');
+
+    @@INCLUDERAW:external/leaflet.draw-fix.js@@
+
+    @@INCLUDERAW:external/leaflet.draw-snap.js@@
+
+    @@INCLUDERAW:external/leaflet.draw-geodesic.js@@
 
   } catch (e) {
     console.error('leaflet.draw-src.js loading failed');

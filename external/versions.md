@@ -28,11 +28,10 @@
   leaflet-src.js
 
 * https://github.com/Leaflet/Leaflet.draw
-  1.0.0+33ea262
-  leaflet.draw-src.js
-  modified: geodesic shapes, snap points, update to leaflet 1 (clickable->interactive)
-  https://github.com/McBen/ingress-intel-total-conversion/commit/1901ee52534c1108402b864eff387a47a15830ca#diff-faf274517d8a5af6178bf8dbb31c682a
-  used in: draw-tools
+  1.0.4 (https://unpkg.com/browse/leaflet-draw@1.0.4/dist/)
+  leaflet.draw-src.js, leaflet.draw-src.css, images
+
+  our custom fixes: leaflet.draw-fix.css, leaflet.draw-fix.js, leaflet.draw-snap.js, leaflet.draw-geodesic.js
 
 * https://github.com/shramov/leaflet-plugins/
   3.3.0
