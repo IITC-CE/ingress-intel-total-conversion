@@ -145,7 +145,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     // create the chooser Intent
                     final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
                     // iitcm only parses *.user.js scripts
-                    target.setType("file/*");
+                    target.setType("application/javascript");
                     target.addCategory(Intent.CATEGORY_OPENABLE);
 
                     try {
