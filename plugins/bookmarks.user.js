@@ -659,9 +659,8 @@
   }
 
   window.plugin.bookmarks.optExport = function() {
-    if(typeof android !== 'undefined' && android && android.saveFile) {
-      android.saveFile("IITC-bookmarks.json", "application/json", localStorage[window.plugin.bookmarks.KEY_STORAGE]);
-    }
+    var data = localStorage[window.plugin.bookmarks.KEY_STORAGE];
+    window.saveFile(data, 'IITC-bookmarks.json', 'application/json');
   }
 
   window.plugin.bookmarks.optPaste = function() {
@@ -1230,8 +1229,9 @@
 
     if(plugin.bookmarks.isAndroid()) {
       actions += '<a onclick="window.plugin.bookmarks.optImport();return false;">Import bookmarks</a>';
-      actions += '<a onclick="window.plugin.bookmarks.optExport();return false;">Export bookmarks</a>';
     }
+    actions += '<a onclick="window.plugin.bookmarks.optExport();return false;">Export bookmarks</a>';
+
     actions += '<a onclick="window.plugin.bookmarks.optRenameF();return false;">Rename Folder</a>'
     if(!plugin.bookmarks.isAndroid()) {
       actions += '<a onclick="window.plugin.bookmarks.optBox(\'save\');return false;">Save box position</a>';
