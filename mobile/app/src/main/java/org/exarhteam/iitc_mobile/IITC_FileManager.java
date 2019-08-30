@@ -45,6 +45,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import androidx.core.app.ActivityCompat;
 
@@ -103,16 +105,13 @@ public class IITC_FileManager {
         map.put("description", "");
         map.put("category", "Misc");
         final BufferedReader reader = new BufferedReader(new StringReader(header));
-        String headerLine;
         try {
+            Pattern p = Pattern.compile("^\\s*//\\s*@(\\S+)(.*)$");
+            String headerLine;
             while ((headerLine = reader.readLine()) != null) {
-                if (headerLine.matches("//.*@.*")) {
-                    // get start of key name (first @ in line)
-                    final String[] keyStart = headerLine.split("@", 2);
-                    // split key value
-                    final String[] keyValue = keyStart[1].split(" ", 2);
-                    // remove whitespaces from string begin and end and push to map
-                    map.put(keyValue[0].trim(), keyValue[1].trim());
+                Matcher m = p.matcher(headerLine);
+                if (m.matches()) {
+                    map.put(m.group(1), m.group(2).trim());
                 }
             }
         } catch (final IOException e) {
