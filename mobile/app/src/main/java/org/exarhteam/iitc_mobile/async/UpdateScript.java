@@ -14,10 +14,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class UpdateScript extends AsyncTask<String, Void, Boolean> {
 
@@ -27,10 +30,13 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
     private HashMap<String, String> mScriptInfo;
     private final boolean mForceSecureUpdates;
 
+    private final OkHttpClient client;
+
     public UpdateScript(final Activity activity) {
         mActivity = activity;
         mForceSecureUpdates = PreferenceManager.getDefaultSharedPreferences(mActivity)
                 .getBoolean("pref_secure_updates", true);
+        client = new OkHttpClient();
     }
 
     @Override
@@ -44,14 +50,15 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             String updateURL = mScriptInfo.get("updateURL");
             String downloadURL = mScriptInfo.get("downloadURL");
             if (updateURL == null) updateURL = downloadURL;
-
+            if (updateURL == null) return false;
             if (!isUpdateAllowed(updateURL)) return false;
 
-            final File updateFile = File.createTempFile("iitc.update", ".meta.js", mActivity.getCacheDir());
-            IITC_FileManager.copyStream(new URL(updateURL).openStream(), new FileOutputStream(updateFile), true);
-
+            final String updateMetaScript = downloadFile(updateURL);
+            if (updateMetaScript == null) {
+                return false;
+            }
             final HashMap<String, String> updateInfo =
-                    IITC_FileManager.getScriptInfo(IITC_FileManager.readFile(updateFile));
+                    IITC_FileManager.getScriptInfo(updateMetaScript);
 
             final String remote_version = updateInfo.get("version");
 
@@ -62,24 +69,26 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
 
             Log.d("plugin " + mFilePath + " outdated\n" + local_version + " vs " + remote_version);
 
-            InputStream sourceStream;
+            String updatedScript = null;
             if (updateURL.equals(downloadURL)) {
-                sourceStream = new FileInputStream(updateFile);
+                updatedScript = updateMetaScript;
             } else {
                 if (updateInfo.get("downloadURL") != null) {
                     downloadURL = updateInfo.get("downloadURL");
                 }
 
                 if (!isUpdateAllowed(downloadURL)) return false;
-
-                sourceStream = new URL(downloadURL).openStream();
+                updatedScript = downloadFile(downloadURL);
+                if (updatedScript == null) {
+                    return false;
+                }
             }
 
             Log.d("updating file....");
-            IITC_FileManager.copyStream(sourceStream, new FileOutputStream(local_file), true);
+            try (FileOutputStream stream = new FileOutputStream(local_file)) {
+                stream.write(updatedScript.getBytes());
+            }
             Log.d("...done");
-
-            updateFile.delete();
 
             return true;
 
@@ -93,6 +102,24 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             return true;
 
         return !mForceSecureUpdates;
+    }
+
+    private String downloadFile(final String url) throws IOException {
+        Response response = client.newCall(
+                new Request.Builder()
+                        .url(url)
+                        .get()
+                        .build()).execute();
+        final int code = response.code();
+        if (code != 200) {
+            Log.d("Error when request \"" + url + "\", code: " + code);
+            return null;
+        }
+        if (response.body() == null) {
+            Log.d("Empty response from " + url);
+            return null;
+        }
+        return response.body().string();
     }
 
     @Override
