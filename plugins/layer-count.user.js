@@ -70,23 +70,21 @@ plugin.layerCount.pnpoly = function(latlngs, point) {
 	return c;
 }
 
-/*
- * Compute hav(theta), as per
- * <https://en.wikipedia.org/wiki/Haversine_formula>
+/***********************************************************************
+ * Code for calculating the area of a triangle on the surface of a
+ * sphere.  See in-line comments for references.
+ **********************************************************************/
+/* Compute hav(theta), as per <https://en.wikipedia.org/wiki/Haversine_formula>
  */
 plugin.layerCount.havTheta = function(theta) {
 	return (1 - Math.cos(theta)) / 2;
 }
 
-/* Given how often degrees get converted to Radians I'm surprised IITC
- * doesn't have a general utility function for this.
- */
 plugin.layerCount.deg2Radians= function(degrees) {
 	return degrees / 360 * 2 * Math.PI;
 }
 
-/*
- * Compute hav(Theta) (NB: Capital theta!) as per
+/* Compute hav(Theta) (NB: Capital theta!) as per
  * <https://en.wikipedia.org/wiki/Haversine_formula>
  */
 plugin.layerCount.haversine = function(LatLngPair) {
@@ -94,7 +92,7 @@ plugin.layerCount.haversine = function(LatLngPair) {
 }
 
 
-/* Calculate the Great Circle Distance (not Greates Common Denominator!)
+/* Calculate the Great Circle Distance (not Greatest Common Denominator!)
  * of a pair of Latitude/Longitude points.
  * Ref: <https://en.wikipedia.org/wiki/Haversine_formula>
  */
@@ -153,7 +151,7 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 	}
 	console.log('plugin.layerCount.fieldarea: Great Circle Distances (Earth, metres) = %o', dE);
 
-	// Now we need the internal angle, between the GCDs, between
+	// Now we need the internal angle, using the GCDs, between
 	// side a and side b, which is the angle C.
 	// <https://en.wikipedia.org/wiki/Spherical_law_of_cosines#Rearrangements>
 	var cosC = ( Math.cos(d[2]) - (Math.cos(d[0]) * Math.cos(d[1])) ) / ( Math.sin(d[0]) * Math.sin(d[1]) );
@@ -161,7 +159,7 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 	var C = Math.acos(cosC);
 	console.log('plugin.layerCount.fieldarea: C = %o', C);
 
-	// From this we can calculate the Spherical Excess, which is directly
+	// From this we calculate the Spherical Excess 'E', which is directly
 	// related to the area of the enclosed triangle.
 	var E = 2 * Math.atan(
 			(Math.tan(d[0]/2)
@@ -192,7 +190,7 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 	//
 	// So, using Earth's surface area as areaSphere
 	//
-	//    areaOnEarth = E * (4 * pi * Earth['radius']) / (4 * pi)
+	//    areaOnEarth = E * (4 * pi * Earth['radius']^2) / (4 * pi)
 	//
 	// and the "4 * pi" cancels out either side:
 	//
@@ -205,12 +203,17 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 // Take an area in m^2 and output a not-too long string
 // Mostly to avoid things like "235239856 m^2" for large fields
 plugin.layerCount.prettyAreaString = function(area) {
+	// 1million because we're using parseInt.  If we try to go to
+	// km^2 before this we'll just display "0 km^2"
 	if (area < 1000000.0) {
 		return parseInt(area).toLocaleString() + " m^2";
 	} else {
 		return parseInt(area / 1000.0 / 1000.0).toLocaleString() + " km^2";
 	}
 }
+/***********************************************************************
+ * End triangle area code
+ **********************************************************************/
 
 plugin.layerCount.calculate = function(ev) {
 	var point = ev.latlng;
