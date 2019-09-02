@@ -205,10 +205,10 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 plugin.layerCount.prettyAreaString = function(area) {
 	// 1million because we're using parseInt.  If we try to go to
 	// km^2 before this we'll just display "0 km^2"
-	var a = parseInt(area * 100) / 100;
-	if (a < 1000000.0) {
-		return a.toLocaleString() + " m^2";
+	if (area < 1000000.0) {
+		return parseInt(area).toLocaleString() + " m^2";
 	} else {
+		var a = parseInt(area * 100) / 100;
 		return (a / 1000.0 / 1000.0).toLocaleString() + " km^2";
 	}
 }
