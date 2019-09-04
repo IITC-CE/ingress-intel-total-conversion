@@ -26,24 +26,25 @@ document.body.onload = function() {};
 //however, that's already been executed, so we can just access PLAYER - no messing around needed!
 
 var PLAYER = window.PLAYER || (typeof unsafeWindow !== 'undefined' && unsafeWindow.PLAYER);
-if (typeof(PLAYER)!="object" || typeof(PLAYER.nickname) != "string") {
+if (!PLAYER || !PLAYER.nickname) {
   // page doesn’t have a script tag with player information.
-  if(document.getElementById('header_email')) {
+  if (document.getElementById('header_email')) {
     // however, we are logged in.
     // it used to be regularly common to get temporary 'account not enabled' messages from the intel site.
     // however, this is no longer common. more common is users getting account suspended/banned - and this
     // currently shows the 'not enabled' message. so it's safer to not repeatedly reload in this case
-//    setTimeout('location.reload();', 3*1000);
-    throw("Page doesn't have player data, but you are logged in.");
+    // //setTimeout('location.reload();', 3*1000);
+    throw new Error("Logged in but page doesn't have player data");
   }
   // FIXME: handle nia takedown in progress
   
   // add login form stylesheet
-  headHTML = document.getElementsByTagName('head')[0].innerHTML;
-  headHTML += '<style>@@INCLUDESTRING:login.css@@</style>';
-  document.getElementsByTagName('head')[0].innerHTML = headHTML;
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode('@@INCLUDESTRING:login.css@@'));
+  document.head.appendChild(style);
   
-  throw("Couldn't retrieve player data. Are you logged in?");
+  throw new Error("Couldn't retrieve player data. Are you logged in?");
 }
 
 // player information is now available in a hash like this:
@@ -52,7 +53,7 @@ if (typeof(PLAYER)!="object" || typeof(PLAYER.nickname) != "string") {
 // remove complete page. We only wanted the user-data and the page’s
 // security context so we can access the API easily. Setup as much as
 // possible without requiring scripts.
-document.getElementsByTagName('head')[0].innerHTML = ''
+document.head.innerHTML = ''
   + '<title>Ingress Intel Map</title>'
   + '<style>@@INCLUDESTRING:style.css@@</style>'
   + '<style>@@INCLUDECSS:external/leaflet.css@@</style>'
