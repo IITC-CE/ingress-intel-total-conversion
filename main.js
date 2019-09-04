@@ -14,8 +14,9 @@
 
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
-if(document.getElementsByTagName('html')[0].getAttribute('itemscope') != null)
-  throw('Ingress Intel Website is down, not a userscript issue.');
+if (document.documentElement.getAttribute('itemscope') !== null) {
+  throw new Error('Ingress Intel Website is down, not a userscript issue.');
+}
 window.iitcBuildDate = '@@BUILDDATE@@';
 
 // disable vanilla JS

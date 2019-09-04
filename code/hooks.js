@@ -103,7 +103,9 @@ window.addHook = function(event, callback) {
     return;
   }
 
-  if(typeof callback !== 'function') throw('Callback must be a function.');
+  if (typeof callback !== 'function') {
+    throw new Error('Callback must be a function.');
+  }
 
   if(!_hooks[event])
     _hooks[event] = [callback];
@@ -113,7 +115,9 @@ window.addHook = function(event, callback) {
 
 // callback must the SAME function to be unregistered.
 window.removeHook = function(event, callback) {
-  if (typeof callback !== 'function') throw('Callback must be a function.');
+  if (typeof callback !== 'function') {
+    throw new Error('Callback must be a function.');
+  }
 
   if (_hooks[event]) {
     var index = _hooks[event].indexOf(callback);
