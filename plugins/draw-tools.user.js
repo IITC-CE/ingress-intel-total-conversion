@@ -279,6 +279,10 @@ window.plugin.drawTools.import = function(data) {
 
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function() {
+  var statusCheck = '';
+	if(window.plugin.drawTools.edf.obj.status){
+		statusCheck = 'checked';
+	}
 
   var html = '<div class="drawtoolsStyles">'
            + '<input type="color" name="drawColor" id="drawtools_color"></input>'
@@ -295,6 +299,7 @@ window.plugin.drawTools.manualOpt = function() {
              ? '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>' : '')
            + '<a onclick="window.plugin.drawTools.optReset();return false;" tabindex="0">Reset Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>'
+           + '<label id="edfToggle"><input type="checkbox" '+statusCheck+' name="edf" onchange="window.plugin.drawTools.edf.action.toggle();return false;" />Not fill the polygon(s)<label>'
            + '</div>';
 
   dialog({
@@ -329,6 +334,23 @@ window.plugin.drawTools.optAlert = function(message) {
     $('.drawtools-alert').delay(2500).fadeOut();
 }
 
+// ** POC for download to file
+window.plugin.drawTools.optDownload = function(SaveText) {
+    var file = new Blob([SaveText], {type: 'text/plain'});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(file);
+    a.download = window.plugin.drawTools.KEY_STORAGE+'.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    console.log('optDownload: exported '+window.plugin.drawTools.KEY_STORAGE+' to file');
+}
+
+// *******************************************************************************
+// ** Copy dialogue
+// ** WIP: expandable textbox for selctive cut&paste, switch for filled/not-filled
+// *******************************************************************************
 window.plugin.drawTools.optCopy = function() {
 	if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
 		dialog({
@@ -339,14 +361,20 @@ window.plugin.drawTools.optCopy = function() {
 		});
 		return;
 	}
+	var txtDownlaod = "D";
+	var txtUpload = "U";
+	if(window.plugin.faIcon){
+		txtDownload = '<i class="fa fa-download"></i>';
+		txtUpload = '<i class="fa fa-upload"></i>';
+    }
 
     if(typeof android !== 'undefined' && android && android.shareString){
     	android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
     } else {
-      var stockWarnings = {};
-      var stockLinks = [];
+        var stockWarnings = {};
+        var stockLinks = [];
 
-      window.plugin.drawTools.drawnItems.eachLayer( function(layer) {
+        window.plugin.drawTools.drawnItems.eachLayer( function(layer) {
         if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
           stockWarnings.noCircle = true;
           return; //.eachLayer 'continue'
@@ -388,19 +416,24 @@ window.plugin.drawTools.optCopy = function() {
 */
       		// Export Normal draw
 		var html = ''
-			+'<p style="margin:0 0 6px;">Normal export:</p>'
+			+'<p style="margin:0 0 6px;">Normal export: '
+      +'<a onclick="window.plugin.drawTools.optDownload(window.localStorage[window.plugin.drawTools.KEY_STORAGE]); return false;" title="Download">'+txtDownload+'</a>'
+			+'</p>'
 			+'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
 			+'<textarea readonly onclick="event.target.select();" style="height:70px;">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>';
 
 		// Export draw (polygons as lines)
 		html += '<hr/>'
-			+'<p style="margin:0 0 6px;">or export with polygons as lines (not filled):</p>'
+			+'<p style="margin:0 0 6px;">or export with polygons as lines (not filled):'
+      +'<a onclick="window.plugin.drawTools.optDownload(window.plugin.drawTools.getDrawAsLines()); return false;" title="Download">'+txtDownload+'</a>'
+      +'</p>'
 			+'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
 			+'<textarea readonly onclick="event.target.select();" style="height:70px;">'+window.plugin.drawTools.getDrawAsLines()+'</textarea>';
 
 		// Export for intel stock URL (only lines)
 		html += '<hr/>'
-			+'<p style="margin:0 0 6px;">or export as a link for the standard intel map (for non IITC users):</p>'
+			+'<p style="margin:0 0 6px;">or export as a link for the standard intel map (for non IITC users):'
+      +'</p>'
 			+'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'input\').select();">Select all</a> and press CTRL+C to copy it.</p>'
 			+'<input onclick="event.target.select();" type="text" size="49" value="'+stockUrl+'"/>';
 
@@ -705,7 +738,7 @@ window.plugin.drawTools.boot = function() {
     runHooks('pluginDrawTools',{event:'layersEdited'});
   });
   //add options menu
-  $('#toolbox').append('<a onclick="window.plugin.drawTools.manualOpt();return false;" accesskey="x" title="[x]">DrawTools Opt</a>');
+  $('#toolbox').append('<a onclick="window.plugin.drawTools.manualOpt();return false;" accesskey="x" title="[x]"><i class="fa fa-pencil"></i> DrawTools Opt</a>');
 
   $('head').append('<style>' +
         '.drawtoolsSetbox > a { display:block; color:#ffce00; border:1px solid #ffce00; padding:3px 0; margin:10px auto; width:80%; text-align:center; background:rgba(8,48,78,.9); }'+
@@ -964,7 +997,7 @@ window.plugin.drawTools.edf.hookManagement = function(data){
 		}
 	}
 }
-
+/*
 window.plugin.drawTools.edf.ui.appendBtnToBox = function(){
 	var statusCheck = '';
 	if(window.plugin.drawTools.edf.obj.status){
@@ -975,6 +1008,8 @@ window.plugin.drawTools.edf.ui.appendBtnToBox = function(){
 		'<label id="edfToggle"><input type="checkbox" '+statusCheck+' name="edf" onchange="window.plugin.drawTools.edf.action.toggle();return false;" />Not fill the polygon(s)<label>'
 	);
 }
+*/
+
 window.plugin.drawTools.edf.ui.setupCSS = function(){
 	$("<style>").prop("type", "text/css").html(''
 		+'#edfToggle{cursor:pointer;display:block;margin-bottom:10px;text-align:center;margin-top:-4px;color:#ffce00;}'
@@ -999,11 +1034,6 @@ window.plugin.drawTools.setupCSS = function(){
 var setup = function(){
 		window.pluginCreateHook('pluginDrawTools');
 		window.plugin.drawTools.loadExternals();
-/*  Obsolete code? need to check with Zaso after adding new functions.
-		window.addHook('iitcLoaded', function(){
-			$('#toolbox a:contains(\'DrawTools Opt\')').addClass('list-group-item').prepend('<i class="fa fa-pencil"></i>');
-		});
-*/
 		window.plugin.drawTools.setupCSS();
 		window.plugin.drawTools.edf.boot();
 }
