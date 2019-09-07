@@ -285,8 +285,7 @@ window.plugin.drawTools.manualOpt = function() {
            + '<div class="drawtoolsSetbox">'
            + '<a onclick="window.plugin.drawTools.optCopy();" tabindex="0">Copy Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optPaste();return false;" tabindex="0">Paste Drawn Items</a>'
-           + (window.requestFile != undefined
-             ? '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>' : '')
+           + '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optReset();return false;" tabindex="0">Reset Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>'
@@ -459,22 +458,22 @@ window.plugin.drawTools.optPaste = function() {
 }
 
 window.plugin.drawTools.optImport = function() {
-  if (window.requestFile === undefined) return;
-  window.requestFile(function(filename, content) {
-    try {
-      var data = JSON.parse(content);
-      window.plugin.drawTools.drawnItems.clearLayers();
-      window.plugin.drawTools.import(data);
-      console.log('DRAWTOOLS: reset and imported drawn tiems');
-      window.plugin.drawTools.optAlert('Import Successful.');
+  window.loadFiles({accept:'application/json'})
+    .on('load',function (e) {
+      try {
+        var data = JSON.parse(e.reader.result);
+        window.plugin.drawTools.drawnItems.clearLayers();
+        window.plugin.drawTools.import(data);
+        console.log('DRAWTOOLS: reset and imported drawn tiems');
+        window.plugin.drawTools.optAlert('Import Successful.');
 
-      // to write back the data to localStorage
-      window.plugin.drawTools.save();
-    } catch(e) {
-      console.warn('DRAWTOOLS: failed to import data: '+e);
-      window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
-    }
-  });
+        // to write back the data to localStorage
+        window.plugin.drawTools.save();
+      } catch(e) {
+        console.warn('DRAWTOOLS: failed to import data: '+e);
+        window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
+      }
+    });
 }
 
 window.plugin.drawTools.optReset = function() {
