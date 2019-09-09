@@ -458,7 +458,7 @@ window.plugin.drawTools.optPaste = function() {
 }
 
 window.plugin.drawTools.optImport = function() {
-  window.loadFiles({accept:'application/json'})
+  L.FileListLoader.loadFiles({accept:'application/json'})
     .on('load',function (e) {
       try {
         var data = JSON.parse(e.reader.result);

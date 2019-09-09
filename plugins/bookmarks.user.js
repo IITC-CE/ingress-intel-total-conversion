@@ -681,7 +681,7 @@
   }
 
   window.plugin.bookmarks.optImport = function() {
-    window.loadFiles({accept:'application/json'})
+    L.FileListLoader.loadFiles({accept:'application/json'})
       .on('load',function (e) {
         try {
           JSON.parse(e.reader.result); // try to parse JSON first
