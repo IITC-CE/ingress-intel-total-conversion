@@ -281,28 +281,25 @@ window.setPortalIndicators = function(p) {
 // on old selection. Returns false if the selected portal changed.
 // Returns true if it's still the same portal that just needs an
 // update.
-window.selectPortal = function(guid) {
-  var update = selectedPortal === guid;
+window.selectPortal = function (newPortalGuid) {
+  var update = selectedPortal === newPortalGuid;
   var oldPortalGuid = selectedPortal;
-  selectedPortal = guid;
+  selectedPortal = newPortalGuid;
 
   var oldPortal = portals[oldPortalGuid];
-  var newPortal = portals[guid];
+  var newPortal = portals[newPortalGuid];
 
   // Restore style of unselected portal
-  if(!update && oldPortal) setMarkerStyle(oldPortal,false);
+  if (oldPortal) { oldPortal.setSelected(false); }
 
   // Change style of selected portal
-  if(newPortal) {
-    setMarkerStyle(newPortal, true);
-
-    if (map.hasLayer(newPortal)) {
-      newPortal.bringToFront();
-    }
-  }
+  if (newPortal) { newPortal.setSelected(true); }
 
   setPortalIndicators(newPortal);
 
-  runHooks('portalSelected', {selectedPortalGuid: guid, unselectedPortalGuid: oldPortalGuid});
+  runHooks('portalSelected', {
+    selectedPortalGuid: newPortalGuid,
+    unselectedPortalGuid: oldPortalGuid
+  });
   return update;
-}
+};
