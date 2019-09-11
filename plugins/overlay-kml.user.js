@@ -190,14 +190,6 @@ function setup () {
   var control = L.Control.fileLayerLoad(overlayKML.options).addTo(map);
   overlayKML.control = control;
 
-  if (window.requestFile) { // IITCm (android webview): use custom file selector. See #244
-    $(control.getContainer()).find('a').click(function () {
-      window.requestFile(function (name, data) {
-        control.loader.loadData(data, name);
-      });
-    });
-  }
-
   var event, tasks, handler;
   for (event in overlayKML.events) {
     tasks = overlayKML.events[event];
