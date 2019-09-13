@@ -236,11 +236,11 @@ if buildMobile:
         shutil.rmtree("mobile/assets/plugins")
     except:
         pass
+    ignore_patterns = settings.get('ignore_patterns') or []
+    ignore_patterns.append('*.meta.js')
     shutil.copytree(os.path.join(outDir, "plugins"), "mobile/assets/plugins",
                     # do not include desktop-only plugins to mobile assets
-                    ignore=shutil.ignore_patterns('*.meta.js',
-                                                  'force-https*', 'speech-search*', 'basemap-cloudmade*',
-                                                  'scroll-wheel-zoom-disable*'))
+                    ignore=shutil.ignore_patterns(*ignore_patterns))
 
     if buildMobile != 'copyonly':
         # now launch 'ant' to build the mobile project
