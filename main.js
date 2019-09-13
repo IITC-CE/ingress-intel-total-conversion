@@ -2,13 +2,8 @@
 // @id             ingress-intel-total-conversion@jonatkins
 // @name           IITC: Ingress intel map total conversion
 // @version        0.29.1.@@DATETIMEVERSION@@
-// @namespace      https://github.com/IITC-CE/ingress-intel-total-conversion
-// @updateURL      @@UPDATEURL@@
-// @downloadURL    @@DOWNLOADURL@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Total conversion for the ingress intel map.
-// @include        https://intel.ingress.com/*
-// @match          https://intel.ingress.com/*
-// @grant          none
+@@METAINFO@@
 // @run-at         document-end
 // ==/UserScript==
 
