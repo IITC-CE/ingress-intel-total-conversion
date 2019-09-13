@@ -114,7 +114,9 @@ def doReplacements(script, updateUrl, downloadUrl, pluginName=None):
     script = script.replace('@@METAINFO@@', pluginMetaBlock)
     script = script.replace('@@PLUGINSTART@@', pluginWrapper.start)
     script = script.replace('@@PLUGINSTART-USE-STRICT@@', pluginWrapper.startUseStrict)
-    script = script.replace('@@PLUGINEND@@', pluginWrapper.end)
+    script = script.replace('@@PLUGINEND@@',
+        pluginWrapper.end if pluginName == 'total-conversion-build'
+        else pluginWrapper.setup + pluginWrapper.end)
 
     script = re.sub('@@INCLUDERAW:([0-9a-zA-Z_./-]+)@@', loaderRaw, script)
     script = re.sub('@@INCLUDESTRING:([0-9a-zA-Z_./-]+)@@', loaderString, script)
@@ -187,7 +189,7 @@ main = readfile('main.js')
 
 downloadUrl = distUrlBase and distUrlBase + '/total-conversion-build.user.js' or 'none'
 updateUrl = distUrlBase and distUrlBase + '/total-conversion-build.meta.js' or 'none'
-main = doReplacements(main, downloadUrl=downloadUrl, updateUrl=updateUrl)
+main = doReplacements(main, downloadUrl=downloadUrl, updateUrl=updateUrl, pluginName='total-conversion-build')
 
 saveScriptAndMeta(main, outDir, 'total-conversion-build.user.js', oldDir)
 
