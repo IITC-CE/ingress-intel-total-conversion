@@ -7,6 +7,8 @@
 // @run-at         document-end
 // ==/UserScript==
 
+@@PLUGINSTART@@
+window.script_info = plugin_info;
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
 if(document.getElementsByTagName('html')[0].getAttribute('itemscope') != null)
@@ -20,8 +22,7 @@ document.body.onload = function() {};
 //originally code here parsed the <Script> tags from the page to find the one that defined the PLAYER object
 //however, that's already been executed, so we can just access PLAYER - no messing around needed!
 
-var PLAYER = window.PLAYER || (unsafeWindow && unsafeWindow.PLAYER);
-if (typeof(PLAYER)!="object" || typeof(PLAYER.nickname) != "string") {
+if (!window.PLAYER || !PLAYER.nickname) {
   // page doesn’t have a script tag with player information.
   if(document.getElementById('header_email')) {
     // however, we are logged in.
@@ -89,9 +90,6 @@ document.body.innerHTML = ''
   + '<div id="updatestatus"><div id="innerstatus"></div></div>'
   // avoid error by stock JS
   + '<div id="play_button"></div>';
-
-@@PLUGINSTART@@
-window.script_info = plugin_info;
 
 // CONFIG OPTIONS ////////////////////////////////////////////////////
 window.REFRESH = 30; // refresh view every 30s (base time)
