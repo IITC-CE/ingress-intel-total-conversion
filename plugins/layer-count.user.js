@@ -112,6 +112,10 @@ plugin.layerCount.calcGCD= function(LatLngPair) {
  */
 plugin.layerCount.fieldarea = function(LatLngs) {
 	console.log('plugin.layerCount.fieldarea: Input field = %o', LatLngs);
+	if (LatLngs.length != 3) {
+		console.log('plugin.layerCount.fieldarea: More/Less than 3 points, aborting');
+		return 0.0;
+	}
 	var radiusEarth = 6371.0 * 1000.0; // In metres
 	var areaTriangle = 0.0;
 	// NB: All initial work is done on a unit sphere, radius = 1
@@ -259,7 +263,7 @@ plugin.layerCount.calculate = function(ev) {
 		var content = "No fields";
 
 	if (layersDrawn != 0)
-		content += "; draw: " + layersDrawn + " polygon(s) (Area: " + plugin.layerCount.prettyAreaString(areaDrawn) + ")";
+		content += "; draw: " + layersDrawn + " polygon(s) (Triangles Area: " + plugin.layerCount.prettyAreaString(areaDrawn) + ")";
 
 	plugin.layerCount.tooltip.innerHTML = content;
 
