@@ -111,7 +111,7 @@ plugin.layerCount.calcGCD= function(LatLngPair) {
  * approximation, with the error varying by latitude.
  */
 plugin.layerCount.fieldarea = function(LatLngs) {
-	console.log('plugin.layerCount.fieldarea: Input field = %o', LatLngs);
+	//console.log('plugin.layerCount.fieldarea: Input field = %o', LatLngs);
 	if (LatLngs.length != 3) {
 		console.log('plugin.layerCount.fieldarea: More/Less than 3 points, aborting');
 		return 0.0;
@@ -145,23 +145,23 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 		lng1 = LatLngs[p1].lng
 		lat2 = LatLngs[p2].lat
 		lng2 = LatLngs[p2].lng
-		console.log('plugin.layerCount.fieldarea: lat1, lng1, lat2, lng2 in Radians = %o, %o, %o, %o', lat1, lng1, lat2, lng2);
+		//console.log('plugin.layerCount.fieldarea: lat1, lng1, lat2, lng2 in Radians = %o, %o, %o, %o', lat1, lng1, lat2, lng2);
 		d[gcd] = plugin.layerCount.calcGCD([LatLngs[p1], LatLngs[p2]]);
 	}
-	console.log('plugin.layerCount.fieldarea: Great Circle Distances (unit circle) = %o', d);
+	//console.log('plugin.layerCount.fieldarea: Great Circle Distances (unit circle) = %o', d);
 	var dE = [];
 	for (var e = 0; e < d.length ; e++) {
 		dE[e] = d[e] * radiusEarth;
 	}
-	console.log('plugin.layerCount.fieldarea: Great Circle Distances (Earth, metres) = %o', dE);
+	//console.log('plugin.layerCount.fieldarea: Great Circle Distances (Earth, metres) = %o', dE);
 
 	// Now we need the internal angle, using the GCDs, between
 	// side a and side b, which is the angle C.
 	// <https://en.wikipedia.org/wiki/Spherical_law_of_cosines#Rearrangements>
 	var cosC = ( Math.cos(d[2]) - (Math.cos(d[0]) * Math.cos(d[1])) ) / ( Math.sin(d[0]) * Math.sin(d[1]) );
-	console.log('plugin.layerCount.fieldarea: cos(C) = %o', cosC);
+	//console.log('plugin.layerCount.fieldarea: cos(C) = %o', cosC);
 	var C = Math.acos(cosC);
-	console.log('plugin.layerCount.fieldarea: C = %o', C);
+	//console.log('plugin.layerCount.fieldarea: C = %o', C);
 
 	// From this we calculate the Spherical Excess 'E', which is directly
 	// related to the area of the enclosed triangle.
@@ -175,7 +175,7 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 			  * Math.cos(C)
 			)
 		);
-	console.log('plugin.layerCount.fieldarea: Spherical Excess = %o', E);
+	//console.log('plugin.layerCount.fieldarea: Spherical Excess = %o', E);
 	// <https://en.wikipedia.org/wiki/Spherical_trigonometry#Area_and_spherical_excess>
 	//
 	// 1) E = A + B + C - pi
