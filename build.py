@@ -212,9 +212,32 @@ else:
     # no 'dist' folder - so create an empty target folder
     os.makedirs(outDir)
 
+from runpy import run_module
+# Note: importlib.import_module cannot be used here, 'cause it succeeds even with empty directories
+def run_cmds(cmds):
+    for cmd in cmds:
+        try:
+            mod = run_module(cmd)
+        except ImportError as err:
+            if getattr(err, 'name', None) != None:  # to catch exceptions from nested modules (Python 3 only)
+                raise
+        else:
+            if 'iitc_build' in mod:
+                mod['iitc_build'](buildName, settings)
+            continue
+        # on ImportError/ModuleNotFoundError:
+        status = os.system(cmd)
+        try:
+            exit_code = os.WIFEXITED(status) and os.WEXITSTATUS(status)
+        except AttributeError:  # Windows
+            exit_code = status
+        if exit_code != 0:
+            sys.stderr.write('%s: error: execution failed: %s' % (os.path.basename(sys.argv[0]), cmd))
+            sys.exit(1)
+
+
 # run any preBuild commands
-for cmd in settings.get('preBuild', []):
-    os.system(cmd)
+run_cmds(settings.get('preBuild',[]))
 
 # load main.js, parse, and create main total-conversion-build.user.js
 main = readfile('main.js')
@@ -287,7 +310,6 @@ if buildMobile:
                         os.path.join(outDir, "IITC_Mobile-%s.apk" % buildMobile))
 
 # run any postBuild commands
-for cmd in settings.get('postBuild', []):
-    os.system(cmd)
+run_cmds(settings.get('postBuild',[]))
 
 # vim: ai si ts=4 sw=4 sts=4 et
