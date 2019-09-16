@@ -26,16 +26,24 @@ if len(sys.argv) >= 3:
     if len(port) == 2:
         startWebServerPort = int(port[1])
 
-os.chdir(os.path.join(os.getcwd(), 'build', buildName))
+if sys.version_info < (3,7):
+    sys.stderr.write('Error: Python at least version 3.7 required')
+    sys.exit(2)
 
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+class HTTPServerExt(HTTPServer):
+    """HTTPServer extended with additional named argument: base_path, which is the path you want to serve requests from."""
+    def __init__(self, server_address, RequestHandlerClass=SimpleHTTPRequestHandler, base_path=None):
+        self.base_path = base_path
+        super().__init__(server_address, RequestHandlerClass)
+
+    def finish_request(self, request, client_address):
+        self.RequestHandlerClass(request, client_address, self, directory=self.base_path)
+
+httpd = HTTPServerExt(('localhost', startWebServerPort), base_path=directory)
+print('Update channel: %s\nServing at port %i' % (buildName, startWebServerPort))
 try:
-    # Python 2
-    from SimpleHTTPServer import test
-    sys.argv[1] = startWebServerPort
-    test()
-except ImportError:
-    # Python 3
-    from http.server import test, SimpleHTTPRequestHandler
-    test(HandlerClass=SimpleHTTPRequestHandler, port=startWebServerPort)
-
-print('Update channel "%s" opened. Start a web server on port %i' % (buildName, startWebServerPort))
+    httpd.serve_forever()
+except KeyboardInterrupt:
+    print('\nKeyboard interrupt received, exiting.')
+    sys.exit(0)
