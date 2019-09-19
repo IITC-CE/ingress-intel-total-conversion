@@ -174,5 +174,6 @@
         <b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!<br><br>
         Are you sure you want to proceed?]]>
     </string>
+    <string name="send_to">Send to...</string>
 
 </resources>
