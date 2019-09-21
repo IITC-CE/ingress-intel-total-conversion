@@ -35,10 +35,12 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
         final Uri uri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
                 : Uri.fromFile(file);
-        return new Intent().setAction(Intent.ACTION_SEND)
+        Intent shareIntent = new Intent().setAction(Intent.ACTION_SEND)
                 .putExtra(Intent.EXTRA_STREAM, uri)
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 .setType(type);
+        String title = context.getString(R.string.send_to);
+        return Intent.createChooser(shareIntent, title);
     }
 
     public static Intent forPosition(final Context context, final double lat, final double lng, final int zoom,
