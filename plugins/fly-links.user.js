@@ -2,17 +2,35 @@
 // @id             fly-links@fly
 // @name           IITC plugin: Fly Links
 // @category       Draw
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
-@@METAINFO@@
+// @version        0.2.1.20190315.122356
+// @description    [release-2019-03-15-122355] Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
+// @updateURL      https://iitc.modos189.ru/build/release/plugins/fly-links.meta.js
+// @downloadURL    https://iitc.modos189.ru/build/release/plugins/fly-links.user.js
+// @namespace      https://github.com/IITC-CE/ingress-intel-total-conversion
+// @include        https://intel.ingress.com/*
+// @match          https://intel.ingress.com/*
+// @grant          none
 // ==/UserScript==
 
-@@PLUGINSTART@@
+
+function wrapper(plugin_info) {
+// ensure plugin framework is there, even if iitc is not yet loaded
+if(typeof window.plugin !== 'function') window.plugin = function() {};
+
+//PLUGIN AUTHORS: writing a plugin outside of the IITC build environment? if so, delete these lines!!
+//(leaving them in place might break the 'About IITC' page or break update checks)
+plugin_info.buildName = 'release';
+plugin_info.dateTimeVersion = '20190315.122355';
+plugin_info.pluginId = 'fly-links';
+//END PLUGIN AUTHORS NOTE
+
+
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.flyLinks = function() {};
+window.plugin.flyLinks.dt = [{}];
 
 // const values
 window.plugin.flyLinks.MAX_PORTALS_TO_OBSERVE = 1000;
@@ -24,6 +42,15 @@ window.plugin.flyLinks.PROJECT_ZOOM = 16;
 window.plugin.flyLinks.linksLayerGroup = null;
 window.plugin.flyLinks.fieldsLayerGroup = null;
 
+window.plugin.flyLinks.Drow = function() {
+  var data = JSON.parse(window.plugin.flyLinks.dt);
+  window.plugin.drawTools.drawnItems.clearLayers();
+  window.plugin.drawTools.import(data);
+  console.log('DRAWTOOLS: reset and imported drawn items');
+  window.plugin.drawTools.optAlert('Import Successful.');
+  window.plugin.drawTools.save();
+}
+
 window.plugin.flyLinks.updateLayer = function() {
   if (!window.map.hasLayer(window.plugin.flyLinks.linksLayerGroup) &&
       !window.map.hasLayer(window.plugin.flyLinks.fieldsLayerGroup))
@@ -31,7 +58,7 @@ window.plugin.flyLinks.updateLayer = function() {
 
   window.plugin.flyLinks.linksLayerGroup.clearLayers();
   window.plugin.flyLinks.fieldsLayerGroup.clearLayers();
-  var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(), 
+  var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(),
               $('.leaflet-control-layers-selector + span:contains("Fly fields")').parent()];
   if (Object.keys(window.portals).length > window.plugin.flyLinks.MAX_PORTALS_TO_OBSERVE) {
     $.each(ctrl, function(guid, ctl) {ctl.addClass('disabled').attr('title', 'Too many portals: ' + Object.keys(window.portals).length);});
@@ -45,7 +72,8 @@ window.plugin.flyLinks.updateLayer = function() {
     var ll = portal.getLatLng();
     if (bounds.contains(ll)) {
       var p = map.project(portal.getLatLng(), window.plugin.flyLinks.PROJECT_ZOOM);
-      locations.push(p);
+      if (!window.plugin.disablePortal || !(guid in window.plugin.disablePortal.disabledGUID))
+        locations.push(p);
     }
   });
 
@@ -59,6 +87,7 @@ window.plugin.flyLinks.updateLayer = function() {
 
     var poly = L.polyline([alatlng, blatlng], style);
     poly.addTo(window.plugin.flyLinks.linksLayerGroup);
+    window.plugin.flyLinks.dt += "{\"type\":\"polyline\",\"latLngs\":[{\"lat\":" + alatlng.toString().split(",")[0].split("(")[1] + ",\"lng\":" + alatlng.toString().split(",")[1].split(")")[0] + "},{\"lat\":" + blatlng.toString().split(",")[0].split("(")[1] + ",\"lng\":" + blatlng.toString().split(",")[1].split(")")[0] + "}],\"color\":\"#a24ac3\"},";
   }
   
   var drawField = function(a, b, c, style) {
@@ -235,6 +264,7 @@ window.plugin.flyLinks.updateLayer = function() {
   var edges = triangulation.edges;
   var triangles = triangulation.triangles;
 
+  window.plugin.flyLinks.dt = '[';
   $.each(edges, function(idx, edge) {
     drawLink(edge.a, edge.b, {
       color: '#FF0000',
@@ -245,7 +275,8 @@ window.plugin.flyLinks.updateLayer = function() {
       dashArray: '6, 4',
     });
   });
-  
+  window.plugin.flyLinks.dt += "{}]";
+
   $.each(triangles, function(idx, triangle) {
     drawField(triangle.a, triangle.b, triangle.c, {
       stroke: false,
@@ -273,7 +304,7 @@ window.plugin.flyLinks.Triangle = function(a, b, c, depth) {
 window.plugin.flyLinks.setup = function() {
   window.plugin.flyLinks.linksLayerGroup = new L.LayerGroup();
   window.plugin.flyLinks.fieldsLayerGroup = new L.LayerGroup();
-  
+
   window.addHook('mapDataRefreshEnd', function(e) {
     window.plugin.flyLinks.updateLayer();
   });
@@ -284,9 +315,22 @@ window.plugin.flyLinks.setup = function() {
 
   window.addLayerGroup('Fly links', window.plugin.flyLinks.linksLayerGroup, false);
   window.addLayerGroup('Fly fields', window.plugin.flyLinks.fieldsLayerGroup, false);
+  $('#toolbox').append('<a onclick="window.plugin.flyLinks.Drow(); return false;">Drow FlyLinks</a>');
 }
 var setup = window.plugin.flyLinks.setup;
 
 // PLUGIN END //////////////////////////////////////////////////////////
 
-@@PLUGINEND@@
+
+setup.info = plugin_info; //add the script info data to the function as a property
+if(!window.bootPlugins) window.bootPlugins = [];
+window.bootPlugins.push(setup);
+// if IITC has already booted, immediately run the 'setup' function
+if(window.iitcLoaded && typeof setup === 'function') setup();
+} // wrapper end
+// inject code into site context
+var script = document.createElement('script');
+var info = {};
+if (typeof GM_info !== 'undefined' && GM_info && GM_info.script) info.script = { version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description };
+script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(info)+');'));
+(document.body || document.head || document.documentElement).appendChild(script);
