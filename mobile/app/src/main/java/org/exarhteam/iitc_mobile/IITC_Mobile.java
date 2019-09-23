@@ -23,6 +23,8 @@ import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.print.PdfPrint;
+import android.print.PrintAttributes;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -955,38 +957,23 @@ public class IITC_Mobile extends AppCompatActivity
         mPermalink = href;
     }
 
-    private void sendScreenshot() {
-        Bitmap bitmap = mIitcWebView.getDrawingCache();
-        if (bitmap == null) {
-            mIitcWebView.buildDrawingCache();
-            bitmap = mIitcWebView.getDrawingCache();
-            if (bitmap == null) {
-                Log.e("could not get bitmap!");
-                return;
-            }
-            bitmap = Bitmap.createBitmap(bitmap);
-            if (!mIitcWebView.isDrawingCacheEnabled()) mIitcWebView.destroyDrawingCache();
-        }
-        else {
-            bitmap = Bitmap.createBitmap(bitmap);
-        }
 
-        try {
-            final File cache = getExternalCacheDir();
-            final File file = File.createTempFile("IITC screenshot", ".png", cache);
-            if (!bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
-                // quality is ignored by PNG
-                throw new IOException("Could not compress bitmap!");
-            }
-            startActivityForResult(ShareActivity.forFile(this, file, "image/png"), new ResponseHandler() {
-                @Override
-                public void onActivityResult(final int resultCode, final Intent data) {
-                    file.delete();
-                }
-            });
-        } catch (final IOException e) {
-            Log.e("Could not generate screenshot", e);
-        }
+
+    private void createWebPrintJob(WebView webView) {
+        String jobName = getString(R.string.app_name) + " Document";
+        PrintAttributes attributes = new PrintAttributes.Builder()
+                .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                .setResolution(new PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                .setMinMargins(PrintAttributes.Margins.NO_MARGINS).build();
+        PdfPrint pdfPrint = new PdfPrint(attributes);
+        pdfPrint.print(webView.createPrintDocumentAdapter(jobName), getExternalCacheDir(), "output_" + System.currentTimeMillis() + ".pdf");
+    }
+
+
+    private void sendScreenshot() {
+        Toast.makeText(this, R.string.msg_prepare_screenshot, Toast.LENGTH_SHORT).show();
+
+        this.createWebPrintJob(mIitcWebView);
     }
 
     @Override
