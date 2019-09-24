@@ -106,10 +106,10 @@ public class IITC_FileManager {
         map.put("category", "Misc");
         final BufferedReader reader = new BufferedReader(new StringReader(header));
         try {
-            Pattern p = Pattern.compile("^\\s*//\\s*@(\\S+)(.*)$");
+            final Pattern p = Pattern.compile("^\\s*//\\s*@(\\S+)(.*)$");
             String headerLine;
             while ((headerLine = reader.readLine()) != null) {
-                Matcher m = p.matcher(headerLine);
+                final Matcher m = p.matcher(headerLine);
                 if (m.matches()) {
                     map.put(m.group(1), m.group(2).trim());
                 }
@@ -156,15 +156,10 @@ public class IITC_FileManager {
             try {
                 return new FileInputStream(file);
             } catch (final FileNotFoundException e) {
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mActivity, "File " + mIitcPath +
-                                        "dev/" + filename + " not found. " +
-                                        "Disable developer mode or add iitc files to the dev folder.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+                mActivity.runOnUiThread(() -> Toast.makeText(mActivity, "File " + mIitcPath +
+                                "dev/" + filename + " not found. " +
+                                "Disable developer mode or add iitc files to the dev folder.",
+                        Toast.LENGTH_SHORT).show());
                 Log.w(e);
             }
         }

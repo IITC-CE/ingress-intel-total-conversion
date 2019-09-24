@@ -38,10 +38,10 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
     @Override
     protected Boolean doInBackground(final String... urls) {
         try {
-            String filePath = urls[0];
+            final String filePath = urls[0];
             // get local script meta information
-            String script = IITC_FileManager.readStream(new FileInputStream(new File(filePath)));
-            HashMap<String, String> mScriptInfo = IITC_FileManager.getScriptInfo(script);
+            final String script = IITC_FileManager.readStream(new FileInputStream(new File(filePath)));
+            final HashMap<String, String> mScriptInfo = IITC_FileManager.getScriptInfo(script);
 
             mScriptName = mScriptInfo.get("name");
             String updateURL = mScriptInfo.get("updateURL");
@@ -102,7 +102,7 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
     }
 
     private String downloadFile(final String url) throws IOException {
-        Response response = mClient.newCall(
+        final Response response = mClient.newCall(
                 new Request.Builder()
                         .url(url)
                         .get()
