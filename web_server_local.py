@@ -2,36 +2,36 @@
 
 """Utility to start local webserver for specified build target."""
 
+import argparse
 import os
 import sys
 from functools import partial
+from http.server import SimpleHTTPRequestHandler, test
 
-# argv[0] = program, argv[1] = buildname, len=2
-if len(sys.argv) == 1: # load defaultBuild from settings file
-    try:
-        from localbuildsettings import defaultBuild as buildName
-    except ImportError:
-        sys.stderr.write('Usage: %s buildname [--port=8000]' % os.path.basename(sys.argv[0]))
-        sys.exit(2)
-else: # build name from command line
-    buildName = sys.argv[1]
+parser = argparse.ArgumentParser(description=__doc__)
 
-directory = os.path.join(os.getcwd(), 'build', buildName)
-if not os.path.isdir(directory):
-    sys.stderr.write('Directory not found: %s' % directory)
-    sys.exit(1)
-
-startWebServerPort = 8000
-if len(sys.argv) >= 3:
-    port = sys.argv[2].split('=')
-    if len(port) == 2:
-        startWebServerPort = int(port[1])
+parser.add_argument('buildname', type=str, nargs='?',
+                    help='Specify build name')
+parser.add_argument('--port', default=8000, type=int,
+                    help='Specify alternate port [default: %(default)s]')
 
 if sys.version_info < (3,7):
-    sys.stderr.write('Error: Python at least version 3.7 required')
-    sys.exit(2)
+    parser.error('Python at least version 3.7 required')
 
-from http.server import test, SimpleHTTPRequestHandler
+args = parser.parse_args()
+
+if not args.buildname:
+    try:
+        from localbuildsettings import defaultBuild
+    except ImportError:
+        parser.error('the following arguments are required: buildname')
+    print('using defaults from localbuildsettings...')
+    args.buildname = defaultBuild
+
+directory = os.path.join(os.getcwd(), 'build', args.buildname)
+if not os.path.isdir(directory):
+    parser.error('Directory not found: {0}'.format(directory))
+
 handler_class = partial(SimpleHTTPRequestHandler, directory=directory)
-print('Update channel: %s' % buildName)
-test(HandlerClass=handler_class, port=startWebServerPort, bind='localhost')
+print('Update channel: {0}'.format(args.buildname))
+test(HandlerClass=handler_class, port=args.port, bind='localhost')
