@@ -247,8 +247,8 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-		if (key.equals("pref_force_desktop")) {
-			mDesktopMode = sharedPreferences.getBoolean("pref_force_desktop", false);
+        if (key.equals("pref_force_desktop")) {
+            mDesktopMode = sharedPreferences.getBoolean("pref_force_desktop", false);
             mNavigationHelper.onPrefChanged();
         } else if (key.equals("pref_dex_desktop")) {
             mDexDesktopMode = sharedPreferences.getBoolean( "pref_dex_desktop", true);
