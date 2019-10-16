@@ -532,7 +532,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	// @method initialize(): void
 	initialize: function (map, options) {
 		// if touch, switch to touch icon
-		if (window.isSmartphone()) {
+		if (L.Browser.touch) {
 			this.options.icon = this.options.touchIcon;
 		}
 
@@ -786,12 +786,12 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			if (this.options.maxPoints > 1 && this.options.maxPoints == this._markers.length + 1) {
 				this.addVertex(e.latlng);
 				this._finishShape();
-			} else if (lastPtDistance < 10 && window.isSmartphone()) {
+			} else if (lastPtDistance < 10 && L.Browser.touch) {
 				this._finishShape();
 			} else if (Math.abs(dragCheckDistance) < 9 * (window.devicePixelRatio || 1)) {
 				if (this.options.snapPoint) {
 					e.latlng = this.options.snapPoint(e.latlng);
-				}
+				}	
 				this.addVertex(e.latlng);
 			}
 			this._enableNewMarkers(); // after a short pause, enable new markers
@@ -1889,7 +1889,7 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 	// @method intialize(): void
 	initialize: function (poly, latlngs, options) {
 		// if touch, switch to touch icon
-		if (window.isSmartphone()) {
+		if (L.Browser.touch) {
 			this.options.icon = this.options.touchIcon;
 		}
 		this._poly = poly;
@@ -2373,7 +2373,7 @@ L.Edit.SimpleShape = L.Handler.extend({
 	// @method intialize(): void
 	initialize: function (shape, options) {
 		// if touch, switch to touch icon
-		if (window.isSmartphone()) {
+		if (L.Browser.touch) {
 			this.options.moveIcon = this.options.touchMoveIcon;
 			this.options.resizeIcon = this.options.touchResizeIcon;
 		}
