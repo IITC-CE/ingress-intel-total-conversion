@@ -781,6 +781,7 @@ function boot() {
 
 }
 
+
 @@INCLUDERAW:external/load.js@@
 
 try { console.log('Loading included JS now'); } catch(e) {}
@@ -789,6 +790,11 @@ try { console.log('Loading included JS now'); } catch(e) {}
 @@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
 @@INCLUDERAW:external/autolink.js@@
 @@INCLUDERAW:external/oms.min.js@@
+L.CanvasIconLayer = (function (module) {
+  @@INCLUDERAW:external/rbush.min.js@@
+  @@INCLUDERAW:external/leaflet.canvas-markers.js@@
+  return module;
+}({})).exports(L);
 
 @@INCLUDERAW:external/jquery-3.3.1.min.js@@
 @@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@
