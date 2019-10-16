@@ -175,22 +175,16 @@ window.setupMap = function() {
 //    zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
-    preferCanvas: true // Set to true if Leaflet should draw things using Canvas instead of SVG
+    preferCanvas: 'PREFER_CANVAS' in window
+      ? window.PREFER_CANVAS
+      : true // default
   });
   if (L.CRS.S2) { map.options.crs = L.CRS.S2; }
 
-  if (L.Path.CANVAS) {
-    // for canvas, 2% overdraw only - to help performance
-    L.Path.CLIP_PADDING = 0.02;
-  } else if (L.Path.SVG) {
-    if (L.Browser.mobile) {
-      // mobile SVG - 10% ovredraw. might help performance?
-      L.Path.CLIP_PADDING = 0.1;
-    } else {
-      // for svg, 100% overdraw - so we have a full screen worth in all directions
-      L.Path.CLIP_PADDING = 1.0;
-    }
-  }
+  L.Renderer.mergeOptions({
+    padding: window.RENDERER_PADDING ||
+             L.Browser.mobile ? 0.5 : 1
+  });
 
   // add empty div to leaflet control areas - to force other leaflet controls to move around IITC UI elements
   // TODO? move the actual IITC DOM into the leaflet control areas, so dummy <div>s aren't needed
