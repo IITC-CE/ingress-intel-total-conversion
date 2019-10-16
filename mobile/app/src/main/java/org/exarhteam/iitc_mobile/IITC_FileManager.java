@@ -21,6 +21,8 @@ import android.util.Base64OutputStream;
 import android.webkit.WebResourceResponse;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
 import org.exarhteam.iitc_mobile.IITC_Mobile.ResponseHandler;
 import org.exarhteam.iitc_mobile.async.UpdateScript;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
@@ -45,8 +47,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
-import androidx.core.app.ActivityCompat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IITC_FileManager {
     private static final int PERMISSION_REQUEST_CODE = 3;
@@ -103,16 +105,13 @@ public class IITC_FileManager {
         map.put("description", "");
         map.put("category", "Misc");
         final BufferedReader reader = new BufferedReader(new StringReader(header));
-        String headerLine;
         try {
+            final Pattern p = Pattern.compile("^\\s*//\\s*@(\\S+)(.*)$");
+            String headerLine;
             while ((headerLine = reader.readLine()) != null) {
-                if (headerLine.matches("//.*@.*")) {
-                    // get start of key name (first @ in line)
-                    final String[] keyStart = headerLine.split("@", 2);
-                    // split key value
-                    final String[] keyValue = keyStart[1].split(" ", 2);
-                    // remove whitespaces from string begin and end and push to map
-                    map.put(keyValue[0].trim(), keyValue[1].trim());
+                final Matcher m = p.matcher(headerLine);
+                if (m.matches()) {
+                    map.put(m.group(1), m.group(2).trim());
                 }
             }
         } catch (final IOException e) {
@@ -157,15 +156,10 @@ public class IITC_FileManager {
             try {
                 return new FileInputStream(file);
             } catch (final FileNotFoundException e) {
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mActivity, "File " + mIitcPath +
-                                        "dev/" + filename + " not found. " +
-                                        "Disable developer mode or add iitc files to the dev folder.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+                mActivity.runOnUiThread(() -> Toast.makeText(mActivity, "File " + mIitcPath +
+                                "dev/" + filename + " not found. " +
+                                "Disable developer mode or add iitc files to the dev folder.",
+                        Toast.LENGTH_SHORT).show());
                 Log.w(e);
             }
         }
@@ -338,12 +332,13 @@ public class IITC_FileManager {
         // get the plugin preferences
         final TreeMap<String, ?> all_prefs = new TreeMap<String, Object>(mPrefs.getAll());
 
+        final Boolean forceSecureUpdates = mPrefs.getBoolean("pref_secure_updates", true);
         // iterate through all plugins
         for (final Map.Entry<String, ?> entry : all_prefs.entrySet()) {
             final String plugin = entry.getKey();
             if (plugin.endsWith(".user.js") && entry.getValue().toString().equals("true")) {
                 if (plugin.startsWith(PLUGINS_PATH)) {
-                    new UpdateScript(mActivity).execute(plugin);
+                    new UpdateScript(new ScriptUpdatedCallback(), forceSecureUpdates).execute(plugin);
                 }
             }
         }
@@ -352,6 +347,34 @@ public class IITC_FileManager {
                 .putLong("pref_last_plugin_update", now)
                 .commit();
     }
+
+    private class ScriptUpdatedCallback implements UpdateScript.ScriptUpdatedFinishedCallback {
+        public void scriptUpdateFinished(String scriptName, Boolean updated) {
+            if (!updated) {
+                return;
+            }
+            new AlertDialog.Builder(mActivity)
+                    .setTitle("Plugin updated")
+                    .setMessage(scriptName)
+                    .setCancelable(true)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setNegativeButton("Reload", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int which) {
+                            dialog.cancel();
+                            ((IITC_Mobile) mActivity).reloadIITC();
+                        }
+                    })
+                    .create()
+                    .show();
+        }
+    }
+
 
     public void setUpdateInterval(final int interval) {
         mUpdateInterval = 1000 * 60 * 60 * 24 * interval;
