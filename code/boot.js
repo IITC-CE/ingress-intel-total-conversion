@@ -3,10 +3,9 @@
 // created a basic framework. All of these functions should only ever
 // be run once.
 
-window.setupLargeImagePreview = function() {
-  $('#portaldetails').on('click', '.imgpreview', function() {
-    var img = $(this).find('img')[0];
-    var details = $(this).find('div.portalDetails')[0];
+window.setupLargeImagePreview = function () {
+  $('#portaldetails').on('click', '.imgpreview', function (e) {
+    var img = this.querySelector('img');
     //dialogs have 12px padding around the content
     var dlgWidth = Math.max(img.naturalWidth+24,500);
     // This might be a case where multiple dialogs make sense, for example
@@ -14,21 +13,17 @@ window.setupLargeImagePreview = function() {
     // usually we only want to show one version of each image.
     // To support that, we'd need a unique key per portal.  Example, guid.
     // So that would have to be in the html fetched into details.
-    if (details) {
-      dialog({
-        html: '<div style="text-align: center">' + img.outerHTML + '</div>' + details.outerHTML,
-        title: $(this).parent().find('h3.title').text(),
-        id: 'iitc-portal-image',
-        width: dlgWidth,
-      });
-    } else {
-      dialog({
-        html: '<div style="text-align: center">' + img.outerHTML + '</div>',
-        title: $(this).parent().find('h3.title').text(),
-        id: 'iitc-portal-image',
-        width: dlgWidth,
-      });
-    }
+
+    var preview = new Image(img.width, img.height);
+    preview.src = img.src;
+    preview.style = 'margin: auto; display: block';
+    var title = e.delegateTarget.querySelector('.title').innerText;
+    dialog({
+      html: preview,
+      title: title,
+      id: 'iitc-portal-image',
+      width: dlgWidth,
+    });
   });
 }
 
@@ -497,14 +492,12 @@ window.setupLayerChooserApi = function() {
   //hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
   //WARNING: does depend on internals of the L.Control.Layers code
   window.layerChooser.getLayers = function() {
-    var baseLayers = new Array();
-    var overlayLayers = new Array();
-    
-    for (i in this._layers) {
-      var obj = this._layers[i];
+    var baseLayers = [];
+    var overlayLayers = [];
+    this._layers.forEach(function (obj,idx) {
       var layerActive = window.map.hasLayer(obj.layer);
       var info = {
-        layerId: i,
+        layerId: idx,
         name: obj.name,
         active: layerActive
       }
@@ -513,7 +506,7 @@ window.setupLayerChooserApi = function() {
       } else {
         baseLayers.push(info);
       }
-    }
+    });
 
     var overlayLayersJSON = JSON.stringify(overlayLayers);
     var baseLayersJSON = JSON.stringify(baseLayers);

@@ -600,9 +600,10 @@ window.plugin.missions = {
 	},
 	
 	onWaypointsRefreshed: function() {
+		var checkedWaypoints = this.checkedWaypoints;
 		$('[data-mission_mwpid]').each(function(i, element) {
 			var mwpid = element.dataset['mission_mwpid'];
-			var checked = !!this.checkedWaypoints[mwpid];
+			var checked = !!checkedWaypoints[mwpid];
 			element.checked = checked;
 		});
 	},
@@ -629,9 +630,10 @@ window.plugin.missions = {
 	},
 	
 	onMissionsRefreshed: function() {
+		var checkedMissions = this.checkedMissions;
 		$('[data-mission_mid]').each(function(i, element) {
 			var mid = element.dataset['mission_mid'];
-			var checked = !!this.checkedMissions[mid];
+			var checked = !!checkedMissions[mid];
 			$(element).toggleClass('checked', checked);
 		});
 	},
@@ -973,7 +975,7 @@ window.plugin.missions = {
 			}
 			
 			query.addResult(result);
-		}.bind(this));
+		}, this);
 	},
 
 	onSearchResultSelected: function(result, event) {
@@ -1036,29 +1038,13 @@ window.plugin.missions = {
 
 		window.addHook('search', this.onSearch.bind(this));
 
-		/*
-		  I know iitc has portalAdded event but it is missing portalDeleted. So we have to resort to Object.observe
-		*/
 		var me = this;
-		if (Object.observe) { // Chrome
-			Object.observe(window.portals, function(changes) {
-				changes.forEach(function(change) {
-					me.onPortalChanged(change.type, change.name, change.oldValue);
-				});
-			});
-		} else { // Firefox why no Object.observer ? :<
-			window.addHook('portalAdded', function(data) {
-				me.onPortalChanged('add', data.portal.options.guid, data.portal);
-			});
-			// TODO: bug iitc dev for portalRemoved event
-			var oldDeletePortal = window.Render.prototype.deletePortalEntity;
-			window.Render.prototype.deletePortalEntity = function(guid) {
-				if (guid in window.portals) {
-					me.onPortalChanged('delete', guid, window.portals[guid]);
-				}
-				oldDeletePortal.apply(this, arguments);
-			};
-		}
+		window.addHook('portalAdded', function(data) {
+			me.onPortalChanged('add', data.portal.options.guid, data.portal);
+		});
+		window.addHook('portalRemoved', function(data) {
+			me.onPortalChanged('delete', data.portal.options.guid, data.portal);
+		});
 
 		this.missionStartLayer = new L.LayerGroup();
 		this.missionLayer = new L.LayerGroup();

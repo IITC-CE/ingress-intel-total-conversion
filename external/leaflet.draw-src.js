@@ -1660,7 +1660,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 		}
 
 		if (!this._shape) {
-			this._shape = new L.Circle(this._startLatLng, distance, this.options.shapeOptions);
+			this._shape = new L.GeodesicCircle(this._startLatLng, distance, this.options.shapeOptions);
 			this._map.addLayer(this._shape);
 		} else {
 			this._shape.setRadius(distance);
@@ -1668,7 +1668,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 	},
 
 	_fireCreatedEvent: function () {
-		var circle = new L.Circle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
+		var circle = new L.GeodesicCircle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
 		L.Draw.SimpleShape.prototype._fireCreatedEvent.call(this, circle);
 	},
 
@@ -2767,6 +2767,7 @@ L.Edit = L.Edit || {};
  * @aka Edit.Circle
  * @inherits L.Edit.CircleMarker
  */
+
 L.Edit.Circle = L.Edit.CircleMarker.extend({
 
 	_createResizeMarker: function () {
@@ -2778,10 +2779,8 @@ L.Edit.Circle = L.Edit.CircleMarker.extend({
 	},
 
 	_getResizeMarkerPoint: function (latlng) {
-		// From L.shape.getBounds()
-		var delta = this._shape._radius * Math.cos(Math.PI / 4),
-			point = this._map.project(latlng);
-		return this._map.unproject([point.x + delta, point.y - delta]);
+		var bounds = this._shape.getBounds(); // geodesic circle stores precalculated bounds
+		return L.latLng(bounds.getNorth(), latlng.lng);
 	},
 
 	_resize: function (latlng) {

@@ -293,7 +293,7 @@ window.escapeJavascriptString = function(str) {
 
 //escape special characters, such as tags
 window.escapeHtmlSpecialChars = function(str) {
-  var div = document.createElement(div);
+  var div = document.createElement('div');
   var text = document.createTextNode(str);
   div.appendChild(text);
   return div.innerHTML;
@@ -392,13 +392,20 @@ window.addLayerGroup = function(name, layerGroup, defaultDisplay) {
 }
 
 window.removeLayerGroup = function(layerGroup) {
-  if(!layerChooser._layers[layerGroup._leaflet_id]) throw('Layer was not found');
+  function find (arr, callback) { // ES5 doesn't include Array.prototype.find()
+    for (var i=0; i<arr.length; i++) {
+      if (callback(arr[i], i, arr)) { return arr[i]; }
+    }
+  }
+  var element = find(layerChooser._layers, function (el) { return el.layer === layerGroup; });
+  if (!element) {
+    throw new Error('Layer was not found');
+  }
   // removing the layer will set it's default visibility to false (store if layer gets added again)
-  var name = layerChooser._layers[layerGroup._leaflet_id].name;
-  var enabled = isLayerGroupDisplayed(name);
+  var enabled = isLayerGroupDisplayed(element.name);
   map.removeLayer(layerGroup);
   layerChooser.removeLayer(layerGroup);
-  updateDisplayedLayerGroup(name, enabled);
+  updateDisplayedLayerGroup(element.name, enabled);
 };
 
 window.clampLat = function(lat) {

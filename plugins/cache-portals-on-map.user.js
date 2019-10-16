@@ -18,7 +18,9 @@ window.plugin.cachePortalDetailsOnMap = function() {};
 window.plugin.cachePortalDetailsOnMap.MAX_AGE = 12*60*60;  //12 hours max age for cached data
 
 window.plugin.cachePortalDetailsOnMap.portalDetailLoaded = function(data) {
-  window.plugin.cachePortalDetailsOnMap.cache[data.guid] = { loadtime: Date.now(), ent: data.ent };
+  if (data.success) {
+    window.plugin.cachePortalDetailsOnMap.cache[data.guid] = { loadtime: Date.now(), ent: data.ent };
+  }
 };
 
 window.plugin.cachePortalDetailsOnMap.entityInject = function(data) {

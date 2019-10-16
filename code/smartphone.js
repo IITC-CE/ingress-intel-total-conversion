@@ -191,18 +191,19 @@ window.useAndroidPanes = function() {
   return (typeof android !== 'undefined' && android && android.addPane && window.isSmartphone());
 }
 
-if(typeof android !== 'undefined' && android && android.getFileRequestUrlPrefix) {
+if (typeof android !== 'undefined' && android.getFileRequestUrlPrefix) {
   window.requestFile = function(callback) {
-    do {
-      var funcName = "onFileSelected" + parseInt(Math.random()*0xFFFF).toString(16);
-    } while(window[funcName] !== undefined)
-
-    window[funcName] = function(filename, content) {
+    var name = 'onFileSelected',
+      funcName = name;
+    for (var c=0; window[funcName]; funcName=name+c++);
+    window[funcName] = function (filename, content) {
       callback(decodeURIComponent(filename), atob(content));
+      delete window[funcName];
     };
     var script = document.createElement('script');
     script.src = android.getFileRequestUrlPrefix() + funcName;
     (document.body || document.head || document.documentElement).appendChild(script);
+    script.remove();
   };
 }
 
