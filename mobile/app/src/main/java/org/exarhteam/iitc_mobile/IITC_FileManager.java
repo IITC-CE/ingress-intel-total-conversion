@@ -414,7 +414,7 @@ public class IITC_FileManager {
 
             // create the chooser Intent
             final Intent target = new Intent(Intent.ACTION_GET_CONTENT)
-                    .setType("text/*")
+                    .setType("*/*")
                     .addCategory(Intent.CATEGORY_OPENABLE);
             final IITC_Mobile iitc = (IITC_Mobile) mActivity;
 
