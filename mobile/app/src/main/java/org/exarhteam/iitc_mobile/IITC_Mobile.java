@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -27,6 +28,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -36,6 +38,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -1010,37 +1013,39 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     private void sendScreenshot() {
-        Bitmap bitmap = mIitcWebView.getDrawingCache();
-        if (bitmap == null) {
-            mIitcWebView.buildDrawingCache();
-            bitmap = mIitcWebView.getDrawingCache();
-            if (bitmap == null) {
-                Log.e("could not get bitmap!");
-                return;
-            }
-            bitmap = Bitmap.createBitmap(bitmap);
-            if (!mIitcWebView.isDrawingCacheEnabled()) mIitcWebView.destroyDrawingCache();
-        }
-        else {
-            bitmap = Bitmap.createBitmap(bitmap);
-        }
+        Toast.makeText(this, R.string.msg_prepare_screenshot, Toast.LENGTH_SHORT).show();
 
-        try {
-            final File cache = getExternalCacheDir();
-            final File file = File.createTempFile("IITC screenshot", ".png", cache);
-            if (!bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
-                // quality is ignored by PNG
-                throw new IOException("Could not compress bitmap!");
-            }
-            startActivityForResult(ShareActivity.forFile(this, file, "image/png"), new ResponseHandler() {
-                @Override
-                public void onActivityResult(final int resultCode, final Intent data) {
-                    file.delete();
+        // Hack for Android >= 5.0 Lollipop
+        // When hardware acceleration is enabled, it is not possible to create a screenshot.
+        mIitcWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        // After switch to software render, we need to redraw the webview, but of all the ways I have worked only resizing.
+        final ViewGroup.LayoutParams savedLayoutParams = mIitcWebView.getLayoutParams();
+        mIitcWebView.setLayoutParams(new LinearLayout.LayoutParams(mIitcWebView.getWidth()+10, LinearLayout.LayoutParams.FILL_PARENT));
+        // This takes some time, so a timer is set.
+        // After the screenshot is taken, the webview size and render type are returned to their original state.
+
+        new Handler().postDelayed(() -> {
+            final Bitmap bitmap = Bitmap.createBitmap(mIitcWebView.getWidth(),mIitcWebView.getHeight(), Bitmap.Config.ARGB_8888);
+            mIitcWebView.draw(new Canvas(bitmap));
+
+            try {
+                mIitcWebView.setLayoutParams(savedLayoutParams);
+                mIitcWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                Toast.makeText(this, R.string.msg_take_screenshot, Toast.LENGTH_SHORT).show();
+                final File file = File.createTempFile("IITC screenshot", ".png", getExternalCacheDir());
+                if (!bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
+                    // quality is ignored by PNG
+                    throw new IOException("Failed to compress bitmap");
                 }
-            });
-        } catch (final IOException e) {
-            Log.e("Could not generate screenshot", e);
-        }
+                startActivityForResult(ShareActivity.forFile(this, file, "image/png"), (resultCode, data) -> {
+                    file.delete();
+                });
+            } catch (final IOException e) {
+                Log.e("Failed to generate screenshot", e);
+            }
+
+        }, 2000);
+
     }
 
     @Override

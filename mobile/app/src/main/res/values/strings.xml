@@ -155,6 +155,8 @@
     <string name="search_hint">Search locations</string>
     <string name="intent_error">Address could not be opened</string>
     <string name="msg_copied">Copied to clipboard…</string>
+    <string name="msg_prepare_screenshot">Preparing…</string>
+    <string name="msg_take_screenshot">Taking screenshot…</string>
     <string name="notice_do_not_show_again">Do not show again</string>
 
     <string name="sign_in_to">Sign in to %1$s %2$s"</string>
