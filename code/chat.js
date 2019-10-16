@@ -54,7 +54,9 @@ window.chat.handleTabCompletion = function() {
 
 window.chat._oldBBox = null;
 window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
-  if (typeof channel !== 'string') throw ('API changed: isFaction flag now a channel string - all, faction, alerts');
+  if (typeof channel !== 'string') {
+    throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
+  }
 
   var b = clampLatLngBounds(map.getBounds());
 
@@ -607,7 +609,7 @@ window.chat.chooseTab = function(tab) {
       break;
 
     default:
-      throw('chat.chooser was asked to handle unknown button: ' + tt);
+      throw new Error('chat.chooser was asked to handle unknown button: ' + tt);
   }
 
   var elm = $('#chat' + tab);
