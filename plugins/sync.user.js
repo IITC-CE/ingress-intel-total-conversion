@@ -228,8 +228,6 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
       _this.forceFileSearch = true;
       _this.initFile();
       setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
-    } else {
-      alert('Plugin Sync error: ' + errorMessage + ', ' + e.message);
     }
   };
 
