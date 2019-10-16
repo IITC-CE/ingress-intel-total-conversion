@@ -506,7 +506,7 @@ window.plugin.missions = {
 			
 			var lat = waypoint.portal.latE6/1E6;
 			var lng = waypoint.portal.lngE6/1E6;
-			var perma = '/intel?ll='+lat+','+lng+'&z=17&pll='+lat+','+lng;
+			var perma = window.makePermalink([lat,lng]);
 			
 			title.href = perma;
 			title.addEventListener('click', function(ev) {

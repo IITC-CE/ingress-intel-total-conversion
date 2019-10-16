@@ -178,23 +178,11 @@ window.runOnSmartphonesAfterBoot = function() {
 
 }
 
-
-
 window.setAndroidPermalink = function() {
-  var c = window.map.getCenter();
-  var lat = Math.round(c.lat*1E6)/1E6;
-  var lng = Math.round(c.lng*1E6)/1E6;
-
-  var href = '/intel?ll='+lat+','+lng+'&z=' + map.getZoom();
-
-  if(window.selectedPortal && window.portals[window.selectedPortal]) {
-    var p = window.portals[window.selectedPortal].getLatLng();
-    lat = Math.round(p.lat*1E6)/1E6;
-    lng = Math.round(p.lng*1E6)/1E6;
-    href += '&pll='+lat+','+lng;
-  }
-
-  href = $('<a>').prop('href',  href).prop('href'); // to get absolute URI
+  var p = window.selectedPortal && window.portals[window.selectedPortal];
+  var href = $('<a>')
+    .prop('href',  window.makePermalink(p && p.getLatLng(), true))
+    .prop('href'); // to get absolute URI
   android.setPermalink(href);
 }
 
