@@ -186,9 +186,7 @@ window.potentialPortalLevel = function(d) {
 window.fixPortalImageUrl = function(url) {
   if (url) {
     if (window.location.protocol === 'https:') {
-      url = url.indexOf('www.panoramio.com') !== -1
-            ? url.replace(/^http:\/\/www/, 'https://ssl').replace('small', 'medium')
-            : url.replace(/^http:\/\//, '//');
+      url = url.replace(/^http:\/\//, '//');
     }
     return url;
   } else {

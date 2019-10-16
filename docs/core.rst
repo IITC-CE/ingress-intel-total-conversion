@@ -201,25 +201,6 @@ Constants
   Maps team to its CSS class. Presumably to be used like
   ``TEAM_TO_CSS[TEAM_ENL]``.
 
-.. data:: window.SLOT_TO_LAT
-          window.SLOT_TO_LNG
-
-  ::
-
-    [0, Math.sqrt(2)/2, 1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2]
-    [1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2, 0, Math.sqrt(2)/2]
-
-  Something to do with resonator slots?
-
-.. data:: window.EARTH_RADIUS
-
-  The Earth's approximate radius at the equator in metres.
-
-.. data:: window.DEG2RAD
-
-  ::
-
-    Math.PI / 180
 
 Variables
 ---------
@@ -265,12 +246,6 @@ Variables
 
   **Note:** Although these will be Leaflet objects, not all may be added to the
   map if render limits are reached.
-
-.. data:: window.resonators
-
-  My guess is that it used to be like :data:`~window.portals` but was deprecated
-  when Niantic stopped sending resonator positions to Intel, and kept in for
-  backwards compatibility with older plugins.
 
 .. data:: window.overlayStatus
 
