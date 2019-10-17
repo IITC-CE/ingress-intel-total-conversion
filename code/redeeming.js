@@ -28,7 +28,7 @@ window.handleRedeemResponse = function(data, textStatus, jqXHR) {
   var passcode = jqXHR.passcode;
 
   if(data.error) {
-    console.error('Error redeeming passcode "'+passcode+'": ' + data.error)
+    log.error('Error redeeming passcode "'+passcode+'": ' + data.error)
     dialog({
       title: 'Error: ' + passcode,
       html: '<strong>' + data.error + '</strong>'
@@ -36,7 +36,7 @@ window.handleRedeemResponse = function(data, textStatus, jqXHR) {
     return;
   }
   if(!data.rewards) {
-    console.error('Error redeeming passcode "'+passcode+'": ', data)
+    log.error('Error redeeming passcode "'+passcode+'": ', data)
     dialog({
       title: 'Error: ' + passcode,
       html: '<strong>An unexpected error occured</strong>'

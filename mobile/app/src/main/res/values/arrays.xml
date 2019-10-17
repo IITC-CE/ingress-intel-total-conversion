@@ -33,7 +33,6 @@
         <item>@string/menu_layer_chooser</item>
         <item>@string/menu_toggle_fullscreen</item>
         <item>@string/menu_reload</item>
-        <item>@string/menu_send_screenshot</item>
     </string-array>
 
     <string-array name="pref_user_location_titles">

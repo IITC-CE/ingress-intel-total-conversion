@@ -97,7 +97,7 @@ window.plugin.keysOnMap.setupCSS = function() {
             color: #FFFFBB;\
             font-family: monospace;\
             text-align: center;\
-            text-shadow: 0 0 0.5em black, 0 0 0.5em black, 0 0 0.5em black;\
+            text-shadow: 0 0 1px black, 0 0 1em black, 0 0 0.2em black;\
             pointer-events: none;\
             -webkit-text-size-adjust:none;\
           }")
@@ -113,12 +113,6 @@ var setup =  function() {
 
   window.plugin.keysOnMap.setupCSS();
   window.plugin.keysOnMap.setupLayer();
-
-  // Avoid error if this plugin load first
-  if($.inArray('pluginKeysUpdateKey', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysUpdateKey');
-  if($.inArray('pluginKeysRefreshAll', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysRefreshAll');
 
   window.addHook('portalAdded', window.plugin.keysOnMap.portalAdded);
   window.addHook('pluginKeysUpdateKey', window.plugin.keysOnMap.keyUpdate);

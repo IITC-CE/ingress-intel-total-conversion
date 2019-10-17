@@ -21,7 +21,7 @@ window.storeMapPosition = function() {
 // returns a map that shows the whole world.
 window.getPosition = function() {
   if(getURLParam('latE6') && getURLParam('lngE6')) {
-    console.log("mappos: reading email URL params");
+    log.log("mappos: reading email URL params");
     var lat = parseInt(getURLParam('latE6'))/1E6 || 0.0;
     var lng = parseInt(getURLParam('lngE6'))/1E6 || 0.0;
     var z = parseInt(getURLParam('z')) || 17;
@@ -29,7 +29,7 @@ window.getPosition = function() {
   }
 
   if(getURLParam('ll')) {
-    console.log("mappos: reading stock Intel URL params");
+    log.log("mappos: reading stock Intel URL params");
     var lat = parseFloat(getURLParam('ll').split(",")[0]) || 0.0;
     var lng = parseFloat(getURLParam('ll').split(",")[1]) || 0.0;
     var z = parseInt(getURLParam('z')) || 17;
@@ -37,7 +37,7 @@ window.getPosition = function() {
   }
 
   if(getURLParam('pll')) {
-    console.log("mappos: reading stock Intel URL portal params");
+    log.log("mappos: reading stock Intel URL portal params");
     var lat = parseFloat(getURLParam('pll').split(",")[0]) || 0.0;
     var lng = parseFloat(getURLParam('pll').split(",")[1]) || 0.0;
     var z = parseInt(getURLParam('z')) || 17;
@@ -45,7 +45,7 @@ window.getPosition = function() {
   }
 
   if(readCookie('ingress.intelmap.lat') && readCookie('ingress.intelmap.lng')) {
-    console.log("mappos: reading cookies");
+    log.log("mappos: reading cookies");
     var lat = parseFloat(readCookie('ingress.intelmap.lat')) || 0.0;
     var lng = parseFloat(readCookie('ingress.intelmap.lng')) || 0.0;
     var z = parseInt(readCookie('ingress.intelmap.zoom')) || 17;

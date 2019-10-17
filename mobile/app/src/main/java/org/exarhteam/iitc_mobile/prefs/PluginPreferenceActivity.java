@@ -144,8 +144,13 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 if (mFileManager.checkWriteStoragePermissionGranted()) {
                     // create the chooser Intent
                     final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
+
+                    target.setType("*/*");
                     // iitcm only parses *.user.js scripts
-                    target.setType("file/*");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        String[] mimeTypes = {"application/javascript", "text/plain", "text/javascript", "application/octet-stream"};
+                        target.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    }
                     target.addCategory(Intent.CATEGORY_OPENABLE);
 
                     try {

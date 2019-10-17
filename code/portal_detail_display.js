@@ -81,7 +81,7 @@ window.renderPortalDetails = function(guid) {
   var linkDetails = [];
 
   var posOnClick = 'window.showPortalPosLinks('+lat+','+lng+',\''+escapeJavascriptString(title)+'\')';
-  var permalinkUrl = '/intel?ll='+lat+','+lng+'&z=17&pll='+lat+','+lng;
+  var permalinkUrl = window.makePermalink([lat,lng]);
 
   if (typeof android !== 'undefined' && android && android.intentPosLink) {
     // android devices. one share link option - and the android app provides an interface to share the URL,

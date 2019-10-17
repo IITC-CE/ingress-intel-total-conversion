@@ -421,7 +421,6 @@ window.plugin.uniques.setupContent = function() {
 }
 
 window.plugin.uniques.setupPortalsList = function() {
-	if(!window.plugin.portalslist) return;
 
 	window.addHook('pluginUniquesUpdateUniques', function(data) {
 		var info = plugin.uniques.uniques[data.guid];
@@ -556,31 +555,24 @@ window.plugin.uniques.checkMissionWaypoints = function(mission) {
 
 
 var setup = function() {
-	window.pluginCreateHook('pluginUniquesUpdateUniques');
-	window.pluginCreateHook('pluginUniquesRefreshAll');
-	
-	// to mark mission portals as visited
-	window.pluginCreateHook('plugin-missions-mission-changed');
-	window.pluginCreateHook('plugin-missions-loaded-mission');
-	
+	// HOOKS:
+	// - pluginUniquesUpdateUniques
+	// - pluginUniquesRefreshAll
+
 	window.plugin.uniques.setupCSS();
 	window.plugin.uniques.setupContent();
 	window.plugin.uniques.loadLocal('uniques');
 	window.addPortalHighlighter('Uniques', window.plugin.uniques.highlighter);
 	window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
 	window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
-	window.addHook('iitcLoaded', window.plugin.uniques.registerFieldForSyncing);
+	window.plugin.uniques.registerFieldForSyncing();
 	
+	// to mark mission portals as visited
 	window.addHook('plugin-missions-mission-changed', window.plugin.uniques.onMissionChanged);
 	window.addHook('plugin-missions-loaded-mission', window.plugin.uniques.onMissionLoaded);
 	
-	if(window.plugin.portalslist) {
+	if (window.plugin.portalslist) {
 		window.plugin.uniques.setupPortalsList();
-	} else {
-		setTimeout(function() {
-			if(window.plugin.portalslist)
-				window.plugin.uniques.setupPortalsList();
-		}, 500);
 	}
 }
 

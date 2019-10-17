@@ -88,7 +88,6 @@ window.plugin.drawTools.addDrawControl = function() {
       },
 
       circle: {
-        circlemarker: false,
         shapeOptions: window.plugin.drawTools.polygonOptions,
         snapPoint: window.plugin.drawTools.getSnapLatLng,
       },
@@ -393,15 +392,21 @@ window.plugin.drawTools.optPaste = function() {
           }
         }
 
-        if (foundAt == -1) throw ("No drawn items found in intel URL");
+        if (foundAt === -1) {
+          throw new Error('No drawn items found in intel URL');
+        }
 
         var newLines = [];
         var linesStr = items[foundAt].substr(4).split('_');
         for (var i=0; i<linesStr.length; i++) {
           var floats = linesStr[i].split(',').map(Number);
-          if (floats.length != 4) throw("URL item not a set of four floats");
+          if (floats.length !== 4) {
+            throw new Error('URL item not a set of four floats');
+          }
           for (var j=0; j<floats.length; j++) {
-            if (isNaN(floats[j])) throw("URL item had invalid number");
+            if (isNaN(floats[j])) {
+              throw new Error('URL item had invalid number');
+            }
           }
           var layer = L.geodesicPolyline([[floats[0],floats[1]],[floats[2],floats[3]]], window.plugin.drawTools.lineOptions);
           newLines.push(layer);
@@ -571,9 +576,24 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
+window.plugin.drawTools.drawstart = function (e) {
+  var mouseActive = L.Browser.touch && matchMedia('(hover:hover)').matches; // workaround for https://github.com/IITC-CE/ingress-intel-total-conversion/issues/162
+  if (mouseActive || e.layerType === 'circle' || e.layerType === 'rectangle') {
+    e.target.touchExtend.enable()
+  } else {
+    e.target.touchExtend.disable()
+  };
+}
+
+// HOOK: pluginDrawTools
+// custom hook for draw tools to share it's activity with other plugins
+
 window.plugin.drawTools.boot = function() {
-  // add a custom hook for draw tools to share it's activity with other plugins
-  pluginCreateHook('pluginDrawTools');
+  // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
+  map.addHandler('touchExtend', L.Map.TouchExtend);
+
+  // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
+  map.on('draw:drawstart', plugin.drawTools.drawstart);
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
@@ -607,7 +627,6 @@ window.plugin.drawTools.boot = function() {
 
   //add the layer
   window.addLayerGroup('Drawn Items', window.plugin.drawTools.drawnItems, true);
-
 
   //place created items into the specific layer
   map.on('draw:created', function(e) {

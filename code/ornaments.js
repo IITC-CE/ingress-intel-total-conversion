@@ -15,62 +15,61 @@
 // (there are 7 different colors for each of them)
 
 
-window.ornaments = {};
-window.ornaments.OVERLAY_SIZE = 60;
-window.ornaments.OVERLAY_OPACITY = 0.6;
+window.ornaments = {
 
-window.ornaments.setup = function() {
-  window.ornaments._portals = {};
-  window.ornaments._layer = L.layerGroup();
-  window.ornaments._beacons = L.layerGroup();
-  window.ornaments._frackers = L.layerGroup();
-  window.addLayerGroup('Ornaments', window.ornaments._layer, true);
-  window.addLayerGroup('Beacons', window.ornaments._beacons, true);
-  window.addLayerGroup('Frackers', window.ornaments._frackers, true);
-};
+  OVERLAY_SIZE: 60,
+  OVERLAY_OPACITY: 0.6,
 
-// quick test for portal having ornaments
-window.ornaments.isInterestingPortal = function(portal) {
-  return portal.options.data.ornaments.length !== 0;
-};
+  setup: function () {
+    this._portals = {};
+    var layerGroup = L.layerGroup;
+    if (window.map.options.preferCanvas && L.Browser.canvas) {
+      layerGroup = L.canvasIconLayer;
+      L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
+    }
+    this._layer = layerGroup();
+    this._beacons = layerGroup();
+    this._frackers = layerGroup();
+    window.addLayerGroup('Ornaments', this._layer, true);
+    window.addLayerGroup('Beacons', this._beacons, true);
+    window.addLayerGroup('Frackers', this._frackers, true);
+  },
 
-window.ornaments.addPortal = function(portal) {
-  var guid = portal.options.guid;
+  addPortal: function (portal) {
+    this.removePortal(portal);
 
-  window.ornaments.removePortal(portal);
-
-  var size = window.ornaments.OVERLAY_SIZE;
-  var latlng = portal.getLatLng();
-
-  if (portal.options.data.ornaments) {
-    window.ornaments._portals[guid] = portal.options.data.ornaments.map(function(ornament) {
-      var layer = window.ornaments._layer;
-      if (ornament.startsWith("pe")) {
-        if (ornament === "peFRACK") {
-          layer = window.ornaments._frackers;
-        } else {
-          layer = window.ornaments._beacons;
+    var ornaments = portal.options.data.ornaments;
+    if (ornaments && ornaments.length) {
+      this._portals[portal.options.guid] = ornaments.map(function (ornament) {
+        var layer = this._layer;
+        if (ornament.startsWith('pe')) {
+          layer = ornament === 'peFRACK'
+            ? this._frackers
+            : this._beacons;
         }
-      }
-      var icon = L.icon({
-        iconUrl: "//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/" + ornament + ".png",
-        iconSize: [size, size],
-        iconAnchor: [size/2, size/2],
+        var size = this.OVERLAY_SIZE;
+        return L.marker(portal.getLatLng(), {
+          icon: L.icon({
+            iconUrl: '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png',
+            iconSize: [size, size],
+            iconAnchor: [size/2, size/2] // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4
+          }),
+          interactive: false,
+          keyboard: false,
+          opacity: this.OVERLAY_OPACITY,
+          layer: layer
+        }).addTo(layer);
+      }, this);
+    }
+  },
+
+  removePortal: function (portal) {
+    var guid = portal.options.guid;
+    if (this._portals[guid]) {
+      this._portals[guid].forEach(function (marker) {
+        marker.options.layer.removeLayer(marker);
       });
-
-      return L.marker(latlng, {icon: icon, interactive: false, keyboard: false, opacity: window.ornaments.OVERLAY_OPACITY }).addTo(layer);
-    });
-  }
-};
-
-window.ornaments.removePortal = function(portal) {
-  var guid = portal.options.guid;
-  if(window.ornaments._portals[guid]) {
-    window.ornaments._portals[guid].forEach(function(marker) {
-      window.ornaments._layer.removeLayer(marker);
-      window.ornaments._beacons.removeLayer(marker);
-      window.ornaments._frackers.removeLayer(marker);
-    });
-    delete window.ornaments._portals[guid];
+      delete this._portals[guid];
+    }
   }
 };
