@@ -30,12 +30,12 @@ window.setupDataTileParams = function() {
 
 
     // lazy numerical array comparison
-    if ( JSON.stringify(niantic_params.ZOOM_TO_LEVEL) != JSON.stringify(DEFAULT_ZOOM_TO_LEVEL)) {
-      console.warn('Tile parameter ZOOM_TO_LEVEL have changed in stock intel. Detected correct values, but code should be updated');
+    if (JSON.stringify(niantic_params.ZOOM_TO_LEVEL) !== JSON.stringify(DEFAULT_ZOOM_TO_LEVEL)) {
+      log.warn('Tile parameter ZOOM_TO_LEVEL have changed in stock intel. Detected correct values, but code should be updated');
       debugger;
     }
-    if ( JSON.stringify(niantic_params.TILES_PER_EDGE) != JSON.stringify(DEFAULT_ZOOM_TO_TILES_PER_EDGE)) {
-      console.warn('Tile parameter TILES_PER_EDGE have changed in stock intel. Detected correct values, but code should be updated');
+    if (JSON.stringify(niantic_params.TILES_PER_EDGE) !== JSON.stringify(DEFAULT_ZOOM_TO_TILES_PER_EDGE)) {
+      log.warn('Tile parameter TILES_PER_EDGE have changed in stock intel. Detected correct values, but code should be updated');
       debugger;
     }
 
@@ -62,11 +62,11 @@ window.setupDataTileParams = function() {
 window.debugMapZoomParameters = function() {
 
   //for debug purposes, log the tile params used for each zoom level
-  console.log('DEBUG: Map Zoom Parameters');
+  log.log('DEBUG: Map Zoom Parameters');
   var doneZooms = {};
   for (var z=MIN_ZOOM; z<=21; z++) {
     var ourZoom = getDataZoomForMapZoom(z);
-    console.log('DEBUG: map zoom '+z+': IITC requests '+ourZoom+(ourZoom!=z?' instead':''));
+    log.log('DEBUG: map zoom '+z+': IITC requests '+ourZoom+(ourZoom!=z?' instead':''));
     if (!doneZooms[ourZoom]) {
       var params = getMapZoomTileParameters(ourZoom);
       var msg = 'DEBUG: data zoom '+ourZoom;
@@ -77,7 +77,7 @@ window.debugMapZoomParameters = function() {
       }
       msg += ', minLinkLength='+params.minLinkLength;
       msg += ', tiles per edge='+params.tilesPerEdge;
-      console.log(msg);
+      log.log(msg);
       doneZooms[ourZoom] = true;
     }
   }

@@ -30,7 +30,7 @@ window.chat.handleTabCompletion = function() {
   for(var i = 0; i < list.length; i++) {
     if(!list[i].toLowerCase().startsWith(word)) continue;
     if(nick && nick !== list[i]) {
-      console.warn('More than one nick matches, aborting. ('+list[i]+' vs '+nick+')');
+      log.warn('More than one nick matches, aborting. ('+list[i]+' vs '+nick+')');
       return;
     }
     nick = list[i];
@@ -68,7 +68,7 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
   var CHAT_BOUNDINGBOX_SAME_FACTOR = 0.1;
   // if the old and new box contain each other, after expanding by the factor, don't reset chat
   if (!(b.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(chat._oldBBox) && chat._oldBBox.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(b))) {
-    console.log('Bounding Box changed, chat will be cleared (old: '+chat._oldBBox.toBBoxString()+'; new: '+b.toBBoxString()+')');
+    log.log('Bounding Box changed, chat will be cleared (old: '+chat._oldBBox.toBBoxString()+'; new: '+b.toBBoxString()+')');
 
     $('#chat > div').data('needsClearing', true);
 
@@ -164,7 +164,7 @@ window.chat.handleFaction = function(data, olderMsgs) {
 
   if(!data || !data.result) {
     window.failedRequestCount++;
-    return console.warn('faction chat error. Waiting for next auto-refresh.');
+    return log.warn('faction chat error. Waiting for next auto-refresh.');
   }
 
   if(data.result.length === 0) return;
@@ -212,7 +212,7 @@ window.chat.handlePublic = function(data, olderMsgs) {
 
   if(!data || !data.result) {
     window.failedRequestCount++;
-    return console.warn('public chat error. Waiting for next auto-refresh.');
+    return log.warn('public chat error. Waiting for next auto-refresh.');
   }
 
   if(data.result.length === 0) return;
@@ -262,7 +262,7 @@ window.chat.handleAlerts = function(data, olderMsgs) {
 
   if(!data || !data.result) {
     window.failedRequestCount++;
-    return console.warn('alerts chat error. Waiting for next auto-refresh.');
+    return log.warn('alerts chat error. Waiting for next auto-refresh.');
   }
 
   if(data.result.length === 0) return;
@@ -563,7 +563,7 @@ window.chat.needMoreMessages = function() {
 
 window.chat.chooseTab = function(tab) {
   if (tab != 'all' && tab != 'faction' && tab != 'alerts') {
-    console.warn('chat tab "'+tab+'" requested - but only "all", "faction" and "alerts" are valid - assuming "all" wanted');
+    log.warn('chat tab "'+tab+'" requested - but only "all", "faction" and "alerts" are valid - assuming "all" wanted');
     tab = 'all';
   }
 
@@ -749,9 +749,9 @@ window.chat.setupPosting = function() {
           event.preventDefault();
           window.chat.handleTabCompletion();
         }
-      } catch(error) {
-        console.error(error);
-        debug.printStackTrace();
+      } catch (e) {
+        log.error(e);
+        //if (e.stack) { console.error(e.stack); }
       }
     });
   }
@@ -771,16 +771,17 @@ window.chat.postMsg = function() {
   var msg = $.trim($('#chatinput input').val());
   if(!msg || msg === '') return;
 
-  if(c === 'debug') {
+  if (c === 'debug') {
     var result;
     try {
       result = eval(msg);
-    } catch(e) {
-      if(e.stack) console.error(e.stack);
+    } catch (e) {
+      if (e.stack) { log.error(e.stack); }
       throw e; // to trigger native error message
     }
-    if(result !== undefined)
-      console.error(result.toString());
+    if (result !== undefined) {
+      log.error(result.toString());
+    }
     return result;
   }
 

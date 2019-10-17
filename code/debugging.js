@@ -5,14 +5,14 @@
 window.debug = function() {}
 
 window.debug.renderDetails = function() {
-  console.log('portals: ' + Object.keys(window.portals).length);
-  console.log('links:   ' + Object.keys(window.links).length);
-  console.log('fields:  ' + Object.keys(window.fields).length);
+  log.log('portals: ' + Object.keys(window.portals).length);
+  log.log('links:   ' + Object.keys(window.links).length);
+  log.log('fields:  ' + Object.keys(window.fields).length);
 }
 
 window.debug.printStackTrace = function() {
   var e = new Error('dummy');
-  console.error(e.stack);
+  log.error(e.stack);
   return e.stack;
 }
 

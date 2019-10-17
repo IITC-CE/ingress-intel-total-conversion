@@ -106,7 +106,7 @@ window.decodeArray.portalSummary = function(a) {
   // NOTE: allow for either summary or detailed portal data to be passed in here, as details are sometimes
   // passed into code only expecting summaries
   if (a.length != SUMMARY_PORTAL_DATA_LENGTH && a.length != DETAILED_PORTAL_DATA_LENGTH) {
-    console.warn('Portal summary length changed - portal details likely broken!');
+    log.warn('Portal summary length changed - portal details likely broken!');
     debugger;
   }
 
@@ -121,7 +121,7 @@ window.decodeArray.portalDetail = function(a) {
   }
 
   if (a.length != DETAILED_PORTAL_DATA_LENGTH) {
-    console.warn('Portal detail length changed - portal details may be wrong');
+    log.warn('Portal detail length changed - portal details may be wrong');
     debugger;
   }
 

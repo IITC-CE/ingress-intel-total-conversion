@@ -321,7 +321,7 @@ window.setupMap = function() {
     var z = map.getZoom();
     if (z != parseInt(z))
     {
-      console.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
+      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
       map.setZoom(parseInt(z), {animate:false});
     }
   });
@@ -564,10 +564,10 @@ window.setupLayerChooserApi = function() {
   window.layerChooser._update = function() {
     // update layer menu in IITCm
     try {
-      if(typeof android != 'undefined')
+      if (typeof android !== 'undefined')
         window.layerChooser.getLayers();
-    } catch(e) {
-      console.error(e);
+    } catch (e) {
+      log.error(e);
     }
     // call through
     return _update.apply(this, arguments);
@@ -575,10 +575,10 @@ window.setupLayerChooserApi = function() {
   // as this setupLayerChooserApi function is called after the layer menu is populated, we need to also get they layers once
   // so they're passed through to the android app
   try {
-    if(typeof android != 'undefined')
+    if (typeof android !== 'undefined')
       window.layerChooser.getLayers();
-  } catch(e) {
-    console.error(e);
+  } catch (e) {
+    log.error(e);
   }
 }
 
@@ -682,7 +682,7 @@ function prepPluginsToLoad() {
     var v = data && data.priority || 'normal';
     var prio = priorities[v] || v;
     if (typeof prio !== 'number') {
-      console.warn('wrong plugin priority specified: ', v);
+      log.warn('wrong plugin priority specified: ', v);
       prio = priorities.normal;
     }
     return prio;
@@ -692,12 +692,12 @@ function prepPluginsToLoad() {
   // and collects info for About IITC
   function safeSetup (setup) {
     if (!setup) {
-      console.warn('plugin must provide setup function');
+      log.warn('plugin must provide setup function');
       return;
     }
     var info = setup.info;
     if (typeof info !== 'object' || typeof info.script !== 'object' || typeof info.script.name !== 'string') {
-      console.warn('plugin does not have proper wrapper:',setup);
+      log.warn('plugin does not have proper wrapper:',setup);
       info = { script: {} };
     }
 
@@ -705,7 +705,7 @@ function prepPluginsToLoad() {
       setup.call(this);
     } catch (err) {
       var name = info.script.name || '<unknown>';
-      console.error('error starting plugin: ' + name + ', error: ' + err);
+      log.error('error starting plugin: ' + name + ', error: ' + err);
       info.error = err;
     }
     pluginsInfo.push(info);
@@ -736,8 +736,10 @@ function boot() {
   if(!isSmartphone()) // TODO remove completely?
     window.debug.console.overwriteNativeIfRequired();
 
-  console.log('loading done, booting. Built: @@BUILDDATE@@');
-  if(window.deviceID) console.log('Your device ID: ' + window.deviceID);
+  log.log('loading done, booting. Built: @@BUILDDATE@@');
+  if (window.deviceID) {
+    log.log('Your device ID: ' + window.deviceID);
+  }
   window.runOnSmartphonesBeforeBoot();
 
   var loadPlugins = prepPluginsToLoad();
@@ -800,7 +802,7 @@ function boot() {
 
 @@INCLUDERAW:external/load.js@@
 
-try { console.log('Loading included JS now'); } catch(e) {}
+try { log.log('Loading included JS now'); } catch(e) {}
 window.L_NO_TOUCH = navigator.maxTouchPoints===0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
 @@INCLUDERAW:external/leaflet-src.js@@
 @@INCLUDERAW:external/L.Geodesic.js@@
@@ -816,6 +818,6 @@ L.CanvasIconLayer = (function (module) {
 @@INCLUDERAW:external/jquery-3.3.1.min.js@@
 @@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@
 
-try { console.log('done loading included JS'); } catch(e) {}
+try { log.log('done loading included JS'); } catch(e) {}
 
 $(boot);

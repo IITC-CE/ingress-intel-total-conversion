@@ -68,7 +68,7 @@ window.dialog = function(options) {
   } else if(options.html) {
     html = options.html;
   } else {
-    console.error('window.dialog: warning: no text in dialog');
+    log.error('window.dialog: warning: no text in dialog');
     html = window.convertTextToTableMagic('');
   }
 
@@ -84,8 +84,8 @@ window.dialog = function(options) {
       var selector = $(window.DIALOGS[id]);
       selector.dialog('close');
       selector.remove();
-    } catch(err) {
-      console.error('window.dialog: Tried to close nonexistent dialog ' + id);
+    } catch (e) {
+      log.error('window.dialog: Tried to close nonexistent dialog ' + id);
     }
   }
 
@@ -168,7 +168,7 @@ window.dialog = function(options) {
       window.DIALOGS[$(this).data('id')] = this;
       window.DIALOG_COUNT++;
 
-      console.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') opened. ' + window.DIALOG_COUNT + ' remain.');
+      log.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') opened. ' + window.DIALOG_COUNT + ' remain.');
     },
     close: function() {
       // Run the close callback if we have one
@@ -185,7 +185,7 @@ window.dialog = function(options) {
       delete window.DIALOGS[$(this).data('id')];
 
       window.DIALOG_COUNT--;
-      console.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') closed. ' + window.DIALOG_COUNT + ' remain.');
+      log.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') closed. ' + window.DIALOG_COUNT + ' remain.');
       // hint for iitc mobile that a dialog was closed
       if (typeof android !== 'undefined' && android && android.dialogOpened) {
         android.dialogOpened(id, false);
