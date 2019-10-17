@@ -95,7 +95,9 @@ var DETAILED_PORTAL_DATA_LENGTH = SUMMARY_PORTAL_DATA_LENGTH+4;
 window.decodeArray.portalSummary = function(a) {
   if (!a) return undefined;
 
-  if (a[0] != 'p') throw 'Error: decodeArray.portalSUmmary - not a portal';
+  if (a[0] !== 'p') {
+    throw new Error('Error: decodeArray.portalSUmmary - not a portal');
+  }
 
   if (a.length == CORE_PORTA_DATA_LENGTH) {
     return corePortalData(a);
@@ -114,7 +116,9 @@ window.decodeArray.portalSummary = function(a) {
 window.decodeArray.portalDetail = function(a) {
   if (!a) return undefined;
 
-  if (a[0] != 'p') throw 'Error: decodeArray.portalDetail - not a portal';
+  if (a[0] !== 'p') {
+    throw new Error('Error: decodeArray.portalDetail - not a portal');
+  }
 
   if (a.length != DETAILED_PORTAL_DATA_LENGTH) {
     log.warn('Portal detail length changed - portal details may be wrong');

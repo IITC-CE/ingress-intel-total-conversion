@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -27,6 +28,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -36,6 +38,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -79,6 +82,8 @@ public class IITC_Mobile extends AppCompatActivity
     private IITC_MapSettings mMapSettings;
     private IITC_DeviceAccountLogin mLogin;
     private final Vector<ResponseHandler> mResponseHandlers = new Vector<ResponseHandler>();
+    private boolean mDexRunning = false;
+    private boolean mDexDesktopMode = true;
     private boolean mDesktopMode = false;
     private Set<String> mAdvancedMenu;
     private MenuItem mSearchMenuItem;
@@ -95,6 +100,7 @@ public class IITC_Mobile extends AppCompatActivity
     private final Stack<String> mDialogStack = new Stack<String>();
     private String mPermalink = null;
     private String mSearchTerm = "";
+    private IntentFilter mDesktopFilter;
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -108,8 +114,43 @@ public class IITC_Mobile extends AppCompatActivity
         }
     };
 
+    // Setup receiver to detect if Samsung DeX mode has been changed
+	private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
+		@Override
+    	public void onReceive(Context context, Intent intent) {
+        	String action = intent.getAction();
+
+        	if ("android.app.action.ENTER_KNOX_DESKTOP_MODE".equals(action)) {
+            	// Samsung DeX Mode has been entered
+            	mDexRunning = true;
+            	mNavigationHelper.onDexModeChanged(true);
+        	} else if ("android.app.action.EXIT_KNOX_DESKTOP_MODE".equals(action)) {
+            	// Samsung DeX mode has been exited
+            	mDexRunning = false;
+            	mNavigationHelper.onDexModeChanged(false);
+        	}
+    	}
+	};
+	
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+
+        // get status of Samsung DeX Mode at creation
+        Configuration config = getResources().getConfiguration();
+        try {
+            Class configClass = config.getClass();
+            if(configClass.getField("SEM_DESKTOP_MODE_ENABLED").getInt(configClass)
+                    == configClass.getField("semDesktopModeEnabled").getInt(config)) {
+                mDexRunning = true; // Samsung DeX mode enabled
+            }
+        } catch(NoSuchFieldException e) {
+            //Handle the NoSuchFieldException
+        } catch(IllegalAccessException e) {
+            //Handle the IllegalAccessException
+        } catch(IllegalArgumentException e) {
+            //Handle the IllegalArgumentException
+        }
+
         // enable progress bar above action bar
         // must be called BEFORE calling parent method
         requestWindowFeature(Window.FEATURE_PROGRESS);
@@ -157,6 +198,9 @@ public class IITC_Mobile extends AppCompatActivity
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
+        // enable/disable mDexDesktopMode mode on menu create and url load
+        mDexDesktopMode = mSharedPrefs.getBoolean("pref_dex_desktop", true);
+
         // enable/disable mDesktopMode mode on menu create and url load
         mDesktopMode = mSharedPrefs.getBoolean("pref_force_desktop", false);
 
@@ -188,6 +232,12 @@ public class IITC_Mobile extends AppCompatActivity
         // Clear the back stack
         mBackStack.clear();
 
+        // Setup Samsung DeX Desktop detection
+        mDesktopFilter = new IntentFilter();
+        mDesktopFilter.addAction("UiModeManager.SEM_ACTION_ENTER_KNOX_DESKTOP_MODE");
+        mDesktopFilter.addAction("UiModeManager.SEM_ACTION_EXIT_KNOX_DESKTOP_MODE");
+        registerReceiver(mDesktopModeReceiver, mDesktopFilter);
+
         // receive downloadManagers downloadComplete intent
         // afterwards install iitc update
         registerReceiver(mBroadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
@@ -202,6 +252,9 @@ public class IITC_Mobile extends AppCompatActivity
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
         if (key.equals("pref_force_desktop")) {
             mDesktopMode = sharedPreferences.getBoolean("pref_force_desktop", false);
+            mNavigationHelper.onPrefChanged();
+        } else if (key.equals("pref_dex_desktop")) {
+            mDexDesktopMode = sharedPreferences.getBoolean( "pref_dex_desktop", true);
             mNavigationHelper.onPrefChanged();
         } else if (key.equals("pref_user_location_mode")) {
             final int mode = Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0"));
@@ -522,8 +575,12 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     public void switchToPane(final Pane pane) {
-        if (mDesktopMode) return;
+        if (mNavigationHelper.isDesktopActive()) return;
         mIitcWebView.loadUrl("javascript: window.show('" + pane.name + "');");
+    }
+
+    public boolean isDexRunning() {
+        return mDexRunning;
     }
 
     @Override
@@ -699,7 +756,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     // vp=f enables mDesktopMode mode...vp=m is the default mobile view
     private String addUrlParam(final String url) {
-        return url + (url.contains("?") ? '&' : '?') + "vp=" + (mDesktopMode ? 'f' : 'm');
+        return url + (url.contains("?") ? '&' : '?') + "vp=" + (mNavigationHelper.isDesktopActive() ? 'f' : 'm');
     }
 
     public void reset() {
@@ -956,37 +1013,39 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     private void sendScreenshot() {
-        Bitmap bitmap = mIitcWebView.getDrawingCache();
-        if (bitmap == null) {
-            mIitcWebView.buildDrawingCache();
-            bitmap = mIitcWebView.getDrawingCache();
-            if (bitmap == null) {
-                Log.e("could not get bitmap!");
-                return;
-            }
-            bitmap = Bitmap.createBitmap(bitmap);
-            if (!mIitcWebView.isDrawingCacheEnabled()) mIitcWebView.destroyDrawingCache();
-        }
-        else {
-            bitmap = Bitmap.createBitmap(bitmap);
-        }
+        Toast.makeText(this, R.string.msg_prepare_screenshot, Toast.LENGTH_SHORT).show();
 
-        try {
-            final File cache = getExternalCacheDir();
-            final File file = File.createTempFile("IITC screenshot", ".png", cache);
-            if (!bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
-                // quality is ignored by PNG
-                throw new IOException("Could not compress bitmap!");
-            }
-            startActivityForResult(ShareActivity.forFile(this, file, "image/png"), new ResponseHandler() {
-                @Override
-                public void onActivityResult(final int resultCode, final Intent data) {
-                    file.delete();
+        // Hack for Android >= 5.0 Lollipop
+        // When hardware acceleration is enabled, it is not possible to create a screenshot.
+        mIitcWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        // After switch to software render, we need to redraw the webview, but of all the ways I have worked only resizing.
+        final ViewGroup.LayoutParams savedLayoutParams = mIitcWebView.getLayoutParams();
+        mIitcWebView.setLayoutParams(new LinearLayout.LayoutParams(mIitcWebView.getWidth()+10, LinearLayout.LayoutParams.FILL_PARENT));
+        // This takes some time, so a timer is set.
+        // After the screenshot is taken, the webview size and render type are returned to their original state.
+
+        new Handler().postDelayed(() -> {
+            final Bitmap bitmap = Bitmap.createBitmap(mIitcWebView.getWidth(),mIitcWebView.getHeight(), Bitmap.Config.ARGB_8888);
+            mIitcWebView.draw(new Canvas(bitmap));
+
+            try {
+                mIitcWebView.setLayoutParams(savedLayoutParams);
+                mIitcWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                Toast.makeText(this, R.string.msg_take_screenshot, Toast.LENGTH_SHORT).show();
+                final File file = File.createTempFile("IITC screenshot", ".png", getExternalCacheDir());
+                if (!bitmap.compress(CompressFormat.PNG, 100, new FileOutputStream(file))) {
+                    // quality is ignored by PNG
+                    throw new IOException("Failed to compress bitmap");
                 }
-            });
-        } catch (final IOException e) {
-            Log.e("Could not generate screenshot", e);
-        }
+                startActivityForResult(ShareActivity.forFile(this, file, "image/png"), (resultCode, data) -> {
+                    file.delete();
+                });
+            } catch (final IOException e) {
+                Log.e("Failed to generate screenshot", e);
+            }
+
+        }, 2000);
+
     }
 
     @Override

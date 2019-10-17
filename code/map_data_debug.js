@@ -3,8 +3,8 @@
 
 
 window.RenderDebugTiles = function() {
-  this.CLEAR_CHECK_TIME = L.Path.CANVAS ? 2.0 : 0.5;
-  this.FADE_TIME = 2.0;
+  this.CLEAR_CHECK_TIME = 0.1;
+  this.FADE_TIME = 1.0;
 
   this.debugTileLayer = L.layerGroup();
   window.addLayerGroup("DEBUG Data Tiles", this.debugTileLayer, false);
@@ -21,7 +21,7 @@ window.RenderDebugTiles.prototype.reset = function() {
 }
 
 window.RenderDebugTiles.prototype.create = function(id,bounds) {
-  var s = {color: '#666', weight: 2, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false};
+  var s = {color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false};
 
   var bounds = new L.LatLngBounds(bounds);
   bounds = bounds.pad(-0.02);
