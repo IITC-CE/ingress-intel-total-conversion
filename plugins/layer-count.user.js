@@ -20,30 +20,9 @@ plugin.layerCount.onBtnClick = function(ev) {
 		layer = plugin.layerCount.layer;
 
 	if(btn.classList.contains("active")) {
-		if(window.plugin.drawTools !== undefined) {
-			window.plugin.drawTools.drawnItems.eachLayer(function(layer) {
-				if (layer instanceof L.GeodesicPolygon) {
-					L.DomUtil.addClass(layer._path, "leaflet-clickable");
-					layer._path.setAttribute("pointer-events", layer.options.pointerEventsBackup);
-					layer.options.pointerEvents = layer.options.pointerEventsBackup;
-					layer.options.interactive = true;
-				}
-			});
-		}
 		map.off("click", plugin.layerCount.calculate);
 		btn.classList.remove("active");
 	} else {
-		if(window.plugin.drawTools !== undefined) {
-			window.plugin.drawTools.drawnItems.eachLayer(function(layer) {
-				if (layer instanceof L.GeodesicPolygon) {
-					layer.options.pointerEventsBackup = layer.options.pointerEvents;
-					layer.options.pointerEvents = null;
-					layer.options.interactive = false;
-					L.DomUtil.removeClass(layer._path, "leaflet-clickable");
-					layer._path.setAttribute("pointer-events", "none");
-				}
-			});
-		}
 		map.on("click", plugin.layerCount.calculate);
 		btn.classList.add("active");
 		setTimeout(function(){

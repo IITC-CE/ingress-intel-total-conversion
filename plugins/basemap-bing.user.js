@@ -2,8 +2,8 @@
 // @id             iitc-plugin-bing-maps
 // @name           IITC plugin: Bing maps
 // @category       Map Tiles
-// @version        0.1.3.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the maps.bing.com map layers.
+// @version        0.3.0.@@DATETIMEVERSION@@
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the bing.com map layers.
 @@METAINFO@@
 // ==/UserScript==
 
@@ -11,59 +11,52 @@
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
-window.plugin.mapBing = function() {};
+var mapBing = {};
+window.plugin.mapBing = mapBing;
 
-window.plugin.mapBing.setupBingLeaflet = function() {
-@@INCLUDERAW:external/Bing.js@@
-}
-
-
-window.plugin.mapBing.setup = function() {
-  window.plugin.mapBing.setupBingLeaflet();
-
-  //set this to your API key
-  var bingApiKey = 'ArR2hTa2C9cRQZT-RmgrDkfvh3PwEVRl0gB34OO4wJI7vQNElg3DDWvbo5lfUs3p';
-
-  var bingTypes = {
-    'Road': "Road",
-    'Aerial': "Aerial",
-    'AerialWithLabels': "Aerial with labels",
-  };
-
-  // bing maps has an annual usage limit, which will likely be hit in 6 months at this time.
-  // it seems that the usage is counted on initialising the L.BingLayer, when the metadata is retrieved.
-  // so, we'll create some dummy layers and add those to the map, then, the first time a layer is added,
-  // create the L.BingLayer. This will eliminate all usage for users who install but don't use the map,
-  // and only create usage for the map layers actually selected in use
-
-  var bingMapContainers = [];
-
-  for (type in bingTypes) {
-    var name = bingTypes[type];
-
-    bingMapContainers[type] = new L.LayerGroup();
-    layerChooser.addBaseLayer(bingMapContainers[type], 'Bing '+name);
+mapBing.sets = {
+  Road: {
+    imagerySet: 'RoadOnDemand'
+  },
+  Dark: {
+    imagerySet: 'CanvasDark'
+  },
+  Aerial: {
+    imagerySet: 'Aerial'
+  },
+  Hybrid: {
+    imagerySet: 'AerialWithLabelsOnDemand'
   }
-
-  // now a leaflet event to catch base layer changes and create a L.BingLayer when needed
-  map.on('baselayerchange', function(e) {
-    for (type in bingMapContainers) {
-      if (e.layer == bingMapContainers[type]) {
-        if (bingMapContainers[type].getLayers().length == 0) {
-          // dummy layer group is empty - create the bing layer
-          console.log('basemap-bing: creating '+type+' layer');
-          var bingMap = new L.BingLayer (bingApiKey, {type: type, maxNativeZoom: 19, maxZoom: 21});
-          bingMapContainers[type].addLayer(bingMap);
-        }
-      }
-    }
-  });
-
 };
 
-var setup = window.plugin.mapBing.setup;
+mapBing.options = {
+  //set this to your API key
+  key: 'ArR2hTa2C9cRQZT-RmgrDkfvh3PwEVRl0gB34OO4wJI7vQNElg3DDWvbo5lfUs3p'
+}
+
+function setup () {
+  setupBingLeaflet();
+
+  for (var name in mapBing.sets) {
+    var options = L.extend({}, mapBing.options, mapBing.sets[name]);
+    layerChooser.addBaseLayer(L.bingLayer(options), 'Bing ' + name);
+  }
+};
+
+function setupBingLeaflet () {
+  try {
+    // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.js
+    @@INCLUDERAW:external/Bing.js@@
+
+    // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.addon.applyMaxNativeZoom.js
+    @@INCLUDERAW:external/Bing.addon.applyMaxNativeZoom.js@@
+
+    } catch (e) {
+      console.error('Bing.js loading failed');
+      throw e;
+    }
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
-
 
 @@PLUGINEND@@

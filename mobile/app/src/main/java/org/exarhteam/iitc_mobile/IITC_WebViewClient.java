@@ -281,6 +281,10 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("Google login");
             return false;
         }
+        else if (url.contains("facebook.com") && url.contains("oauth")) {
+            Log.d("Facebook login");
+            return false;
+        }
         else if (uri.getHost().contains(".google.") && "/url".equals(uri.getPath()) && uri.getQueryParameter("q") != null) {
             Log.d("redirect to: " + uri.getQueryParameter("q"));
             return shouldOverrideUrlLoading(view, uri.getQueryParameter("q"));
