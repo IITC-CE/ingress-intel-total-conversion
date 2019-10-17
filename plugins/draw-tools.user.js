@@ -597,15 +597,15 @@ window.plugin.drawTools.drawstart = function (e) {
   };
 }
 
+// HOOK: pluginDrawTools
+// custom hook for draw tools to share it's activity with other plugins
+
 window.plugin.drawTools.boot = function() {
   // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
   map.addHandler('touchExtend', L.Map.TouchExtend);
 
   // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
   map.on('draw:drawstart', plugin.drawTools.drawstart);
-
-  // add a custom hook for draw tools to share it's activity with other plugins
-  pluginCreateHook('pluginDrawTools');
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
@@ -639,7 +639,6 @@ window.plugin.drawTools.boot = function() {
 
   //add the layer
   window.addLayerGroup('Drawn Items', window.plugin.drawTools.drawnItems, true);
-
 
   //place created items into the specific layer
   map.on('draw:created', function(e) {

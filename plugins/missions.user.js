@@ -862,11 +862,6 @@ window.plugin.missions = {
 				this.zoomToMission(mission);
 			}.bind(this));
 		}
-		
-		if(window.plugin.sync) {
-			window.plugin.sync.registerMapForSync('missions', 'checkedMissions', this.syncCallback.bind(this), this.syncInitialed.bind(this));
-			window.plugin.sync.registerMapForSync('missions', 'checkedWaypoints', this.syncCallback.bind(this), this.syncInitialed.bind(this));
-		}
 	},
 
 	// called after local or remote change uploaded
@@ -1052,17 +1047,23 @@ window.plugin.missions = {
 		window.addLayerGroup('Mission start portals', this.missionStartLayer, false);
 		window.addLayerGroup('Mission portals', this.missionLayer, true);
 
-		window.pluginCreateHook('plugin-missions-loaded-mission');
-		window.pluginCreateHook('plugin-missions-on-portal-loaded');
-		window.pluginCreateHook('plugin-missions-mission-changed');
-		window.pluginCreateHook('plugin-missions-missions-refreshed');
-		window.pluginCreateHook('plugin-missions-waypoint-changed');
-		window.pluginCreateHook('plugin-missions-waypoints-refreshed');
+		// HOOKS:
+		// - plugin-missions-loaded-mission
+		// - plugin-missions-on-portal-loaded
+		// - plugin-missions-mission-changed
+		// - plugin-missions-missions-refreshed
+		// - plugin-missions-waypoint-changed
+		// - plugin-missions-waypoints-refreshed
 
 		window.addHook('plugin-missions-mission-changed',     this.onMissionChanged.bind(this));
 		window.addHook('plugin-missions-missions-refreshed',  this.onMissionsRefreshed.bind(this));
 		window.addHook('plugin-missions-waypoint-changed',    this.onWaypointChanged.bind(this));
 		window.addHook('plugin-missions-waypoints-refreshed', this.onWaypointsRefreshed.bind(this));
+		
+		if(window.plugin.sync) {
+			window.plugin.sync.registerMapForSync('missions', 'checkedMissions', this.syncCallback.bind(this), this.syncInitialed.bind(this));
+			window.plugin.sync.registerMapForSync('missions', 'checkedWaypoints', this.syncCallback.bind(this), this.syncInitialed.bind(this));
+		}
 
 		window.addHook('iitcLoaded', this.onIITCLoaded.bind(this));
 	}

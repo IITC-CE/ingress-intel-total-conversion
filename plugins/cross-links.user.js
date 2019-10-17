@@ -282,9 +282,6 @@ var setup = function() {
        return;
     }
 
-    // this plugin also needs to create the draw-tools hook, in case it is initialised before draw-tools
-    window.pluginCreateHook('pluginDrawTools');
-
     window.plugin.crossLinks.createLayer();
 
     // events

@@ -103,8 +103,6 @@ window.plugin.distanceToPortal.setLocation = function() {
 };
 
 window.plugin.distanceToPortal.setupPortalsList = function() {
-  if(!window.plugin.portalslist) return;
-
   window.plugin.portalslist.fields.push({
     title: "Dist",
     value: function(portal) { if (window.plugin.distanceToPortal.currentLoc) return window.plugin.distanceToPortal.currentLoc.distanceTo(portal.getLatLng()); else return 0; },
@@ -131,8 +129,9 @@ window.plugin.distanceToPortal.setup  = function() {
 
   addHook('portalDetailsUpdated', window.plugin.distanceToPortal.addDistance);
 
-  window.plugin.distanceToPortal.setupPortalsList();
-
+  if (window.plugin.portalslist) {
+    window.plugin.distanceToPortal.setupPortalsList();
+  }
 };
 
 var setup =  window.plugin.distanceToPortal.setup;

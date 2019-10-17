@@ -799,6 +799,8 @@ var setup = function() {
   });
 };
 
+setup.priority = 'high';
+
 // PLUGIN END //////////////////////////////////////////////////////////
 
 @@PLUGINEND@@
