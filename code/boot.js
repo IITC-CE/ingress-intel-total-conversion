@@ -3,10 +3,9 @@
 // created a basic framework. All of these functions should only ever
 // be run once.
 
-window.setupLargeImagePreview = function() {
-  $('#portaldetails').on('click', '.imgpreview', function() {
-    var img = $(this).find('img')[0];
-    var details = $(this).find('div.portalDetails')[0];
+window.setupLargeImagePreview = function () {
+  $('#portaldetails').on('click', '.imgpreview', function (e) {
+    var img = this.querySelector('img');
     //dialogs have 12px padding around the content
     var dlgWidth = Math.max(img.naturalWidth+24,500);
     // This might be a case where multiple dialogs make sense, for example
@@ -14,21 +13,17 @@ window.setupLargeImagePreview = function() {
     // usually we only want to show one version of each image.
     // To support that, we'd need a unique key per portal.  Example, guid.
     // So that would have to be in the html fetched into details.
-    if (details) {
-      dialog({
-        html: '<div style="text-align: center">' + img.outerHTML + '</div>' + details.outerHTML,
-        title: $(this).parent().find('h3.title').text(),
-        id: 'iitc-portal-image',
-        width: dlgWidth,
-      });
-    } else {
-      dialog({
-        html: '<div style="text-align: center">' + img.outerHTML + '</div>',
-        title: $(this).parent().find('h3.title').text(),
-        id: 'iitc-portal-image',
-        width: dlgWidth,
-      });
-    }
+
+    var preview = new Image(img.width, img.height);
+    preview.src = img.src;
+    preview.style = 'margin: auto; display: block';
+    var title = e.delegateTarget.querySelector('.title').innerText;
+    dialog({
+      html: preview,
+      title: title,
+      id: 'iitc-portal-image',
+      width: dlgWidth,
+    });
   });
 }
 
@@ -175,22 +170,16 @@ window.setupMap = function() {
 //    zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
-    preferCanvas: true // Set to true if Leaflet should draw things using Canvas instead of SVG
+    preferCanvas: 'PREFER_CANVAS' in window
+      ? window.PREFER_CANVAS
+      : true // default
   });
   if (L.CRS.S2) { map.options.crs = L.CRS.S2; }
 
-  if (L.Path.CANVAS) {
-    // for canvas, 2% overdraw only - to help performance
-    L.Path.CLIP_PADDING = 0.02;
-  } else if (L.Path.SVG) {
-    if (L.Browser.mobile) {
-      // mobile SVG - 10% ovredraw. might help performance?
-      L.Path.CLIP_PADDING = 0.1;
-    } else {
-      // for svg, 100% overdraw - so we have a full screen worth in all directions
-      L.Path.CLIP_PADDING = 1.0;
-    }
-  }
+  L.Renderer.mergeOptions({
+    padding: window.RENDERER_PADDING ||
+             L.Browser.mobile ? 0.5 : 1
+  });
 
   // add empty div to leaflet control areas - to force other leaflet controls to move around IITC UI elements
   // TODO? move the actual IITC DOM into the leaflet control areas, so dummy <div>s aren't needed
@@ -503,14 +492,12 @@ window.setupLayerChooserApi = function() {
   //hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
   //WARNING: does depend on internals of the L.Control.Layers code
   window.layerChooser.getLayers = function() {
-    var baseLayers = new Array();
-    var overlayLayers = new Array();
-    
-    for (i in this._layers) {
-      var obj = this._layers[i];
+    var baseLayers = [];
+    var overlayLayers = [];
+    this._layers.forEach(function (obj,idx) {
       var layerActive = window.map.hasLayer(obj.layer);
       var info = {
-        layerId: i,
+        layerId: idx,
         name: obj.name,
         active: layerActive
       }
@@ -519,7 +506,7 @@ window.setupLayerChooserApi = function() {
       } else {
         baseLayers.push(info);
       }
-    }
+    });
 
     var overlayLayersJSON = JSON.stringify(overlayLayers);
     var baseLayersJSON = JSON.stringify(baseLayers);
@@ -810,14 +797,21 @@ function boot() {
 
 }
 
+
 @@INCLUDERAW:external/load.js@@
 
 try { console.log('Loading included JS now'); } catch(e) {}
+window.L_NO_TOUCH = navigator.maxTouchPoints===0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
 @@INCLUDERAW:external/leaflet-src.js@@
 @@INCLUDERAW:external/L.Geodesic.js@@
 @@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
 @@INCLUDERAW:external/autolink.js@@
 @@INCLUDERAW:external/oms.min.js@@
+L.CanvasIconLayer = (function (module) {
+  @@INCLUDERAW:external/rbush.min.js@@
+  @@INCLUDERAW:external/leaflet.canvas-markers.js@@
+  return module;
+}({})).exports(L);
 
 @@INCLUDERAW:external/jquery-3.3.1.min.js@@
 @@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@

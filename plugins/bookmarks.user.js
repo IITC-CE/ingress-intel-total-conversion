@@ -606,7 +606,7 @@
       helper:'clone', // fix accidental click in firefox
       forcePlaceholderSize:true,
       update:function(event, ui) {
-        var typeList = $('#'+ui.item.context.id).parent().parent('.bookmarkList').attr('id');
+        var typeList = ui.item.parent().parent('.bookmarkList').attr('id');
         window.plugin.bookmarks.sortFolder(typeList);
       }
     });
@@ -619,7 +619,7 @@
       helper:'clone', // fix accidental click in firefox
       forcePlaceholderSize:true,
       update:function(event, ui) {
-        var typeList = $('#'+ui.item.context.id).parent().parent().parent().parent('.bookmarkList').attr('id');
+        var typeList = ui.item.parent().parent().parent().parent('.bookmarkList').attr('id');
         window.plugin.bookmarks.sortBookmark(typeList);
       }
     });

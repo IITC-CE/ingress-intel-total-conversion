@@ -225,8 +225,3 @@ body {
   border: 1px outset #20A8B1;
   margin-top: 2px;
 }
-
-/* Hide drawtools circle on mobile */
-.leaflet-draw-draw-circle {
-  display: none !important;
-}

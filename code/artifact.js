@@ -27,8 +27,14 @@ window.artifact.setup = function() {
   artifact._layer = new L.LayerGroup();
   addLayerGroup ('Artifacts', artifact._layer, true);
 
-  $('#toolbox').append(' <a onclick="window.artifact.showArtifactList()" title="Show artifact portal list">Artifacts</a>');
-
+  $('<a>')
+    .html('Artifacts')
+    .attr({
+      id: 'artifacts-toolbox-link',
+      title: 'Show artifact portal list'
+    })
+    .click(window.artifact.showArtifactList)
+    .appendTo('#toolbox');
 }
 
 window.artifact.requestData = function() {
@@ -292,13 +298,11 @@ window.artifact.showArtifactList = function() {
     html += '</table>';
   });
 
-
-  html += "<hr />"
-        + "<p>In Summer 2015, Niantic changed the data format for artifact portals. We no longer know:</p>"
-        + "<ul><li>Which team each target portal is for - only that it is a target</li>"
-        + "<li>Which shards are at each portal, just that it has one or more shards</li></ul>"
-        + "<p>You can select a portal and the detailed data contains the list of shard numbers, but there's still no"
-        + " more information on targets.</p>";
+  // In Summer 2015, Niantic changed the data format for artifact portals. We no longer know:
+  // - Which team each target portal is for - only that it is a target
+  // - Which shards are at each portal, just that it has one or more shards
+  // You can select a portal and the detailed data contains the list of shard numbers, but there's still no
+  // more information on targets
 
   dialog({
     title: 'Artifacts',

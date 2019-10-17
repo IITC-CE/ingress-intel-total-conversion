@@ -97,7 +97,7 @@ window.plugin.keysOnMap.setupCSS = function() {
             color: #FFFFBB;\
             font-family: monospace;\
             text-align: center;\
-            text-shadow: 0 0 0.5em black, 0 0 0.5em black, 0 0 0.5em black;\
+            text-shadow: 0 0 1px black, 0 0 1em black, 0 0 0.2em black;\
             pointer-events: none;\
             -webkit-text-size-adjust:none;\
           }")

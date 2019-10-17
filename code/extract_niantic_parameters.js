@@ -108,7 +108,7 @@ window.extractFromStock = function() {
     console.log('Discovered parameters');
     console.log(JSON.stringify(window.niantic_params,null,2));
 
-    throw('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
+    throw new Error('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
   }
 
 }
