@@ -11,24 +11,37 @@
 
 // PLUGIN START ////////////////////////////////////////////////////////
 
-
 // use own namespace for plugin
-window.plugin.scaleBar = function() {};
+var scaleBar = {};
+window.plugin.scaleBar = scaleBar;
 
-window.plugin.scaleBar.setup  = function() {
-  // Before you ask: yes, I explicitely turned off imperial units. Imperial units
-  // are worse than Internet Explorer 6 whirring fans combined. Upgrade to the metric
-  // system already.
-  if (window.isSmartphone()) {
-      $('head').append('<style>.leaflet-control-scale { position: absolute; bottom: 15px; right: 0px; margin-bottom: 20px !important; } </style>');
-      window.map.addControl(new L.Control.Scale({position: 'bottomright', imperial: false, maxWidth: 100}));
-  } else {
-      $('head').append('<style>.leaflet-control-scale { position: absolute; top: 2px; left: 40px; } </style>');
-      window.map.addControl(new L.Control.Scale({position: 'topleft', imperial: false, maxWidth: 200}));
+// Before you ask: yes, I explicitely turned off imperial units. Imperial units
+// are worse than Internet Explorer 6 whirring fans combined. Upgrade to the metric
+// system already.
+scaleBar.options = { imperial: false };
+
+scaleBar.mobileOptions = { position: 'bottomright', maxWidth: 100 };
+
+scaleBar.desktopOptions = { position: 'topleft', maxWidth: 200 };
+
+function moveToEdge (ctrl) {
+  var $el = $(ctrl.getContainer());
+  var $corner = $el.parent();
+  var pos = ctrl.getPosition();
+  if (pos.indexOf('top') !== -1) {
+    $corner.prepend($el);
+  } else if (pos.indexOf('bottom') !== -1) {
+    $corner.append($el);
   }
-};
+}
 
-var setup =  window.plugin.scaleBar.setup;
+function setup () {
+  window.addHook('iitcLoaded', function () { // wait other controls to initialize (should be initialized last)
+    var options = L.extend({}, window.isSmartphone() ? scaleBar.mobileOptions : scaleBar.desktopOptions, scaleBar.options);
+    scaleBar.control = L.control.scale(options).addTo(window.map);
+    setTimeout(function () { moveToEdge(scaleBar.control); });
+  });
+}
 
 // PLUGIN END //////////////////////////////////////////////////////////
 

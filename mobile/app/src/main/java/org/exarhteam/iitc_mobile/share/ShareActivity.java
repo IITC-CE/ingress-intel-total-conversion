@@ -6,14 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 
 import androidx.core.app.NavUtils;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import org.exarhteam.iitc_mobile.BuildConfig;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
 
@@ -29,10 +32,14 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
     private static final String TYPE_STRING = "string";
 
     public static Intent forFile(final Context context, final File file, final String type) {
+        final Uri uri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                ? FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
+                : Uri.fromFile(file);
         return new Intent(context, ShareActivity.class)
                 .putExtra(EXTRA_TYPE, TYPE_FILE)
-                .putExtra("uri", Uri.fromFile(file))
-                .putExtra("type", type);
+                .putExtra("uri", uri)
+                .putExtra("type", type)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
     }
 
     public static Intent forPosition(final Context context, final double lat, final double lng, final int zoom,

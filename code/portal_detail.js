@@ -6,9 +6,6 @@
 // API. expect things to change here
 
 
-// anonymous function wrapper for the code - any variables/functions not placed into 'window' will be private
-(function(){
-
 var cache;
 var requestQueue = {};
 
@@ -82,9 +79,3 @@ window.portalDetail.request = function(guid) {
 
   return requestQueue[guid];
 }
-
-
-
-})(); // anonymous wrapper function end
-
-

@@ -37,13 +37,14 @@
             android:id="@+id/viewDebug"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@color/iitc_blue_dark"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btnToggleMapVisibility"
                 android:layout_width="@dimen/button_size"
                 android:layout_height="@dimen/button_size"
-                android:layout_gravity="bottom"
+                android:layout_gravity="center_vertical"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/toggle_map"
                 android:onClick="onToggleMapVisibility"
@@ -53,7 +54,7 @@
                 android:id="@+id/btnClearLog"
                 android:layout_width="@dimen/button_size"
                 android:layout_height="@dimen/button_size"
-                android:layout_gravity="bottom"
+                android:layout_gravity="center_vertical"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/clear_log"
                 android:onClick="onClearLog"
@@ -72,7 +73,7 @@
             <ImageButton
                 android:layout_width="@dimen/button_size"
                 android:layout_height="@dimen/button_size"
-                android:layout_gravity="bottom"
+                android:layout_gravity="center_vertical"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/debug_run"
                 android:onClick="onBtnRunCodeClick"

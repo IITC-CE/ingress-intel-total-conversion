@@ -82,18 +82,15 @@ public class IITC_JSInterface {
 
     @JavascriptInterface
     public void switchToPane(final String id) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Pane pane;
-                try {
-                    pane = mIitc.getNavigationHelper().getPane(id);
-                } catch (final IllegalArgumentException e) {
-                    pane = Pane.MAP;
-                }
-
-                mIitc.setCurrentPane(pane);
+        mIitc.runOnUiThread(() -> {
+            Pane pane;
+            try {
+                pane = mIitc.getNavigationHelper().getPane(id);
+            } catch (final IllegalArgumentException e) {
+                pane = Pane.MAP;
             }
+
+            mIitc.setCurrentPane(pane);
         });
     }
 
@@ -111,76 +108,43 @@ public class IITC_JSInterface {
     public void bootFinished() {
         Log.d("...boot finished");
 
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.setLoadingState(false);
+        mIitc.runOnUiThread(() -> {
+            mIitc.setLoadingState(false);
 
-                mIitc.getMapSettings().onBootFinished();
-            }
+            mIitc.getMapSettings().onBootFinished();
         });
     }
 
     // get layers and list them in a dialog
     @JavascriptInterface
     public void setLayers(final String base_layer, final String overlay_layer) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.getMapSettings().setLayers(base_layer, overlay_layer);
-            }
-        });
+        mIitc.runOnUiThread(() -> mIitc.getMapSettings().setLayers(base_layer, overlay_layer));
     }
 
     @JavascriptInterface
     public void addPortalHighlighter(final String name) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.getMapSettings().addPortalHighlighter(name);
-            }
-        });
+        mIitc.runOnUiThread(() -> mIitc.getMapSettings().addPortalHighlighter(name));
     }
 
     @JavascriptInterface
     public void setActiveHighlighter(final String name) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.getMapSettings().setActiveHighlighter(name);
-            }
-        });
+        mIitc.runOnUiThread(() -> mIitc.getMapSettings().setActiveHighlighter(name));
     }
 
     @JavascriptInterface
     public void updateIitc(final String fileUrl) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.updateIitc(fileUrl);
-            }
-        });
+        mIitc.runOnUiThread(() -> mIitc.updateIitc(fileUrl));
     }
 
     @JavascriptInterface
     public void addPane(final String name, final String label, final String icon) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.getNavigationHelper().addPane(name, label, icon);
-            }
-        });
+        mIitc.runOnUiThread(() -> mIitc.getNavigationHelper().addPane(name, label, icon));
     }
 
     // some plugins may have no specific icons...add a default icon
     @JavascriptInterface
     public void addPane(final String name, final String label) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.getNavigationHelper().addPane(name, label, "ic_action_new_event");
-            }
-        });
+        mIitc.runOnUiThread(() -> mIitc.getNavigationHelper().addPane(name, label, "ic_action_new_event"));
     }
 
     @JavascriptInterface
@@ -193,34 +157,26 @@ public class IITC_JSInterface {
 
     @JavascriptInterface
     public void setFollowMode(final boolean follow) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.getUserLocation().setFollowMode(follow);
-            }
-        });
+        mIitc.runOnUiThread(() -> mIitc.getUserLocation().setFollowMode(follow));
     }
 
     @JavascriptInterface
     public void setProgress(final double progress) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (progress != -1) {
-                        // maximum for setProgress is 10,000
-                        mIitc.setProgressBarIndeterminate(false);
-                        mIitc.setProgress((int) Math.round(progress * 10000));
-                    }
-                    else {
-                        mIitc.setProgressBarIndeterminate(true);
-                        mIitc.setProgress(1);
-                    }
-                } catch(NullPointerException e) {
-                    // for some reason, setProgressBarIndeterminate throws a NullPointerException on some devices
-                    e.printStackTrace();
-                    mIitc.setProgress(10000); // hide the progress bar
+        mIitc.runOnUiThread(() -> {
+            try {
+                if (progress != -1) {
+                    // maximum for setProgress is 10,000
+                    mIitc.setProgressBarIndeterminate(false);
+                    mIitc.setProgress((int) Math.round(progress * 10000));
                 }
+                else {
+                    mIitc.setProgressBarIndeterminate(true);
+                    mIitc.setProgress(1);
+                }
+            } catch(NullPointerException e) {
+                // for some reason, setProgressBarIndeterminate throws a NullPointerException on some devices
+                e.printStackTrace();
+                mIitc.setProgress(10000); // hide the progress bar
             }
         });
     }
@@ -253,22 +209,14 @@ public class IITC_JSInterface {
 
     @JavascriptInterface
     public void reloadIITC() {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mIitc.reloadIITC();
-            }
-        });
+        mIitc.runOnUiThread(mIitc::reloadIITC);
     }
 
     @JavascriptInterface
     public void reloadIITC(final boolean clearCache) {
-        mIitc.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (clearCache) mIitc.getWebView().clearCache(true);
-                mIitc.reloadIITC();
-            }
+        mIitc.runOnUiThread(() -> {
+            if (clearCache) mIitc.getWebView().clearCache(true);
+            mIitc.reloadIITC();
         });
     }
 }

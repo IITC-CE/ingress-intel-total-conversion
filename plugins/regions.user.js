@@ -28,7 +28,7 @@ window.plugin.regions.setup  = function() {
              color: gold;\
              opacity: 0.7;\
              text-align: center;\
-             text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000, 0 0 2px #000; \
+             text-shadow: 0 0 1px black, 0 0 1em black, 0 0 0.2em black;\
              pointer-events: none;\
           }")
   .appendTo("head");

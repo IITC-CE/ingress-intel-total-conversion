@@ -356,7 +356,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 // code from getPortalLink function by xelio from iitc: AP List - https://raw.github.com/breunigs/ingress-intel-total-conversion/gh-pages/plugins/ap-list.user.js
 window.plugin.portalslist.getPortalLink = function(portal) {
   var coord = portal.getLatLng();
-  var perma = '/intel?ll='+coord.lat+','+coord.lng+'&z=17&pll='+coord.lat+','+coord.lng;
+  var perma = window.makePermalink(coord);
 
   // jQuery's event handlers seem to be removed when the nodes are remove from the DOM
   var link = document.createElement("a");

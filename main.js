@@ -11,8 +11,9 @@
 window.script_info = plugin_info;
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
-if(document.getElementsByTagName('html')[0].getAttribute('itemscope') != null)
-  throw('Ingress Intel Website is down, not a userscript issue.');
+if (document.documentElement.getAttribute('itemscope') !== null) {
+  throw new Error('Ingress Intel Website is down, not a userscript issue.');
+}
 window.iitcBuildDate = '@@BUILDDATE@@';
 
 // disable vanilla JS
@@ -24,16 +25,23 @@ document.body.onload = function() {};
 
 if (!window.PLAYER || !PLAYER.nickname) {
   // page doesn’t have a script tag with player information.
-  if(document.getElementById('header_email')) {
+  if (document.getElementById('header_email')) {
     // however, we are logged in.
     // it used to be regularly common to get temporary 'account not enabled' messages from the intel site.
     // however, this is no longer common. more common is users getting account suspended/banned - and this
     // currently shows the 'not enabled' message. so it's safer to not repeatedly reload in this case
-//    setTimeout('location.reload();', 3*1000);
-    throw("Page doesn't have player data, but you are logged in.");
+    // //setTimeout('location.reload();', 3*1000);
+    throw new Error("Logged in but page doesn't have player data");
   }
   // FIXME: handle nia takedown in progress
-  throw("Couldn't retrieve player data. Are you logged in?");
+  
+  // add login form stylesheet
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode('@@INCLUDESTRING:login.css@@'));
+  document.head.appendChild(style);
+  
+  throw new Error("Couldn't retrieve player data. Are you logged in?");
 }
 
 // player information is now available in a hash like this:
@@ -42,7 +50,7 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // remove complete page. We only wanted the user-data and the page’s
 // security context so we can access the API easily. Setup as much as
 // possible without requiring scripts.
-document.getElementsByTagName('head')[0].innerHTML = ''
+document.head.innerHTML = ''
   + '<title>Ingress Intel Map</title>'
   + '<style>@@INCLUDESTRING:style.css@@</style>'
   + '<style>@@INCLUDECSS:external/leaflet.css@@</style>'
@@ -83,7 +91,6 @@ document.body.innerHTML = ''
   + '    <div id="toolbox">'
   + '      <a onmouseover="setPermaLink(this)" onclick="setPermaLink(this);return androidPermalink()" title="URL link to this map view">Permalink</a>'
   + '      <a onclick="window.aboutIITC()" style="cursor: help">About IITC</a>'
-  + '      <a onclick="window.regionScoreboard()" title="View regional scoreboard">Region scores</a>'
   + '    </div>'
   + '  </div>'
   + '</div>'
@@ -153,11 +160,7 @@ window.TEAM_NONE = 0;
 window.TEAM_RES = 1;
 window.TEAM_ENL = 2;
 window.TEAM_TO_CSS = ['none', 'res', 'enl'];
-
-window.SLOT_TO_LAT = [0, Math.sqrt(2)/2, 1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2];
-window.SLOT_TO_LNG = [1, Math.sqrt(2)/2, 0, -Math.sqrt(2)/2, -1, -Math.sqrt(2)/2, 0, Math.sqrt(2)/2];
-window.EARTH_RADIUS=6367000;
-window.DEG2RAD = Math.PI / 180;
+window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened'];
 
 // STORAGE ///////////////////////////////////////////////////////////
 // global variables used for storage. Most likely READ ONLY. Proper
@@ -179,8 +182,6 @@ window.portals = {};
 window.links = {};
 window.fields = {};
 
-window.resonators = {};
-
 // contain current status(on/off) of overlay layerGroups.
 // But you should use isLayerGroupDisplayed(name) to check the status
 window.overlayStatus = {};
@@ -189,8 +190,14 @@ window.overlayStatus = {};
 // overwrite data
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
+var ulog = (function (module) {
+  @@INCLUDERAW:external/ulog.min.js@@
+  return module;
+}({})).exports;
 
 @@INJECTCODE@@
 
+  // fixed Addons
+  RegionScoreboard.setup();
 
 @@PLUGINEND@@
