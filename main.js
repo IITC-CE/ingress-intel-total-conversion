@@ -2,16 +2,13 @@
 // @id             ingress-intel-total-conversion@jonatkins
 // @name           IITC: Ingress intel map total conversion
 // @version        0.29.1.@@DATETIMEVERSION@@
-// @namespace      https://github.com/IITC-CE/ingress-intel-total-conversion
-// @updateURL      @@UPDATEURL@@
-// @downloadURL    @@DOWNLOADURL@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Total conversion for the ingress intel map.
-// @include        https://intel.ingress.com/*
-// @match          https://intel.ingress.com/*
-// @grant          none
+@@METAINFO@@
 // @run-at         document-end
 // ==/UserScript==
 
+@@PLUGINSTART@@
+window.script_info = plugin_info;
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
 if (document.documentElement.getAttribute('itemscope') !== null) {
@@ -26,8 +23,7 @@ document.body.onload = function() {};
 //originally code here parsed the <Script> tags from the page to find the one that defined the PLAYER object
 //however, that's already been executed, so we can just access PLAYER - no messing around needed!
 
-var PLAYER = window.PLAYER || (typeof unsafeWindow !== 'undefined' && unsafeWindow.PLAYER);
-if (!PLAYER || !PLAYER.nickname) {
+if (!window.PLAYER || !PLAYER.nickname) {
   // page doesn’t have a script tag with player information.
   if (document.getElementById('header_email')) {
     // however, we are logged in.
@@ -101,18 +97,6 @@ document.body.innerHTML = ''
   + '<div id="updatestatus"><div id="innerstatus"></div></div>'
   // avoid error by stock JS
   + '<div id="play_button"></div>';
-
-
-// putting everything in a wrapper function that in turn is placed in a
-// script tag on the website allows us to execute in the site’s context
-// instead of in the Greasemonkey/Extension/etc. context.
-function wrapper(info) {
-// a cut-down version of GM_info is passed as a parameter to the script
-// (not the full GM_info - it contains the ENTIRE script source!)
-window.script_info = info;
-
-
-
 
 // CONFIG OPTIONS ////////////////////////////////////////////////////
 window.REFRESH = 30; // refresh view every 30s (base time)
@@ -216,11 +200,4 @@ var ulog = (function (module) {
   // fixed Addons
   RegionScoreboard.setup();
 
-} // end of wrapper
-
-// inject code into site context
-var script = document.createElement('script');
-var info = { buildName: '@@BUILDNAME@@', dateTimeVersion: '@@DATETIMEVERSION@@' };
-if (this.GM_info && this.GM_info.script) info.script = { version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description };
-script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(info)+');'));
-(document.body || document.head || document.documentElement).appendChild(script);
+@@PLUGINEND@@
