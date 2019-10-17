@@ -1,5 +1,5 @@
 /*
- Leaflet.draw 1.0.0+33ea262, a plugin that adds drawing and editing tools to Leaflet powered maps.
+ Leaflet.draw 1.0.4, a plugin that adds drawing and editing tools to Leaflet powered maps.
  (c) 2012-2017, Jacob Toye, Jon West, Smartrak, Leaflet
 
  https://github.com/Leaflet/Leaflet.draw
@@ -8,7 +8,7 @@
 (function (window, document, undefined) {/**
  * Leaflet.draw assumes that you have already included the Leaflet library.
  */
-L.drawVersion = "1.0.0+33ea262";
+L.drawVersion = "1.0.4";
 /**
  * @class L.Draw
  * @aka Draw
@@ -493,7 +493,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		TYPE: 'polyline'
 	},
 
-	Poly: L.GeodesicPolyline,
+	Poly: L.Polyline,
 
 	options: {
 		allowIntersection: true,
@@ -518,7 +518,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			weight: 4,
 			opacity: 0.5,
 			fill: false,
-			interactive: true
+			clickable: true
 		},
 		metric: true, // Whether to use the metric measurement system or imperial
 		feet: true, // When not metric, to use feet instead of yards for display.
@@ -559,7 +559,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 			this._markerGroup = new L.LayerGroup();
 			this._map.addLayer(this._markerGroup);
-			this._poly = new L.GeodesicPolyline([], this.options.shapeOptions);
+
+			this._poly = new L.Polyline([], this.options.shapeOptions);
 
 			this._tooltip.updateContent(this._getTooltipText());
 
@@ -789,9 +790,6 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			} else if (lastPtDistance < 10 && L.Browser.touch) {
 				this._finishShape();
 			} else if (Math.abs(dragCheckDistance) < 9 * (window.devicePixelRatio || 1)) {
-				if (this.options.snapPoint) {
-					e.latlng = this.options.snapPoint(e.latlng);
-				}	
 				this.addVertex(e.latlng);
 			}
 			this._enableNewMarkers(); // after a short pause, enable new markers
@@ -1090,7 +1088,7 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 		TYPE: 'polygon'
 	},
 
-	Poly: L.GeodesicPolygon,
+	Poly: L.Polygon,
 
 	options: {
 		showArea: false,
@@ -1103,7 +1101,7 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 			fill: true,
 			fillColor: null, //same as color by default
 			fillOpacity: 0.2,
-			interactive: true
+			clickable: true
 		},
 		// Whether to use the metric measurement system (truthy) or not (falsy).
 		// Also defines the units to use for the metric system as an array of
@@ -1258,7 +1256,7 @@ L.Draw.SimpleShape = L.Draw.Feature.extend({
 			// (update): we have to send passive now to prevent scroll, because by default it is {passive: true} now, which means,
 			// handler can't event.preventDefault
 			// check the news https://developers.google.com/web/updates/2016/06/passive-event-listeners
-			this._map.getPanes().mapPane.addEventListener('touchstart', L.DomEvent.preventDefault, {passive: false});
+			document.addEventListener('touchstart', L.DomEvent.preventDefault, {passive: false});
 		}
 	},
 
@@ -1283,7 +1281,7 @@ L.Draw.SimpleShape = L.Draw.Feature.extend({
 			L.DomEvent.off(document, 'mouseup', this._onMouseUp, this);
 			L.DomEvent.off(document, 'touchend', this._onMouseUp, this);
 
-			this._map.getPanes().mapPane.removeEventListener('touchstart', L.DomEvent.preventDefault);
+			document.removeEventListener('touchstart', L.DomEvent.preventDefault);
 
 			// If the box element doesn't exist they must not have moved the mouse, so don't need to destroy/return
 			if (this._shape) {
@@ -1353,9 +1351,9 @@ L.Draw.Rectangle = L.Draw.SimpleShape.extend({
 			fill: true,
 			fillColor: null, //same as color by default
 			fillOpacity: 0.2,
-			showArea: true,
-			interactive: true
+			clickable: true
 		},
+		showArea: true, //Whether to show the area in the tooltip
 		metric: true // Whether to use the metric measurement system or imperial
 	},
 
@@ -1543,10 +1541,6 @@ L.Draw.Marker = L.Draw.Feature.extend({
 	},
 
 	_onClick: function () {
-		if (this.options.snapPoint)  {
-			this._marker.setLatLng(this.options.snapPoint(this._marker.getLatLng()));
-		}
-
 		this._fireCreatedEvent();
 
 		this.disable();
@@ -1587,7 +1581,7 @@ L.Draw.CircleMarker = L.Draw.Marker.extend({
 		fill: true,
 		fillColor: null, //same as color by default
 		fillOpacity: 0.2,
-		interactive: true,
+		clickable: true,
 		zIndexOffset: 2000 // This should be > than the highest z-index any markers
 	},
 
@@ -1633,7 +1627,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 			fill: true,
 			fillColor: null, //same as color by default
 			fillOpacity: 0.2,
-			interactive: true
+			clickable: true
 		},
 		showRadius: true,
 		metric: true, // Whether to use the metric measurement system or imperial
@@ -1660,7 +1654,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 		}
 
 		if (!this._shape) {
-			this._shape = new L.GeodesicCircle(this._startLatLng, distance, this.options.shapeOptions);
+			this._shape = new L.Circle(this._startLatLng, distance, this.options.shapeOptions);
 			this._map.addLayer(this._shape);
 		} else {
 			this._shape.setRadius(distance);
@@ -1668,7 +1662,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 	},
 
 	_fireCreatedEvent: function () {
-		var circle = new L.GeodesicCircle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
+		var circle = new L.Circle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
 		L.Draw.SimpleShape.prototype._fireCreatedEvent.call(this, circle);
 	},
 
@@ -1797,7 +1791,8 @@ L.Edit = L.Edit || {};
 L.Edit.Poly = L.Handler.extend({
 	// @method initialize(): void
 	initialize: function (poly) {
-		this.latlngs = [poly.getLatLngs()];
+
+		this.latlngs = [poly._latlngs];
 		if (poly._holes) {
 			this.latlngs = this.latlngs.concat(poly._holes);
 		}
@@ -1809,12 +1804,11 @@ L.Edit.Poly = L.Handler.extend({
 
 	// Compatibility method to normalize Poly* objects
 	// between 0.7.x and 1.0+
-	// NOTE: GeodesicPoly still uses flat model so no conversation is needed
 	_defaultShape: function () {
-			return this._poly.getLatLngs();
-	},
-	getLatLngs: function () {
-		return this._latlngs
+		if (!L.Polyline._flat) {
+			return this._poly._latlngs;
+		}
+		return L.Polyline._flat(this._poly._latlngs) ? this._poly._latlngs : this._poly._latlngs[0];
 	},
 
 	_eachVertexHandler: function (callback) {
@@ -1856,7 +1850,7 @@ L.Edit.Poly = L.Handler.extend({
 	},
 
 	_updateLatLngs: function (e) {
-		this.latlngs = [e.layer.getLatLngs()];
+		this.latlngs = [e.layer._latlngs];
 		if (e.layer._holes) {
 			this.latlngs = this.latlngs.concat(e.layer._holes);
 		}
@@ -1905,9 +1899,11 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 
 	// Compatibility method to normalize Poly* objects
 	// between 0.7.x and 1.0+
-	// NOTE: GeodesicPoly still uses flat model so no conversation is needed
 	_defaultShape: function () {
-			return this._poly.getLatLngs();
+		if (!L.Polyline._flat) {
+			return this._latlngs;
+		}
+		return L.Polyline._flat(this._latlngs) ? this._latlngs : this._latlngs[0];
 	},
 
 	// @method addHooks(): void
@@ -1916,7 +1912,7 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 		var poly = this._poly;
 		var path = poly._path;
 
-		if (!(poly instanceof L.GeodesicPolygon)) {
+		if (!(poly instanceof L.Polygon)) {
 			poly.options.fill = false;
 			if (poly.options.editing) {
 				poly.options.editing.fill = false;
@@ -2004,7 +2000,7 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 		var markerLeft, markerRight;
 
 		for (i = 0, j = len - 1; i < len; j = i++) {
-			if (i === 0 && !(L.GeodesicPolygon && (this._poly instanceof L.GeodesicPolygon))) {
+			if (i === 0 && !(L.Polygon && (this._poly instanceof L.Polygon))) {
 				continue;
 			}
 
@@ -2081,32 +2077,17 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 		var marker = e.target;
 		var poly = this._poly;
 
+		var oldOrigLatLng = L.LatLngUtil.cloneLatLng(marker._origLatLng);
 		L.extend(marker._origLatLng, marker._latlng);
-
-		if (marker._middleLeft) {
-			marker._middleLeft.setLatLng(this._getMiddleLatLng(marker._prev, marker));
-		}
-		if (marker._middleRight) {
-			marker._middleRight.setLatLng(this._getMiddleLatLng(marker, marker._next));
-		}
-
 		if (poly.options.poly) {
 			var tooltip = poly._map._editTooltip; // Access the tooltip
 
 			// If we don't allow intersections and the polygon intersects
 			if (!poly.options.poly.allowIntersection && poly.intersects()) {
-
+				L.extend(marker._origLatLng, oldOrigLatLng);
+				marker.setLatLng(oldOrigLatLng);
 				var originalColor = poly.options.color;
 				poly.setStyle({color: this.options.drawError.color});
-
-				// Manually trigger 'dragend' behavior on marker we are about to remove
-				// WORKAROUND: introduced in 1.0.0-rc2, may be related to #4484
-				if (L.version.indexOf('0.7') !== 0) {
-					marker.dragging._draggable._onUp(e);
-				}
-				this._onMarkerClick(e); // Remove violating marker
-				// FIXME: Reset the marker to it's original position (instead of remove)
-
 				if (tooltip) {
 					tooltip.updateContent({
 						text: L.drawLocal.draw.handlers.polyline.error
@@ -2125,6 +2106,14 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 				}, 1000);
 			}
 		}
+
+		if (marker._middleLeft) {
+			marker._middleLeft.setLatLng(this._getMiddleLatLng(marker._prev, marker));
+		}
+		if (marker._middleRight) {
+			marker._middleRight.setLatLng(this._getMiddleLatLng(marker, marker._next));
+		}
+
 		//refresh the bounds when draging
 		this._poly._bounds._southWest = L.latLng(Infinity, Infinity);
 		this._poly._bounds._northEast = L.latLng(-Infinity, -Infinity);
@@ -2136,7 +2125,7 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 
 	_onMarkerClick: function (e) {
 
-		var minPoints = L.GeodesicPolygon && (this._poly instanceof L.GeodesicPolygon) ? 4 : 3,
+		var minPoints = L.Polygon && (this._poly instanceof L.Polygon) ? 4 : 3,
 			marker = e.target;
 
 		// If removing this point would create an invalid polyline/polygon don't remove
@@ -2284,37 +2273,7 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 	}
 });
 
-L.GeodesicPolyline.addInitHook(function () {
-
-	// Check to see if handler has already been initialized. This is to support versions of Leaflet that still have L.Handler.PolyEdit
-	if (this.editing) {
-		return;
-	}
-
-	if (L.Edit.Poly) {
-
-		this.editing = new L.Edit.Poly(this, this.options.poly);
-
-		if (this.options.editable) {
-			this.editing.enable();
-		}
-	}
-
-	this.on('add', function () {
-		if (this.editing && this.editing.enabled()) {
-			this.editing.addHooks();
-		}
-	});
-
-	this.on('remove', function () {
-		if (this.editing && this.editing.enabled()) {
-			this.editing.removeHooks();
-		}
-	});
-});
-
-
-L.GeodesicPolygon.addInitHook(function () {
+L.Polyline.addInitHook(function () {
 
 	// Check to see if handler has already been initialized. This is to support versions of Leaflet that still have L.Handler.PolyEdit
 	if (this.editing) {
@@ -2767,7 +2726,6 @@ L.Edit = L.Edit || {};
  * @aka Edit.Circle
  * @inherits L.Edit.CircleMarker
  */
-
 L.Edit.Circle = L.Edit.CircleMarker.extend({
 
 	_createResizeMarker: function () {
@@ -2779,8 +2737,10 @@ L.Edit.Circle = L.Edit.CircleMarker.extend({
 	},
 
 	_getResizeMarkerPoint: function (latlng) {
-		var bounds = this._shape.getBounds(); // geodesic circle stores precalculated bounds
-		return L.latLng(bounds.getNorth(), latlng.lng);
+		// From L.shape.getBounds()
+		var delta = this._shape._radius * Math.cos(Math.PI / 4),
+			point = this._map.project(latlng);
+		return this._map.unproject([point.x + delta, point.y - delta]);
 	},
 
 	_resize: function (latlng) {
@@ -2808,7 +2768,7 @@ L.Edit.Circle = L.Edit.CircleMarker.extend({
 	}
 });
 
-L.GeodesicCircle.addInitHook(function () {
+L.Circle.addInitHook(function () {
 	if (L.Edit.Circle) {
 		this.editing = new L.Edit.Circle(this);
 
@@ -2816,18 +2776,6 @@ L.GeodesicCircle.addInitHook(function () {
 			this.editing.enable();
 		}
 	}
-
-	this.on('add', function () {
-		if (this.editing && this.editing.enabled()) {
-			this.editing.addHooks();
-		}
-	});
-
-	this.on('remove', function () {
-		if (this.editing && this.editing.enabled()) {
-			this.editing.removeHooks();
-		}
-	});
 });
 
 
@@ -2875,7 +2823,7 @@ L.Map.TouchExtend = L.Handler.extend({
 		L.DomEvent.off(this._container, 'touchend', this._onTouchEnd, this);
 		L.DomEvent.off(this._container, 'touchmove', this._onTouchMove, this);
 		if (this._detectIE()) {
-			L.DomEvent.off(this._container, 'MSPointerDowm', this._onTouchStart, this);
+			L.DomEvent.off(this._container, 'MSPointerDown', this._onTouchStart, this);
 			L.DomEvent.off(this._container, 'MSPointerUp', this._onTouchEnd, this);
 			L.DomEvent.off(this._container, 'MSPointerMove', this._onTouchMove, this);
 			L.DomEvent.off(this._container, 'MSPointerCancel', this._onTouchCancel, this);
@@ -3037,7 +2985,7 @@ L.Marker.Touch = L.Marker.extend({
 	// with the addition of the touch events
 	_initInteractionLegacy: function () {
 
-		if (!this.options.interactive) {
+		if (!this.options.clickable) {
 			return;
 		}
 
@@ -3330,11 +3278,12 @@ L.Util.extend(L.LineUtil, {
 });
 
 
+
 /**
- * @class L.GeodesicPolyline
+ * @class L.Polyline
  * @aka Polyline
  */
-L.GeodesicPolyline.include({
+L.Polyline.include({
 
 	// @method intersects(): boolean
 	// Check to see if this polyline has any linesegments that intersect.
@@ -3443,7 +3392,7 @@ L.GeodesicPolyline.include({
  * @class L.Polygon
  * @aka Polygon
  */
-L.GeodesicPolygon.include({
+L.Polygon.include({
 
 	// @method intersects(): boolean
 	// Checks a polygon for any intersecting line segments. Ignores holes.
@@ -3456,7 +3405,7 @@ L.GeodesicPolygon.include({
 			return false;
 		}
 
-		polylineIntersects = L.GeodesicPolyline.prototype.intersects.call(this);
+		polylineIntersects = L.Polyline.prototype.intersects.call(this);
 
 		// If already found an intersection don't need to check for any more.
 		if (polylineIntersects) {
@@ -4508,11 +4457,11 @@ L.EditToolbar.Edit = L.Handler.extend({
 
 		if (!this._uneditedLayerProps[id]) {
 			// Polyline, Polygon or Rectangle
-			if (layer instanceof L.GeodesicPolyline || layer instanceof L.GeodesicPolygon || layer instanceof L.Rectangle) {
+			if (layer instanceof L.Polyline || layer instanceof L.Polygon || layer instanceof L.Rectangle) {
 				this._uneditedLayerProps[id] = {
 					latlngs: L.LatLngUtil.cloneLatLngs(layer.getLatLngs())
 				};
-			} else if (layer instanceof L.Circle || layer instanceof L.GeodesicCircle) {
+			} else if (layer instanceof L.Circle) {
 				this._uneditedLayerProps[id] = {
 					latlng: L.LatLngUtil.cloneLatLng(layer.getLatLng()),
 					radius: layer.getRadius()
@@ -4541,9 +4490,9 @@ L.EditToolbar.Edit = L.Handler.extend({
 		layer.edited = false;
 		if (this._uneditedLayerProps.hasOwnProperty(id)) {
 			// Polyline, Polygon or Rectangle
-			if (layer instanceof L.GeodesicPolyline || layer instanceof L.GeodesicPolygon || layer instanceof L.Rectangle) {
+			if (layer instanceof L.Polyline || layer instanceof L.Polygon || layer instanceof L.Rectangle) {
 				layer.setLatLngs(this._uneditedLayerProps[id].latlngs);
-			} else if (layer instanceof L.Circle || layer instanceof L.GeodesicCircle) {
+			} else if (layer instanceof L.Circle) {
 				layer.setLatLng(this._uneditedLayerProps[id].latlng);
 				layer.setRadius(this._uneditedLayerProps[id].radius);
 			} else if (layer instanceof L.Marker || layer instanceof L.CircleMarker) { // Marker or CircleMarker
