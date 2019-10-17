@@ -2,8 +2,8 @@
 // @id             iitc-plugin-sync@xelio
 // @name           IITC plugin: Sync
 // @category       Misc
-// @version        0.3.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
+// @version        0.4.0.@@DATETIMEVERSION@@
+// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 @@METAINFO@@
 // ==/UserScript==
 
@@ -40,6 +40,8 @@ window.plugin.sync.authorizer = null;
 // Store registered CollaborativeMap
 window.plugin.sync.registeredPluginsFields = null;
 window.plugin.sync.logger = null;
+
+window.plugin.sync.checkInterval = 3 * 60 * 1000; // update data every 3 minutes
 
 // Other plugin call this function to push update to Google Drive API
 // example:
@@ -142,7 +144,7 @@ window.plugin.sync.RegisteredMap.prototype.initFile = function(callback) {
   failedCallback = function(resp) {
     _this.initializing = false;
     _this.failed = true;
-    plugin.sync.logger.log('Could not create file: ' + _this.getFileName() + '. If this problem persist, delete this file in IITC-SYNC-DATA-V3 in your Google Drive and try again.');
+    plugin.sync.logger.log(_this.getFileName(), 'Could not create file. If this problem persist, delete this file in IITC-SYNC-DATA-V3 in your Google Drive and try again.');
   };
 
   this.dataStorage = new plugin.sync.DataManager({'fileName': this.getFileName(),
@@ -174,7 +176,8 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     });
 
     _this.dataStorage.saveFile(_this.prepareFileData());
-    plugin.sync.logger.log('Model initialized: ' + _this.pluginName + '[' + _this.fieldName + ']');
+    plugin.sync.logger.log(_this.getFileName(), 'Model initialized');
+    setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
   };
 
   // this function called when the document is loaded
@@ -187,12 +190,12 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     if (!_this.intervalID) {
       _this.intervalID = setInterval(function() {
         _this.loadDocument();
-      }, 3 * 60 * 1000); // update data every 3 minutes
+      }, window.plugin.sync.checkInterval);
     }
     
     // Replace local value if data is changed by others
     if(_this.isUpdatedByOthers()) {
-      plugin.sync.logger.log('Updated by others, replacing content: ' + _this.pluginName + '[' + _this.fieldName + ']');
+      plugin.sync.logger.log(_this.getFileName(), 'Updated by others, replacing content');
       window.plugin[_this.pluginName][_this.fieldName] = {};
       $.each(_this.map, function(key, value) {
         window.plugin[_this.pluginName][_this.fieldName][key] = _this.map[key];
@@ -202,44 +205,33 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
 
     _this.initialized = true;
     _this.initializing = false;
-    plugin.sync.logger.log('Data loaded: ' + _this.pluginName + '[' + _this.fieldName + ']');
-    if(callback) callback();
+    plugin.sync.logger.log(_this.getFileName(), 'Data loaded');
+    if(_this.callback) _this.callback();
     if(_this.initializedCallback) _this.initializedCallback(_this.pluginName, _this.fieldName);
   };
 
   // Stop the sync if any error occur and try to re-authorize
   handleError = function(e) {
-    var error_type = e.type;
+    var isNetworkError = e.type;
+    var errorMessage = (e.error !== undefined) ? e.error.message : e.result.error.message;
     
-    if(e.error.message === "A network error occurred, and the request could not be completed.") {
-      error_type = "network error";
+    if(errorMessage === "A network error occurred, and the request could not be completed.") {
+      isNetworkError = true;
     }
     
-    plugin.sync.logger.log('Drive API Error: ' + error_type);
-    _this.stopSync();
-    if(error_type === "network error") {
+    plugin.sync.logger.log(_this.getFileName(), errorMessage);
+    if(isNetworkError === true) {
       setTimeout(function() {_this.authorizer.authorize();}, 50*1000);
     } else if(e.status === 401) { // Unauthorized
       _this.authorizer.authorize();
     } else if(e.status === 404) { // Not found
       _this.forceFileSearch = true;
-      _this.initFile()
-    } else {
-      alert('Plugin Sync error: ' + error_type + ', ' + e.message);
+      _this.initFile();
+      setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
     }
   };
 
   this.dataStorage.readFile(initializeFile, onFileLoaded, handleError);
-};
-
-window.plugin.sync.RegisteredMap.prototype.stopSync = function() {
-  clearInterval(this.intervalID);
-  this.intervalID = null;
-  this.map = null;
-  this.lastUpdateUUID = null;
-  this.initializing = false;
-  this.initialized = false;
-  plugin.sync.registeredPluginsFields.addToWaitingInitialize(this.pluginName, this.fieldName);
 };
 //// end RegisteredMap
 
@@ -274,19 +266,6 @@ window.plugin.sync.RegisteredPluginsFields.prototype.add = function(registeredMa
   this.waitingInitialize[registeredMap.getFileName()] = registeredMap;
 
   this.initializeWorker();
-};
-
-window.plugin.sync.RegisteredPluginsFields.prototype.addToWaitingInitialize = function(pluginName, fieldName) {
-  var registeredMap, _this;
-  _this = this;
-
-  registeredMap = this.get(pluginName, fieldName);
-  if(!registeredMap) return;
-  this.waitingInitialize[registeredMap.getFileName()] = registeredMap;
-
-  clearTimeout(this.timer);
-  this.timer = setTimeout(function() {_this.initializeWorker()}, 10000);
-  plugin.sync.logger.log('Retry in 10 sec.: ' +  pluginName + '[' + fieldName + ']');
 };
 
 window.plugin.sync.RegisteredPluginsFields.prototype.get = function(pluginName, fieldName) {
@@ -364,7 +343,7 @@ window.plugin.sync.DataManager.prototype.initialize = function(force, assignIdCa
   this.force = force;
   // throw error if too many retry
   if(this.retryCount >= this.RETRY_LIMIT) {
-    plugin.sync.logger.log('Too many file operation: ' + this.fileName);
+    plugin.sync.logger.log(this.fileName, 'Too many file operation');
     failedCallback();
     return;
   }
@@ -392,7 +371,7 @@ window.plugin.sync.DataManager.prototype.initFile = function(assignIdCallback, f
   handleFailed = function(resp) {
     _this.fileId = null;
     _this.saveFileId();
-    plugin.sync.logger.log('File operation failed: ' + (resp.error || 'unknown error'));
+    plugin.sync.logger.log(_this.fileName, 'File operation failed: ' + (resp.error || 'unknown error'));
     failedCallback(resp);
   };
 
@@ -427,7 +406,7 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
   
   parentAssignIdCallback = function(id) {
     plugin.sync.parentFolderID = id;
-    plugin.sync.logger.log('Parent folder success initialized');
+    plugin.sync.logger.log('all', 'Parent folder success initialized');
     if (plugin.sync.parentFolderIDrequested) {
       plugin.sync.parentFolderIDrequested = false;
       return;
@@ -438,7 +417,7 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
   parentFailedCallback = function(resp) {
     plugin.sync.parentFolderID = null;
     plugin.sync.parentFolderIDrequested = false;
-    plugin.sync.logger.log('Create folder operation failed: ' + (resp.error || 'unknown error'));
+    plugin.sync.logger.log('all', 'Create folder operation failed: ' + (resp.error || 'unknown error'));
     failedCallback(resp);
   };
   
@@ -597,13 +576,13 @@ window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
   handleAuthResult = function(authResult) {
     if(authResult && !authResult.error) {
       _this.authorized = true;
-      plugin.sync.logger.log('Authorized');
+      plugin.sync.logger.log('all', 'Authorized');
     } else {
       _this.authorized = false;
       var error = (authResult && authResult.error) ? authResult.error : 'not authorized';
-      plugin.sync.logger.log('Authorization error: ' + error);
+      plugin.sync.logger.log('all', 'Authorization error: ' + error);
       if (error === "idpiframe_initialization_failed") {
-        plugin.sync.logger.log('You need enable 3rd-party cookies in your browser or allow [*.]google.com');
+        plugin.sync.logger.log('all', 'You need enable 3rd-party cookies in your browser or allow [*.]google.com');
       }
     }
     _this.authComplete();
@@ -622,7 +601,7 @@ window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
 
     if(isSignedIn) {
       _this.authorized = true;
-      plugin.sync.logger.log('Authorized');
+      plugin.sync.logger.log('all', 'Authorized');
 
     } else {
       _this.authorized = false;
@@ -644,25 +623,32 @@ window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
 window.plugin.sync.Logger = function(options) {
   this.logLimit = options['logLimit'];
   this.logUpdateCallback = options['logUpdateCallback'];
-  this.logs = [];
+  this.logs = {};
   this.log = this.log.bind(this);
   this.getLogs = this.getLogs.bind(this);
 };
 
-window.plugin.sync.Logger.prototype.log = function(message) {
-  var log = {'time': new Date(), 'message': message};
-  this.logs.unshift(log);
-  if(this.logs.length > this.logLimit) {
-    this.logs.pop();
+window.plugin.sync.Logger.prototype.log = function(filename, message) {
+  var entity = {'time': new Date(), 'message': message};
+  
+  if (filename === 'all') {
+    Object.keys(this.logs).forEach((key) => {
+      this.logs[key] = entity;
+    });
+  } else {
+    this.logs[filename] = entity;
   }
+  
   if(this.logUpdateCallback) this.logUpdateCallback(this.getLogs());
 };
 
 window.plugin.sync.Logger.prototype.getLogs = function() {
   var allLogs = '';
-  $.each(this.logs, function(ind,log) {
-    allLogs += log.time.toLocaleTimeString() + ': ' + log.message + '<br />';
+  Object.keys(this.logs).forEach((key) => {
+    var value = this.logs[key];
+    allLogs += '<div class="sync-log-block"><p class="sync-log-file">'+key+':</p><p class="sync-log-message">' + value.message+' ('+value.time.toLocaleTimeString()+')</p></div>';
   });
+
   return allLogs;
 };
 
@@ -778,6 +764,18 @@ window.plugin.sync.setupCSS = function() {
             white-space: -o-pre-wrap;\
             word-wrap: break-word;\
             overflow-y: auto;\
+          }\
+          .sync-log-block {\
+            background: #ffffff1a;\
+            padding: 5px;\
+            margin: 0.5em 0;\
+          }\
+          .sync-log-file {\
+            margin: 0;\
+          }\
+          .sync-log-message {\
+            margin: 0;\
+            text-align: right;\
           }")
   .appendTo("head");
 };
@@ -800,6 +798,8 @@ var setup = function() {
     gapi.load('client:auth2', window.plugin.sync.authorizer.authorize);
   });
 };
+
+setup.priority = 'high';
 
 // PLUGIN END //////////////////////////////////////////////////////////
 

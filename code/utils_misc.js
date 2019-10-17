@@ -1,62 +1,88 @@
 // UTILS + MISC  ///////////////////////////////////////////////////////
 
 window.aboutIITC = function() {
-  var v = (script_info.script && script_info.script.version || script_info.dateTimeVersion) + ' ['+script_info.buildName+']';
-  if (typeof android !== 'undefined' && android && android.getVersionName) {
-    v += '[IITC Mobile '+android.getVersionName()+']';
-  }
-
-  if (window.bootPlugins) {
-    var plugins = '<ul>';
-    for(var i in bootPlugins) {
-      var info = bootPlugins[ i ].info;
-      if(info) {
-        var pname = info.script && info.script.name || info.pluginId;
-        if(pname.substr(0, 13) == 'IITC plugin: ' || pname.substr(0, 13) == 'IITC Plugin: ') {
-          pname = pname.substr(13);
-        }
-        var pvers = info.script && info.script.version || info.dateTimeVersion;
-      
-        var ptext = pname + ' - ' + pvers;
-        if(info.buildName != script_info.buildName) {
-          ptext += ' [' + (info.buildName || '<i>non-standard plugin</i>') + ']';
-        }
-      
-        plugins += '<li>' + ptext + '</li>';
+  var pluginsInfo = window.bootPlugins.info;
+  var iitc = script_info;
+  var iitcVersion = iitc.script.version + ' [' + iitc.buildName + ']';
+  var verRE = /^([\d.]+?)(?:\.(2\d{7}\.\d*))?$/;
+  var descRE = /^\[.+?\-2\d\d\d\-\d\d\-\d\d\-\d+\] /; // regexps to match 'garbage' parts
+  function prepData (info,idx) {
+    var data = {
+      build: info.buildName ? ' [' + info.buildName + ']' : '',
+      date: '',
+      error: info.error,
+      standard: info.buildName === iitc.buildName && info.dateTimeVersion === iitc.dateTimeVersion,
+      version: ''
+    };
+    var script = info.script;
+    if (!script.name) {
+      data.name = '[unknown plugin: index ' + idx + ']';
+      data.description = "this plugin does not have proper wrapper; report to it's author";
+      return data;
+    }
+    data.name = script.name.substring(0, 13) === 'IITC plugin: '
+      ? script.name.substring(13)
+      : script.name;
+    data.description = script.description
+      ? script.description.replace(descRE,'') // remove buildname component from description
+      : '';
+    if (script.version) {
+      var ver = script.version.match(verRE);
+      if (ver) {
+        data.version = ver[1] || ver[2]; // remove date component from version
+        data.date = ver[1] && ver[2] || '';
       } else {
-        // no 'info' property of the plugin setup function - old plugin wrapper code
-        // could attempt to find the "window.plugin.NAME = function() {};" line it's likely to have..?
-        plugins += '<li>(unknown plugin: index ' + i + ')</li>';
+        data.version = script.version;
       }
     }
-    plugins += '</ul>';
+    return data;
   }
 
-  var a = ''
-  + '  <div><b>About IITC</b></div> '
-  + '  <div>Ingress Intel Total Conversion</div> '
-  + '  <hr>'
-  + '  <div>'
-  + '    <a href="https://iitc.modos189.ru/" target="_blank">IITC Homepage</a> |' +
-    '    <a href="https://t.me/iitc_news" target="_blank">Telegram channel</a><br />'
-  + '     On the script’s homepage you can:'
-  + '     <ul>'
-  + '       <li>Find Updates</li>'
-  + '       <li>Get Plugins</li>'
-  + '       <li>Report Bugs</li>'
-  + '       <li>Contribute!</li>'
-  + '     </ul>'
-  + '  </div>'
-  + '  <hr>'
-  + '  <div>Version: ' + v + '</div>';
-  if (window.bootPlugins && window.bootPlugins.length > 0) {
-    a += '  <div>Plugins: ' + plugins + '</div>';
+  var plugins = pluginsInfo.map(prepData)
+    .sort(function (a,b) { return a.name > b.name ? 1 : -1; })
+    .map(function (p) {
+      p.style = '';
+      p.title = p.description;
+      if (p.error) {
+        p.style += 'text-decoration:line-through;';
+        p.title = p.error;
+      } else if (p.standard) {
+        p.style += 'color:darkgray;';
+      }
+      p.sep = p.version ? ' - ' : '';
+      return L.Util.template('<li style="{style}" title="{title}">{name}{sep}<code title="{date}{build}">{version}</code></li>', p);
+    })
+    .join('\n');
+
+  var html = ''
+  + '<div><b>About IITC</b></div> '
+  + '<div>Ingress Intel Total Conversion</div> '
+  + '<hr>'
+  + '<div>'
+  + '  <a href="https://iitc.modos189.ru/" target="_blank">IITC Homepage</a> |' +
+    '  <a href="https://t.me/iitc_news" target="_blank">Telegram channel</a><br />'
+  + '   On the script’s homepage you can:'
+  + '   <ul>'
+  + '     <li>Find Updates</li>'
+  + '     <li>Get Plugins</li>'
+  + '     <li>Report Bugs</li>'
+  + '     <li>Contribute!</li>'
+  + '   </ul>'
+  + '</div>'
+  + '<hr>'
+  + '<div>Version: ' + iitcVersion + '</div>';
+
+  if (typeof android !== 'undefined' && android.getVersionName) {
+    html += '<div>IITC Mobile ' + android.getVersionName() + '</div>';
+  }
+  if (plugins) {
+    html += '<div><p>Plugins:</p><ul>' + plugins + '</ul></div>';
   }
 
   dialog({
-    title: 'IITC ' + v,
+    title: 'IITC ' + iitcVersion,
     id: 'iitc-about',
-    html: a,
+    html: html,
     dialogClass: 'ui-dialog-aboutIITC'
   });
 }
@@ -208,7 +234,7 @@ window.showPortalPosLinks = function(lat, lng, name) {
     var gmaps = '<a href="https://maps.google.com/maps?ll='+lat+','+lng+'&q='+lat+','+lng+'%20('+encoded_name+')">Google Maps</a>';
     var bingmaps = '<a href="https://www.bing.com/maps/?v=2&cp='+lat+'~'+lng+'&lvl=16&sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps</a>';
     var osm = '<a href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lng+'&zoom=16">OpenStreetMap</a>';
-    var latLng = '<span>&lt;' + lat + ',' + lng +'&gt;</span>';
+    var latLng = '<span>' + lat + ',' + lng +'</span>';
     dialog({
       html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
       title: name,
@@ -227,15 +253,6 @@ window.androidCopy = function(text) {
     return true; // i.e. execute other actions
   else
     android.copy(text);
-  return false;
-}
-
-window.androidPermalink = function() {
-  if(typeof android === 'undefined' || !android || !android.intentPosLink)
-    return true; // i.e. execute other actions
-
-  var center = map.getCenter();
-  android.intentPosLink(center.lat, center.lng, map.getZoom(), "Selected map view", false);
   return false;
 }
 
@@ -302,7 +319,7 @@ window.escapeJavascriptString = function(str) {
 
 //escape special characters, such as tags
 window.escapeHtmlSpecialChars = function(str) {
-  var div = document.createElement(div);
+  var div = document.createElement('div');
   var text = document.createTextNode(str);
   div.appendChild(text);
   return div.innerHTML;
@@ -310,14 +327,6 @@ window.escapeHtmlSpecialChars = function(str) {
 
 window.prettyEnergy = function(nrg) {
   return nrg> 1000 ? Math.round(nrg/1000) + ' k': nrg;
-}
-
-window.setPermaLink = function(elm) {
-  var c = map.getCenter();
-  var lat = Math.round(c.lat*1E6)/1E6;
-  var lng = Math.round(c.lng*1E6)/1E6;
-  var qry = 'll='+lat+','+lng+'&z=' + map.getZoom();
-  $(elm).attr('href',  '/intel?' + qry);
 }
 
 window.uniqueArray = function(arr) {
@@ -409,13 +418,20 @@ window.addLayerGroup = function(name, layerGroup, defaultDisplay) {
 }
 
 window.removeLayerGroup = function(layerGroup) {
-  if(!layerChooser._layers[layerGroup._leaflet_id]) throw('Layer was not found');
+  function find (arr, callback) { // ES5 doesn't include Array.prototype.find()
+    for (var i=0; i<arr.length; i++) {
+      if (callback(arr[i], i, arr)) { return arr[i]; }
+    }
+  }
+  var element = find(layerChooser._layers, function (el) { return el.layer === layerGroup; });
+  if (!element) {
+    throw new Error('Layer was not found');
+  }
   // removing the layer will set it's default visibility to false (store if layer gets added again)
-  var name = layerChooser._layers[layerGroup._leaflet_id].name;
-  var enabled = isLayerGroupDisplayed(name);
+  var enabled = isLayerGroupDisplayed(element.name);
   map.removeLayer(layerGroup);
   layerChooser.removeLayer(layerGroup);
-  updateDisplayedLayerGroup(name, enabled);
+  updateDisplayedLayerGroup(element.name, enabled);
 };
 
 window.clampLat = function(lat) {
@@ -442,3 +458,38 @@ window.clampLatLng = function(latlng) {
 window.clampLatLngBounds = function(bounds) {
   return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
 }
+
+// @function makePermalink(latlng?: LatLng, mapView?: Boolean): String
+// Makes the permalink for the portal with specified latlng, incluging current map view.
+// At least one of the parameters have to be present.
+window.makePermalink = function(latlng, mapView) {
+  function ll2str (ll) { return ll[0] + ',' + ll[1]; }
+  function round (ll) { // ensures that lat,lng are with same precision as in stock intel permalinks
+    return ll.map(function (n) { return Math.trunc(n*1e6)/1e6; });
+  }
+  var args = [];
+  if (mapView) {
+    var c = window.map.getCenter();
+    args.push('ll='+ll2str(round([c.lat,c.lng])), 'z='+window.map.getZoom())
+  }
+  if (latlng) {
+    if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
+    args.push('pll='+ll2str(latlng));
+  }
+  return '/intel?' + args.join('&');
+};
+
+window.setPermaLink = function(elm) { // deprecated
+  $(elm).attr('href', window.makePermalink(null,true));
+}
+
+window.androidPermalink = function() { // deprecated
+  if(typeof android === 'undefined' || !android || !android.intentPosLink)
+    return true; // i.e. execute other actions
+
+  var center = map.getCenter();
+  android.intentPosLink(center.lat, center.lng, map.getZoom(), "Selected map view", false);
+  return false;
+}
+
+// todo refactor main.js to get rid of setPermaLink and androidPermalink

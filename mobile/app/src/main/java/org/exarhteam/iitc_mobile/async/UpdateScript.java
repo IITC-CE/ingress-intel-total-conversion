@@ -1,85 +1,91 @@
 package org.exarhteam.iitc_mobile.async;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 
 import org.exarhteam.iitc_mobile.IITC_FileManager;
-import org.exarhteam.iitc_mobile.IITC_Mobile;
 import org.exarhteam.iitc_mobile.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class UpdateScript extends AsyncTask<String, Void, Boolean> {
 
-    private final Activity mActivity;
-    private String mFilePath;
-    private String mScript;
-    private HashMap<String, String> mScriptInfo;
+    public interface ScriptUpdatedFinishedCallback {
+        void scriptUpdateFinished(String scriptName, Boolean updated);
+    }
+
+    private final ScriptUpdatedFinishedCallback mCallback;
+    private String mScriptName;
     private final boolean mForceSecureUpdates;
 
-    public UpdateScript(final Activity activity) {
-        mActivity = activity;
-        mForceSecureUpdates = PreferenceManager.getDefaultSharedPreferences(mActivity)
-                .getBoolean("pref_secure_updates", true);
+    private final OkHttpClient mClient;
+
+    public UpdateScript(final ScriptUpdatedFinishedCallback callback, final Boolean forceSecureUpdates) {
+        mCallback = callback;
+        mForceSecureUpdates = forceSecureUpdates;
+        mClient = new OkHttpClient();
     }
 
     @Override
     protected Boolean doInBackground(final String... urls) {
         try {
-            mFilePath = urls[0];
+            final String filePath = urls[0];
             // get local script meta information
-            mScript = IITC_FileManager.readStream(new FileInputStream(new File(mFilePath)));
-            mScriptInfo = IITC_FileManager.getScriptInfo(mScript);
+            final String script = IITC_FileManager.readStream(new FileInputStream(new File(filePath)));
+            final HashMap<String, String> mScriptInfo = IITC_FileManager.getScriptInfo(script);
 
+            mScriptName = mScriptInfo.get("name");
             String updateURL = mScriptInfo.get("updateURL");
             String downloadURL = mScriptInfo.get("downloadURL");
             if (updateURL == null) updateURL = downloadURL;
-
+            if (updateURL == null) return false;
             if (!isUpdateAllowed(updateURL)) return false;
 
-            final File updateFile = File.createTempFile("iitc.update", ".meta.js", mActivity.getCacheDir());
-            IITC_FileManager.copyStream(new URL(updateURL).openStream(), new FileOutputStream(updateFile), true);
-
+            final String updateMetaScript = downloadFile(updateURL);
+            if (updateMetaScript == null) {
+                return false;
+            }
             final HashMap<String, String> updateInfo =
-                    IITC_FileManager.getScriptInfo(IITC_FileManager.readFile(updateFile));
+                    IITC_FileManager.getScriptInfo(updateMetaScript);
 
             final String remote_version = updateInfo.get("version");
 
-            final File local_file = new File(mFilePath);
+            final File local_file = new File(filePath);
             final String local_version = mScriptInfo.get("version");
 
             if (local_version.compareTo(remote_version) >= 0) return false;
 
-            Log.d("plugin " + mFilePath + " outdated\n" + local_version + " vs " + remote_version);
+            Log.d("plugin " + filePath + " outdated\n" + local_version + " vs " + remote_version);
 
-            InputStream sourceStream;
+            String updatedScript = null;
             if (updateURL.equals(downloadURL)) {
-                sourceStream = new FileInputStream(updateFile);
+                updatedScript = updateMetaScript;
             } else {
                 if (updateInfo.get("downloadURL") != null) {
                     downloadURL = updateInfo.get("downloadURL");
                 }
 
                 if (!isUpdateAllowed(downloadURL)) return false;
-
-                sourceStream = new URL(downloadURL).openStream();
+                updatedScript = downloadFile(downloadURL);
+                if (updatedScript == null) {
+                    return false;
+                }
             }
 
             Log.d("updating file....");
-            IITC_FileManager.copyStream(sourceStream, new FileOutputStream(local_file), true);
+            try (FileOutputStream stream = new FileOutputStream(local_file)) {
+                stream.write(updatedScript.getBytes());
+            }
             Log.d("...done");
-
-            updateFile.delete();
 
             return true;
 
@@ -95,29 +101,26 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
         return !mForceSecureUpdates;
     }
 
+    private String downloadFile(final String url) throws IOException {
+        final Response response = mClient.newCall(
+                new Request.Builder()
+                        .url(url)
+                        .get()
+                        .build()).execute();
+        final int code = response.code();
+        if (code != 200) {
+            Log.d("Error when request \"" + url + "\", code: " + code);
+            return null;
+        }
+        if (response.body() == null) {
+            Log.d("Empty response from " + url);
+            return null;
+        }
+        return response.body().string();
+    }
+
     @Override
     protected void onPostExecute(final Boolean updated) {
-        if (updated) {
-            final String name = IITC_FileManager.getScriptInfo(mScript).get("name");
-            new AlertDialog.Builder(mActivity)
-                    .setTitle("Plugin updated")
-                    .setMessage(name)
-                    .setCancelable(true)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog, final int which) {
-                            dialog.cancel();
-                        }
-                    })
-                    .setNegativeButton("Reload", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog, final int which) {
-                            dialog.cancel();
-                            ((IITC_Mobile) mActivity).reloadIITC();
-                        }
-                    })
-                    .create()
-                    .show();
-        }
+        mCallback.scriptUpdateFinished(mScriptName, updated);
     }
 }

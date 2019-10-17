@@ -2,7 +2,7 @@ Ingress Intel Total Conversion (IITC)
 =====================================
 
 <!-- [START badges] -->
-[![Build Status](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion.svg?branch=master)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
+[![Build Status](http://img.shields.io/travis/IITC-CE/ingress-intel-total-conversion/test-builds.svg?label=test-builds)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
 [![Docs Status](https://readthedocs.org/projects/iitc-ce/badge/?version=latest)](https://readthedocs.org/projects/iitc-ce/)
 [![LICENSE](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
 <!-- [END badges] -->
@@ -54,6 +54,11 @@ To build the mobile app, along with python, you will need
 - The Android SDK
 
 Run `build.py mobile` to build IITC Mobile in debug mode.
+
+### IITC-Button
+
+The source codes of the IITC-Button browser extension are in a nearby repository:
+https://github.com/IITC-CE/IITC-Button
 
 ### Website
 

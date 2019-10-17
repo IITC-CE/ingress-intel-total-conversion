@@ -155,6 +155,16 @@
             android:noHistory="false"
             android:theme="@android:style/Theme.Holo.Dialog"/>
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
         <!-- START Used for Samsung Multi-Window support -->
         <uses-library
             android:name="com.sec.android.app.multiwindow"

@@ -532,7 +532,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	// @method initialize(): void
 	initialize: function (map, options) {
 		// if touch, switch to touch icon
-		if (window.isSmartphone()) {
+		if (L.Browser.touch) {
 			this.options.icon = this.options.touchIcon;
 		}
 
@@ -786,12 +786,12 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			if (this.options.maxPoints > 1 && this.options.maxPoints == this._markers.length + 1) {
 				this.addVertex(e.latlng);
 				this._finishShape();
-			} else if (lastPtDistance < 10 && window.isSmartphone()) {
+			} else if (lastPtDistance < 10 && L.Browser.touch) {
 				this._finishShape();
 			} else if (Math.abs(dragCheckDistance) < 9 * (window.devicePixelRatio || 1)) {
 				if (this.options.snapPoint) {
 					e.latlng = this.options.snapPoint(e.latlng);
-				}
+				}	
 				this.addVertex(e.latlng);
 			}
 			this._enableNewMarkers(); // after a short pause, enable new markers
@@ -1258,7 +1258,7 @@ L.Draw.SimpleShape = L.Draw.Feature.extend({
 			// (update): we have to send passive now to prevent scroll, because by default it is {passive: true} now, which means,
 			// handler can't event.preventDefault
 			// check the news https://developers.google.com/web/updates/2016/06/passive-event-listeners
-			document.addEventListener('touchstart', L.DomEvent.preventDefault, {passive: false});
+			this._map.getPanes().mapPane.addEventListener('touchstart', L.DomEvent.preventDefault, {passive: false});
 		}
 	},
 
@@ -1283,7 +1283,7 @@ L.Draw.SimpleShape = L.Draw.Feature.extend({
 			L.DomEvent.off(document, 'mouseup', this._onMouseUp, this);
 			L.DomEvent.off(document, 'touchend', this._onMouseUp, this);
 
-			document.removeEventListener('touchstart', L.DomEvent.preventDefault);
+			this._map.getPanes().mapPane.removeEventListener('touchstart', L.DomEvent.preventDefault);
 
 			// If the box element doesn't exist they must not have moved the mouse, so don't need to destroy/return
 			if (this._shape) {
@@ -1660,7 +1660,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 		}
 
 		if (!this._shape) {
-			this._shape = new L.Circle(this._startLatLng, distance, this.options.shapeOptions);
+			this._shape = new L.GeodesicCircle(this._startLatLng, distance, this.options.shapeOptions);
 			this._map.addLayer(this._shape);
 		} else {
 			this._shape.setRadius(distance);
@@ -1668,7 +1668,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 	},
 
 	_fireCreatedEvent: function () {
-		var circle = new L.Circle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
+		var circle = new L.GeodesicCircle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
 		L.Draw.SimpleShape.prototype._fireCreatedEvent.call(this, circle);
 	},
 
@@ -1889,7 +1889,7 @@ L.Edit.PolyVerticesEdit = L.Handler.extend({
 	// @method intialize(): void
 	initialize: function (poly, latlngs, options) {
 		// if touch, switch to touch icon
-		if (window.isSmartphone()) {
+		if (L.Browser.touch) {
 			this.options.icon = this.options.touchIcon;
 		}
 		this._poly = poly;
@@ -2373,7 +2373,7 @@ L.Edit.SimpleShape = L.Handler.extend({
 	// @method intialize(): void
 	initialize: function (shape, options) {
 		// if touch, switch to touch icon
-		if (window.isSmartphone()) {
+		if (L.Browser.touch) {
 			this.options.moveIcon = this.options.touchMoveIcon;
 			this.options.resizeIcon = this.options.touchResizeIcon;
 		}
@@ -2767,6 +2767,7 @@ L.Edit = L.Edit || {};
  * @aka Edit.Circle
  * @inherits L.Edit.CircleMarker
  */
+
 L.Edit.Circle = L.Edit.CircleMarker.extend({
 
 	_createResizeMarker: function () {
@@ -2778,10 +2779,8 @@ L.Edit.Circle = L.Edit.CircleMarker.extend({
 	},
 
 	_getResizeMarkerPoint: function (latlng) {
-		// From L.shape.getBounds()
-		var delta = this._shape._radius * Math.cos(Math.PI / 4),
-			point = this._map.project(latlng);
-		return this._map.unproject([point.x + delta, point.y - delta]);
+		var bounds = this._shape.getBounds(); // geodesic circle stores precalculated bounds
+		return L.latLng(bounds.getNorth(), latlng.lng);
 	},
 
 	_resize: function (latlng) {

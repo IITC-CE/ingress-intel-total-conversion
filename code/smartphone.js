@@ -178,23 +178,11 @@ window.runOnSmartphonesAfterBoot = function() {
 
 }
 
-
-
 window.setAndroidPermalink = function() {
-  var c = window.map.getCenter();
-  var lat = Math.round(c.lat*1E6)/1E6;
-  var lng = Math.round(c.lng*1E6)/1E6;
-
-  var href = '/intel?ll='+lat+','+lng+'&z=' + map.getZoom();
-
-  if(window.selectedPortal && window.portals[window.selectedPortal]) {
-    var p = window.portals[window.selectedPortal].getLatLng();
-    lat = Math.round(p.lat*1E6)/1E6;
-    lng = Math.round(p.lng*1E6)/1E6;
-    href += '&pll='+lat+','+lng;
-  }
-
-  href = $('<a>').prop('href',  href).prop('href'); // to get absolute URI
+  var p = window.selectedPortal && window.portals[window.selectedPortal];
+  var href = $('<a>')
+    .prop('href',  window.makePermalink(p && p.getLatLng(), true))
+    .prop('href'); // to get absolute URI
   android.setPermalink(href);
 }
 
@@ -203,18 +191,19 @@ window.useAndroidPanes = function() {
   return (typeof android !== 'undefined' && android && android.addPane && window.isSmartphone());
 }
 
-if(typeof android !== 'undefined' && android && android.getFileRequestUrlPrefix) {
+if (typeof android !== 'undefined' && android.getFileRequestUrlPrefix) {
   window.requestFile = function(callback) {
-    do {
-      var funcName = "onFileSelected" + parseInt(Math.random()*0xFFFF).toString(16);
-    } while(window[funcName] !== undefined)
-
-    window[funcName] = function(filename, content) {
+    var name = 'onFileSelected',
+      funcName = name;
+    for (var c=0; window[funcName]; funcName=name+c++);
+    window[funcName] = function (filename, content) {
       callback(decodeURIComponent(filename), atob(content));
+      delete window[funcName];
     };
     var script = document.createElement('script');
     script.src = android.getFileRequestUrlPrefix() + funcName;
     (document.body || document.head || document.documentElement).appendChild(script);
+    script.remove();
   };
 }
 

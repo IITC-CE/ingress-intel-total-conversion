@@ -186,7 +186,6 @@ window.plugin.keys.setupContent = function() {
 }
 
 window.plugin.keys.setupPortalsList = function() {
-  if(!window.plugin.portalslist) return;
 
   window.addHook('pluginKeysUpdateKey', function(data) {
     $('[data-list-keycount="'+data.guid+'"]').text(data.count);
@@ -232,25 +231,19 @@ window.plugin.keys.setupPortalsList = function() {
 }
 
 var setup =  function() {
-  if($.inArray('pluginKeysUpdateKey', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysUpdateKey');
-  if($.inArray('pluginKeysRefreshAll', window.VALID_HOOKS) < 0)
-    window.VALID_HOOKS.push('pluginKeysRefreshAll');
+  // HOOKS:
+  // - pluginKeysUpdateKey
+  // - pluginKeysRefreshAll
 
   window.plugin.keys.setupCSS();
   window.plugin.keys.setupContent();
   window.plugin.keys.loadLocal(plugin.keys.UPDATE_QUEUE);
   window.plugin.keys.loadKeys();
   window.addHook('portalDetailsUpdated', window.plugin.keys.addToSidebar);
-  window.addHook('iitcLoaded', window.plugin.keys.registerFieldForSyncing);
+  window.plugin.keys.registerFieldForSyncing();
 
-  if(window.plugin.portalslist) {
+  if (window.plugin.portalslist) {
     window.plugin.keys.setupPortalsList();
-  } else {
-    setTimeout(function() {
-      if(window.plugin.portalslist)
-        window.plugin.keys.setupPortalsList();
-    }, 500);
   }
 }
 
