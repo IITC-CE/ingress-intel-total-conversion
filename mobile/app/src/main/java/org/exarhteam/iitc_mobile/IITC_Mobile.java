@@ -49,6 +49,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
+import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.exarhteam.iitc_mobile.prefs.PreferenceActivity;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
 
@@ -598,6 +599,10 @@ public class IITC_Mobile extends AppCompatActivity
                     item.setVisible(true);
                     break;
 
+                case R.id.menu_open_plugins:
+                    item.setVisible(enabled);
+                    break;
+
                 case R.id.toggle_fullscreen:
                     item.setChecked(mIitcWebView.isInFullscreen());
                     item.setIcon(mIitcWebView.isInFullscreen()
@@ -674,6 +679,10 @@ public class IITC_Mobile extends AppCompatActivity
                 return true;
             case R.id.menu_send_screenshot:
                 sendScreenshot();
+                return true;
+            case R.id.menu_open_plugins:
+                final Intent intent_plugins = new Intent(this, PluginPreferenceActivity.class);
+                startActivity(intent_plugins);
                 return true;
             case R.id.menu_debug:
                 mDebugging = !mDebugging;

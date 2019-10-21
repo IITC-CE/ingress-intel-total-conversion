@@ -143,6 +143,7 @@
     <string name="menu_locate">Get Location</string>
     <string name="menu_clear_cookies">Clear cookies</string>
     <string name="menu_search">Search</string>
+    <string name="menu_open_plugins">Plugins</string>
     <string name="menu_debug">Debug</string>
     <string name="menu_send_screenshot">Send screenshot</string>
     <string name="menu_plugins_add">Add external plugins</string>
