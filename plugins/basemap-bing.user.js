@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-bing-maps
-// @name           IITC plugin: Bing maps
+// @author         johnd0e
+// @name           Bing maps
 // @category       Map Tiles
-// @version        0.3.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the bing.com map layers.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.3.0
+// @description    Add the bing.com map layers.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 var mapBing = {};
 window.plugin.mapBing = mapBing;
@@ -46,17 +40,13 @@ function setup () {
 function setupBingLeaflet () {
   try {
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.js
-    @@INCLUDERAW:external/Bing.js@@
+    '@include_raw:external/Bing.js@';
 
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.addon.applyMaxNativeZoom.js
-    @@INCLUDERAW:external/Bing.addon.applyMaxNativeZoom.js@@
+    '@include_raw:external/Bing.addon.applyMaxNativeZoom.js@';
 
     } catch (e) {
       console.error('Bing.js loading failed');
       throw e;
     }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-marker-canvas-icon@jonatkins
-// @name           IITC plugin: Marker drawn using icons from canvas data URLs
+// @author         jonatkins
+// @name           Marker drawn using icons from canvas data URLs
 // @category       Tweaks
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] EXPERIMENTAL: draw markers using individual Leaflet Icons, created from canvas elements converted to data: URLs
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.1.0
+// @description    EXPERIMENTAL: draw markers using individual Leaflet Icons, created from canvas elements converted to data: URLs
 
 
 // use own namespace for plugin
@@ -102,7 +95,3 @@ window.plugin.markerIconCanvasUrl.setup  = function() {
 };
 
 var setup =  window.plugin.markerIconCanvasUrl.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

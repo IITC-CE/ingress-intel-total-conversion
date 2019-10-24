@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             tidy-links@boombuler
-// @name           IITC plugin: Tidy Links
+// @author         boombuler
+// @name           Tidy Links
 // @category       Draw
-// @version        0.5.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (former `Max Links`)
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.5.0
+// @description    Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (former `Max Links`)
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 var tidyLinks = {};
@@ -122,7 +116,7 @@ function setup () {
 function loadDelaunay () {
   try {
     // https://github.com/ironwallaby/delaunay
-    @@INCLUDERAW:external/delaunay.js@@
+    '@include_raw:external/delaunay.js@';
 
     return Delaunay;
   } catch (e) {
@@ -130,7 +124,3 @@ function loadDelaunay () {
     throw e;
   }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

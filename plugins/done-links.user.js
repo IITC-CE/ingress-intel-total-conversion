@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-done-links@jonatkins
-// @name           IITC plugin: Done links
+// @author         jonatkins
+// @name           Done links
 // @category       Draw
-// @version        0.0.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] A companion to the Cross Links plugin. Highlights any links that match existing draw-tools line/polygon edges
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.0.1
+// @description    A companion to the Cross Links plugin. Highlights any links that match existing draw-tools line/polygon edges
 
 
 window.plugin.doneLinks = function() {};
@@ -176,9 +169,4 @@ var setup = function() {
     window.addHook('linkAdded', window.plugin.doneLinks.onLinkAdded);
     window.addHook('mapDataRefreshEnd', window.plugin.doneLinks.onMapDataRefreshEnd);
 
-    
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

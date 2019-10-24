@@ -1,15 +1,9 @@
-﻿// ==UserScript==
-// @id             iitc-plugin-basemap-gaode
-// @name           IITC plugin: Gaode (高德地图) / AutoNavi map
+﻿// @author         johnd0e
+// @name           Gaode (高德地图) / AutoNavi map
 // @category       Map Tiles
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Map layers from AutoNavi / Gaode (高德地图)
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.0
+// @description    Map layers from AutoNavi / Gaode (高德地图)
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 function setup () {
   // sample tile: https://webrd01.is.autonavi.com/appmaptile?style=8&x=13720&y=6693&z=14&lang=zh_cn
@@ -86,7 +80,3 @@ function setup () {
     //new GaodeLayer({ style: 8, type: 'labels', opacity: 0.75, lang: 'zh_cn', ltype: 4 }) // (feature mask) here: 2: roads, 4: labels)
   ]));
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

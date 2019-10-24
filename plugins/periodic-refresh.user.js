@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-periodic-refresh
-// @name           IITC plugin: Periodic refresh
+// @author         jonatkins
+// @name           Periodic refresh
 // @category       Tweaks
-// @version        0.1.0.@@DATETIMEVERSION@@
+// @version        0.1.0
 // @description    For use for unattended display screens only, this plugin causes idle mode to be left once per hour.
-@@METAINFO@@
-// ==/UserScript==
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 window.plugin.periodicRefresh = function() {};
 
@@ -28,7 +22,3 @@ window.plugin.periodicRefresh.setup = function() {
 };
 
 var setup = window.plugin.periodicRefresh.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

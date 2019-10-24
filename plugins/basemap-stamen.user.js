@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-basemap-stamen@jonatkins
-// @name           IITC plugin: Stamen.com map layers
+// @author         jonatkins
+// @name           Stamen.com map layers
 // @category       Map Tiles
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.2.1
+// @description    Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
 
 
 // see API here http://maps.stamen.com/
@@ -69,7 +62,3 @@ function setup () {
   };
   addLayer('Watercolor',options);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

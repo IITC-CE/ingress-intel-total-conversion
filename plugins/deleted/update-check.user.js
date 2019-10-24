@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-update-check@jonatkins
-// @name           IITC plugin: Check for updates
+// @author         jonatkins
+// @name           Check for updates
 // @category       Misc
-// @version        0.1.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] **WORK IN PROGRESS** Check for updates for IITC and plugins against http://iitc.jonatkins.com/. Can also report status messages for known IITC issues.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.1.1
+// @description    **WORK IN PROGRESS** Check for updates for IITC and plugins against http://iitc.jonatkins.com/. Can also report status messages for known IITC issues.
 
 
 // use own namespace for plugin
@@ -21,7 +14,7 @@ window.plugin.updateCheck.versionDataLoading = false;
 window.plugin.updateCheck.getUrl = function(callback) {
   var base = window.location.protocol == 'https:' ? 'https://secure.jonatkins.com/iitc' : 'http://iitc.jonatkins.com';
   var url = base+'/versioncheck.php'
-          + '?build=@@BUILDNAME@@'
+          + '?build='+'@build_name@'
           + '&mobile='+((typeof android !== 'undefined' && android)?'1':'0')
           + '&ts='+Date.now();  // append timestamp - ensures no caching of old data, even on mobile with the aggressive cache code
 
@@ -302,7 +295,3 @@ window.plugin.updateCheck.setup  = function() {
 };
 
 var setup =  window.plugin.updateCheck.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

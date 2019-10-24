@@ -1,15 +1,10 @@
-// ==UserScript==
-// @id             iitc-plugin-bookmarks@ZasoGD
-// @name           IITC plugin: Bookmarks for maps and portals
+// @author         ZasoGD
+// @name           Bookmarks for maps and portals
 // @category       Controls
-// @version        0.2.12.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Save your favorite Maps and Portals and move the intel map with a click. Works with sync.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.12
+// @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync.
 
-@@PLUGINSTART@@
 
-// PLUGIN START ////////////////////////////////////////////////////////
 /***********************************************************************
 
   HOOKS:
@@ -18,7 +13,6 @@
   - pluginBkmrksSyncEnd: fired when the sync is finished;
 
 ***********************************************************************/
-////////////////////////////////////////////////////////////////////////
 
   // use own namespace for plugin
   window.plugin.bookmarks = function() {};
@@ -508,7 +502,7 @@
         query.addResult({
           title: escapeHtmlSpecialChars(bookmark.label),
           description: 'Map in folder "' + escapeHtmlSpecialChars(folder.label) + '"',
-          icon: '@@INCLUDEIMAGE:images/icon-bookmark-map.png@@',
+          icon: '@include_img:images/icon-bookmark-map.png@',
           position: L.latLng(bookmark.latlng.split(",")),
           zoom: bookmark.z,
           onSelected: window.plugin.bookmarks.onSearchResultSelected,
@@ -523,7 +517,7 @@
         query.addResult({
           title: escapeHtmlSpecialChars(bookmark.label),
           description: 'Bookmark in folder "' + escapeHtmlSpecialChars(folder.label) + '"',
-          icon: '@@INCLUDEIMAGE:images/icon-bookmark.png@@',
+          icon: '@include_img:images/icon-bookmark.png@',
           position: L.latLng(bookmark.latlng.split(",")),
           guid: bookmark.guid,
           onSelected: window.plugin.bookmarks.onSearchResultSelected,
@@ -902,7 +896,7 @@
   }
 
   window.plugin.bookmarks.dialogLoadList = function() {
-    var r = 'The "<a href="https://iitc.modos189.ru/desktop.html" target="_BLANK"><strong>Draw Tools</strong></a>" plugin is required.</span>';
+    var r = 'The "<a href="'+'@url_homepage@'+'" target="_BLANK"><strong>Draw Tools</strong></a>" plugin is required.</span>';
 
     if(!window.plugin.bookmarks || !window.plugin.drawTools) {
       $('.ui-dialog-autodrawer .ui-dialog-buttonset .ui-button:not(:first)').hide();
@@ -1095,7 +1089,7 @@
     var star = L.marker(latlng, {
       title: lbl,
       icon: L.icon({
-        iconUrl: '@@INCLUDEIMAGE:images/marker-star.png@@',
+        iconUrl: '@include_img:images/marker-star.png@',
         iconAnchor: [15,40],
         iconSize: [30,40]
       })
@@ -1130,7 +1124,7 @@
 /***************************************************************************************************************************************************************/
 
   window.plugin.bookmarks.setupCSS = function() {
-    $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/bookmarks.css@@').appendTo('head');
+    $('<style>').prop('type', 'text/css').html('@include_css:plugins/bookmarks.css@').appendTo('head');
   }
 
   window.plugin.bookmarks.setupPortalsList = function() {
@@ -1310,7 +1304,3 @@
       window.plugin.bookmarks.setupPortalsList();
     }
   }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-distance-to-portal@jonatkins
-// @name           IITC plugin: Distance to portal
+// @author         jonatkins
+// @name           Distance to portal
 // @category       Portal Info
-// @version        0.1.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allows your current location to be set manually, then shows the distance to the selected portal. Useful when managing portal keys.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.1.1
+// @description    Allows your current location to be set manually, then shows the distance to the selected portal. Useful when managing portal keys.
 
 
 // use own namespace for plugin
@@ -115,7 +108,7 @@ window.plugin.distanceToPortal.setupPortalsList = function() {
 
 window.plugin.distanceToPortal.setup  = function() {
   // https://github.com/gregallensworth/Leaflet/
-  @@INCLUDERAW:external/LatLng_Bearings.js@@
+  '@include_raw:external/LatLng_Bearings.js@';
 
   try {
     window.plugin.distanceToPortal.currentLoc = L.latLng(JSON.parse(localStorage['plugin-distance-to-portal']));
@@ -125,7 +118,7 @@ window.plugin.distanceToPortal.setup  = function() {
 
   window.plugin.distanceToPortal.currentLocMarker = null;
 
-  $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/distance-to-portal.css@@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@include_string:plugins/distance-to-portal.css@').appendTo('head');
 
   addHook('portalDetailsUpdated', window.plugin.distanceToPortal.addDistance);
 
@@ -135,7 +128,3 @@ window.plugin.distanceToPortal.setup  = function() {
 };
 
 var setup =  window.plugin.distanceToPortal.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

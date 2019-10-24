@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-show-less-portals@jonatkins
-// @name           IITC plugin: Show less portals when zoomed out
+// @author         jonatkins
+// @name           Show less portals when zoomed out
 // @category       Tweaks
-// @version        0.3.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Vastly reduce the detail level when zoomed out to level 11 or less (L4+ portals), to significantly reduce data usage when viewing large areas.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.3.0
+// @description    Vastly reduce the detail level when zoomed out to level 11 or less (L4+ portals), to significantly reduce data usage when viewing large areas.
 
 
 // use own namespace for plugin
@@ -24,7 +17,3 @@ window.plugin.showLessPortalsZoomedOut.setup  = function() {
 };
 
 var setup =  window.plugin.showLessPortalsZoomedOut.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

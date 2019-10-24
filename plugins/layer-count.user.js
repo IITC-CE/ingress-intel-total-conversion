@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             layer-count@fkloft
-// @name           IITC plugin: Layer count
+// @author         fkloft
+// @name           Layer count
 // @category       Info
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow users to count nested fields
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.0
+// @description    Allow users to count nested fields
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 plugin.layerCount = {}
@@ -114,7 +108,7 @@ plugin.layerCount.calculate = function(ev) {
 };
 
 var setup = function() {
-	$('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/layer-count.css@@').appendTo('head');
+	$('<style>').prop('type', 'text/css').html('@include_string:plugins/layer-count.css@').appendTo('head');
 
 	var parent = $(".leaflet-top.leaflet-left", window.map.getContainer());
 
@@ -136,8 +130,3 @@ var setup = function() {
 	plugin.layerCount.tooltip = tooltip;
 	plugin.layerCount.container = container;
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
-

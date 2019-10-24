@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-reso-energy-pct-in-portal-detail@xelio
-// @name           IITC plugin: Reso energy % in portal details
+// @author         xelio
+// @name           Reso energy % in portal details
 // @category       Portal Info
-// @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show resonator energy percentage on resonator energy bar in portal details panel.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.2
+// @description    Show resonator energy percentage on resonator energy bar in portal details panel.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.resoEnergyPctInPortalDetail = function() {};
@@ -34,7 +28,3 @@ window.plugin.resoEnergyPctInPortalDetail.updateMeter = function(data) {
 var setup =  function() {
   window.addHook('portalDetailsUpdated', window.plugin.resoEnergyPctInPortalDetail.updateMeter);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

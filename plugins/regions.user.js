@@ -1,22 +1,15 @@
-// ==UserScript==
-// @id             iitc-plugin-regions@jonatkins
-// @name           IITC plugin: Ingress scoring regions
+// @author         jonatkins
+// @name           Ingress scoring regions
 // @category       Layer
-// @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the regional scoring cells grid on the map
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.1.2
+// @description    Show the regional scoring cells grid on the map
 
 
 // use own namespace for plugin
 window.plugin.regions = function() {};
 
 window.plugin.regions.setup  = function() {
-  @@INCLUDERAW:external/s2geometry.js@@
+  '@include_raw:external/s2geometry.js@';
 
   window.plugin.regions.regionLayer = L.layerGroup();
 
@@ -158,11 +151,11 @@ window.plugin.regions.getSearchResult = function(match) {
 
   if(id2 === undefined) {
     result.description = 'Regional score cells (cluster of 16 cells)';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@@INCLUDESTRING:images/icon-cell.svg@@'.replace(/orange/, 'gold'));
+    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
     level = 4;
   } else {
     result.description = 'Regional score cell';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@@INCLUDESTRING:images/icon-cell.svg@@');
+    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@');
     level = 6;
 
     var xy = window.plugin.regions.d2xy(4, id2);
@@ -305,7 +298,3 @@ window.plugin.regions.drawCell = function(cell) {
 };
 
 var setup =  window.plugin.regions.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

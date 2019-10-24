@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-marker-divicon-svg@jonatkins
-// @name           IITC plugin: Marker drawn using separate SVGs
+// @author         jonatkins
+// @name           Marker drawn using separate SVGs
 // @category       Tweaks
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] EXPERIMENTAL: draw markers using individual Leaflet DivIcons, as SVG
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.1.0
+// @description    EXPERIMENTAL: draw markers using individual Leaflet DivIcons, as SVG
 
 
 // use own namespace for plugin
@@ -66,7 +59,3 @@ window.plugin.markerDivIconSvg.setup  = function() {
 };
 
 var setup =  window.plugin.markerDivIconSvg.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -575,9 +575,9 @@ window.setupLayerChooserApi = function() {
 
 window.extendLeaflet = function() {
   L.Icon.Default.mergeOptions({
-    iconUrl: '@@INCLUDEIMAGE:images/marker-ingress.png@@',
-    iconRetinaUrl: '@@INCLUDEIMAGE:images/marker-ingress-2x.png@@',
-    shadowUrl: '@@INCLUDEIMAGE:images/marker-shadow.png@@'
+    iconUrl: '@include_img:images/marker-ingress.png@',
+    iconRetinaUrl: '@include_img:images/marker-ingress-2x.png@',
+    shadowUrl: '@include_img:images/marker-shadow.png@'
   });
   L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
 
@@ -730,7 +730,7 @@ function boot() {
   if(!isSmartphone()) // TODO remove completely?
     window.debug.console.overwriteNativeIfRequired();
 
-  log.log('loading done, booting. Built: @@BUILDDATE@@');
+  log.log('loading done, booting. Built: '+'@build_date@');
   if (window.deviceID) {
     log.log('Your device ID: ' + window.deviceID);
   }
@@ -832,23 +832,23 @@ window.registerMarkerForOMS = function(marker) {
 }
 
 try {
-@@INCLUDERAW:external/autolink-min.js@@
+  '@include_raw:external/autolink-min.js@';
 
-window.L_NO_TOUCH = navigator.maxTouchPoints===0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
-@@INCLUDERAW:external/leaflet-src.js@@
-@@INCLUDERAW:external/L.Geodesic.js@@
-@@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
-@@INCLUDERAW:external/oms.min.js@@
-L.CanvasIconLayer = (function (module) {
-  @@INCLUDERAW:external/rbush.min.js@@
-  @@INCLUDERAW:external/leaflet.canvas-markers.js@@
-  return module;
-}({})).exports(L);
+  window.L_NO_TOUCH = navigator.maxTouchPoints===0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
+  '@include_raw:external/leaflet-src.js@';
+  '@include_raw:external/L.Geodesic.js@';
+  '@include_raw:external/Leaflet.GoogleMutant.js@';
+  '@include_raw:external/oms.min.js@';
+  L.CanvasIconLayer = (function (module) {
+    '@include_raw:external/rbush.min.js@';
+    '@include_raw:external/leaflet.canvas-markers.js@';
+    return module;
+  }({})).exports(L);
 
-@@INCLUDERAW:external/jquery-3.4.1.min.js@@
-@@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@
-@@INCLUDERAW:external/taphold.js@@
-@@INCLUDERAW:external/jquery.qrcode.min.js@@
+  '@include_raw:external/jquery-3.4.1.min.js@';
+  '@include_raw:external/jquery-ui-1.12.1.min.js@';
+  '@include_raw:external/taphold.js@';
+  '@include_raw:external/jquery.qrcode.min.js@';
 
 } catch (e) {
   log.error("External's js loading failed");

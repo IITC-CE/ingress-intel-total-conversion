@@ -1,14 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-uniques@3ch01c
-// @name           IITC plugin: Uniques
+// @author         3ch01c
+// @name           Uniques
 // @category       Misc
-// @version        0.2.4.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.4
+// @description    Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
 
-@@PLUGINSTART@@
-//PLUGIN START ////////////////////////////////////////////////////////
 
 //use own namespace for plugin
 window.plugin.uniques = function() {};
@@ -408,7 +403,7 @@ window.plugin.uniques.highlighter = {
 window.plugin.uniques.setupCSS = function() {
 	$("<style>")
 	.prop("type", "text/css")
-	.html("@@INCLUDESTRING:plugins/uniques.css@@")
+	.html('@include_string:plugins/uniques.css@')
 	.appendTo("head");
 }
 
@@ -575,7 +570,3 @@ var setup = function() {
 		window.plugin.uniques.setupPortalsList();
 	}
 }
-
-//PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

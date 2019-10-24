@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-highlight-forgotten@jonatkins
-// @name           IITC plugin: Highlight inactive portals
+// @author         jonatkins
+// @name           Highlight inactive portals
 // @category       Highlighter
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal is unclaimed with no recent activity. Shades of red from one week to one month, then tinted to purple for longer. May also highlight captured portals that are stuck and fail to decay every 24 hours.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.0
+// @description    Use the portal fill color to denote if the portal is unclaimed with no recent activity. Shades of red from one week to one month, then tinted to purple for longer. May also highlight captured portals that are stuck and fail to decay every 24 hours.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalHighlighterInactive = function() {};
@@ -39,7 +33,3 @@ window.plugin.portalHighlighterInactive.highlight = function(data) {
 var setup =  function() {
   window.addPortalHighlighter('Inactive Portals', window.plugin.portalHighlighterInactive.highlight);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

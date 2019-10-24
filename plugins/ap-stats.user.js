@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-compute-ap-stats@Hollow011
-// @name           IITC plugin: Available AP statistics
+// @author         Hollow011
+// @name           Available AP statistics
 // @category       Info
-// @version        0.4.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Displays the per-team AP gains available in the current view.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.4.1
+// @description    Displays the per-team AP gains available in the current view.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.compAPStats = function() {};
@@ -160,7 +154,3 @@ window.plugin.compAPStats.compAPStats = function() {
 var setup =  function() {
   window.plugin.compAPStats.setupCallback();
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

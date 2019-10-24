@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-user-location@cradle
-// @name           IITC plugin: User Location
+// @author         cradle
+// @name           User Location
 // @category       Tweaks
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show user location marker on map
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.1
+// @description    Show user location marker on map
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 window.plugin.userLocation = function() {};
 
@@ -19,7 +13,7 @@ window.plugin.userLocation.user = { latlng:null, direction:null };
 window.plugin.userLocation.setup = function() {
   window.pluginCreateHook('pluginUserLocation');
 
-  $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:mobile/plugins/user-location.css@@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@include_string:mobile/plugins/user-location.css@').appendTo('head');
 
   var cssClass = PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
 
@@ -167,7 +161,3 @@ window.plugin.userLocation.getUser = function() {
 }
 
 var setup = window.plugin.userLocation.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

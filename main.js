@@ -1,20 +1,17 @@
-// ==UserScript==
-// @id             ingress-intel-total-conversion@jonatkins
+// @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.29.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Total conversion for the ingress intel map.
-@@METAINFO@@
+// @version        0.29.1
+// @description    Total conversion for the ingress intel map.
 // @run-at         document-end
-// ==/UserScript==
 
-@@PLUGINSTART@@
+
 window.script_info = plugin_info;
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
 if (document.documentElement.getAttribute('itemscope') !== null) {
   throw new Error('Ingress Intel Website is down, not a userscript issue.');
 }
-window.iitcBuildDate = '@@BUILDDATE@@';
+window.iitcBuildDate = '@build_date@';
 
 // disable vanilla JS
 window.onload = function() {};
@@ -38,7 +35,7 @@ if (!window.PLAYER || !PLAYER.nickname) {
   // add login form stylesheet
   var style = document.createElement('style');
   style.type = 'text/css';
-  style.appendChild(document.createTextNode('@@INCLUDESTRING:login.css@@'));
+  style.appendChild(document.createTextNode('@include_string:login.css@'));
   document.head.appendChild(style);
   
   throw new Error("Couldn't retrieve player data. Are you logged in?");
@@ -52,8 +49,8 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // possible without requiring scripts.
 document.head.innerHTML = ''
   + '<title>Ingress Intel Map</title>'
-  + '<style>@@INCLUDESTRING:style.css@@</style>'
-  + '<style>@@INCLUDECSS:external/leaflet.css@@</style>'
+  + '<style>'+'@include_string:style.css@'+'</style>'
+  + '<style>'+'@include_css:external/leaflet.css@'+'</style>'
 //note: smartphone.css injection moved into code/smartphone.js
   + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
@@ -83,7 +80,7 @@ document.body.innerHTML = ''
   + '    <div id="playerstat">t</div>'
   + '    <div id="gamestat">&nbsp;loading global control stats</div>'
   + '    <div id="searchwrapper">'
-  + '      <button title="Current location" id="buttongeolocation"><img src="@@INCLUDEIMAGE:images/current-location.png@@" alt="Current location"/></button>'
+  + '      <button title="Current location" id="buttongeolocation"><img src="'+'@include_img:images/current-location.png@'+'" alt="Current location"/></button>'
   + '      <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>'
   + '    </div>'
   + '    <div id="portaldetails"></div>'
@@ -194,13 +191,11 @@ window.overlayStatus = {};
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
 var ulog = (function (module) {
-  @@INCLUDERAW:external/ulog.min.js@@
+  '@include_raw:external/ulog.min.js@';
   return module;
 }({})).exports;
 
-@@INJECTCODE@@
+'@bundle_code@';
 
   // fixed Addons
   RegionScoreboard.setup();
-
-@@PLUGINEND@@

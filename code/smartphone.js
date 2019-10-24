@@ -22,9 +22,10 @@ window.runOnSmartphonesBeforeBoot = function() {
   log.warn('running smartphone pre boot stuff');
 
   // add smartphone stylesheet
-  headHTML = document.getElementsByTagName('head')[0].innerHTML;
-  headHTML += '<style>@@INCLUDESTRING:mobile/smartphone.css@@</style>';
-  document.getElementsByTagName('head')[0].innerHTML = headHTML;
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode('@include_string:mobile/smartphone.css@'));
+  document.head.appendChild(style);
 
   // don’t need many of those
   window.setupStyles = function() {

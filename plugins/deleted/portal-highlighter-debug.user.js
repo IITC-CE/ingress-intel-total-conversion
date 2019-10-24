@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-highlight-portals-debug
-// @name           IITC plugin: Debug: Highlighers
+// @author         jonatkins
+// @name           Debug: Highlighers
 // @category       Debug
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Various debug and/or temporary highlighters. Will change over time as needed.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.0
+// @description    Various debug and/or temporary highlighters. Will change over time as needed.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalHighlighterDebug = function() {};
@@ -30,7 +24,3 @@ window.plugin.portalHighlighterDebug = function() {};
 var setup =  function() {
 //  window.addPortalHighlighter('DEBUG: Unknoen_11', window.plugin.portalHighlighterDebug.unknown11);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

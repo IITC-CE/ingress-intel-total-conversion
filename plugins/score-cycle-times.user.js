@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-score-cycle-times@jonatkins
-// @name           IITC plugin: Scoring cycle / checkpoint times
+// @author         jonatkins
+// @name           Scoring cycle / checkpoint times
 // @category       Info
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the times used for the septicycle and checkpoints for regional scoreboards.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.1.0
+// @description    Show the times used for the septicycle and checkpoints for regional scoreboards.
 
 
 // use own namespace for plugin
@@ -68,11 +61,4 @@ window.plugin.scoreCycleTimes.update = function() {
 };
 
 
-
-
-
 var setup =  window.plugin.scoreCycleTimes.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

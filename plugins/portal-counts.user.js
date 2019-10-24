@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-portals-count@yenky
-// @name           IITC plugin: Portal count
+// @author         yenky
+// @name           Portal count
 // @category       Info
-// @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Display a list of all localized portals by level and faction.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.2
+// @description    Display a list of all localized portals by level and faction.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 /* whatsnew
 * 0.1.0  : display graphs
@@ -347,7 +341,3 @@ var setup =  function() {
     '#portalcounts table th:nth-child(1) { text-align: left;}' +
     '</style>');
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

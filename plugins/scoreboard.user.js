@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-scoreboard@Costaspap
-// @name           IITC plugin: Localized scoreboard
-// @version        0.3.0.@@DATETIMEVERSION@@
+// @author         Costaspap
+// @name           Localized scoreboard
+// @version        0.3.0
 // @category       Info
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
-@@METAINFO@@
-// ==/UserScript==
+// @description    Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // A plug in by Costaspap and harisbitsakou
 
@@ -179,7 +173,3 @@ function setup () {
     #scoreboard.mobile { position: absolute; top: 0; width: 100%; }\
     ').appendTo('head');
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

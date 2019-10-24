@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-portal-level-numbers@rongou
-// @name           IITC plugin: Portal Level Numbers
+// @author         rongou
+// @name           Portal Level Numbers
 // @category       Layer
-// @version        0.1.5.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show portal level numbers on map.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.5
+// @description    Show portal level numbers on map.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalLevelNumbers = function() {
@@ -170,7 +164,3 @@ var setup = function() {
   window.map.on('overlayadd overlayremove', function() { setTimeout(function(){window.plugin.portalLevelNumbers.delayedUpdatePortalLabels(1.0);},1); });
 
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

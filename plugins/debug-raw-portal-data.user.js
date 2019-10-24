@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-raw-portal-data
-// @name           IITC plugin: Debug: Raw portal JSON data
+// @author         jonatkins
+// @name           Debug: Raw portal JSON data
 // @category       Portal Info
-// @version        0.2.4.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Developer debugging aid: Add a link to the portal details to show the raw data of a portal.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.4
+// @description    Developer debugging aid: Add a link to the portal details to show the raw data of a portal.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.rawdata = function() {};
@@ -90,8 +84,3 @@ var setup = function () {
     '}' +
     '</style>');
 }
-
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

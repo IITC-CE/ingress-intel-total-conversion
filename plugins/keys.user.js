@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-keys@xelio
-// @name           IITC plugin: Keys
+// @author         xelio
+// @name           Keys
 // @category       Misc
-// @version        0.3.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow manual entry of key counts for each portal. Use the 'keys-on-map' plugin to show the numbers on the map, and 'sync' to share between multiple browsers or desktop/mobile.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.3.0
+// @description    Allow manual entry of key counts for each portal. Use the 'keys-on-map' plugin to show the numbers on the map, and 'sync' to share between multiple browsers or desktop/mobile.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.keys = function() {};
@@ -162,7 +156,7 @@ window.plugin.keys.loadKeys = function() {
 window.plugin.keys.setupCSS = function() {
   $("<style>")
     .prop("type", "text/css")
-    .html("@@INCLUDESTRING:plugins/keys.css@@")
+    .html('@include_string:plugins/keys.css@')
     .appendTo("head");
 }
 
@@ -246,7 +240,3 @@ var setup =  function() {
     window.plugin.keys.setupPortalsList();
   }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

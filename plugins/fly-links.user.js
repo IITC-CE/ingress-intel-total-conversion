@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             fly-links@fly
-// @name           IITC plugin: Fly Links
+// @author         fly
+// @name           Fly Links
 // @category       Draw
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.1
+// @description    Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.flyLinks = function() {};
@@ -286,7 +280,3 @@ window.plugin.flyLinks.setup = function() {
   window.addLayerGroup('Fly fields', window.plugin.flyLinks.fieldsLayerGroup, false);
 }
 var setup = window.plugin.flyLinks.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-guess-player-levels@breunigs
-// @name           IITC plugin: Player level guess
+// @author         breunigs
+// @name           Player level guess
 // @category       Info
-// @version        0.5.7.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Try to determine player levels from the data available in the current view.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.5.7
+// @description    Try to determine player levels from the data available in the current view.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.guessPlayerLevels = function() {};
@@ -539,7 +533,3 @@ var setup =  function() {
   window.plugin.guessPlayerLevels.setupCallback();
   window.plugin.guessPlayerLevels.setupChatNickHelper();
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

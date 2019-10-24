@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-highlight-portal-infrastructure@vita10gy
-// @name           IITC plugin: Highlight portals with infrastructure problems
+// @author         vita10gy
+// @name           Highlight portals with infrastructure problems
 // @category       Highlighter
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal has any infrastructure problems. Red: no picture. Yellow: potential title issue. Orange:  both of these.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.1
+// @description    Use the portal fill color to denote if the portal has any infrastructure problems. Red: no picture. Yellow: potential title issue. Orange:  both of these.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalInfrastructure = function() {};
@@ -47,7 +41,3 @@ window.plugin.portalInfrastructure.highlight = function(data) {
 var setup =  function() {
   window.addPortalHighlighter('Infrastructure', window.plugin.portalInfrastructure.highlight);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

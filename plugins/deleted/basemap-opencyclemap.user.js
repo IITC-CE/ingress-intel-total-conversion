@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-basemap-opencyclepam@jonatkins
-// @name           IITC plugin: OpenCycleMap.org map tiles
+// @author         jonatkins
+// @name           OpenCycleMap.org map tiles
 // @category       Map Tiles
-// @version        0.2.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add the OpenCycleMap.org map tiles as an optional layer.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.2.0
+// @description    Add the OpenCycleMap.org map tiles as an optional layer.
 
 
 // use own namespace for plugin
@@ -39,7 +32,3 @@ window.plugin.mapTileOpenCycleMap = {
 };
 
 var setup =  window.plugin.mapTileOpenCycleMap.addLayer;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

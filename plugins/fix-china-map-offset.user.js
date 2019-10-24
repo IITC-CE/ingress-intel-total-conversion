@@ -1,15 +1,9 @@
-﻿// ==UserScript==
-// @id             iitc-plugin-fix-china-map-offset
-// @name           IITC plugin: Fix maps offsets in China
+﻿// @author         modos189
+// @name           Fix maps offsets in China
 // @category       Tweaks
-// @version        0.2.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show correct maps for China user by applying offset tweaks.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.0
+// @description    Show correct maps for China user by applying offset tweaks.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 var fixChinaMapOffset = {};
@@ -329,7 +323,3 @@ function setup () {
     }
   });
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-portals-list@teo96
-// @name           IITC plugin: Portals list
+// @author         teo96
+// @name           Portals list
 // @category       Info
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.1
+// @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalslist = function() {};
@@ -400,11 +394,7 @@ var setup =  function() {
 
   $("<style>")
     .prop("type", "text/css")
-    .html("@@INCLUDESTRING:plugins/portals-list.css@@")
+    .html('@include_string:plugins/portals-list.css@')
     .appendTo("head");
 
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

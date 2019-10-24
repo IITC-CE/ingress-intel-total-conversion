@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-highlight-portals-my-level@vita10gy
-// @name           IITC plugin: Highlight portals by my level
+// @author         vita10gy
+// @name           Highlight portals by my level
 // @category       Highlighter
-// @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal is either at and above, or at and below your level.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.2
+// @description    Use the portal fill color to denote if the portal is either at and above, or at and below your level.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalHighlighterPortalsMyLevel = function() {};
@@ -40,7 +34,3 @@ var setup =  function() {
   window.addPortalHighlighter('Below My Level', window.plugin.portalHighlighterPortalsMyLevel.belowLevel);
   window.addPortalHighlighter('Above My Level', window.plugin.portalHighlighterPortalsMyLevel.aboveLevel);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

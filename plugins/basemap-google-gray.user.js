@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-basemap-gmaps-gray@jacob1123
-// @name           IITC plugin: Gray Google map
+// @author         jacob1123
+// @name           Gray Google map
 // @category       Map Tiles
-// @version        0.1.3.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add a simplified gray Version of Google map tiles as an optional layer.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.3
+// @description    Add a simplified gray Version of Google map tiles as an optional layer.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.grayGMaps = function() {};
@@ -36,7 +30,3 @@ window.plugin.grayGMaps.addLayer = function() {
 };
 
 var setup =  window.plugin.grayGMaps.addLayer;
-	
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

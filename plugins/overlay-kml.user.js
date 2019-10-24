@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             overlay-kml@danielatkins
-// @name           IITC plugin: Overlay KML / GPX / GeoJSON
+// @author         danielatkins
+// @name           Overlay KML / GPX / GeoJSON
 // @category       Layer
-// @version        0.3.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow users to overlay their own KML / GPX / GeoJSON files on top of IITC.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.3.0
+// @description    Allow users to overlay their own KML / GPX / GeoJSON files on top of IITC.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 var overlayKML = {};
@@ -251,7 +245,7 @@ function setup () {
 function loadLeafletFileLayer () {
   try {
     // https://github.com/mapbox/togeojson/
-    @@INCLUDERAW:external/togeojson.js@@
+    '@include_raw:external/togeojson.js@';
 
   } catch (e) {
     console.error('togeojson.js loading failed');
@@ -262,13 +256,10 @@ function loadLeafletFileLayer () {
 
   try {
     // https://github.com/makinacorpus/Leaflet.FileLayer/
-    @@INCLUDERAW:external/leaflet.filelayer.js@@
+    '@include_raw:external/leaflet.filelayer.js@';
 
   } catch (e) {
     console.error('leaflet.filelayer.js loading failed');
     throw e;
   }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-@@PLUGINEND@@

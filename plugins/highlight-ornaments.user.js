@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-highlight-ornaments@jonatkins
-// @name           IITC plugin: Highlight portals with ornaments
+// @author         jonatkins
+// @name           Highlight portals with ornaments
 // @category       Highlighter
-// @version        0.0.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote portals with additional 'ornament' markers. e.g. Anomaly portals
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.0.1
+// @description    Use the portal fill color to denote portals with additional 'ornament' markers. e.g. Anomaly portals
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalHighlightOrnaments = function() {};
@@ -30,7 +24,3 @@ window.plugin.portalHighlightOrnaments.highlight = function(data) {
 var setup =  function() {
   window.addPortalHighlighter('Ornaments (anomaly portals)', window.plugin.portalHighlightOrnaments.highlight);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

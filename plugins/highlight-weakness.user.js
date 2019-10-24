@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-show-portal-weakness@vita10gy
-// @name           IITC plugin: Highlight portal weakness
+// @author         vita10gy
+// @name           Highlight portal weakness
 // @category       Highlighter
-// @version        0.7.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the fill color of the portals to denote if the portal is weak. Stronger red indicates recharge required, missing resonators, or both.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.7.2
+// @description    Use the fill color of the portals to denote if the portal is weak. Stronger red indicates recharge required, missing resonators, or both.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalWeakness = function() {};
@@ -42,7 +36,3 @@ window.plugin.portalWeakness.highlightWeakness = function(data) {
 var setup =  function() {
   window.addPortalHighlighter('Portal Weakness', window.plugin.portalWeakness.highlightWeakness);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

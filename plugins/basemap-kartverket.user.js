@@ -1,15 +1,9 @@
-﻿// ==UserScript==
-// @id             iitc-plugin-basemap-kartverket
-// @name           IITC plugin: Kartverket.no maps (Norway)
+﻿// @author         johnd0e
+// @name           Kartverket.no maps (Norway)
 // @category       Map Tiles
-// @version        0.2.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add Kartverket.no map layers.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.0
+// @description    Add Kartverket.no map layers.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 function setup () {
 
@@ -78,7 +72,3 @@ function setup () {
     layerChooser.addBaseLayer(l, l._name);
   }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

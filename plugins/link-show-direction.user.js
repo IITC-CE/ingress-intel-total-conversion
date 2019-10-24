@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-link-show-direction
-// @name           IITC plugin: Direction of links on map
+// @author         jonatkins
+// @name           Direction of links on map
 // @category       Tweaks
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the direction of links on the map by adding short dashes to the line at the origin portal.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.2.1
+// @description    Show the direction of links on the map by adding short dashes to the line at the origin portal.
 
 
 // use own namespace for plugin
@@ -175,7 +168,3 @@ window.plugin.linkShowDirection.setup  = function() {
 };
 
 var setup =  window.plugin.linkShowDirection.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

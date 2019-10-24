@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-sync@xelio
-// @name           IITC plugin: Sync
+// @author         xelio
+// @name           Sync
 // @category       Misc
-// @version        0.4.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.4.0
+// @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 // Notice for developers:
@@ -593,7 +587,7 @@ window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
     'client_id': this.CLIENT_ID,
     'scope': this.SCOPES,
     ux_mode: 'redirect',
-    redirect_uri: 'https://intel.ingress.com/'
+    redirect_uri: '@url_intel_base@'
   }).then(function() {
     
     GoogleAuth = gapi.auth2.getAuthInstance();
@@ -800,7 +794,3 @@ var setup = function() {
 };
 
 setup.priority = 'high';
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

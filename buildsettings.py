@@ -1,55 +1,91 @@
-# settings file for builds.
+"""Config file for builds.
 
-# if you want to have custom builds, copy this file to "localbuildsettings.py" and make changes there.
+if you want to have custom builds, copy this file to "localbuildsettings.py" and make changes there.
+"""
 
-# possible fields:
-# resourceBaseUrl - optional - the URL base for external resources (all resources embedded in standard IITC)
-# distUrlBase - optional - the base URL to use for update checks
-# buildMobile - optional - if set, mobile builds are built with 'gradle'. requires the Android SDK and appropriate mobile/local.properties file configured
-# preBuild - optional - an array of strings to run as commands, via os.system, before building the scripts
-# postBuild - optional - an array of string to run as commands, via os.system, after all builds are complete
-# pluginWrapper - optional - name of module to import custom plugin wrapper from
+from __future__ import print_function
 
+localfile = 'localbuildsettings.py'
 
-buildSettings = {
-    # local: use this build if you're not modifying external resources
-    # no external resources allowed - they're not needed any more
-    'local': {
-        'resourceUrlBase': None,
-        'distUrlBase': None,
-    },
+defaults = {  # common for all build targets
 
-    # local8000: if you need to modify external resources, this build will load them from
-    # the web server at http://0.0.0.0:8000/dist
-    # (This shouldn't be required any more - all resources are embedded. but, it remains just in case some new feature
-    #  needs external resources)
-    'local8000': {
-        'resourceUrlBase': 'http://0.0.0.0:8000/dist',
-        'distUrlBase': None,
-    },
+    'url_dist_base': None,             # network location, used for @updateURL and @downloadURL fields
+    'update_file': None,               # how to use @updateURL
+                                       # - '.meta.js': generate .meta.js
+                                       # - '.user.js': use main script
+                                       # - None: do not use the field
 
-    # mobile: default entry that also builds the mobile .apk
-    # you will need to have the android-sdk installed, and the file mobile/local.properties created as required
-    'mobile': {
-        'resourceUrlBase': None,
-        'distUrlBase': None,
-        'buildMobile': 'debug',
-        'ignore_patterns': ['speech-search*', 'scroll-wheel-zoom-disable*'],
-    },
+    'version_timestamp': False,        # add extra component to version field (to force update)
 
+    # these settings should be modified when developing own fork of this project
+    'namespace': 'https://github.com/IITC-CE/ingress-intel-total-conversion',
+    'url_homepage': 'https://iitc.modos189.ru/',
+    'url_tg': 'https://t.me/iitc_news',
 
-    # if you want to publish your own fork of the project, and host it on your own web site
-    # create a localbuildsettings.py file containing something similar to this
-    # note: Firefox+Greasemonkey require the distUrlBase to be "https" - they won't check for updates on regular "http" URLs
-    # 'example': {
-    #    'resourceBaseUrl': 'http://www.example.com/iitc/dist',
-    #    'distUrlBase': 'https://secure.example.com/iitc/dist',
-    # },
+    # these settings should not be touched unless intel url(s) changed
+    'url_intel_base': 'https://intel.ingress.com/',
+    'match': 'https://intel.ingress.com/*',
 
+    'plugin_wrapper': 'pluginwrapper', # use wrapper from pluginwrapper.py
 
+    'pre_build': [],                   # list of commands to execute before build run
+    'post_build': [],                  # ...                         after build succeed
+
+    # watch mode settings:
+    'watch_mode': False,               # otherwise can be activated with --watch commandline argument
+    'watch_interval': 1,               # (seconds)
+    'sources': (                       # list of source directories to watch for changes,
+        'code',                        # relative to 'build_source_dir' (and including it)
+        'external',
+        'images',
+        'plugins',
+     ),
+    'on_fail': lambda: print('\a'),    # function (or string for os.system)
+    'on_success': lambda: print('Build successed'),
+
+    # other:
+    # runtime settings set in settings.py also can be overriden
+    # - 'build_source_dir'
+    # - 'build_target_dir'
+    # - ...
 }
 
+builds = {  # every build entry extends common defaults
 
-# defaultBuild - the name of the default build to use if none is specified on the build.py command line
-# (in here as an example - it only works in localbuildsettings.py)
-#defaultBuild = 'local'
+    # default settings
+    'local': {},
+
+    # specify localhost as base for scripts (auto)updating
+    # useful for developers
+    'dev': {
+        'url_dist_base': 'http://localhost:8000',
+        'update_file': '.user.js',
+        'version_timestamp': True,
+    },
+
+    # use no-inject wrapper for easy breakpoints (Tampermonkey only!)
+    'tmdev': {
+        'url_dist_base': 'http://localhost:8000',
+        'update_file': '.user.js',
+        'version_timestamp': True,
+        'plugin_wrapper': 'pluginwrapper_noinject',
+    },
+
+    # default entry that also builds the mobile .apk
+    # requires: Java JDK, android-sdk
+    'mobile': {
+        'post_build': ['build_mobile.py'],
+    },
+
+
+    # publish your own fork of the project, and host it on your own web site
+    # 'myfork': {
+    #    'url_homepage': 'https://www.example.com/iitc',
+    #    'url_dist_base': 'https://download.example.com/iitc',
+    #    'update_file': '.meta.js',
+    # },
+}
+
+# default_build - the name of the build settings to use if none is specified on the build.py command line
+# (change it in localbuildsettings.py)
+default_build = None

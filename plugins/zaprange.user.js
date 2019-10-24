@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-zaprange@zaso
-// @name           IITC plugin: Zaprange
+// @author         ZasoGD
+// @name           Zaprange
 // @category       Layer
-// @version        0.1.4.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Shows the maximum range of attack by the portals.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.4
+// @description    Shows the maximum range of attack by the portals.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ///////////////////////////////////////////////////////
 
   // use own namespace for plugin
   window.plugin.zaprange = function() {};
@@ -110,7 +104,3 @@
 
     window.plugin.zaprange.showOrHide();
   }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

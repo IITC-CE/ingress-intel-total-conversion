@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-portal-names@zaso
-// @name           IITC plugin: Portal Names
+// @author         ZasoGD
+// @name           Portal Names
 // @category       Layer
-// @version        0.1.6.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show portal names on the map.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.6
+// @description    Show portal names on the map.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalNames = function() {};
@@ -181,7 +175,3 @@ var setup = function() {
   window.map.on('zoomend', window.plugin.portalNames.clearAllPortalLabels );
 
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

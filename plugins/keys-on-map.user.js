@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-keys-on-map@xelio
-// @name           IITC plugin: Keys on map
+// @author         xelio
+// @name           Keys on map
 // @category       Layer
-// @version        0.2.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show the manually entered key counts from the 'keys' plugin on the map.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.1
+// @description    Show the manually entered key counts from the 'keys' plugin on the map.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.keysOnMap = function() {};
@@ -118,7 +112,3 @@ var setup =  function() {
   window.addHook('pluginKeysUpdateKey', window.plugin.keysOnMap.keyUpdate);
   window.addHook('pluginKeysRefreshAll', window.plugin.keysOnMap.refreshAllKeys);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-missions@jonatkins
-// @name           IITC plugin: Missions
+// @author         jonatkins
+// @name           Missions
 // @category       Info
-// @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.1.2
+// @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 
 var decodeWaypoint = function(data) {
@@ -76,10 +69,10 @@ window.plugin.missions = {
 	enableSync: false,
 
 	missionTypeImages: [
-		'@@INCLUDEIMAGE:images/mission-type-unknown.png@@',
-		'@@INCLUDEIMAGE:images/mission-type-sequential.png@@',
-		'@@INCLUDEIMAGE:images/mission-type-random.png@@',
-		'@@INCLUDEIMAGE:images/mission-type-hidden.png@@',
+		'@include_img:images/mission-type-unknown.png@',
+		'@include_img:images/mission-type-sequential.png@',
+		'@include_img:images/mission-type-random.png@',
+		'@include_img:images/mission-type-hidden.png@',
 	],
 
 	onPortalSelected: function(event) {
@@ -388,7 +381,7 @@ window.plugin.missions = {
 				infoLength.title = 'Length of this mission.\n\nNOTE: The actual distance required to cover may vary depending on several factors!';
 				infoLength.textContent = len;
 				img = infoLength.insertBefore(document.createElement('img'), infoLength.firstChild);
-				img.src = '@@INCLUDEIMAGE:images/mission-length.png@@';
+				img.src = '@include_img:images/mission-length.png@';
 			}
 			
 			if(window.plugin.distanceToPortal && window.plugin.distanceToPortal.currentLoc) {
@@ -991,7 +984,7 @@ window.plugin.missions = {
 
 		this.loadData();
 
-		$('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/missions.css@@').appendTo('head');
+		$('<style>').prop('type', 'text/css').html('@include_string:plugins/missions.css@').appendTo('head');
 		$('#toolbox').append('<a tabindex="0" onclick="plugin.missions.openTopMissions();">Missions in view</a>');
 
 		if(window.useAndroidPanes()) {
@@ -1070,7 +1063,3 @@ window.plugin.missions = {
 };
 
 var setup = window.plugin.missions.setup.bind(window.plugin.missions);
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

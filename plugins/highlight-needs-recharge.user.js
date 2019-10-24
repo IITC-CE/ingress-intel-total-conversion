@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-highlight-needs-recharge@vita10gy
-// @name           IITC plugin: Highlight portals that need recharging
+// @author         vita10gy
+// @name           Highlight portals that need recharging
 // @category       Highlighter
-// @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal needs recharging and how much. Yellow: above 85%. Orange: above 50%. Red: above 15%. Magenta: below 15%.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.2
+// @description    Use the portal fill color to denote if the portal needs recharging and how much. Yellow: above 85%. Orange: above 50%. Red: above 15%. Magenta: below 15%.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalHighlighterNeedsRecharge = function() {};
@@ -42,7 +36,3 @@ window.plugin.portalHighlighterNeedsRecharge.highlight = function(data) {
 var setup =  function() {
   window.addPortalHighlighter('Needs Recharge (Health)', window.plugin.portalHighlighterNeedsRecharge.highlight);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

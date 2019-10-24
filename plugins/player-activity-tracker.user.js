@@ -1,15 +1,10 @@
-// ==UserScript==
-// @id             iitc-plugin-player-tracker@breunigs
-// @name           IITC plugin: Player activity tracker
+// @author         breunigs
+// @name           Player activity tracker
 // @category       Layer
-// @version        0.11.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.11.1
+// @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
-@@PLUGINSTART@@
 
-// PLUGIN START ////////////////////////////////////////////////////////
 window.PLAYER_TRACKER_MAX_TIME = 3*60*60*1000; // in milliseconds
 window.PLAYER_TRACKER_MIN_ZOOM = 9;
 window.PLAYER_TRACKER_MIN_OPACITY = 0.3;
@@ -20,12 +15,12 @@ window.PLAYER_TRACKER_LINE_COLOUR = '#FF00FD';
 window.plugin.playerTracker = function() {};
 
 window.plugin.playerTracker.setup = function() {
-  $('<style>').prop('type', 'text/css').html('@@INCLUDESTRING:plugins/player-tracker.css@@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@include_string:plugins/player-tracker.css@').appendTo('head');
 
-  var iconEnlImage = '@@INCLUDEIMAGE:images/marker-green.png@@';
-  var iconEnlRetImage = '@@INCLUDEIMAGE:images/marker-green-2x.png@@';
-  var iconResImage = '@@INCLUDEIMAGE:images/marker-blue.png@@';
-  var iconResRetImage = '@@INCLUDEIMAGE:images/marker-blue-2x.png@@';
+  var iconEnlImage = '@include_img:images/marker-green.png@';
+  var iconEnlRetImage = '@include_img:images/marker-green-2x.png@';
+  var iconResImage = '@include_img:images/marker-blue.png@';
+  var iconResRetImage = '@include_img:images/marker-blue-2x.png@';
 
   plugin.playerTracker.iconEnl = L.Icon.Default.extend({options: {
     iconUrl: iconEnlImage,
@@ -560,7 +555,3 @@ window.plugin.playerTracker.setupUserSearch = function() {
 
 
 var setup = plugin.playerTracker.setup;
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

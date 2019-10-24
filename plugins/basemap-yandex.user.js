@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-basemap-yandex@jonatkins
-// @name           IITC plugin: Yandex maps
+// @author         johnd0e
+// @name           Yandex maps
 // @category       Map Tiles
-// @version        0.3.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Add Yandex.com (Russian/Русский) map layers
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.3.0
+// @description    Add Yandex.com (Russian/Русский) map layers
 
 
 // use own namespace for plugin
@@ -46,16 +39,12 @@ function setupYandexLeaflet () {
 
   try {
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Yandex.js
-    @@INCLUDERAW:external/Yandex.js@@
+    '@include_raw:external/Yandex.js@';
 
-    @@INCLUDERAW:external/Yandex.addon.LoadApi.js@@
+    '@include_raw:external/Yandex.addon.LoadApi.js@';
     
     } catch (e) {
       console.error('Yandex.js loading failed');
       throw e;
     }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

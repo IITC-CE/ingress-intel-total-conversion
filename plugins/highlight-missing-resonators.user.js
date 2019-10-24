@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-highlight-portals-missing-resonators@vita10gy
-// @name           IITC plugin: Highlight portals missing resonators
+// @author         vita10gy
+// @name           Highlight portals missing resonators
 // @category       Highlighter
-// @version        0.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Use the portal fill color to denote if the portal is missing resonators. 
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.2
+// @description    Use the portal fill color to denote if the portal is missing resonators. 
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.portalsMissingResonators = function() {};
@@ -36,7 +30,3 @@ window.plugin.portalsMissingResonators.highlight = function(data) {
 var setup =  function() {
   window.addPortalHighlighter('Portals Missing Resonators', window.plugin.portalsMissingResonators.highlight);
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

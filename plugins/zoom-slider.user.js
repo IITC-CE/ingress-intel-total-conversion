@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-zoom-slider@fragger
-// @name           IITC plugin: Zoom slider
+// @author         fragger
+// @name           Zoom slider
 // @category       Controls
-// @version        0.2.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a zoom slider on the map instead of the zoom buttons.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.0
+// @description    Show a zoom slider on the map instead of the zoom buttons.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 var zoomSlider = {};
@@ -46,15 +40,11 @@ function setup () {
 function loadLeafletZoomslider () {
   try {
     // https://github.com/kartena/Leaflet.zoomslider
-    @@INCLUDERAW:external/L.Control.Zoomslider.js@@
-    $('<style>').html('@@INCLUDESTRING:external/L.Control.Zoomslider.css@@').appendTo('head');
+    '@include_raw:external/L.Control.Zoomslider.js@';
+    $('<style>').html('@include_string:external/L.Control.Zoomslider.css@').appendTo('head');
 
   } catch (e) {
     console.error('L.Control.Zoomslider.js loading failed');
     throw e;
   }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

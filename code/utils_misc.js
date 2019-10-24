@@ -77,8 +77,8 @@ window.aboutIITC = function () {
   + '<div>Ingress Intel Total Conversion</div> '
   + '<hr>'
   + '<div>'
-  + '  <a href="https://iitc.modos189.ru/" target="_blank">IITC Homepage</a> |' +
-    '  <a href="https://t.me/iitc_news" target="_blank">Telegram channel</a><br />'
+  + '  <a href="'+'@url_homepage@'+'" target="_blank">IITC Homepage</a> |' +
+    '  <a href="'+'@url_tg@'+'" target="_blank">Telegram channel</a><br />'
   + '   On the script’s homepage you can:'
   + '   <ul>'
   + '     <li>Find Updates</li>'
@@ -502,7 +502,7 @@ window.makePermalink = function (latlng, options) {
     if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
     args.push('pll='+latlng.join(','));
   }
-  var url = options.fullURL ? 'https://intel.ingress.com/' : '/';
+  var url = options.fullURL ? '@url_intel_base@' : '/';
   return url + '?' + args.join('&');
 };
 

@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-scale-bar@breunigs
-// @name           IITC plugin: Scale bar
+// @author         breunigs
+// @name           Scale bar
 // @category       Controls
-// @version        0.1.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show scale bar on the map.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.1.0
+// @description    Show scale bar on the map.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 var scaleBar = {};
@@ -42,7 +36,3 @@ function setup () {
     setTimeout(function () { moveToEdge(scaleBar.control); });
   });
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

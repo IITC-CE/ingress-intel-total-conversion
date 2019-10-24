@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-pan-control@fragger
-// @name           IITC plugin: Pan control
+// @author         fragger
+// @name           Pan control
 // @category       Controls
-// @version        0.2.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a panning control on the map.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.2.0
+// @description    Show a panning control on the map.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 var panControl = {};
@@ -50,14 +44,11 @@ function setup () {
 function loadLeafletPancontrol () {
   try {
     // https://github.com/kartena/Leaflet.Pancontrol
-    @@INCLUDERAW:external/L.Control.Pan.js@@
-    $('<style>').html('@@INCLUDECSS:external/L.Control.Pan.css@@').appendTo('head');
+    '@include_raw:external/L.Control.Pan.js@';
+    $('<style>').html('@include_css:external/L.Control.Pan.css@').appendTo('head');
 
   } catch (e) {
     console.error('L.Control.Pan.js loading failed');
     throw e;
   }
 }
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

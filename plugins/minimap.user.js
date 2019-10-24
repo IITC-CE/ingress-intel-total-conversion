@@ -1,15 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-minimap@breunigs
-// @name           IITC plugin: Mini map
+// @author         johnd0e
+// @name           Mini map
 // @category       Controls
-// @version        0.4.0.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show a mini map on the corner of the map.
-@@METAINFO@@
-// ==/UserScript==
+// @version        0.4.0
+// @description    Show a mini map on the corner of the map.
 
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 var miniMap = {};
@@ -148,15 +142,11 @@ function setup () {
 function loadLeafletMiniMap () {
   try {
     // https://github.com/Norkart/Leaflet-MiniMap
-    @@INCLUDERAW:external/Control.MiniMap.js@@
-    $('<style>').html('@@INCLUDECSS:external/Control.MiniMap.css@@').appendTo('head');
+    '@include_raw:external/Control.MiniMap.js@';
+    $('<style>').html('@include_css:external/Control.MiniMap.css@').appendTo('head');
 
   } catch (e) {
     console.error('Control.MiniMap.js loading failed');
     throw e;
   }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -1,11 +1,9 @@
-// ==UserScript==
-// @id             iitc-plugin-farms@949
-// @name           IITC plugin: Find farms on map
+// @author         949
+// @name           Find farms on map
 // @category       Layer
-// @version        1.4.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Show farms by minimum level
-@@METAINFO@@
-// ==/UserScript==
+// @version        1.4.1
+// @description    Show farms by minimum level
+
 
 //CHANGELOG
 /*
@@ -31,12 +29,6 @@ Center is now the midpoint of the max and min long and lat coords
 Radius is distance from center to furthest portal (i.e., now the circle will be limited to portals in the farm)
 
 */
-
-
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
 
 
 // use own namespace for plugin
@@ -337,7 +329,3 @@ var setup =  function() {
     myselect.options.selectedIndex = 6;
     window.addLayerGroup('Farms', window.plugin.farmFind.levelLayerGroup, true);
 };
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

@@ -1,19 +1,11 @@
-// ==UserScript==
-// @id             iitc-plugin-cross-links@mcben
-// @name           IITC plugin: Cross links
+// @author         mcben
+// @name           Cross links
 // @category       Draw
-// @version        1.1.2.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] EXPERIMENTAL: Checks for existing links that cross planned links. Requires draw-tools plugin.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        1.1.2
+// @description    Checks for existing links that cross planned links. Requires draw-tools plugin.
 
 
 window.plugin.crossLinks = function() {};
-
 
 window.plugin.crossLinks.greatCircleArcIntersect = function(a0,a1,b0,b1) {
   // based on the formula at http://williams.best.vwh.net/avform.htm#Int
@@ -298,9 +290,4 @@ var setup = function() {
     window.addHook('linkAdded', window.plugin.crossLinks.onLinkAdded);
     window.addHook('mapDataRefreshEnd', window.plugin.crossLinks.onMapDataRefreshEnd);
 
-    
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@

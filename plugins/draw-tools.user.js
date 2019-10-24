@@ -1,15 +1,8 @@
-// ==UserScript==
-// @id             iitc-plugin-draw-tools@breunigs
-// @name           IITC plugin: Draw tools
+// @author         breunigs
+// @name           Draw tools
 // @category       Draw
-// @version        0.7.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Allow drawing things onto the current map so you may plan your next move.
-@@METAINFO@@
-// ==/UserScript==
-
-@@PLUGINSTART@@
-
-// PLUGIN START ////////////////////////////////////////////////////////
+// @version        0.7.1
+// @description    Allow drawing things onto the current map so you may plan your next move.
 
 
 // use own namespace for plugin
@@ -673,16 +666,16 @@ function setup () {
 function loadExternals () {
   try {
     // https://github.com/Leaflet/Leaflet.draw
-    @@INCLUDERAW:external/leaflet.draw-src.js@@
-    $('<style>').html('@@INCLUDECSS:external/leaflet.draw-src.css@@').appendTo('head');
+    '@include_raw:external/leaflet.draw-src.js@';
+    $('<style>').html('@include_css:external/leaflet.draw-src.css@').appendTo('head');
 
-    $('<style>').html('@@INCLUDECSS:external/leaflet.draw-fix.css@@').appendTo('head');
+    $('<style>').html('@include_css:external/leaflet.draw-fix.css@').appendTo('head');
 
-    @@INCLUDERAW:external/leaflet.draw-fix.js@@
+    '@include_raw:external/leaflet.draw-fix.js@';
 
-    @@INCLUDERAW:external/leaflet.draw-snap.js@@
+    '@include_raw:external/leaflet.draw-snap.js@';
 
-    @@INCLUDERAW:external/leaflet.draw-geodesic.js@@
+    '@include_raw:external/leaflet.draw-geodesic.js@';
 
   } catch (e) {
     console.error('leaflet.draw-src.js loading failed');
@@ -691,15 +684,11 @@ function loadExternals () {
 
   try {
     // https://github.com/bgrins/spectrum
-    @@INCLUDERAW:external/spectrum.js@@
-    $('<style>').html('@@INCLUDESTRING:external/spectrum.css@@').appendTo('head');
+    '@include_raw:external/spectrum.js@';
+    $('<style>').html('@include_string:external/spectrum.css@').appendTo('head');
 
   } catch (e) {
     console.error('spectrum.js loading failed');
     throw e;
   }
 }
-
-// PLUGIN END //////////////////////////////////////////////////////////
-
-@@PLUGINEND@@
