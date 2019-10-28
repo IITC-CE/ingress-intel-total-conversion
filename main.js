@@ -1,20 +1,36 @@
-// ==UserScript==
-// @id             ingress-intel-total-conversion@jonatkins
-// @name           IITC: Ingress intel map total conversion
-// @version        0.29.1.@@DATETIMEVERSION@@
-// @description    [@@BUILDNAME@@-@@BUILDDATE@@] Total conversion for the ingress intel map.
-@@METAINFO@@
-// @run-at         document-end
-// ==/UserScript==
+if (typeof unsafeWindow !== "undefined") {
+  window = unsafeWindow;
+  document = window.document;
+}
 
-@@PLUGINSTART@@
-window.script_info = plugin_info;
+global.$ = $;
+global.jQuery = jQuery;
+require("jquery-ui/ui/widgets/accordion.js");
+require("jquery-ui/ui/widgets/autocomplete.js");
+require("jquery-ui/ui/widgets/button.js");
+require("jquery-ui/ui/widgets/checkboxradio.js");
+require("jquery-ui/ui/widgets/controlgroup.js");
+require("jquery-ui/ui/widgets/datepicker.js");
+require("jquery-ui/ui/widgets/dialog.js");
+require("jquery-ui/ui/widgets/draggable.js");
+require("jquery-ui/ui/widgets/droppable.js");
+require("jquery-ui/ui/widgets/menu.js");
+require("jquery-ui/ui/widgets/mouse.js");
+require("jquery-ui/ui/widgets/progressbar.js");
+require("jquery-ui/ui/widgets/resizable.js");
+require("jquery-ui/ui/widgets/selectable.js");
+require("jquery-ui/ui/widgets/selectmenu.js");
+require("jquery-ui/ui/widgets/slider.js");
+require("jquery-ui/ui/widgets/sortable.js");
+require("jquery-ui/ui/widgets/spinner.js");
+require("jquery-ui/ui/widgets/tabs.js");
+require("jquery-ui/ui/widgets/tooltip.js");
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
 if (document.documentElement.getAttribute('itemscope') !== null) {
   throw new Error('Ingress Intel Website is down, not a userscript issue.');
 }
-window.iitcBuildDate = '@@BUILDDATE@@';
+window.iitcBuildDate = process.env.BUILD_DATE;
 
 // disable vanilla JS
 window.onload = function() {};
@@ -34,13 +50,13 @@ if (!window.PLAYER || !PLAYER.nickname) {
     throw new Error("Logged in but page doesn't have player data");
   }
   // FIXME: handle nia takedown in progress
-  
+
   // add login form stylesheet
   var style = document.createElement('style');
   style.type = 'text/css';
-  style.appendChild(document.createTextNode('@@INCLUDESTRING:login.css@@'));
+  style.appendChild(document.createTextNode(require("!!raw-loader!./login.css").default));
   document.head.appendChild(style);
-  
+
   throw new Error("Couldn't retrieve player data. Are you logged in?");
 }
 
@@ -52,8 +68,8 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // possible without requiring scripts.
 document.head.innerHTML = ''
   + '<title>Ingress Intel Map</title>'
-  + '<style>@@INCLUDESTRING:style.css@@</style>'
-  + '<style>@@INCLUDECSS:external/leaflet.css@@</style>'
+  + `<style>${require("!!raw-loader!./style.css").default}</style>`
+  + `<style>${require("./external/leaflet.css").toString()}</style>`
 //note: smartphone.css injection moved into code/smartphone.js
   + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
@@ -83,7 +99,7 @@ document.body.innerHTML = ''
   + '    <div id="playerstat">t</div>'
   + '    <div id="gamestat">&nbsp;loading global control stats</div>'
   + '    <div id="searchwrapper">'
-  + '      <button title="Current location" id="buttongeolocation"><img src="@@INCLUDEIMAGE:images/current-location.png@@" alt="Current location"/></button>'
+  + `      <button title="Current location" id="buttongeolocation"><img src="${require('./images/current-location.png')}" alt="Current location"/></button>`
   + '      <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>'
   + '    </div>'
   + '    <div id="portaldetails"></div>'
@@ -174,7 +190,9 @@ window.portalRangeIndicator = null;
 window.portalAccessIndicator = null;
 window.mapRunsUserAction = false;
 //var portalsLayers, linksLayer, fieldsLayer;
-var portalsFactionLayers, linksFactionLayers, fieldsFactionLayers;
+global.portalsFactionLayers = undefined;
+global.linksFactionLayers = undefined;
+global.fieldsFactionLayers = undefined;
 
 // contain references to all entities loaded from the server. If render limits are hit,
 // not all may be added to the leaflet layers
@@ -190,14 +208,24 @@ window.overlayStatus = {};
 // overwrite data
 if(typeof window.plugin !== 'function') window.plugin = function() {};
 
-var ulog = (function (module) {
-  @@INCLUDERAW:external/ulog.min.js@@
-  return module;
-}({})).exports;
-
-@@INJECTCODE@@
+require("./code");
 
   // fixed Addons
   RegionScoreboard.setup();
 
-@@PLUGINEND@@
+var info = {};
+if (typeof GM_info !== 'undefined' && GM_info && GM_info.script) {
+  info.script = {
+    version: GM_info.script.version,
+    name: GM_info.script.name,
+    description: GM_info.script.description
+  };
+} else {
+  info.script = {
+    version: "",
+    name: "",
+    description: ""
+  };
+}
+global.script_info = info;
+
