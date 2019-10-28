@@ -679,6 +679,10 @@ function prepPluginsToLoad() {
     return prio;
   }
 
+  if (!script_info.script) {
+    log.warn('GM_info is not provided (improper userscript manager?)'); // IITC-Mobile for iOS
+  }
+
   // executes setup function of plugin
   // and collects info for About IITC
   function safeSetup (setup) {
@@ -687,16 +691,15 @@ function prepPluginsToLoad() {
       return;
     }
     var info = setup.info;
-    if (typeof info !== 'object' || typeof info.script !== 'object' || typeof info.script.name !== 'string') {
+    if (typeof info !== 'object') {
       log.warn('plugin does not have proper wrapper:',setup);
-      info = { script: {} };
+      info = {};
     }
-
     try {
       setup.call(this);
     } catch (err) {
-      var name = info.script.name || '<unknown>';
-      log.error('error starting plugin: ' + name + ', error: ' + err);
+      var name = info.script && info.script.name || info.pluginId;
+      log.error('error starting plugin:', name, ', error:', err);
       info.error = err;
     }
     pluginsInfo.push(info);

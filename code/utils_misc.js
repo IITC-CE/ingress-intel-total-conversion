@@ -1,56 +1,74 @@
 // UTILS + MISC  ///////////////////////////////////////////////////////
 
-window.aboutIITC = function() {
+window.aboutIITC = function () {
+  // Plugins metadata come from 2 sources:
+  // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
+  //   (only standard plugins)
+  // - script.name/version/description: from GM_info object, passed to wrapper
+  //   `script` may be not available if userscript manager does not provede GM_info
+  //   (atm: IITC-Mobile for iOS)
   var pluginsInfo = window.bootPlugins.info;
   var iitc = script_info;
-  var iitcVersion = iitc.script.version + ' [' + iitc.buildName + ']';
-  var verRE = /^([\d.]+?)(?:\.(2\d{7}\.\d*))?$/;
-  var descRE = /^\[.+?\-2\d\d\d\-\d\d\-\d\d\-\d+\] /; // regexps to match 'garbage' parts
-  function prepData (info,idx) {
+  var iitcVersion = (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
+  function prepData (info,idx) { // try to gather plugin metadata from both sources
     var data = {
-      build: info.buildName ? ' [' + info.buildName + ']' : '',
-      date: '',
-      error: info.error,
-      standard: info.buildName === iitc.buildName && info.dateTimeVersion === iitc.dateTimeVersion,
-      version: ''
+      build: info.buildName,
+      name: info.pluginId,
+      date: info.dateTimeVersion,
+      error: info.error
     };
     var script = info.script;
-    if (!script.name) {
-      data.name = '[unknown plugin: index ' + idx + ']';
-      data.description = "this plugin does not have proper wrapper; report to it's author";
-      return data;
+    if (script) {
+      if (typeof script.name === 'string') { // cut non-informative name part
+        data.name = script.name.replace(/^IITC plugin: /,'');
+      }
+      data.version = script.version;
+      data.description = script.description;
     }
-    data.name = script.name.substring(0, 13) === 'IITC plugin: '
-      ? script.name.substring(13)
-      : script.name;
-    data.description = script.description
-      ? script.description.replace(descRE,'') // remove buildname component from description
-      : '';
-    if (script.version) {
-      var ver = script.version.match(verRE);
-      if (ver) {
-        data.version = ver[1] || ver[2]; // remove date component from version
-        data.date = ver[1] && ver[2] || '';
-      } else {
-        data.version = script.version;
+    if (!data.name) {
+      if (iitc.script) { // check if GM_info is available
+        data.name = '[unknown plugin: index ' + idx + ']';
+        data.description = "this plugin does not have proper wrapper; report to it's author";
+      } else { // userscript manager fault
+        data.name = '[3rd-party plugin: index ' + idx + ']';
       }
     }
     return data;
   }
-
+  var extra = iitc.script && iitc.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
+  extra = extra && extra[1];
+  function formatVerInfo (p) {
+    if (p.version && extra) {
+      var cutPos = p.version.length-extra.length;
+      // cut extra version component (timestamp) if it is equal to main script's one
+      if (p.version.substring(cutPos) === extra) {
+        p.version = p.version.substring(0,cutPos);
+      }
+    }
+    p.version = p.version || p.date;
+    if (p.version) {
+      var tooltip = [];
+      if (p.build) { tooltip.push('[' + p.build + ']'); }
+      if (p.date && p.date !== p.version) { tooltip.push(p.date); }
+      return L.Util.template(' - <code{title}>{version}</code>', {
+        title: tooltip[0] ? ' title="' + tooltip.join(' ') + '"' : '',
+        version: p.version
+      });
+    }
+  }
   var plugins = pluginsInfo.map(prepData)
     .sort(function (a,b) { return a.name > b.name ? 1 : -1; })
     .map(function (p) {
       p.style = '';
-      p.title = p.description;
+      p.description = p.description || '';
       if (p.error) {
         p.style += 'text-decoration:line-through;';
-        p.title = p.error;
-      } else if (p.standard) {
+        p.description = p.error;
+      } else if (p.build === iitc.buildName && p.date === iitc.dateTimeVersion) { // is standard plugin
         p.style += 'color:darkgray;';
       }
-      p.sep = p.version ? ' - ' : '';
-      return L.Util.template('<li style="{style}" title="{title}">{name}{sep}<code title="{date}{build}">{version}</code></li>', p);
+      p.verinfo = formatVerInfo(p) || '';
+      return L.Util.template('<li style="{style}" title="{description}">{name}{verinfo}</li>', p);
     })
     .join('\n');
 
