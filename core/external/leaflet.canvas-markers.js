@@ -1,4 +1,5 @@
 'use strict';
+const rbush = require("rbush");
 
 function layerFactory (L) {
 
