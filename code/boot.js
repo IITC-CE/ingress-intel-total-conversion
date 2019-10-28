@@ -2,6 +2,9 @@
 // these functions set up specific areas after the boot function
 // created a basic framework. All of these functions should only ever
 // be run once.
+import "overlapping-marker-spiderfier-leaflet";
+
+const log = require("ulog")("boot.js");
 
 window.setupLargeImagePreview = function () {
   $('#portaldetails').on('click', '.imgpreview', function (e) {
@@ -111,7 +114,7 @@ function createDefaultBaseMapLayers() {
   var baseLayers = {};
 
   //OpenStreetMap attribution - required by several of the layers
-  osmAttribution = 'Map data © OpenStreetMap contributors';
+  global.osmAttribution = 'Map data © OpenStreetMap contributors';
 
   // MapQuest - http://developer.mapquest.com/web/products/open/map
   // now requires an API key
@@ -275,7 +278,7 @@ window.setupMap = function() {
 
   window.layerChooser = new L.Control.Layers(baseLayers, addLayers);
 
-  // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers 
+  // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers
   $.each(hiddenLayer, function(ind, layer){
     map.removeLayer(layer);
 
@@ -349,7 +352,7 @@ window.setMapBaseLayer = function() {
   var nameToLayer = {};
   var firstLayer = null;
 
-  for (i in window.layerChooser._layers) {
+  for (var i in window.layerChooser._layers) {
     var obj = window.layerChooser._layers[i];
     if (!obj.overlay) {
       nameToLayer[obj.name] = obj.layer;
@@ -575,9 +578,9 @@ window.setupLayerChooserApi = function() {
 
 window.extendLeaflet = function() {
   L.Icon.Default.mergeOptions({
-    iconUrl: '@@INCLUDEIMAGE:images/marker-ingress.png@@',
-    iconRetinaUrl: '@@INCLUDEIMAGE:images/marker-ingress-2x.png@@',
-    shadowUrl: '@@INCLUDEIMAGE:images/marker-shadow.png@@'
+    iconUrl: require('../images/marker-ingress.png'),
+    iconRetinaUrl: require('../images/marker-ingress-2x.png'),
+    shadowUrl: require('../images/marker-shadow.png'),
   });
   L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
 
@@ -727,7 +730,7 @@ function boot() {
   if(!isSmartphone()) // TODO remove completely?
     window.debug.console.overwriteNativeIfRequired();
 
-  log.log('loading done, booting. Built: @@BUILDDATE@@');
+  log.log('loading done, booting. Built: ' + process.env.BUILD_DATE);
   if (window.deviceID) {
     log.log('Your device ID: ' + window.deviceID);
   }
@@ -828,28 +831,14 @@ window.registerMarkerForOMS = function(marker) {
     window.oms.addMarker(marker);
 }
 
-try {
-@@INCLUDERAW:external/autolink-min.js@@
+require("../external/autolink-min.js");
+window.L_NO_TOUCH = navigator.maxTouchPoints === 0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
+require("../external/leaflet-src.js")
+require("../external/L.Geodesic.js")
+require("../external/Leaflet.GoogleMutant.js")
 
-window.L_NO_TOUCH = navigator.maxTouchPoints===0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
-@@INCLUDERAW:external/leaflet-src.js@@
-@@INCLUDERAW:external/L.Geodesic.js@@
-@@INCLUDERAW:external/Leaflet.GoogleMutant.js@@
-@@INCLUDERAW:external/oms.min.js@@
-L.CanvasIconLayer = (function (module) {
-  @@INCLUDERAW:external/rbush.min.js@@
-  @@INCLUDERAW:external/leaflet.canvas-markers.js@@
-  return module;
-}({})).exports(L);
+L.CanvasIconLayer = require("../external/leaflet.canvas-markers.js")(L);
 
-@@INCLUDERAW:external/jquery-3.4.1.min.js@@
-@@INCLUDERAW:external/jquery-ui-1.12.1.min.js@@
-@@INCLUDERAW:external/taphold.js@@
-@@INCLUDERAW:external/jquery.qrcode.min.js@@
-
-} catch (e) {
-  log.error("External's js loading failed");
-  throw e;
-}
+$.qrcode = require("../external/jquery.qrcode.min.js")
 
 $(boot);

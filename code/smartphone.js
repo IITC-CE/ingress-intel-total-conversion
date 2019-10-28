@@ -23,7 +23,7 @@ window.runOnSmartphonesBeforeBoot = function() {
 
   // add smartphone stylesheet
   headHTML = document.getElementsByTagName('head')[0].innerHTML;
-  headHTML += '<style>@@INCLUDESTRING:mobile/smartphone.css@@</style>';
+  headHTML += `<style>${require("!!raw-loader!../mobile/smartphone.css").default}</style>`;
   document.getElementsByTagName('head')[0].innerHTML = headHTML;
 
   // don’t need many of those
