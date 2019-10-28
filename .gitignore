@@ -28,3 +28,6 @@ node_modules
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+
+### Node modules
+node_modules
