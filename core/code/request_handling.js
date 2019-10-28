@@ -59,7 +59,7 @@ window.startRefreshTimeout = function(override) {
     window.requests._quickRefreshPending = true;
     t = override;
     //ensure override can't cause too fast a refresh if repeatedly used (e.g. lots of scrolling/zooming)
-    timeSinceLastRefresh = new Date().getTime()-window.requests._lastRefreshTime;
+    global.timeSinceLastRefresh = new Date().getTime()-window.requests._lastRefreshTime;
     if(timeSinceLastRefresh < 0) timeSinceLastRefresh = 0;  //in case of clock adjustments
     if(timeSinceLastRefresh < MINIMUM_OVERRIDE_REFRESH*1000)
       t = (MINIMUM_OVERRIDE_REFRESH*1000-timeSinceLastRefresh);

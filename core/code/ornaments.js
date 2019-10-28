@@ -47,7 +47,7 @@ window.ornaments = {
   knownOrnaments: {},
 
   setup: function () {
-    this._portals = {};
+    _portals = {};
     this.layerGroup = L.layerGroup;
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
       this.layerGroup = L.canvasIconLayer;
@@ -79,7 +79,7 @@ window.ornaments = {
     this.removePortal(portal);
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
-      this._portals[portal.options.guid] = ornaments.map(function (ornament) {
+      _portals[portal.options.guid] = ornaments.map(function (ornament) {
         var layer = this.layers['Ornaments'];
         var opacity = this.OVERLAY_OPACITY;
         var size = this.OVERLAY_SIZE * window.portalMarkerScale();
@@ -140,11 +140,11 @@ window.ornaments = {
 
   removePortal: function (portal) {
     var guid = portal.options.guid;
-    if (this._portals[guid]) {
-      this._portals[guid].forEach(function (marker) {
+    if (_portals[guid]) {
+      _portals[guid].forEach(function (marker) {
         marker.options.layer.removeLayer(marker);
       });
-      delete this._portals[guid];
+      delete _portals[guid];
     }
   },
   initOrnaments: function () {

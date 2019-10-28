@@ -116,7 +116,7 @@ window.search.Query.prototype.addResult = function(result) {
       .append($('<em>')
         .append(result.description));
   }
-  
+
 };
 
 window.search.Query.prototype.resultLayer = function(result) {
@@ -276,7 +276,7 @@ addHook('search', function(query) {
         title: data.title,
         description: teams[team] + ', L' + data.level + ', ' + data.health + '%, ' + data.resCount + ' Resonators',
         position: portal.getLatLng(),
-        icon: 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-portal.svg@'.replace(/%COLOR%/g, color)),
+        icon: 'data:image/svg+xml;base64,'+btoa(require('!!raw-loader!../images/icon-portal.svg').replace(/%COLOR%/g, color)),
         onSelected: function(result, event) {
           if(event.type == 'dblclick') {
             zoomToAndShowPortal(guid, portal.getLatLng());
@@ -357,7 +357,7 @@ addHook('search', function(query) {
     data.forEach(function(item) {
       if(resultMap[item.place_id]) { return; } // duplicate
       resultMap[item.place_id] = true;
-      
+
       var result = {
         title: item.display_name,
         description: 'Type: ' + item.type,
@@ -391,11 +391,11 @@ addHook('search', function(query) {
       query.addResult(result);
     });
   }
-  
+
   // Bounded search allows amenity-only searches (e.g. "amenity=toilet") via special phrases
   // http://wiki.openstreetmap.org/wiki/Nominatim/Special_Phrases/EN
   var bounded = '&bounded=1';
-  
+
   $.getJSON(NOMINATIM + encodeURIComponent(query.term) + viewbox + bounded, onQueryResult.bind(null, true));
 });
 
