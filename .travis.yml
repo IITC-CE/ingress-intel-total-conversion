@@ -1,9 +1,6 @@
 language: android
 jdk: oraclejdk8
-branches:
-  only:
-  - test-builds
-  - /^v([0-9]+)\.([0-9]+).*$/
+
 android:
   components:
   - platform-tools
@@ -12,9 +9,6 @@ android:
   - android-28
   - extra-android-m2repository
 addons:
-  apt:
-    packages:
-    - python3
   ssh_known_hosts: modos189.ru
 notifications:
   email:
@@ -23,11 +17,18 @@ notifications:
 
 jobs:
   include:
-    - stage: test-builds
+    - stage: check
+      if: branch != test-builds
+      if: tag IS blank
+      env: BUILD_TYPE=check
+ 
+    - stage: deploy-test-builds
       if: branch = test-builds
       env: BUILD_TYPE=test
-    - stage: release
+      
+    - stage: deploy-release
       if: branch != test-builds
+      if: tag IS present
       env: BUILD_TYPE=release
 
 before_script:
@@ -39,9 +40,8 @@ before_script:
 - ssh-add /tmp/deploy_rsa
 
 script:
-- wget https://iitc.modos189.ru/deploy/$BUILD_TYPE/localbuildsettings.py
+- wget https://iitc.modos189.ru/deploy/localbuildsettings.py
 - ./build.py $BUILD_TYPE
-- ./build.py mobile
 
 deploy:
   provider: releases
