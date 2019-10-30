@@ -45,6 +45,11 @@
         app:showAsAction="never"
         android:title="@string/menu_send_screenshot"/>
     <item
+        android:id="@+id/menu_open_plugins"
+        android:orderInCategory="150"
+        app:showAsAction="never"
+        android:title="@string/menu_open_plugins"/>
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="200"
         app:showAsAction="never"
