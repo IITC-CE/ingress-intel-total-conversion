@@ -342,7 +342,7 @@ window.plugin.drawTools.optCopy = function() {
           stockLinks.push([latLngs[latLngs.length-1].lat,latLngs[latLngs.length-1].lng,latLngs[0].lat,latLngs[0].lng]);
         }
       });
-      var stockUrl = 'https://intel.ingress.com/intel?ll='+map.getCenter().lat+','+map.getCenter().lng+'&z='+map.getZoom()+'&pls='+stockLinks.map(function(link){return link.join(',');}).join('_');
+      var stockUrl = window.makePermalink(false,true,true)+'&pls='+stockLinks.map(function(link){return link.join(',');}).join('_');
       var stockWarnTexts = [];
       if (stockWarnings.polyAsLine) stockWarnTexts.push('Note: polygons are exported as lines');
       if (stockLinks.length>40) stockWarnTexts.push('Warning: Stock intel may not work with more than 40 line segments - there are '+stockLinks.length);
@@ -375,11 +375,15 @@ window.plugin.drawTools.optExport = function() {
 
 window.plugin.drawTools.optPaste = function() {
   var promptAction = prompt('Press CTRL+V to paste (draw-tools data or stock intel URL).', '');
-  if(promptAction !== null && promptAction !== '') {
+  promptAction = promptAction && promptAction.trim();
+  if (promptAction) {
     try {
       // first see if it looks like a URL-format stock intel link, and if so, try and parse out any stock drawn items
       // from the pls parameter
-      if (promptAction.match(new RegExp("^(https?://)?(www\.)|(intel\.)?ingress\\.com/intel.*[?&]pls="))) {
+
+      // var intel = new RegExp('(https?://)?(www\\.)?ingress\\.com/intel.*[?&]pls=').exec(promptAction); // old url
+      var matchIntel = new RegExp('(https://)?intel\\.ingress\\.com/.*[?&]pls=').exec(promptAction);
+      if (matchIntel && matchIntel.index === 0) {
         //looks like a ingress URL that has drawn items...
         var items = promptAction.split(/[?&]/);
         var foundAt = -1;

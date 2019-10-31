@@ -73,7 +73,7 @@ import java.util.regex.Pattern;
 
 public class IITC_Mobile extends AppCompatActivity
         implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnItemLongClickListener {
-    private static final String mIntelUrl = "https://intel.ingress.com/intel";
+    private static final String mIntelUrl = "https://intel.ingress.com/";
 
     private SharedPreferences mSharedPrefs;
     private IITC_FileManager mFileManager;

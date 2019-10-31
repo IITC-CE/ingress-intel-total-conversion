@@ -477,10 +477,11 @@ window.clampLatLngBounds = function(bounds) {
   return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
 }
 
-// @function makePermalink(latlng?: LatLng, mapView?: Boolean): String
-// Makes the permalink for the portal with specified latlng, incluging current map view.
-// At least one of the parameters have to be present.
-window.makePermalink = function(latlng, mapView) {
+// @function makePermalink(latlng?: LatLng, mapView?: Boolean, absolute?: Boolean): String
+// Makes the permalink for the portal with specified latlng, possibly incluging current map view
+// (at least one of two parameters have to be present).
+// By default generate relative link, but absolute (full) also can be requested.
+window.makePermalink = function(latlng, mapView, absolute) {
   function ll2str (ll) { return ll[0] + ',' + ll[1]; }
   function round (ll) { // ensures that lat,lng are with same precision as in stock intel permalinks
     return ll.map(function (n) { return Math.trunc(n*1e6)/1e6; });
@@ -494,7 +495,8 @@ window.makePermalink = function(latlng, mapView) {
     if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
     args.push('pll='+ll2str(latlng));
   }
-  return '/intel?' + args.join('&');
+  var url = absolute ? 'https://intel.ingress.com/' : '/';
+  return url + '/?' + args.join('&');
 };
 
 window.setPermaLink = function(elm) { // deprecated

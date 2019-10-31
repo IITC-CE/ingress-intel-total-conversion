@@ -593,7 +593,7 @@ window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
     'client_id': this.CLIENT_ID,
     'scope': this.SCOPES,
     ux_mode: 'redirect',
-    redirect_uri: 'https://intel.ingress.com/intel'
+    redirect_uri: 'https://intel.ingress.com/'
   }).then(function() {
     
     GoogleAuth = gapi.auth2.getAuthInstance();
