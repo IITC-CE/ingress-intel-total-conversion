@@ -659,9 +659,8 @@
   }
 
   window.plugin.bookmarks.optExport = function() {
-    if(typeof android !== 'undefined' && android && android.saveFile) {
-      android.saveFile("IITC-bookmarks.json", "application/json", localStorage[window.plugin.bookmarks.KEY_STORAGE]);
-    }
+    var data = localStorage[window.plugin.bookmarks.KEY_STORAGE];
+    window.saveFile(data, 'IITC-bookmarks.json', 'application/json');
   }
 
   window.plugin.bookmarks.optPaste = function() {
@@ -682,20 +681,20 @@
   }
 
   window.plugin.bookmarks.optImport = function() {
-    if (window.requestFile === undefined) return;
-    window.requestFile(function(filename, content) {
-      try {
-        JSON.parse(content); // try to parse JSON first
-        localStorage[window.plugin.bookmarks.KEY_STORAGE] = content;
-        window.plugin.bookmarks.refreshBkmrks();
-        window.runHooks('pluginBkmrksEdit', {"target": "all", "action": "import"});
-        console.log('BOOKMARKS: reset and imported bookmarks');
-        window.plugin.bookmarks.optAlert('Successful. ');
-      } catch(e) {
-        console.warn('BOOKMARKS: failed to import data: '+e);
-        window.plugin.bookmarks.optAlert('<span style="color: #f88">Import failed </span>');
-      }
-    });
+    L.FileListLoader.loadFiles({accept:'application/json'})
+      .on('load',function (e) {
+        try {
+          JSON.parse(e.reader.result); // try to parse JSON first
+          localStorage[window.plugin.bookmarks.KEY_STORAGE] = e.reader.result;
+          window.plugin.bookmarks.refreshBkmrks();
+          window.runHooks('pluginBkmrksEdit', {"target": "all", "action": "import"});
+          console.log('BOOKMARKS: reset and imported bookmarks');
+          window.plugin.bookmarks.optAlert('Successful. ');
+        } catch(e) {
+          console.warn('BOOKMARKS: failed to import data: '+e);
+          window.plugin.bookmarks.optAlert('<span style="color: #f88">Import failed </span>');
+        }
+      });
   }
 
   window.plugin.bookmarks.optReset = function() {
@@ -1228,10 +1227,9 @@
     actions += '<a onclick="window.plugin.bookmarks.optCopy();return false;">Copy bookmarks</a>';
     actions += '<a onclick="window.plugin.bookmarks.optPaste();return false;">Paste bookmarks</a>';
 
-    if(plugin.bookmarks.isAndroid()) {
-      actions += '<a onclick="window.plugin.bookmarks.optImport();return false;">Import bookmarks</a>';
-      actions += '<a onclick="window.plugin.bookmarks.optExport();return false;">Export bookmarks</a>';
-    }
+    actions += '<a onclick="window.plugin.bookmarks.optImport();return false;">Import bookmarks</a>';
+    actions += '<a onclick="window.plugin.bookmarks.optExport();return false;">Export bookmarks</a>';
+
     actions += '<a onclick="window.plugin.bookmarks.optRenameF();return false;">Rename Folder</a>'
     if(!plugin.bookmarks.isAndroid()) {
       actions += '<a onclick="window.plugin.bookmarks.optBox(\'save\');return false;">Save box position</a>';

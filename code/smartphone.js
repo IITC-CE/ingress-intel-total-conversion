@@ -191,19 +191,11 @@ window.useAndroidPanes = function() {
   return (typeof android !== 'undefined' && android && android.addPane && window.isSmartphone());
 }
 
-if (typeof android !== 'undefined' && android.getFileRequestUrlPrefix) {
-  window.requestFile = function(callback) {
-    var name = 'onFileSelected',
-      funcName = name;
-    for (var c=0; window[funcName]; funcName=name+c++);
-    window[funcName] = function (filename, content) {
-      callback(decodeURIComponent(filename), atob(content));
-      delete window[funcName];
-    };
-    var script = document.createElement('script');
-    script.src = android.getFileRequestUrlPrefix() + funcName;
-    (document.body || document.head || document.documentElement).appendChild(script);
-    script.remove();
+if (typeof android !== 'undefined') {
+  window.requestFile = function (callback) { // deprecated
+    L.FileListLoader.loadFiles()
+      .on('load',function (e) {
+        callback(e.file.name, e.reader.result);
+      });
   };
 }
-
