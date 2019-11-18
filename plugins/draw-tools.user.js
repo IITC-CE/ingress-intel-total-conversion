@@ -342,7 +342,10 @@ window.plugin.drawTools.optCopy = function() {
           stockLinks.push([latLngs[latLngs.length-1].lat,latLngs[latLngs.length-1].lng,latLngs[0].lat,latLngs[0].lng]);
         }
       });
-      var stockUrl = window.makePermalink(false,true,true)+'&pls='+stockLinks.map(function(link){return link.join(',');}).join('_');
+      var stockUrl = window.makePermalink(null, {
+        includeMapView: true,
+        fullURL: true
+      }) + '&pls='+stockLinks.map(function(link){return link.join(',');}).join('_');
       var stockWarnTexts = [];
       if (stockWarnings.polyAsLine) stockWarnTexts.push('Note: polygons are exported as lines');
       if (stockLinks.length>40) stockWarnTexts.push('Warning: Stock intel may not work with more than 40 line segments - there are '+stockLinks.length);

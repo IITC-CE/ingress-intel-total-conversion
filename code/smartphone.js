@@ -181,7 +181,7 @@ window.runOnSmartphonesAfterBoot = function() {
 window.setAndroidPermalink = function() {
   var p = window.selectedPortal && window.portals[window.selectedPortal];
   var href = $('<a>')
-    .prop('href',  window.makePermalink(p && p.getLatLng(), true))
+    .prop('href',  window.makePermalink(p && p.getLatLng(), {includeMapView: true}))
     .prop('href'); // to get absolute URI
   android.setPermalink(href);
 }
