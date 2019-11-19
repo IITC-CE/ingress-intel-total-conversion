@@ -2,9 +2,9 @@
 
 """IITC main build script."""
 
-import glob
 import os
 import shutil
+from pathlib import Path
 from runpy import run_path
 
 import build_plugin
@@ -12,14 +12,11 @@ import settings
 
 
 def run_python(cmd):
-    if not os.path.isfile(cmd) and not os.path.isabs(cmd):
-        path = os.path.dirname(__file__)  # try script path instead cwd
-        if path and not os.path.samefile(os.curdir, path):
-            fullpath = os.path.join(path, cmd)
-            if os.path.isfile(fullpath):
-                cmd = fullpath
-    if not os.path.isfile(cmd):
-        raise UserWarning('no such file: {}'.format(cmd))
+    if not cmd.is_file():  # try script path instead cwd
+        original = cmd
+        cmd = Path(__file__).with_name(cmd)
+        if not cmd.is_file():
+            raise UserWarning(f'no such file: {original}')
     return run_path(cmd)
 
 
@@ -30,15 +27,16 @@ def run_system(cmd):
     except AttributeError:  # Windows
         exit_code = status
     if exit_code != 0:
-        raise UserWarning('execution failed: {}'.format(cmd))
+        raise UserWarning(f'execution failed: {cmd}')
 
 
 def run_cmds(cmds, source, target):
     for cmd in (cmds or []):
+        path = Path(cmd)
         if callable(cmd):
             cmd(source, target)
-        elif os.path.splitext(cmd)[1] == '.py':
-            module = run_python(cmd)
+        elif path.suffix == '.py':
+            module = run_python(path)
             if 'iitc_build' in module:
                 module['iitc_build'](source, target)
         else:
@@ -54,40 +52,38 @@ def iitc_build(source, outdir):
     run_cmds(settings.pre_build, source, outdir)
 
     iitc_script = 'total-conversion-build.js'
-    build_plugin.process_file(os.path.join(source, iitc_script), outdir)
+    build_plugin.process_file(source / iitc_script, outdir)
 
-    plugins_outdir = os.path.join(outdir, 'plugins')
-    if not os.path.isdir(plugins_outdir):
-        os.mkdir(plugins_outdir)
-    for filename in glob.glob(os.path.join(source, 'plugins', '*.js')):
-        build_plugin.process_file(filename, plugins_outdir, dist_path='plugins')
+    outdir.joinpath('plugins').mkdir(parents=True, exist_ok=True)
+    for filename in source.joinpath('plugins').glob('*.js'):
+        build_plugin.process_file(filename, outdir / 'plugins', dist_path='plugins')
 
     run_cmds(settings.post_build, source, outdir)
 
 
 def clean(directory):
-    if os.path.exists(directory):
+    if directory.exists():
         shutil.rmtree(directory)
 
 
 def backup(directory):
-    if os.path.exists(directory):
-        bak = directory + '~'
+    if directory.exists():
+        bak = directory.with_name(directory.name + '~')
         clean(bak)
-        os.rename(directory, bak)
+        directory.replace(bak)
 
 
 def backup_and_run():
-    target_parent = os.path.join(settings.build_target_dir, os.pardir)
-    workdir = os.path.join(os.path.normpath(target_parent), '~')
+    source = Path(settings.build_source_dir)
+    target = Path(settings.build_target_dir)
+    workdir = target.with_name('~')
     clean(workdir)
-    os.makedirs(workdir)
+    workdir.mkdir(parents=True)
 
-    iitc_build(settings.build_source_dir, workdir)
+    iitc_build(source, workdir)
 
-    outdir = settings.build_target_dir
-    backup(outdir)
-    os.rename(workdir, outdir)
+    backup(target)
+    workdir.replace(target)
 
 
 def on_event(cmd):
@@ -104,8 +100,8 @@ def watch(watch_list, run, interval):
     from traceback import print_exc
 
     last_modified = 0
-    while 1:
-        timestamp = max(map(os.path.getmtime, watch_list))
+    while True:
+        timestamp = max(p.stat().st_mtime for p in watch_list)
         if timestamp == last_modified:
             try:
                 sleep(interval)
@@ -118,7 +114,7 @@ def watch(watch_list, run, interval):
         print('\nrebuild started [{}]'.format(ctime(last_modified)))
         try:
             run()
-        except Exception as err:
+        except Exception:
             print_exc()
             on_event(settings.on_fail)
         else:
@@ -140,20 +136,17 @@ if __name__ == '__main__':
         parser.error(err)
 
     if args.watch or settings.watch_mode:
-        sources_root = os.path.abspath(settings.build_source_dir)
-        watch_list = {sources_root}
-        watch_list.update([os.path.join(sources_root, path) for path in settings.sources])
+        sources_root = Path(settings.build_source_dir).resolve()
+        watch_list = [sources_root / path for path in settings.sources]
 
-        target_root = os.path.abspath(settings.build_target_dir)
-        target_parent = os.path.normpath(os.path.join(target_root, os.pardir))
-        if {target_root, target_parent}.intersection(watch_list):
-            # !!this check is not perfect: it does not consider case-insensitive file system
-            parser.error('specified target location would cause endless cycle: {}'.format(target_root))
+        target_root = Path(settings.build_target_dir).resolve()
+        if (target_root in watch_list) or (target_root.parent in watch_list):
+            parser.error(f'specified target location would cause endless cycle: {target_root}')
 
-        print('IITC build: {} (watch mode)'.format(settings.build_name))
+        print('IITC build: {.build_name} (watch mode)'.format(settings))
         watch(watch_list, backup_and_run, settings.watch_interval)
     else:
-        print('IITC build: {}'.format(settings.build_name))
+        print('IITC build: {.build_name}'.format(settings))
         try:
             backup_and_run()
         except UserWarning as err:

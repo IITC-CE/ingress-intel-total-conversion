@@ -9,7 +9,7 @@
 # a cut-down version of GM_info is passed as a parameter to the script
 # (not the full GM_info - it contains the ENTIRE script source!)
 
-start = u"""
+start = """
 function wrapper(plugin_info) {
 // ensure plugin framework is there, even if iitc is not yet loaded
 if(typeof window.plugin !== 'function') window.plugin = function() {};
@@ -23,14 +23,14 @@ plugin_info.pluginId = '@plugin_id@';
 
 """
 
-setup = u"""
+setup = """
 setup.info = plugin_info; //add the script info data to the function as a property
 if(!window.bootPlugins) window.bootPlugins = [];
 window.bootPlugins.push(setup);
 // if IITC has already booted, immediately run the 'setup' function
 if(window.iitcLoaded && typeof setup === 'function') setup();"""
 
-end = u"""
+end = """
 } // wrapper end
 // inject code into site context
 var script = document.createElement('script');

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Utility to generate meta.json for IITC-Button (https://github.com/IITC-CE/IITC-Button).
 
@@ -12,21 +12,18 @@ Sample content for localbuildsettings.py::
     }
 """
 
-import fnmatch
-import io
 import json
-import os
-from functools import partial
+from pathlib import Path
 
 import settings
 
 
 def parse_user_script(filename):
     data = {}
-    with io.open(filename, 'r', encoding='utf-8-sig') as script:
+    with filename.open('r', encoding='utf-8-sig') as script:
         line = script.readline()
         if line != '// ==UserScript==\n':
-            raise UserWarning('{}: Metablock not found'.format(filename))
+            raise UserWarning(f'{filename}: Metablock not found')
         for line in script:
             if line == '// ==/UserScript==\n':
                 return data
@@ -37,7 +34,7 @@ def parse_user_script(filename):
             if rem == '//' and key[0] == '@':
                 data[key[1:]] = value
 
-        raise UserWarning('{}: Metablock ending not found'.format(filename))
+        raise UserWarning(f'{filename}: Metablock ending not found')
 
 
 def add_to_meta(meta, info, filename):
@@ -61,22 +58,22 @@ def add_to_meta(meta, info, filename):
 
 def gen_meta(source, target=None):
     print('Generating meta for build: {.build_name}'.format(settings))
-    build_dir = partial(os.path.join, source)
-    plugins_dir = partial(os.path.join, build_dir('plugins'))
-    target = target or build_dir('meta.json')
+    target = target or source / 'meta.json'
 
     meta = {}
-    for filename in fnmatch.filter(os.listdir(plugins_dir()), '*.user.js'):
-        info = parse_user_script(plugins_dir(filename))
-        add_to_meta(meta, info, filename)
+    for filename in (source / 'plugins').glob('*.user.js'):
+        info = parse_user_script(filename)
+        add_to_meta(meta, info, filename.name)
 
-    iitc = parse_user_script(build_dir('total-conversion-build.user.js'))
+    iitc = parse_user_script(source / 'total-conversion-build.user.js')
     data = {
         'categories': meta,
         'iitc_version': iitc['version'],
     }
-    with io.open(target, 'w', encoding='utf8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    target.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False),
+        encoding='utf8',
+    )
 
 
 def iitc_build(source, outdir):
@@ -97,9 +94,9 @@ if __name__ == '__main__':
     except ValueError as err:
         parser.error(err)
 
-    source = settings.build_target_dir
-    if not os.path.isdir(source):
-        parser.error('Directory not found: {}'.format(source))
+    source = Path(settings.build_target_dir)
+    if not source.is_dir():
+        parser.error(f'Directory not found: {source}')
 
     try:
         gen_meta(source)

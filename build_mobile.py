@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Utility to build IITC-Mobile apk."""
 
 import os
 import shutil
+from pathlib import Path
 
 import build_plugin
 import settings
@@ -25,15 +26,17 @@ def add_default_settings(build_source):
     for attr, default in defaults.items():
         if not hasattr(settings, attr):
             setattr(settings, attr, default)
-    if not settings.mobile_source:
+    if settings.mobile_source:
+        settings.mobile_source = Path(settings.mobile_source)
+    else:
         assert build_source, 'Either mobile_source or build_source required'
-        settings.mobile_source = os.path.join(build_source, 'mobile')
+        settings.mobile_source = build_source / 'mobile'
 
 
 def exec_gradle(source):
-    gradlew = os.path.join(source, 'gradlew')
+    gradlew = source / 'gradlew'
     options = settings.gradle_options
-    buildfile = settings.gradle_buildfile or os.path.join(source, 'build.gradle')
+    buildfile = settings.gradle_buildfile or source / 'build.gradle'
     buildtype = settings.gradle_buildtype
     if buildtype not in buildtypes:
         raise UserWarning('gradle_buildtype value must be in: {}'.format(', '.join(buildtypes)))
@@ -48,29 +51,29 @@ def exec_gradle(source):
         exit_code = os.WEXITSTATUS(status)
 
     if exit_code != 0:
-        raise UserWarning('gradlew returned {}'.format(exit_code))
+        raise UserWarning(f'gradlew returned {exit_code}')
 
-    return os.path.join(source, 'app', 'build', 'outputs', 'apk', buildtype, 'app-{}.apk'.format(buildtype))
+    return source / 'app/build/outputs/apk' / buildtype / f'app-{buildtype}.apk'
 
 
-def build_mobile(source, scripts_dir, out_dir=None, out_name='IITC_Mobile.apk'):
+def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
     """Build IITC-Mobile apk file, embedding scripts from given directory."""
-    assets_dir = os.path.join(source, 'assets')
-    if os.path.exists(assets_dir):
+    assets_dir = source / 'assets'
+    if assets_dir.exists():
         shutil.rmtree(assets_dir)
-    os.makedirs(assets_dir)
 
-    user_location_plug = os.path.join(source, 'plugins', 'user-location.js')
-    build_plugin.process_file(user_location_plug, assets_dir)
-    shutil.copy(os.path.join(scripts_dir, iitc_script), assets_dir)
     shutil.copytree(
-        os.path.join(scripts_dir, 'plugins'),
-        os.path.join(assets_dir, 'plugins'),
+        scripts_dir,
+        assets_dir,
         ignore=shutil.ignore_patterns(*settings.ignore_patterns),
     )
+    user_location_plug = source / 'plugins' / 'user-location.js'
+    build_plugin.process_file(user_location_plug, assets_dir)
+
+    out_name = out_name or 'IITC_Mobile-{.build_name}.apk'.format(settings)
     shutil.copy(
         exec_gradle(source),
-        os.path.join(out_dir or scripts_dir, out_name),
+        (out_dir or scripts_dir) / out_name,
     )
 
 
@@ -91,15 +94,15 @@ if __name__ == '__main__':
     except ValueError as err:
         parser.error(err)
 
-    directory = settings.build_target_dir
-    if not os.path.isdir(directory):
-        parser.error('Directory not found: {}'.format(directory))
-    script_path = os.path.join(directory, iitc_script)
-    if not os.path.isfile(script_path):
-        parser.error('Main script not found: {}'.format(script_path))
+    directory = Path(settings.build_target_dir)
+    if not directory.is_dir():
+        parser.error(f'Directory not found: {directory}')
+    script_path = directory / iitc_script
+    if not script_path.is_file():
+        parser.error(f'Main script not found: {script_path}')
 
-    add_default_settings(settings.build_source_dir)
+    add_default_settings(Path(settings.build_source_dir))
     try:
         build_mobile(settings.mobile_source, directory)
     except UserWarning as err:
-        parser.error('mobile app failed to build\n{}'.format(err))
+        parser.error(f'mobile app failed to build\n{err}')

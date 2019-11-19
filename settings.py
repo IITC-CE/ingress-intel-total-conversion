@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Module to get settings for given iitc build name.
 
@@ -10,15 +10,15 @@ values from localbuildsettings.py (if exists).
 def load(build_name, localfile=None):
     """Load settings for given iitc build name."""
     import buildsettings as config
-    import os
     import time
+    from pathlib import Path
     from runpy import run_path
 
     try:
         localsettings = run_path(localfile or config.localfile)
-    except IOError as err:  # Python 3: FileNotFoundError
-        if err.errno != 2:  # No such file or directory
-            raise
+    except FileNotFoundError:
+        if localfile:  # ignore for default file
+            raise      # but raise for explicitely specified
     else:
         config.defaults.update(localsettings.get('defaults', {}))
         config.builds.update(localsettings.get('builds', {}))
@@ -40,9 +40,9 @@ def load(build_name, localfile=None):
     utc = time.gmtime()
     mod['build_date'] = time.strftime('%Y-%m-%d-%H%M%S', utc)
     mod['build_timestamp'] = time.strftime('%Y%m%d.%H%M%S', utc)
-    cwd = os.getcwd()
+    cwd = Path.cwd()
     mod['build_source_dir'] = cwd
-    mod['build_target_dir'] = os.path.join(cwd, 'build', build_name)
+    mod['build_target_dir'] = cwd / 'build' / build_name
     mod.update(config.defaults)
     mod.update(config.builds[build_name])
 

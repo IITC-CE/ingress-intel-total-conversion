@@ -5,7 +5,7 @@
 
 from pluginwrapper import start, setup
 
-end = u"""
+end = """
 } // wrapper end
 var info = {};
 if (typeof GM_info !== 'undefined' && GM_info && GM_info.script) info.script = { version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description };

@@ -1,15 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Utility to build iitc plugin for given source file name."""
 
 import base64
-import glob
-import io
-import os
 import re
 import sys
-from importlib import import_module  # Python >= 2.7
+from importlib import import_module
 from mimetypes import guess_type
+from pathlib import Path
 
 import settings
 
@@ -27,20 +25,20 @@ def fill_meta(source, plugin_name, dist_path):
 
     def append_line(key, value):
         if key not in keys:
-            meta.append('// @{:<14} {}'.format(key, value))
+            meta.append(f'// @{key:<14} {value}')
 
     is_main = False
     for line in source.splitlines():
         text = line.lstrip()
         rem = text[:2]
         if rem != '//':
-            raise UserWarning('{}: wrong line in metablock: {}'.format(plugin_name, line))
+            raise UserWarning(f'{plugin_name}: wrong line in metablock: {line}')
         text = text[2:].strip()
         try:
             key, value = text.split(None, 1)
         except ValueError:
             if text == '==UserScript==':
-                raise UserWarning('{}: wrong metablock detected'.format(plugin_name))
+                raise UserWarning(f'{plugin_name}: wrong metablock detected')
         else:
             key = key[1:]
             keys.add(key)
@@ -80,53 +78,43 @@ def multi_line(text):
 
 
 def readtext(filename):
-    with io.open(filename, 'r', encoding='utf-8-sig') as src:
-        return src.read()
+    return filename.read_text(encoding='utf-8-sig')
 
 
 def readbytes(filename):
-    with io.open(filename, 'rb') as src:
-        return src.read()
+    return filename.read_bytes()
 
 
 def load_image(filename):
-    mtype, _ = guess_type(filename)
-    assert mtype, 'Failed to guess mimetype: {}'.format(filename)
+    mtype, _ = guess_type(str(filename))  # todo: after Python 3.8 mimetypes accepts PathLike too
+    assert mtype, f'Failed to guess mimetype: {filename}'
     return 'data:{};base64,{}'.format(
         mtype,
         base64.b64encode(readbytes(filename)).decode('utf8'),
     )
 
 
-def wrap_iife(fullname):
-    filename = os.path.basename(fullname)
-    name, _ = os.path.splitext(filename)
-    return u"""
-// *** module: {filename} ***
+def wrap_iife(filename):
+    return """
+// *** module: {.name} ***
 (function () {{
-var log = ulog('{name}');
+var log = ulog('{.stem}');
 {content}
 
 }})();
-""".format(filename=filename, name=name, content=readtext(fullname))
+""".format(filename, filename, content=readtext(filename))
 
 
 current_path = None
 
 
 def bundle_code(_):
-    files = os.path.join(current_path, 'code', '*.js')
-    return '\n'.join(map(wrap_iife, sorted(glob.glob(files))))
-
-
-def getabs(filename, base):
-    if os.path.isabs(filename):
-        return filename
-    return os.path.join(base, filename)
+    files = (current_path / 'code').glob('*.js')
+    return '\n'.join(map(wrap_iife, sorted(files)))
 
 
 def imgrepl(match):
-    fullname = getabs(match.group('filename'), current_path)
+    fullname = current_path / match.group('filename')
     return load_image(fullname)
 
 
@@ -136,9 +124,9 @@ def expand_template(match):
     if not filename:
         return quote % getattr(settings, kw)
 
-    fullname = getabs(filename, current_path)
+    fullname = current_path / filename
     if kw == 'include_raw':
-        return u"""// *** included: {filename} ***
+        return """// *** included: {filename} ***
 {content}
 
 """.format(filename=filename, content=readtext(fullname))
@@ -152,18 +140,6 @@ def expand_template(match):
         return quote % multi_line(css)
 
 
-def split_filename(path):
-    filename = os.path.basename(path)
-    return filename.split('.')[0]
-
-
-def write_userscript(data, plugin_name, ext, directory=None):
-    filename = plugin_name + ext
-    filename = os.path.join(directory, filename) if directory else filename
-    with io.open(filename, 'w', encoding='utf8') as userscript:
-        userscript.write(data)
-
-
 def process_file(source, out_dir, dist_path=None):
     """Generate .user.js (and optionally .meta.js) from given source file.
 
@@ -172,13 +148,13 @@ def process_file(source, out_dir, dist_path=None):
     dist_path component is for adding to @downloadURL/@updateURL.
     """
     global current_path  # to pass value to repl-functions
-    current_path = settings.build_source_dir  # used as root for all (relative) paths
-                                              # todo: evaluate relatively to processed file (with os.path.dirname)
+    current_path = Path(settings.build_source_dir)  # used as root for all (relative) paths
+                                                    # todo: evaluate relatively to processed file
     try:
         meta, script = readtext(source).split('\n\n', 1)
     except ValueError:
-        raise Exception('{}: wrong input: empty line expected after metablock'.format(source))
-    plugin_name = split_filename(source)
+        raise Exception(f'{source}: wrong input: empty line expected after metablock')
+    plugin_name = source.stem
     meta, is_main = fill_meta(meta, plugin_name, dist_path)
     settings.plugin_id = plugin_name
 
@@ -194,10 +170,10 @@ def process_file(source, out_dir, dist_path=None):
     ]
     if is_main:
         data.pop(3)  # remove wrapper.setup (it's for plugins only)
-    write_userscript(''.join(data), plugin_name, '.user.js', out_dir)
 
+    (out_dir / (plugin_name + '.user.js')).write_text(''.join(data), encoding='utf8')
     if settings.url_dist_base and settings.update_file == '.meta.js':
-        write_userscript(meta, plugin_name, '.meta.js', out_dir)
+        (out_dir / (plugin_name + '.meta.js')).write_text(meta, encoding='utf8')
 
 
 if __name__ == '__main__':
@@ -205,9 +181,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('build', type=str, nargs='?',
                         help='Specify build name')
-    parser.add_argument('source', type=str,
+    parser.add_argument('source', type=Path,
                         help='Specify source file name')
-    parser.add_argument('--out-dir', type=str, nargs='?',
+    parser.add_argument('--out-dir', type=Path, nargs='?',
                         help='Specify out directory')
     args = parser.parse_args()
 
@@ -216,19 +192,19 @@ if __name__ == '__main__':
     except ValueError as err:
         parser.error(err)
 
-    if not os.path.isfile(args.source):
+    if not args.source.is_file():
         parser.error('Source file not found: {.source}'.format(args))
 
-    out_dir = args.out_dir or settings.build_target_dir
-    if not os.path.isdir(out_dir):
-        parser.error('Out directory not found: {}'.format(out_dir))
+    args.out_dir = args.out_dir or Path(settings.build_target_dir)
+    if not args.out_dir.is_dir():
+        parser.error('Out directory not found: {.out_dir}'.format(args))
 
-    target = os.path.join(out_dir, split_filename(args.source) + '.user.js')
-    if os.path.isfile(target) and os.path.samefile(args.source, target):
+    target = args.out_dir / (args.source.stem + '.user.js')
+    if target.is_file() and target.samefile(args.source):
         parser.error('Target cannot be same as source: {.source}'.format(args))
 
     try:
-        process_file(args.source, out_dir)
+        process_file(args.source, args.out_dir)
     except UserWarning as err:
         parser.error(err)
 

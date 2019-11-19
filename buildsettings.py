@@ -3,8 +3,6 @@
 if you want to have custom builds, copy this file to "localbuildsettings.py" and make changes there.
 """
 
-from __future__ import print_function
-
 localfile = 'localbuildsettings.py'
 
 defaults = {  # common for all build targets
@@ -35,7 +33,8 @@ defaults = {  # common for all build targets
     'watch_mode': False,               # otherwise can be activated with --watch commandline argument
     'watch_interval': 1,               # (seconds)
     'sources': (                       # list of source directories to watch for changes,
-        'code',                        # relative to 'build_source_dir' (and including it)
+        '',                            # relative to 'build_source_dir' (and including it)
+        'code',
         'external',
         'images',
         'plugins',
