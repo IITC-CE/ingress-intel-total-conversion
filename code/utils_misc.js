@@ -477,16 +477,22 @@ window.clampLatLngBounds = function(bounds) {
   return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
 }
 
-// @function makePermalink(latlng?: LatLng, mapView?: Boolean): String
-// Makes the permalink for the portal with specified latlng, incluging current map view.
-// At least one of the parameters have to be present.
-window.makePermalink = function(latlng, mapView) {
+// @function makePermalink(latlng?: LatLng, options?: Object): String
+// Makes the permalink for the portal with specified latlng, possibly including current map view.
+// Portal latlng can be omitted to create mapview-only permalink.
+// @option: includeMapView: Boolean = null
+// Use to add zoom level and latlng of current map center.
+// @option: fullURL: Boolean = null
+// Use to make absolute fully qualified URL (default: relative link).
+window.makePermalink = function(latlng, options) {
+  options = options || {}
+
   function ll2str (ll) { return ll[0] + ',' + ll[1]; }
   function round (ll) { // ensures that lat,lng are with same precision as in stock intel permalinks
     return ll.map(function (n) { return Math.trunc(n*1e6)/1e6; });
   }
   var args = [];
-  if (mapView) {
+  if (!latlng || options.includeMapView) {
     var c = window.map.getCenter();
     args.push('ll='+ll2str(round([c.lat,c.lng])), 'z='+window.map.getZoom())
   }
@@ -494,7 +500,8 @@ window.makePermalink = function(latlng, mapView) {
     if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
     args.push('pll='+ll2str(latlng));
   }
-  return '/intel?' + args.join('&');
+  var url = options.fullURL ? 'https://intel.ingress.com/' : '/';
+  return url + '/?' + args.join('&');
 };
 
 window.setPermaLink = function(elm) { // deprecated

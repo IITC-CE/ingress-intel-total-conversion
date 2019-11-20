@@ -76,7 +76,7 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
     }
 
     private String getIntelUrl(final String ll, final int zoom, final boolean isPortal) {
-        String url = "https://intel.ingress.com/intel?ll=" + ll + "&z=" + zoom;
+        String url = "https://intel.ingress.com/?ll=" + ll + "&z=" + zoom;
         if (isPortal) {
             url += "&pll=" + ll;
         }

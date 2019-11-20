@@ -422,7 +422,7 @@ window.setupPlayerStat = function() {
     + '<h2 title="'+t+'">'+level+'&nbsp;'
     + '<div id="name">'
     + '<span class="'+cls+'">'+PLAYER.nickname+'</span>'
-    + '<a href="/_ah/logout?continue=https://www.google.com/accounts/Logout%3Fcontinue%3Dhttps://appengine.google.com/_ah/logout%253Fcontinue%253Dhttps://intel.ingress.com/intel%26service%3Dah" id="signout">sign out</a>'
+    + '<a href="https://intel.ingress.com/logout" id="signout">sign out</a>'
     + '</div>'
     + '<div id="stats">'
     + '<sup>XM: '+xmRatio+'%</sup>'
