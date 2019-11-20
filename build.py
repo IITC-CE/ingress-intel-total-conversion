@@ -53,8 +53,8 @@ def run_cmds(cmds, source, target):
 def iitc_build(source, outdir):
     run_cmds(settings.pre_build, source, outdir)
 
-    iitc_script = 'main.js'
-    build_plugin.process_file(os.path.join(source, iitc_script), outdir, name='total-conversion-build')
+    iitc_script = 'total-conversion-build.js'
+    build_plugin.process_file(os.path.join(source, iitc_script), outdir)
 
     plugins_outdir = os.path.join(outdir, 'plugins')
     if not os.path.isdir(plugins_outdir):

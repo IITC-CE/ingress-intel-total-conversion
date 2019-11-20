@@ -164,7 +164,7 @@ def write_userscript(data, plugin_name, ext, directory=None):
         userscript.write(data)
 
 
-def process_file(source, out_dir, dist_path=None, name=None):
+def process_file(source, out_dir, dist_path=None):
     """Generate .user.js (and optionally .meta.js) from given source file.
 
     Resulted file(s) put into out_dir (if specified, otherwise - use current).
@@ -178,7 +178,7 @@ def process_file(source, out_dir, dist_path=None, name=None):
         meta, script = readtext(source).split('\n\n', 1)
     except ValueError:
         raise Exception('{}: wrong input: empty line expected after metablock'.format(source))
-    plugin_name = name or split_filename(source)
+    plugin_name = split_filename(source)
     meta, is_main = fill_meta(meta, plugin_name, dist_path)
     settings.plugin_id = plugin_name
 

@@ -60,7 +60,7 @@ def build_mobile(source, scripts_dir, out_dir=None, out_name='IITC_Mobile.apk'):
         shutil.rmtree(assets_dir)
     os.makedirs(assets_dir)
 
-    user_location_plug = os.path.join(source, 'plugins', 'user-location.user.js')
+    user_location_plug = os.path.join(source, 'plugins', 'user-location.js')
     build_plugin.process_file(user_location_plug, assets_dir)
     shutil.copy(os.path.join(scripts_dir, iitc_script), assets_dir)
     shutil.copytree(
