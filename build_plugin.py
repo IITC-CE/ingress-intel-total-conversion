@@ -5,6 +5,7 @@
 import base64
 import re
 import sys
+from functools import partial
 from importlib import import_module
 from mimetypes import guess_type
 from pathlib import Path
@@ -105,26 +106,23 @@ var log = ulog('{.stem}');
 """.format(filename, filename, content=readtext(filename))
 
 
-current_path = None
-
-
-def bundle_code(_):
-    files = (current_path / 'code').glob('*.js')
+def bundle_code(_, path=None):
+    files = (path / 'code').glob('*.js')
     return '\n'.join(map(wrap_iife, sorted(files)))
 
 
-def imgrepl(match):
-    fullname = current_path / match.group('filename')
+def imgrepl(match, path=None):
+    fullname = path / match.group('filename')
     return load_image(fullname)
 
 
-def expand_template(match):
+def expand_template(match, path=None):
     quote = "'%s'"
     kw, filename = match.groups()
     if not filename:
         return quote % getattr(settings, kw)
 
-    fullname = current_path / filename
+    fullname = path / filename
     if kw == 'include_raw':
         return """// *** included: {filename} ***
 {content}
@@ -136,7 +134,7 @@ def expand_template(match):
         return quote % load_image(fullname)
     elif kw == 'include_css':
         pattern = r'(?<=url\()["\']?(?P<filename>[^)#]+?)["\']?(?=\))'
-        css = re.sub(pattern, imgrepl, readtext(fullname))
+        css = re.sub(pattern, partial(imgrepl, path=fullname.parent), readtext(fullname))
         return quote % multi_line(css)
 
 
@@ -147,9 +145,6 @@ def process_file(source, out_dir, dist_path=None):
 
     dist_path component is for adding to @downloadURL/@updateURL.
     """
-    global current_path  # to pass value to repl-functions
-    current_path = Path(settings.build_source_dir)  # used as root for all (relative) paths
-                                                    # todo: evaluate relatively to processed file
     try:
         meta, script = readtext(source).split('\n\n', 1)
     except ValueError:
@@ -158,13 +153,15 @@ def process_file(source, out_dir, dist_path=None):
     meta, is_main = fill_meta(meta, plugin_name, dist_path)
     settings.plugin_id = plugin_name
 
-    script = re.sub(r"'@bundle_code@';", bundle_code, script)
+    path = source.parent  # used as root for all (relative) paths
+    script = re.sub(r"'@bundle_code@';", partial(bundle_code, path=path), script)
     wrapper = get_module(settings.plugin_wrapper)
     template = r"'@(\w+)(?::([\w./-]+))?@'"  # to find '@keyword[:path]@' patterns
+    repl = partial(expand_template, path=path)
     data = [
         meta,
-        re.sub(template, expand_template, wrapper.start),
-        re.sub(template, expand_template, script),
+        re.sub(template, repl, wrapper.start),
+        re.sub(template, repl, script),
         wrapper.setup,
         wrapper.end,
     ]

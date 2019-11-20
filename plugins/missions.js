@@ -984,7 +984,7 @@ window.plugin.missions = {
 
 		this.loadData();
 
-		$('<style>').prop('type', 'text/css').html('@include_string:plugins/missions.css@').appendTo('head');
+		$('<style>').prop('type', 'text/css').html('@include_string:missions.css@').appendTo('head');
 		$('#toolbox').append('<a tabindex="0" onclick="plugin.missions.openTopMissions();">Missions in view</a>');
 
 		if(window.useAndroidPanes()) {

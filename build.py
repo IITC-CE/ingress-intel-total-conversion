@@ -51,7 +51,7 @@ def run_cmds(cmds, source, target):
 def iitc_build(source, outdir):
     run_cmds(settings.pre_build, source, outdir)
 
-    iitc_script = 'total-conversion-build.js'
+    iitc_script = 'core/total-conversion-build.js'
     build_plugin.process_file(source / iitc_script, outdir)
 
     outdir.joinpath('plugins').mkdir(parents=True, exist_ok=True)
@@ -137,8 +137,8 @@ if __name__ == '__main__':
 
     if args.watch or settings.watch_mode:
         sources_root = Path(settings.build_source_dir).resolve()
-        watch_list = [sources_root / path for path in settings.sources]
-
+        watch_list = [Path(dirs[0]) for src in settings.sources
+                                    for dirs in os.walk(sources_root / src)]
         target_root = Path(settings.build_target_dir).resolve()
         if (target_root in watch_list) or (target_root.parent in watch_list):
             parser.error(f'specified target location would cause endless cycle: {target_root}')

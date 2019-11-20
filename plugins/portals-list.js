@@ -394,7 +394,7 @@ var setup =  function() {
 
   $("<style>")
     .prop("type", "text/css")
-    .html('@include_string:plugins/portals-list.css@')
+    .html('@include_string:portals-list.css@')
     .appendTo("head");
 
 }

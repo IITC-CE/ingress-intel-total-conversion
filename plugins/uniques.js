@@ -403,7 +403,7 @@ window.plugin.uniques.highlighter = {
 window.plugin.uniques.setupCSS = function() {
 	$("<style>")
 	.prop("type", "text/css")
-	.html('@include_string:plugins/uniques.css@')
+	.html('@include_string:uniques.css@')
 	.appendTo("head");
 }
 

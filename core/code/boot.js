@@ -577,7 +577,7 @@ window.extendLeaflet = function() {
   L.Icon.Default.mergeOptions({
     iconUrl: '@include_img:images/marker-ingress.png@',
     iconRetinaUrl: '@include_img:images/marker-ingress-2x.png@',
-    shadowUrl: '@include_img:images/marker-shadow.png@'
+    shadowUrl: '@include_img:external/images/marker-shadow.png@'
   });
   L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
 

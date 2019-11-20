@@ -168,5 +168,5 @@ plugin.showLinkedPortal.removePreview = function() {
 
 var setup = function () {
   window.addHook('portalDetailsUpdated', window.plugin.showLinkedPortal.portalDetail);
-  $('<style>').prop('type', 'text/css').html('@include_string:plugins/linked-portals-show.css@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@include_string:linked-portals-show.css@').appendTo('head');
 }

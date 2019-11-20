@@ -15,7 +15,7 @@ window.PLAYER_TRACKER_LINE_COLOUR = '#FF00FD';
 window.plugin.playerTracker = function() {};
 
 window.plugin.playerTracker.setup = function() {
-  $('<style>').prop('type', 'text/css').html('@include_string:plugins/player-tracker.css@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@include_string:player-tracker.css@').appendTo('head');
 
   var iconEnlImage = '@include_img:images/marker-green.png@';
   var iconEnlRetImage = '@include_img:images/marker-green-2x.png@';

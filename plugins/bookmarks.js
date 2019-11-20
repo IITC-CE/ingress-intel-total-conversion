@@ -1124,7 +1124,7 @@
 /***************************************************************************************************************************************************************/
 
   window.plugin.bookmarks.setupCSS = function() {
-    $('<style>').prop('type', 'text/css').html('@include_css:plugins/bookmarks.css@').appendTo('head');
+    $('<style>').prop('type', 'text/css').html('@include_css:bookmarks.css@').appendTo('head');
   }
 
   window.plugin.bookmarks.setupPortalsList = function() {

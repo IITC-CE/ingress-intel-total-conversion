@@ -108,7 +108,7 @@ plugin.layerCount.calculate = function(ev) {
 };
 
 var setup = function() {
-	$('<style>').prop('type', 'text/css').html('@include_string:plugins/layer-count.css@').appendTo('head');
+	$('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
 
 	var parent = $(".leaflet-top.leaflet-left", window.map.getContainer());
 

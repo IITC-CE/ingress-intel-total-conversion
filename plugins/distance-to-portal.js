@@ -118,7 +118,7 @@ window.plugin.distanceToPortal.setup  = function() {
 
   window.plugin.distanceToPortal.currentLocMarker = null;
 
-  $('<style>').prop('type', 'text/css').html('@include_string:plugins/distance-to-portal.css@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@include_string:distance-to-portal.css@').appendTo('head');
 
   addHook('portalDetailsUpdated', window.plugin.distanceToPortal.addDistance);
 

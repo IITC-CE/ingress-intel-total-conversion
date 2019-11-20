@@ -156,7 +156,7 @@ window.plugin.keys.loadKeys = function() {
 window.plugin.keys.setupCSS = function() {
   $("<style>")
     .prop("type", "text/css")
-    .html('@include_string:plugins/keys.css@')
+    .html('@include_string:keys.css@')
     .appendTo("head");
 }
 

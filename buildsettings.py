@@ -33,10 +33,7 @@ defaults = {  # common for all build targets
     'watch_mode': False,               # otherwise can be activated with --watch commandline argument
     'watch_interval': 1,               # (seconds)
     'sources': (                       # list of source directories to watch for changes,
-        '',                            # relative to 'build_source_dir' (and including it)
-        'code',
-        'external',
-        'images',
+        'core',                        # relative to 'build_source_dir'
         'plugins',
      ),
     'on_fail': lambda: print('\a'),    # function (or string for os.system)
