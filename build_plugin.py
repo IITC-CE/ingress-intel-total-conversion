@@ -78,11 +78,18 @@ def multi_line(text):
     return ('\n' + text).replace('\\', r'\\').replace('\n', '\\\n').replace("'", r"\'")
 
 
+def log_dependency(filename, deps_list=None):
+    if deps_list is not None:
+        deps_list.append(filename)
+
+
 def readtext(filename):
+    log_dependency(filename)
     return filename.read_text(encoding='utf-8-sig')
 
 
 def readbytes(filename):
+    log_dependency(filename)
     return filename.read_bytes()
 
 
@@ -138,13 +145,15 @@ def expand_template(match, path=None):
         return quote % multi_line(css)
 
 
-def process_file(source, out_dir, dist_path=None):
+def process_file(source, out_dir, dist_path=None, deps_list=None):
     """Generate .user.js (and optionally .meta.js) from given source file.
 
     Resulted file(s) put into out_dir (if specified, otherwise - use current).
 
     dist_path component is for adding to @downloadURL/@updateURL.
     """
+    global log_dependency
+    log_dependency = partial(log_dependency, deps_list=deps_list)
     try:
         meta, script = readtext(source).split('\n\n', 1)
     except ValueError:
@@ -182,6 +191,8 @@ if __name__ == '__main__':
                         help='Specify source file name')
     parser.add_argument('--out-dir', type=Path, nargs='?',
                         help='Specify out directory')
+    parser.add_argument('--watch', action='store_true',
+                        help='auto-rebuild on sources changes')
     args = parser.parse_args()
 
     try:
@@ -200,9 +211,15 @@ if __name__ == '__main__':
     if target.is_file() and target.samefile(args.source):
         parser.error('Target cannot be same as source: {.source}'.format(args))
 
-    try:
-        process_file(args.source, args.out_dir)
-    except UserWarning as err:
-        parser.error(err)
-
-    print(target)
+    if args.watch or settings.watch_mode:
+        from build import watch
+        print('Plugin build: {.build_name} (watch mode)\n'
+              ' source: {.source}\n'
+              ' target: {}'.format(settings, args, target))
+        watch(process_file, args.source, args.out_dir, interval=settings.watch_interval)
+    else:
+        try:
+            process_file(args.source, args.out_dir)
+        except UserWarning as err:
+            parser.error(err)
+        print(target)

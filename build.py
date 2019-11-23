@@ -48,15 +48,20 @@ def run_cmds(cmds, source, target):
             ))
 
 
-def iitc_build(source, outdir):
+def iitc_build(source, outdir, deps_list=None):
     run_cmds(settings.pre_build, source, outdir)
 
     iitc_script = 'core/total-conversion-build.js'
-    build_plugin.process_file(source / iitc_script, outdir)
+    build_plugin.process_file(source / iitc_script, outdir, deps_list=deps_list)
 
     outdir.joinpath('plugins').mkdir(parents=True, exist_ok=True)
     for filename in source.joinpath('plugins').glob('*.js'):
-        build_plugin.process_file(filename, outdir / 'plugins', dist_path='plugins')
+        build_plugin.process_file(
+            filename,
+            outdir / 'plugins',
+            dist_path='plugins',
+            deps_list=deps_list
+        )
 
     run_cmds(settings.post_build, source, outdir)
 
@@ -73,14 +78,14 @@ def backup(directory):
         directory.replace(bak)
 
 
-def backup_and_run():
+def backup_and_run(deps_list=None):
     source = Path(settings.build_source_dir)
     target = Path(settings.build_target_dir)
     workdir = target.with_name('~')
     clean(workdir)
     workdir.mkdir(parents=True)
 
-    iitc_build(source, workdir)
+    iitc_build(source, workdir, deps_list=deps_list)
 
     backup(target)
     workdir.replace(target)
@@ -95,14 +100,33 @@ def on_event(cmd):
         os.system(cmd)
 
 
-def watch(watch_list, run, interval):
-    from time import ctime, sleep
+def timestamp(watch_list, basetime):
+    return sum(
+        basetime-p.stat().st_mtime if p.exists() else 0
+        for p in watch_list
+    )
+
+
+def watch(build_cb, *args, interval=1, **kwargs):
+    """Initiate rebuild on source files changes.
+
+    build_cb - building function, to be called on sources changes.
+
+    interval - optional keyword argument, defines period (in seconds) between checks.
+
+    Any other subsequent positional and/or keyword arguments will be passed to build_cb.
+
+    Every found dependancy (to be watched for changes) build_cb must append
+    to deps_list, which is passed to it as additional keyword argument.
+    """
+    from time import ctime, sleep, time
     from traceback import print_exc
 
-    last_modified = 0
+    basetime = None
+    last_stamp = None
+    watch_list = None
     while True:
-        timestamp = max(p.stat().st_mtime for p in watch_list)
-        if timestamp == last_modified:
+        if watch_list is not None and last_stamp == timestamp(watch_list, basetime):
             try:
                 sleep(interval)
             except KeyboardInterrupt:
@@ -110,15 +134,21 @@ def watch(watch_list, run, interval):
                 break
             else:
                 continue
-        last_modified = timestamp
-        print('\nrebuild started [{}]'.format(ctime(last_modified)))
+        basetime = time()
+        print('\nrebuild started [{}]'.format(ctime(basetime)))
+        watch_list = []
+        if settings.localfile:
+            watch_list.append(settings.localfile)
         try:
-            run()
+            build_cb(*args, deps_list=watch_list, **kwargs)
         except Exception:
             print_exc()
             on_event(settings.on_fail)
         else:
             on_event(settings.on_success)
+        if not watch_list:
+            raise Exception('watch list is empty')
+        last_stamp = timestamp(watch_list, basetime)
 
 
 if __name__ == '__main__':
@@ -136,15 +166,8 @@ if __name__ == '__main__':
         parser.error(err)
 
     if args.watch or settings.watch_mode:
-        sources_root = Path(settings.build_source_dir).resolve()
-        watch_list = [Path(dirs[0]) for src in settings.sources
-                                    for dirs in os.walk(sources_root / src)]
-        target_root = Path(settings.build_target_dir).resolve()
-        if (target_root in watch_list) or (target_root.parent in watch_list):
-            parser.error(f'specified target location would cause endless cycle: {target_root}')
-
         print('IITC build: {.build_name} (watch mode)'.format(settings))
-        watch(watch_list, backup_and_run, settings.watch_interval)
+        watch(backup_and_run, interval=settings.watch_interval)
     else:
         print('IITC build: {.build_name}'.format(settings))
         try:

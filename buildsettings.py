@@ -32,10 +32,6 @@ defaults = {  # common for all build targets
     # watch mode settings:
     'watch_mode': False,               # otherwise can be activated with --watch commandline argument
     'watch_interval': 1,               # (seconds)
-    'sources': (                       # list of source directories to watch for changes,
-        'core',                        # relative to 'build_source_dir'
-        'plugins',
-     ),
     'on_fail': lambda: print('\a'),    # function (or string for os.system)
     'on_success': lambda: print('Build successed'),
 

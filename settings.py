@@ -19,7 +19,9 @@ def load(build_name, localfile=None):
     except FileNotFoundError:
         if localfile:  # ignore for default file
             raise      # but raise for explicitely specified
+        localfile = None
     else:
+        localfile = localfile or config.localfile
         config.defaults.update(localsettings.get('defaults', {}))
         config.builds.update(localsettings.get('builds', {}))
         config.default_build = localsettings.get('default_build', None)
@@ -45,6 +47,7 @@ def load(build_name, localfile=None):
     mod['build_target_dir'] = cwd / 'build' / build_name
     mod.update(config.defaults)
     mod.update(config.builds[build_name])
+    mod['localfile'] = Path(localfile) if localfile else None
 
 
 if __name__ == '__main__':
