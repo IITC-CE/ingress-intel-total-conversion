@@ -42,9 +42,9 @@ def load(build_name, localfile=None):
     utc = time.gmtime()
     mod['build_date'] = time.strftime('%Y-%m-%d-%H%M%S', utc)
     mod['build_timestamp'] = time.strftime('%Y%m%d.%H%M%S', utc)
-    cwd = Path.cwd()
-    mod['build_source_dir'] = cwd
-    mod['build_target_dir'] = cwd / 'build' / build_name
+    base = Path(localfile or __file__).parent
+    mod['build_source_dir'] = base
+    mod['build_target_dir'] = base / 'build' / build_name
     mod.update(config.defaults)
     mod.update(config.builds[build_name])
     mod['localfile'] = Path(localfile) if localfile else None
