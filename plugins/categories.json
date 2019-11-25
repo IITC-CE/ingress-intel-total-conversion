@@ -1,0 +1,80 @@
+{
+  "Cache": {
+    "name": "Cache",
+    "name:ru": "Кэш",
+    "description": "Data caching to prevent reloading",
+    "description:ru": "Кэширование данных для предотвращения повторной загрузки"
+  },
+  "Controls": {
+    "name": "Controls",
+    "name:ru": "Управление",
+    "description": "Map controls/widgets",
+    "description:ru": "Виджеты для управления картой"
+  },
+  "Draw": {
+    "name": "Draw",
+    "name:ru": "Рисование",
+    "description": "Allow drawing things onto the current map so you may plan your next move",
+    "description:ru": "Позволяет рисовать на текущей карте, чтобы вы могли спланировать свой следующий шаг"
+  },
+  "Highlighter": {
+    "name": "Highlighter",
+    "name:ru": "Подсветка",
+    "description": "Portal highlighters",
+    "description:ru": "Подсветка порталов"
+  },
+  "Info": {
+    "name": "Info",
+    "name:ru": "Информация",
+    "description": "Display additional information",
+    "description:ru": "Отображение дополнительной информации"
+  },
+  "Keys": {
+    "name": "Keys",
+    "name:ru": "Ключи",
+    "description": "Manual key management",
+    "description:ru": "Ручное управление ключами"
+  },
+  "Layer": {
+    "name": "Layer",
+    "name:ru": "Слои",
+    "description": "Additional map layers",
+    "description:ru": "Дополнительные слои карт"
+  },
+  "Map Tiles": {
+    "name": "Map Tiles",
+    "name:ru": "Провайдеры карт",
+    "description": "Alternative map layers",
+    "description:ru": "Альтернативные провайдеры карт"
+  },
+  "Portal Info": {
+    "name": "Portal Info",
+    "name:ru": "Информация о портале",
+    "description": "Enhanced information on the selected portal",
+    "description:ru": "Подробная информация на выбранном портале"
+  },
+  "Tweaks": {
+    "name": "Tweaks",
+    "name:ru": "Настройки",
+    "description": "Adjust IITC settings",
+    "description:ru": "Настройка параметров IITC"
+  },
+  "Misc": {
+    "name": "Misc",
+    "name:ru": "Разное",
+    "description": "Unclassified plugins",
+    "description:ru": "Неклассифицированные плагины"
+  },
+  "Obsolete": {
+    "name": "Obsolete",
+    "name:ru": "Устаревшее",
+    "description": "Plugins that are no longer recommended, due to being superceded by others or similar",
+    "description:ru": "Плагины, которые больше не рекомендуются в связи с заменой другими или аналогичными плагинами"
+  },
+  "Deleted": {
+    "name": "Deleted",
+    "name:ru": "Удалённое",
+    "description": "Deleted plugins – listed here for reference only. No download available",
+    "description:ru": "Удаленные плагины – перечислены здесь только для справки. Нет возможности скачать"
+  }
+}

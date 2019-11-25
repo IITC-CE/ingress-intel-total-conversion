@@ -45,22 +45,24 @@ def add_to_meta(meta, info, filename):
         'name': info['name'].replace('IITC plugin: ', ''),
     }
     # optional fields
-    for key in ('namespace', 'description', 'version'):
+    for key in ('author', 'description', 'namespace', 'version'):
         value = info.get(key)
         if value:
             data[key] = value
 
     category = info.get('category', 'Misc')
     if category not in meta:
-        meta[category] = {'name': category, 'plugins': []}
+        meta[category] = {'name': category}
+    if 'plugins' not in meta[category]:
+        meta[category]['plugins'] = []
     meta[category]['plugins'].append(data)
 
 
-def gen_meta(source, target=None):
+def gen_meta(source, target=None, categories=None):
     print('Generating meta for build: {.build_name}'.format(settings))
     target = target or source / 'meta.json'
 
-    meta = {}
+    meta = json.loads(categories.read_text(encoding='utf8')) if categories else {}
     for filename in (source / 'plugins').glob('*.user.js'):
         info = parse_user_script(filename)
         add_to_meta(meta, info, filename.name)
@@ -76,8 +78,8 @@ def gen_meta(source, target=None):
     )
 
 
-def iitc_build(source, outdir):
-    gen_meta(outdir)
+def iitc_build(_, outdir):
+    gen_meta(outdir, categories=settings.build_source_dir / 'plugins/categories.json')
 
 
 if __name__ == '__main__':
@@ -99,6 +101,6 @@ if __name__ == '__main__':
         parser.error(f'Directory not found: {source}')
 
     try:
-        gen_meta(source)
+        gen_meta(source, categories=settings.build_source_dir / 'plugins/categories.json')
     except UserWarning as err:
         parser.error(err)
