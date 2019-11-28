@@ -266,7 +266,8 @@ window.getPortalMitigationDetails = function(d,linkCount) {
   // mitigation is limited to 95% (as confirmed by Brandon Badger on G+)
   mitigation.total = Math.min(95, mitigation.shields+mitigation.links);
 
-  mitigation.excess = (mitigation.shields+mitigation.links) - mitigation.total;
+  var excess = (mitigation.shields+mitigation.links) - mitigation.total;
+  mitigation.excess = Math.round(10 * excess) / 10;
 
   return mitigation;
 }
