@@ -80,7 +80,7 @@ L.Draw.Circle.include({ // ?? extend to L.Draw.GeodesicCircle ??
 
 });
 
-// ******* avoid direct access to L.Geodesic* private property _latlns
+// ******* avoid direct access to L.Geodesic* private property _latlngs
 L.Edit.Poly.include({
 	initialize: function (poly) {
 
