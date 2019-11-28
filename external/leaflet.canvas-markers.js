@@ -273,6 +273,9 @@ function layerFactory (L) {
         },
 
         _handleMouseHover: function (e, point) {
+            if (this._mouseHoverThrottled) {
+                return;
+            }
             var candidateHoveredLayer;
             var layer_intersect = this._pointsIdx && this._pointsIdx.searchBy(point);
             if (layer_intersect) {
@@ -296,6 +299,11 @@ function layerFactory (L) {
             if (this._hoveredLayer) {
                 this._fireEvent([this._hoveredLayer], e);
             }
+
+            this._mouseHoverThrottled = true;
+            setTimeout(L.bind(function () {
+                this._mouseHoverThrottled = false;
+            }, this), 32);
         },
 
         _handleMouseOut: function (e) {
