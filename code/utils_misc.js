@@ -501,7 +501,7 @@ window.makePermalink = function(latlng, options) {
     args.push('pll='+ll2str(latlng));
   }
   var url = options.fullURL ? 'https://intel.ingress.com/' : '/';
-  return url + '/?' + args.join('&');
+  return url + '?' + args.join('&');
 };
 
 window.setPermaLink = function(elm) { // deprecated
