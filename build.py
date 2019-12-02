@@ -137,8 +137,6 @@ def watch(build_cb, *args, interval=1, **kwargs):
         basetime = time()
         print('\nrebuild started [{}]'.format(ctime(basetime)))
         watch_list = []
-        if settings.localfile:
-            watch_list.append(settings.localfile)
         try:
             build_cb(*args, deps_list=watch_list, **kwargs)
         except Exception:
