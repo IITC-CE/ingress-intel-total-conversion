@@ -280,7 +280,7 @@
 	cursor:pointer;
 }
 #bkmrksTrigger, .bkmrksStar span, .portal-list-bookmark span {
-	background-image:url(@@INCLUDEIMAGE:images/bookmarks-img.png@@);
+	background-image:url(images/bookmarks-img.png);
 }
 .bkmrksStar span{
 	display:inline-block;

@@ -16,9 +16,9 @@ if(typeof window.plugin !== 'function') window.plugin = function() {};
 
 //PLUGIN AUTHORS: writing a plugin outside of the IITC build environment? if so, delete these lines!!
 //(leaving them in place might break the 'About IITC' page or break update checks)
-plugin_info.buildName = '@@BUILDNAME@@';
-plugin_info.dateTimeVersion = '@@DATETIMEVERSION@@';
-plugin_info.pluginId = '@@PLUGINNAME@@';
+plugin_info.buildName = '@build_name@';
+plugin_info.dateTimeVersion = '@build_date@';
+plugin_info.pluginId = '@plugin_id@';
 //END PLUGIN AUTHORS NOTE
 
 """
