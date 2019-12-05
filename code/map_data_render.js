@@ -333,7 +333,7 @@ window.Render.prototype.createPortalEntity = function(ent) {
   }
   function handler_portal_dblclick (e) {
     window.renderPortalDetails(e.target.options.guid);
-    window.map.setView(e.target.getLatLng(), 17);
+    window.map.setView(e.target.getLatLng(), DEFAULT_ZOOM);
   }
   function handler_portal_contextmenu (e) {
     window.renderPortalDetails(e.target.options.guid);

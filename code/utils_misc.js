@@ -288,7 +288,7 @@ window.scrollBottom = function(elm) {
 }
 
 window.zoomToAndShowPortal = function(guid, latlng) {
-  map.setView(latlng, 17);
+  map.setView(latlng, DEFAULT_ZOOM);
   // if the data is available, render it immediately. Otherwise defer
   // until it becomes available.
   if(window.portals[guid])
@@ -315,7 +315,7 @@ window.selectPortalByLatLng = function(lat, lng) {
 
   // not currently visible
   urlPortalLL = [lat, lng];
-  map.setView(urlPortalLL, 17);
+  map.setView(urlPortalLL, DEFAULT_ZOOM);
 };
 
 String.prototype.capitalize = function() {

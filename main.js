@@ -135,6 +135,9 @@ window.RANGE_INDICATOR_COLOR = 'red'
 // min zoom for intel map - should match that used by stock intel
 window.MIN_ZOOM = 3;
 
+// used when zoom level is not specified explicitly (must contain all the portals)
+window.DEFAULT_ZOOM = 15;
+
 window.DEFAULT_PORTAL_IMG = '//commondatastorage.googleapis.com/ingress.com/img/default-portal-image.png';
 //window.NOMINATIM = '//open.mapquestapi.com/nominatim/v1/search.php?format=json&polygon_geojson=1&q=';
 window.NOMINATIM = '//nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=';

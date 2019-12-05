@@ -217,7 +217,7 @@ window.plugin.missions = {
 	},
 
 	zoomToMission: function(mission) {
-		map.fitBounds(this.getMissionBounds(mission), {maxZoom: 17});
+		map.fitBounds(this.getMissionBounds(mission), {maxZoom: DEFAULT_ZOOM});
 	},
 
 	getMissionBounds: function(mission) {
@@ -975,7 +975,7 @@ window.plugin.missions = {
 
 	onSearchResultSelected: function(result, event) {
 		if(result.bounds) {
-			map.fitBounds(result.bounds, {maxZoom: 17});
+			map.fitBounds(result.bounds, {maxZoom: DEFAULT_ZOOM});
 		}
 		
 		this.openMission(result.mission.guid);

@@ -457,7 +457,7 @@ window.plugin.playerTracker.getPortalLink = function(data) {
       return false;
     })
     .dblclick(function(event) {
-      map.setView(position, 17)
+      map.setView(position, DEFAULT_ZOOM);
       window.selectPortalByLatLng(position);
       event.preventDefault();
       return false;
@@ -529,7 +529,7 @@ window.plugin.playerTracker.onSearchResultSelected = function(result, event) {
     map.setView(result.position);
 
   if(event.type == 'dblclick')
-    map.setZoom(17);
+    map.setZoom(DEFAULT_ZOOM);
 
   return true;
 };
