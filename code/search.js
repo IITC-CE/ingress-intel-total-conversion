@@ -153,13 +153,13 @@ window.search.Query.prototype.onResultSelected = function(result, ev) {
 
   if(ev.type == 'dblclick') {
     if(result.position) {
-      map.setView(result.position, 17);
+      map.setView(result.position, DEFAULT_ZOOM);
     } else if(result.bounds) {
-      map.fitBounds(result.bounds, {maxZoom: 17});
+      map.fitBounds(result.bounds, {maxZoom: DEFAULT_ZOOM});
     }
   } else { // ev.type != 'dblclick'
     if(result.bounds) {
-      map.fitBounds(result.bounds, {maxZoom: 17});
+      map.fitBounds(result.bounds, {maxZoom: DEFAULT_ZOOM});
     } else if(result.position) {
       map.setView(result.position);
     }

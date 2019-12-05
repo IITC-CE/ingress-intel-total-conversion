@@ -24,7 +24,7 @@ window.getPosition = function() {
     log.log("mappos: reading email URL params");
     var lat = parseInt(getURLParam('latE6'))/1E6 || 0.0;
     var lng = parseInt(getURLParam('lngE6'))/1E6 || 0.0;
-    var z = parseInt(getURLParam('z')) || 17;
+    var z = parseInt(getURLParam('z')) || DEFAULT_ZOOM;
     return {center: new L.LatLng(lat, lng), zoom: z};
   }
 
@@ -32,7 +32,7 @@ window.getPosition = function() {
     log.log("mappos: reading stock Intel URL params");
     var lat = parseFloat(getURLParam('ll').split(",")[0]) || 0.0;
     var lng = parseFloat(getURLParam('ll').split(",")[1]) || 0.0;
-    var z = parseInt(getURLParam('z')) || 17;
+    var z = parseInt(getURLParam('z')) || DEFAULT_ZOOM;
     return {center: new L.LatLng(lat, lng), zoom: z};
   }
 
@@ -40,7 +40,7 @@ window.getPosition = function() {
     log.log("mappos: reading stock Intel URL portal params");
     var lat = parseFloat(getURLParam('pll').split(",")[0]) || 0.0;
     var lng = parseFloat(getURLParam('pll').split(",")[1]) || 0.0;
-    var z = parseInt(getURLParam('z')) || 17;
+    var z = parseInt(getURLParam('z')) || DEFAULT_ZOOM;
     return {center: new L.LatLng(lat, lng), zoom: z};
   }
 
@@ -48,7 +48,7 @@ window.getPosition = function() {
     log.log("mappos: reading cookies");
     var lat = parseFloat(readCookie('ingress.intelmap.lat')) || 0.0;
     var lng = parseFloat(readCookie('ingress.intelmap.lng')) || 0.0;
-    var z = parseInt(readCookie('ingress.intelmap.zoom')) || 17;
+    var z = parseInt(readCookie('ingress.intelmap.zoom')) || DEFAULT_ZOOM;
 
     if(lat < -90  || lat > 90) lat = 0.0;
     if(lng < -180 || lng > 180) lng = 0.0;

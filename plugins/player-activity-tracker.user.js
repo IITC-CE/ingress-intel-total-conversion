@@ -442,14 +442,13 @@ window.plugin.playerTracker.drawData = function() {
 
 window.plugin.playerTracker.getPortalLink = function(data) {
   var position = data.latlngs[0];
-  var ll = position.join(',');
   return $('<a>')
     .addClass('text-overflow-ellipsis')
     .css('max-width', '15em')
     .text(window.chat.getChatPortalName(data))
     .prop({
       title: window.chat.getChatPortalName(data),
-      href: '/intel?ll=' + ll + '&pll=' + ll,
+      href: window.makePermalink(position)
     })
     .click(function(event) {
       window.selectPortalByLatLng(position);
@@ -457,7 +456,7 @@ window.plugin.playerTracker.getPortalLink = function(data) {
       return false;
     })
     .dblclick(function(event) {
-      map.setView(position, 17)
+      map.setView(position, DEFAULT_ZOOM);
       window.selectPortalByLatLng(position);
       event.preventDefault();
       return false;
@@ -529,7 +528,7 @@ window.plugin.playerTracker.onSearchResultSelected = function(result, event) {
     map.setView(result.position);
 
   if(event.type == 'dblclick')
-    map.setZoom(17);
+    map.setZoom(DEFAULT_ZOOM);
 
   return true;
 };
