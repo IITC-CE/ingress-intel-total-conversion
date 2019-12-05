@@ -442,14 +442,13 @@ window.plugin.playerTracker.drawData = function() {
 
 window.plugin.playerTracker.getPortalLink = function(data) {
   var position = data.latlngs[0];
-  var ll = position.join(',');
   return $('<a>')
     .addClass('text-overflow-ellipsis')
     .css('max-width', '15em')
     .text(window.chat.getChatPortalName(data))
     .prop({
       title: window.chat.getChatPortalName(data),
-      href: '/intel?ll=' + ll + '&pll=' + ll,
+      href: window.makePermalink(position)
     })
     .click(function(event) {
       window.selectPortalByLatLng(position);

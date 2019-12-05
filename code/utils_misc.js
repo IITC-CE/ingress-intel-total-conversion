@@ -484,21 +484,23 @@ window.clampLatLngBounds = function(bounds) {
 // Use to add zoom level and latlng of current map center.
 // @option: fullURL: Boolean = null
 // Use to make absolute fully qualified URL (default: relative link).
-window.makePermalink = function(latlng, options) {
-  options = options || {}
+window.makePermalink = function (latlng, options) {
+  options = options || {};
 
-  function ll2str (ll) { return ll[0] + ',' + ll[1]; }
-  function round (ll) { // ensures that lat,lng are with same precision as in stock intel permalinks
-    return ll.map(function (n) { return Math.trunc(n*1e6)/1e6; });
+  function round (l) { // ensures that lat,lng are with same precision as in stock intel permalinks
+    return Math.trunc(l*1e6)/1e6;
   }
   var args = [];
   if (!latlng || options.includeMapView) {
     var c = window.map.getCenter();
-    args.push('ll='+ll2str(round([c.lat,c.lng])), 'z='+window.map.getZoom())
+    args.push(
+      'll='+[round(c.lat),round(c.lng)].join(','),
+      'z='+window.map.getZoom()
+    );
   }
   if (latlng) {
     if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
-    args.push('pll='+ll2str(latlng));
+    args.push('pll='+latlng.join(','));
   }
   var url = options.fullURL ? 'https://intel.ingress.com/' : '/';
   return url + '?' + args.join('&');
