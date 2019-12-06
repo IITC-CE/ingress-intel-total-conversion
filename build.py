@@ -32,11 +32,10 @@ def run_system(cmd):
 
 def run_cmds(cmds, source, target):
     for cmd in (cmds or []):
-        path = Path(cmd)
         if callable(cmd):
             cmd(source, target)
-        elif path.suffix == '.py':
-            module = run_python(path)
+        elif Path(cmd).suffix == '.py':
+            module = run_python(Path(cmd))
             if 'iitc_build' in module:
                 module['iitc_build'](source, target)
         else:
