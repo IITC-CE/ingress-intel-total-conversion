@@ -276,8 +276,8 @@ public class IITC_WebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
         Uri uri = Uri.parse(url);
-        
-        if (url.contains("conflogin") || url.contains("ServiceLogin") || url.contains("appengine.google.com")) {
+
+        if ((url.contains("accounts.google.com") && url.contains("oauth")) || url.contains("conflogin") || url.contains("ServiceLogin") || url.contains("appengine.google.com")) {
             Log.d("Google login");
             return false;
         }
@@ -289,11 +289,6 @@ public class IITC_WebViewClient extends WebViewClient {
                 && "/url".equals(uri.getPath()) && uri.getQueryParameter("q") != null) {
             Log.d("redirect to: " + uri.getQueryParameter("q"));
             return shouldOverrideUrlLoading(view, uri.getQueryParameter("q"));
-        }
-        else if (url.contains("accounts.google.com/o/oauth2")) {
-            Log.d("redirect to: " + url);
-            Log.d("Authorize Sync plugin");
-            return false;
         }
         else if (isIntelUrl(url)) {
             Log.d("intel link requested, reset app and load " + url);
