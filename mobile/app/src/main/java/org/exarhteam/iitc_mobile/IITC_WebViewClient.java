@@ -287,7 +287,7 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("Facebook login");
             return false;
         }
-        else if (uriHost.equals("accounts.google.com") && uriPath.contains("oauth") ||
+        else if (uriHost.equals("accounts.google.com") && (uriPath.contains("signin") || uriPath.contains("oauth")) ||
                 uriPath.contains("conflogin") ||
                 uriPath.contains("ServiceLogin") ||
                 uriHost.equals("appengine.google.com")) {
