@@ -93,7 +93,8 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
   $('#showLinkedPortalContainer')
     .on('click', '.showLinkedPortalLink:not(".outOfRange")', plugin.showLinkedPortal.onLinkedPortalClick)
     .on('click', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalClick)
-    .on('taphold', '.showLinkedPortalLink', { duration: 900 }, plugin.showLinkedPortal.onLinkedPortalTapHold)
+    // temporary disabled until we solve https://github.com/IITC-CE/jquery-taphold/issues/1
+    //.on('taphold', '.showLinkedPortalLink', { duration: 900 }, plugin.showLinkedPortal.onLinkedPortalTapHold)
     .on('mouseover', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalMouseOver)
     .on('mouseover', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOver)
     .on('mouseout', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOut);
