@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.29.1
+// @version        0.30
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 

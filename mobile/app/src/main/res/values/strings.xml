@@ -21,33 +21,41 @@
     <string name="pref_about_text">
         <![CDATA[
         <h1>Ingress Intel Total Conversion Mobile</h1>
-        <b>Build Version: %1$s</b><br>
-        <b>IITC Version: %2$s</b><br>
-        <br>
-        <b>by <a href="https://github.com/leCradle">cradle</a>, <a href="https://github.com/fkloft">fkloft</a> and
-        contributors</b><br><br>
-        <b>Icon by <a href="http://be.net/giuseppelucido">Giuseppe Lucido</a></b><br><br>
-        IITC Mobile is an optimized mobile browser for the
-        Ingress Intel Total Conversion (IITC) userscript by <a href="https://github.com/breunigs"><b>breunigs</b></a>.
-        After Niantic asked the main developer to shut down his github project, development
-        is continued on a fork of <a href="https://github.com/jonatkins"><b>jonatkins</b></a>.
-        <h3>Community:</h3>
-        • Visit the <a href="https://iitc.modos189.ru/">IITC website</a> for new releases and the desktop version.<br>
-        • Follow the <a href="https://plus.google.com/105383756361375410867">IITC Google+ page</a>
-        for release announcements.<br>
-        • Join the <a href="https://plus.google.com/communities/105647403088015055797">IITC Google+ community</a>
-        - a place to ask for help and discuss with other users.
-        <h3>Developers:</h3>
-        <a href="https://github.com/iitc-project/ingress-intel-total-conversion">IITC on Github</a>
-        <h3>IITC Licence:</h3>
-        Copyright © 2013 Stefan Breunig, Jon Atkins, Philipp Schäfer and others<br><br>
 
-        Permission to use, copy, modify, and/or distribute this software for
+        <p><b>Build version: %1$s</b>
+        <br><b>IITC version: %2$s</b>
+
+        <p><b>by <a href="https://github.com/leCradle">cradle</a>,
+        <a href="https://github.com/fkloft">fkloft</a> and contributors</b>
+
+        <p><b>Icon by <a href="http://be.net/giuseppelucido">Giuseppe Lucido</a></b>
+
+        <p><b>IITC Mobile</b> is an optimized mobile browser for the
+        <i>Ingress Intel Total Conversion (IITC)</i> userscript.
+
+        <h3>Community:</h3>
+
+        • Visit the <a href="https://iitc.modos189.ru/">IITC website</a> for new releases
+          and the desktop version.<br>
+        • Follow the <a href="https://t.me/iitc_news">IITC News</a> Telegram channel
+          for announcements and join <a href="https://t.me/iitc_group">IITC Group</a> chat.<br>
+        • Join the <a href="https://www.reddit.com/r/IITC/">r/IITC/</a> Reddit community
+          - a place to ask for help and discuss with other users.<br>
+        • Report issues and propose enhancements at <a href="https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new">bugtracker</a>.<br>
+
+        <h3>Developers:</h3>
+        <a href="https://github.com/IITC-CE/ingress-intel-total-conversion">IITC <i>"Community Edition"</i></a> on Github.
+
+        <h3>IITC Licence:</h3>
+        <tt>
+        <p>Copyright © 2013 Stefan Breunig, Jon Atkins, Philipp Schäfer and others
+
+        <p>Permission to use, copy, modify, and/or distribute this software for
         any purpose with or without fee is hereby granted, provided that the
         above copyright notice and this permission notice appear in all
-        copies.<br><br>
+        copies.
 
-        THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL
+        <p>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL
         WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
         WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
         AUTHORS BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
@@ -55,46 +63,64 @@
         OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
         TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
         PERFORMANCE OF THIS SOFTWARE.
+        </tt>
         ]]>
     </string>
     <string name="notice_how_to">
-        <![CDATA[<b>How to use IITCm:</b><br><br>
-        • Navigation: swipe from the left edge of your screen (or click the app icon) to evoke the Navigation Drawer.
-        Click the app icon again to return to the map.<br><br>
-        • Layers/Highlights: swipe from the right edge of your screen (or click the layer-chooser icon in the ActionBar)
-        to evoke the Layer Drawer.<br><br>
-        • You can quickly send the current portal link/permalink to another device if both devices support NFC (hold
-        both devices back-to-back and tap the screen to beam the map to the other device).<br><br>
-        • You can add official plugins in the settings.<br><br>
-        • For external plugins please have a look at the <a href="https://iitc.modos189.ru/faq.html">FAQ.]]>
+        <![CDATA[
+        <h3>How to use IITCm:</h3>
+
+        • Navigation: swipe from the left edge of your screen (or click the app icon)
+          to evoke the <em>Navigation Drawer</em>.<br>
+          Click the app icon again to return to the map.<br>
+        • Layers/Highlights: swipe from the right edge of your screen 
+          (or click the layer-chooser icon in the ActionBar)
+          to evoke the <em>Layer Drawer</em>.<br>
+        • You can quickly send the current portal link/permalink to another device
+          if both devices support NFC (hold both devices back-to-back and
+          tap the screen to beam the map to the other device).<br>
+        • You can add official plugins in the settings.<br>
+        • For external plugins please have a look at the
+          <a href="https://iitc.modos189.ru/faq.html">FAQ.<br>
+        ]]>
     </string>
     <string name="notice_info">
-        <![CDATA[Hint: Alternative ways to open the info screen:<br><br>
+        <![CDATA[
+        <p>Hint: Alternative ways to open the info screen:
+        <p>
         • tap and hold a portal for a second<br>
-        • tap on the left half of the status bar]]>
+        • tap on the left half of the status bar<br>
+        ]]>
     </string>
     <string name="notice_panes">
-        <![CDATA[Hint:<br><br>
-        Some plugins (e.g. portals list and bookmarks) now appear in the navigation drawer for quick access.<br>
-        They won\'t appear in the info pane any more.<br><br>
-        Swipe from the left edge of your screen (or click the app icon) to seem them.]]>
+        <![CDATA[
+        <p>Hint:
+        <p>Some plugins (e.g. <em>portals list</em> and <em>bookmarks</em>) now appear
+        in the <em>Navigation Drawer</em> for quick access.
+        <p>They won\'t appear in the info pane any more.
+        <p>Swipe from the left edge of your screen (or click the app icon) to seem them.
+        ]]>
     </string>
     <string name="notice_extplugins">
-        <![CDATA[Hint:<br><br>
-        IITC Mobile is able to load external plugins too!<br><br>
-        Add them by clicking the (+) icon at the top right.
-        The plugin files have to end with \'.user.js\' and are copied to <b>%1$s</b><br>]]>
+        <![CDATA[
+        <p>Hint:
+        <p>IITC Mobile is able to load external plugins too!
+        <p>Add them by clicking the (+) icon at the top right.
+        The plugin files have to end with \'.user.js\' and are copied to <b>%1$s</b>
+        ]]>
     </string>
     <string name="notice_sharing">
-        <![CDATA[With <em>Share portal</em> you can:<br>
+        <![CDATA[
+        <p>With <em>Share portal</em> you can:
+        <p>
         • send the portal link to other people<br>
         • view the selected portal\'s position in another app<br>
         • open the portal link in a webbrowser<br>
-        <br>
-        Hint: By selecting Google Maps (or any other installed navigation software), you can quickly navigate to the
-        selected portal.<br>
-        <br>
-        These hints also apply for the <em>permalink</em>.]]>
+
+        <p>Hint: By selecting Google Maps (or any other installed navigation software), 
+        you can quickly navigate to the selected portal.
+        <p>These hints also apply for the <em>permalink</em>.
+        ]]>
     </string>
 
     <string name="pref_ui_cat">UI</string>
@@ -175,9 +201,11 @@
 
     <string name="install_dialog_top">Install external plugin?</string>
     <string name="install_dialog_msg">
-        <![CDATA[IITCm was requested to install the following javascript file:<br><br>%1$s<br><br>
-        <b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!<br><br>
-        Are you sure you want to proceed?]]>
+        <![CDATA[
+        <p>IITCm was requested to install the following javascript file:
+        <p>%1$s
+        <p><b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!
+        <p>Are you sure you want to proceed?]]>
     </string>
 
 </resources>

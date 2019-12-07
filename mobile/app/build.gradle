@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-final BUILD_DATE = new Date().format('yyyy-MM-dd_HH:mm:ss')
+final BUILD_DATE = new Date().format('yyyy.MM.dd-HH:mm')
 
 def getVersionCode = { ->
     def git = 'git rev-list HEAD --count'
@@ -25,7 +25,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 28
         versionCode = getVersionCode()
-        versionName "0.29.1"
+        versionName "0.30"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -53,7 +53,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
-            versionNameSuffix "-test$BUILD_DATE"
+            versionNameSuffix "-test-$BUILD_DATE"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.debug
