@@ -500,7 +500,10 @@ window.makePermalink = function (latlng, options) {
   }
   if (latlng) {
     if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
-    args.push('pll='+latlng.join(','));
+    args.push(
+      'pll='+latlng.join(','),
+      'z=17'
+    );
   }
   var url = options.fullURL ? '@url_intel_base@' : '/';
   return url + '?' + args.join('&');
