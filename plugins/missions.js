@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.1.2
+// @version        0.2.0
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 
