@@ -286,6 +286,7 @@ public class IITC_WebViewClient extends WebViewClient {
         else if (uriHost.equals("facebook.com") && uriPath.contains("oauth")) {
             Log.d("Facebook login");
             return false;
+        /*
         }
         else if (uriHost.equals("accounts.google.com") ||
                  uriHost.equals("appengine.google.com") ||
@@ -293,11 +294,16 @@ public class IITC_WebViewClient extends WebViewClient {
                  uriPath.contains("ServiceLogin")) {
             Log.d("Google login");
             return false;
+        */
         } else {
-            Log.d("no ingress intel link, start external app to load url: " + url);
             final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            // make new activity independent from iitcm
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (uriHost.equals("accounts.google.com") || uriHost.equals("appengine.google.com")) {
+                Log.d("Google login");
+            } else {
+                Log.d("no ingress intel link, start external app to load url: " + url);
+                // make new activity independent from iitcm
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
             mIitc.startActivity(intent);
         }
         return true;
