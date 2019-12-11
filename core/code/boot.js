@@ -542,12 +542,14 @@ window.setupLayerChooserApi = function() {
       }
     }
 
+    /* this code seems obsolete.
+
     //below logic based on code in L.Control.Layers _onInputClick
     if(!obj.overlay) {
       this._map.setZoom(this._map.getZoom());
       this._map.fire('baselayerchange', {layer: obj.layer});
     }
-
+    */
     return true;
   };
 
