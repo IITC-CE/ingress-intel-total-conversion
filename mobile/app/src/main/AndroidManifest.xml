@@ -98,7 +98,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data android:mimeType="application/x-javascript"/>
+                <data android:mimeType="application/javascript"/>
                 <data android:mimeType="text/javascript"/>
             </intent-filter>
             <intent-filter>
