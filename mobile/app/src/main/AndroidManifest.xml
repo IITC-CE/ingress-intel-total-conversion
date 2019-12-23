@@ -42,9 +42,24 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data
-                    android:host="intel.ingress.com"
-                    android:scheme="https"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:host="intel.ingress.com"/>
+            </intent-filter>
+
+            <!-- Handles the implicit intent to VIEW legacy [www.]ingress.com/intel URI -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:host="ingress.com"/>
+                <data android:host="www.ingress.com"/>
+                <data android:pathPrefix="/intel"/>
             </intent-filter>
 
             <!-- Handles geo: URIs -->
