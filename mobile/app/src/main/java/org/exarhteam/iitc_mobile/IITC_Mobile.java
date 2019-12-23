@@ -132,7 +132,7 @@ public class IITC_Mobile extends AppCompatActivity
         	}
     	}
 	};
-	
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
@@ -308,7 +308,7 @@ public class IITC_Mobile extends AppCompatActivity
     // handles ingress intel url intents, search intents, geo intents and javascript file intents
     private void handleIntent(final Intent intent, final boolean onCreate) {
         final String action = intent.getAction();
-        if (Intent.ACTION_VIEW.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+        if (Intent.ACTION_VIEW.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action) || action == null) {
             final Uri uri = intent.getData();
             Log.d("intent received url: " + uri.toString());
 

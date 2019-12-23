@@ -48,6 +48,17 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="pref_external_links_titles">
+        <item>Classic (authorization inside application, other external links open in browser)</item>
+        <item>All external links open in Custom Tab browser</item>
+        <item>All external links open in your default browser</item>
+    </string-array>
+    <string-array name="pref_external_links_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string-array name="pref_update_plugins_interval_titles">
         <item>Disable</item>
         <item>1 day</item>

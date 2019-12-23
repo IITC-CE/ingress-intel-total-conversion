@@ -3,9 +3,12 @@ package org.exarhteam.iitc_mobile;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Environment;
@@ -24,6 +27,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import androidx.browser.customtabs.CustomTabsIntent;
+import com.droibit.android.customtabs.launcher.CustomTabsLauncher;
+import com.droibit.android.customtabs.launcher.CustomTabsLauncher.LaunchNonChromeCustomTabs;
+
+import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
+
+import java.util.Arrays;
 
 public class IITC_WebViewClient extends WebViewClient {
 
@@ -265,6 +276,13 @@ public class IITC_WebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, url);
     }
 
+    private PendingIntent createButtonPendingIntent() {
+        Intent actionIntent = new Intent(mIitc.getApplicationContext(), IITC_Application.class);
+        actionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Log.d("actionIntent");
+        return PendingIntent.getActivity(mIitc.getApplicationContext(), 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     // start non-ingress-intel-urls in another app...
     @Override
     public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
@@ -272,6 +290,11 @@ public class IITC_WebViewClient extends WebViewClient {
         final String uriHost = uri.getHost();
         final String uriPath = uri.getPath();
         final String uriQuery = uri.getQueryParameter("q");
+
+        boolean auth = false;
+        final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mIitc);
+        final int external_links_mode = Integer.parseInt(sharedPref.getString("pref_external_links_mode", "0"));
+
         if (uriHost.equals("intel.ingress.com")) {
             Log.d("intel link requested, reset app and load " + url);
             mIitc.reset();
@@ -283,29 +306,64 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("redirect to: " + uriQuery);
             return shouldOverrideUrlLoading(view, uriQuery);
         }
-        else if (uriHost.equals("facebook.com") && uriPath.contains("oauth")) {
-            Log.d("Facebook login");
-            return false;
-        /*
-        }
-        else if (uriHost.equals("accounts.google.com") ||
-                 uriHost.equals("appengine.google.com") ||
-                 uriPath.contains("conflogin") ||
-                 uriPath.contains("ServiceLogin")) {
-            Log.d("Google login");
-            return false;
-        */
-        } else {
-            final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            if (uriHost.equals("accounts.google.com") || uriHost.equals("appengine.google.com")) {
-                Log.d("Google login");
+
+        if (uriHost.equals("facebook.com") && uriPath.contains("oauth")) {
+            Log.d("Facebook login: "+url);
+            if (external_links_mode == 0) {
+                return false;
             } else {
+                auth = true;
+            }
+        }
+        else if (uriHost.contains("accounts.google") ||
+                 uriHost.contains("accounts.youtube") ||
+                 uriHost.contains("appengine.google")) {
+            Log.d("Google login: "+url);
+            if (external_links_mode == 0) {
+                return false;
+            } else {
+                auth = true;
+            }
+        }
+
+        if (external_links_mode == 1) {
+
+            CustomTabsIntent.Builder customTabsBuilder = new CustomTabsIntent.Builder();
+            customTabsBuilder.setToolbarColor(mIitc.getResources().getColor(R.color.iitc_blue));
+
+            if (auth) {
+                Intent actionIntent = new Intent(mIitc.getBaseContext(), IITC_Mobile.class);
+                actionIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                PendingIntent pendingIntent = PendingIntent.getActivity(mIitc.getApplicationContext(),
+                        0,
+                        actionIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+                Bitmap closeIconBitmap = BitmapFactory.decodeResource(mIitc.getResources(), R.drawable.ic_iitcm_outline);
+
+                customTabsBuilder.setActionButton(closeIconBitmap, mIitc.getString(R.string.custom_tabs_to_iitc), pendingIntent, false);
+                customTabsBuilder.addMenuItem(mIitc.getString(R.string.custom_tabs_to_iitc), pendingIntent);
+            }
+
+            final List<String> exampleNonChromePackages = Arrays.asList(
+                    "org.mozilla.firefox",
+                    "com.microsoft.emmx"
+            );
+
+            CustomTabsLauncher.launch(mIitc, customTabsBuilder.build(), uri, new LaunchNonChromeCustomTabs(exampleNonChromePackages));
+
+        } else {
+
+            final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            if (!auth) {
                 Log.d("no ingress intel link, start external app to load url: " + url);
                 // make new activity independent from iitcm
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
             mIitc.startActivity(intent);
         }
+
         return true;
     }
 }
