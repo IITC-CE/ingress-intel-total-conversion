@@ -32,8 +32,6 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import com.droibit.android.customtabs.launcher.CustomTabsLauncher;
 import com.droibit.android.customtabs.launcher.CustomTabsLauncher.LaunchNonChromeCustomTabs;
 
-import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
-
 import java.util.Arrays;
 
 public class IITC_WebViewClient extends WebViewClient {
@@ -291,7 +289,6 @@ public class IITC_WebViewClient extends WebViewClient {
         final String uriPath = uri.getPath();
         final String uriQuery = uri.getQueryParameter("q");
 
-        boolean auth = false;
         final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mIitc);
         final int external_links_mode = Integer.parseInt(sharedPref.getString("pref_external_links_mode", "0"));
 
@@ -301,37 +298,21 @@ public class IITC_WebViewClient extends WebViewClient {
             mIitc.setLoadingState(true);
             return false;
         }
-        else if ((uriHost.startsWith("google.") || uriHost.contains(".google."))
-                && uriPath.equals("/url") && uriQuery != null) {
-            Log.d("redirect to: " + uriQuery);
-            return shouldOverrideUrlLoading(view, uriQuery);
-        }
-
-        if (uriHost.equals("facebook.com") && uriPath.contains("oauth")) {
-            Log.d("Facebook login: "+url);
-            if (external_links_mode == 0) {
-                return false;
-            } else {
-                auth = true;
-            }
-        }
-        else if (uriHost.contains("accounts.google") ||
-                 uriHost.contains("accounts.youtube") ||
-                 uriHost.contains("appengine.google")) {
-            Log.d("Google login: "+url);
-            if (external_links_mode == 0) {
-                return false;
-            } else {
-                auth = true;
-            }
+        else if (uri.getQuery() != null && uri.getQuery().contains("redirect_auth_sync") || mIitc.isForceWebViewAuth) {
+            Log.d("Force authorize in WebView: "+url);
+            mIitc.isForceWebViewAuth = true;
+            return false;
+        } else if (!mIitc.isBootFinished) {
+            Log.d("boot: loading url: " + url);
         }
 
         if (external_links_mode == 1) {
 
+            Log.d("no ingress intel link, start Custom Tab to load url: " + url);
             CustomTabsIntent.Builder customTabsBuilder = new CustomTabsIntent.Builder();
             customTabsBuilder.setToolbarColor(mIitc.getResources().getColor(R.color.iitc_blue));
 
-            if (auth) {
+            if (!mIitc.isBootFinished) {
                 Intent actionIntent = new Intent(mIitc.getBaseContext(), IITC_Mobile.class);
                 actionIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -352,18 +333,21 @@ public class IITC_WebViewClient extends WebViewClient {
             );
 
             CustomTabsLauncher.launch(mIitc, customTabsBuilder.build(), uri, new LaunchNonChromeCustomTabs(exampleNonChromePackages));
-
-        } else {
+            return true;
+        }
+        else if (mIitc.isBootFinished || external_links_mode == 2) {
 
             final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            if (!auth) {
+            if (mIitc.isBootFinished) {
                 Log.d("no ingress intel link, start external app to load url: " + url);
                 // make new activity independent from iitcm
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
             mIitc.startActivity(intent);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

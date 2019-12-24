@@ -102,6 +102,8 @@ public class IITC_Mobile extends AppCompatActivity
     private String mPermalink = null;
     private String mSearchTerm = "";
     private IntentFilter mDesktopFilter;
+    public boolean isBootFinished = false;
+    public boolean isForceWebViewAuth = false;
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -871,6 +873,8 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         mIsLoading = isLoading;
+        isForceWebViewAuth = false;
+        if (isLoading) isBootFinished = false;
         mNavigationHelper.onLoadingStateChanged();
         mUserLocation.onLoadingStateChanged();
         invalidateOptionsMenu();
