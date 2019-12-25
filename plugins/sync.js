@@ -215,9 +215,9 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     
     plugin.sync.logger.log(_this.getFileName(), errorMessage);
     if(isNetworkError === true) {
-      setTimeout(function() {_this.authorizer.authorize();}, 50*1000);
+      setTimeout(_this.authorizer.init.bind(_this.authorizer), 50*1000); // todo CHECK!
     } else if(e.status === 401) { // Unauthorized
-      _this.authorizer.authorize();
+      _this.authorizer.init(); // todo CHECK!
     } else if(e.status === 404) { // Not found
       _this.forceFileSearch = true;
       _this.initFile();
@@ -245,7 +245,7 @@ window.plugin.sync.RegisteredPluginsFields = function(options) {
   this.cleanWaitingInitialize = this.cleanWaitingInitialize.bind(this);
   this.initializeWorker = this.initializeWorker.bind(this);
 
-  this.authorizer.addAuthCallback(this.initializeRegistered);
+  this.authorizer.authCallback.push(this.initializeRegistered);
 };
 
 window.plugin.sync.RegisteredPluginsFields.prototype.add = function(registeredMap) {
@@ -269,7 +269,7 @@ window.plugin.sync.RegisteredPluginsFields.prototype.get = function(pluginName, 
 
 window.plugin.sync.RegisteredPluginsFields.prototype.initializeRegistered = function() {
   var _this = this;
-  if(this.authorizer.isAuthed()) {
+  if(this.authorizer.authorized) {
     $.each(this.waitingInitialize, function(key, map) {
       if(!map.initializing && !map.initialized) {
         map.initialize(_this.cleanWaitingInitialize);
@@ -525,89 +525,76 @@ window.plugin.sync.DataManager.prototype.loadFileId = function() {
 
 //// Authorizer
 // authorize user's google account
-window.plugin.sync.Authorizer = function(options) {
-  this.authCallback = options['authCallback'];
-  this.authorizing = false;
+var GOOGLEAPI = 'https://apis.google.com/js/api.js';
+var CLIENT_ID = '1099227387115-osrmhfh1i6dto7v7npk4dcpog1cnljtb.apps.googleusercontent.com';
+var SCOPES = 'https://www.googleapis.com/auth/drive.file';
+var Authorizer = function (options) {
+  this.authCallback = options && options.authCallback || [];
+  this.isAuthorizing = false;
   this.authorized = false;
-  this.isAuthed = this.isAuthed.bind(this);
-  this.isAuthorizing = this.isAuthorizing.bind(this);
-  this.authorize = this.authorize.bind(this);
+  $.getScript(GOOGLEAPI).done(function () {
+    gapi.load('client:auth2', this.init.bind(this));
+  }.bind(this));
 };
 
-window.plugin.sync.Authorizer.prototype.CLIENT_ID = '1099227387115-osrmhfh1i6dto7v7npk4dcpog1cnljtb.apps.googleusercontent.com';
-window.plugin.sync.Authorizer.prototype.SCOPES = 'https://www.googleapis.com/auth/drive.file';
-
-window.plugin.sync.Authorizer.prototype.isAuthed = function() {
-  return this.authorized;
+Authorizer.prototype.init = function () {
+  this.googleAuth = null;
+  this.authorized = false;
+  return gapi.auth2.init({
+    client_id: CLIENT_ID,
+    scope: SCOPES
+  }).then(function (googleAuth) {
+      this.googleAuth = googleAuth;
+      googleAuth.isSignedIn.listen(this.onAuthChanged.bind(this));
+      this.authorized = googleAuth.isSignedIn.get();
+      if (this.authorized) {
+        this.onAuthChanged(true);
+      }
+    }.bind(this))
+    .catch(this._onError.bind(this));
 };
 
-window.plugin.sync.Authorizer.prototype.isAuthorizing = function() {
-  return this.authorizing;
-};
-window.plugin.sync.Authorizer.prototype.addAuthCallback = function(callback) {
-  if(typeof(this.authCallback) === 'function') this.authCallback = [this.authCallback];
-  this.authCallback.push(callback);
+Authorizer.prototype.authorize = function (redirect) {
+  var options = redirect && {
+    ux_mode: 'redirect',
+    redirect_uri: '@url_intel_base@'
+  }
+  this.isAuthorizing = true;
+  plugin.sync.toggleAuthButton();
+  this.googleAuth.signIn(options)
+    .then(function (result) {
+      this.isAuthorizing = false;
+    }.bind(this))
+    .catch(this._onError.bind(this));
 };
 
-window.plugin.sync.Authorizer.prototype.authComplete = function() {
-  this.authorizing = false;
-  if(this.authCallback) {
-    if(typeof(this.authCallback) === 'function') this.authCallback();
-    if(this.authCallback instanceof Array && this.authCallback.length > 0) {
-      $.each(this.authCallback, function(ind, func) {
-        func();
-      });
-    }
+Authorizer.prototype.onAuthChanged = function (isSignedIn) {
+  this.authorized = isSignedIn;
+  if (isSignedIn) {
+    plugin.sync.logger.log('all', 'Authorized');
+    this.authCallback.forEach(function (func) {
+      func();
+    });
+  } else {
+    plugin.sync.logger.log('all', 'Signed out');
+    // TODO:
+    // - button to sign in into different account
+    // - button to sign out
+    // - stop sync on signout
+  }
+  plugin.sync.toggleDialogLink();
+  plugin.sync.toggleAuthButton();
+}
+
+Authorizer.prototype._onError = function (msg) {
+  this.isAuthorizing = false;
+  plugin.sync.logger.log('all', 'Authorization error: ' + msg.error);
+  if (msg.details) {
+    plugin.sync.logger.log('all', msg.details);
   }
 };
 
-window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
-  this.authorizing = true;
-  this.authorized = false;
-  var handleAuthResult, _this;
-  _this = this;
-
-  handleAuthResult = function(authResult) {
-    if(authResult && !authResult.error) {
-      _this.authorized = true;
-      plugin.sync.logger.log('all', 'Authorized');
-    } else {
-      _this.authorized = false;
-      var error = (authResult && authResult.error) ? authResult.error : 'not authorized';
-      plugin.sync.logger.log('all', 'Authorization error: ' + error);
-      if (error === "idpiframe_initialization_failed") {
-        plugin.sync.logger.log('all', 'You need enable 3rd-party cookies in your browser or allow [*.]google.com');
-      }
-    }
-    _this.authComplete();
-  };
-
-  var GoogleAuth;
-  gapi.auth2.init({
-    'client_id': this.CLIENT_ID,
-    'scope': this.SCOPES,
-    ux_mode: 'redirect',
-    redirect_uri: '@url_intel_base@'
-  }).then(function() {
-    
-    GoogleAuth = gapi.auth2.getAuthInstance();
-    var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-
-    if(isSignedIn) {
-      _this.authorized = true;
-      plugin.sync.logger.log('all', 'Authorized');
-
-    } else {
-      _this.authorized = false;
-
-      if (redirect) {
-        GoogleAuth.signIn().then(handleAuthResult);
-      }
-    }
-    _this.authComplete();
-    
-  }, handleAuthResult);
-};
+window.plugin.sync.Authorizer = Authorizer;
 //// end Authorizer
 
 
@@ -707,22 +694,20 @@ window.plugin.sync.updateLog = function(messages) {
 };
 
 window.plugin.sync.toggleAuthButton = function() {
-  var authed, authorizing;
-  authed = plugin.sync.authorizer.isAuthed();
-  authorizing = plugin.sync.authorizer.isAuthorizing();
+  var authorized = plugin.sync.authorizer.authorized;
+  var authorizing = plugin.sync.authorizer.isAuthorizing;
 
-  $('#sync-authButton').html(authed ? 'Authorized' : 'Authorize');
+  $('#sync-authButton').html(authorized ? 'Authorized' : 'Authorize');
 
-  $('#sync-authButton').attr('disabled', (authed || authorizing));
-  $('#sync-authButton').toggleClass('sync-authButton-dimmed', authed || authorizing);
+  $('#sync-authButton').attr('disabled', (authorized || authorizing));
+  $('#sync-authButton').toggleClass('sync-authButton-dimmed', authorized || authorizing);
 };
 
 window.plugin.sync.toggleDialogLink = function() {
-  var authed, anyFail;
-  authed = plugin.sync.authorizer.isAuthed();
-  anyFail = plugin.sync.registeredPluginsFields.anyFail;
+  var authorized = plugin.sync.authorizer.authorized;
+  var anyFail = plugin.sync.registeredPluginsFields.anyFail;
 
-  $('#sync-show-dialog').toggleClass('sync-show-dialog-error', !authed || anyFail);
+  $('#sync-show-dialog').toggleClass('sync-show-dialog-error', !authorized || anyFail);
 };
 
 window.plugin.sync.showDialog = function() {
@@ -735,11 +720,10 @@ window.plugin.sync.showDialog = function() {
 window.plugin.sync.setupDialog = function() {
   plugin.sync.dialogHTML = '<div id="sync-dialog">'
                          + '<button id="sync-authButton" class="sync-authButton-dimmed" '
-                         + 'onclick="setTimeout(function(){window.plugin.sync.authorizer.authorize(true)}, 1)" '
+                         + 'onclick="window.plugin.sync.authorizer.authorize(window.android)" '
                          + 'disabled="disabled">Authorize</button>'
                          + '<div id="sync-log"></div>'
                          + '</div>';
-  $('#toolbox').append('<a id="sync-show-dialog" onclick="window.plugin.sync.showDialog();">Sync</a> ');
 };
 
 window.plugin.sync.setupCSS = function() {
@@ -775,22 +759,25 @@ window.plugin.sync.setupCSS = function() {
 };
 
 var setup = function() {
-  window.plugin.sync.logger = new plugin.sync.Logger({'logLimit':10, 'logUpdateCallback': plugin.sync.updateLog});
+  window.plugin.sync.logger = new plugin.sync.Logger({
+    logLimit: 10,
+    logUpdateCallback: plugin.sync.updateLog
+  });
   window.plugin.sync.loadUUID();
   window.plugin.sync.setupCSS();
   window.plugin.sync.setupDialog();
 
-  window.plugin.sync.authorizer = new window.plugin.sync.Authorizer({
-    'authCallback': [plugin.sync.toggleAuthButton, plugin.sync.toggleDialogLink]
-  });
+  $('<a>')
+    .html('Sync')
+    .attr('id','sync-show-dialog')
+    .click(window.plugin.sync.showDialog)
+    .appendTo('#toolbox');
+
+  window.plugin.sync.authorizer = new window.plugin.sync.Authorizer();
   window.plugin.sync.registeredPluginsFields = new window.plugin.sync.RegisteredPluginsFields({
-    'authorizer': window.plugin.sync.authorizer
+    authorizer: window.plugin.sync.authorizer
   });
 
-  var GOOGLEAPI = 'https://apis.google.com/js/api.js';
-  $.getScript(GOOGLEAPI).done(function () {
-    gapi.load('client:auth2', window.plugin.sync.authorizer.authorize);
-  });
 };
 
 setup.priority = 'high';
