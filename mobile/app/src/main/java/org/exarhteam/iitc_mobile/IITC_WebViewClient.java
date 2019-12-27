@@ -278,28 +278,26 @@ public class IITC_WebViewClient extends WebViewClient {
             mIitc.setLoadingState(true);
             return false;
         }
-        else if ((uriHost.startsWith("google.") || uriHost.contains(".google."))
+        if ((uriHost.startsWith("google.") || uriHost.contains(".google."))
                 && uriPath.equals("/url") && uriQuery != null) {
             Log.d("redirect to: " + uriQuery);
             return shouldOverrideUrlLoading(view, uriQuery);
         }
-        else if (uriHost.equals("facebook.com") && uriPath.contains("oauth")) {
+        if (uriHost.equals("facebook.com") && uriPath.contains("oauth")) {
             Log.d("Facebook login");
             return false;
         }
-        else if (uriHost.equals("accounts.google.com") ||
-                 uriHost.equals("appengine.google.com") ||
-                 uriPath.contains("conflogin") ||
-                 uriPath.contains("ServiceLogin")) {
+        if (uriHost.startsWith("accounts.google.") ||
+                 uriHost.startsWith("appengine.google.") ||
+                 uriHost.startsWith("accounts.youtube.")) {
             Log.d("Google login");
             return false;
-        } else {
-            Log.d("no ingress intel link, start external app to load url: " + url);
-            final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            // make new activity independent from iitcm
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mIitc.startActivity(intent);
         }
+        Log.d("no ingress intel link, start external app to load url: " + url);
+        final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        // make new activity independent from iitcm
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mIitc.startActivity(intent);
         return true;
     }
 }
