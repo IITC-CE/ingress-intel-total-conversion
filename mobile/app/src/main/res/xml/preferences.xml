@@ -53,7 +53,7 @@
         </PreferenceScreen>
 
         <ListPreference
-            android:defaultValue="0"
+            android:defaultValue="classic"
             android:entries="@array/pref_external_links_titles"
             android:entryValues="@array/pref_external_links_values"
             android:key="pref_external_links_mode"

@@ -310,6 +310,7 @@ public class IITC_Mobile extends AppCompatActivity
     // handles ingress intel url intents, search intents, geo intents and javascript file intents
     private void handleIntent(final Intent intent, final boolean onCreate) {
         final String action = intent.getAction();
+        // No action is specified when switching to activity from Custom Tabs. Or I didn't find a way to specify.
         if (Intent.ACTION_VIEW.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action) || action == null) {
             final Uri uri = intent.getData();
             Log.d("intent received url: " + uri.toString());

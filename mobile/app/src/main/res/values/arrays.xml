@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string-array name="pref_hide_fullscreen">
         <item>System Notification Bar</item>
         <item>IITC Action Bar</item>
@@ -48,15 +48,13 @@
         <item>2</item>
     </string-array>
 
-    <string-array name="pref_external_links_titles">
+    <string-array name="pref_external_links_titles" tools:ignore="InconsistentArrays">
         <item>Classic (authorization inside application, other external links open in browser)</item>
-        <item>All external links open in Custom Tab browser</item>
         <item>All external links open in your default browser</item>
     </string-array>
-    <string-array name="pref_external_links_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+    <string-array name="pref_external_links_values" tools:ignore="InconsistentArrays">
+        <item>classic</item>
+        <item>browser</item>
     </string-array>
 
     <string-array name="pref_update_plugins_interval_titles">

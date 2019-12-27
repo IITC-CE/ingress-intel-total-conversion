@@ -274,13 +274,6 @@ public class IITC_WebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, url);
     }
 
-    private PendingIntent createButtonPendingIntent() {
-        Intent actionIntent = new Intent(mIitc.getApplicationContext(), IITC_Application.class);
-        actionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Log.d("actionIntent");
-        return PendingIntent.getActivity(mIitc.getApplicationContext(), 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
     // start non-ingress-intel-urls in another app...
     @Override
     public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
@@ -290,7 +283,7 @@ public class IITC_WebViewClient extends WebViewClient {
         final String uriQuery = uri.getQueryParameter("q");
 
         final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mIitc);
-        final int external_links_mode = Integer.parseInt(sharedPref.getString("pref_external_links_mode", "0"));
+        final String external_links_mode = sharedPref.getString("pref_external_links_mode", "classic");
 
         if (uriHost.equals("intel.ingress.com")) {
             Log.d("intel link requested, reset app and load " + url);
@@ -306,7 +299,7 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("boot: loading url: " + url);
         }
 
-        if (external_links_mode == 1) {
+        if (external_links_mode.equals("custom_tabs")) {
 
             Log.d("no ingress intel link, start Custom Tab to load url: " + url);
             CustomTabsIntent.Builder customTabsBuilder = new CustomTabsIntent.Builder();
@@ -335,7 +328,7 @@ public class IITC_WebViewClient extends WebViewClient {
             CustomTabsLauncher.launch(mIitc, customTabsBuilder.build(), uri, new LaunchNonChromeCustomTabs(exampleNonChromePackages));
             return true;
         }
-        else if (mIitc.isBootFinished || external_links_mode == 2) {
+        else if (mIitc.isBootFinished || external_links_mode.equals("browser")) {
 
             final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             if (mIitc.isBootFinished) {
