@@ -274,6 +274,33 @@ public class IITC_WebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, url);
     }
 
+    private void openCustomTabs(Uri uri, boolean showReturnButton) {
+        CustomTabsIntent.Builder customTabsBuilder = new CustomTabsIntent.Builder();
+        customTabsBuilder.setToolbarColor(mIitc.getResources().getColor(R.color.iitc_blue));
+
+        if (showReturnButton) {
+            Intent actionIntent = new Intent(mIitc.getBaseContext(), IITC_Mobile.class);
+            actionIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(mIitc.getApplicationContext(),
+                    0,
+                    actionIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Bitmap closeIconBitmap = BitmapFactory.decodeResource(mIitc.getResources(), R.drawable.ic_iitcm_outline);
+
+            customTabsBuilder.setActionButton(closeIconBitmap, mIitc.getString(R.string.custom_tabs_to_iitc), pendingIntent, false);
+            customTabsBuilder.addMenuItem(mIitc.getString(R.string.custom_tabs_to_iitc), pendingIntent);
+        }
+
+        final List<String> exampleNonChromePackages = Arrays.asList(
+                "org.mozilla.firefox",
+                "com.microsoft.emmx"
+        );
+
+        CustomTabsLauncher.launch(mIitc, customTabsBuilder.build(), uri, new LaunchNonChromeCustomTabs(exampleNonChromePackages));
+    }
+
     // start non-ingress-intel-urls in another app...
     @Override
     public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
@@ -301,31 +328,8 @@ public class IITC_WebViewClient extends WebViewClient {
 
         if (external_links_mode.equals("custom_tabs")) {
 
-            Log.d("no ingress intel link, start Custom Tab to load url: " + url);
-            CustomTabsIntent.Builder customTabsBuilder = new CustomTabsIntent.Builder();
-            customTabsBuilder.setToolbarColor(mIitc.getResources().getColor(R.color.iitc_blue));
-
-            if (!mIitc.isBootFinished) {
-                Intent actionIntent = new Intent(mIitc.getBaseContext(), IITC_Mobile.class);
-                actionIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                PendingIntent pendingIntent = PendingIntent.getActivity(mIitc.getApplicationContext(),
-                        0,
-                        actionIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-                Bitmap closeIconBitmap = BitmapFactory.decodeResource(mIitc.getResources(), R.drawable.ic_iitcm_outline);
-
-                customTabsBuilder.setActionButton(closeIconBitmap, mIitc.getString(R.string.custom_tabs_to_iitc), pendingIntent, false);
-                customTabsBuilder.addMenuItem(mIitc.getString(R.string.custom_tabs_to_iitc), pendingIntent);
-            }
-
-            final List<String> exampleNonChromePackages = Arrays.asList(
-                    "org.mozilla.firefox",
-                    "com.microsoft.emmx"
-            );
-
-            CustomTabsLauncher.launch(mIitc, customTabsBuilder.build(), uri, new LaunchNonChromeCustomTabs(exampleNonChromePackages));
+            Log.d("no ingress intel link, start Custom Tabs to load url: " + url);
+            this.openCustomTabs(uri, !mIitc.isBootFinished);
             return true;
         }
         else if (mIitc.isBootFinished || external_links_mode.equals("browser")) {
