@@ -590,7 +590,12 @@ Authorizer.prototype._onError = function (msg) {
   this.isAuthorizing = false;
   plugin.sync.logger.log('all', 'Authorization error: ' + msg.error);
   if (msg.details) {
-    plugin.sync.logger.log('all', msg.details);
+    var log_message = msg.details;
+    if (msg.error === "idpiframe_initialization_failed") {
+      this.isAuthorizing = true;
+      log_message = 'You need enable 3rd-party cookies in your browser or allow [*.]google.com';
+    }
+    plugin.sync.logger.log('all', log_message);
   }
 };
 
@@ -613,6 +618,9 @@ window.plugin.sync.Logger.prototype.log = function(filename, message) {
   var entity = {'time': new Date(), 'message': message};
   
   if (filename === 'all') {
+    if (Object.keys(this.logs).length === 0) {
+      this.logs['all'] = entity;
+    }
     Object.keys(this.logs).forEach((key) => {
       this.logs[key] = entity;
     });
@@ -625,9 +633,12 @@ window.plugin.sync.Logger.prototype.log = function(filename, message) {
 
 window.plugin.sync.Logger.prototype.getLogs = function() {
   var allLogs = '';
+  var showDefaultCategory = (Object.keys(this.logs).length === 1);
   Object.keys(this.logs).forEach((key) => {
-    var value = this.logs[key];
-    allLogs += '<div class="sync-log-block"><p class="sync-log-file">'+key+':</p><p class="sync-log-message">' + value.message+' ('+value.time.toLocaleTimeString()+')</p></div>';
+    if ((key !== 'all') || showDefaultCategory) {
+      var value = this.logs[key];
+      allLogs += '<div class="sync-log-block"><p class="sync-log-file">' + key + ':</p><p class="sync-log-message">' + value.message + ' (' + value.time.toLocaleTimeString() + ')</p></div>';
+    }
   });
 
   return allLogs;
