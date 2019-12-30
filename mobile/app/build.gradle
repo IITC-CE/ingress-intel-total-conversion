@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId "org.exarhteam.iitc_mobile"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode = getVersionCode()
         versionName "0.30"
