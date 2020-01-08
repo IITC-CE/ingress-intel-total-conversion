@@ -207,5 +207,8 @@
         <p><b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!
         <p>Are you sure you want to proceed?]]>
     </string>
+    <string name="webview_requires_update_top">Unable to login</string>
+    <string name="webview_requires_update_msg">Google login continues redirecting to same URL. This is most likely caused by outdated Android System WebView component.</string>
+    <string name="open_google_play">Update WebView</string>
 
 </resources>

@@ -3,12 +3,15 @@ package org.exarhteam.iitc_mobile;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.net.http.SslError;
+import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
@@ -37,6 +40,7 @@ public class IITC_WebViewClient extends WebViewClient {
     private boolean mIitcInjected = false;
     private final String mIitcPath;
     private final IITC_TileManager mTileManager;
+    private String lastGoogleUrl = "";
 
     public IITC_WebViewClient(final IITC_Mobile iitc) {
         mIitc = iitc;
@@ -265,6 +269,34 @@ public class IITC_WebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, url);
     }
 
+    private void updateWebView() {
+        mIitc.runOnUiThread(() -> new AlertDialog.Builder(mIitc)
+                .setTitle(mIitc.getString(R.string.webview_requires_update_top))
+                .setMessage(mIitc.getString(R.string.webview_requires_update_msg))
+                .setCancelable(false)
+                .setPositiveButton(mIitc.getString(R.string.open_google_play), (dialog, which) -> {
+                    final String webViewPackageName = "com.google.android.webview";
+                    try {
+                        mIitc.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + webViewPackageName)));
+                    } catch (ActivityNotFoundException anfe) {
+                        mIitc.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + webViewPackageName)));
+                    }
+
+                    // I have not found a way to restart WebView correctly when return to IITC app after Android WebView System update.
+                    // So when you go to Google Play after a while, IITC app closes in background.
+                    // Then when you open IITC app, it will be launched from scratch.
+                    Handler handler = new android.os.Handler();
+                    handler.postDelayed(() -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            mIitc.finishAndRemoveTask();
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            mIitc.finishAffinity();
+                        }
+                    }, 10000);
+
+                }).setNegativeButton(mIitc.getString(R.string.close), null).show();
+    }
+
     // start non-ingress-intel-urls in another app...
     @Override
     public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
@@ -292,6 +324,14 @@ public class IITC_WebViewClient extends WebViewClient {
                  uriPath.contains("conflogin") ||
                  uriPath.contains("ServiceLogin")) {
             Log.d("Google login");
+
+            // Prevent loop redirects on some older versions of WebView
+            if (lastGoogleUrl.equals(url)) {
+                Log.d("Endless loop detected: Google login redirected to same URL:" + url);
+                updateWebView();
+                return true;
+            }
+            lastGoogleUrl = url;
             return false;
         } else {
             Log.d("no ingress intel link, start external app to load url: " + url);
