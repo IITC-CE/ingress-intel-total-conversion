@@ -1,7 +1,7 @@
 // @author         xelio
 // @name           Keys on map
 // @category       Layer
-// @version        0.2.1
+// @version        0.3.0
 // @description    Show the manually entered key counts from the 'keys' plugin on the map.
 
 

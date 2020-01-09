@@ -1,7 +1,7 @@
 // @author         xelio
 // @name           Keys
 // @category       Misc
-// @version        0.3.0
+// @version        0.4.0
 // @description    Allow manual entry of key counts for each portal. Use the 'keys-on-map' plugin to show the numbers on the map, and 'sync' to share between multiple browsers or desktop/mobile.
 
 

@@ -1,7 +1,7 @@
 // @author         ZasoGD
 // @name           Bookmarks for maps and portals
 // @category       Controls
-// @version        0.2.12
+// @version        0.3.0
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync.
 
 
