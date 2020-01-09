@@ -15,7 +15,6 @@ import org.exarhteam.iitc_mobile.share.ShareActivity;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.NullPointerException;
 
 // provide communication between IITC script and android app
 public class IITC_JSInterface {

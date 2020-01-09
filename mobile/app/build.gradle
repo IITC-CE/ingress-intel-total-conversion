@@ -2,18 +2,11 @@ apply plugin: 'com.android.application'
 
 final BUILD_DATE = new Date().format('yyyy.MM.dd-HH:mm')
 
-def getVersionCode = { ->
-    def git = 'git rev-list HEAD --count'
-
-    def proc = git.execute()
-    proc.waitFor()
-    def desc = "${proc.in.text}".trim()
-
-    if (desc.isEmpty()) {
-        println "ERROR setting version code"
-        return -1
-    }
-    return Integer.parseInt(desc)
+def getVersionCodeTimeStamps = { ->
+    def date = new Date()
+    def formattedDate = date.format('yyMMddHH')
+    def result = formattedDate.toInteger() / 10 // maximum allowed value in Google Play is 2100000000
+    return result
 }
 
 android {
@@ -24,7 +17,7 @@ android {
         applicationId "org.exarhteam.iitc_mobile"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode = getVersionCode()
+        versionCode = getVersionCodeTimeStamps()
         versionName "0.30.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -54,12 +47,18 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-test-$BUILD_DATE"
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
         }
+        beta {
+            versionNameSuffix "-beta-$BUILD_DATE"
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
