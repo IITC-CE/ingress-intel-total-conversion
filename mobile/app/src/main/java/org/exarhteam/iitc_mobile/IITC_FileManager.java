@@ -183,7 +183,7 @@ public class IITC_FileManager {
 
         final InputStream data = prepareUserScript(stream);
 
-        return new WebResourceResponse("application/x-javascript", "UTF-8", data);
+        return new WebResourceResponse("application/javascript", "UTF-8", data);
     }
 
     private HashMap<String, String> getScriptInfo(final InputStream stream) {
@@ -206,7 +206,7 @@ public class IITC_FileManager {
 
         final InputStream data = prepareUserScript(stream);
 
-        return new WebResourceResponse("application/x-javascript", "UTF-8", data);
+        return new WebResourceResponse("application/javascript", "UTF-8", data);
     }
 
     private InputStream prepareUserScript(final InputStream stream) {
@@ -401,7 +401,7 @@ public class IITC_FileManager {
 
         private FileRequest(final Uri uri) {
             // create two connected streams we can write to after the file has been read
-            super("application/x-javascript", "UTF-8", new PipedInputStream());
+            super("application/javascript", "UTF-8", new PipedInputStream());
 
             try {
                 mStreamOut = new PipedOutputStream((PipedInputStream) getData());
