@@ -47,8 +47,7 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-test-$BUILD_DATE"
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled false
             signingConfig signingConfigs.debug
         }
         beta {
