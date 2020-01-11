@@ -188,12 +188,8 @@ window.plugin.portalslist.getPortals = function() {
     // eliminate offscreen portals (selected, and in padding)
     if(!displayBounds.contains(portal.getLatLng())) return true;
 
-    if (!portal.options.data.title) { // no data about portal
-      // bug in intel, observed with ghost fields
-      // todo: check if such portal is really duplicate
-      // otherwise better keep it (with data filled by some defaults)
-      console.warn('filtering out "ghost" portal:', portal.options.data);
-      return true;
+    if (!('title' in portal.options.data)) {
+      return true; // filter out placeholder portals
     }
 
     retval=true;
