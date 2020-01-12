@@ -861,7 +861,7 @@ h3.title {
  */
 .ui-tooltip, .ui-dialog {
   position: absolute;
-  z-index: 9999;
+  z-index: 9500;
   background-color: rgba(8, 48, 78, 0.9);
   border: 1px solid #20A8B1;
   color: #eee;
