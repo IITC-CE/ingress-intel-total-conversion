@@ -673,7 +673,7 @@ function prepPluginsToLoad() {
 
   function getPriority (data) {
     var v = data && data.priority || 'normal';
-    var prio = priorities[v] || v;
+    var prio = v in priorities ? priorities[v] : v;
     if (typeof prio !== 'number') {
       log.warn('wrong plugin priority specified: ', v);
       prio = priorities.normal;
