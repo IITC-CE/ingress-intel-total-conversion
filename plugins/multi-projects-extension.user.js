@@ -2,7 +2,7 @@
 // @id             iitc-plugin-multi-projects-extension@Zaso
 // @name           IITC plugin: Multi Projects Extension
 // @category       Control
-// @version        0.0.6.@@DATETIMEVERSION@@
+// @version        0.0.7.@@DATETIMEVERSION@@
 // @description    [@@BUILDNAME@@-@@BUILDDATE@@] Create separated projects in some plugins.
 @@METAINFO@@
 // ==/UserScript==
@@ -50,6 +50,10 @@ window.plugin.myPlugin.initMPE();
 
 
 // PLUGIN START ////////////////////////////////////////////////////////
+// History
+// 0.0.7 Headers changed. Ready for IITC-CE
+// 0.0.6 Original sript
+
 
 // use own namespace for plugin
 window.plugin.mpe = function() {};
