@@ -195,6 +195,11 @@ var ulog = (function (module) {
   return module;
 }({})).exports;
 
+// ulog currently fails in pre-ES2015 environment
+if (!Object.getOwnPropertyDescriptor(Function, 'name').configurable) {
+  ulog = function () { return console; }; // replace ulog with stub
+}
+
 '@bundle_code@';
 
   // fixed Addons
