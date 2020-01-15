@@ -5,6 +5,9 @@
 // @description    Allow drawing things onto the current map so you may plan your next move.
 
 
+// HOOK: pluginDrawTools
+// custom hook for draw tools to share it's activity with other plugins
+
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
 
@@ -581,9 +584,6 @@ window.plugin.drawTools.patch789 = function (e) {
     e.target.touchExtend.disable()
   };
 }
-
-// HOOK: pluginDrawTools
-// custom hook for draw tools to share it's activity with other plugins
 
 window.plugin.drawTools.boot = function() {
   // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
