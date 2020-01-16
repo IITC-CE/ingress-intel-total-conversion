@@ -1,12 +1,20 @@
+// @id             draw-tools
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.7.1
+// @version        0.8.0
 // @description    Allow drawing things onto the current map so you may plan your next move.
 
+// PLUGIN START ////////////////////////////////////////////////////////
+// History ***********************************************
+// 0.8.0 MPE-enabled Version (Johtaja)
+// 0.7.1 published with IITC-CE 0.30
+// *******************************************************
 
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
+
+window.plugin.drawTools.KEY_STORAGE = 'plugin-draw-tools-layer';
 
 window.plugin.drawTools.getMarkerIcon = function(color) {
   if (!color) {
@@ -198,15 +206,14 @@ window.plugin.drawTools.save = function() {
 
     data.push(item);
   });
-
-  localStorage['plugin-draw-tools-layer'] = JSON.stringify(data);
+  localStorage[window.plugin.drawTools.KEY_STORAGE] = JSON.stringify(data);
 
   console.log('draw-tools: saved to localStorage');
 }
 
 window.plugin.drawTools.load = function() {
   try {
-    var dataStr = localStorage['plugin-draw-tools-layer'];
+        var dataStr = localStorage[window.plugin.drawTools.KEY_STORAGE];
     if (dataStr === undefined) return;
 
     var data = JSON.parse(dataStr);
@@ -303,8 +310,17 @@ window.plugin.drawTools.optAlert = function(message) {
 }
 
 window.plugin.drawTools.optCopy = function() {
-    if (typeof android !== 'undefined' && android && android.shareString) {
-        android.shareString(localStorage['plugin-draw-tools-layer']);
+    if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
+        dialog({
+            html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
+            width: 250,
+            dialogClass: 'ui-dialog-drawtools-message',
+            title: 'Draw Tools Message'
+        });
+        return;
+    }
+    if(typeof android !== 'undefined' && android && android.shareString){
+        android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
     } else {
       var stockWarnings = {};
       var stockLinks = [];
@@ -347,7 +363,7 @@ window.plugin.drawTools.optCopy = function() {
       if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
 
       var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+localStorage['plugin-draw-tools-layer']+'</textarea>'
+                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
                 +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
                 +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
       if (stockWarnTexts.length>0) {
@@ -363,10 +379,11 @@ window.plugin.drawTools.optCopy = function() {
         });
     }
 }
-
 window.plugin.drawTools.optExport = function() {
-  var data = localStorage['plugin-draw-tools-layer'];
-  window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
+  if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
+    var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
+    window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
+  }
 }
 
 window.plugin.drawTools.optPaste = function() {
@@ -472,10 +489,10 @@ window.plugin.drawTools.optImport = function() {
 window.plugin.drawTools.optReset = function() {
   var promptAction = confirm('All drawn items will be deleted. Are you sure?', '');
   if(promptAction) {
-    delete localStorage['plugin-draw-tools-layer'];
+    localStorage[window.plugin.drawTools.KEY_STORAGE] = '[]';
     window.plugin.drawTools.drawnItems.clearLayers();
     window.plugin.drawTools.load();
-    console.log('DRAWTOOLS: reset all drawn items');
+    console.log('DRAWTOOLS: reset all drawn items (OptReset)');
     window.plugin.drawTools.optAlert('Reset Successful. ');
     runHooks('pluginDrawTools', {event: 'clear'});
   }
@@ -658,11 +675,95 @@ window.plugin.drawTools.boot = function() {
 
 }
 
-function setup () {
-  loadExternals();
-  window.plugin.drawTools.boot();
+// ---------------------------------------------------------------------------------
+// MPE - MULTI PROJECTS EXTENSION
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.mpe = {};
+window.plugin.drawTools.mpe.ui = {};
+
+window.plugin.drawTools.mpe.boot = function(){
+  window.plugin.drawTools.mpe.initMPE();
+  console.log('Drawtools MPE Boot');
+};
+
+
+window.plugin.drawTools.mpe.initMPE = function(){
+  // Not launch the code if the MPE plugin there isn't.
+  if(!window.plugin.mpe){ return; }
+
+  // The MPE function to set a MultiProjects type
+  window.plugin.mpe.setMultiProjects({
+    namespace: 'drawTools',
+    title: 'Draw Tools Layer',
+    // Font awesome css class
+    fa: 'fa-pencil',
+    // Function to change a localstorage key
+    func_setKey: function(newKey){
+      window.plugin.drawTools.KEY_STORAGE = newKey;
+    },
+    // Native value of localstorage key
+    defaultKey: 'plugin-draw-tools-layer',
+    // This function is run before the localstorage key change
+    func_pre: function(){},
+    // This function is run after the localstorage key change
+    func_post: function(){
+      window.plugin.drawTools.drawnItems.clearLayers();
+      window.plugin.drawTools.load();
+      console.log('DRAWTOOLS: reset all drawn items (func_post)');
+
+      if(window.plugin.crossLinks !== undefined){
+        if(window.overlayStatus['Cross Links'] === true){
+          window.plugin.crossLinks.checkAllLinks();
+
+          if(window.plugin.destroyedLinks !== undefined){
+            if(window.overlayStatus['Destroyed Links Simulator'] === true){
+              //                                    window.plugin.destroyedLinks.cross.restoreCrossAll();
+              window.plugin.destroyedLinks.cross.removeCrossAll();
+            }
+          }
+        }
+      }
+
+      // Code to:
+      // hide/remove elements from DOM, layers, variables, etc...
+      // load data from window.localStorage[window.plugin.myPlugin.KEY_STORAGE]
+      // show/add/draw elements in the DOM, layers, variables, etc...
+    }
+  });
+}
+/* // not used
+window.plugin.drawTools.mpe.setupCSS = function(){
+    $("<style>").prop("type", "text/css").html(''
+    ).appendTo("head");
+}
+// */
+window.plugin.drawTools.setupCSS = function(){
+  $("<style>").prop("type", "text/css").html(''
+  +'.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);}'
+  +'.leaflet-draw .leaflet-draw-section .leaflet-bar{box-shadow:none;}'
+  +'.leaflet-draw{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px;}'
+
+  +'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top a:last-child{border-bottom:2px solid #999;}'
+  +'.leaflet-draw .leaflet-draw-section .leaflet-bar a{border-radius:0;}'
+
+  +'.leaflet-draw .leaflet-draw-section .leaflet-bar{border-radius:0 0 4px 4px;overflow:hidden;margin-top:0;}'
+  +'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top{border-radius:4px 4px 0 0;}'
+).appendTo("head");
 }
 
+
+function setup () {
+  loadExternals();                              // initialize leaflet
+  window.plugin.drawTools.boot();               // initialize drawtools
+  window.pluginCreateHook('pluginDrawTools');
+  window.plugin.drawTools.setupCSS();           // create additional CSS elements
+  window.plugin.drawTools.mpe.boot();           // register to MPE if available
+}
+
+// *********************************************************************************************
+// Leave the following function at end of code so that the complied script gets better readable.
+// Only the wrapper-code will be found below.
+// *********************************************************************************************
 function loadExternals () {
   try {
     // https://github.com/Leaflet/Leaflet.draw

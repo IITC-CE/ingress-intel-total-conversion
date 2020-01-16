@@ -1,12 +1,17 @@
+// @id             Bookmarks
 // @author         ZasoGD
 // @name           Bookmarks for maps and portals
 // @category       Controls
-// @version        0.3.0
+// @version        0.4.0
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync.
 
 
-/***********************************************************************
+// History ***********************************************
+// 0.4.0 MPE-enabled Version (Johtaja)
+// 0.3.0 published with IITC-CE 0.30
+// *******************************************************
 
+/***********************************************************************
   HOOKS:
   - pluginBkmrksEdit: fired when a bookmarks/folder is removed, added or sorted, also when a folder is opened/closed;
   - pluginBkmrksOpenOpt: fired when the "Bookmarks Options" panel is opened (you can add new options);
@@ -16,6 +21,7 @@
 
   // use own namespace for plugin
   window.plugin.bookmarks = function() {};
+  window.plugin.mpeBkmrks = {};
 
   window.plugin.bookmarks.SYNC_DELAY = 5000;
 
@@ -81,7 +87,7 @@
     }
     return result;
   }
-  
+
   // Update the localStorage
   window.plugin.bookmarks.saveStorage = function() {
     localStorage[plugin.bookmarks.KEY_STORAGE] = JSON.stringify(window.plugin.bookmarks.bkmrksObj);
@@ -725,7 +731,7 @@
   }
 
   window.plugin.bookmarks.dialogLoadListFolders = function(idBox, clickAction, showOthersF, scanType/*0 = maps&portals; 1 = maps; 2 = portals*/) {
-    var list = JSON.parse(localStorage['plugin-bookmarks']);
+    var list = JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]);
     var listHTML = '';
     var foldHTML = '';
     var elemGenericFolder = '';
@@ -902,7 +908,7 @@
       $('.ui-dialog-autodrawer .ui-dialog-buttonset .ui-button:not(:first)').hide();
     }
     else{
-      var portalsList = JSON.parse(localStorage['plugin-bookmarks']);
+      var portalsList = JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]);
       var element = '';
       var elementTemp = '';
       var elemGenericFolder = '';
@@ -1233,6 +1239,49 @@
   }
 
 /***************************************************************************************************************************************************************/
+window.plugin.mpeBkmrks.initMPE = function(){
+  if(!window.plugin.bookmarks){ return; }
+
+  window.plugin.mpe.setMultiProjects({
+    namespace: 'bookmarks2',
+    title: 'Bookmarks for Maps and Portals',
+    fa: 'fa-bookmark',
+    defaultKey: 'plugin-bookmarks',
+    func_setKey: function(newKey){
+      window.plugin.bookmarks.KEY_STORAGE = newKey;
+      window.plugin.bookmarks.KEY.key = newKey;
+    },
+    func_pre: function(){},
+    func_post: function(){
+      // Delete all Markers
+      //                window.plugin.bookmarks.resetAllStars();
+      for(guid in window.plugin.bookmarks.starLayers){
+        var starInLayer = window.plugin.bookmarks.starLayers[guid];
+        window.plugin.bookmarks.starLayerGroup.removeLayer(starInLayer);
+        delete window.plugin.bookmarks.starLayers[guid];
+      }
+
+      // Create Storage if not exist
+      window.plugin.bookmarks.createStorage();
+      // Load Storage
+      window.plugin.bookmarks.loadStorage();
+      //                window.plugin.bookmarks.saveStorage();
+
+      // Delete and Regenerate Bookmark Lists
+      window.plugin.bookmarks.refreshBkmrks();
+
+      // Add Markers
+      window.plugin.bookmarks.addAllStars();
+
+      // Refresh Highlight
+      window.plugin.bookmarks.highlightRefresh();
+
+      window.runHooks('pluginBkmrksEdit', {"target": "all", "action": "import"});
+    }
+  });
+}
+
+/***************************************************************************************************************************************************************/
 
   var setup = function() {
     window.plugin.bookmarks.isSmart = window.isSmartphone();
@@ -1303,4 +1352,11 @@
     if (window.plugin.portalslist) {
       window.plugin.bookmarks.setupPortalsList();
     }
+// Initilaize MPE-Support only if MPE-Module is available
+    if(window.plugin.mpe !== undefined){
+        window.plugin.mpeBkmrks.initMPE();
+    }
+
   }
+
+// PLUGIN END //////////////////////////////////////////////////////////
