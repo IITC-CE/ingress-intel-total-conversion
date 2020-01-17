@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="org.exarhteam.iitc_mobile">
+        package="org.exarhteam.iitc_mobile"
+        xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -8,6 +9,8 @@
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <uses-sdk tools:overrideLibrary="com.droibit.android.customtabs.launcher, androidx.browser"/>
 
     <application
         android:name="org.exarhteam.iitc_mobile.IITC_Application"

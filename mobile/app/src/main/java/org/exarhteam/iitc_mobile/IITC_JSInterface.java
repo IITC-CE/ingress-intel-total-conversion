@@ -110,6 +110,7 @@ public class IITC_JSInterface {
 
         mIitc.runOnUiThread(() -> {
             mIitc.setLoadingState(false);
+            mIitc.isBootFinished = true;
 
             mIitc.getMapSettings().onBootFinished();
         });

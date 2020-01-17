@@ -587,11 +587,11 @@ window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
     'client_id': this.CLIENT_ID,
     'scope': this.SCOPES,
     ux_mode: 'redirect',
-    redirect_uri: '@url_intel_base@'
+    redirect_uri: '@url_intel_base@'+'?redirect_auth_sync'
   }).then(function() {
     
     GoogleAuth = gapi.auth2.getAuthInstance();
-    var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+    var isSignedIn = GoogleAuth.isSignedIn.get();
 
     if(isSignedIn) {
       _this.authorized = true;

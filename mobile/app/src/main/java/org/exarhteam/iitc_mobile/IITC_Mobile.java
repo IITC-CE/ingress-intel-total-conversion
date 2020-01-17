@@ -102,6 +102,8 @@ public class IITC_Mobile extends AppCompatActivity
     private String mPermalink = null;
     private String mSearchTerm = "";
     private IntentFilter mDesktopFilter;
+    public boolean isBootFinished = false;
+    public boolean isForceWebViewAuth = false;
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -132,7 +134,7 @@ public class IITC_Mobile extends AppCompatActivity
         	}
     	}
 	};
-	
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
@@ -308,7 +310,8 @@ public class IITC_Mobile extends AppCompatActivity
     // handles ingress intel url intents, search intents, geo intents and javascript file intents
     private void handleIntent(final Intent intent, final boolean onCreate) {
         final String action = intent.getAction();
-        if (Intent.ACTION_VIEW.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+        // No action is specified when switching to activity from Custom Tabs. Or I didn't find a way to specify.
+        if (Intent.ACTION_VIEW.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action) || action == null) {
             final Uri uri = intent.getData();
             Log.d("intent received url: " + uri.toString());
 
@@ -871,6 +874,8 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         mIsLoading = isLoading;
+        isForceWebViewAuth = false;
+        if (isLoading) isBootFinished = false;
         mNavigationHelper.onLoadingStateChanged();
         mUserLocation.onLoadingStateChanged();
         invalidateOptionsMenu();

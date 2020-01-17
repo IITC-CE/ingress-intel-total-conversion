@@ -141,6 +141,10 @@
     <string name="pref_force_desktop_sum">Nice for tablets, looks awful on smartphones</string>
     <string name="pref_dex_desktop">Support Samsung DeX Mode</string>
     <string name="pref_dex_desktop_sum">Force desktop mode when DeX mode is active</string>
+
+    <string name="pref_external_links">Rules for handling external links</string>
+    <string name="pref_external_links_sum">Configuring authorization method and opening other external links</string>
+
     <string name="pref_external_storage">Move tiles cache to external storage</string>
     <string name="pref_external_storage_sum">Restart required! Write cache to sdCard.
         External storage has to be mounted.</string>
@@ -207,5 +211,6 @@
         <p><b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!
         <p>Are you sure you want to proceed?]]>
     </string>
+    <string name="custom_tabs_to_iitc">Return to IITC-CE</string>
 
 </resources>
