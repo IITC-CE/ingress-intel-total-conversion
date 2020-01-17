@@ -1,15 +1,8 @@
-// @id             Bookmarks
 // @author         ZasoGD
 // @name           Bookmarks for maps and portals
 // @category       Controls
 // @version        0.4.0
-// @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync.
-
-
-// History ***********************************************
-// 0.4.0 MPE-enabled Version (Johtaja)
-// 0.3.0 published with IITC-CE 0.30
-// *******************************************************
+// @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync. Supports Multi-Project-Extension
 
 /***********************************************************************
   HOOKS:
@@ -30,6 +23,7 @@
   window.plugin.bookmarks.KEY_STATUS_BOX = 'plugin-bookmarks-box';
 
   window.plugin.bookmarks.KEY = {key: window.plugin.bookmarks.KEY_STORAGE, field: 'bkmrksObj'};
+  window.plugin.bookmarks.SyncKEY = {key: window.plugin.bookmarks.KEY_STORAGE, field: 'bkmrksObj'};
   window.plugin.bookmarks.UPDATE_QUEUE = {key: 'plugin-bookmarks-queue', field: 'updateQueue'};
   window.plugin.bookmarks.UPDATING_QUEUE = {key: 'plugin-bookmarks-updating-queue', field: 'updatingQueue'};
 
@@ -991,7 +985,8 @@
   // Call after local or remote change uploaded
   window.plugin.bookmarks.syncCallback = function(pluginName, fieldName, e, fullUpdated) {
     if(fieldName === window.plugin.bookmarks.KEY.field) {
-      window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.KEY);
+//    window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.KEY);
+      window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.SyncKEY);
       // All data is replaced if other client update the data during this client offline,
       if(fullUpdated) {
         window.plugin.bookmarks.refreshBkmrks();
@@ -1040,7 +1035,8 @@
   }
 
   window.plugin.bookmarks.syncBkmrks = function() {
-    window.plugin.bookmarks.loadLocal(window.plugin.bookmarks.KEY);
+//    window.plugin.bookmarks.loadLocal(window.plugin.bookmarks.KEY);
+    window.plugin.bookmarks.loadLocal(window.plugin.bookmarks.SyncKEY);
 
     window.plugin.bookmarks.updateQueue = window.plugin.bookmarks.bkmrksObj;
     window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
@@ -1246,7 +1242,7 @@ window.plugin.mpeBkmrks.initMPE = function(){
     namespace: 'bookmarks2',
     title: 'Bookmarks for Maps and Portals',
     fa: 'fa-bookmark',
-    defaultKey: 'plugin-bookmarks',
+    SyncKEY: 'plugin-bookmarks',
     func_setKey: function(newKey){
       window.plugin.bookmarks.KEY_STORAGE = newKey;
       window.plugin.bookmarks.KEY.key = newKey;
@@ -1352,7 +1348,7 @@ window.plugin.mpeBkmrks.initMPE = function(){
     if (window.plugin.portalslist) {
       window.plugin.bookmarks.setupPortalsList();
     }
-// Initilaize MPE-Support only if MPE-Module is available
+    // Initilaize MPE-Support only if MPE-Module is available
     if(window.plugin.mpe !== undefined){
         window.plugin.mpeBkmrks.initMPE();
     }

@@ -1,15 +1,10 @@
-// @id             draw-tools
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
 // @version        0.8.0
-// @description    Allow drawing things onto the current map so you may plan your next move.
+// @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 // PLUGIN START ////////////////////////////////////////////////////////
-// History ***********************************************
-// 0.8.0 MPE-enabled Version (Johtaja)
-// 0.7.1 published with IITC-CE 0.30
-// *******************************************************
 
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
@@ -213,7 +208,7 @@ window.plugin.drawTools.save = function() {
 
 window.plugin.drawTools.load = function() {
   try {
-        var dataStr = localStorage[window.plugin.drawTools.KEY_STORAGE];
+    var dataStr = localStorage[window.plugin.drawTools.KEY_STORAGE];
     if (dataStr === undefined) return;
 
     var data = JSON.parse(dataStr);
@@ -379,6 +374,7 @@ window.plugin.drawTools.optCopy = function() {
         });
     }
 }
+
 window.plugin.drawTools.optExport = function() {
   if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
     var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
@@ -731,32 +727,11 @@ window.plugin.drawTools.mpe.initMPE = function(){
     }
   });
 }
-/* // not used
-window.plugin.drawTools.mpe.setupCSS = function(){
-    $("<style>").prop("type", "text/css").html(''
-    ).appendTo("head");
-}
-// */
-window.plugin.drawTools.setupCSS = function(){
-  $("<style>").prop("type", "text/css").html(''
-  +'.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);}'
-  +'.leaflet-draw .leaflet-draw-section .leaflet-bar{box-shadow:none;}'
-  +'.leaflet-draw{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px;}'
-
-  +'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top a:last-child{border-bottom:2px solid #999;}'
-  +'.leaflet-draw .leaflet-draw-section .leaflet-bar a{border-radius:0;}'
-
-  +'.leaflet-draw .leaflet-draw-section .leaflet-bar{border-radius:0 0 4px 4px;overflow:hidden;margin-top:0;}'
-  +'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top{border-radius:4px 4px 0 0;}'
-).appendTo("head");
-}
-
 
 function setup () {
   loadExternals();                              // initialize leaflet
   window.plugin.drawTools.boot();               // initialize drawtools
   window.pluginCreateHook('pluginDrawTools');
-  window.plugin.drawTools.setupCSS();           // create additional CSS elements
   window.plugin.drawTools.mpe.boot();           // register to MPE if available
 }
 

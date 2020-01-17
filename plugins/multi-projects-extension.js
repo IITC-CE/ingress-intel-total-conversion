@@ -48,9 +48,6 @@ window.plugin.myPlugin.initMPE();
 
 
 // PLUGIN START ////////////////////////////////////////////////////////
-// History
-// 0.0.7 Headers changed. Ready for IITC-CE
-// 0.0.6 Original sript
 
 
 // use own namespace for plugin
