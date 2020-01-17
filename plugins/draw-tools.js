@@ -5,6 +5,9 @@
 // @description    Allow drawing things onto the current map so you may plan your next move.
 
 
+// HOOK: pluginDrawTools
+// custom hook for draw tools to share it's activity with other plugins
+
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
 
@@ -573,7 +576,7 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
-window.plugin.drawTools.drawstart = function (e) {
+window.plugin.drawTools.patch789 = function (e) {
   var mouseActive = L.Browser.touch && matchMedia('(hover:hover)').matches; // workaround for https://github.com/IITC-CE/ingress-intel-total-conversion/issues/162
   if (mouseActive || e.layerType === 'circle' || e.layerType === 'rectangle') {
     e.target.touchExtend.enable()
@@ -582,15 +585,18 @@ window.plugin.drawTools.drawstart = function (e) {
   };
 }
 
-// HOOK: pluginDrawTools
-// custom hook for draw tools to share it's activity with other plugins
-
 window.plugin.drawTools.boot = function() {
   // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
   map.addHandler('touchExtend', L.Map.TouchExtend);
 
   // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
-  map.on('draw:drawstart', plugin.drawTools.drawstart);
+  // Browsers where leaflet.draw misbehaves:
+  // - all Chrominium-based
+  // - Firefox (except Android version up to 68)
+  // following condition was empirically picked and currently it covers all known cases:
+  if ('PointerEvent' in window && !L.Browser.safari) {
+    map.on('draw:drawstart', plugin.drawTools.patch789);
+  }
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
