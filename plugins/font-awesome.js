@@ -1,4 +1,4 @@
-// @name           IITC plugin: Font Awesome
+// @name           Font Awesome
 // @author         breunigs
 // @category       Tweaks
 // @version        0.0.3

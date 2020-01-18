@@ -1,5 +1,5 @@
 // @author         ZasoGD
-// @name           IITC plugin: Multi Projects Extension
+// @name           Multi Projects Extension
 // @category       Control
 // @version        0.0.7
 // @description    Create separated projects in some plugins.

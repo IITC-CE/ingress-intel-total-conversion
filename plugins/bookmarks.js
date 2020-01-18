@@ -1235,14 +1235,14 @@
   }
 
 /***************************************************************************************************************************************************************/
-window.plugin.mpeBkmrks.initMPE = function(){
-  if(!window.plugin.bookmarks){ return; }
+window.plugin.bookmarks.initMPE = function(){
+//  if(!window.plugin.bookmarks){ return; }
 
   window.plugin.mpe.setMultiProjects({
-    namespace: 'bookmarks2',
+    namespace: 'bookmarks',
     title: 'Bookmarks for Maps and Portals',
     fa: 'fa-bookmark',
-    SyncKEY: 'plugin-bookmarks',
+    defaultKey: 'plugin-bookmarks',
     func_setKey: function(newKey){
       window.plugin.bookmarks.KEY_STORAGE = newKey;
       window.plugin.bookmarks.KEY.key = newKey;
@@ -1350,7 +1350,7 @@ window.plugin.mpeBkmrks.initMPE = function(){
     }
     // Initilaize MPE-Support only if MPE-Module is available
     if(window.plugin.mpe !== undefined){
-        window.plugin.mpeBkmrks.initMPE();
+        window.plugin.bookmarks.initMPE();
     }
 
   }
