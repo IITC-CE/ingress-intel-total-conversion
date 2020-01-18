@@ -177,8 +177,7 @@ window.setupMap = function() {
   if (L.CRS.S2) { map.options.crs = L.CRS.S2; }
 
   L.Renderer.mergeOptions({
-    padding: window.RENDERER_PADDING ||
-             L.Browser.mobile ? 0.5 : 1
+    padding: window.RENDERER_PADDING || 0.5
   });
 
   // add empty div to leaflet control areas - to force other leaflet controls to move around IITC UI elements

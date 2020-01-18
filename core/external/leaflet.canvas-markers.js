@@ -111,6 +111,14 @@ function layerFactory (L) {
             this._latlngsIdx = new LatLngsIndex();
         },
 
+        _checkDisplay() {
+            if (this._latlngsIdx._total) {
+                this._container.style.display = 'initial';
+            } else {
+                this._container.style.display = 'none';
+            }
+        },
+
         onAdd: function () {
             L.Renderer.prototype.onAdd.call(this);
             L.DomUtil.toBack(this._container);
@@ -118,6 +126,7 @@ function layerFactory (L) {
 
         _initContainer: function () {
             L.Canvas.prototype._initContainer.call(this);
+            this._checkDisplay();
         },
 
         onRemove: function () {
@@ -331,6 +340,7 @@ function layerFactory (L) {
                 this._pointsIdx.insert(marker, batch);
             }
             this._latlngsIdx.insert(marker, batch);
+            this._checkDisplay();
         },
 
         // Adds single layer at a time. Less efficient for rBush
@@ -396,12 +406,14 @@ function layerFactory (L) {
             }).forEach(function (el) {
                 this._latlngsIdx.remove(el);
             }, this);
+            this._checkDisplay();
         },
 
         removeMarker: function (marker, redraw) {
             var latlng = marker.getLatLng();
             var isDisplaying = this._map && this._map.getBounds().pad(this.options.padding).contains(latlng);
             this._latlngsIdx.remove(marker);
+            this._checkDisplay();
 
             if (isDisplaying && redraw) {
                 this._redraw();
@@ -426,6 +438,7 @@ function layerFactory (L) {
             this._latlngsIdx.clear();
             this._pointsIdx.clear();
             this._clear();
+            this._checkDisplay();
             return this;
         }
     });
