@@ -1,4 +1,4 @@
-// @author         fly
+// @author         Fly33
 // @name           Fly Links
 // @category       Draw
 // @version        0.3.0
