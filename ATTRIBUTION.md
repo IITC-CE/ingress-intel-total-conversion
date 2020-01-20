@@ -2,7 +2,8 @@
 Parts imported from other projects remain under their respective licenses:
 
 ### Vue.js-related components:
-- [**Vue.js**](https://vuejs.org/) © Yuxi (Evan) You: [[MIT](https://jquery.org/license/)]
+- [**Vue.js**](https://vuejs.org/) © Yuxi (Evan) You: [[MIT](https://github.com/vuejs/vue/blob/dev/LICENSE)]
+- [**http-vue-loader**](https://github.com/FranckFreiburger/http-vue-loader) © Franck Freiburger: [[MIT](https://github.com/FranckFreiburger/http-vue-loader/blob/master/LICENSE)]
 
 ### jQuery-related components:
 - [**jQuery**](https://jquery.com/) © [_JS Foundation_](https://js.foundation/): [[MIT](https://jquery.org/license/)]

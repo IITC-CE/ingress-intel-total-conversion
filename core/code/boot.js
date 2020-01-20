@@ -851,12 +851,20 @@ try {
   '@include_raw:external/taphold.js@';
   '@include_raw:external/jquery.qrcode.min.js@';
   
-  '@include_raw:external/vue.min.js@';
+  '@include_raw:external/vue.js@';
+  '@include_raw:external/httpVueLoader.js@';
+  // Hack to load vue components from string
+  // https://github.com/FranckFreiburger/http-vue-loader/issues/72#issuecomment-523972707
+  httpVueLoader.httpRequest = function(code) {
+    return new Promise(function(resolve, reject) {
+      resolve(code);
+    })
+  };
   
-  '@include_raw:components/chat.vue.js@';
-  '@include_raw:components/toolbox.vue.js@';
-  '@include_raw:components/sidebar.vue.js@';
-  '@include_raw:components/updatestatus.vue.js@';
+  Vue.component("updatestatus", httpVueLoader(`'@include_raw:components/updatestatus.vue@'`.replace(/\r?\n/g, "")));
+  Vue.component("chat", httpVueLoader(`'@include_raw:components/chat.vue@'`.replace(/\r?\n/g, "")));
+  Vue.component("sidebar", httpVueLoader(`'@include_raw:components/sidebar.vue@'`.replace(/\r?\n/g, "")));
+  Vue.component("sidebar", httpVueLoader(`'@include_raw:components/sidebar.vue@'`.replace(/\r?\n/g, "")));
   '@include_raw:components/main.vue.js@';
   
 } catch (e) {
