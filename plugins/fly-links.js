@@ -1,7 +1,7 @@
 // @author         Fly33
 // @name           Fly Links
 // @category       Draw
-// @version        0.3.0
+// @version        0.4.0
 // @description    Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 
 
@@ -25,7 +25,7 @@ window.plugin.flyLinks.updateLayer = function() {
 
   window.plugin.flyLinks.linksLayerGroup.clearLayers();
   window.plugin.flyLinks.fieldsLayerGroup.clearLayers();
-  var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(), 
+  var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(),
               $('.leaflet-control-layers-selector + span:contains("Fly fields")').parent()];
 
   var distance = function(a, b) {
@@ -97,7 +97,7 @@ window.plugin.flyLinks.updateLayer = function() {
     return result;
   }
   
-  var triangulate2 = function(index, locations) {
+  var triangulate2 = function(index, line_indexes, line_edge_indexes, locations) {
     if (index.length == 0)
       return {edges: [], triangles: []};
     var data = [];
@@ -119,7 +119,19 @@ window.plugin.flyLinks.updateLayer = function() {
         }
         var besth = 0;
         var besthi = -1;
-        if (_index.length == 0) {
+        var i
+        for (i = 0; i < line_indexes.length; ++i) {
+          var f0 = _index.indexOf(line_indexes[i][0]) != -1
+          var f1 = _index.indexOf(line_indexes[i][1]) != -1
+          if (f0 && !f1 && _i.indexOf(line_indexes[i][1]) == -1)
+            break
+          if (f1 && !f0 && _i.indexOf(line_indexes[i][0]) == -1)
+            break
+        }
+        if (i < line_indexes.length) {
+          besth = 0;
+          besthi = -1;
+        } else if (_index.length == 0) {
           var a = locations[ai];
           var b = locations[bi];
           var c = locations[ci];
@@ -153,22 +165,29 @@ window.plugin.flyLinks.updateLayer = function() {
       subindex.push(i);
     }
     var best = [];
-    for (var len = 1; len <= index.length - 1; ++len) {
+    best[1] = []
+    for (var k = 0; k < index.length - 1; ++k) {
+      best[1][k] = {height: Infinity, length: -1};
+    }
+    for (var len = 2; len <= index.length - 1; ++len) {
       best[len] = [];
       for (var k = 0; k < index.length - len; ++k) {
         var t = 0;
         var tlen = -1;
-        for (var _len = 1; _len <= len - 1; ++_len) {
-          var _t = 0;
-          $.each([best[_len][k].height, best[len-_len][k+_len].height, subtriangulate(index[k], index[k+_len], index[k+len], subindex)], function(guid, __t) {
-            if (__t == 0)
-              return;
-            if (_t == 0 || _t > __t)
-              _t = __t;
-          });
-          if (t == 0 || t < _t) {
-            t = _t;
-            tlen = _len;
+        var i
+        for (i = 0; i < line_edge_indexes.length; ++i) {
+          var [i0, i1] = line_edge_indexes[i]
+          if (k < i0 && i0 < k+len && (i1 < k || k+len < i1) ||
+              k < i1 && i1 < k+len && (i0 < k || k+len < i0))
+            break
+        }
+        if (i >= line_edge_indexes.length) {
+          for (var _len = 1; _len <= len - 1; ++_len) {
+            var _t = Math.min(best[_len][k].height, best[len-_len][k+_len].height, subtriangulate(index[k], index[k+_len], index[k+len], subindex))
+            if (t < _t) {
+              t = _t;
+              tlen = _len;
+            }
           }
         }
         best[len][k] = {height: t, length: tlen};
@@ -198,15 +217,27 @@ window.plugin.flyLinks.updateLayer = function() {
       _maketriangulation(best[len][a].length, a);
       _maketriangulation(len - best[len][a].length, a + best[len][a].length);
     }
-    maketriangulation(index.length - 1, 0);
+    if (best[index.length - 1][0].height > 0)
+      maketriangulation(index.length - 1, 0)
+    else
+      console.log("Fly links: no triangulation")
     return {edges: edges, triangles: triangles};
   }
   
-  var triangulate = function(locations) {
+  var triangulate = function(locations, lines) {
     var index = convexHull(locations);
-    return triangulate2(index, locations);
+    var line_indexes = filterLines(locations, lines)
+    var line_edge_indexes = []
+    for (var i = 0; i < line_indexes.length; ++i) {
+      var i0 = index.indexOf(line_indexes[i][0])
+      var i1 = index.indexOf(line_indexes[i][1])
+      if (i0 == -1 || i1 == -1)
+        continue
+      line_edge_indexes.push([i0, i1])
+    }
+    return triangulate2(index, line_indexes, line_edge_indexes, locations);
   }
-    
+  
   var locations = [];
   
   var bounds = map.getBounds();
@@ -220,12 +251,22 @@ window.plugin.flyLinks.updateLayer = function() {
   var triangles = [];
 
   var markers = [];
+  var lines = [];
   for (var i in plugin.drawTools.drawnItems._layers) {
     var layer = plugin.drawTools.drawnItems._layers[i];
     if (layer instanceof L.Marker) {
       var ll = layer.getLatLng();
       var p = map.project(ll, window.plugin.flyLinks.PROJECT_ZOOM);
       markers.push(p);
+    } else if (layer instanceof L.GeodesicPolyline) {
+      var p = []
+      var ll = layer.getLatLngs();
+      for (var j = 0; j < ll.length; ++j) {
+        p.push(map.project(ll[j], window.plugin.flyLinks.PROJECT_ZOOM))
+      }
+      for (var j = 1; j < p.length; ++j) {
+        lines.push([p[j-1], p[j]])
+      }
     }
   }
   
@@ -242,6 +283,27 @@ window.plugin.flyLinks.updateLayer = function() {
     }
     return result;
   };
+
+  var filterLines = function(points, lines) {
+    var result = [];
+    var findPoint = function(points, point) {
+      for (var i = 0; i < points.length; ++i) {
+        if (points[i].x === point.x && points[i].y === point.y)
+          return i
+      }
+      return -1
+    }
+    for (var i = 0; i < lines.length; ++i) {
+      var a = findPoint(points, lines[i][0])
+      if (a == -1)
+        continue
+      var b = findPoint(points, lines[i][1])
+      if (b == -1)
+        continue
+      result.push([a, b])
+    }
+    return result
+  }
 
   var filterPolygon = function(points, polygon) {
     var result = [];
@@ -288,12 +350,12 @@ window.plugin.flyLinks.updateLayer = function() {
         var p = map.project(ll[i], window.plugin.flyLinks.PROJECT_ZOOM);
         polygon.push(p);
       }
-      var points = filterPolygon(locations, polygon, markers);
+      var points = filterPolygon(locations, polygon);
       if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
         //alert("Some polygon contains more than 100 portals.");
         continue;
       }
-      var triangulation = triangulate(points);
+      var triangulation = triangulate(points, lines);
       edges = edges.concat(triangulation.edges);
       triangles = triangles.concat(triangulation.triangles);
     }
@@ -306,7 +368,7 @@ window.plugin.flyLinks.updateLayer = function() {
       weight: 1.5,
       interactive: false,
       smoothFactor: 10,
-      dashArray: '6, 4',
+      dashArray: [6, 4],
     });
   });
   
