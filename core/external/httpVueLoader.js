@@ -349,13 +349,12 @@
     
     return value;
   }
-  
+
+  // Hack to load vue components from string
   function parseComponentURL(url) {
-    
-    var comp = url.match(/(.*?)([^/]+?)\/?(\.vue)?(\?.*|#.*|$)/);
     return {
-      name: comp[2],
-      url: comp[1] + comp[2] + (comp[3] === undefined ? '/index.vue' : comp[3]) + comp[4]
+      name: 'script',
+      url: url+"/index.vue"
     };
   }
   
@@ -437,27 +436,12 @@
     return window[moduleName];
   };
   
-  httpVueLoader.httpRequest = function(url) {
-    
+  // Hack to load vue components from string
+  // https://github.com/FranckFreiburger/http-vue-loader/issues/72#issuecomment-523972707
+  httpVueLoader.httpRequest = function(code) {
     return new Promise(function(resolve, reject) {
-      
-      var xhr = new XMLHttpRequest();
-      xhr.responseType = 'text';
-      xhr.open('GET', url);
-      
-      xhr.onreadystatechange = function() {
-        
-        if ( xhr.readyState === 4 ) {
-          
-          if ( xhr.status >= 200 && xhr.status < 300 )
-            resolve(xhr.responseText);
-          else
-            reject(xhr.status);
-        }
-      };
-      
-      xhr.send(null);
-    });
+      resolve(code);
+    })
   };
   
   httpVueLoader.langProcessor = {

@@ -26,6 +26,7 @@ window.runOnSmartphonesBeforeBoot = function() {
   style.type = 'text/css';
   style.appendChild(document.createTextNode('@include_string:smartphone.css@'));
   document.head.appendChild(style);
+  document.querySelector('body').classList.add('smartphone')
 
   // don’t need many of those
   window.setupStyles = function() {
