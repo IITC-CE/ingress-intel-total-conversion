@@ -1,6 +1,9 @@
 ﻿This project is [licensed](https://github.com/IITC-CE/ingress-intel-total-conversion/blob/master/LICENSE) under the permissive [ISC license](https://www.isc.org/licenses/).
 Parts imported from other projects remain under their respective licenses:
 
+### Vue.js-related components:
+- [**Vue.js**](https://vuejs.org/) © Yuxi (Evan) You: [[MIT](https://jquery.org/license/)]
+
 ### jQuery-related components:
 - [**jQuery**](https://jquery.com/) © [_JS Foundation_](https://js.foundation/): [[MIT](https://jquery.org/license/)]
 - [**jQuery UI**](https://jqueryui.com/) © [_JS Foundation_](https://js.foundation/): [[MIT](https://jquery.org/license/)]

@@ -274,7 +274,7 @@ window.setupMap = function() {
 
   window.layerChooser = new L.Control.Layers(baseLayers, addLayers);
 
-  // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers 
+  // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers
   $.each(hiddenLayer, function(ind, layer){
     map.removeLayer(layer);
 
@@ -850,7 +850,15 @@ try {
   '@include_raw:external/jquery-ui-1.12.1.min.js@';
   '@include_raw:external/taphold.js@';
   '@include_raw:external/jquery.qrcode.min.js@';
-
+  
+  '@include_raw:external/vue.min.js@';
+  
+  '@include_raw:components/chat.vue.js@';
+  '@include_raw:components/toolbox.vue.js@';
+  '@include_raw:components/sidebar.vue.js@';
+  '@include_raw:components/updatestatus.vue.js@';
+  '@include_raw:components/main.vue.js@';
+  
 } catch (e) {
   log.error("External's js loading failed");
   throw e;
