@@ -136,7 +136,7 @@ def expand_template(match, path=None):
         return """// *** included: {filename} ***
 {content}
 
-""".format(filename=filename, content=readtext(fullname))
+""".format(filename=filename, content=recursive_expand_template(readtext(fullname), path))
     elif kw == 'include_string':
         return quote % multi_line(readtext(fullname))
     elif kw == 'include_img':
@@ -146,6 +146,10 @@ def expand_template(match, path=None):
         css = re.sub(pattern, partial(imgrepl, path=fullname.parent), readtext(fullname))
         return quote % multi_line(css)
 
+def recursive_expand_template(script, path=None):
+    template = r"'@(\w+)(?::([\w./-]+))?@'"  # to find '@keyword[:path]@' patterns
+    repl = partial(expand_template, path=path)
+    return re.sub(template, repl, script)
 
 def process_file(source, out_dir, dist_path=None, deps_list=None):
     """Generate .user.js (and optionally .meta.js) from given source file.
@@ -167,12 +171,10 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
     path = source.parent  # used as root for all (relative) paths
     script = re.sub(r"'@bundle_code@';", partial(bundle_code, path=path), script)
     wrapper = get_module(settings.plugin_wrapper)
-    template = r"'@(\w+)(?::([\w./-]+))?@'"  # to find '@keyword[:path]@' patterns
-    repl = partial(expand_template, path=path)
     data = [
         meta,
-        re.sub(template, repl, wrapper.start),
-        re.sub(template, repl, script),
+        recursive_expand_template(wrapper.start, path),
+        recursive_expand_template(script, path),
         wrapper.setup,
         wrapper.end,
     ]

@@ -854,10 +854,6 @@ try {
   '@include_raw:external/vue.js@';
   '@include_raw:external/httpVueLoader.js@';
   
-  Vue.component("updatestatus", httpVueLoader(`'@include_raw:components/updatestatus.vue@'`));
-  Vue.component("chat", httpVueLoader(`'@include_raw:components/chat.vue@'`));
-  Vue.component("toolbox", httpVueLoader(`'@include_raw:components/toolbox.vue@'`));
-  Vue.component("sidebar", httpVueLoader(`'@include_raw:components/sidebar.vue@'`));
   '@include_raw:components/main.vue.js@';
   
 } catch (e) {
