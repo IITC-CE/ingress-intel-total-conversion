@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.7.1
+// @version        0.7.2
 // @description    Allow drawing things onto the current map so you may plan your next move.
 
 
@@ -576,21 +576,19 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
-window.plugin.drawTools.drawstart = function (e) {
-  var mouseActive = L.Browser.touch && matchMedia('(hover:hover)').matches; // workaround for https://github.com/IITC-CE/ingress-intel-total-conversion/issues/162
-  if (mouseActive || e.layerType === 'circle' || e.layerType === 'rectangle') {
-    e.target.touchExtend.enable()
-  } else {
-    e.target.touchExtend.disable()
-  };
-}
-
-window.plugin.drawTools.boot = function() {
+window.plugin.drawTools.draw_hotfix = function() {
   // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
   map.addHandler('touchExtend', L.Map.TouchExtend);
 
-  // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
-  map.on('draw:drawstart', plugin.drawTools.drawstart);
+  // disable tap handler as it conflicts with leaflet.draw
+  // https://github.com/Leaflet/Leaflet/issues/6977
+  // !Note: currently this may brake `contextmenu` handling on iOS
+  map.tap = map.tap ? map.tap.disable() : false;
+}
+
+window.plugin.drawTools.boot = function() {
+
+  window.plugin.drawTools.draw_hotfix();
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
