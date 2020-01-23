@@ -1224,6 +1224,11 @@ table.artifact .portal {
 	content: "⊟";
 }
 
+/* prevent nonfunctional horizontal scrollbar in Chrome (perhaps jQuery issue) */
+.cellscore .historychart > div {
+  overflow: auto; 
+}
+
 @-moz-document url-prefix() {
  .cellscore .logscale {
     transform: scale(0.5) translate(0,-18px);

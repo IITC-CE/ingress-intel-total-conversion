@@ -198,7 +198,7 @@ window.RegionScoreboard = (function() {
     mainDialog.html(
       '<div class="cellscore">' +
         '<b>Region scores for ' + regionScore.regionName + '</b>' +
-        '<div>' + createResults() + RegionScoreboard.HistoryChart.create(regionScore, logscale) + '</div>' +
+        '<div class="historychart">' + createResults() + RegionScoreboard.HistoryChart.create(regionScore, logscale) + '</div>' +
         '<b>Checkpoint overview</b><div>' + createHistoryTable() + '</div>' +
         '<b>Top agents</b><div>' + createAgentTable() + '</div>' +
       '</div>' +
