@@ -654,9 +654,9 @@ RegionScoreboard.HistoryChart = (function() {
   }
 
   function formatNumber(num) {
-    return (num>=1000000000 ? (num/1000000000).toFixed() + 'B' :
-      num>=1000000 ? (num/1000000).toFixed() + 'M' :
-        num>=1000 ? (num/1000).toFixed() + 'k' :
+    return (num>=1000000000 ? (num/1000000000) + 'B' :
+      num>=1000000 ? (num/1000000) + 'M' :
+        num>=1000 ? (num/1000) + 'k' :
           num);
   }
 
