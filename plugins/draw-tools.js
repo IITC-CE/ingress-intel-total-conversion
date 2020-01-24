@@ -278,7 +278,6 @@ window.plugin.drawTools.manualOpt = function() {
     html: html,
     id: 'plugin-drawtools-options',
     dialogClass: 'ui-dialog-drawtoolsSet',
-    id: 'plugin-drawtools-options',
     title: 'Draw Tools Options'
   });
 
