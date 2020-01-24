@@ -576,19 +576,7 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
-window.plugin.drawTools.draw_hotfix = function() {
-  // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
-  map.addHandler('touchExtend', L.Map.TouchExtend);
-
-  // disable tap handler as it conflicts with leaflet.draw
-  // https://github.com/Leaflet/Leaflet/issues/6977
-  // !Note: currently this may brake `contextmenu` handling on iOS
-  map.tap = map.tap ? map.tap.disable() : false;
-}
-
 window.plugin.drawTools.boot = function() {
-
-  window.plugin.drawTools.draw_hotfix();
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
@@ -669,11 +657,30 @@ function loadExternals () {
 
     $('<style>').html('@include_css:external/leaflet.draw-fix.css@').appendTo('head');
 
-    '@include_raw:external/leaflet.draw-fix.js@';
-
     '@include_raw:external/leaflet.draw-snap.js@';
 
     '@include_raw:external/leaflet.draw-geodesic.js@';
+
+    // support Leaflet >= 1
+    // https://github.com/Leaflet/Leaflet.draw/pull/911
+    L.Draw.Polyline.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Polygon.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Rectangle.prototype.options.shapeOptions.interactive = true;
+    L.Draw.CircleMarker.prototype.options.interactive = true;
+    L.Draw.Circle.prototype.options.shapeOptions.interactive = true;
+
+    // https://github.com/Leaflet/Leaflet.draw/issues/789
+    // https://github.com/Leaflet/Leaflet.draw/issues/695
+    L.Draw.Polyline.prototype._onTouch_original = L.Draw.Polyline.prototype._onTouch; // just in case
+    L.Draw.Polyline.prototype._onTouch = L.Util.falseFn;
+
+    // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
+    map.addHandler('touchExtend', L.Map.TouchExtend);
+
+    // disable tap handler as it conflicts with leaflet.draw
+    // https://github.com/Leaflet/Leaflet/issues/6977
+    // !Note: currently this may brake `contextmenu` handling on iOS
+    map.tap = map.tap ? map.tap.disable() : false;
 
   } catch (e) {
     console.error('leaflet.draw-src.js loading failed');

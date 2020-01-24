@@ -1,7 +1,5 @@
 // L.Draw extension to support L.Geodesic*
-// support Leaflet >= 1
 
-L.Draw.Polyline.prototype.options.shapeOptions.interactive = true;
 L.Draw.Polyline.include({
 	Poly: L.GeodesicPolyline,
 
@@ -56,12 +54,7 @@ L.Draw.Polyline.include({
 });
 
 L.Draw.Polygon.prototype.Poly = L.GeodesicPolygon;
-L.Draw.Polygon.prototype.options.shapeOptions.interactive = true;
 
-L.Draw.Rectangle.prototype.options.shapeOptions.interactive = true;
-
-L.Draw.CircleMarker.prototype.options.interactive = true;
-L.Draw.Circle.prototype.options.shapeOptions.interactive = true;
 L.Draw.Circle.include({ // ?? extend to L.Draw.GeodesicCircle ??
 	_drawShape: function (latlng) {
 		var distance = this._map.distance(this._startLatLng, latlng);
