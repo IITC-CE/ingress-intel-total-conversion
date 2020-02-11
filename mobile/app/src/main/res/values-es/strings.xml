@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toggle_map">Alternar visibilidad del mapa</string>
+    <string name="clear_log">Borrar registro</string>
+    <string name="activity_settings">Configuración móvil de IITC</string>
+    <string name="activity_plugins">Plugins de IITC</string>
+    <string name="activity_share">Compartir usando…</string>
+    <string name="activity_share_to_clipboard">Copiar al portapapeles</string>
+    <string name="activity_save_to_file">Guardar a un archivo</string>
+    <string name="action_settings">Configuración</string>
+    <string name="drawer_close">Ocultar menú de navegación</string>
+    <string name="version">Imprimir versión</string>
+    <string name="pref_about_title">Acerca de IITC Mobile</string>
+    <string name="close">Cerrar</string>
+    <string name="debug_run">Correr</string>
+    <string name="drawer_open">Mostrar menú de navegación</string>
+    <string name="download_description">Descargando el paquete de inteligencia más reciente…</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Build version: %1$s&lt;/b&gt; &lt;br&gt;&lt;b&gt;Versión de IITC: %2$s&lt;/b&gt; &lt;p&gt;&lt;b&gt;por&lt;a href=https://github.com/leCradle&gt;cradle&lt;/a&gt;, &lt;a href=https://github.com/fkloft&gt;fkloft&lt;/a&gt; y contribuidores&lt;/b&gt; &lt;p&gt;&lt;b&gt;Ícono por &lt;a href=http://be.net/giuseppelucido&gt;Giuseppe Lucido&lt;/a&gt;&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; es un explorador móvil optimizado para el &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; userscript. &lt;h3&gt;Comunidad:&lt;/h3&gt; • Visita &lt;a href=https://iitc.modos189.ru/&gt;IITC website&lt;/a&gt; para nuevos lanzamientos y la versión de escritorio. &lt;br&gt; • Sigue el canal de Telegram &lt;a href=https://t.me/iitc_news&gt;IITC News&lt;/a&gt; para más anuncios y únete al chat &lt;a href=https://t.me/iitc_group&gt;IITC Group&lt;/a&gt;.&lt;br&gt; • Únete a la comunidad en Reddit &lt;a href=https://www.reddit.com/r/IITC/&gt;r/IITC/&lt;/a&gt; - un lugar para pedir ayuda y conversar con otros usuarios.&lt;br&gt; • Reporta incidentes y propón mejoras en &lt;a href=https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new&gt;bugtracker&lt;/a&gt;.&lt;br&gt; &lt;h3&gt;Desarrolladores:&lt;/h3&gt; &lt;a href=https://github.com/IITC-CE/ingress-intel-total-conversion&gt;IITC &lt;i&gt;Community Edition&lt;/i&gt;&lt;/a&gt; en Github. &lt;h3&gt;Licencia de IITC:&lt;/h3&gt; &lt;tt&gt; &lt;p&gt;Copyright © 2013 Stefan Breunig, Jon Atkins, Philipp Schäfer y otros &lt;p&gt;El permiso para usar, copiar, modificar y/o distribuir este software para cualquier propósito con o sin tarifa se concede aquí, mientras el anuncio de copyright y el permiso aparezca en todas las copias.&lt;p&gt;EL SOFTWARE ES ENTREGADO TAL CUAL Y LOS AUTORES RENUNCIAN A TODAS LAS GARANTÏAS REFERENTES A ESTE SOFTWARE INCLUYENDO TODAS LAS GARANTÍAS DE MERCABILIDAD Y ESTADO FÍSICO. EN NINGÚN EVENTO LOS AUTORES SERÁN RESPONSABLES POR CUALQUIER DAÑO ESPECIAL, DIRECTO, INDIRECTO O COMO CONSECUENCIA O CUALQUIER OTRO TIPO DE DAÑO QUE RESULTE EN LA PERDIDA DE INFORMACIÓN O GANANCIAS, SEA EN UNA ACCIÓN DE CONTRATO, NEGLIGENCIA O CUALQUIER OTRA ACCIÓN TORTUOSA, SURGIENDO DE O EN RELACIÓN CON EL USO O RENDIMIENTO DE ESTE SOFTWARE.&lt;/tt&gt;</string>
+    <string name="pref_plugins_sum">Los plugins amplían/modifican la experiencia de IITC. La mayoría de los plugins conocidos de IITC de escritorio se pueden encontrar aquí.</string>
+    <string name="pref_misc_cat">Otros</string>
+    <string name="pref_plugins">IITC Plugins</string>
+    <string name="pref_plugins_title">Plugins disponibles</string>
+    <string name="pref_user_location">Mostrar la ubicación del usuario en el mapa</string>
+    <string name="pref_persistent_zoom">Nivel de zoom persistente</string>
+    <string name="pref_user_zoom">Mostrar controles de zoom</string>
+</resources>

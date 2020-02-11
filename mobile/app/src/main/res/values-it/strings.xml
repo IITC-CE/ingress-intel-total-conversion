@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toggle_map">Modifica la visibilità della mappa</string>
+    <string name="debug_run">Esegui</string>
+    <string name="activity_settings">Opzioni per IITC Mobile</string>
+    <string name="clear_log">Pulisci il registro</string>
+</resources>

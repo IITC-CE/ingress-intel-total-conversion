@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_about_title">IITC Mobile 정보</string>
+    <string name="download_description">최신 Intel 패키지를 다운로드 중…</string>
+    <string name="close">닫기</string>
+    <string name="drawer_close">네비게이션 메뉴 닫기</string>
+    <string name="drawer_open">네비게이션 메뉴 보기</string>
+    <string name="action_settings">설정</string>
+    <string name="activity_save_to_file">파일로 저장</string>
+    <string name="activity_share_to_clipboard">클립보드에 복사</string>
+    <string name="activity_share">다음을 사용하여 공유…</string>
+    <string name="activity_plugins">IITC 플러그인</string>
+    <string name="activity_settings">IITC Mobile 설정</string>
+    <string name="debug_run">실행</string>
+    <string name="clear_log">로그 지우기</string>
+</resources>

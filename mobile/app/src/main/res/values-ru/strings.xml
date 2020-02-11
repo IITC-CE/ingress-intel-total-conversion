@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="drawer_open">Показать меню навигации</string>
+    <string name="download_description">Загрузка последней версии пакета Intel…</string>
+    <string name="toggle_map">Переключить видимость карты</string>
+    <string name="clear_log">Очистить лог</string>
+    <string name="activity_plugins">Плагины IITC</string>
+    <string name="activity_share">Поделиться через…</string>
+    <string name="activity_share_to_clipboard">Копировать в буфер обмена</string>
+    <string name="activity_save_to_file">Сохранить в файл</string>
+    <string name="action_settings">Настройки</string>
+    <string name="drawer_close">Скрыть меню навигации</string>
+    <string name="version">Версия</string>
+    <string name="close">Закрыть</string>
+    <string name="pref_about_title">О IITC Mobile</string>
+    <string name="debug_run">Выполнить</string>
+    <string name="activity_settings">Настройки</string>
+    <string name="pref_about_text">"&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Версия сборки: %1$s&lt;/b&gt; &lt;br&gt;&lt;b&gt;Версия IITC: %2$s&lt;/b&gt; &lt;p&gt;&lt;b&gt;от &lt;a href=https://github.com/leCradle&gt;cradle&lt;/a&gt;, от&lt;a href=https://github.com/fkloft&gt;fkloft&lt;/a&gt; и участников&lt;/b&gt; &lt;p&gt;&lt;b&gt;Иконка: &lt;a href=http://be.net/giuseppelucido&gt;Giuseppe Lucido&lt;/a&gt;&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; это оптимизированный мобильный браузер для пользовательских скриптов &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt;. &lt;h3&gt;Сообщество:&lt;/h3&gt; • Посетите &lt;a href=https://iitc.modos189.ru/&gt;сайт IITC&lt;/a&gt; для новых обновлений и версии для ПК.&lt;br&gt; • Подпишитесь на &lt;a href=https://t.me/iitc_news&gt;IITC News&lt;/a&gt; Телеграм канал для обновлений и присоединитесь к чату &lt;a href=https://t.me/iitc_group&gt;IITC Group&lt;/a&gt;.&lt;br&gt; • Присоединяйтесь к &lt;a href=https://www.reddit.com/r/IITC/&gt;r/IITC/&lt;/a&gt; Сообществу Reddit - место для вопросов, помощи, и дискуссий с другими пользователями.&lt;br&gt; • Сообщайте о проблемах и предлагайте улучшения на &lt;a href=https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new&gt;bugtracker&lt;/a&gt;.&lt;br&gt; &lt;h3&gt;Разработчики:&lt;/h3&gt; &lt;a href=https://github.com/IITC-CE/ingress-intel-total-conversion&gt;IITC &lt;i&gt;Community Edition&lt;/i&gt;&lt;/a&gt; на GitHub. &lt;h3&gt;Лицензия IITC:&lt;/h3&gt; &lt;tt&gt; &lt;p&gt;Copyright © 2013 Стефан Бройниг, Джон Аткинс, Филипп Шёфер и другие &lt;p&gt;Настоящим предоставляется разрешение на использование, копирование, изменение и/или распространение данного программного обеспечения для любых целей с оплатой или без оплаты при условии, что вышеупомянутое уведомление об авторских правах и это уведомление о разрешении присутствуют во всех копиях.. &lt;p&gt;ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ КАК ЕСТЬ, И АВТОРЫ ОТКАЗЫВАЮТСЯ ОТ ВСЕХ ГАРАНТИЙ, ОТНОСЯЩИХСЯ К НАСТОЯЩЕМУ ПРОГРАММНОМУ ОБЕСПЕЧЕНИЮ, ВКЛЮЧАЯ ВСЕ ПОДРАЗУМЕВАЕМЫЕ ГАРАНТИИ ПО ТОВАРНЫМ ВОЗМОЖНОСТЯМ И ФИТНЕСУ.  Ни при каких обстоятельствах авторы не несут ответственности за какие-либо особые, прямые или косвенные убытки или любые убытки, возникающие в результате потери использования, данных или прибыли, в результате действия контракта, неумышленности или иного аргумента в пользу возражения  В СВЯЗИ С ИСПОЛЬЗОВАНИЕМ ИЛИ РАБОТОЙ ЭТОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ. &lt;/tt&gt;"</string>
+</resources>

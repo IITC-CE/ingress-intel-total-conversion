@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toggle_map">Пераключыць бачнасць карты</string>
+    <string name="clear_log">Ачысціць журнал</string>
+    <string name="debug_run">Запуск</string>
+</resources>
