@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/iitc_blue"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingBottom="90dp">
+
+    <TextView
+        android:id="@+id/appintro_welcome_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.2"
+        android:gravity="bottom|center"
+        android:padding="8dp"
+        android:text="@string/iitc_ce_mobile"
+        android:textColor="#ffffff"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.4"
+        android:paddingLeft="32dp"
+        android:paddingTop="16dp"
+        android:paddingRight="32dp"
+        android:paddingBottom="16dp"
+        app:srcCompat="@drawable/appintro_logo" />
+
+    <TextView
+        android:id="@+id/appintro_welcome_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
+        android:gravity="center|top"
+        android:padding="16dp"
+        android:text="@string/appintro_welcome_description"
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/appintro_welcome_change_language"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:text="@string/continue_in_english"
+        android:textAllCaps="false"
+        android:textColor="@android:color/holo_blue_light" />
+
+</LinearLayout>

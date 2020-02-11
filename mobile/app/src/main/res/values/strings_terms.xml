@@ -38,5 +38,6 @@
         ]]>
     </string>
 
-
+    <string name="iitc_ce_mobile">IITC-CE Mobile</string>
+    <string name="continue_in_english">Continue in English</string>
 </resources>

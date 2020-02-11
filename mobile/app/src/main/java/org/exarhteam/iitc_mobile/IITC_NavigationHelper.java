@@ -79,8 +79,6 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
                 mIitc.switchToPane(Pane.MAP);
             }
         });
-
-        mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_HOWTO);
     }
 
     private void updateViews() {
@@ -134,8 +132,6 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     }
 
     public void addPane(final String name, final String label, final String icon) {
-        mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_PANES);
-
         final Resources res = mIitc.getResources();
         final String packageName = res.getResourcePackageName(R.string.app_name);
         /*
