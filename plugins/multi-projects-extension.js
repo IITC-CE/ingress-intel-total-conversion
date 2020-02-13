@@ -428,7 +428,6 @@ window.plugin.mpe.action.switchProject = function(PJ, storageKey){
   console.log('MULTI PROJECTS: switch "'+pj.title+'" storage to "'+storageKey+'".');
 
   pj.func_post();
-  //        console.log('MULTI PROJECTS: reset "'+pj.title+'".');
 
   window.plugin.mpe.ui.redrawHTMLOptions(PJ);
 
@@ -442,7 +441,6 @@ window.plugin.mpe.action.switchProject = function(PJ, storageKey){
       currentStorage: storageKey
     }
   }
-  //        console.log(data);
 
   window.runHooks('mpe', data);
 }
@@ -548,6 +546,7 @@ window.plugin.mpe.setupCSS = function(){
   ).appendTo("head");
 }
 
+
 var setup = function(){
   window.pluginCreateHook('mpe');
 
@@ -556,5 +555,7 @@ var setup = function(){
   window.plugin.mpe.ui.addControl();
   window.plugin.mpe.ui.appendContainerInSidebar();
 }
+
+setup.priority = 'high';
 
 // PLUGIN END //////////////////////////////////////////////////////////
