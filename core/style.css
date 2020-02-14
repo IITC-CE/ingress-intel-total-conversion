@@ -1233,10 +1233,19 @@ table.artifact .portal {
   overflow: auto; 
 }
 
+.cellscore .logscale {
+  vertical-align: middle;
+  margin-top: 0;
+}
+
 @-moz-document url-prefix() {
  .cellscore .logscale {
-    transform: scale(0.5) translate(0,-18px);
-    vertical-align: top !important;
+    transform: scale(0.8);
+  }
+
+  /* prevent nonfunctional vertical scrollbar in Firefox (perhaps jQuery issue) */
+  .cellscore > .historychart {
+    overflow-y: hidden;
   }
 }
 
