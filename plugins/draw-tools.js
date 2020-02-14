@@ -4,7 +4,6 @@
 // @version        0.8.0
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
-// PLUGIN START ////////////////////////////////////////////////////////
 
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
@@ -305,14 +304,16 @@ window.plugin.drawTools.optAlert = function(message) {
 }
 
 window.plugin.drawTools.optCopy = function() {
-    if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
-        dialog({
-            html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
-            width: 250,
-            dialogClass: 'ui-dialog-drawtools-message',
-            title: 'Draw Tools Message'
-        });
-        return;
+    if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
+        window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
+    {
+      dialog({
+        html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
+        width: 250,
+        dialogClass: 'ui-dialog-drawtools-message',
+        title: 'Draw Tools Message'
+      });
+      return;
     }
     if(typeof android !== 'undefined' && android && android.shareString){
         android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
@@ -376,7 +377,9 @@ window.plugin.drawTools.optCopy = function() {
 }
 
 window.plugin.drawTools.optExport = function() {
-  if(window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' || window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined){
+  if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
+      window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
+  {
     var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
     window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
   }
@@ -679,7 +682,6 @@ window.plugin.drawTools.mpe.ui = {};
 
 window.plugin.drawTools.mpe.boot = function(){
   window.plugin.drawTools.mpe.initMPE();
-  console.log('Drawtools MPE Boot');
 };
 
 
@@ -707,16 +709,11 @@ window.plugin.drawTools.mpe.initMPE = function(){
       window.plugin.drawTools.load();
       console.log('DRAWTOOLS: reset all drawn items (func_post)');
 
-      if(window.plugin.crossLinks !== undefined){
-        if(window.overlayStatus['Cross Links'] === true){
-          window.plugin.crossLinks.checkAllLinks();
+      if (window.plugin.crossLinks !== undefined && window.overlayStatus['Cross Links']) {
+        window.plugin.crossLinks.checkAllLinks();
 
-          if(window.plugin.destroyedLinks !== undefined){
-            if(window.overlayStatus['Destroyed Links Simulator'] === true){
-              //                                    window.plugin.destroyedLinks.cross.restoreCrossAll();
-              window.plugin.destroyedLinks.cross.removeCrossAll();
-            }
-          }
+        if (window.plugin.destroyedLinks !== undefined && window.overlayStatus['Destroyed Links Simulator']){
+          window.plugin.destroyedLinks.cross.removeCrossAll();
         }
       }
 
@@ -731,7 +728,6 @@ window.plugin.drawTools.mpe.initMPE = function(){
 function setup () {
   loadExternals();                              // initialize leaflet
   window.plugin.drawTools.boot();               // initialize drawtools
-  window.pluginCreateHook('pluginDrawTools');
   window.plugin.drawTools.mpe.boot();           // register to MPE if available
 }
 

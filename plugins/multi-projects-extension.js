@@ -4,51 +4,9 @@
 // @version        0.0.7
 // @description    Create separated projects in some plugins.
 
-
-/* ************************************************************************************
-
-//--------------------------------------------
-// This is an example to implement MPE:
-//--------------------------------------------
-
-// A function for myPlugin
-window.plugin.myPlugin.initMPE = function(){
-  // Not launch che code if the MPE plugin there isn't.
-  if(!window.plugin.mpe){ return; }
-
-  // The MPE function to set a MultiProjects type
-  window.plugin.mpe.setMultiProjects({
-    namespace: 'myplugin',
-    title: 'Label for My Plugin',
-    // Font awesome css class
-    fa: 'fa-star',
-    // Function to change a localstorage key
-    func_setKey: function(newKey){
-      window.plugin.myPlugin.KEY_STORAGE = newKey;
-    },
-    // Native value of localstorage key
-    defaultKey: 'plugin-myplugin',
-    // This function is run before the localstorage key change
-    func_pre: function(){},
-    // This function is run after the localstorage key change
-    func_post: function(){
-      // Code to:
-      // hide/remove elements from DOM, layers, variables, etc...
-      // load data from window.localStorage[window.plugin.myPlugin.KEY_STORAGE]
-      // show/add/draw elements in the DOM, layers, variables, etc...
-    }
-  });
-}
-
-// Insert in the plugin setup
-window.plugin.myPlugin.initMPE();
-
-*************************************************************************************** */
-
-
-
-// PLUGIN START ////////////////////////////////////////////////////////
-
+//
+// How to implement MPE in your plugin: https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/Multi-Projects-Extension
+//
 
 // use own namespace for plugin
 window.plugin.mpe = function() {};
@@ -97,7 +55,7 @@ window.plugin.mpe.storage.removeStorage = function(storage){
 window.plugin.mpe.data.validateName = function(name){
   var name = name.toString();
   var pattern = new RegExp(/^[a-zA-Z0-9_\-\ \(\)\[\]]/);
-  for(i=0; i<name.length; i++){
+  for(var i=0; i<name.length; i++){
     if(!pattern.test(name[i])){
       return false;
     }
@@ -172,7 +130,7 @@ window.plugin.mpe.data.setKey = function(PJ, keyName){
 
 window.plugin.mpe.data.scanStorageForAll = function(){
   var list = window.plugin.mpe.obj.projects;
-  for(name in list){
+  for(var name in list){
     window.plugin.mpe.data.scanStorageForOne(name);
   }
 }
@@ -181,7 +139,7 @@ window.plugin.mpe.data.scanStorageForOne = function(name){
   PROJ.pj = [];
 
   //        if(window.localStorage[PROJ.defaultKey] !== undefined){
-  for(field in window.localStorage){
+  for(var field in window.localStorage){
     if(field.includes('MPE_'+PROJ.defaultKey)){
       PROJ.pj.push(field);
     }
@@ -237,7 +195,7 @@ window.plugin.mpe.getHTML.project = function(PJ){
 window.plugin.mpe.getHTML.projectsAll = function(){
   var html = '';
 
-  for(name in window.plugin.mpe.obj.projects){
+  for(var name in window.plugin.mpe.obj.projects){
     html += window.plugin.mpe.getHTML.project(name);
   }
   return html;
@@ -270,7 +228,7 @@ window.plugin.mpe.getHTML.prjSett = function(PJ){
 window.plugin.mpe.getHTML.prjSettAll = function(){
   var html = '';
 
-  for(type in window.plugin.mpe.obj.projects){
+  for(var type in window.plugin.mpe.obj.projects){
     html += window.plugin.mpe.getHTML.prjSett(type);
   }
   return html;
@@ -323,7 +281,7 @@ window.plugin.mpe.dialog.openMain = function(){
   });
 
   var list = window.plugin.mpe.obj.projects;
-  for(name in list){
+  for(var name in list){
     window.plugin.mpe.ui.toggleManager(name);
   }
 }
@@ -557,5 +515,3 @@ var setup = function(){
 }
 
 setup.priority = 'high';
-
-// PLUGIN END //////////////////////////////////////////////////////////
