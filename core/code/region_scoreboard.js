@@ -271,7 +271,7 @@ window.RegionScoreboard = (function() {
     var order_name = (PLAYER.team === 'RESISTANCE' ? [TEAM_RES,TEAM_ENL]:[TEAM_ENL,TEAM_RES]);
     var order_team = (PLAYER.team === 'RESISTANCE' ? [1,0]:[0,1]);
 
-    var table = '<table class="checkpoint_table" width="90%"><thead><tr>' +
+    var table = '<table class="checkpoint_table"><thead><tr>' +
       '<th align="right">CP</th><th>Time</th>' +
       '<th align="right">' + window.TEAM_NAMES[order_name[0]] + '</th>' +
       '<th align="right">' + window.TEAM_NAMES[order_name[1]] + '</th></tr></thead>';
