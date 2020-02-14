@@ -13,7 +13,7 @@ It is available for desktop browsers, such as Firefox and Chrome, and as a mobil
 
 **IITC "Community Edition"** (**_IITC-CE_**) started by [modos189](https://github.com/modos189) to continue development of stalled [iitc-project](https://github.com/iitc-project/ingress-intel-total-conversion).
 
-**[Website](https://iitc.app/) | [Documentation](http://iitc-ce.rtfd.io/) | [Telegram channel](https://teleg.run/iitc_news)**
+**[Website](https://iitc.app/) | [Documentation](http://iitc-ce.rtfd.io/) | [Telegram channel](https://t.me/iitc_news)**
 
 
 ## Users
@@ -46,4 +46,4 @@ and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/
 [iitc.app]: https://github.com/IITC-CE/iitc.app
 [IITC-Button]: https://github.com/IITC-CE/IITC-Button
 [IITC Mobile]: https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/IITC-Mobile-(Android-app)
-[IITC-Mobile for iOS]: https://apps.apple.com/app/iitc-mobile/id1032695947
+[IITC-Mobile for iOS]: https://github.com/HubertZhang/IITC-Mobile
