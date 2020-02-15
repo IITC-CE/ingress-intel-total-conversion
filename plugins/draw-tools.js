@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.7.1
+// @version        0.7.2
 // @description    Allow drawing things onto the current map so you may plan your next move.
 
 
@@ -575,27 +575,7 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
-window.plugin.drawTools.patch789 = function (e) {
-  var mouseActive = L.Browser.touch && matchMedia('(hover:hover)').matches; // workaround for https://github.com/IITC-CE/ingress-intel-total-conversion/issues/162
-  if (mouseActive || e.layerType === 'circle' || e.layerType === 'rectangle') {
-    e.target.touchExtend.enable()
-  } else {
-    e.target.touchExtend.disable()
-  };
-}
-
 window.plugin.drawTools.boot = function() {
-  // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
-  map.addHandler('touchExtend', L.Map.TouchExtend);
-
-  // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
-  // Browsers where leaflet.draw misbehaves:
-  // - all Chrominium-based
-  // - Firefox (except Android version up to 68)
-  // following condition was empirically picked and currently it covers all known cases:
-  if ('PointerEvent' in window && !L.Browser.safari) {
-    map.on('draw:drawstart', plugin.drawTools.patch789);
-  }
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
@@ -676,11 +656,30 @@ function loadExternals () {
 
     $('<style>').html('@include_css:external/leaflet.draw-fix.css@').appendTo('head');
 
-    '@include_raw:external/leaflet.draw-fix.js@';
-
     '@include_raw:external/leaflet.draw-snap.js@';
 
     '@include_raw:external/leaflet.draw-geodesic.js@';
+
+    // support Leaflet >= 1
+    // https://github.com/Leaflet/Leaflet.draw/pull/911
+    L.Draw.Polyline.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Polygon.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Rectangle.prototype.options.shapeOptions.interactive = true;
+    L.Draw.CircleMarker.prototype.options.interactive = true;
+    L.Draw.Circle.prototype.options.shapeOptions.interactive = true;
+
+    // https://github.com/Leaflet/Leaflet.draw/issues/789
+    // https://github.com/Leaflet/Leaflet.draw/issues/695
+    L.Draw.Polyline.prototype._onTouch_original = L.Draw.Polyline.prototype._onTouch; // just in case
+    L.Draw.Polyline.prototype._onTouch = L.Util.falseFn;
+
+    // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
+    map.addHandler('touchExtend', L.Map.TouchExtend);
+
+    // disable tap handler as it conflicts with leaflet.draw
+    // https://github.com/Leaflet/Leaflet/issues/6977
+    // !Note: currently this may brake `contextmenu` handling on iOS
+    map.tap = map.tap ? map.tap.disable() : false;
 
   } catch (e) {
     console.error('leaflet.draw-src.js loading failed');
