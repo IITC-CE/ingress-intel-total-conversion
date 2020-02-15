@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cradle_link"><![CDATA[ <a href="https://github.com/leCradle">cradle</a> ]]></string>
+    <string name="fkloft_link"><![CDATA[ <a href="https://github.com/fkloft">fkloft</a> ]]></string>
+    <string name="giuseppe_lucido_link"><![CDATA[ <a href="http://be.net/giuseppelucido">Giuseppe Lucido</a> ]]></string>
+    <string name="tg_iitc_news_link"><![CDATA[ <a href="https://t.me/iitc_news">IITC News</a> ]]></string>
+    <string name="tg_iitc_group_link"><![CDATA[ <a href="https://t.me/iitc_group">IITC Group</a> ]]></string>
+    <string name="reddit_iitc_link"><![CDATA[ <a href="https://www.reddit.com/r/IITC/">r/IITC/</a> ]]></string>
+    <string name="bugtracker_link"><![CDATA[ <a href="https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new">bugtracker</a> ]]></string>
+
+    <string name="website_url">https://iitc.app/</string>
+    <string name="github_iitc_url">https://github.com/IITC-CE/ingress-intel-total-conversion</string>
+
+    <string name="ISC_license_text">
+        <![CDATA[
+        <tt>
+        <p>Copyright © 2013 Stefan Breunig, Jon Atkins, Philipp Schäfer and others
+
+        <p>Permission to use, copy, modify, and/or distribute this software for
+        any purpose with or without fee is hereby granted, provided that the
+        above copyright notice and this permission notice appear in all
+        copies.
+
+        <p>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL
+        WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+        WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+        AUTHORS BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+        DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
+        OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+        TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+        PERFORMANCE OF THIS SOFTWARE.
+        </tt>
+        ]]>
+    </string>
+
+
+</resources>
