@@ -168,7 +168,7 @@ window.RegionScoreboard = (function() {
         title: 'Region scores',
         html: text,
         width: 450,
-        minHeight: 340,
+        height: 340,
         closeCallback: onDialogClose
       });
     }

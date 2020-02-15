@@ -26,7 +26,7 @@ window.plugin.rawdata.showPortalData = function(guid) {
   var data = window.portals[guid].options.data;
   var ts = window.portals[guid].options.timestamp;
 
-  var title = 'Raw portal data: ' + (data.title || '<no title>') + ' ('+guid+')';
+  var title = 'Raw portal data: ' + (data.title || '<no title>');
 
   var body =
     '<b>Portal GUID</b>: <code>'+guid+'</code><br />' +
@@ -66,21 +66,11 @@ window.plugin.rawdata.showPortalData = function(guid) {
     title: title,
     html: body,
     id: 'dialog-rawdata',
+    width: 'auto',
     dialogClass: 'ui-dialog-rawdata',
   });
 }
 
 var setup = function () {
   window.plugin.rawdata.setupCallback();
-  $('head').append('<style>' +
-      '.ui-dialog-rawdata {' +
-        'width: auto !important;' +
-        'min-width: 400px !important;' +
-        //'max-width: 600px !important;' +
-    '}' +
-      '#dialog-rawdata {' +
-        'overflow-x: auto;' +
-        'overflow-y: auto;' +
-    '}' +
-    '</style>');
 }

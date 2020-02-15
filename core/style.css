@@ -993,11 +993,24 @@ h3.title {
 
 .ui-dialog-content {
   padding: 12px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 600px !important;
-  max-width: 700px !important;
+  overflow: auto;
   position: relative;
+
+  /* Limiting the height of dialog content on small screens */
+  /* 57px – height .ui-dialog-titlebar + .ui-dialog-buttonpane */
+  /* 24px – padding 12px * 2 */
+  /*  2px – border 1px * 2 */
+  max-height: calc(100vh - 57px - 24px - 2px) !important;
+}
+
+.ui-dialog {
+  max-width: calc(100vw - 2px);
+}
+
+@media (min-width: 700px) {
+  .ui-dialog {
+    max-width: 600px;
+  }
 }
 
 .ui-dialog-content-hidden {
@@ -1024,12 +1037,6 @@ h3.title {
 
 .ui-dialog-buttonset button:hover {
   text-decoration: underline;
-}
-
-.ui-dialog-aboutIITC {
-  width: auto !important;
-  min-width: 400px !important;
-  max-width: 600px !important;
 }
 
 td {

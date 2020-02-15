@@ -119,6 +119,13 @@ window.dialog = function(options) {
       // Title should not show up on mouseover
       close.removeAttr('title').addClass('ui-dialog-titlebar-button');
 
+      // re-center dialog on title dblclick
+      // jQuery-UI takes care about initial dialog position, but if content's height grows,
+      // then dialog's bottom may go beyond screen (e.g. 'Auto draw' with a bunch of bookmarks in folder).
+      // So this is just a nasty workaround for such issue.
+      // todo: watch height changes and adapt automatically
+      titlebar.dblclick(sizeFix);
+
       if(!$(this).dialog('option', 'modal')) {
         // Start out with a cloned version of the close button
         var collapse = close.clone();
