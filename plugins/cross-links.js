@@ -1,138 +1,114 @@
 // @author         mcben
 // @name           Cross links
 // @category       Draw
-// @version        1.2.0
+// @version        1.3.0
 // @description    Checks for existing links that cross planned links. Requires draw-tools plugin.
 
 
-window.plugin.crossLinks = function() {};
+window.plugin.crossLinks = function () { };
 
-window.plugin.crossLinks.greatCircleArcIntersect = function(a0,a1,b0,b1) {
-  // based on the formula at http://williams.best.vwh.net/avform.htm#Int
+/**
+ * greatCircleArcIntersect
+ */
+window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
 
-  // method:
-  // check to ensure no line segment is zero length - if so, cannot cross
-  // check to see if either of the lines start/end at the same point. if so, then they cannot cross
-  // check to see if the line segments overlap in longitude. if not, no crossing
-  // if overlap, clip each line to the overlapping longitudes, then see if latitudes cross 
+    // 0) quick checks
+    // zero length line 
+    if (a0.equals(a1)) return false;
+    if (b0.equals(b1)) return false;
 
-  // anti-meridian handling. this code will not sensibly handle a case where one point is
-  // close to -180 degrees and the other +180 degrees. unwrap coordinates in this case, so one point
-  // is beyond +-180 degrees. this is already true in IITC
-  // FIXME? if the two lines have been 'unwrapped' differently - one positive, one negative - it will fail
+    // lines have a common point
+    if (a0.equals(b0) || a0.equals(b1)) return false;
+    if (a1.equals(b0) || a1.equals(b1)) return false;
 
-  // zero length line tests
-  if (a0.equals(a1)) return false;
-  if (b0.equals(b1)) return false;
+    // check for 'horizontal' overlap in longitude
+    if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) return false;
+    if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) return false;
 
-  // lines have a common point
-  if (a0.equals(b0) || a0.equals(b1)) return false;
-  if (a1.equals(b0) || a1.equals(b1)) return false;
+    // a) convert into 3D coordinates on a unit sphere
+    const ca0 = toCartesian(a0.lat, a0.lng);
+    const ca1 = toCartesian(a1.lat, a1.lng);
+    const cb0 = toCartesian(b0.lat, b0.lng);
+    const cb1 = toCartesian(b1.lat, b1.lng);
 
+    // b) two planes: ca0,ca1,0/0/0 and cb0,cb1,0/0/0
+    // find the intersetion line 
 
-  // check for 'horizontal' overlap in lngitude
-  if (Math.min(a0.lng,a1.lng) > Math.max(b0.lng,b1.lng)) return false;
-  if (Math.max(a0.lng,a1.lng) < Math.min(b0.lng,b1.lng)) return false;
+    // b1) build plane normals for 
+    const da = cross(ca0, ca1);
+    const db = cross(cb0, cb1);
 
+    // prepare for d) build 90° rotated vectors
+    const da0 = cross(da, ca0);
+    const da1 = cross(da, ca1);
+    const db0 = cross(db, cb0);
+    const db1 = cross(db, cb1);
 
-  // ok, our two lines have some horizontal overlap in longitude
-  // 1. calculate the overlapping min/max longitude
-  // 2. calculate each line latitude at each point
-  // 3. if latitudes change place between overlapping range, the lines cross
+    // b2) intersetion line
+    const p = cross(da, db);
 
-
-  // class to hold the pre-calculated maths for a geodesic line
-  // TODO: move this outside this function, so it can be pre-calculated once for each line we test
-  var GeodesicLine = function(start,end) {
-    var d2r = Math.PI/180.0;
-    var r2d = 180.0/Math.PI;
-
-    // maths based on http://williams.best.vwh.net/avform.htm#Int
-
-    if (start.lng == end.lng) {
-      throw new Error('Error: cannot calculate latitude for meridians');
+    // c) special case when both planes are equal
+    // = both lines are on the same greatarc. test if they overlap
+    const len2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
+    if (len2 < 1e-30) /* === 0 */ {
+        // b0 inside a0-a1 ?
+        let s = dot(cb0, da0);
+        let d = dot(cb0, da1);
+        if ((s < 0 && d > 0) || (s > 0 && d < 0)) return true;
+        // b1 inside a0-a1 ?
+        s = dot(cb1, da0);
+        d = dot(cb1, da1);
+        if ((s < 0 && d > 0) || (s > 0 && d < 0)) return true;
+        // a inside b0-b1 ?
+        s = dot(ca0, db0);
+        d = dot(ca0, db1);
+        if ((s < 0 && d > 0) || (s > 0 && d < 0)) return true;
+        return false;
     }
 
-    // only the variables needed to calculate a latitude for a given longitude are stored in 'this'
-    this.lat1 = start.lat * d2r;
-    this.lat2 = end.lat * d2r;
-    this.lng1 = start.lng * d2r;
-    this.lng2 = end.lng * d2r;
+    // normalize P
+    const n = 1 / Math.sqrt(len2);
+    p[0] *= n, p[1] *= n, p[2] *= n
 
-    var dLng = this.lng1-this.lng2;
+    // d) at this point we have two possible collision points
+    //    p or -p  (in 3D space)
 
-    var sinLat1 = Math.sin(this.lat1);
-    var sinLat2 = Math.sin(this.lat2);
-    var cosLat1 = Math.cos(this.lat1);
-    var cosLat2 = Math.cos(this.lat2);
+    // e) angel to point
+    //    since da,db is rotated: dot<0 => left, dot>0 => right of P
+    const s = dot(p, da0);
+    const d = dot(p, da1);
+    const l = dot(p, db0);
+    const f = dot(p, db1);
 
-    this.sinLat1CosLat2 = sinLat1*cosLat2;
-    this.sinLat2CosLat1 = sinLat2*cosLat1;
-
-    this.cosLat1CosLat2SinDLng = cosLat1*cosLat2*Math.sin(dLng);
-  }
-
-  GeodesicLine.prototype.isMeridian = function() {
-    return this.lng1 == this.lng2;
-  }
-
-  GeodesicLine.prototype.latAtLng = function(lng) {
-    lng = lng * Math.PI / 180; //to radians
-
-    var lat;
-    // if we're testing the start/end point, return that directly rather than calculating
-    // 1. this may be fractionally faster, no complex maths
-    // 2. there's odd rounding issues that occur on some browsers (noticed on IITC MObile) for very short links - this may help
-    if (lng == this.lng1) {
-      lat = this.lat1;
-    } else if (lng == this.lng2) {
-      lat = this.lat2;
-    } else {
-      lat = Math.atan ( (this.sinLat1CosLat2*Math.sin(lng-this.lng2) - this.sinLat2CosLat1*Math.sin(lng-this.lng1))
-                       / this.cosLat1CosLat2SinDLng);
+    // is on side a (P)
+    if (s > 0 && 0 > d && l > 0 && 0 > f) {
+        return true;
     }
-    return lat * 180 / Math.PI; // return value in degrees
-  }
 
+    // is on side b (-P)
+    if (0 > s && d > 0 && 0 > l && f > 0) {
+        return true;
+    }
 
+    return false;
+};
 
-  // calculate the longitude of the overlapping region
-  var leftLng = Math.max( Math.min(a0.lng,a1.lng), Math.min(b0.lng,b1.lng) );
-  var rightLng = Math.min( Math.max(a0.lng,a1.lng), Math.max(b0.lng,b1.lng) );
+const d2r = Math.PI / 180;
 
-  // calculate the latitudes for each line at left + right longitudes
-  // NOTE: need a special case for meridians - as GeodesicLine.latAtLng method is invalid in that case
-  var aLeftLat, aRightLat;
-  if (a0.lng == a1.lng) {
-    // 'left' and 'right' now become 'top' and 'bottom' (in some order) - which is fine for the below intersection code
-    aLeftLat = a0.lat;
-    aRightLat = a1.lat;
-  } else {
-    var aGeo = new GeodesicLine(a0,a1);
-    aLeftLat = aGeo.latAtLng(leftLng);
-    aRightLat = aGeo.latAtLng(rightLng);
-  }
-
-  var bLeftLat, bRightLat;
-  if (b0.lng == b1.lng) {
-    // 'left' and 'right' now become 'top' and 'bottom' (in some order) - which is fine for the below intersection code
-    bLeftLat = b0.lat;
-    bRightLat = b1.lat;
-  } else {
-    var bGeo = new GeodesicLine(b0,b1);
-    bLeftLat = bGeo.latAtLng(leftLng);
-    bRightLat = bGeo.latAtLng(rightLng);
-  }
-
-  // if both a are less or greater than both b, then lines do not cross
-
-  if (aLeftLat < bLeftLat && aRightLat < bRightLat) return false;
-  if (aLeftLat > bLeftLat && aRightLat > bRightLat) return false;
-
-  // latitudes cross between left and right - so geodesic lines cross
-  return true;
+function toCartesian(lat, lng) {
+    lat *= d2r;
+    lng *= d2r;
+    const o = Math.cos(lat);
+    return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)]
 }
 
+function cross(t, n) {
+    return [t[1] * n[2] - t[2] * n[1], t[2] * n[0] - t[0] * n[2], t[0] * n[1] - t[1] * n[0]]
+}
+
+function dot(t, n) {
+    return t[0] * n[0] + t[1] * n[1] + t[2] * n[2]
+}
 
 
 window.plugin.crossLinks.testPolyLine = function (polyline, link,closed) {
