@@ -617,7 +617,6 @@ window.extendLeaflet = function() {
     return new L.DivIcon.ColoredSvg(color, options);
   };
 
-  /* !!This block is commented out as it's unclear if we really need this patch
 
   // See https://github.com/IITC-CE/ingress-intel-total-conversion/issues/122
 
@@ -628,9 +627,9 @@ window.extendLeaflet = function() {
   L.CRS.Earth.R = 6367000;
 
   var s2SphericalMercator = L.Util.extend({}, L.Projection.SphericalMercator, {
-    R: window.EARTH_RADIUS,
+    R: 6378137,
     bounds: (function () {
-      var d = window.EARTH_RADIUS * Math.PI;
+      var d = this.R * Math.PI;
       return L.bounds([-d, -d], [d, d]);
     })()
   });
@@ -644,7 +643,6 @@ window.extendLeaflet = function() {
     }())
   });
 
-  */
 
   // Fix Leaflet: handle touchcancel events in Draggable
   L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
