@@ -111,159 +111,158 @@ function dot(t, n) {
 }
 
 
-window.plugin.crossLinks.testPolyLine = function (polyline, link,closed) {
+window.plugin.crossLinks.testPolyLine = function (polyline, link, closed) {
 
-    var a = link.getLatLngs();
-    var b = polyline.getLatLngs();
+  var a = link.getLatLngs();
+  var b = polyline.getLatLngs();
 
-    for (var i=0;i<b.length-1;++i) {
-        if (window.plugin.crossLinks.greatCircleArcIntersect(a[0],a[1],b[i],b[i+1])) return true;
-    }
+  for (var i = 0; i < b.length - 1; ++i) {
+    if (window.plugin.crossLinks.greatCircleArcIntersect(a[0], a[1], b[i], b[i + 1])) return true;
+  }
 
-    if (closed) {
-        if (window.plugin.crossLinks.greatCircleArcIntersect(a[0],a[1],b[b.length-1],b[0])) return true;
-    }
+  if (closed) {
+    if (window.plugin.crossLinks.greatCircleArcIntersect(a[0], a[1], b[b.length - 1], b[0])) return true;
+  }
 
-    return false;
+  return false;
 }
 
 window.plugin.crossLinks.onLinkAdded = function (data) {
-    if (window.plugin.crossLinks.disabled) return;
+  if (window.plugin.crossLinks.disabled) return;
 
-    plugin.crossLinks.testLink(data.link);
+  plugin.crossLinks.testLink(data.link);
 }
 
-window.plugin.crossLinks.checkAllLinks = function() {
-    if (window.plugin.crossLinks.disabled) return;
+window.plugin.crossLinks.checkAllLinks = function () {
+  if (window.plugin.crossLinks.disabled) return;
 
-    console.debug("Cross-Links: checking all links");
-    plugin.crossLinks.linkLayer.clearLayers();
-    plugin.crossLinks.linkLayerGuids = {};
+  console.debug('Cross-Links: checking all links');
+  plugin.crossLinks.linkLayer.clearLayers();
+  plugin.crossLinks.linkLayerGuids = {};
 
-    $.each(window.links, function(guid, link) {
-        plugin.crossLinks.testLink(link);
-    });
+  $.each(window.links, function (guid, link) {
+    plugin.crossLinks.testLink(link);
+  });
 }
 
 window.plugin.crossLinks.testLink = function (link) {
-    if (plugin.crossLinks.linkLayerGuids[link.options.guid]) return;
+  if (plugin.crossLinks.linkLayerGuids[link.options.guid]) return;
 
-    for (var i in plugin.drawTools.drawnItems._layers) { // leaflet don't support breaking out of the loop
-       var layer = plugin.drawTools.drawnItems._layers[i];
-       if (layer instanceof L.GeodesicPolygon) {
-           if (plugin.crossLinks.testPolyLine(layer, link,true)) {
-               plugin.crossLinks.showLink(link);
-               break;
-           }
-        } else if (layer instanceof L.GeodesicPolyline) {
-            if (plugin.crossLinks.testPolyLine(layer, link)) {
-                plugin.crossLinks.showLink(link);
-                break;
-            }
-        }
-    };
+  for (var i in plugin.drawTools.drawnItems._layers) { // leaflet don't support breaking out of the loop
+    var layer = plugin.drawTools.drawnItems._layers[i];
+    if (layer instanceof L.GeodesicPolygon) {
+      if (plugin.crossLinks.testPolyLine(layer, link, true)) {
+        plugin.crossLinks.showLink(link);
+        break;
+      }
+    } else if (layer instanceof L.GeodesicPolyline) {
+      if (plugin.crossLinks.testPolyLine(layer, link)) {
+        plugin.crossLinks.showLink(link);
+        break;
+      }
+    }
+  }
 }
 
 
-window.plugin.crossLinks.showLink = function(link) {
+window.plugin.crossLinks.showLink = function (link) {
 
-    var poly = L.geodesicPolyline(link.getLatLngs(), {
-       color: '#d22',
-       opacity: 0.7,
-       weight: 5,
-       interactive: false,
-       dashArray: '8,8',
+  var poly = L.geodesicPolyline(link.getLatLngs(), {
+    color: '#d22',
+    opacity: 0.7,
+    weight: 5,
+    interactive: false,
+    dashArray: '8,8',
 
-       guid: link.options.guid
-    });
+    guid: link.options.guid
+  });
 
-    poly.addTo(plugin.crossLinks.linkLayer);
-    plugin.crossLinks.linkLayerGuids[link.options.guid]=poly;
+  poly.addTo(plugin.crossLinks.linkLayer);
+  plugin.crossLinks.linkLayerGuids[link.options.guid] = poly;
 }
 
 window.plugin.crossLinks.onMapDataRefreshEnd = function () {
-    if (window.plugin.crossLinks.disabled) return;
+  if (window.plugin.crossLinks.disabled) return;
 
-    window.plugin.crossLinks.linkLayer.bringToFront();
+  window.plugin.crossLinks.linkLayer.bringToFront();
 
-    window.plugin.crossLinks.testForDeletedLinks();
+  window.plugin.crossLinks.testForDeletedLinks();
 }
 
 window.plugin.crossLinks.testAllLinksAgainstLayer = function (layer) {
-    if (window.plugin.crossLinks.disabled) return;
+  if (window.plugin.crossLinks.disabled) return;
 
-    $.each(window.links, function(guid, link) {
-        if (!plugin.crossLinks.linkLayerGuids[link.options.guid])
-        {
-            if (layer instanceof L.GeodesicPolygon) {
-                if (plugin.crossLinks.testPolyLine(layer, link,true)) {
-                    plugin.crossLinks.showLink(link);
-                }
-            } else if (layer instanceof L.GeodesicPolyline) {
-                if (plugin.crossLinks.testPolyLine(layer, link)) {
-                    plugin.crossLinks.showLink(link);
-                }
-            }
+  $.each(window.links, function (guid, link) {
+    if (!plugin.crossLinks.linkLayerGuids[link.options.guid]) {
+      if (layer instanceof L.GeodesicPolygon) {
+        if (plugin.crossLinks.testPolyLine(layer, link, true)) {
+          plugin.crossLinks.showLink(link);
         }
-    });
+      } else if (layer instanceof L.GeodesicPolyline) {
+        if (plugin.crossLinks.testPolyLine(layer, link)) {
+          plugin.crossLinks.showLink(link);
+        }
+      }
+    }
+  });
 }
 
 window.plugin.crossLinks.testForDeletedLinks = function () {
-    window.plugin.crossLinks.linkLayer.eachLayer( function(layer) {
-        var guid = layer.options.guid;
-        if (!window.links[guid]) {
-            console.log("link removed");
-            plugin.crossLinks.linkLayer.removeLayer(layer);
-            delete plugin.crossLinks.linkLayerGuids[guid];
-        }
-    });
+  window.plugin.crossLinks.linkLayer.eachLayer(function (layer) {
+    var guid = layer.options.guid;
+    if (!window.links[guid]) {
+      console.log('link removed');
+      plugin.crossLinks.linkLayer.removeLayer(layer);
+      delete plugin.crossLinks.linkLayerGuids[guid];
+    }
+  });
 }
 
-window.plugin.crossLinks.createLayer = function() {
-    window.plugin.crossLinks.linkLayer = new L.FeatureGroup();
-    window.plugin.crossLinks.linkLayerGuids={};
-    window.addLayerGroup('Cross Links', window.plugin.crossLinks.linkLayer, true);
+window.plugin.crossLinks.createLayer = function () {
+  window.plugin.crossLinks.linkLayer = new L.FeatureGroup();
+  window.plugin.crossLinks.linkLayerGuids = {};
+  window.addLayerGroup('Cross Links', window.plugin.crossLinks.linkLayer, true);
 
-    map.on('layeradd', function(obj) {
-      if(obj.layer === window.plugin.crossLinks.linkLayer) {
-        delete window.plugin.crossLinks.disabled;
-        window.plugin.crossLinks.checkAllLinks();
-      }
-    });
-    map.on('layerremove', function(obj) {
-      if(obj.layer === window.plugin.crossLinks.linkLayer) {
-        window.plugin.crossLinks.disabled = true;
-        window.plugin.crossLinks.linkLayer.clearLayers();
-        plugin.crossLinks.linkLayerGuids = {};
-      }
-    });
-
-    // ensure 'disabled' flag is initialised
-    if (!map.hasLayer(window.plugin.crossLinks.linkLayer)) {
-        window.plugin.crossLinks.disabled = true;
+  map.on('layeradd', function (obj) {
+    if (obj.layer === window.plugin.crossLinks.linkLayer) {
+      delete window.plugin.crossLinks.disabled;
+      window.plugin.crossLinks.checkAllLinks();
     }
+  });
+  map.on('layerremove', function (obj) {
+    if (obj.layer === window.plugin.crossLinks.linkLayer) {
+      window.plugin.crossLinks.disabled = true;
+      window.plugin.crossLinks.linkLayer.clearLayers();
+      plugin.crossLinks.linkLayerGuids = {};
+    }
+  });
+
+  // ensure 'disabled' flag is initialised
+  if (!map.hasLayer(window.plugin.crossLinks.linkLayer)) {
+    window.plugin.crossLinks.disabled = true;
+  }
 }
 
-var setup = function() {
-    if (window.plugin.drawTools === undefined) {
-       alert("'Cross-Links' requires 'draw-tools'");
-       return;
+var setup = function () {
+  if (window.plugin.drawTools === undefined) {
+    alert('\'Cross-Links\' requires \'draw-tools\'');
+    return;
+  }
+
+  window.plugin.crossLinks.createLayer();
+
+  // events
+  window.addHook('pluginDrawTools', function (e) {
+    if (e.event === 'layerCreated') {
+      // we can just test the new layer in this case
+      window.plugin.crossLinks.testAllLinksAgainstLayer(e.layer);
+    } else {
+      // all other event types - assume anything could have been modified and re-check all links
+      window.plugin.crossLinks.checkAllLinks();
     }
+  });
 
-    window.plugin.crossLinks.createLayer();
-
-    // events
-    window.addHook('pluginDrawTools',function(e) {
-        if (e.event == 'layerCreated') {
-            // we can just test the new layer in this case
-            window.plugin.crossLinks.testAllLinksAgainstLayer(e.layer);
-        } else {
-            // all other event types - assume anything could have been modified and re-check all links
-            window.plugin.crossLinks.checkAllLinks();
-        }
-    });
-
-    window.addHook('linkAdded', window.plugin.crossLinks.onLinkAdded);
-    window.addHook('mapDataRefreshEnd', window.plugin.crossLinks.onMapDataRefreshEnd);
+  window.addHook('linkAdded', window.plugin.crossLinks.onLinkAdded);
+  window.addHook('mapDataRefreshEnd', window.plugin.crossLinks.onMapDataRefreshEnd);
 
 }
