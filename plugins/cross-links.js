@@ -12,102 +12,102 @@ window.plugin.crossLinks = function () { };
  */
 window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
 
-    // 0) quick checks
-    // zero length line 
-    if (a0.equals(a1)) return false;
-    if (b0.equals(b1)) return false;
+  // 0) quick checks
+  // zero length line
+  if (a0.equals(a1)) return false;
+  if (b0.equals(b1)) return false;
 
-    // lines have a common point
-    if (a0.equals(b0) || a0.equals(b1)) return false;
-    if (a1.equals(b0) || a1.equals(b1)) return false;
+  // lines have a common point
+  if (a0.equals(b0) || a0.equals(b1)) return false;
+  if (a1.equals(b0) || a1.equals(b1)) return false;
 
-    // check for 'horizontal' overlap in longitude
-    if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) return false;
-    if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) return false;
+  // check for 'horizontal' overlap in longitude
+  if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) return false;
+  if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) return false;
 
-    // a) convert into 3D coordinates on a unit sphere
-    const ca0 = toCartesian(a0.lat, a0.lng);
-    const ca1 = toCartesian(a1.lat, a1.lng);
-    const cb0 = toCartesian(b0.lat, b0.lng);
-    const cb1 = toCartesian(b1.lat, b1.lng);
+  // a) convert into 3D coordinates on a unit sphere
+  var ca0 = toCartesian(a0.lat, a0.lng);
+  var ca1 = toCartesian(a1.lat, a1.lng);
+  var cb0 = toCartesian(b0.lat, b0.lng);
+  var cb1 = toCartesian(b1.lat, b1.lng);
 
-    // b) two planes: ca0,ca1,0/0/0 and cb0,cb1,0/0/0
-    // find the intersetion line 
+  // b) two planes: ca0,ca1,0/0/0 and cb0,cb1,0/0/0
+  // find the intersetion line
 
-    // b1) build plane normals for 
-    const da = cross(ca0, ca1);
-    const db = cross(cb0, cb1);
+  // b1) build plane normals for
+  var da = cross(ca0, ca1);
+  var db = cross(cb0, cb1);
 
-    // prepare for d) build 90° rotated vectors
-    const da0 = cross(da, ca0);
-    const da1 = cross(da, ca1);
-    const db0 = cross(db, cb0);
-    const db1 = cross(db, cb1);
+  // prepare for d) build 90° rotated vectors
+  var da0 = cross(da, ca0);
+  var da1 = cross(da, ca1);
+  var db0 = cross(db, cb0);
+  var db1 = cross(db, cb1);
 
-    // b2) intersetion line
-    const p = cross(da, db);
+  // b2) intersetion line
+  var p = cross(da, db);
 
-    // c) special case when both planes are equal
-    // = both lines are on the same greatarc. test if they overlap
-    const len2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
-    if (len2 < 1e-30) /* === 0 */ {
-        // b0 inside a0-a1 ?
-        let s = dot(cb0, da0);
-        let d = dot(cb0, da1);
-        if ((s < 0 && d > 0) || (s > 0 && d < 0)) return true;
-        // b1 inside a0-a1 ?
-        s = dot(cb1, da0);
-        d = dot(cb1, da1);
-        if ((s < 0 && d > 0) || (s > 0 && d < 0)) return true;
-        // a inside b0-b1 ?
-        s = dot(ca0, db0);
-        d = dot(ca0, db1);
-        if ((s < 0 && d > 0) || (s > 0 && d < 0)) return true;
-        return false;
-    }
-
-    // normalize P
-    const n = 1 / Math.sqrt(len2);
-    p[0] *= n, p[1] *= n, p[2] *= n
-
-    // d) at this point we have two possible collision points
-    //    p or -p  (in 3D space)
-
-    // e) angel to point
-    //    since da,db is rotated: dot<0 => left, dot>0 => right of P
-    const s = dot(p, da0);
-    const d = dot(p, da1);
-    const l = dot(p, db0);
-    const f = dot(p, db1);
-
-    // is on side a (P)
-    if (s > 0 && 0 > d && l > 0 && 0 > f) {
-        return true;
-    }
-
-    // is on side b (-P)
-    if (0 > s && d > 0 && 0 > l && f > 0) {
-        return true;
-    }
-
+  // c) special case when both planes are equal
+  // = both lines are on the same greatarc. test if they overlap
+  var len2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
+  if (len2 < 1e-30) /* === 0 */ {
+    // b0 inside a0-a1 ?
+    var s1 = dot(cb0, da0);
+    var d1 = dot(cb0, da1);
+    if ((s1 < 0 && d1 > 0) || (s1 > 0 && d1 < 0)) return true;
+    // b1 inside a0-a1 ?
+    var s2 = dot(cb1, da0);
+    var d2 = dot(cb1, da1);
+    if ((s2 < 0 && d2 > 0) || (s2 > 0 && d2 < 0)) return true;
+    // a inside b0-b1 ?
+    var s3 = dot(ca0, db0);
+    var d3 = dot(ca0, db1);
+    if ((s3 < 0 && d3 > 0) || (s3 > 0 && d3 < 0)) return true;
     return false;
+  }
+
+  // normalize P
+  var n = 1 / Math.sqrt(len2);
+  p[0] *= n, p[1] *= n, p[2] *= n
+
+  // d) at this point we have two possible collision points
+  //    p or -p  (in 3D space)
+
+  // e) angel to point
+  //    since da,db is rotated: dot<0 => left, dot>0 => right of P
+  var s = dot(p, da0);
+  var d = dot(p, da1);
+  var l = dot(p, db0);
+  var f = dot(p, db1);
+
+  // is on side a (P)
+  if (s > 0 && 0 > d && l > 0 && 0 > f) {
+    return true;
+  }
+
+  // is on side b (-P)
+  if (0 > s && d > 0 && 0 > l && f > 0) {
+    return true;
+  }
+
+  return false;
 };
 
-const d2r = Math.PI / 180;
+var d2r = Math.PI / 180;
 
 function toCartesian(lat, lng) {
-    lat *= d2r;
-    lng *= d2r;
-    const o = Math.cos(lat);
-    return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)]
+  lat *= d2r;
+  lng *= d2r;
+  var o = Math.cos(lat);
+  return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)]
 }
 
 function cross(t, n) {
-    return [t[1] * n[2] - t[2] * n[1], t[2] * n[0] - t[0] * n[2], t[0] * n[1] - t[1] * n[0]]
+  return [t[1] * n[2] - t[2] * n[1], t[2] * n[0] - t[0] * n[2], t[0] * n[1] - t[1] * n[0]]
 }
 
 function dot(t, n) {
-    return t[0] * n[0] + t[1] * n[1] + t[2] * n[2]
+  return t[0] * n[0] + t[1] * n[1] + t[2] * n[2]
 }
 
 
