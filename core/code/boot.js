@@ -170,11 +170,14 @@ window.setupMap = function() {
 //    zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
+    maxBoundsViscosity: 0.7,
     preferCanvas: 'PREFER_CANVAS' in window
       ? window.PREFER_CANVAS
       : true // default
   });
   if (L.CRS.S2) { map.options.crs = L.CRS.S2; }
+  var max_lat = map.options.crs.projection.MAX_LATITUDE;
+  map.setMaxBounds([[max_lat,360],[-max_lat,-360]]);
 
   L.Renderer.mergeOptions({
     padding: window.RENDERER_PADDING || 0.5
@@ -300,10 +303,8 @@ window.setupMap = function() {
   map.on('moveend', window.storeMapPosition);
 
   map.on('moveend', function(e) {
-    // two limits on map position
     // we wrap longitude (the L.LatLng 'wrap' method) - so we don't find ourselves looking beyond +-180 degrees
-    // then latitude is clamped with the clampLatLng function (to the 85 deg north/south limits)
-    var newPos = clampLatLng(map.getCenter().wrap());
+    var newPos = map.getCenter().wrap();
     if (!map.getCenter().equals(newPos)) {
       map.panTo(newPos,{animate:false})
     }
