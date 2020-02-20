@@ -641,6 +641,7 @@ window.extendLeaflet = function() {
   });
   */
 
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
   // Fix Leaflet: handle touchcancel events in Draggable
   L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
   L.Draggable.prototype._onDown = function(e) {
@@ -650,6 +651,7 @@ window.extendLeaflet = function() {
       L.DomEvent.on(document, "touchcancel", this._onUp, this);
     }
   };
+  */
 };
 
 // BOOTING ///////////////////////////////////////////////////////////
