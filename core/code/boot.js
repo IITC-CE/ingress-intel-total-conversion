@@ -628,6 +628,7 @@ window.extendLeaflet = function() {
 
   */
 
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
   // on zoomend, check to see the zoom level is an int, and reset the view if not
   // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
   map.on('zoomend', function() {
@@ -638,6 +639,7 @@ window.extendLeaflet = function() {
       map.setZoom(parseInt(z), {animate:false});
     }
   });
+  */
 
   // Fix Leaflet: handle touchcancel events in Draggable
   L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
