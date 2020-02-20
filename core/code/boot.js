@@ -171,6 +171,7 @@ window.setupMap = function() {
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
     maxBoundsViscosity: 0.7,
+    worldCopyJump: true, // wrap longitude to not find ourselves looking beyond +-180 degrees
     preferCanvas: 'PREFER_CANVAS' in window
       ? window.PREFER_CANVAS
       : true // default
@@ -301,14 +302,6 @@ window.setupMap = function() {
   map.attributionControl.setPrefix('');
   // listen for changes and store them in cookies
   map.on('moveend', window.storeMapPosition);
-
-  map.on('moveend', function(e) {
-    // we wrap longitude (the L.LatLng 'wrap' method) - so we don't find ourselves looking beyond +-180 degrees
-    var newPos = map.getCenter().wrap();
-    if (!map.getCenter().equals(newPos)) {
-      map.panTo(newPos,{animate:false})
-    }
-  });
 
   // map update status handling & update map hooks
   // ensures order of calls
