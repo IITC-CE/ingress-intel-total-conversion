@@ -106,9 +106,28 @@ L.Edit.PolyVerticesEdit.include({
 	_defaultShape: function () { // support Leaflet >= 1
 		var latlngs = this._poly.getLatLngs();
 		return L.LineUtil.isFlat(latlngs) ? latlngs : latlngs[0];
-	}
+	},
 });
 // ^^^^^^
+
+(function (_getMiddleLatLng) {
+var coeff =  Math.PI/180.0 * 6367000.0 / 2.01;
+L.Edit.PolyVerticesEdit.include({
+	_getMiddleLatLng: function (marker1, marker2) {
+		if (this._poly._geodesicConvert) {
+			var start = marker1.getLatLng(), end = marker2.getLatLng();
+			// todo: implement relevant function/method in L.Geodesic* instead of following hack
+			var geoline = L.geodesicPolyline([start, end], {
+				segmentsCoeff: (start.lng-end.lng) * coeff
+			});
+			if (geoline._latlngs.length > 2) {
+				return geoline._latlngs[1];
+			}
+		}
+		return _getMiddleLatLng.call(this, marker1, marker2);
+	}
+});
+})(L.Edit.PolyVerticesEdit.prototype._getMiddleLatLng);
 
 L.GeodesicCircle.addInitHook(function () { // todo check if this does not conflict with L.Polyline.addInitHook
 	if (L.Edit.Circle) {
