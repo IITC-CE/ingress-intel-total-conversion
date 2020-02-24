@@ -14,7 +14,9 @@
     <string name="ISC_license_text">
         <![CDATA[
         <tt>
-        <p>Copyright © 2013 Stefan Breunig, Jon Atkins, Philipp Schäfer and others
+        <p>Copyright © 2018-2020 Ingress Intel Total Conversion - Community Edition ("IITC-CE")
+        <br>Copyright © 2013-2018 Ingress Intel Total Conversion ("IITC")
+        <br>Copyright © 2013 Stefan Breunig
 
         <p>Permission to use, copy, modify, and/or distribute this software for
         any purpose with or without fee is hereby granted, provided that the
