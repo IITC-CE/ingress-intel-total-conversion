@@ -113,7 +113,9 @@ window.dialog = function(options) {
     },
     open: function() {
       var titlebar = $(this).closest('.ui-dialog').find('.ui-dialog-titlebar');
-      titlebar.find('.ui-dialog-title').addClass('ui-dialog-title-active');
+      titlebar.find('.ui-dialog-title')
+        .addClass('ui-dialog-title-active')
+        .addClass('text-overflow-ellipsis');
       var close = titlebar.find('.ui-dialog-titlebar-close');
 
       // Title should not show up on mouseover

@@ -11,6 +11,15 @@
   #portal_highlight_select { display: none !important; }
 }
 
+.text-overflow-ellipsis {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: text-bottom;
+  width: 100%;
+}
+
 
 html, body {
   height: 100%;
@@ -912,12 +921,13 @@ h3.title {
   text-align: center;
   padding: 4px;
   background-color: rgba(8, 60, 78, 0.9);
-  min-width: 250px;
 }
 
 .ui-dialog-title {
-  padding: 2px;
   font-weight: bold;
+  margin-left: 8px;
+  margin-right: 45px;
+  width: calc(100% - 45px);
 }
 
 .ui-dialog-title-active {
@@ -1248,15 +1258,6 @@ g.checkpoint:hover circle {
 .checkpoint_table td {
 	text-align: right;
 	padding-left: 10px;
-}
-
-.text-overflow-ellipsis {
-	display: inline-block;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	vertical-align: text-bottom;
-	width: 100%;
 }
 
 .cellscore #overview {
