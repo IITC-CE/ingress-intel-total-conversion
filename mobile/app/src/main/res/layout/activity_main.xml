@@ -65,10 +65,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="@android:color/background_light"
                 android:imeActionLabel="@string/debug_run"
                 android:imeOptions="actionGo"
                 android:inputType="textMultiLine|textNoSuggestions"
-                android:maxLines="4" />
+                android:maxLines="4"
+                android:textColor="@android:color/background_light"
+                android:textColorHighlight="@android:color/tertiary_text_light"
+                android:typeface="monospace" />
 
             <ImageButton
                 android:layout_width="@dimen/button_size"
