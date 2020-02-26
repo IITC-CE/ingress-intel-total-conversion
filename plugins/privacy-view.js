@@ -24,6 +24,9 @@ function setup () {
     .click(function () {
       var active = document.body.classList.toggle('privacy_active');
       this.innerHTML = active ? 'Privacy active' : 'Privacy inactive';
+      if (!active) { // refresh chat
+        window.startRefreshTimeout(0.1*1000);
+      }
     });
 
   if (window.isSmartphone()) {
