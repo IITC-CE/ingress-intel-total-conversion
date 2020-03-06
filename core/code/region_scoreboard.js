@@ -268,33 +268,35 @@ window.RegionScoreboard = (function() {
 
   function createHistoryTable() {
 
-    var order_name = (PLAYER.team === 'RESISTANCE' ? [TEAM_RES,TEAM_ENL]:[TEAM_ENL,TEAM_RES]);
-    var order_team = (PLAYER.team === 'RESISTANCE' ? [1,0]:[0,1]);
+    var _invert = PLAYER.team === 'RESISTANCE';
+    function order (_1, _2) {
+      return (_invert ? [_2, _1] : [_1, _2]).join('');
+    }
+    var enl = { class: window.TEAM_TO_CSS[window.TEAM_ENL], name: window.TEAM_NAMES[window.TEAM_ENL]};
+    var res = { class: window.TEAM_TO_CSS[window.TEAM_RES], name: window.TEAM_NAMES[window.TEAM_RES]};
 
-    var table = '<table class="checkpoint_table"><thead><tr>' +
-      '<th>CP</th><th>Time</th>' +
-      '<th>' + window.TEAM_NAMES[order_name[0]] + '</th>' +
-      '<th>' + window.TEAM_NAMES[order_name[1]] + '</th></tr>';
+    var table = '<table class="checkpoint_table"><thead>' +
+      '<tr><th>CP</th><th>Time</th>' + order('<th>'+enl.name+'</th>','<th>'+res.name+'</th>') + '</tr>';
 
     var total = regionScore.getCPSum();
-    table += '<tr>' +
-      '<th></th><th></th>' +
-      '<th class="' + window.TEAM_TO_CSS[order_name[0]] + '">' + digits(total[order_team[0]]) + '</th>' +
-      '<th class="' + window.TEAM_TO_CSS[order_name[1]] + '">' + digits(total[order_team[1]]) + '</th></tr></thead>';
+    table += '<tr class="cp_total"><th></th><th></th>' +
+      order(
+      '<th class="' + enl.class + '">' + digits(total[0]) + '</th>',
+      '<th class="' + res.class + '">' + digits(total[1]) + '</th>'
+      ) + '</tr></thead>';
 
     for (var cp=regionScore.getLastCP(); cp>0; cp--) {
       var score = regionScore.getCPScore(cp);
-      var style1='';
-      var style2='';
-
-      if (score[order_team[0]] > score[order_team[1]]) style1=' class="' + window.TEAM_TO_CSS[order_name[0]] + '"';
-      if (score[order_team[1]] > score[order_team[0]]) style2=' class="' + window.TEAM_TO_CSS[order_name[1]] + '"';
+      var class_e = score[0] > score[1] ? ' class="' + enl.class + '"' : '';
+      var class_r = score[1] > score[0] ? ' class="' + res.class + '"' : '';
 
       table += '<tr>' +
         '<td>' + cp + '</td>' +
         '<td>' + formatDayHours(regionScore.getCheckpointEnd(cp)) + '</td>' +
-        '<td' + style1 + '>' + digits(score[order_team[0]]) + '</td>' +
-        '<td' + style2 + '>' + digits(score[order_team[1]]) + '</td></tr>';
+        order(
+        '<td' + class_e + '>' + digits(score[0]) + '</td>',
+        '<td' + class_r + '>' + digits(score[1]) + '</td>'
+        ) + '</tr>';
     }
 
     table += '</table>';
