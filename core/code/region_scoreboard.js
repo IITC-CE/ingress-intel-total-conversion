@@ -402,11 +402,9 @@ window.RegionScoreboard = (function() {
     var nextcp = regionScore.getCheckpointEnd( regionScore.getLastCP() + 1 );
     var endcp = regionScore.getCycleEnd();
 
-    return '<div><table style="margin: auto; width: 420px; padding-top: 4px">' +
-      '<tr>' +
-        '<td align="left" width="33%">t- <span id="cycletimer"></span></td>' +
-        '<td align="center" width="33%">cp at: ' + formatHours(nextcp) + '</td>' +
-        '<td align="right" width="33%">cycle: ' + formatDayHours(endcp) + '</td>' +
+    return '<div class="checkpoint_timers"><table><tr>' +
+        '<td>Next CP at: ' + formatHours(nextcp) + ' (in <span id="cycletimer"></span>)</td>' +
+        '<td>Cycle ends: ' + formatDayHours(endcp) + '</td>' +
       '</tr></table></div>';
   }
 

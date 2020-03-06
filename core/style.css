@@ -1295,6 +1295,11 @@ g.checkpoint:hover circle {
   min-width: 180px;
 }
 
+.checkpoint_timers table {
+  padding-top: 4px;
+  width: 100%;
+}
+
 /* tabs */
 .ui-tabs-nav {
 	display: block;
