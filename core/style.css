@@ -1253,12 +1253,16 @@ g.checkpoint:hover circle {
   fill-opacity: 1;
   stroke-width: 2px;
 }
+
+.cellscore th, .cellscore td {
+	text-align: left;
+	padding-left: 5px;
+}
 .checkpoint_table {
 	border-collapse: collapse;
 }
-.checkpoint_table td {
+.checkpoint_table th, .checkpoint_table td {
 	text-align: right;
-	padding-left: 10px;
 }
 
 .text-overflow-ellipsis {

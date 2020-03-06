@@ -272,15 +272,15 @@ window.RegionScoreboard = (function() {
     var order_team = (PLAYER.team === 'RESISTANCE' ? [1,0]:[0,1]);
 
     var table = '<table class="checkpoint_table"><thead><tr>' +
-      '<th align="right">CP</th><th>Time</th>' +
-      '<th align="right">' + window.TEAM_NAMES[order_name[0]] + '</th>' +
-      '<th align="right">' + window.TEAM_NAMES[order_name[1]] + '</th></tr></thead>';
+      '<th>CP</th><th>Time</th>' +
+      '<th>' + window.TEAM_NAMES[order_name[0]] + '</th>' +
+      '<th>' + window.TEAM_NAMES[order_name[1]] + '</th></tr>';
 
     var total = regionScore.getCPSum();
     table += '<tr>' +
-      '<td style="text-align:center" colspan="2">Total</td>' +
-      '<td class="' + window.TEAM_TO_CSS[order_name[0]] + '">' + digits(total[order_team[0]]) + '</td>' +
-      '<td class="' + window.TEAM_TO_CSS[order_name[1]] + '">' + digits(total[order_team[1]]) + '</td></tr>';
+      '<th></th><th></th>' +
+      '<th class="' + window.TEAM_TO_CSS[order_name[0]] + '">' + digits(total[order_team[0]]) + '</th>' +
+      '<th class="' + window.TEAM_TO_CSS[order_name[1]] + '">' + digits(total[order_team[1]]) + '</th></tr></thead>';
 
     for (var cp=regionScore.getLastCP(); cp>0; cp--) {
       var score = regionScore.getCPScore(cp);
