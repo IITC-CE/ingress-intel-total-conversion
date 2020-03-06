@@ -389,7 +389,7 @@ window.RegionScoreboard = (function() {
       var required_mu = Math.abs(e_res-e_enl) * regionScore.MAX_CYCLES + 1;
       res += '<hr>\n';
       res += window.TEAM_NAMES[loosing_faction] + ' requires:\t' + digits(Math.ceil(required_mu)) + ' \n';
-      res += 'Checkpoint(s) left:\t' + (regionScore.MAX_CYCLES-regionScore.getLastCP()-1) + ' \n';
+      res += 'Checkpoint(s) left:\t' + (regionScore.MAX_CYCLES-regionScore.getLastCP()) + ' \n';
 
       return res;
     }
