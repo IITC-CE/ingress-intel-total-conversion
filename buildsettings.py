@@ -55,14 +55,6 @@ builds = {  # every build entry extends common defaults
         'version_timestamp': True,
     },
 
-    # use no-inject wrapper for easy breakpoints (Tampermonkey only!)
-    'tmdev': {
-        'url_dist_base': 'http://localhost:8000',
-        'update_file': '.user.js',
-        'version_timestamp': True,
-        'plugin_wrapper': 'pluginwrapper_noinject',
-    },
-
     # default entry that also builds the mobile .apk
     # requires: Java JDK, android-sdk
     'mobile': {
