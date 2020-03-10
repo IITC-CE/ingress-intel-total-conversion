@@ -1245,7 +1245,7 @@ table.artifact .portal {
 
   /* prevent nonfunctional vertical scrollbar in Firefox (perhaps jQuery issue) */
   .cellscore > .historychart {
-    overflow-y: hidden;
+    overflow-y: hidden !important;
   }
 }
 
