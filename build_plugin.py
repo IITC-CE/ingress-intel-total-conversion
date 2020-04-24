@@ -166,18 +166,22 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
 
     path = source.parent  # used as root for all (relative) paths
     script = re.sub(r"'@bundle_code@';", partial(bundle_code, path=path), script)
+    try:
+        script_before_wrapper, script = script.split('\n/*wrapped-from-here*/\n', 1)
+    except ValueError:
+        script_before_wrapper = ''
+
     wrapper = get_module(settings.plugin_wrapper)
     template = r"'@(\w+)(?::([\w./-]+))?@'"  # to find '@keyword[:path]@' patterns
     repl = partial(expand_template, path=path)
     data = [
         meta,
+        script_before_wrapper,
         re.sub(template, repl, wrapper.start),
         re.sub(template, repl, script),
-        wrapper.setup,
+        wrapper.setup if not is_main else '',  # it's for plugins only
         wrapper.end,
     ]
-    if is_main:
-        data.pop(3)  # remove wrapper.setup (it's for plugins only)
 
     (out_dir / (plugin_name + '.user.js')).write_text(''.join(data), encoding='utf8')
     if settings.url_dist_base and settings.update_file == '.meta.js':
