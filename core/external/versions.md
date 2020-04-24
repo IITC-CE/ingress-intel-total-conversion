@@ -28,8 +28,7 @@
   Leaflet.GoogleMutant.js
 
 * https://github.com/IITC-CE/Leaflet.Geodesic
-  L.Geodesic.js: 95e8bb77e344ec2894f92820aabbc0afcb930a50
-  (https://github.com/IITC-CE/Leaflet.Geodesic/pull/3)
+  L.Geodesic.js: c9f84ab763e89fa172ed410037a67151ef56d06c
 
 * https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet
   v0.2.6
