@@ -29,8 +29,11 @@
         <ListView
             android:id="@+id/lvDebug"
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="@color/iitc_blue"
+            android:stackFromBottom="true"
+            android:transcriptMode="alwaysScroll"
             android:visibility="gone" />
 
         <LinearLayout
@@ -65,11 +68,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="@android:color/background_light"
                 android:imeActionLabel="@string/debug_run"
                 android:imeOptions="actionGo"
                 android:inputType="textMultiLine|textNoSuggestions"
+                android:backgroundTint="@android:color/background_light"
                 android:maxLines="4"
+                android:textSize="@dimen/debug_text_size"
                 android:textColor="@android:color/background_light"
                 android:textColorHighlight="@android:color/tertiary_text_light"
                 android:typeface="monospace" />

@@ -15,4 +15,7 @@
     <!-- button size for debug views -->
     <dimen name="button_size">36dp</dimen>
 
+    <!-- text size for debug views -->
+    <dimen name="debug_text_size">12sp</dimen>
+
 </resources>
