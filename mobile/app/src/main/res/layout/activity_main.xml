@@ -31,7 +31,7 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/iitc_blue"
+            android:background="@color/iitc_blue_dark"
             android:stackFromBottom="true"
             android:transcriptMode="alwaysScroll"
             android:visibility="gone" />

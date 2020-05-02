@@ -3,6 +3,8 @@ package org.exarhteam.iitc_mobile;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,10 +17,16 @@ import java.io.StringWriter;
 public class IITC_LogAdapter extends ArrayAdapter<Message> implements Log.Receiver {
     private final IITC_Mobile mIitc;
     private int mObservers = 0;
+    private int lastPosition = -1;
 
     public IITC_LogAdapter(final IITC_Mobile iitc) {
         super(iitc, 0);
         mIitc = iitc;
+    }
+
+    @Override
+    public Message getItem(int position) {
+        return super.getItem(getCount() - 1 - position);
     }
 
     @Override
@@ -35,6 +43,13 @@ public class IITC_LogAdapter extends ArrayAdapter<Message> implements Log.Receiv
             holder.tag = (TextView) v.findViewById(R.id.log_tag);
             holder.time = (TextView) v.findViewById(R.id.log_time);
             holder.msg = (TextView) v.findViewById(R.id.log_msg);
+
+            if ((getCount() - 1 - position) % 2 == 0) {
+                v.setBackgroundResource(R.drawable.log_msg_even);
+            } else {
+                v.setBackgroundResource(R.drawable.log_msg_odd);
+            }
+
             v.setTag(holder);
         }
 
@@ -64,10 +79,22 @@ public class IITC_LogAdapter extends ArrayAdapter<Message> implements Log.Receiv
             else
                 msg += "\n" + sw.toString();
         }
+        
+        if (getCount() > lastPosition) {
+            Animation anim = AnimationUtils.loadAnimation(mIitc.getApplicationContext(), R.anim.shake);
+            v.startAnimation(anim);
+            lastPosition = getCount();
+        }
 
         holder.msg.setText(msg);
 
         return v;
+    }
+
+    @Override
+    public void clear() {
+        lastPosition = -1;
+        super.clear();
     }
 
     @Override
