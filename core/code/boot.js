@@ -170,11 +170,15 @@ window.setupMap = function() {
 //    zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
+    maxBoundsViscosity: 0.7,
+    worldCopyJump: true, // wrap longitude to not find ourselves looking beyond +-180 degrees
     preferCanvas: 'PREFER_CANVAS' in window
       ? window.PREFER_CANVAS
       : true // default
   });
   if (L.CRS.S2) { map.options.crs = L.CRS.S2; }
+  var max_lat = map.options.crs.projection.MAX_LATITUDE;
+  map.setMaxBounds([[max_lat,360],[-max_lat,-360]]);
 
   L.Renderer.mergeOptions({
     padding: window.RENDERER_PADDING || 0.5
@@ -299,32 +303,10 @@ window.setupMap = function() {
   // listen for changes and store them in cookies
   map.on('moveend', window.storeMapPosition);
 
-  map.on('moveend', function(e) {
-    // two limits on map position
-    // we wrap longitude (the L.LatLng 'wrap' method) - so we don't find ourselves looking beyond +-180 degrees
-    // then latitude is clamped with the clampLatLng function (to the 85 deg north/south limits)
-    var newPos = clampLatLng(map.getCenter().wrap());
-    if (!map.getCenter().equals(newPos)) {
-      map.panTo(newPos,{animate:false})
-    }
-  });
-
   // map update status handling & update map hooks
   // ensures order of calls
   map.on('movestart', function() { window.mapRunsUserAction = true; window.requests.abort(); window.startRefreshTimeout(-1); });
   map.on('moveend', function() { window.mapRunsUserAction = false; window.startRefreshTimeout(ON_MOVE_REFRESH*1000); });
-
-  // on zoomend, check to see the zoom level is an int, and reset the view if not
-  // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
-  map.on('zoomend', function() {
-    var z = map.getZoom();
-    if (z != parseInt(z))
-    {
-      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
-      map.setZoom(parseInt(z), {animate:false});
-    }
-  });
-
 
   // set a 'moveend' handler for the map to clear idle state. e.g. after mobile 'my location' is used.
   // possibly some cases when resizing desktop browser too
@@ -646,6 +628,20 @@ window.extendLeaflet = function() {
 
   */
 
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
+  // on zoomend, check to see the zoom level is an int, and reset the view if not
+  // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
+  map.on('zoomend', function() {
+    var z = map.getZoom();
+    if (z != parseInt(z))
+    {
+      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
+      map.setZoom(parseInt(z), {animate:false});
+    }
+  });
+  */
+
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
   // Fix Leaflet: handle touchcancel events in Draggable
   L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
   L.Draggable.prototype._onDown = function(e) {
@@ -655,6 +651,7 @@ window.extendLeaflet = function() {
       L.DomEvent.on(document, "touchcancel", this._onUp, this);
     }
   };
+  */
 };
 
 // BOOTING ///////////////////////////////////////////////////////////
