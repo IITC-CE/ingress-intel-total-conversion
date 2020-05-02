@@ -11,6 +11,15 @@
   #portal_highlight_select { display: none !important; }
 }
 
+.text-overflow-ellipsis {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: text-bottom;
+  width: 100%;
+}
+
 
 html, body {
   height: 100%;
@@ -912,12 +921,13 @@ h3.title {
   text-align: center;
   padding: 4px;
   background-color: rgba(8, 60, 78, 0.9);
-  min-width: 250px;
 }
 
 .ui-dialog-title {
-  padding: 2px;
   font-weight: bold;
+  margin-left: 8px;
+  margin-right: 45px;
+  width: calc(100% - 45px);
 }
 
 .ui-dialog-title-active {
@@ -993,11 +1003,24 @@ h3.title {
 
 .ui-dialog-content {
   padding: 12px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 600px !important;
-  max-width: 700px !important;
+  overflow: auto;
   position: relative;
+
+  /* Limiting the height of dialog content on small screens */
+  /* 57px – height .ui-dialog-titlebar + .ui-dialog-buttonpane */
+  /* 24px – padding 12px * 2 */
+  /*  2px – border 1px * 2 */
+  max-height: calc(100vh - 57px - 24px - 2px) !important;
+}
+
+.ui-dialog {
+  max-width: calc(100vw - 2px);
+}
+
+@media (min-width: 700px) {
+  .ui-dialog {
+    max-width: 600px;
+  }
 }
 
 .ui-dialog-content-hidden {
@@ -1024,12 +1047,6 @@ h3.title {
 
 .ui-dialog-buttonset button:hover {
   text-decoration: underline;
-}
-
-.ui-dialog-aboutIITC {
-  width: auto !important;
-  min-width: 400px !important;
-  max-width: 600px !important;
 }
 
 td {
@@ -1263,15 +1280,6 @@ g.checkpoint:hover circle {
 }
 .checkpoint_table th, .checkpoint_table td {
 	text-align: right;
-}
-
-.text-overflow-ellipsis {
-	display: inline-block;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	vertical-align: text-bottom;
-	width: 100%;
 }
 
 .cellscore #overview {

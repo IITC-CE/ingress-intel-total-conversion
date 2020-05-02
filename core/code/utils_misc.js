@@ -101,6 +101,7 @@ window.aboutIITC = function () {
     title: 'IITC ' + iitcVersion,
     id: 'iitc-about',
     html: html,
+    width: 'auto',
     dialogClass: 'ui-dialog-aboutIITC'
   });
 }
