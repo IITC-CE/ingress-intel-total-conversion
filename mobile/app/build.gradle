@@ -79,8 +79,9 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 }
 
 task copyUserscripts(type: Copy) {

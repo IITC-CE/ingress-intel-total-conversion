@@ -34,13 +34,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Build;
@@ -49,7 +45,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
@@ -72,7 +69,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IITC_Mobile extends AppCompatActivity
-        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnItemLongClickListener {
+        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback {
     private static final String mIntelUrl = "https://intel.ingress.com/";
 
     private SharedPreferences mSharedPrefs;
@@ -89,7 +86,7 @@ public class IITC_Mobile extends AppCompatActivity
     private Set<String> mAdvancedMenu;
     private MenuItem mSearchMenuItem;
     private View mImageLoading;
-    private ListView mLvDebug;
+    public RecyclerView mLvDebug;
     private View mViewDebug;
     private ImageButton mBtnToggleMap;
     private EditText mEditCommand;
@@ -161,7 +158,7 @@ public class IITC_Mobile extends AppCompatActivity
         setContentView(R.layout.activity_main);
         mImageLoading = findViewById(R.id.imageLoading);
         mIitcWebView = (IITC_WebView) findViewById(R.id.iitc_webview);
-        mLvDebug = (ListView) findViewById(R.id.lvDebug);
+        mLvDebug = (RecyclerView) findViewById(R.id.lvDebug);
         mViewDebug = findViewById(R.id.viewDebug);
         mBtnToggleMap = (ImageButton) findViewById(R.id.btnToggleMapVisibility);
         mEditCommand = (EditText) findViewById(R.id.editCommand);
@@ -193,7 +190,9 @@ public class IITC_Mobile extends AppCompatActivity
         });
 
         mLvDebug.setAdapter(new IITC_LogAdapter(this));
-        mLvDebug.setOnItemLongClickListener(this);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setStackFromEnd(true);
+        mLvDebug.setLayoutManager(llm);
 
         // do something if user changed something in the settings
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -1073,33 +1072,8 @@ public class IITC_Mobile extends AppCompatActivity
         return new NdefMessage(records);
     }
 
-    @Override
-    public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-        if (parent == mLvDebug) {
-            final IITC_LogAdapter adapter = ((IITC_LogAdapter) parent.getAdapter());
-            final Log.Message item = adapter.getItem(position);
-
-            final PopupMenu popupMenu = new PopupMenu(this, view);
-            popupMenu.getMenuInflater().inflate(R.menu.debug, popupMenu.getMenu());
-
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(final MenuItem menuitem) {
-                    switch (menuitem.getItemId()) {
-                        case R.id.menu_copy:
-                            mIitcWebView.getJSInterface().copy(item.toString());
-                            return true;
-                        case R.id.menu_delete:
-                            adapter.remove(item);
-                            return true;
-                    }
-                    return false;
-                }
-            });
-
-            popupMenu.show();
-        }
-        return false;
+    public void clipboardCopy(String msg) {
+        mIitcWebView.getJSInterface().copy(msg);
     }
 
     @Override
