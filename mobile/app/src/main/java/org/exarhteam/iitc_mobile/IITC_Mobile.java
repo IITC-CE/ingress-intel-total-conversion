@@ -48,6 +48,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.exarhteam.iitc_mobile.prefs.PreferenceActivity;
@@ -87,7 +89,10 @@ public class IITC_Mobile extends AppCompatActivity
     private MenuItem mSearchMenuItem;
     private View mImageLoading;
     public RecyclerView mLvDebug;
+    private View mLayoutDebug;
     private View mViewDebug;
+    private LinearLayoutManager llm;
+    public FloatingActionButton debugScrollButton;
     private ImageButton mBtnToggleMap;
     private EditText mEditCommand;
     private boolean mDebugging = false;
@@ -129,7 +134,7 @@ public class IITC_Mobile extends AppCompatActivity
         	}
     	}
 	};
-	
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
@@ -156,8 +161,11 @@ public class IITC_Mobile extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        debugScrollButton = findViewById(R.id.debugScrollButton);
+
         mImageLoading = findViewById(R.id.imageLoading);
         mIitcWebView = (IITC_WebView) findViewById(R.id.iitc_webview);
+        mLayoutDebug = findViewById(R.id.layoutDebug);
         mLvDebug = (RecyclerView) findViewById(R.id.lvDebug);
         mViewDebug = findViewById(R.id.viewDebug);
         mBtnToggleMap = (ImageButton) findViewById(R.id.btnToggleMapVisibility);
@@ -190,7 +198,8 @@ public class IITC_Mobile extends AppCompatActivity
         });
 
         mLvDebug.setAdapter(new IITC_LogAdapter(this));
-        LinearLayoutManager llm = new LinearLayoutManager(this);
+
+        llm = new LinearLayoutManager(this);
         llm.setStackFromEnd(true);
         mLvDebug.setLayoutManager(llm);
 
@@ -880,7 +889,7 @@ public class IITC_Mobile extends AppCompatActivity
     private void updateViews() {
         if (!mDebugging) {
             mViewDebug.setVisibility(View.GONE);
-            mLvDebug.setVisibility(View.GONE);
+            mLayoutDebug.setVisibility(View.GONE);
 
             if (mIsLoading && !mSharedPrefs.getBoolean("pref_disable_splash", false)) {
                 mIitcWebView.setVisibility(View.GONE);
@@ -904,11 +913,11 @@ public class IITC_Mobile extends AppCompatActivity
             if (mShowMapInDebug) {
                 mBtnToggleMap.setImageResource(R.drawable.ic_action_view_as_list);
                 mIitcWebView.setVisibility(View.VISIBLE);
-                mLvDebug.setVisibility(View.GONE);
+                mLayoutDebug.setVisibility(View.GONE);
             } else {
                 mBtnToggleMap.setImageResource(R.drawable.ic_action_map);
                 mIitcWebView.setVisibility(View.GONE);
-                mLvDebug.setVisibility(View.VISIBLE);
+                mLayoutDebug.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -1074,6 +1083,15 @@ public class IITC_Mobile extends AppCompatActivity
 
     public void clipboardCopy(String msg) {
         mIitcWebView.getJSInterface().copy(msg);
+    }
+
+    public boolean isDebugEnd() {
+        int visibleItemCount = mLvDebug.getChildCount();
+        int totalItemCount = llm.getItemCount();
+        int firstVisibleItemPosition = llm.findFirstVisibleItemPosition();
+
+        return ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                && firstVisibleItemPosition >= 0);
     }
 
     @Override

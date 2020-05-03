@@ -20,9 +20,29 @@ public class IITC_LogAdapter extends RecyclerView.Adapter<IITC_LogAdapter.ViewHo
     private final IITC_Mobile mIitc;
     private int mObservers = 0;
     private List<Message> logs = new ArrayList<>();
+    private boolean isScrollToEnd = true;
 
     IITC_LogAdapter(IITC_Mobile mIitc){
         this.mIitc = mIitc;
+
+        mIitc.debugScrollButton.setOnClickListener(v -> {
+            mIitc.mLvDebug.smoothScrollToPosition(getItemCount()-1);
+        });
+
+        mIitc.mLvDebug.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (mIitc.isDebugEnd()) {
+                    mIitc.debugScrollButton.hide(false);
+                    isScrollToEnd = true;
+                } else {
+                    mIitc.debugScrollButton.show();
+                    isScrollToEnd = false;
+                }
+            }
+        });
     }
 
     @Override
@@ -32,8 +52,8 @@ public class IITC_LogAdapter extends RecyclerView.Adapter<IITC_LogAdapter.ViewHo
             logs.add(new_id, message);
             notifyItemInserted(new_id);
 
-            if (!mIitc.mLvDebug.canScrollVertically(1)) {
-                mIitc.mLvDebug.smoothScrollToPosition(new_id);
+            if (isScrollToEnd) {
+                mIitc.mLvDebug.scrollToPosition(new_id);
             }
         });
     }

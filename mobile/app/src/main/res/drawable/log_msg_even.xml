@@ -9,6 +9,6 @@
         android:drawable="@color/iitc_blue_dark"
         />
     <item
-        android:drawable="@color/iitc_blue_light"
+        android:drawable="@color/iitc_blue_lighten"
         />
 </selector>
