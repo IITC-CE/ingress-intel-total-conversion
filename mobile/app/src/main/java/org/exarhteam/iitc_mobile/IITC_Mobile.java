@@ -1091,7 +1091,7 @@ public class IITC_Mobile extends AppCompatActivity
         int firstVisibleItemPosition = llm.findFirstVisibleItemPosition();
 
         return ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                && firstVisibleItemPosition >= 0);
+                && firstVisibleItemPosition >= 0 || llm.getItemCount() < 1);
     }
 
     @Override
