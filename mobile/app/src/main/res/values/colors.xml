@@ -7,4 +7,8 @@
     <color name="iitc_blue_lighten">#ff104659</color>
     <color name="iitc_blue_dark">#ff0b303e</color>
     <color name="drawer_background">#990e3d4e</color>
+
+    <!-- debug views -->
+    <color name="debug_panel_background">#ff092733</color>
+    <color name="debug_button_background">#ff0b303e</color>
 </resources>

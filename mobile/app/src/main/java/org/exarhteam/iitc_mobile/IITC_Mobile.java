@@ -104,6 +104,9 @@ public class IITC_Mobile extends AppCompatActivity
     private String mPermalink = null;
     private String mSearchTerm = "";
     private IntentFilter mDesktopFilter;
+    private IITC_DebugHistory debugHistory;
+    private int debugHistoryPosition = -1;
+    private String debugInputStore = "";
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -159,6 +162,8 @@ public class IITC_Mobile extends AppCompatActivity
         requestWindowFeature(Window.FEATURE_PROGRESS);
 
         super.onCreate(savedInstanceState);
+
+        debugHistory = new IITC_DebugHistory(50);
 
         setContentView(R.layout.activity_main);
         debugScrollButton = findViewById(R.id.debugScrollButton);
@@ -911,11 +916,11 @@ public class IITC_Mobile extends AppCompatActivity
             }
 
             if (mShowMapInDebug) {
-                mBtnToggleMap.setImageResource(R.drawable.ic_action_view_as_list);
+                mBtnToggleMap.setImageResource(R.drawable.ic_view_list_white);
                 mIitcWebView.setVisibility(View.VISIBLE);
                 mLayoutDebug.setVisibility(View.GONE);
             } else {
-                mBtnToggleMap.setImageResource(R.drawable.ic_action_map);
+                mBtnToggleMap.setImageResource(R.drawable.ic_map_white);
                 mIitcWebView.setVisibility(View.GONE);
                 mLayoutDebug.setVisibility(View.VISIBLE);
             }
@@ -931,6 +936,9 @@ public class IITC_Mobile extends AppCompatActivity
             Log.w(e);
             return;
         }
+        debugHistoryPosition = -1;
+        debugHistory.push(code);
+        mEditCommand.setText("");
 
         // throwing an exception will be reported by WebView
         final String js = "(function(obj){var result;" +
@@ -957,6 +965,69 @@ public class IITC_Mobile extends AppCompatActivity
     public void onClearLog(final View v)
     {
         ((IITC_LogAdapter) mLvDebug.getAdapter()).clear();
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugUp, assigned in activity_main.xml
+     */
+    public void onDebugHistoryUp(final View v)
+    {
+        if (debugHistoryPosition >= debugHistory.getSize()-1) return;
+
+        if (debugHistoryPosition < 0) {
+            debugInputStore = mEditCommand.getText().toString();
+        }
+
+        debugHistoryPosition += 1;
+        mEditCommand.setText(debugHistory.peek(debugHistoryPosition));
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugDown, assigned in activity_main.xml
+     */
+    public void onDebugHistoryDown(final View v)
+    {
+        if (debugHistoryPosition < 0) return;
+        debugHistoryPosition -= 1;
+
+        String text;
+        if (debugHistoryPosition < 0) {
+            text = debugInputStore;
+        } else {
+            text = debugHistory.peek(debugHistoryPosition);
+        }
+
+        mEditCommand.setText(text);
+    }
+
+    private int debugCursorMove(boolean right) {
+        mEditCommand.requestFocus();
+        int pos = mEditCommand.getSelectionEnd();
+        int len = mEditCommand.length();
+
+        if (right && pos < len) {
+            pos += 1;
+        } else if (!right && pos > 0) {
+            pos -= 1;
+        }
+
+        return pos;
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugLeft, assigned in activity_main.xml
+     */
+    public void onDebugCursorMoveRight(final View v)
+    {
+        mEditCommand.setSelection(debugCursorMove(true));
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugRight, assigned in activity_main.xml
+     */
+    public void onDebugCursorMoveLeft(final View v)
+    {
+        mEditCommand.setSelection(debugCursorMove(false));
     }
 
     private void deleteUpdateFile() {
