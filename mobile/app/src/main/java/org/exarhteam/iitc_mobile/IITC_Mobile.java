@@ -225,6 +225,14 @@ public class IITC_Mobile extends AppCompatActivity
 
         mPersistentZoom = mSharedPrefs.getBoolean("pref_persistent_zoom", false);
 
+        Set<String> restoreDebugHstory = mSharedPrefs.getStringSet("debug_history", new HashSet<>());
+
+        if (restoreDebugHstory != null) {
+            for (String item : restoreDebugHstory) {
+                debugHistory.push(item);
+            }
+        }
+
         // get fullscreen status from settings
         mIitcWebView.updateFullscreenStatus();
 
@@ -939,6 +947,9 @@ public class IITC_Mobile extends AppCompatActivity
         debugHistoryPosition = -1;
         debugHistory.push(code);
         mEditCommand.setText("");
+
+        Set<String> in = new HashSet<>(Arrays.asList(debugHistory.getStackArray()));
+        mSharedPrefs.edit().putStringSet("debug_history", in).apply();
 
         // throwing an exception will be reported by WebView
         final String js = "(function(obj){var result;" +

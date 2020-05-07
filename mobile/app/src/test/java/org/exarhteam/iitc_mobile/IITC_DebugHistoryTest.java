@@ -81,4 +81,15 @@ public class IITC_DebugHistoryTest {
         assertEquals(history.getSize(), 4);
     }
 
+    @Test
+    public void getStackArray() {
+        IITC_DebugHistory history = new IITC_DebugHistory(10);
+        history.push("text1");
+        history.push("text2");
+        history.push("text3");
+
+        String[] expected = {"text3", "text2", "text1"};
+        assertEquals(history.getStackArray(), expected);
+    }
+
 }

@@ -35,4 +35,12 @@ public class IITC_DebugHistory {
         }
         System.out.println();
     }
+
+    public String[] getStackArray() {
+
+        String[] arr = new String[size];
+        if (maxSize > 0) System.arraycopy(stackArray, 0, arr, 0, size);
+
+        return arr;
+    }
 }
