@@ -967,6 +967,10 @@ public class IITC_Mobile extends AppCompatActivity
         ((IITC_LogAdapter) mLvDebug.getAdapter()).clear();
     }
 
+    private void setDebugCursorToEnd() {
+        mEditCommand.setSelection(mEditCommand.getText().length());
+    }
+
     /**
      * onClick handler for R.id.btnDebugUp, assigned in activity_main.xml
      */
@@ -980,6 +984,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         debugHistoryPosition += 1;
         mEditCommand.setText(debugHistory.peek(debugHistoryPosition));
+        setDebugCursorToEnd();
     }
 
     /**
@@ -998,6 +1003,7 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         mEditCommand.setText(text);
+        setDebugCursorToEnd();
     }
 
     private int debugCursorMove(boolean right) {
