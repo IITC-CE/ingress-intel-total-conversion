@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
-import com.github.paolorotolo.appintro.AppIntro;
+import com.github.appintro.AppIntro;
 import org.exarhteam.iitc_mobile.fragments.IntroSlide;
 
 
@@ -106,10 +106,9 @@ public class IntroActivity extends AppIntro implements OnLocaleChangedListener {
 
 
         setBarColor(ResourcesCompat.getColor(getResources(), R.color.iitc_blue_dark, null));
-        showSkipButton(true);
-        setProgressButtonEnabled(true);
+        setButtonsEnabled(true);
         setVibrate(true);
-        setVibrateIntensity(50);
+        setVibrateDuration(50);
     }
 
     @Override
