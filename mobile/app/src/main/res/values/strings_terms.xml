@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="cradle_link"><![CDATA[ <a href="https://github.com/leCradle">cradle</a> ]]></string>
-    <string name="fkloft_link"><![CDATA[ <a href="https://github.com/fkloft">fkloft</a> ]]></string>
-    <string name="giuseppe_lucido_link"><![CDATA[ <a href="http://be.net/giuseppelucido">Giuseppe Lucido</a> ]]></string>
-    <string name="tg_iitc_news_link"><![CDATA[ <a href="https://t.me/iitc_news">IITC News</a> ]]></string>
-    <string name="tg_iitc_group_link"><![CDATA[ <a href="https://t.me/iitc_group">IITC Group</a> ]]></string>
-    <string name="reddit_iitc_link"><![CDATA[ <a href="https://www.reddit.com/r/IITC/">r/IITC/</a> ]]></string>
-    <string name="bugtracker_link"><![CDATA[ <a href="https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new">bugtracker</a> ]]></string>
+    <string name="cradle_url">https://github.com/leCradle</string>
+    <string name="fkloft_url">https://github.com/fkloft</string>
+    <string name="giuseppe_lucido_url">http://be.net/giuseppelucido</string>
+    <string name="iitc_tg_news_url">https://t.me/iitc_news</string>
+    <string name="iitc_tg_group_url">https://t.me/iitc_group</string>
+    <string name="iitc_reddit_url">https://www.reddit.com/r/IITC/</string>
+    <string name="iitc_bugtracker_url">https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new</string>
+    <string name="iitc_website_url">https://iitc.app/</string>
+    <string name="iitc_github_url">https://github.com/IITC-CE/ingress-intel-total-conversion</string>
 
-    <string name="website_url">https://iitc.app/</string>
-    <string name="github_iitc_url">https://github.com/IITC-CE/ingress-intel-total-conversion</string>
+    <string name="iitc_ce_format"><![CDATA[ IITC <i>"Community Edition"</i> ]]></string>
+
+    <string name="link_template"><![CDATA[ <a href="%1$s">%2$s</a> ]]></string>
 
     <string name="ISC_license_text">
         <![CDATA[
