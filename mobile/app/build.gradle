@@ -16,12 +16,37 @@ def getVersionCode = { ->
     return Integer.parseInt(desc)
 }
 
+def getProp(String propName, String propDefault) {
+    def value = System.getenv(propName)
+    if (value)
+        return value
+
+    def localPropsFile = rootProject.file('local.properties')
+
+    def props = new Properties()
+
+    if (localPropsFile.exists()) {
+        props.load(new FileInputStream(localPropsFile))
+        if (props[propName])
+            return props[propName]
+    }
+
+    return propDefault
+}
+
+
+// Example of use:
+// setBuildConfig("IITC_WEBSITE_URL", "\"https://iitc.app/\"")
+def setBuildConfig(String propName, String propDefault) {
+    android.defaultConfig.buildConfigField "String", propName, getProp(propName, propDefault)
+}
+
 android {
     compileSdkVersion 28
     buildToolsVersion = '28.0.3'
 
     defaultConfig {
-        applicationId "org.exarhteam.iitc_mobile"
+        applicationId getProp("IITC_APPLICATION_ID", "org.exarhteam.iitc_mobile")
         minSdkVersion 14
         targetSdkVersion 28
         versionCode = getVersionCode()
@@ -54,12 +79,12 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-test-$BUILD_DATE"
-            minifyEnabled false
+            minifyEnabled getProp("IITC_MINIFY_ENABLED", "false").toBoolean()
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled false
+            minifyEnabled getProp("IITC_MINIFY_ENABLED", "true").toBoolean()
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
