@@ -111,14 +111,6 @@ function layerFactory (L) {
             this._latlngsIdx = new LatLngsIndex();
         },
 
-        _checkDisplay() {
-            if (this._latlngsIdx._total) {
-                this._container.style.display = 'initial';
-            } else {
-                this._container.style.display = 'none';
-            }
-        },
-
         onAdd: function () {
             L.Renderer.prototype.onAdd.call(this);
             L.DomUtil.toBack(this._container);
@@ -126,7 +118,7 @@ function layerFactory (L) {
 
         _initContainer: function () {
             L.Canvas.prototype._initContainer.call(this);
-            this._checkDisplay();
+            this._hideContainer(true);
         },
 
         onRemove: function () {
@@ -198,15 +190,18 @@ function layerFactory (L) {
             var mapBounds = this._map.getBounds().pad(this.options.padding);
 
             // Only re-draw what we are showing on the map.
+            var isEmpty = true;
             this._latlngsIdx.searchIn(mapBounds).forEach(function (marker) {
                 // Readjust Point Map
                 if (!marker._map) { marker._map = this._map; } // todo ??implement proper handling in (on)add*/remove*
                 this._drawMarker(marker);
                 this._pointsIdx.insert(marker,true);
+                isEmpty = false;
             }, this);
             this._drawing = false;
             // Clear rBush & Bulk Load for performance
             this._pointsIdx.clear().flush();
+            this._hideContainer(isEmpty);
         },
 
         _drawMarker: function (marker) {
@@ -236,7 +231,9 @@ function layerFactory (L) {
                     img.onload = function () {
                         queued.loaded = true;
                         queued.queue.forEach(function (_marker) {
-                            this._drawImage(_marker);
+                            if (this.hasLayer(_marker)) {
+                                this._drawImage(_marker);
+                            }
                         }, this);
                     }.bind(this);
                 }
@@ -338,9 +335,9 @@ function layerFactory (L) {
             if (isDisplaying) {
                 this._drawMarker(marker);
                 this._pointsIdx.insert(marker, batch);
+                this._hideContainer(false);
             }
             this._latlngsIdx.insert(marker, batch);
-            this._checkDisplay();
         },
 
         // Adds single layer at a time. Less efficient for rBush
@@ -404,18 +401,16 @@ function layerFactory (L) {
             this._latlngsIdx.all().filter(function (marker) {
                 return marker._canvasGroupID === groupID;
             }).forEach(function (el) {
-                this._latlngsIdx.remove(el);
+                this.removeMarker(el, false, true);
             }, this);
-            this._checkDisplay();
         },
 
-        removeMarker: function (marker, redraw) {
-            var latlng = marker.getLatLng();
-            var isDisplaying = this._map && this._map.getBounds().pad(this.options.padding).contains(latlng);
+        removeMarker: function (marker, redraw, hasLayer) {
+            if (!hasLayer && !this.hasLayer(marker)) { return; }
             this._latlngsIdx.remove(marker);
-            this._checkDisplay();
 
-            if (isDisplaying && redraw) {
+            if (redraw && this._map &&
+                  this._map.getBounds().pad(this.options.padding).contains(marker.getLatLng())) {
                 this._redraw();
             }
             marker.removeEventParent(this);
@@ -438,8 +433,18 @@ function layerFactory (L) {
             this._latlngsIdx.clear();
             this._pointsIdx.clear();
             this._clear();
-            this._checkDisplay();
             return this;
+        },
+
+        hasLayer: function (layer) {
+            // return this._latlngsIdx.all().indexOf(layer) !== -1;
+            return layer._eventParents[L.Util.stamp(this)]; // !! to cut corners
+        },
+
+        _hideContainer: function (hide) {
+            if (this._isEmpty === hide) { return; }
+            this._isEmpty = hide;
+            this._container.style.display = hide ? 'none' : 'initial';
         }
     });
 
