@@ -307,7 +307,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
         public static final Pane FACTION = new Pane("faction", "Faction", R.drawable.ic_action_cc_bcc);
         public static final Pane ALERTS = new Pane("alerts", "Alerts", R.drawable.ic_action_warning);
         public static final Pane INFO = new Pane("info", "Info", R.drawable.ic_action_about);
-        public static final Pane MAP = new Pane("map", "Map", R.drawable.ic_action_map);
+        public static final Pane MAP = new Pane("map", "Map", R.drawable.ic_map_white);
 
         private final int icon;
         public String label;
