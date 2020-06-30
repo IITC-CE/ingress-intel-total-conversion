@@ -73,7 +73,7 @@ window.plugin.portalcounts.getPortals = function (){
     var drawLayer = JSON.parse(localStorage['plugin-draw-tools-layer']);
   }
   $.each(window.portals, function(i, portal) {
-    if (drawLayer.length) {
+    if (drawLayer && drawLayer.length) {
       var portalInPolygon = false;
       var latlng = portal._latlng.lat + ',' + portal._latlng.lng;
       for(var dl in drawLayer){
@@ -238,7 +238,7 @@ window.plugin.portalcounts.getPortals = function (){
 
   var total = self.enlP + self.resP + self.neuP;
   var title = total + ' ' + (total == 1 ? 'portal' : 'portals');
-  if (drawLayer.length) {
+  if (drawLayer && drawLayer.length) {
       title = title + ' in polygons';
   }
 
