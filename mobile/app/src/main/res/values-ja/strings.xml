@@ -15,18 +15,18 @@
     <string name="pref_misc_cat">その他</string>
     <string name="activity_share">以下の方法で共有…</string>
     <string name="drawer_close">ナビゲーションメニューを閉じる</string>
-    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt;
-\n&lt;p&gt;&lt;b&gt;ビルドバージョン：%1$s&lt;/b&gt;&lt;br&gt;&lt;b&gt;IITCバージョン：%2$s&lt;/b&gt;
-\n&lt;p&gt;&lt;b&gt;&lt;a href=https://github.com/leCradle&gt;cradle&lt;/a&gt;、&lt;a href=https://github.com/fkloft&gt;fkloft&lt;/a&gt;および寄稿者&lt;/b&gt;
-\n&lt;p&gt;&lt;b&gt;アイコン：&lt;a href=http://be.net/giuseppelucido&gt;Giuseppe Lucido&lt;/a&gt;&lt;/b&gt;
-\n&lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt;は、&lt;i&gt;Ingress Intel Total Conversion（IITC）&lt;/i&gt;ユーザースクリプトに最適化されたモバイルブラウザです。
-\n&lt;h3&gt;コミュニティ：&lt;/h3&gt;
-\n•新しいリリースとデスクトップバージョンについては、&lt;a href=https://iitc.modos189.ru/&gt;IITC Webサイト&lt;/a&gt;にアクセスしてください。&lt;br&gt;
-\n•&lt;a href = https：//t.me/iitc_news&gt;IITC News&lt;/a&gt;アナウンスメント用のテレグラムチャンネル,&lt;a href=https://t.me/iitc_group&gt;IITC Group&lt;/a&gt;テレグラムチャットに参加。&lt;br&gt;
-\n•&lt;a href=https://www.reddit.com/r/IITC/&gt;r/IITC /&lt;/a&gt;Redditコミュニティ-助けを求め、他のユーザーと議論する場所。&lt;br&gt;
-\n•問題を報告し、&lt;a href=https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new&gt;バグトラッカー&lt;/a&gt;で機能強化を提案してください。&lt;br&gt;
-\n&lt;h3&gt;開発者：&lt;/h3&gt;&lt;a href = https：//github.com/IITC-CE/ingress-intel-total-conversion&gt;GithubのIITC&lt;i&gt;Community Edition&lt;/i&gt;&lt;/a&gt;。 
-\n&lt;h3&gt;IITCライセンス：&lt;/h3&gt;&lt;tt&gt;&lt;p&gt;著作権©2013 Stefan Breunig、Jon Atkins、PhilippSchäferおよびその他&lt;p&gt;このソフトウェアをあらゆる目的で使用、コピー、変更、および/または配布する許可上記の著作権表示とこの許可通知がすべてのコピーに表示される場合、料金なしでここに付与されます。&lt;p&gt;ソフトウェアは現状のまま提供され、著者は、商品性および適合性のすべての暗黙の保証を含むこのソフトウェアに関するすべての保証を否認します。いかなる場合においても、作者は、このソフトウェアの使用またはパフォーマンスにおける、契約、過失またはその他の利害関係の行為、またはそれ以外の行為のいずれにおいても、使用、データまたは利益の損失に起因する特別、直接的、間接的、または間接的な損害、またはいかなる損害についても責任を負わないものとします。&lt;/tt&gt;</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; 
+\n&lt;p&gt;&lt;b&gt;ビルドバージョン：${build_version}&lt;/b&gt;&lt;br&gt;&lt;b&gt;IITCバージョン：${build_version}&lt;/b&gt; 
+\n&lt;p&gt;&lt;b&gt;${cradle_link}、${fkloft_link}および寄稿者&lt;/b&gt; 
+\n&lt;p&gt;&lt;b&gt;アイコン：${giuseppe_lucido_link}&lt;/b&gt; 
+\n&lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt;は、&lt;i&gt;Ingress Intel Total Conversion（IITC）&lt;/i&gt;ユーザースクリプトに最適化されたモバイルブラウザです。 
+\n&lt;h3&gt;コミュニティ：&lt;/h3&gt; 
+\n•新しいリリースとデスクトップバージョンについては、${website_link}にアクセスしてください。&lt;br&gt; 
+\n•${tg_iitc_news_link}アナウンスメント用のテレグラムチャンネル,${tg_iitc_group_link}テレグラムチャットに参加。&lt;br&gt; 
+\n•${reddit_iitc_link}Redditコミュニティ-助けを求め、他のユーザーと議論する場所。&lt;br&gt; 
+\n•問題を報告し、${bugtracker_link}で機能強化を提案してください。&lt;br&gt; 
+\n&lt;h3&gt;開発者：&lt;/h3&gt;${github_iitc_link}。 
+\n&lt;h3&gt;IITCライセンス：&lt;/h3&gt;${ISC_license_text}</string>
     <string name="notice_how_to">&lt;h3&gt;IITCmの使用方法：&lt;/h3&gt;•ナビゲーション：画面の左端からスワイプして（またはアプリのアイコンをクリックして）、&lt;em&gt;ナビゲーション ドロワー&lt;/em&gt;を呼び出します。&lt;br&gt;アプリのアイコンをタップして、再びマップに戻ります。&lt;br&gt;•レイヤー/ハイライト：画面の右端からスワイプして（またはアクションバーのレイヤー選択アイコンをタップして）、&lt;em&gt;レイヤー ドロワー&lt;/em&gt;を呼び出します。&lt;br&gt;•両方のデバイスがNFCをサポートしている場合、現在のポータルリンク/パーマリンクを別のデバイスにすばやく送信できます（両方のデバイスを背中合わせに押し、画面をタップしてマップを他のデバイスに送信します）。&lt;br&gt;•設定より、公式プラグインを追加できます。&lt;br&gt;•外部プラグインについては、&lt;ahref=https://iitc.modos189.ru/faq.html&gt;FAQ&lt;/a&gt;をご覧ください。&lt;br&gt;</string>
     <string name="version">バージョン表示</string>
     <string name="pref_ui_cat">ユーザーインタフェース</string>
