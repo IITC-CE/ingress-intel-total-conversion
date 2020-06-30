@@ -46,6 +46,9 @@ window.plugin.portalcounts.getPortals = function (){
     self.PortalsRes[level] = 0;
   }
 
+  self.upcP = 0;
+  self.upvP = 0;
+
   $.each(window.portals, function(i, portal) {
     var level = portal.options.level;
     var team = portal.options.team;
@@ -63,6 +66,23 @@ window.plugin.portalcounts.getPortals = function (){
       default:
         self.neuP++;
         break;
+    }
+
+    if (window.plugin.uniques) {
+      var guid = portal.options.ent[0];
+      var uniqueInfo = window.plugin.uniques.uniques[guid];
+
+      if (uniqueInfo) {
+        if (!uniqueInfo.captured) {
+          self.upcP++;
+        }
+        if (!uniqueInfo.visited) {
+          self.upvP++;
+        }
+      } else {
+        self.upvP++;
+        self.upcP++;
+      }
     }
   });
 
@@ -82,7 +102,19 @@ window.plugin.portalcounts.getPortals = function (){
 
     counts += '<tr><td>Neutral:</td><td colspan="2">';
     counts += self.neuP;
-    counts += '</td></tr></table>';
+    counts += '</td></tr>';
+
+    if (window.plugin.uniques) {
+      counts += '<tr><td>Unvisited:</td><td colspan="2">';
+      counts += self.upvP;
+      counts += '</td></tr>';
+
+      counts += '<tr><td>Uncaptured:</td><td colspan="2">';
+      counts += self.upcP;
+      counts += '</td></tr>';
+    }
+
+    counts += '</table>';
 
     var svg = $('<svg width="300" height="200">').css('margin-top', 10);
 
