@@ -1,8 +1,27 @@
+// ==UserScript==
 // @author         yenky
-// @name           Portal count
+// @name           IITC plugin: Portal count
 // @category       Info
 // @version        0.1.2
 // @description    Display a list of all localized portals by level and faction.
+// @id             portal-counts
+// @namespace      https://github.com/IITC-CE/ingress-intel-total-conversion
+// @updateURL      https://iitc.modos189.ru/build/release/plugins/portal-counts.meta.js
+// @downloadURL    https://iitc.modos189.ru/build/release/plugins/portal-counts.user.js
+// @match          https://intel.ingress.com/*
+// @grant          none
+// ==/UserScript==
+
+function wrapper(plugin_info) {
+// ensure plugin framework is there, even if iitc is not yet loaded
+if(typeof window.plugin !== 'function') window.plugin = function() {};
+
+//PLUGIN AUTHORS: writing a plugin outside of the IITC build environment? if so, delete these lines!!
+//(leaving them in place might break the 'About IITC' page or break update checks)
+plugin_info.buildName = 'release';
+plugin_info.dateTimeVersion = '2020-01-18-170317';
+plugin_info.pluginId = 'portal-counts';
+//END PLUGIN AUTHORS NOTE
 
 
 /* whatsnew
@@ -30,6 +49,26 @@ window.plugin.portalcounts = {
   CENTER_Y: 100,
 };
 
+/*********** HELPER FUNCTION ****************************************************/
+window.plugin.portalcounts.portalinpolygon = function(portal,LatLngsObjectsArray) {
+  var portalCoords = portal.split(',');
+
+  var x = portalCoords[0], y = portalCoords[1];
+
+  var inside = false;
+  for (var i = 0, j = LatLngsObjectsArray.length - 1; i < LatLngsObjectsArray.length; j = i++) {
+    var xi = LatLngsObjectsArray[i]['lat'], yi = LatLngsObjectsArray[i]['lng'];
+    var xj = LatLngsObjectsArray[j]['lat'], yj = LatLngsObjectsArray[j]['lng'];
+
+    var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) {
+      inside = !inside;
+    }
+  }
+
+  return inside;
+};
+
 //count portals for each level available on the map
 window.plugin.portalcounts.getPortals = function (){
   //console.log('** getPortals');
@@ -49,7 +88,26 @@ window.plugin.portalcounts.getPortals = function (){
   self.upcP = 0;
   self.upvP = 0;
 
+  if(localStorage['plugin-draw-tools-layer']) {
+    var drawLayer = JSON.parse(localStorage['plugin-draw-tools-layer']);
+  }
   $.each(window.portals, function(i, portal) {
+    console.log(drawLayer);
+    if (drawLayer.length) {
+      var portalInPolygon = false;
+      var latlng = portal._latlng.lat + ',' + portal._latlng.lng;
+      for(var dl in drawLayer){
+        if(drawLayer[dl].type === 'polygon') {
+          if(window.plugin.portalcounts.portalinpolygon(latlng,drawLayer[dl].latLngs)) {
+            portalInPolygon = true;
+            break;
+          }
+        }
+      }
+      if (!portalInPolygon) {
+        return;
+      }
+    }
     var level = portal.options.level;
     var team = portal.options.team;
     // just count portals in viewport
@@ -91,7 +149,7 @@ window.plugin.portalcounts.getPortals = function (){
 
   var counts = '';
   if(total > 0) {
-    counts += '<table><tr><th></th><th class="enl">Enlightened</th><th class="res">Resistance</th></tr>';  //'+self.enlP+' Portal(s)</th></tr>';
+    counts += '<table><tr><th></th><th class="enl">Enlightened</th><th class="res">Resistance</th></tr>';
     for(var level = window.MAX_PORTAL_LEVEL; level > 0; level--){
       counts += '<tr><td class="L'+level+'">Level '+level+'</td>';
       counts += '<td class="enl">'+self.PortalsEnl[level]+'</td><td class="res">'+self.PortalsRes[level]+'</td>';
@@ -200,6 +258,9 @@ window.plugin.portalcounts.getPortals = function (){
 
   var total = self.enlP + self.resP + self.neuP;
   var title = total + ' ' + (total == 1 ? 'portal' : 'portals');
+  if (drawLayer.length) {
+      title = title + ' in polygons';
+  }
 
   if(window.useAndroidPanes()) {
     $('<div id="portalcounts" class="mobile">'
@@ -373,3 +434,17 @@ var setup =  function() {
     '#portalcounts table th:nth-child(1) { text-align: left;}' +
     '</style>');
 }
+
+setup.info = plugin_info; //add the script info data to the function as a property
+if(!window.bootPlugins) window.bootPlugins = [];
+window.bootPlugins.push(setup);
+// if IITC has already booted, immediately run the 'setup' function
+if(window.iitcLoaded && typeof setup === 'function') setup();
+} // wrapper end
+// inject code into site context
+var script = document.createElement('script');
+var info = {};
+if (typeof GM_info !== 'undefined' && GM_info && GM_info.script) info.script = { version: GM_info.script.version, name: GM_info.script.name, description: GM_info.script.description };
+script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(info)+');'));
+(document.body || document.head || document.documentElement).appendChild(script);
+
