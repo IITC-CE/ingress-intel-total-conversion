@@ -76,24 +76,44 @@
     </string-array>
 
     <string-array name="pref_languages_titles">
+        <item>Catalan</item>
+        <item>Chinese (Simplified)</item>
         <item>Czech</item>
         <item>English</item>
         <item>French</item>
+        <item>Galician</item>
         <item>German</item>
+        <item>Greek</item>
+        <item>Italian</item>
         <item>Japanese</item>
+        <item>Korean</item>
+        <item>Polish</item>
         <item>Portuguese (Brazil)</item>
+        <item>Portuguese (Portugal)</item>
         <item>Russian</item>
         <item>Spanish (Latin America)</item>
+        <item>Spanish (Spain)</item>
+        <item>Thai</item>
     </string-array>
 
     <string-array name="pref_languages_values">
+        <item>ca</item>
+        <item>zh_Hans</item>
         <item>cs</item>
         <item>en</item>
         <item>fr</item>
+        <item>gl</item>
         <item>de</item>
+        <item>el</item>
+        <item>it</item>
         <item>ja</item>
+        <item>ko</item>
+        <item>pl</item>
         <item>pt_BR</item>
+        <item>pt_PT</item>
         <item>ru</item>
         <item>es_419</item>
+        <item>es</item>
+        <item>th</item>
     </string-array>
 </resources>
