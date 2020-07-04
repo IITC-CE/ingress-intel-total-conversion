@@ -186,6 +186,8 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 // Take an area in m² and output a not-too long string
 // Mostly to avoid things like "235239856 m²" for large fields
 plugin.layerCount.prettyAreaString = function(area) {
+  if (area === 0.0) return null;
+  
 	// 1million because we're using parseInt. If we try to go to
 	// km² before this we'll just display "0 km²"
 	if (area < 1000000.0) {
@@ -240,9 +242,14 @@ plugin.layerCount.calculate = function(ev) {
 		var content = "Enl: " + layersEnl + " field(s) (Area: " + plugin.layerCount.prettyAreaString(areaFields) + ")";
 	else
 		var content = "No fields";
-
-	if (layersDrawn != 0)
-		content += "; draw: " + layersDrawn + " polygon(s) (Triangles Area: " + plugin.layerCount.prettyAreaString(areaDrawn) + ")";
+  
+  if (layersDrawn !== 0) {
+    content += "; draw: " + layersDrawn + " polygon(s)";
+    let area = plugin.layerCount.prettyAreaString(areaDrawn);
+    if (area !== null) {
+      content += " (Triangles Area: " + area + ")";
+    }
+  }
 
 	plugin.layerCount.tooltip.innerHTML = content;
 
