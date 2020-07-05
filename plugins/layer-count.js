@@ -68,59 +68,58 @@ plugin.layerCount.pnpoly = function(latlngs, point) {
  * Code for calculating the area of a triangle on the surface of a
  * sphere.  See in-line comments for references.
  **********************************************************************/
-/* Compute hav(theta), as per <https://en.wikipedia.org/wiki/Haversine_formula>
- */
+// Compute hav(theta), as per https://en.wikipedia.org/wiki/Haversine_formula
 plugin.layerCount.havTheta = function(theta) {
 	return (1 - Math.cos(theta)) / 2;
-}
+};
 
 plugin.layerCount.deg2Radians= function(degrees) {
 	return degrees / 360 * 2 * Math.PI;
-}
+};
 
-/* Compute hav(Theta) (NB: Capital theta!) as per
- * <https://en.wikipedia.org/wiki/Haversine_formula>
- */
+// Compute hav(Theta) (NB: Capital theta!) as per https://en.wikipedia.org/wiki/Haversine_formula
 plugin.layerCount.haversine = function(LatLngPair) {
-	return plugin.layerCount.havTheta(plugin.layerCount.deg2Radians(LatLngPair[1]['lat'] - LatLngPair[0]['lat'])) + Math.cos(plugin.layerCount.deg2Radians(LatLngPair[0]['lat'])) * Math.cos(plugin.layerCount.deg2Radians(LatLngPair[1]['lat'])) * plugin.layerCount.havTheta(plugin.layerCount.deg2Radians(LatLngPair[1]['lng'] - LatLngPair[0]['lng']))
-}
+  let havLat = plugin.layerCount.havTheta(plugin.layerCount.deg2Radians(LatLngPair[1]['lat'] - LatLngPair[0]['lat']));
+  let cosPoint1 = Math.cos(plugin.layerCount.deg2Radians(LatLngPair[0]['lat']));
+  let cosPoint2 = Math.cos(plugin.layerCount.deg2Radians(LatLngPair[1]['lat']));
+  let havLng = plugin.layerCount.havTheta(plugin.layerCount.deg2Radians(LatLngPair[1]['lng'] - LatLngPair[0]['lng']));
+	return havLat + cosPoint1 * cosPoint2 * havLng;
+};
 
 
-/* Calculate the Great Circle Distance (not Greatest Common Denominator!)
+/*
+ * Calculate the Great Circle Distance (not Greatest Common Denominator!)
  * of a pair of Latitude/Longitude points.
- * Ref: <https://en.wikipedia.org/wiki/Haversine_formula>
+ * Ref: https://en.wikipedia.org/wiki/Haversine_formula
  */
 plugin.layerCount.calcGCD= function(LatLngPair) {
-	haverSine = plugin.layerCount.haversine(LatLngPair)
-
+	let haverSine = plugin.layerCount.haversine(LatLngPair);
 	return 2 * Math.asin(Math.sqrt(haverSine));
-}
+};
 
-/* For a set of three Latitude/Longitude points calculate the area of
+/*
+ * For a set of three Latitude/Longitude points calculate the area of
  * the enclosed triangle.
- * Ref: <https://en.wikipedia.org/wiki/Spherical_trigonometry#Area_and_spherical_excess>
+ * Ref: https://en.wikipedia.org/wiki/Spherical_trigonometry#Area_and_spherical_excess
  *
  * We're using an average value of the Earth's radius, and treating the
- * Earth as a perfect sphere.  Thus this calculation will only yield an
+ * Earth as a perfect sphere. Thus this calculation will only yield an
  * approximation, with the error varying by latitude.
  */
 plugin.layerCount.fieldarea = function(LatLngs) {
-	//console.log('plugin.layerCount.fieldarea: Input field = %o', LatLngs);
-	if (LatLngs.length != 3) {
-		console.log('plugin.layerCount.fieldarea: More/Less than 3 points, aborting');
+	if (LatLngs.length !== 3) {
 		return 0.0;
 	}
-	var radiusEarth = 6371.0 * 1000.0; // In metres
-	var areaTriangle = 0.0;
+	let radiusEarth = 6371.0 * 1000.0; // In metres
 	// NB: All initial work is done on a unit sphere, radius = 1
 	//     We'll multiply up versus the surface area of the Earth
 	//     at the end.
 	// Use Haversine
-	// <https://en.wikipedia.org/wiki/Haversine_formula>
+	// https://en.wikipedia.org/wiki/Haversine_formula
 	// to calculate the lengths of the sides of the field, storing
 	// them in d[]
 	//
-	// As per // <https://en.wikipedia.org/wiki/Spherical_trigonometry#Notation>
+	// As per https://en.wikipedia.org/wiki/Spherical_trigonometry#Notation
 	// [A,B,C] are the angles in the triangle. These correspdond to
 	// [u,v,w] the vertices at the corners.
 	// [a,b,c] are the edges, where:
@@ -131,35 +130,23 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 	// d[0] = a = v - u
 	// d[1] = b = u - w
 	// d[2] = c = w - v
-	var d = [];
-	for (var gcd = 0; gcd < 3 ; gcd++) {
-		var p2 = (4 - gcd) % 3;
-		var p1 = (3 - gcd) % 3;
-		lat1 = LatLngs[p1].lat
-		lng1 = LatLngs[p1].lng
-		lat2 = LatLngs[p2].lat
-		lng2 = LatLngs[p2].lng
-		//console.log('plugin.layerCount.fieldarea: lat1, lng1, lat2, lng2 in Radians = %o, %o, %o, %o', lat1, lng1, lat2, lng2);
+	let d = [];
+	for (let gcd = 0; gcd < 3 ; gcd++) {
+		let p2 = (4 - gcd) % 3;
+    let p1 = (3 - gcd) % 3;
+
 		d[gcd] = plugin.layerCount.calcGCD([LatLngs[p1], LatLngs[p2]]);
 	}
-	//console.log('plugin.layerCount.fieldarea: Great Circle Distances (unit circle) = %o', d);
-	var dE = [];
-	for (var e = 0; e < d.length ; e++) {
-		dE[e] = d[e] * radiusEarth;
-	}
-	//console.log('plugin.layerCount.fieldarea: Great Circle Distances (Earth, metres) = %o', dE);
-
+	
 	// Now we need the internal angle, using the GCDs, between
 	// side a and side b, which is the angle C.
-	// <https://en.wikipedia.org/wiki/Spherical_law_of_cosines#Rearrangements>
-	var cosC = ( Math.cos(d[2]) - (Math.cos(d[0]) * Math.cos(d[1])) ) / ( Math.sin(d[0]) * Math.sin(d[1]) );
-	//console.log('plugin.layerCount.fieldarea: cos(C) = %o', cosC);
-	var C = Math.acos(cosC);
-	//console.log('plugin.layerCount.fieldarea: C = %o', C);
+	// https://en.wikipedia.org/wiki/Spherical_law_of_cosines#Rearrangements
+	let cosC = ( Math.cos(d[2]) - (Math.cos(d[0]) * Math.cos(d[1])) ) / ( Math.sin(d[0]) * Math.sin(d[1]) );
+  let C = Math.acos(cosC);
 
 	// From this we calculate the Spherical Excess 'E', which is directly
 	// related to the area of the enclosed triangle.
-	var E = 2 * Math.atan(
+	let E = 2 * Math.atan(
 			(Math.tan(d[0]/2)
 			 * Math.tan(d[1]/2)
 			 * Math.sin(C)
@@ -169,8 +156,8 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 			  * Math.cos(C)
 			)
 		);
-	//console.log('plugin.layerCount.fieldarea: Spherical Excess = %o', E);
-	// <https://en.wikipedia.org/wiki/Spherical_trigonometry#Area_and_spherical_excess>
+	
+	// https://en.wikipedia.org/wiki/Spherical_trigonometry#Area_and_spherical_excess
 	//
 	// 1) E = A + B + C - pi
 	// 2) A + B + C  = pi + (4 * pi * areaTriangle) / areaSphere
@@ -193,23 +180,21 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 	// and the "4 * pi" cancels out either side:
 	//
 	//    areaOnEarth = E * Earth['radius']
-	areaTriangle = E * Math.pow(radiusEarth, 2);
-	console.log('plugin.layerCount.fieldarea: areaTriangle(onEarth) = %o', areaTriangle);
-	return areaTriangle
-}
+  return E * Math.pow(radiusEarth, 2)
+};
 
-// Take an area in m^2 and output a not-too long string
-// Mostly to avoid things like "235239856 m^2" for large fields
+// Take an area in m² and output a not-too long string
+// Mostly to avoid things like "235239856 m²" for large fields
 plugin.layerCount.prettyAreaString = function(area) {
-	// 1million because we're using parseInt.  If we try to go to
-	// km^2 before this we'll just display "0 km^2"
+	// 1million because we're using parseInt. If we try to go to
+	// km² before this we'll just display "0 km²"
 	if (area < 1000000.0) {
-		return parseInt(area).toLocaleString() + " m^2";
+		return parseInt(area).toLocaleString() + " m²";
 	} else {
-		var a = parseInt(area * 100) / 100;
-		return (a / 1000.0 / 1000.0).toLocaleString() + " km^2";
+		let a = parseInt(area * 100) / 100;
+		return (a / 1000.0 / 1000.0).toLocaleString() + " km²";
 	}
-}
+};
 /***********************************************************************
  * End triangle area code
  **********************************************************************/
@@ -218,7 +203,7 @@ plugin.layerCount.calculate = function(ev) {
 	var point = ev.latlng;
 	var fields = window.fields;
 	var layersRes = layersEnl = layersDrawn = 0;
-	var areaRes = areaEnl = areaDrawn = 0.0;
+	let areaFields = areaDrawn = 0.0;
 
 	for(var guid in fields) {
 		var field = fields[guid];
@@ -228,11 +213,11 @@ plugin.layerCount.calculate = function(ev) {
 		if(plugin.layerCount.pnpoly(field.getLatLngs(), point)) {
 			if(field.options.team == TEAM_ENL) {
 				layersEnl++;
-				areaEnl += plugin.layerCount.fieldarea(field.getLatLngs());
+        areaFields += plugin.layerCount.fieldarea(field.getLatLngs());
 			}
 			else if(field.options.team == TEAM_RES) {
 				layersRes++;
-				areaRes += plugin.layerCount.fieldarea(field.getLatLngs());
+        areaFields += plugin.layerCount.fieldarea(field.getLatLngs());
 			}
 		}
 	}
@@ -250,9 +235,9 @@ plugin.layerCount.calculate = function(ev) {
 	if(layersRes != 0 && layersEnl != 0)
 		var content = "Res: " + layersRes + " + Enl: " + layersEnl + " = " + (layersRes + layersEnl) + " fields";
 	else if(layersRes != 0)
-		var content = "Res: " + layersRes + " field(s) (Area: " + plugin.layerCount.prettyAreaString(areaRes) + ")";
+		var content = "Res: " + layersRes + " field(s) (Area: " + plugin.layerCount.prettyAreaString(areaFields) + ")";
 	else if(layersEnl != 0)
-		var content = "Enl: " + layersEnl + " field(s) (Area: " + plugin.layerCount.prettyAreaString(areaEnl) + ")";
+		var content = "Enl: " + layersEnl + " field(s) (Area: " + plugin.layerCount.prettyAreaString(areaFields) + ")";
 	else
 		var content = "No fields";
 
