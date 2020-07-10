@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_hide_fullscreen">
-        <item>System Notification Bar</item>
-        <item>IITC Action Bar</item>
-        <item>IITC Status Bar</item>
-        <item>System Navigation Bar</item>
+        <item>@string/pref_hide_fullscreen_notification_bar</item>
+        <item>@string/pref_hide_fullscreen_action_bar</item>
+        <item>@string/pref_hide_fullscreen_status_bar</item>
+        <item>@string/pref_hide_fullscreen_navigation_bar</item>
     </string-array>
     <string-array name="pref_hide_fullscreen_vals">
         <item>2</item>
@@ -49,9 +49,9 @@
     </string-array>
 
     <string-array name="pref_user_location_titles">
-        <item>Don\'t show user position</item>
-        <item>Show user position on map</item>
-        <item>Show user position and orientation on map</item>
+        <item>@string/pref_user_location_dont_show</item>
+        <item>@string/pref_user_location_show_position</item>
+        <item>@string/pref_user_location_show_position_and_orientation</item>
     </string-array>
     <string-array name="pref_user_location_values">
         <item>0</item>
@@ -60,11 +60,11 @@
     </string-array>
 
     <string-array name="pref_update_plugins_interval_titles">
-        <item>Disable</item>
-        <item>1 day</item>
-        <item>2 days</item>
-        <item>1 week</item>
-        <item>2 weeks</item>
+        <item>@string/pref_update_plugins_interval_disable</item>
+        <item>@string/pref_update_plugins_interval_1_day</item>
+        <item>@string/pref_update_plugins_interval_2_days</item>
+        <item>@string/pref_update_plugins_interval_1_week</item>
+        <item>@string/pref_update_plugins_interval_2_weeks</item>
     </string-array>
 
     <string-array name="pref_update_plugins_interval_values">

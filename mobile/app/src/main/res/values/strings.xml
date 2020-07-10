@@ -120,6 +120,21 @@
     <string name="pref_secure_updates">Require secure updates</string>
     <string name="pref_secure_updates_sum">If enabled, only https updates are handled</string>
 
+    <string name="pref_hide_fullscreen_notification_bar">System Notification Bar</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC Action Bar</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC Status Bar</string>
+    <string name="pref_hide_fullscreen_navigation_bar">System Navigation Bar</string>
+
+    <string name="pref_user_location_dont_show">Don\'t show user position</string>
+    <string name="pref_user_location_show_position">Show user position on map</string>
+    <string name="pref_user_location_show_position_and_orientation">Show user position and orientation on map</string>
+
+    <string name="pref_update_plugins_interval_disable">Disable</string>
+    <string name="pref_update_plugins_interval_1_day">1 day</string>
+    <string name="pref_update_plugins_interval_2_days">2 days</string>
+    <string name="pref_update_plugins_interval_1_week">1 week</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 weeks</string>
+
     <string name="menu_reload">Reload IITC</string>
     <string name="menu_toggle_fullscreen">Fullscreen</string>
     <string name="menu_layer_chooser">Layer Chooser</string>
@@ -203,6 +218,21 @@
     </string>
 
     <string name="show_appintro_screen_title">Show intro screen</string>
+
+    <string name="plugins_permission_denied">Permission denied. You cannot add plugins.</string>
+    <string name="plugins_permission_granted">Permission granted. Please repeat the action.</string>
+    <string name="file_browser_is_required">No activity to select a file found. Please install a file browser of your choice!</string>
+    <string name="file_browser_choose_file">Choose file</string>
+    <string name="plugins_user_plugins">User Plugins</string>
+    <string name="plugins_official_plugins">Official Plugins</string>
+    <string name="toast_press_twice_to_exit">Press twice to exit</string>
+    <string name="plugin_updated">Plugin updated</string>
+
+    <string name="pane_all">All</string>
+    <string name="pane_faction">Faction</string>
+    <string name="pane_alerts">Alerts</string>
+    <string name="pane_info">Info</string>
+    <string name="pane_map">Map</string>
 
     <string name="cradle_url" translatable="false">https://github.com/leCradle</string>
     <string name="fkloft_url" translatable="false">https://github.com/fkloft</string>
