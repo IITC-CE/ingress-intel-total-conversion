@@ -204,4 +204,45 @@
 
     <string name="show_appintro_screen_title">Show intro screen</string>
 
+    <string name="cradle_url" translatable="false">https://github.com/leCradle</string>
+    <string name="fkloft_url" translatable="false">https://github.com/fkloft</string>
+    <string name="giuseppe_lucido_url" translatable="false">http://be.net/giuseppelucido</string>
+    <string name="iitc_tg_news_url" translatable="false">https://t.me/iitc_news</string>
+    <string name="iitc_tg_group_url" translatable="false">https://t.me/iitc_group</string>
+    <string name="iitc_reddit_url" translatable="false">https://www.reddit.com/r/IITC/</string>
+    <string name="iitc_bugtracker_url" translatable="false">https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new</string>
+    <string name="iitc_website_url" translatable="false">https://iitc.app/</string>
+    <string name="iitc_github_url" translatable="false">https://github.com/IITC-CE/ingress-intel-total-conversion</string>
+
+    <string name="iitc_ce_format" translatable="false"><![CDATA[ IITC <i>"Community Edition"</i> ]]></string>
+
+    <string name="link_template" translatable="false"><![CDATA[ <a href="%1$s">%2$s</a> ]]></string>
+
+    <string name="ISC_license_text" translatable="false">
+        <![CDATA[
+        <tt>
+        <p>Copyright © 2018-2020 Ingress Intel Total Conversion - Community Edition ("IITC-CE")
+        <br>Copyright © 2013-2018 Ingress Intel Total Conversion ("IITC")
+        <br>Copyright © 2013 Stefan Breunig
+
+        <p>Permission to use, copy, modify, and/or distribute this software for
+        any purpose with or without fee is hereby granted, provided that the
+        above copyright notice and this permission notice appear in all
+        copies.
+
+        <p>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL
+        WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+        WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+        AUTHORS BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+        DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
+        OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+        TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+        PERFORMANCE OF THIS SOFTWARE.
+        </tt>
+        ]]>
+    </string>
+
+    <string name="iitc_ce_mobile" translatable="false">IITC-CE Mobile</string>
+    <string name="continue_in_english" translatable="false">Continue in English</string>
+
 </resources>
