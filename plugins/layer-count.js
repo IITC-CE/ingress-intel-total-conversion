@@ -66,7 +66,7 @@ plugin.layerCount.pnpoly = function(latlngs, point) {
 
 // Code for calculating the area of a triangle on the surface of a sphere.
 plugin.layerCount.fieldarea = function(LatLngs) {
-	if (LatLngs.length !== 3) {
+	if (LatLngs.length !== 3 || window.plugin.drawTools === undefined) {
 		return 0.0;
 	}
   return L.GeometryUtil.geodesicArea(LatLngs)
@@ -75,15 +75,15 @@ plugin.layerCount.fieldarea = function(LatLngs) {
 // Take an area in m² and output a not-too long string
 // Mostly to avoid things like "235239856 m²" for large fields
 plugin.layerCount.prettyAreaString = function(area) {
-  if (area === 0.0) return null;
+  if (area === 0.0) return "";
   
 	// 1million because we're using parseInt. If we try to go to
 	// km² before this we'll just display "0 km²"
 	if (area < 1000000.0) {
-		return parseInt(area).toLocaleString() + " m²";
+		return "(" + parseInt(area).toLocaleString() + " m²)";
 	} else {
 		let a = parseInt(area * 100) / 100;
-		return (a / 1000.0 / 1000.0).toLocaleString() + " km²";
+		return "(" + (a / 1000.0 / 1000.0).toLocaleString() + " km²)";
 	}
 };
 
@@ -123,19 +123,14 @@ plugin.layerCount.calculate = function(ev) {
 	if(layersRes != 0 && layersEnl != 0)
 		var content = "Res: " + layersRes + " + Enl: " + layersEnl + " = " + (layersRes + layersEnl) + " fields";
 	else if(layersRes != 0)
-		var content = "Res: " + layersRes + " field(s) (Area: " + plugin.layerCount.prettyAreaString(areaFields) + ")";
+		var content = "Res: " + layersRes + " field(s) " + plugin.layerCount.prettyAreaString(areaFields);
 	else if(layersEnl != 0)
-		var content = "Enl: " + layersEnl + " field(s) (Area: " + plugin.layerCount.prettyAreaString(areaFields) + ")";
+		var content = "Enl: " + layersEnl + " field(s) " + plugin.layerCount.prettyAreaString(areaFields);
 	else
 		var content = "No fields";
   
-  if (layersDrawn !== 0) {
-    content += "; draw: " + layersDrawn + " polygon(s)";
-    let area = plugin.layerCount.prettyAreaString(areaDrawn);
-    if (area !== null) {
-      content += " (Triangles Area: " + area + ")";
-    }
-  }
+  if (layersDrawn !== 0)
+    content += "<br>draw: " + layersDrawn + " polygon(s) " + plugin.layerCount.prettyAreaString(areaDrawn);
 
 	plugin.layerCount.tooltip.innerHTML = content;
 
@@ -143,9 +138,6 @@ plugin.layerCount.calculate = function(ev) {
 };
 
 var setup = function() {
-  if (window.plugin.drawTools === undefined) {
-    '@include_raw:external/leaflet.draw-src.js@';
-  }
 	$('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
 
 	var parent = $(".leaflet-top.leaflet-left", window.map.getContainer());

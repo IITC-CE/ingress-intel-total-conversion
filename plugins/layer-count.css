@@ -10,7 +10,6 @@
 {
 	background-color: rgba(255, 255, 255, 0.6);
 	display: none;
-	height: 24px;
 	left: 30px;
 	line-height: 24px;
 	margin-left: 15px;
@@ -20,6 +19,7 @@
 	top: 50%;
 	white-space: nowrap;
 	width: auto;
+	text-align: left;
 }
 .leaflet-control-layer-count a.active .leaflet-control-layer-count-tooltip
 {
