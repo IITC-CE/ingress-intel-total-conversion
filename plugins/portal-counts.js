@@ -78,7 +78,7 @@ window.plugin.portalcounts.getPortals = function (){
       var latlng = portal._latlng.lat + ',' + portal._latlng.lng;
       for(var dl in drawLayer){
         if(drawLayer[dl].type === 'polygon') {
-          if(window.plugin.portalcounts.portalinpolygon(latlng,drawLayer[dl].latLngs)) {
+          if(window.plugin.portalcounts.portalinpolygon(portal, drawLayer[dl].latLngs)) {
             portalInPolygon = true;
             break;
           }
