@@ -34,7 +34,7 @@ window.plugin.portalcounts = {
 window.plugin.portalcounts.portalinpolygon = function(portal,LatLngsObjectsArray) {
   var portalCoords = portal.split(',');
 
-  var x = portalCoords[0], y = portalCoords[1];
+  var x = portalCoords.lat, y = portalCoords.lng;
 
   var inside = false;
   for (var i = 0, j = LatLngsObjectsArray.length - 1; i < LatLngsObjectsArray.length; j = i++) {
