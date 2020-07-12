@@ -32,7 +32,7 @@ window.plugin.portalcounts = {
 
 /*********** HELPER FUNCTION ****************************************************/
 window.plugin.portalcounts.portalinpolygon = function(portal,LatLngsObjectsArray) {
-  var portalCoords = portal.split(',');
+  var portalCoords = portal.getLatLng();
 
   var x = portalCoords.lat, y = portalCoords.lng;
 
