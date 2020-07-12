@@ -30,7 +30,9 @@ window.plugin.portalcounts = {
   CENTER_Y: 100,
 };
 
-/*********** HELPER FUNCTION ****************************************************/
+// Determine if a point is inside of a polygon.
+// ray-casting algorithm based on
+// https://observablehq.com/@tmcw/understanding-point-in-polygon
 window.plugin.portalcounts.portalinpolygon = function(portal,LatLngsObjectsArray) {
   var portalCoords = portal.getLatLng();
 
