@@ -17,7 +17,7 @@ defaults = {  # common for all build targets
 
     # these settings should be modified when developing own fork of this project
     'namespace': 'https://github.com/IITC-CE/ingress-intel-total-conversion',
-    'url_homepage': 'https://iitc.modos189.ru/',
+    'url_homepage': 'https://iitc.app/',
     'url_tg': 'https://t.me/iitc_news',
 
     # these settings should not be touched unless intel url(s) changed

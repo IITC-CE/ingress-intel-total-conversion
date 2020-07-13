@@ -15,7 +15,7 @@ addons:
   apt:
     sources: deadsnakes
     packages: python3.7
-  ssh_known_hosts: ssh.modos189.ru
+  ssh_known_hosts: ssh.iitc.app
 notifications:
   email:
     on_success: change
@@ -33,19 +33,19 @@ before_install: sudo update-alternatives --install /usr/bin/python3 python3 /usr
 
 before_script:
   - git fetch --unshallow
-  - wget https://iitc.modos189.ru/deploy/localbuildsettings.py
+  - wget https://iitc.app/deploy/localbuildsettings.py
 
 script: ./build.py $BUILD_TYPE
 
 deploy:
   - provider: script
     skip_cleanup: true
-    script: curl -s https://iitc.modos189.ru/deploy/deploy.sh | bash -s -- $BUILD_TYPE
+    script: curl -s https://iitc.app/deploy/deploy.sh | bash -s -- $BUILD_TYPE
     on:
       branch: test-builds
   - provider: script
     skip_cleanup: true
-    script: curl -s https://iitc.modos189.ru/deploy/deploy.sh | bash -s -- $BUILD_TYPE
+    script: curl -s https://iitc.app/deploy/deploy.sh | bash -s -- $BUILD_TYPE
     on:
       tags: true
       branch: master

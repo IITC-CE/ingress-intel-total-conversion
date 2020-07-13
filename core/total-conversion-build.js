@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.30.0
+// @version        0.30.1
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -194,6 +194,11 @@ var ulog = (function (module) {
   '@include_raw:external/ulog.min.js@';
   return module;
 }({})).exports;
+
+// ulog currently fails in pre-ES2015 environment
+if (!Object.getOwnPropertyDescriptor(Function, 'name').configurable) {
+  ulog = function () { return console; }; // replace ulog with stub
+}
 
 '@bundle_code@';
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="toggle_map">Toggle map visibility</string>
     <string name="clear_log">Clear log</string>
     <string name="debug_run">Run</string>
@@ -15,55 +14,38 @@
     <string name="version">Print Version</string>
     <string name="close">Close</string>
     <string name="download_description">Downloading latest intel package…</string>
-
+    <string name="bugtracker">bugtracker</string>
+    <string name="iitc_website">IITC website</string>
     <string name="pref_about_title">About IITC Mobile</string>
     <!-- Use CDATA to prevent android from parsing html tags....we are doing this with Html.fromHtml() -->
     <string name="pref_about_text">
         <![CDATA[
         <h1>Ingress Intel Total Conversion Mobile</h1>
 
-        <p><b>Build version: %1$s</b>
-        <br><b>IITC version: %2$s</b>
+        <p><b>Build version: ${build_version}</b>
+        <br><b>IITC version: ${iitc_version}</b>
 
-        <p><b>by <a href="https://github.com/leCradle">cradle</a>,
-        <a href="https://github.com/fkloft">fkloft</a> and contributors</b>
+        <p><b>by ${cradle_link}, ${fkloft_link} and contributors</b>
 
-        <p><b>Icon by <a href="http://be.net/giuseppelucido">Giuseppe Lucido</a></b>
+        <p><b>Icon by ${giuseppe_lucido_link}</b>
 
         <p><b>IITC Mobile</b> is an optimized mobile browser for the
         <i>Ingress Intel Total Conversion (IITC)</i> userscript.
 
         <h3>Community:</h3>
 
-        • Visit the <a href="https://iitc.modos189.ru/">IITC website</a> for new releases
-          and the desktop version.<br>
-        • Follow the <a href="https://t.me/iitc_news">IITC News</a> Telegram channel
-          for announcements and join <a href="https://t.me/iitc_group">IITC Group</a> chat.<br>
-        • Join the <a href="https://www.reddit.com/r/IITC/">r/IITC/</a> Reddit community
+        • Visit the ${website_link} for new releases and the desktop version.<br>
+        • Follow the ${tg_iitc_news_link} Telegram channel
+          for announcements and join ${tg_iitc_group_link} chat.<br>
+        • Join the ${reddit_iitc_link} Reddit community
           - a place to ask for help and discuss with other users.<br>
-        • Report issues and propose enhancements at <a href="https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new">bugtracker</a>.<br>
+        • Report issues and propose enhancements at ${bugtracker_link}.<br>
 
         <h3>Developers:</h3>
-        <a href="https://github.com/IITC-CE/ingress-intel-total-conversion">IITC <i>"Community Edition"</i></a> on Github.
+        ${github_iitc_link} on Github.
 
         <h3>IITC Licence:</h3>
-        <tt>
-        <p>Copyright © 2013 Stefan Breunig, Jon Atkins, Philipp Schäfer and others
-
-        <p>Permission to use, copy, modify, and/or distribute this software for
-        any purpose with or without fee is hereby granted, provided that the
-        above copyright notice and this permission notice appear in all
-        copies.
-
-        <p>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL
-        WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
-        WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
-        AUTHORS BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
-        DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
-        OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
-        TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-        PERFORMANCE OF THIS SOFTWARE.
-        </tt>
+        ${ISC_license_text}
         ]]>
     </string>
     <string name="notice_how_to">
@@ -122,7 +104,6 @@
         <p>These hints also apply for the <em>permalink</em>.
         ]]>
     </string>
-
     <string name="pref_ui_cat">UI</string>
     <string name="pref_misc_cat">Misc</string>
     <string name="pref_tweaks_cat">Tweaks</string>
@@ -164,7 +145,6 @@
     <string name="pref_force_plugin_update_sum">Update all enabled user plugins</string>
     <string name="pref_secure_updates">Require secure updates</string>
     <string name="pref_secure_updates_sum">If enabled, only https updates are handled</string>
-
     <string name="menu_reload">Reload IITC</string>
     <string name="menu_toggle_fullscreen">Fullscreen</string>
     <string name="menu_layer_chooser">Layer Chooser</string>
@@ -185,20 +165,16 @@
     <string name="msg_prepare_screenshot">Preparing…</string>
     <string name="msg_take_screenshot">Taking screenshot…</string>
     <string name="notice_do_not_show_again">Do not show again</string>
-
     <string name="sign_in_to">Sign in to %1$s %2$s"</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="sign_in_action">Sign in</string>
-
     <string name="tab_map">Locate</string>
     <string name="tab_share">Share</string>
     <string name="tab_browser">Intel</string>
-
     <string name="label_highlighter">Highlighter</string>
     <string name="label_base_layer">Base Layer</string>
     <string name="label_overlay_layers">Overlay Layers</string>
-
     <string name="install_dialog_top">Install external plugin?</string>
     <string name="install_dialog_msg">
         <![CDATA[
@@ -207,5 +183,4 @@
         <p><b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!
         <p>Are you sure you want to proceed?]]>
     </string>
-
 </resources>

@@ -12,7 +12,11 @@
     <!-- margin around app icons in share activity -->
     <dimen name="icon_margin">8dp</dimen>
 
-    <!-- button size for debug views -->
-    <dimen name="button_size">36dp</dimen>
+    <!-- debug views button -->
+    <dimen name="button_size">32dp</dimen>
+    <dimen name="button_margin">2dp</dimen>
+
+    <!-- text size for debug views -->
+    <dimen name="debug_text_size">12sp</dimen>
 
 </resources>

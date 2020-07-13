@@ -23,7 +23,7 @@ window.ornaments = {
   setup: function () {
     this._portals = {};
     var layerGroup = L.layerGroup;
-    if (window.map.options.preferCanvas && L.Browser.canvas) {
+    if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
       layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
     }

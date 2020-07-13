@@ -1,7 +1,7 @@
 ﻿// @author         modos189
 // @name           Fix maps offsets in China
 // @category       Tweaks
-// @version        0.2.0
+// @version        0.2.1
 // @description    Show correct maps for China user by applying offset tweaks.
 
 
@@ -243,7 +243,7 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
     var magic = 1 - GCJ_EE * Math.pow(Math.sin(radLat), 2); // just a common expr
 
     // Arc lengths per degree, on the wrong ellipsoid
-    var lat_deg_arclen = Math.PI / 180 * (GCJ_A * (1 - GCJ_EE)) * Math.pow(magic, 1.5);
+    var lat_deg_arclen = Math.PI / 180 * (GCJ_A * (1 - GCJ_EE)) / Math.pow(magic, 1.5);
     var lon_deg_arclen = Math.PI / 180 * (GCJ_A * Math.cos(radLat) / Math.sqrt(magic));
 
     return {

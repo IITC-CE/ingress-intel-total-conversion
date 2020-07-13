@@ -1,7 +1,5 @@
 // L.Draw extension to support L.Geodesic*
-// support Leaflet >= 1
 
-L.Draw.Polyline.prototype.options.shapeOptions.interactive = true;
 L.Draw.Polyline.include({
 	Poly: L.GeodesicPolyline,
 
@@ -56,12 +54,7 @@ L.Draw.Polyline.include({
 });
 
 L.Draw.Polygon.prototype.Poly = L.GeodesicPolygon;
-L.Draw.Polygon.prototype.options.shapeOptions.interactive = true;
 
-L.Draw.Rectangle.prototype.options.shapeOptions.interactive = true;
-
-L.Draw.CircleMarker.prototype.options.interactive = true;
-L.Draw.Circle.prototype.options.shapeOptions.interactive = true;
 L.Draw.Circle.include({ // ?? extend to L.Draw.GeodesicCircle ??
 	_drawShape: function (latlng) {
 		var distance = this._map.distance(this._startLatLng, latlng);
@@ -113,9 +106,28 @@ L.Edit.PolyVerticesEdit.include({
 	_defaultShape: function () { // support Leaflet >= 1
 		var latlngs = this._poly.getLatLngs();
 		return L.LineUtil.isFlat(latlngs) ? latlngs : latlngs[0];
-	}
+	},
 });
 // ^^^^^^
+
+(function (_getMiddleLatLng) {
+var coeff =  Math.PI/180.0 * 6367000.0 / 2.01;
+L.Edit.PolyVerticesEdit.include({
+	_getMiddleLatLng: function (marker1, marker2) {
+		if (this._poly._geodesicConvert) {
+			var start = marker1.getLatLng(), end = marker2.getLatLng();
+			// todo: implement relevant function/method in L.Geodesic* instead of following hack
+			var geoline = L.geodesicPolyline([start, end], {
+				segmentsCoeff: (start.lng-end.lng) * coeff
+			});
+			if (geoline._latlngs.length > 2) {
+				return geoline._latlngs[1];
+			}
+		}
+		return _getMiddleLatLng.call(this, marker1, marker2);
+	}
+});
+})(L.Edit.PolyVerticesEdit.prototype._getMiddleLatLng);
 
 L.GeodesicCircle.addInitHook(function () { // todo check if this does not conflict with L.Polyline.addInitHook
 	if (L.Edit.Circle) {

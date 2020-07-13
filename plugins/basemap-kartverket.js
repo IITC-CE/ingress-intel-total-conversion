@@ -1,7 +1,7 @@
 ﻿// @author         johnd0e
 // @name           Kartverket.no maps (Norway)
 // @category       Map Tiles
-// @version        0.2.0
+// @version        0.2.1
 // @description    Add Kartverket.no map layers.
 
 
@@ -20,6 +20,7 @@ function setup () {
 
     mappings: {
       kartdata2: 'topo4',
+      matrikkel_bakgrunn: 'matrikkel_bakgrunn2',
       norgeskart_bakgrunn: 'topo4',
       sjo_hovedkart2: 'sjokartraster',
       toporaster: 'toporaster3',
@@ -28,7 +29,7 @@ function setup () {
     },
 
     layers: {
-      matrikkel_bakgrunn: 'Matrikkel bakgrunn',
+      matrikkel_bakgrunn2:'Matrikkel bakgrunn',
       topo4:              'Topografisk norgeskart',
       topo4graatone:      'Topografisk norgeskart gråtone',
       europa:             'Europakart',

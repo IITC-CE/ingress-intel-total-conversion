@@ -101,6 +101,7 @@ window.aboutIITC = function () {
     title: 'IITC ' + iitcVersion,
     id: 'iitc-about',
     html: html,
+    width: 'auto',
     dialogClass: 'ui-dialog-aboutIITC'
   });
 }
@@ -452,29 +453,23 @@ window.removeLayerGroup = function(layerGroup) {
   updateDisplayedLayerGroup(element.name, enabled);
 };
 
-window.clampLat = function(lat) {
-  // the map projection used does not handle above approx +- 85 degrees north/south of the equator
-  if (lat > 85.051128)
-    lat = 85.051128;
-  else if (lat < -85.051128)
-    lat = -85.051128;
-  return lat;
+function clamp (n,max,min) {
+  if (n===0) { return 0; }
+  return n>0 ? Math.min(n,max) : Math.max(n,min);
 }
 
-window.clampLng = function(lng) {
-  if (lng > 179.999999)
-    lng = 179.999999;
-  else if (lng < -180.0)
-    lng = -180.0;
-  return lng;
+var MAX_LATITUDE = 85.051128; // L.Projection.SphericalMercator.MAX_LATITUDE
+window.clampLatLng = function (latlng) {
+  // Ingress accepts requests only for this range
+  return [
+    clamp(latlng.lat, MAX_LATITUDE, -MAX_LATITUDE),
+    clamp(latlng.lng, 179.999999, -180)
+  ];
 }
 
-window.clampLatLng = function(latlng) {
-  return new L.LatLng ( clampLat(latlng.lat), clampLng(latlng.lng) );
-}
-
-window.clampLatLngBounds = function(bounds) {
-  return new L.LatLngBounds ( clampLatLng(bounds.getSouthWest()), clampLatLng(bounds.getNorthEast()) );
+window.clampLatLngBounds = function (bounds) {
+  var SW = bounds.getSouthWest(), NE = bounds.getNorthEast();
+  return L.latLngBounds(clampLatLng(SW), clampLatLng(NE));
 }
 
 // @function makePermalink(latlng?: LatLng, options?: Object): String

@@ -5,6 +5,9 @@
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 
+// HOOK: pluginDrawTools
+// custom hook for draw tools to share it's activity with other plugins
+
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
 
@@ -276,7 +279,6 @@ window.plugin.drawTools.manualOpt = function() {
     html: html,
     id: 'plugin-drawtools-options',
     dialogClass: 'ui-dialog-drawtoolsSet',
-    id: 'plugin-drawtools-options',
     title: 'Draw Tools Options'
   });
 
@@ -491,7 +493,7 @@ window.plugin.drawTools.optReset = function() {
     localStorage[window.plugin.drawTools.KEY_STORAGE] = '[]';
     window.plugin.drawTools.drawnItems.clearLayers();
     window.plugin.drawTools.load();
-    console.log('DRAWTOOLS: reset all drawn items (OptReset)');
+    console.log('DRAWTOOLS: reset all drawn items');
     window.plugin.drawTools.optAlert('Reset Successful. ');
     runHooks('pluginDrawTools', {event: 'clear'});
   }
@@ -589,24 +591,7 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
-window.plugin.drawTools.drawstart = function (e) {
-  var mouseActive = L.Browser.touch && matchMedia('(hover:hover)').matches; // workaround for https://github.com/IITC-CE/ingress-intel-total-conversion/issues/162
-  if (mouseActive || e.layerType === 'circle' || e.layerType === 'rectangle') {
-    e.target.touchExtend.enable()
-  } else {
-    e.target.touchExtend.disable()
-  };
-}
-
-// HOOK: pluginDrawTools
-// custom hook for draw tools to share it's activity with other plugins
-
 window.plugin.drawTools.boot = function() {
-  // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
-  map.addHandler('touchExtend', L.Map.TouchExtend);
-
-  // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
-  map.on('draw:drawstart', plugin.drawTools.drawstart);
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
@@ -731,10 +716,6 @@ function setup () {
   window.plugin.drawTools.mpe.boot();           // register to MPE if available
 }
 
-// *********************************************************************************************
-// Leave the following function at end of code so that the complied script gets better readable.
-// Only the wrapper-code will be found below.
-// *********************************************************************************************
 function loadExternals () {
   try {
     // https://github.com/Leaflet/Leaflet.draw
@@ -743,11 +724,30 @@ function loadExternals () {
 
     $('<style>').html('@include_css:external/leaflet.draw-fix.css@').appendTo('head');
 
-    '@include_raw:external/leaflet.draw-fix.js@';
-
     '@include_raw:external/leaflet.draw-snap.js@';
 
     '@include_raw:external/leaflet.draw-geodesic.js@';
+
+    // support Leaflet >= 1
+    // https://github.com/Leaflet/Leaflet.draw/pull/911
+    L.Draw.Polyline.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Polygon.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Rectangle.prototype.options.shapeOptions.interactive = true;
+    L.Draw.CircleMarker.prototype.options.interactive = true;
+    L.Draw.Circle.prototype.options.shapeOptions.interactive = true;
+
+    // https://github.com/Leaflet/Leaflet.draw/issues/789
+    // https://github.com/Leaflet/Leaflet.draw/issues/695
+    L.Draw.Polyline.prototype._onTouch_original = L.Draw.Polyline.prototype._onTouch; // just in case
+    L.Draw.Polyline.prototype._onTouch = L.Util.falseFn;
+
+    // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
+    map.addHandler('touchExtend', L.Map.TouchExtend);
+
+    // disable tap handler as it conflicts with leaflet.draw
+    // https://github.com/Leaflet/Leaflet/issues/6977
+    // !Note: currently this may brake `contextmenu` handling on iOS
+    map.tap = map.tap ? map.tap.disable() : false;
 
   } catch (e) {
     console.error('leaflet.draw-src.js loading failed');
