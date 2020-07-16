@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.7.1
+// @version        0.8.1
 // @description    Allow drawing things onto the current map so you may plan your next move.
 
 
@@ -10,6 +10,16 @@
 
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
+
+window.plugin.drawTools.KEY_STORAGE = 'plugin-draw-tools-layer';
+
+window.plugin.drawTools.merge = {};
+window.plugin.drawTools.merge.status = true;
+window.plugin.drawTools.merge.toggle() = function() {
+  var status = window.plugin.drawTools.merge.status;
+  status = Boolean(!status);
+  window.plugin.drawTools.merge.status = status;
+ }
 
 window.plugin.drawTools.getMarkerIcon = function(color) {
   if (!color) {
@@ -202,14 +212,14 @@ window.plugin.drawTools.save = function() {
     data.push(item);
   });
 
-  localStorage['plugin-draw-tools-layer'] = JSON.stringify(data);
+  localStorage[window.plugin.drawTools.KEY_STORAGE] = JSON.stringify(data);
 
   console.log('draw-tools: saved to localStorage');
 }
 
 window.plugin.drawTools.load = function() {
   try {
-    var dataStr = localStorage['plugin-draw-tools-layer'];
+    var dataStr = localStorage[window.plugin.drawTools.KEY_STORAGE];
     if (dataStr === undefined) return;
 
     var data = JSON.parse(dataStr);
@@ -257,9 +267,12 @@ window.plugin.drawTools.import = function(data) {
 
 
 //Draw Tools Options
-
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function() {
+	var mergeStatusCheck = '';
+	if(window.plugin.drawTools.merge.status){
+		mergeStatusCheck = 'checked';
+	}
 
   var html = '<div class="drawtoolsStyles">'
            + '<input type="color" name="drawColor" id="drawtools_color"></input>'
@@ -267,6 +280,9 @@ window.plugin.drawTools.manualOpt = function() {
            + '</div>'
            + '<div class="drawtoolsSetbox">'
            + '<a onclick="window.plugin.drawTools.optCopy();" tabindex="0">Copy Drawn Items</a>'
+           + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
+           +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Merge, not replace</label></center>'
+           //+ '<center><input type="checkbox" name="merge" id="drawtools_merge"></input> Do not overwrite, merge!</center>' 
            + '<a onclick="window.plugin.drawTools.optPaste();return false;" tabindex="0">Paste Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>'
@@ -307,7 +323,7 @@ window.plugin.drawTools.optAlert = function(message) {
 
 window.plugin.drawTools.optCopy = function() {
     if (typeof android !== 'undefined' && android && android.shareString) {
-        android.shareString(localStorage['plugin-draw-tools-layer']);
+        android.shareString(localStorage[window.plugin.drawTools.KEY_STORAGE]);
     } else {
       var stockWarnings = {};
       var stockLinks = [];
@@ -350,7 +366,7 @@ window.plugin.drawTools.optCopy = function() {
       if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
 
       var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+localStorage['plugin-draw-tools-layer']+'</textarea>'
+                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
                 +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
                 +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
       if (stockWarnTexts.length>0) {
@@ -368,11 +384,12 @@ window.plugin.drawTools.optCopy = function() {
 }
 
 window.plugin.drawTools.optExport = function() {
-  var data = localStorage['plugin-draw-tools-layer'];
+  var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
   window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
 }
 
-window.plugin.drawTools.optPaste = function() {
+window.plugin.drawTools.optPaste = function() { 
+//  if (merge === undefined) merge = true;   //default to true
   var promptAction = prompt('Press CTRL+V to paste (draw-tools data or stock intel URL).', '');
   promptAction = promptAction && promptAction.trim();
   if (promptAction) {
@@ -413,7 +430,9 @@ window.plugin.drawTools.optPaste = function() {
         }
 
         // all parsed OK - clear and insert
-        window.plugin.drawTools.drawnItems.clearLayers();
+        if (!window.plugin.drawTools.merge.status) {
+          window.plugin.drawTools.drawnItems.clearLayers();
+        }
         for (var i=0; i<newLines.length; i++) {
           window.plugin.drawTools.drawnItems.addLayer(newLines[i]);
         }
@@ -424,6 +443,13 @@ window.plugin.drawTools.optPaste = function() {
 
 
       } else {
+        if (window.plugin.drawTools.merge.status) {
+          promptAction = (typeof(
+            window.localStorage[window.plugin.drawTools.KEY_STORAGE]) !== 'undefined' &&
+            window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
+              ? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0,-1) + ',' + promptAction.slice(1) 
+              : promptAction);
+        }     
         var data;
           try{
             data = JSON.parse(promptAction);
@@ -475,7 +501,7 @@ window.plugin.drawTools.optImport = function() {
 window.plugin.drawTools.optReset = function() {
   var promptAction = confirm('All drawn items will be deleted. Are you sure?', '');
   if(promptAction) {
-    delete localStorage['plugin-draw-tools-layer'];
+    delete localStorage[window.plugin.drawTools.KEY_STORAGE];
     window.plugin.drawTools.drawnItems.clearLayers();
     window.plugin.drawTools.load();
     console.log('DRAWTOOLS: reset all drawn items');
