@@ -438,7 +438,7 @@ window.plugin.drawTools.optPaste = function() {
         }
         runHooks('pluginDrawTools', {event: 'import'});
 
-        console.log('DRAWTOOLS: reset and imported drawn items from stock URL');
+        console.log('DRAWTOOLS: '+(window.plugin.drawTools.merge.status?'':'reset and ')+'pasted drawn items from stock URL');
         window.plugin.drawTools.optAlert('Import Successful.');
 
 
@@ -466,7 +466,7 @@ window.plugin.drawTools.optPaste = function() {
         }
         window.plugin.drawTools.drawnItems.clearLayers();
         window.plugin.drawTools.import(data);
-        console.log('DRAWTOOLS: reset and imported drawn items');
+        console.log('DRAWTOOLS: '+(window.plugin.drawTools.merge.status?'':'reset and ')+'pasted drawn items');
         window.plugin.drawTools.optAlert('Import Successful.');
       }
 
@@ -484,9 +484,11 @@ window.plugin.drawTools.optImport = function() {
     .on('load',function (e) {
       try {
         var data = JSON.parse(e.reader.result);
-        window.plugin.drawTools.drawnItems.clearLayers();
+        if (!window.plugin.drawTools.merge.status) {
+          window.plugin.drawTools.drawnItems.clearLayers();
+        }
         window.plugin.drawTools.import(data);
-        console.log('DRAWTOOLS: reset and imported drawn tiems');
+        console.log('DRAWTOOLS: '+(window.plugin.drawTools.merge.status?'':'reset and ')+'imported drawn items');
         window.plugin.drawTools.optAlert('Import Successful.');
 
         // to write back the data to localStorage
