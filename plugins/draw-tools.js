@@ -270,7 +270,7 @@ window.plugin.drawTools.import = function(data) {
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function() {
 	var mergeStatusCheck = '';
-	if(window.plugin.drawTools.merge.status){
+	if(!window.plugin.drawTools.merge.status){
 		mergeStatusCheck = 'checked';
 	}
 
@@ -281,7 +281,7 @@ window.plugin.drawTools.manualOpt = function() {
            + '<div class="drawtoolsSetbox">'
            + '<a onclick="window.plugin.drawTools.optCopy();" tabindex="0">Copy Drawn Items</a>'
            + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
-           +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Merge, not replace</label></center>'
+           +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
            //+ '<center><input type="checkbox" name="merge" id="drawtools_merge"></input> Do not overwrite, merge!</center>' 
            + '<a onclick="window.plugin.drawTools.optPaste();return false;" tabindex="0">Paste Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>'
