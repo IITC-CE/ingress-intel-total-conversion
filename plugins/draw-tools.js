@@ -1,8 +1,8 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.7.2
-// @description    Allow drawing things onto the current map so you may plan your next move.
+// @version        0.8.2
+// @description    Allow drawing things onto the current map so you may plan your next move. EDF-Support
 
 
 // HOOK: pluginDrawTools
@@ -11,7 +11,7 @@
 // use own namespace for plugin
 window.plugin.drawTools = function() {};
 
-window.plugin.drawTools.KEY_STORAGE = window.plugin.drawTools.KEY_STORAGE;
+window.plugin.drawTools.KEY_STORAGE = 'plugin-draw-tools-layer';
 
 window.plugin.drawTools.getMarkerIcon = function(color) {
   if (!color) {
@@ -263,6 +263,11 @@ window.plugin.drawTools.import = function(data) {
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function() {
 
+  var edfStatusCheck = '';
+  if(!window.plugin.drawTools.edf.obj.status){
+    edfStatusCheck = 'checked';
+  }
+
   var html = '<div class="drawtoolsStyles">'
            + '<input type="color" name="drawColor" id="drawtools_color"></input>'
 //TODO: add line style choosers: thickness, maybe dash styles?
@@ -274,6 +279,9 @@ window.plugin.drawTools.manualOpt = function() {
            + '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optReset();return false;" tabindex="0">Reset Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>'
+           + '<center><label id="edfToggle" style="color: #ffce00; cursor:pointer; display:block;">'
+           +    '<input type="checkbox" '+edfStatusCheck+' name="edf"'
+           +    'onchange="window.plugin.drawTools.edf.action.toggle();return false;" />Fill the polygon(s)</label></center>'
            + '</div>';
 
   dialog({
@@ -645,9 +653,112 @@ window.plugin.drawTools.boot = function() {
 
 }
 
+// ---------------------------------------------------------------------------------
+// EXPORT (POLYS AS LINES)
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.getDrawAsLines = function(){
+  var rawDraw = JSON.parse(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
+  var draw = [];
+
+  for(i in rawDraw){
+    var elemDraw = rawDraw[i];
+
+    if(elemDraw.type === 'polygon'){
+      var convElemDraw = {};
+      convElemDraw.color = elemDraw.color;
+      convElemDraw.type = 'polyline';
+      convElemDraw.latLngs = [];
+
+      var v = elemDraw.latLngs.length;
+      for(j in elemDraw.latLngs){
+        var ll = elemDraw.latLngs[j];
+        convElemDraw.latLngs.push(ll);
+      }
+      convElemDraw.latLngs.push(elemDraw.latLngs[0]);
+
+      draw.push(convElemDraw);
+    }else{
+      draw.push(elemDraw);
+    }
+  }
+
+  return JSON.stringify(draw);
+}
+
+// ---------------------------------------------------------------------------------
+// EMPTY POLYGONS (EMPTY DRAWN FIELDS)
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.edf = {};
+window.plugin.drawTools.edf.storage = {};
+window.plugin.drawTools.edf.draw = {};
+window.plugin.drawTools.edf.obj = {};
+window.plugin.drawTools.edf.action = {};
+window.plugin.drawTools.edf.ui = {};
+
+window.plugin.drawTools.edf.boot = function(){
+  window.addHook('pluginDrawTools', window.plugin.drawTools.edf.hookManagement);
+  window.addHook('iitcLoaded', function(){
+    if(window.plugin.drawTools.edf.obj.status){
+      window.plugin.drawTools.edf.draw.toggleOpacityOpt();
+      window.plugin.drawTools.edf.draw.clearAndDraw();
+    }
+  });
+};
+
+window.plugin.drawTools.edf.obj.status = false;
+window.plugin.drawTools.edf.obj.toggle = function(){
+  var status = window.plugin.drawTools.edf.obj.status;
+  status = Boolean(!status);
+  window.plugin.drawTools.edf.obj.status = status;
+}
+window.plugin.drawTools.edf.draw.toggleOpacityOpt = function(){
+  if(window.plugin.drawTools.edf.obj.status){
+    window.plugin.drawTools.polygonOptions.fillOpacity = 0.0;
+  }else{
+    window.plugin.drawTools.polygonOptions.fillOpacity = 0.2;
+  }
+}
+window.plugin.drawTools.edf.draw.clearAndDraw = function(){
+  window.plugin.drawTools.drawnItems.clearLayers();
+  window.plugin.drawTools.load();
+  console.log('DRAWTOOLS: reset all drawn items');
+}
+
+window.plugin.drawTools.edf.action.toggle = function(){
+  window.plugin.drawTools.edf.obj.toggle();
+  window.plugin.drawTools.edf.draw.toggleOpacityOpt();
+  window.plugin.drawTools.edf.draw.clearAndDraw();
+}
+
+window.plugin.drawTools.edf.hookManagement = function(data){
+  if(data.event === 'openOpt'){
+  }else if(data.event == 'layerCreated'){
+    if(window.plugin.drawTools.edf.obj.status){
+      //    window.plugin.drawTools.edf.draw.toggleOpacityOpt(); // disabled by Zaso
+      window.plugin.drawTools.edf.draw.clearAndDraw();
+    }
+  }
+}
+
+window.plugin.drawTools.setupCSS = function(){
+	$("<style>").prop("type", "text/css").html(''
+		+'.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);}'
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar{box-shadow:none;}'
+		+'.leaflet-draw{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px;}'
+
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top a:last-child{border-bottom:2px solid #999;}'
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar a{border-radius:0;}'
+
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar{border-radius:0 0 4px 4px;overflow:hidden;margin-top:0;}'
+		+'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top{border-radius:4px 4px 0 0;}'
+	).appendTo("head");
+}
+
 function setup () {
   loadExternals();
   window.plugin.drawTools.boot();
+  window.plugin.drawTools.setupCSS();
+  window.plugin.drawTools.edf.boot();
 }
 
 function loadExternals () {
