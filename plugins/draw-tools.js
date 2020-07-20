@@ -357,11 +357,30 @@ window.plugin.drawTools.optCopy = function() {
       if (stockWarnings.noCircle) stockWarnTexts.push('Warning: Circles cannot be exported to stock intel');
       if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
       if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
-
+/*
       var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
                 +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
                 +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
                 +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
+*/
+         // Export Normal draw
+        var html = ''
+          +'<p style="margin:0 0 6px;">Normal export:</p>'
+          +'<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+          +'<textarea id="copyNorm" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">'+localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>';
+
+        // Export draw (polygons as lines)
+        html += '<hr/>'
+          +'<p style="margin:0 0 6px;">or export with polygons as lines (not filled):</p>'
+          +'<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+          +'<textarea id="copyEDF" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">'+window.plugin.drawTools.getDrawAsLines()+'</textarea>';
+
+        // Export for intel stock URL (only lines)
+        html += '<hr/>'
+          +'<p style="margin:0 0 6px;">or export as a link for the standard intel map (for non IITC users):</p>'
+          +'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'input\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+          +'<input onclick="event.target.select();" type="text" size="49" value="'+stockUrl+'"/>';
+
       if (stockWarnTexts.length>0) {
         html += '<ul><li>'+stockWarnTexts.join('</li><li>')+'</li></ul>';
       }
@@ -648,7 +667,7 @@ window.plugin.drawTools.boot = function() {
 
   $('head').append('<style>' +
         '.drawtoolsSetbox > a { display:block; color:#ffce00; border:1px solid #ffce00; padding:3px 0; margin:10px auto; width:80%; text-align:center; background:rgba(8,48,78,.9); }'+
-        '.ui-dialog-drawtoolsSet-copy textarea { width:96%; height:250px; resize:vertical; }'+
+        '.ui-dialog-drawtoolsSet-copy textarea { width:96%; height:100px; resize:vertical; }'+
         '</style>');
 
 }
