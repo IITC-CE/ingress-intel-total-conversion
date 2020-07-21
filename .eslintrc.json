@@ -27,6 +27,9 @@
         "no-const-assign": "error",
         "no-trailing-spaces": "error",
         "max-len": ["warn", { "code": 160 }],
-        "semi": "error"
+        "semi": "error",
+        "eol-last": "error",
+        "quote-props": ["error","consistent-as-needed"],
+        "no-unused-expressions": "error"
     }
 }
