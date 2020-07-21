@@ -20,13 +20,13 @@
         "no-undef": 0,
         "eqeqeq": "error",
         "indent": ["warn", 2],
-        "brace-style": "error",
-        "keyword-spacing": ["error", { "before": true }],
-        "spaced-comment": ["error", "always"],
+        "brace-style": ["error","1tbs", { "allowSingleLine": true }],
+        "keyword-spacing": "error",
+        "spaced-comment": "error",
         "quotes": ["error", "single", { "avoidEscape": true }],
         "no-const-assign": "error",
         "no-trailing-spaces": "error",
-        "max-len": ["warn", { "code": 160 }]
-        // "no-var": "error"
+        "max-len": ["warn", { "code": 160 }],
+        "semi": "error"
     }
 }
