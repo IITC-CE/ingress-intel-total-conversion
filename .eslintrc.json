@@ -6,9 +6,7 @@
         "greasemonkey": true
     },
     "extends": [
-        "eslint:recommended",
-        "plugin:vue/essential",
-        "plugin:es5/no-es2016"
+        "eslint:recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -18,10 +16,6 @@
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
-    "plugins": [
-        "vue",
-        "es5"
-    ],
     "rules": {
         "no-undef": 0,
         "eqeqeq": "error",
