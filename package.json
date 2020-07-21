@@ -1,10 +1,15 @@
 {
   "name": "iitc-ce",
-  "version": "1.0.0",
+  "description": "ingress intel total conversion (IITC-CE)",
+  "keywords": [
+    "iitc",
+    "ingress"
+  ],
   "main": "core/total-conversion-build.js",
   "repository": "https://github.com/IITC-CE/ingress-intel-total-conversion.git",
   "author": ".",
   "license": "ISC",
+  "private": true,
   "devDependencies": {
     "eslint": "^7.5.0"
   }
