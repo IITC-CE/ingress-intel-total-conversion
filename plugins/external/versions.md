@@ -1,8 +1,8 @@
 ### jQuery-related components:
 
 * https://github.com/bgrins/spectrum
-  1.8.0-24-g9e04e58
-  spectrum.js: 1d9835b239869d90bf8d3555641d1f7e9cea1f71
+  1.8.1-4-g101b05c
+  spectrum.js: 8fd0a3a5f6a478f319763f999aaf5d8531c52b1d
   used in: draw-tools
 
 
