@@ -2,8 +2,7 @@
 // @name           Uniques
 // @category       Misc
 // @version        0.3.0
-// @description    Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
-
+// @description    Allow manual entry of portals visited/captured, scouted or droned. Highlighters for all three help to identify new portals. Uniques uses the 'sync'-plugin to share between multiple browsers or desktop/mobile. COMM and portal details are analyzed to fill the fields automatically (but this will not catch every case).
 
 //use own namespace for plugin
 window.plugin.uniques = function() {};
@@ -165,7 +164,16 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
         var portal = markup[1][1];
         var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
         if(guid) plugin.uniques.setPortalScouted(guid);
-      }
+    } else if(plext.plextType == 'SYSTEM_NARROWCAST'
+      && markup.length==3
+      && markup[0][0] == 'TEXT'
+      && markup[0][1].plain == 'You were displaced as Scout Controller on '
+      && markup[1][0] == 'PORTAL') {
+        // search for "You were displaced as Scout Controller on"
+        var portal = markup[1][1];
+        var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+        if(guid) plugin.uniques.setPortalScouted(guid);
+    }
   });
 }
 
@@ -461,10 +469,10 @@ window.plugin.uniques.loadLocal = function(name) {
   }
 }
 
-/***************************************************************************************************************************************************************/
-/** HIGHLIGHTER ************************************************************************************************************************************************/
-/***************************************************************************************************************************************************************/
-window.plugin.uniques.highlighter = {
+/****************************************************************************************/
+/** HIGHLIGHTERS ************************************************************************/
+/****************************************************************************************/
+window.plugin.uniques.highlighterCaptured = {
   highlight: function(data) {
     var guid = data.portal.options.ent[0];
     var uniqueInfo = window.plugin.uniques.uniques[guid];
@@ -498,6 +506,48 @@ window.plugin.uniques.highlighter = {
   }
 }
 
+// highlighter scouted
+window.plugin.uniques.highlighterScouted = {
+  highlight: function(data) {
+    var guid = data.portal.options.ent[0];
+    var uniqueInfo = window.plugin.uniques.uniques[guid];
+
+    var style = {};
+
+    if (uniqueInfo && uniqueInfo.scouted)
+    { // scouted - no highlights
+    } else {
+        style.fillColor = 'red';
+        style.fillOpacity = 0.7;
+    }
+    data.portal.setStyle(style);
+  },
+
+  setSelected: function(active) {
+    window.plugin.uniques.isHighlightActive = active;
+  }
+}
+// highlighter droned
+window.plugin.uniques.highlighterDroned = {
+  highlight: function(data) {
+    var guid = data.portal.options.ent[0];
+    var uniqueInfo = window.plugin.uniques.uniques[guid];
+
+    var style = {};
+
+    if (uniqueInfo && uniqueInfo.droned)
+    { // droneded - no highlights
+    } else {
+        style.fillColor = 'red';
+        style.fillOpacity = 0.7;
+    }
+    data.portal.setStyle(style);
+  },
+
+  setSelected: function(active) {
+    window.plugin.uniques.isHighlightActive = active;
+  }
+}
 
 window.plugin.uniques.setupCSS = function() {
   $("<style>")
@@ -726,7 +776,9 @@ var setup = function() {
   window.plugin.uniques.setupCSS();
   window.plugin.uniques.setupContent();
   window.plugin.uniques.loadLocal('uniques');
-  window.addPortalHighlighter('Uniques', window.plugin.uniques.highlighter);
+  window.addPortalHighlighter('Droned', window.plugin.uniques.highlighterDroned);
+  window.addPortalHighlighter('Scouted', window.plugin.uniques.highlighterScouted);
+  window.addPortalHighlighter('Visited/Captured', window.plugin.uniques.highlighterCaptured);
   window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
   window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
   window.plugin.uniques.registerFieldForSyncing();
