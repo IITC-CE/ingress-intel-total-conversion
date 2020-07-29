@@ -596,7 +596,8 @@ window.plugin.uniques.setupPortalsList = function() {
   function uniqueValue(guid) {
     var info = plugin.uniques.uniques[guid];
     if(!info) return 0;
-
+    if(info.visited === undefined) return 0;
+    if(!info.visited) return 0;
     if(info.visited && info.captured) return 2;
     if(info.visited) return 1;
   }
