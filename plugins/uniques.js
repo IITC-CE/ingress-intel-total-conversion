@@ -601,6 +601,20 @@ window.plugin.uniques.setupPortalsList = function() {
     if(info.visited) return 1;
   }
 
+  function scoutedValue(guid) {
+    var info = plugin.uniques.uniques[guid];
+    if (!info) return 0;
+    if (info.scouted === undefined ) return 0;
+    if (info.scouted === true) return 1;
+  }
+
+  function dronedValue(guid) {
+    var info = plugin.uniques.uniques[guid];
+    if (!info) return 0;
+    if (info.droned === undefined ) return 0;
+    if (info.droned === true) return 1;
+  }
+
   window.plugin.portalslist.fields.push(
     {title: "V/C",
     value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
@@ -646,12 +660,11 @@ window.plugin.uniques.setupPortalsList = function() {
     },
 //---------------------------------------------------------------------------
     {title: "S",
-    value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
-/*    sort:  function(guidA, guidB) {
-      return uniqueValue(guidA) - uniqueValue(guidB);
-    },
- */
-    format: function(cell, portal, guid) {
+      value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
+      sort:  function(guidA, guidB) {
+        return scoutedValue(guidA) - scoutedValue(guidB);
+      },
+      format: function(cell, portal, guid) {
       var info = plugin.uniques.uniques[guid];
       if(!info) info = { visited: false, captured: false, scouted: false, droned: false  };
 
@@ -676,12 +689,11 @@ window.plugin.uniques.setupPortalsList = function() {
   },
 //---------------------------------------------------------------------------
     {title: "D",
-    value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
-/*    sort:  function(guidA, guidB) {
-      return uniqueValue(guidA) - uniqueValue(guidB);
-    },
-*/
-    format: function(cell, portal, guid) {
+      value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
+      sort:  function(guidA, guidB) {
+        return dronedValue(guidA) - dronedValue(guidB);
+      },
+      format: function(cell, portal, guid) {
       var info = plugin.uniques.uniques[guid];
       if(!info) info = { visited: false, captured: false, scouted: false, droned: false  };
 
