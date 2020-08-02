@@ -1,8 +1,8 @@
-// @author         3ch01c
+// @author         3ch01c/AlterTobi
 // @name           Uniques
 // @category       Misc
-// @version        0.2.4
-// @description    Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
+// @version        0.3.0
+// @description    Allow manual entry of portals visited/captured/dronevisited/scout controlled. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
 
 
 //use own namespace for plugin
@@ -47,7 +47,7 @@ window.plugin.uniques.onPortalDetailsUpdated = function() {
 			function installedByPlayer(entity) {
 				return entity && entity.owner == nickname;
 			}
-			
+
 			if(details.resonators.some(installedByPlayer) || details.mods.some(installedByPlayer)) {
 				plugin.uniques.updateVisited(true);
 			}
@@ -156,6 +156,18 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 			var portal = markup[1][1];
 			var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
 			if(guid) plugin.uniques.setPortalVisited(guid);
+		} else if(plext.plextType == 'SYSTEM_NARROWCAST'
+		&& markup.length==3
+		&& markup[0][0] == 'TEXT'
+		&& markup[0][1].plain == 'You claimed Scout Controller on '
+		&& markup[1][0] == 'PORTAL'
+		&& markup[2][0] == 'TEXT'
+		&& markup[2][1].plain == ' by uploading more Portal Scans than any Agent.' 
+		){
+			// search for "You claimed Scout Controller on x by uploading more Portal Scans than any Agent."
+			var portal = markup[1][1];
+			var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+			if(guid) plugin.uniques.setPortalScouted(guid);
 		}
 	});
 }
@@ -167,9 +179,13 @@ window.plugin.uniques.updateCheckedAndHighlight = function(guid) {
 
 		var uniqueInfo = plugin.uniques.uniques[guid],
 			visited = (uniqueInfo && uniqueInfo.visited) || false,
-			captured = (uniqueInfo && uniqueInfo.captured) || false;
+			captured = (uniqueInfo && uniqueInfo.captured) || false,
+			dronevisited = (uniqueInfo && uniqueInfo.dronevisited) || false,
+			scouted = (uniqueInfo && uniqueInfo.scouted) || false;
 		$('#visited').prop('checked', visited);
 		$('#captured').prop('checked', captured);
+		$('#dronevisited').prop('checked', dronevisited);
+		$('#scouted').prop('checked', scouted);
 	}
 
 	if (window.plugin.uniques.isHighlightActive) {
@@ -189,7 +205,9 @@ window.plugin.uniques.setPortalVisited = function(guid) {
 	} else {
 		plugin.uniques.uniques[guid] = {
 			visited: true,
-			captured: false
+			captured: false,
+			dronevisited : false,
+			scouted : false
 		};
 	}
 
@@ -207,13 +225,35 @@ window.plugin.uniques.setPortalCaptured = function(guid) {
 	} else {
 		plugin.uniques.uniques[guid] = {
 			visited: true,
-			captured: true
+			captured: true,
+			dronevisited : false,
+			scouted : false
 		};
 	}
 
 	plugin.uniques.updateCheckedAndHighlight(guid);
 	plugin.uniques.sync(guid);
 }
+
+window.plugin.uniques.setPortalScouted = function(guid) {
+	var uniqueInfo = plugin.uniques.uniques[guid];
+	if (uniqueInfo) {
+		if(uniqueInfo.scouted) return;
+
+		uniqueInfo.scouted = true;
+	} else {
+		plugin.uniques.uniques[guid] = {
+			visited: false,
+			captured: false,
+			dronevisited : false,
+			scouted : true
+		};
+	}
+
+//	plugin.uniques.updateCheckedAndHighlight(guid);
+	plugin.uniques.sync(guid);
+}
+
 
 window.plugin.uniques.updateVisited = function(visited, guid) {
 	if(guid == undefined) guid = window.selectedPortal;
@@ -222,7 +262,9 @@ window.plugin.uniques.updateVisited = function(visited, guid) {
 	if (!uniqueInfo) {
 		plugin.uniques.uniques[guid] = uniqueInfo = {
 			visited: false,
-			captured: false
+			captured: false,
+			dronevisited : false,
+			scouted : false
 		};
 	}
 
@@ -246,7 +288,9 @@ window.plugin.uniques.updateCaptured = function(captured, guid) {
 	if (!uniqueInfo) {
 		plugin.uniques.uniques[guid] = uniqueInfo = {
 			visited: false,
-			captured: false
+			captured: false,
+			dronevisited : false,
+			scouted : false
 		};
 	}
 
@@ -262,6 +306,58 @@ window.plugin.uniques.updateCaptured = function(captured, guid) {
 	plugin.uniques.updateCheckedAndHighlight(guid);
 	plugin.uniques.sync(guid);
 }
+window.plugin.uniques.updateDroneVisited = function(dronevisited, guid) {
+
+	if(guid == undefined) guid = window.selectedPortal;
+
+	var uniqueInfo = plugin.uniques.uniques[guid];
+	if (!uniqueInfo) {
+		plugin.uniques.uniques[guid] = uniqueInfo = {
+			visited: false,
+			captured: false,
+			dronevisited : false,
+			scouted : false
+		};
+	}
+
+	if(dronevisited == uniqueInfo.dronevisited) return;
+
+	if (dronevisited) {
+		uniqueInfo.dronevisited = true;
+	} else {
+		uniqueInfo.dronevisited = false;
+	}
+
+//	plugin.uniques.updateCheckedAndHighlight(guid);
+	plugin.uniques.sync(guid);
+
+}
+
+window.plugin.uniques.updateScouted = function(scouted, guid) {
+	if(guid == undefined) guid = window.selectedPortal;
+
+	var uniqueInfo = plugin.uniques.uniques[guid];
+	if (!uniqueInfo) {
+		plugin.uniques.uniques[guid] = uniqueInfo = {
+			visited: false,
+			captured: false,
+			dronevisited : false,
+			scouted : false
+		};
+	}
+
+	if(scouted == uniqueInfo.scouted) return;
+
+	if (scouted) {
+		uniqueInfo.scouted = true;
+	} else {
+		uniqueInfo.scouted = false;
+	}
+
+//	plugin.uniques.updateCheckedAndHighlight(guid);
+	plugin.uniques.sync(guid);
+
+}
 
 // stores the gived GUID for sync
 plugin.uniques.sync = function(guid) {
@@ -274,9 +370,9 @@ plugin.uniques.sync = function(guid) {
 // sync the queue, but delay the actual sync to group a few updates in a single request
 window.plugin.uniques.syncQueue = function() {
 	if(!plugin.uniques.enableSync) return;
-	
+
 	clearTimeout(plugin.uniques.syncTimer);
-	
+
 	plugin.uniques.syncTimer = setTimeout(function() {
 		plugin.uniques.syncTimer = null;
 
@@ -410,7 +506,9 @@ window.plugin.uniques.setupCSS = function() {
 window.plugin.uniques.setupContent = function() {
 	plugin.uniques.contentHTML = '<div id="uniques-container">'
 		+ '<label><input type="checkbox" id="visited" onclick="window.plugin.uniques.updateVisited($(this).prop(\'checked\'))"> Visited</label>'
-		+ '<label><input type="checkbox" id="captured" onclick="window.plugin.uniques.updateCaptured($(this).prop(\'checked\'))"> Captured</label>'
+		+ '<label><input type="checkbox" id="captured" onclick="window.plugin.uniques.updateCaptured($(this).prop(\'checked\'))"> Captured</label><br/>'
+		+ '<label><input type="checkbox" id="dronevisited" onclick="window.plugin.uniques.updateDroneVisited($(this).prop(\'checked\'))"> Drone Visited</label>'
+		+ '<label><input type="checkbox" id="scouted" onclick="window.plugin.uniques.updateScouted($(this).prop(\'checked\'))"> ScoutController</label>'
 		+ '</div>';
 	plugin.uniques.disabledMessage = '<div id="uniques-container" class="help" title="Your browser does not support localStorage">Plugin Uniques disabled</div>';
 }
@@ -493,10 +591,10 @@ window.plugin.uniques.setupPortalsList = function() {
 
 window.plugin.uniques.onMissionChanged = function(data) {
 	if(!data.local) return;
-	
+
 	var mission = window.plugin.missions && window.plugin.missions.getMissionCache(data.mid, false);
 	if(!mission) return;
-	
+
 	window.plugin.uniques.checkMissionWaypoints(mission);
 };
 
@@ -510,40 +608,40 @@ window.plugin.uniques.onMissionLoaded = function(data) {
 
 window.plugin.uniques.checkMissionWaypoints = function(mission) {
 	if(!(window.plugin.missions && window.plugin.missions.checkedMissions[mission.guid])) return;
-	
+
 	if(!mission.waypoints) return;
-	
+
 	function isValidWaypoint(wp) {
 		// might be hidden or field trip card
 		if(!(wp && wp.portal && wp.portal.guid)) return false;
-		
+
 		// only use hack, deploy, link, field and upgrade; ignore photo and passphrase
 		if(wp.objectiveNum <= 0 || wp.objectiveNum > 5) return false;
-		
+
 		return true;
 	}
 	function isVisited(wp) {
 		var guid = wp.portal.guid,
 			uniqueInfo = plugin.uniques.uniques[guid],
 			visited = (uniqueInfo && uniqueInfo.visited) || false;
-		
+
 		return visited;
 	}
-	
+
 	// check if all waypoints are already visited
 	if(mission.waypoints.every(function(wp) {
 		if(!isValidWaypoint(wp)) return true;
 		return isVisited(wp);
 	})) return;
-	
+
 	if(!confirm('The mission ' + mission.title + ' contains waypoints not yet marked as visited.\n\n' +
 			'Do you want to set them to \'visited\' now?'))
 		return;
-	
+
 	mission.waypoints.forEach(function(wp) {
 		if(!isValidWaypoint(wp)) return;
 		if(isVisited(wp)) return;
-		
+
 		plugin.uniques.setPortalVisited(wp.portal.guid);
 	});
 };
@@ -561,11 +659,11 @@ var setup = function() {
 	window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
 	window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
 	window.plugin.uniques.registerFieldForSyncing();
-	
+
 	// to mark mission portals as visited
 	window.addHook('plugin-missions-mission-changed', window.plugin.uniques.onMissionChanged);
 	window.addHook('plugin-missions-loaded-mission', window.plugin.uniques.onMissionLoaded);
-	
+
 	if (window.plugin.portalslist) {
 		window.plugin.uniques.setupPortalsList();
 	}
