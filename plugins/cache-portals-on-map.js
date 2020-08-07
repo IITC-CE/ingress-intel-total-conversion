@@ -29,11 +29,60 @@ window.plugin.cachePortalDetailsOnMap.entityInject = function(data) {
   }
   data.callback(ents);
 };
+/****************************************************************************************/
+/* extend portal's GUID lookup to search in cached portals as well                      */
 
+window.cachePortalDetailsOnMap.findPortalGuidByCacheE6 = function(latE6, lngE6) {
+  let guid = window.cachePortalDetailsOnMap.findPortalGuidByPositionE6old(latE6, lngE6);
+  //PLUGIN.log("findPortalGuidByPositionE6old %s %s -> %s", latE6, lngE6, guid);
+
+  // PLUGIN: cache > cache
+  if (guid == null) {
+    const cache = window.plugin.cachePortalDetailsOnMap;
+    if (cache && cache.cache) {
+      for (let g in cache.cache) {
+        let p = cache.cache[g];
+        if (latE6 == p.ent[2][2] && lngE6 == p.ent[2][3]) {
+          PLUGIN.log("newFindPortalGuidByPositionE6 matched in cache! %s %s -> [%s] = %o", latE6, lngE6, g, p);
+          guid = g;
+          break;
+        }
+      }
+    }
+  }
+/*  // PLUGIN: (external) > offle
+  if (guid == null) {
+    const offle = window.plugin.offle;
+    if (offle && offle.portalDb) {
+      let lat = parseInt(latE6) / 1000000;
+      let lng = parseInt(lngE6) / 1000000;
+      //PLUGIN.log("lat/lng parsed as", lat, lng);
+      for (let g in offle.portalDb) {
+        let p = offle.portalDb[g];
+        if (p.lat == lat && p.lng == lng) {
+          PLUGIN.log("newFindPortalGuidByPositionE6 matched in offle! %s %s -> [%s] = %o", latE6, lngE6, g, p);
+          guid = g;
+          break;
+        }
+      }
+    }
+*/
+  }
+  return guid;
+}
+
+window.cachePortalDetailsOnMap.searchInit = function () {
+//  if (!window.cachePortalDetailsOnMap.findPortalGuidByCacheE6) {
+    window.cachePortalDetailsOnMap.findPortalGuidByPositionE6old = window.findPortalGuidByPositionE6;
+    window.findPortalGuidByPositionE6 = window.cachePortalDetailsOnMap.findPortalGuidByCacheE6;
+//  }
+
+}
 
 window.plugin.cachePortalDetailsOnMap.setup  = function() {
 
   window.plugin.cachePortalDetailsOnMap.cache = {};
+  window.plugin.cachePortaldetailsOnMap.searchInit;
 
   addHook('portalDetailLoaded', window.plugin.cachePortalDetailsOnMap.portalDetailLoaded);
   addHook('mapDataEntityInject', window.plugin.cachePortalDetailsOnMap.entityInject);
