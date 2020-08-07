@@ -1,7 +1,7 @@
 // @author         3ch01c
 // @name           Uniques
 // @category       Misc
-// @version        0.3.0
+// @version        0.3.9
 // @description    Allow manual entry of portals visited/captured, scouted or droned. Highlighters for all three help to identify new portals. Uniques uses the 'sync'-plugin to share between multiple browsers or desktop/mobile. COMM and portal details are analyzed to fill the fields automatically (but this will not catch every case).
 
 //use own namespace for plugin
@@ -779,8 +779,46 @@ window.plugin.uniques.checkMissionWaypoints = function(mission) {
     plugin.uniques.setPortalVisited(wp.portal.guid);
   });
 };
+/****************************************************************************************/
+/** Im-/Export of uniques ***************************************************************/
+/****************************************************************************************/
+window.plugin.uniques.save = function save() {
+    if (!confirm("Please only confirm this if you know what you are doing!!\nAre you sure you want to save your Unique visits/captures back to IITC?")) return;
 
+    window.plugin.uniques.uniques=$.parseJSON( $('#taUCExportImport').val() );
+    window.plugin.sync.updateMap('uniques', 'uniques', Object.keys(window.plugin.uniques.uniques));
+}
 
+window.plugin.uniques.toolbox = function toolbox() {
+  sExportUniqueJSON='{'+"\n";
+  aoPortals=window.plugin.uniques.uniques;
+  visited=captured=scouted=droned=0;
+  $.each(aoPortals,function(PUID){
+    aPortal=window.plugin.uniques.uniques[PUID];
+    if (aPortal.visited) visited++;
+    if (aPortal.captured) captured++;
+    if (aPortal.scouted) scouted++;
+    if (aPortal.droned) droned++;
+  });
+  sExportUniqueJSON=JSON.stringify(window.plugin.uniques.uniques,null,4);
+
+  var dialog = window.dialog({
+    title: "Ingress unique visits/captures JSON export",
+    html: '<span>Find all of your visited/captured portals as JSON below \n'
+        + '(visited: '+visited+' - captured: '+captured+' - scouted: '+scouted+' - droned: '+droned+'):</span>'
+        + '<textarea id="taUCExportImport" style="width: 570px; height: ' + ($(window).height() - 230)
+        + 'px; margin-top: 5px;"></textarea><a onclick=\"window.plugin.uniques.save();\" title=\"Save portals\' unique info to IITC.\">Save</a>'
+  }).parent();
+  $(".ui-dialog-buttonpane", dialog).remove();
+  // width first, then centre
+  dialog.css("width", 600).css({
+    "top": ($(window).height() - dialog.height()) / 2,
+    "left": ($(window).width() - dialog.width()) / 2
+  });
+  $("#taUCExportImport").val(sExportUniqueJSON);
+  return dialog;
+}
+/****************************************************************************************/
 var setup = function() {
   // HOOKS:
   // - pluginUniquesUpdateUniques
@@ -799,6 +837,10 @@ var setup = function() {
   // to mark mission portals as visited
   window.addHook('plugin-missions-mission-changed', window.plugin.uniques.onMissionChanged);
   window.addHook('plugin-missions-loaded-mission', window.plugin.uniques.onMissionLoaded);
+  
+  // add controls to toolbox
+  var link = $("<a onclick=\"window.plugin.uniques.toolbox();\" title=\"Ex-/import a JSON of portals and their unique visit/capture status.\">Uniques ex-/import</a>");
+  $("#toolbox").append(link);
 
   if (window.plugin.portalslist) {
     window.plugin.uniques.setupPortalsList();
