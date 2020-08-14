@@ -15,11 +15,13 @@ window.plugin.uniques.FIELDS = {
   'uniques': 'plugin-uniques-data',
   'updateQueue': 'plugin-uniques-data-queue',
   'updatingQueue': 'plugin-uniques-data-updating-queue',
+  'missedLatLngs': 'plugin-uniques-missedLatLngs'
 };
 
 window.plugin.uniques.uniques = {};
 window.plugin.uniques.updateQueue = {};
 window.plugin.uniques.updatingQueue = {};
+window.plugin.uniques.missedLatLngs = {};
 
 window.plugin.uniques.enableSync = false;
 
@@ -75,8 +77,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
     && markup[4][0] == 'PORTAL') {
       // search for "x deployed an Ly Resonator on z"
       var portal = markup[4][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-      if(guid) plugin.uniques.setPortalVisited(guid);
+      plugin.uniques.setPortalAction(portal,'visited');
+//    plugin.uniques.setPortalVisited(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_BROADCAST'
     && markup.length==3
     && markup[0][0] == 'PLAYER'
@@ -86,8 +88,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
     && markup[2][0] == 'PORTAL') {
       // search for "x deployed a Resonator on z"
       var portal = markup[2][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-      if(guid) plugin.uniques.setPortalVisited(guid);
+      plugin.uniques.setPortalAction(portal,'visited');
+//    plugin.uniques.setPortalVisited(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_BROADCAST'
     && markup.length==3
     && markup[0][0] == 'PLAYER'
@@ -97,8 +99,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
     && markup[2][0] == 'PORTAL') {
       // search for "x captured y"
       var portal = markup[2][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-      if(guid) plugin.uniques.setPortalCaptured(guid);
+      plugin.uniques.setPortalAction(portal,'captured');
+//    plugin.uniques.setPortalCaptured(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_BROADCAST'
     && markup.length==5
     && markup[0][0] == 'PLAYER'
@@ -111,8 +113,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
     && markup[4][0] == 'PORTAL') {
       // search for "x linked y to z"
       var portal = markup[2][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-      if(guid) plugin.uniques.setPortalVisited(guid);
+      plugin.uniques.setPortalAction(portal,'visited');
+//    plugin.uniques.setPortalVisited(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_NARROWCAST'
     && markup.length==6
     && markup[0][0] == 'TEXT'
@@ -126,8 +128,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
     && markup[5][0] == 'PLAYER') {
       // search for "Your Lx Resonator on y was destroyed by z"
       var portal = markup[3][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-      if(guid) plugin.uniques.setPortalVisited(guid);
+      plugin.uniques.setPortalAction(portal,'visited');
+//    plugin.uniques.setPortalVisited(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_NARROWCAST'
     && markup.length==5
     && markup[0][0] == 'TEXT'
@@ -140,8 +142,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
     && markup[4][1].plain == ' has decayed') {
         // search for "Your Lx Resonator on y has decayed"
       var portal = markup[3][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-      if(guid) plugin.uniques.setPortalVisited(guid);
+      plugin.uniques.setPortalAction(portal,'visited');
+//    plugin.uniques.setPortalVisited(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_NARROWCAST'
     && markup.length==4
     && markup[0][0] == 'TEXT'
@@ -153,8 +155,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
         // search for "Your Portal x neutralized by y"
         // search for "Your Portal x is under attack by y"
       var portal = markup[1][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-      if(guid) plugin.uniques.setPortalVisited(guid);
+      plugin.uniques.setPortalAction(portal,'visited');
+//    plugin.uniques.setPortalVisited(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_NARROWCAST'
       && markup.length==3
       && markup[0][0] == 'TEXT'
@@ -162,8 +164,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
       && markup[1][0] == 'PORTAL') {
         // search for "You claimed Scout Controller on "
         var portal = markup[1][1];
-        var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-        if(guid) plugin.uniques.setPortalScouted(guid);
+        plugin.uniques.setPortalAction(portal,'scouted');
+//      plugin.uniques.setPortalScouted(portal.latE6, portal.lngE6);
     } else if(plext.plextType == 'SYSTEM_NARROWCAST'
       && markup.length==3
       && markup[0][0] == 'TEXT'
@@ -171,8 +173,8 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
       && markup[1][0] == 'PORTAL') {
         // search for "You were displaced as Scout Controller on"
         var portal = markup[1][1];
-        var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
-        if(guid) plugin.uniques.setPortalScouted(guid);
+        plugin.uniques.setPortalAction(portal,'scouted');
+//      plugin.uniques.setPortalScouted(portal.latE6, portal.lngE6);
     }
   });
 }
@@ -184,8 +186,8 @@ window.plugin.uniques.updateCheckedAndHighlight = function(guid) {
 
     var uniqueInfo = plugin.uniques.uniques[guid],
       visited = (uniqueInfo && uniqueInfo.visited) || false,
-      captured = (uniqueInfo && uniqueInfo.captured) || false;
-      scouted = (uniqueInfo && uniqueInfo.scouted) || false;
+      captured = (uniqueInfo && uniqueInfo.captured) || false,
+      scouted = (uniqueInfo && uniqueInfo.scouted) || false,
       droned = (uniqueInfo && uniqueInfo.droned) || false;
     $('#visited').prop('checked', visited);
     $('#captured').prop('checked', captured);
@@ -200,74 +202,42 @@ window.plugin.uniques.updateCheckedAndHighlight = function(guid) {
   }
 }
 
+window.plugin.uniques.setPortalAction = function(portal, action) {
+  let latE6 = portal.latE6;
+  let lngE6 = portal.lngE6;
+  let guid = window.findPortalGuidByPositionE6(latE6, lngE6);
+  let id = latE6 + "," + lngE6;
 
-window.plugin.uniques.setPortalVisited = function(guid) {
-  var uniqueInfo = plugin.uniques.uniques[guid];
-  if (uniqueInfo) {
-    if(uniqueInfo.visited) return;
-
-    uniqueInfo.visited = true;
-  } else {
-    plugin.uniques.uniques[guid] = {
-      visited: true,
-      captured: false
-    };
+  if (guid) {
+    let uniqueInfo = window.plugin.uniques.uniques[guid];
+    if (!uniqueInfo) uniqueInfo = {};
+        // merge ALL pending actions, then remove from missedLatLngs
+    if (window.plugin.uniques.missedLatLngs[id]) {
+      Object.assign(uniqueInfo,window.uniques.missedLatLngs[id].action);
+//    delete window.plugin.uniques.missedLatLngs[id].action[action];
+      // no more actions pending for this portal
+//    if  (Object.keys(window.plugin.uniques.missedLatLngs[id].action).length == 0)
+      delete window.plugin.uniques.missedLatLngs[id];
+      window.plugin.uniques.storeLocal('missedLatLngs');
+    }
+//    if (!uniqueInfo[action]) { // abort if already set
+      uniqueInfo[action] = true;
+      // special handling for captured
+      if (action === 'captured') uniqueInfo.visited = true;
+//    }
+    window.plugin.uniques.uniques[guid] = uniqueInfo;
+    window.plugin.uniques.storeLocal('uniques');
+    // trigger highlighters
+    plugin.uniques.updateCheckedAndHighlight(guid);
+    // triger sync
+    plugin.uniques.sync(guid);
+  } else { //guid not found, so add to missedLatLngs
+    if (!window.plugin.uniques.missedLatLngs[id])
+      window.plugin.uniques.missedLatLngs[id] = {portalName:portal.name,action:{}};
+    window.plugin.uniques.missedLatLngs[id].action[action] = true;
+    if (action === 'captured') window.plugin.uniques.missedLatLngs[id].action.visited = true;
+    window.plugin.uniques.storeLocal('missedLatLngs');
   }
-
-  plugin.uniques.updateCheckedAndHighlight(guid);
-  plugin.uniques.sync(guid);
-}
-
-window.plugin.uniques.setPortalCaptured = function(guid) {
-  var uniqueInfo = plugin.uniques.uniques[guid];
-  if (uniqueInfo) {
-    if(uniqueInfo.visited && uniqueInfo.captured) return;
-
-    uniqueInfo.visited = true;
-    uniqueInfo.captured = true;
-  } else {
-    plugin.uniques.uniques[guid] = {
-      visited: true,
-      captured: true
-    };
-  }
-
-  plugin.uniques.updateCheckedAndHighlight(guid);
-  plugin.uniques.sync(guid);
-}
-
-window.plugin.uniques.setPortalScouted = function(guid) {
-  var uniqueInfo = plugin.uniques.uniques[guid];
-  if (uniqueInfo) {
-    if(uniqueInfo.scouted) return;
-
-    uniqueInfo.scouted = true;
-  } else {
-    plugin.uniques.uniques[guid] = {
-        scouted: true,
-//      captured: false
-    };
-  }
-
-  plugin.uniques.updateCheckedAndHighlight(guid);
-  plugin.uniques.sync(guid);
-}
-
-window.plugin.uniques.setPortalDroned = function(guid) {
-  var uniqueInfo = plugin.uniques.uniques[guid];
-  if (uniqueInfo) {
-    if(uniqueInfo.droned) return;
-
-    uniqueInfo.droned = true;
-  } else {
-    plugin.uniques.uniques[guid] = {
-        droned: true,
-//      captured: false
-    };
-  }
-
-  plugin.uniques.updateCheckedAndHighlight(guid);
-  plugin.uniques.sync(guid);
 }
 
 window.plugin.uniques.updateVisited = function(visited, guid) {
@@ -552,7 +522,27 @@ window.plugin.uniques.highlighterDroned = {
 window.plugin.uniques.setupCSS = function() {
   $("<style>")
   .prop("type", "text/css")
-  .html('@include_string:uniques.css@')
+  .html('\
+#uniques-container {\
+  display: block;\
+  text-align: center;\
+  margin: 6px 3px 1px 3px;\
+  padding: 0 4px;\
+}\
+#uniques-container label {\
+  margin: 0 0.5em;\
+}\
+#uniques-container input {\
+  vertical-align: middle;\
+}\
+\
+.portal-list-uniques input[type=\'checkbox\'] {\
+  padding: 0;\
+  height: auto;\
+  margin-top: -5px;\
+  margin-bottom: -5px;\
+}\
+')
   .appendTo("head");
 }
 
@@ -565,7 +555,7 @@ window.plugin.uniques.setupContent = function() {
     + '</div>';
   plugin.uniques.disabledMessage = '<div id="uniques-container" class="help" title="Your browser does not support localStorage">Plugin Uniques disabled</div>';
 }
-// **************************************************************************************************************
+// ***************************************************************************************
 window.plugin.uniques.setupPortalsList = function() {
 
   window.addHook('pluginUniquesUpdateUniques', function(data) {
@@ -818,6 +808,31 @@ window.plugin.uniques.toolbox = function toolbox() {
   $("#taUCExportImport").val(sExportUniqueJSON);
   return dialog;
 }
+
+/*****************************************************************************************/
+/** UNIQUES Backlog to be processed whenever a portal's LatLonE6 can be resolved to GUID */
+/*****************************************************************************************/
+window.plugin.uniques.onPortalAdded = function(data) {
+  //window.plugin.uniques.log("portal added: %o", data);
+  let guid = data.portal.options.guid;
+  let p = data.portal.options.data;
+  let id = p.latE6 + "," + p.lngE6;
+  
+  //window.plugin.uniques.log("portal added: %s %s %o", guid, id, data);
+  // check if portal is in missedLatLngs
+  if (window.plugin.uniques.missedLatLngs[id]) {
+    console.log("found portal guid for previously missed portal: %s -> %s (%o)", id, guid, data);
+    window.plugin.uniques.uniques[guid] = Object.assign (
+      {}, 
+      window.plugin.uniques.uniques[guid],
+      window.plugin.uniques.missedLatLngs[id].action
+    );
+    window.plugin.uniques.storeLocal('uniques');
+    delete window.plugin.uniques.missedLatLngs[id];
+    window.plugin.uniques.storeLocal('missedLatLngs');
+  }
+}
+
 /****************************************************************************************/
 var setup = function() {
   // HOOKS:
@@ -827,11 +842,17 @@ var setup = function() {
   window.plugin.uniques.setupCSS();
   window.plugin.uniques.setupContent();
   window.plugin.uniques.loadLocal('uniques');
+  window.plugin.uniques.loadLocal('missedLatLngs');
+
+//  window.plugin.uniques.backLogInit();
+  
   window.addPortalHighlighter('Droned', window.plugin.uniques.highlighterDroned);
   window.addPortalHighlighter('Scouted', window.plugin.uniques.highlighterScouted);
   window.addPortalHighlighter('Visited/Captured', window.plugin.uniques.highlighterCaptured);
+  
   window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
   window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
+  window.addHook('portalAdded', window.plugin.uniques.onPortalAdded);
   window.plugin.uniques.registerFieldForSyncing();
 
   // to mark mission portals as visited
