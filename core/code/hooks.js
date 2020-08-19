@@ -64,10 +64,10 @@
 window._hooks = {}
 window.VALID_HOOKS = []; // stub for compatibility
 
-window.runHooks = function(event, data) {
-  if(!_hooks[event]) return true;
+window.runHooks = function (event, data) {
+  if (!_hooks[event]) return true;
   var interrupted = false;
-  $.each(_hooks[event], function(ind, callback) {
+  $.each(_hooks[event], function (ind, callback) {
     try {
       if (callback(data) === false) {
         interrupted = true;
@@ -80,28 +80,28 @@ window.runHooks = function(event, data) {
   return !interrupted;
 }
 
-window.pluginCreateHook = function() {}; // stub for compatibility
+window.pluginCreateHook = function () { }; // stub for compatibility
 
-window.addHook = function(event, callback) {
+window.addHook = function (event, callback) {
   if (typeof callback !== 'function') {
     throw new Error('Callback must be a function.');
   }
 
-  if(!_hooks[event])
+  if (!_hooks[event])
     _hooks[event] = [callback];
   else
     _hooks[event].push(callback);
 }
 
 // callback must the SAME function to be unregistered.
-window.removeHook = function(event, callback) {
+window.removeHook = function (event, callback) {
   if (typeof callback !== 'function') {
     throw new Error('Callback must be a function.');
   }
 
   if (_hooks[event]) {
     var index = _hooks[event].indexOf(callback);
-    if(index == -1)
+    if (index == -1)
       log.warn('Callback wasn\'t registered for this event.');
     else
       _hooks[event].splice(index, 1);
