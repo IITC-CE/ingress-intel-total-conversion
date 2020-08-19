@@ -82,11 +82,7 @@ window.runHooks = function(event, data) {
         return false; // break from $.each
       }
     } catch (e) {
-      log.error('error running hook ' + event,
-        '\n' + e,
-        '\ncallback: ', callback,
-        '\ndata: ', data
-      );
+      log.error('error running hook', { event: event, error: e, source: callback && callback.toString(), data: data });
     }
   });
   isRunning--;

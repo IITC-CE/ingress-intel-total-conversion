@@ -140,14 +140,14 @@ function prepPluginsToLoad () {
 
   // executes setup function of plugin
   // and collects info for About IITC
-  function safeSetup (setup) {
-    if (!setup) {
+  function safeSetup(setup) {
+    if (typeof setup !== 'function') {
       log.warn('plugin must provide setup function');
       return;
     }
     var info = setup.info;
     if (typeof info !== 'object') {
-      log.warn('plugin does not have proper wrapper:',setup);
+      log.warn('plugin does not have proper wrapper:', { function: setup, info: setup.info, source: setup.toString() });
       info = {};
     }
     try {
