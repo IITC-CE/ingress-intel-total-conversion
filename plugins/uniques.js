@@ -824,11 +824,39 @@ window.plugin.uniques.checkMissionWaypoints = function(mission) {
 /****************************************************************************************/
 /** Im-/Export of uniques ***************************************************************/
 /****************************************************************************************/
-window.plugin.uniques.save = function save() {
+/*window.plugin.uniques.optMerge = function save() {
     if (!confirm("Please only confirm this if you know what you are doing!!\nAre you sure you want to save your Unique visits/captures back to IITC?")) return;
 
     window.plugin.uniques.uniques=$.parseJSON( $('#taUCExportImport').val() );
+    
     window.plugin.sync.updateMap('uniques', 'uniques', Object.keys(window.plugin.uniques.uniques));
+}
+*/
+window.plugin.uniques.optExport = function() {
+  var data = localStorage['plugin-uniques-data'];
+  window.saveFile(data, 'IITC-uniques.json', 'application/json');
+  confirm ("IITC-Uniques exported to IITC-uniques.json");
+}
+window.plugin.uniques.optImport = function() {
+  L.FileListLoader.loadFiles({accept:'application/json'})
+    .on('load',function (e) {
+      try {
+        if (!confirm("Please only confirm this if you know what you are doing!!\nAre you sure you want to save your Unique visits/captures back to IITC?")) return;
+        var data = JSON.parse(e.reader.result);
+        
+        if (!data.length === 0) window.plugin.uniques.uniques = data;
+//      window.plugin.uniques.drawnItems.clearLayers();
+//      window.plugin.uniques.import(data);
+        console.log('UNIQUES: reset and imported uniques.');
+        confirm('Import Successful.');
+
+        // to write back the data to localStorage
+        window.plugin.uniques.storeLocal();
+      } catch(e) {
+        console.warn('UNIQUES: failed to import data: '+e);
+//        window.plugin.uniques.optAlert('<span style="color: #f88">Import failed</span>');
+      }
+    });
 }
 
 window.plugin.uniques.toolbox = function toolbox() {
@@ -848,12 +876,15 @@ window.plugin.uniques.toolbox = function toolbox() {
     title: "Ingress unique visits/captures JSON export",
     html: '<span>Find all of your visited/captured portals as JSON below<br>'
         + '(visited: '+visited+' - captured: '+captured+' - scouted: '+scouted+' - droned: '+droned+'):</span>'
-        + '<textarea id="taUCExportImport" style="width: 300px; height: 300px)'
-        + 'px; margin-top: 5px;"></textarea><a onclick=\"window.plugin.uniques.save();\" title=\"Save portals\' unique info to IITC.\">Save</a>'
+        + '<textarea id="taUCExportImport" style="width: 300px; height: 600px; margin-top: 5px;"></textarea>'
+        + '<a onclick=\"window.plugin.uniques.optMerge();\" title=\"Merge portals\' unique info to IITC.\">Merge</a>'
+        + '<a onclick=\"window.plugin.uniques.optExport();\" title=\"Export portals\' unique info to IITC.\">Export</a>'
+        + '<a onclick=\"window.plugin.uniques.optImport();\" title=\"Import portals\' unique info to IITC.\">Import</a>'
+
   }).parent();
   $(".ui-dialog-buttonpane", dialog).remove();
   // width first, then centre
-  dialog.css("width", 600).css({
+  dialog.css("width", 400).css({
     "top": ($(window).height() - dialog.height()) / 2,
     "left": ($(window).width() - dialog.width()) / 2
   });
@@ -882,6 +913,7 @@ window.plugin.uniques.onPortalAdded = function(data) {
     window.plugin.uniques.storeLocal('uniques');
     delete window.plugin.uniques.missedLatLngs[id];
     window.plugin.uniques.storeLocal('missedLatLngs');
+    $("#missedPL").text(window.plugin.uniques.genList());
   }
 }
 
@@ -896,24 +928,45 @@ window.plugin.uniques.removeOldParsedMsgs = function() {
       count++;
     }
   }
-  console.log ('[uniques] removed old parsedMsgs');
+  console.log ('[uniques] removed %s old parsedMsgs', count);
 }
 
-window.plugin.uniques.missedPortalsList = function (){
-  let list = 'Missed Portals:<br>';
+window.plugin.uniques.genList = function (){
   let mLL = window.plugin.uniques.missedLatLngs;
+  let list = '';
   for (let item in mLL) {
     let p = mLL[item].portal;
     list = list + '<a onclick=\"map.setView(['+p.latE6/1E6+','+p.lngE6/1E6+'],15);\">'+p.name+'</a><br>';
-// <a onclick=\"window.plugin.uniques.save();\" title=\"Save portals\' unique info to IITC.\">Save</a>    
   }
+  return list
+}
+
+window.plugin.uniques.missedPortalsList = function (){
+  aoPortals=window.plugin.uniques.uniques;
+  visited=captured=scouted=droned=0;
+  $.each(aoPortals,function(PUID){
+    aPortal=window.plugin.uniques.uniques[PUID];
+    if (aPortal.visited) visited++;
+    if (aPortal.captured) captured++;
+    if (aPortal.scouted) scouted++;
+    if (aPortal.droned) droned++;
+  });
   
+  let list = 'Unique Portals Count:<br>visited: '+visited+' - captured: '+captured+'<br>scouted: '+scouted+' - droned: '+droned+'<br><hr>'
+      + 'Missed Portals: <br>Click on portals to move the map to resolve the backlogged actions for this portal.<br><br>'
+      + '<div id="missedPL" style="height:150px;overflow:auto">'
+      + window.plugin.uniques.genList()
+      + '</div><hr>'
+      + '<a onclick=\"window.plugin.uniques.optExport();\" title=\"Export portals\' unique info to IITC.\">Backup</a> / '
+      + '<a onclick=\"window.plugin.uniques.optImport();\" title=\"Import portals\' unique info to IITC.\">Restore</a> Uniques'
   var dialog = window.dialog ({
     title: "Missed portals",
-    html: list + "Click on portals to move the map to resolve the backlogged actions for this portal."
+    html: list,
+    maxHight: 300
+
   }).parent();
-  
-  return dialog;  
+
+  return dialog;
 }
 /****************************************************************************************/
 var setup = function() {
@@ -946,10 +999,8 @@ var setup = function() {
   window.addHook('plugin-missions-loaded-mission', window.plugin.uniques.onMissionLoaded);
   
   // add controls to toolbox
-  var link = $("<a onclick=\"window.plugin.uniques.toolbox();\" title=\"Ex-/import a JSON of portals and their unique visit/capture status.\">Uniques ex-/import</a>");
-  $("#toolbox").append(link);
 
-  link = $("<a onclick=\"window.plugin.uniques.missedPortalsList();\" title=\"List missed Portals\">Uniques missed</a>");
+  link = $("<a onclick=\"window.plugin.uniques.missedPortalsList();\" title=\"List missed Portals\">Uniques</a>");
   $("#toolbox").append(link);
 
   if (window.plugin.portalslist) {
