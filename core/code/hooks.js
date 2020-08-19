@@ -74,7 +74,7 @@ window.runHooks = function(event, data) {
         return false;  //break from $.each
       }
     } catch (e) {
-      log.error('error running hook '+event+', error: '+e);
+      log.error('error running hook', { event: event, error: e, source: callback.toString(), data: data });
     }
   });
   return !interrupted;
