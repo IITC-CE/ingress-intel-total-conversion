@@ -63,11 +63,13 @@
 
 window._hooks = {}
 window.VALID_HOOKS = []; // stub for compatibility
+var runningHook;
 
 window.runHooks = function(event, data) {
   if(!_hooks[event]) return true;
   var interrupted = false;
-  $.each(_hooks[event], function(ind, callback) {
+  runningHook = event;
+  $.each(_hooks[event], function (ind, callback) {
     try {
       if (callback(data) === false) {
         interrupted = true;
@@ -77,6 +79,8 @@ window.runHooks = function(event, data) {
       log.error('error running hook '+event+', error: '+e);
     }
   });
+
+  runningHook = undefined;
   return !interrupted;
 }
 
@@ -101,9 +105,16 @@ window.removeHook = function(event, callback) {
 
   if (_hooks[event]) {
     var index = _hooks[event].indexOf(callback);
-    if(index == -1)
+    if (index === -1) {
       log.warn('Callback wasn\'t registered for this event.');
-    else
-      _hooks[event].splice(index, 1);
+      return;
+    }
+
+    if (event === runningHook) {
+      log.warn('Removing hook in hook event handler:', event); // warning for old iitc incompability
+      _hooks[event] = _hooks[event].slice(0);
+    }
+
+    _hooks[event].splice(index, 1);
   }
 }
