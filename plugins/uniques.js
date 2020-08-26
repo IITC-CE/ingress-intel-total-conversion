@@ -540,6 +540,11 @@ window.plugin.uniques.setupCSS = function() {
   margin-top: -5px;\
   margin-bottom: -5px;\
 }\
+\
+.ui-dialog-portalslist {\
+  max-width: none !important;\
+}\
+\
 ')
   .appendTo("head");
 }
@@ -873,7 +878,7 @@ window.plugin.uniques.genList = function (){
   return list
 }
 
-window.plugin.uniques.missedPortalsList = function (){
+window.plugin.uniques.options = function (){
   aoPortals=window.plugin.uniques.uniques;
   visited=captured=scouted=droned=0;
   $.each(aoPortals,function(PUID){
@@ -892,7 +897,7 @@ window.plugin.uniques.missedPortalsList = function (){
       + '<a onclick=\"window.plugin.uniques.optExport();\" title=\"Export portals\' unique info to IITC.\">Backup</a> / '
       + '<a onclick=\"window.plugin.uniques.optImport();\" title=\"Import portals\' unique info to IITC.\">Restore</a> Uniques'
   var dialog = window.dialog ({
-    title: "Missed portals",
+    title: "Uniques",
     html: list,
     maxHight: 300
 
@@ -930,7 +935,7 @@ var setup = function() {
 
   // add controls to toolbox
 
-  link = $("<a onclick=\"window.plugin.uniques.missedPortalsList();\" title=\"List missed Portals\">Uniques</a>");
+  link = $("<a onclick=\"window.plugin.uniques.options();\" title=\"Manage UNIQUES\">Uniques</a>");
   $("#toolbox").append(link);
 
   if (window.plugin.portalslist) {
