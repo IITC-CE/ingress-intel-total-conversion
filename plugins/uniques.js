@@ -12,11 +12,11 @@ window.plugin.uniques.SYNC_DELAY = 5000;
 
 // maps the JS property names to localStorage keys
 window.plugin.uniques.FIELDS = {
-  'uniques': 'plugin-uniques-data',
-  'updateQueue': 'plugin-uniques-data-queue',
+  'uniques':       'plugin-uniques-data',
+  'updateQueue':   'plugin-uniques-data-queue',
   'updatingQueue': 'plugin-uniques-data-updating-queue',
   'missedLatLngs': 'plugin-uniques-missedLatLngs',
-  'parsedMsgs': 'pugin-uniques-parsedMsgs'
+  'parsedMsgs':    'plugin-uniques-parsedMsgs'
 };
 
 window.plugin.uniques.uniques = {};
