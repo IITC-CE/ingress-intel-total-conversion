@@ -797,39 +797,6 @@ window.plugin.uniques.optImport = function() {
     });
 }
 
-window.plugin.uniques.toolbox = function toolbox() {
-  sExportUniqueJSON='{'+"\n";
-  aoPortals=window.plugin.uniques.uniques;
-  visited=captured=scouted=droned=0;
-  $.each(aoPortals,function(PUID){
-    aPortal=window.plugin.uniques.uniques[PUID];
-    if (aPortal.visited) visited++;
-    if (aPortal.captured) captured++;
-    if (aPortal.scouted) scouted++;
-    if (aPortal.droned) droned++;
-  });
-  sExportUniqueJSON=JSON.stringify(window.plugin.uniques.uniques,null,4);
-
-  var dialog = window.dialog({
-    title: "Ingress unique visits/captures JSON export",
-    html: '<span>Find all of your visited/captured portals as JSON below<br>'
-        + '(visited: '+visited+' - captured: '+captured+' - scouted: '+scouted+' - droned: '+droned+'):</span>'
-        + '<textarea id="taUCExportImport" style="width: 300px; height: 600px; margin-top: 5px;"></textarea>'
-        + '<a onclick=\"window.plugin.uniques.optMerge();\" title=\"Merge portals\' unique info to IITC.\">Merge</a>'
-        + '<a onclick=\"window.plugin.uniques.optExport();\" title=\"Export portals\' unique info to IITC.\">Export</a>'
-        + '<a onclick=\"window.plugin.uniques.optImport();\" title=\"Import portals\' unique info to IITC.\">Import</a>'
-
-  }).parent();
-  $(".ui-dialog-buttonpane", dialog).remove();
-  // width first, then centre
-  dialog.css("width", 400).css({
-    "top": ($(window).height() - dialog.height()) / 2,
-    "left": ($(window).width() - dialog.width()) / 2
-  });
-  $("#taUCExportImport").val(sExportUniqueJSON);
-  return dialog;
-}
-
 /*****************************************************************************************/
 /** UNIQUES Backlog to be processed whenever a portal's LatLonE6 can be resolved to GUID */
 /*****************************************************************************************/
@@ -851,7 +818,7 @@ window.plugin.uniques.onPortalAdded = function(data) {
     window.plugin.uniques.storeLocal('uniques');
     delete window.plugin.uniques.missedLatLngs[id];
     window.plugin.uniques.storeLocal('missedLatLngs');
-    $("#missedPL").text(window.plugin.uniques.genList());
+    $("#missedPL").html(window.plugin.uniques.genList());
   }
 }
 
