@@ -768,7 +768,7 @@ window.plugin.uniques.checkMissionWaypoints = function(mission) {
     if(!isValidWaypoint(wp)) return;
     if(isVisited(wp)) return;
 
-    plugin.uniques.setPortalVisited(wp.portal.guid);
+    plugin.uniques.setPortalAction(wp.portal.guid,'visited');
   });
 };
 /****************************************************************************************/
@@ -801,12 +801,11 @@ window.plugin.uniques.optImport = function() {
 /** UNIQUES Backlog to be processed whenever a portal's LatLonE6 can be resolved to GUID */
 /*****************************************************************************************/
 window.plugin.uniques.onPortalAdded = function(data) {
-  //window.plugin.uniques.log("portal added: %o", data);
   let guid = data.portal.options.guid;
   let p = data.portal.options.data;
   let id = p.latE6 + "," + p.lngE6;
 
-  console.log("portal added: %s %s %o", guid, id, data);
+  //console.log("portal added: %s %s %o", guid, id, data);
   // check if portal is in missedLatLngs
   if (window.plugin.uniques.missedLatLngs[id]) {
     console.log("found portal guid for previously missed portal: %s -> %s (%o)", id, guid, data);
