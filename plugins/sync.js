@@ -1,7 +1,7 @@
 // @author         xelio
 // @name           Sync
 // @category       Misc
-// @version        0.4.1
+// @version        0.4.2
 // @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 
@@ -35,7 +35,7 @@ window.plugin.sync.authorizer = null;
 window.plugin.sync.registeredPluginsFields = null;
 window.plugin.sync.logger = null;
 
-window.plugin.sync.checkInterval = 3 * 60 * 1000; // update data every 3 minutes
+window.plugin.sync.checkInterval = 3 * 60 * 1000;   // update data every 3 minutes
 
 // Other plugin call this function to push update to Google Drive API
 // example:
@@ -58,21 +58,22 @@ window.plugin.sync.updateMap = function(pluginName, fieldName, keyArray) {
 //
 // initializedCallback function format: function(pluginName, fieldName)
 // initializedCallback will be fired when the storage finished initialize and good to use
-window.plugin.sync.registerMapForSync = function(pluginName, fieldName, callback, initializedCallback) {
+window.plugin.sync.registerMapForSync = function(pluginName, fieldName, updateCallback, initializedCallback) {
   var options, registeredMap;
   options = {'pluginName': pluginName,
                'fieldName': fieldName,
-               'callback': callback,
+               'callback': updateCallback,
                'initializedCallback': initializedCallback,
                'authorizer': plugin.sync.authorizer,
                'uuid': plugin.sync.uuid};
-  registeredMap = new plugin.sync.RegisteredMap(options);
-  plugin.sync.registeredPluginsFields.add(registeredMap);
+  registeredMap = new plugin.sync.RegisteredMap(options);   // create a new datasructure 
+                                                            // for the calling plugin and
+  plugin.sync.registeredPluginsFields.add(registeredMap);   // add it to the main structure
 };
 
 
 
-//// RegisteredMap
+//// RegisteredMap *************************************************************************
 // Create a file named pluginName[fieldName] in folder specified by authorizer
 // The file use as document with JSON to store the data and uuid of last update client
 // callback will called when any local/remote update happen
@@ -83,11 +84,14 @@ window.plugin.sync.RegisteredMap = function(options) {
   this.callback = options['callback'];
   this.initializedCallback = options['initializedCallback'];
   this.authorizer = options['authorizer'];
-  this.uuid = options['uuid'];
+
+  this.uuid = options['uuid'];                              // local UUID
+  this.lastUpdateUUID = null;                               // the UUID that we think
+                                                            // did last Update (can be us)
+  this.remoteUUID = null;                                   // the remote UUID in drive
 
   this.intervalID = null;
   this.map = null;
-  this.lastUpdateUUID = null;
   this.dataStorage = null;
 
   this.forceFileSearch = false;
@@ -99,21 +103,24 @@ window.plugin.sync.RegisteredMap = function(options) {
   this.loadDocument = this.loadDocument.bind(this);
 };
 
+// this function updates the registered map (copy of the plugin's data)
+// and finally saves it to google drive
+// it includes this clients UUID so that a reading client can see if 
+// if an other clinet did the last update or if it was this client
 window.plugin.sync.RegisteredMap.prototype.updateMap = function(keyArray) {
   var _this = this;
   try {
-    this.lastUpdateUUID = this.uuid;
-
-    $.each(keyArray, function(ind, key) {
-      var value = window.plugin[_this.pluginName][_this.fieldName][key];
-      if(typeof(value) !== 'undefined') {
-        _this.map[key] = value;
-      } else {
-        delete _this.map[key];
+    this.lastUpdateUUID = this.uuid;                        // use this clients uuid
+    $.each(keyArray, function(ind, key) {                   // find all changed elements from the array
+      var value = window.plugin[_this.pluginName][_this.fieldName][key]; 
+      if(typeof(value) !== 'undefined') {                  
+        _this.map[key] = value;                             // replace element in the array
+      } else {                                              // or
+        delete _this.map[key];                              // remove it from the array
       }
     });
   } finally {
-    _this.dataStorage.saveFile(_this.prepareFileData());
+    _this.dataStorage.saveFile(_this.prepareFileData());    // save data and UUID to drive
   }
 };
 
@@ -122,34 +129,48 @@ window.plugin.sync.RegisteredMap.prototype.isUpdatedByOthers = function() {
   return (remoteUUID !== '') && (remoteUUID !== this.uuid);
 };
 
+// concatenate a the filename for the drive "pluginName[fieldName]"
 window.plugin.sync.RegisteredMap.prototype.getFileName = function() {
   return this.pluginName + '[' + this.fieldName + ']'
 };
 
+// initialize access to the sync-file on drive
+//   callback (optional) - to be performed on success
 window.plugin.sync.RegisteredMap.prototype.initFile = function(callback) {
   var assignIdCallback, failedCallback, _this;
-  _this = this;
+  _this = this;                                             // have _this point to this Object
 
-  assignIdCallback = function(id) {
+  // file access granted, perform callback-function
+  assignIdCallback = function(id) {                         // where does this id come from?
     _this.forceFileSearch = false;
-    if(callback) callback();
+    if(callback) callback();                                // do the callback passed to .initfile
   };
 
+  // file access not possible
   failedCallback = function(resp) {
     _this.initializing = false;
     _this.failed = true;
     plugin.sync.logger.log(_this.getFileName(), 'Could not create file. If this problem persist, delete this file in IITC-SYNC-DATA-V3 in your Google Drive and try again.');
   };
 
-  this.dataStorage = new plugin.sync.DataManager({'fileName': this.getFileName(),
-                                                    'description': 'IITC plugin data for ' + this.getFileName()});
-  this.dataStorage.initialize(this.forceFileSearch, assignIdCallback, failedCallback);
+  this.dataStorage = new plugin.sync.DataManager(           // create a new dataStorage with
+    { 
+      'fileName': this.getFileName(),                       
+      'description': 'IITC plugin data for ' + this.getFileName()
+    }
+  );
+  
+  this.dataStorage.initialize(                              // initalize the dataStorage to gain 
+    this.forceFileSearch,                                   // find the related file on drive
+    assignIdCallback,                                       // onSuccess: 
+    failedCallback                                          // onFailed: 
+  );
 };
 
 window.plugin.sync.RegisteredMap.prototype.initialize = function(callback) {
   this.initFile(this.loadDocument);
 };
-
+// prepend UUID to data
 window.plugin.sync.RegisteredMap.prototype.prepareFileData = function() {
   return {'map': this.map, 'last-update-uuid': this.uuid};
 };
@@ -162,20 +183,20 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
   // this function called when the document is created first time
   // and the JSON file is populated with data in plugin field
   initializeFile = function() {
-    _this.map = {};
+    _this.map = {};                                         // create an empty map
 
-    // Init the map values if this map is first created
+    // copy all elements from the plugin's data to the new map
     $.each(window.plugin[_this.pluginName][_this.fieldName], function(key, val) {
       _this.map[key] = val;
     });
 
-    _this.dataStorage.saveFile(_this.prepareFileData());
+    _this.dataStorage.saveFile(_this.prepareFileData());    // save the map to drive
     plugin.sync.logger.log(_this.getFileName(), 'Model initialized');
     setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
   };
 
   // this function called when the document is loaded
-  // update local data if the document is updated by other
+  // update local data if the document is updated by other (overwrite!)
   // and adding a timer to further check for updates
   onFileLoaded = function(data) {
     _this.map = data['map'];
@@ -216,15 +237,16 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     plugin.sync.logger.log(_this.getFileName(), errorMessage);
     if(isNetworkError === true) {
       setTimeout(function() {_this.authorizer.authorize();}, 50*1000);
-    } else if(e.status === 401) { // Unauthorized
+    } else if(e.status === 401) {                   // Unauthorized
       _this.authorizer.authorize();
-    } else if(e.status === 404) { // Not found
+    } else if(e.status === 404) {                   // Not found
       _this.forceFileSearch = true;
       _this.initFile();
       setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
     }
   };
 
+  // finally execute readFile
   this.dataStorage.readFile(initializeFile, onFileLoaded, handleError);
 };
 //// end RegisteredMap
@@ -232,14 +254,14 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
 
 
 
-//// RegisteredPluginsFields
+//// RegisteredPluginsFields ***************************************************************
 // Store RegisteredMap and handle initialization of RegisteredMap
 window.plugin.sync.RegisteredPluginsFields = function(options) {
-  this.authorizer = options['authorizer'];
+  this.authorizer = options['authorizer'];                  // 
   this.pluginsfields = {};
-  this.waitingInitialize = {};
+  this.waitingInitialize = {};                              // queue for fields that need initialization
 
-  this.anyFail = false;
+  this.anyFail = false;                                     // anything failed ?
 
   this.initializeRegistered = this.initializeRegistered.bind(this);
   this.cleanWaitingInitialize = this.cleanWaitingInitialize.bind(this);
@@ -259,7 +281,7 @@ window.plugin.sync.RegisteredPluginsFields.prototype.add = function(registeredMa
   this.pluginsfields[pluginName][fieldName] = registeredMap;
   this.waitingInitialize[registeredMap.getFileName()] = registeredMap;
 
-  this.initializeWorker();
+  this.initializeWorker();                                  // start the regular check on drive
 };
 
 window.plugin.sync.RegisteredPluginsFields.prototype.get = function(pluginName, fieldName) {
@@ -267,40 +289,45 @@ window.plugin.sync.RegisteredPluginsFields.prototype.get = function(pluginName, 
   return this.pluginsfields[pluginName][fieldName];
 };
 
+// try to initialize remaining entries in the queue
 window.plugin.sync.RegisteredPluginsFields.prototype.initializeRegistered = function() {
   var _this = this;
   if(this.authorizer.isAuthed()) {
     $.each(this.waitingInitialize, function(key, map) {
-      if(!map.initializing && !map.initialized) {
-        map.initialize(_this.cleanWaitingInitialize);
+      if(!map.initializing && !map.initialized) {           // if not alraedy in process
+        map.initialize(_this.cleanWaitingInitialize);       // initialize the map
       }
     });
   }
 };
 
+// cleanup the initialization queue
 window.plugin.sync.RegisteredPluginsFields.prototype.cleanWaitingInitialize = function() {
   var newWaitingInitialize, _this;
   _this = this;
 
   newWaitingInitialize = {};
-  $.each(this.waitingInitialize, function(key,map) {
-    if(map.failed) _this.anyFail = true;
-    if(map.initialized || map.failed) return true;
-    newWaitingInitialize[map.getFileName()] = map;
+  $.each(this.waitingInitialize, function(key,map) {        // test queue if all data is ready
+    if(map.failed) _this.anyFail = true;                    // at least one failed ?
+    if(map.initialized || map.failed) return true;          // next map
+    newWaitingInitialize[map.getFileName()] = map;          // copy remaining maps
   });
-  this.waitingInitialize = newWaitingInitialize;
+  this.waitingInitialize = newWaitingInitialize;            // to the queue
 };
 
+// Try to initialize all registerd fields with a timeout of 10 sec
 window.plugin.sync.RegisteredPluginsFields.prototype.initializeWorker = function() {
   var _this = this;
 
-  this.cleanWaitingInitialize();
-  plugin.sync.toggleDialogLink();
-  this.initializeRegistered();
-
-  clearTimeout(this.timer);
-  if(Object.keys(this.waitingInitialize).length > 0) {
-    this.timer = setTimeout(function() {_this.initializeWorker()}, 10000);
+  this.cleanWaitingInitialize();                            // clean up the initialization queue
+  plugin.sync.toggleDialogLink();                           // set the color of the menu entry
+  this.initializeRegistered();                              // try initialize remaining entries 
+                                                            //   in the queue
+  clearTimeout(this.timer);                                 // reset the timer
+  if(Object.keys(this.waitingInitialize).length > 0) {      // if queue still not empty
+    this.timer = setTimeout(
+      function() {_this.initializeWorker()}, 10000          // retry in 10 sec
+    );
   }
 };
 //// end RegisteredPluginsFields
@@ -308,13 +335,17 @@ window.plugin.sync.RegisteredPluginsFields.prototype.initializeWorker = function
 
 
 
-//// DataManager
+//// DataManager ***************************************************************************
+// is providing the actual save and load routines as well as initializing folder and files
+// if they do not exist.
 //
 // assignIdCallback function format: function(id)
 // allow you to assign the file/folder id elsewhere
 //
 // failedCallback function format: function()
 // call when the file/folder couldn't create
+//
+// options = {'fileName':string ,'description':string}
 window.plugin.sync.DataManager = function(options) {
   this.fileName = options['fileName'];
   this.description = options['description'];
@@ -371,19 +402,19 @@ window.plugin.sync.DataManager.prototype.initFile = function(assignIdCallback, f
 
   createCallback = function(response) {
     if(response.result.id) {
-      handleFileId(response.result.id); // file created
+      handleFileId(response.result.id);                     // file created
     } else {
-      handleFailed(response) // could not create file
+      handleFailed(response)                                // could not create file
     }
   };
 
   searchCallback = function(resp) {
     if(resp.result.files.length !== 0) {
-      handleFileId(resp.result.files[0].id);// file found
+      handleFileId(resp.result.files[0].id);                // file found
     } else if(resp.result.files.length === 0) {
-      _this.createFile(createCallback); // file not found, create file
+      _this.createFile(createCallback);                     // file not found, create file
     } else {
-      handleFailed(resp); // Error
+      handleFailed(resp);                                   // Error
     }
   };
   this.searchFile(searchCallback);
@@ -457,37 +488,63 @@ window.plugin.sync.DataManager.prototype.createFile = function(callback) {
   });
 };
 
-window.plugin.sync.DataManager.prototype.readFile = function(needInitializeFileCallback, onFileLoadedCallback, handleError) {
+// readFile
+//   needInitializedFileCallback - function to handle no response. 
+//                                 result usually the requested data
+//   onFileLoadedCallback        - function to handle success  
+//   handleError                 - function to handle Error
+window.plugin.sync.DataManager.prototype.readFile = function(needInitializeFileCallback,
+           onFileLoadedCallback,
+           handleError)   {
   var _this = this;
 
-  gapi.client.load('drive', 'v3').then(function () {
-    gapi.client.drive.files.get({ fileId: _this.fileId, alt: 'media' })
-    .then(function (response) {
-      var res = response.result;
-      if (res) {
-        onFileLoadedCallback(res);
-      } else {
-        needInitializeFileCallback();
-      }
-    },function(reason){
+  // gapi.client.load is a depricated routine
+  //   .then(opt_onFulfilled, opt_onRejected)
+  gapi.client.load('drive', 'v3').then(             // depricated, needs replacement
+    // gapi.client.drive.files.get
+    //   .then(opt_onFulfilled, opt_onRejected)
+    function ()                                     // opt_onFulfilled for .load
+      {gapi.client.drive.files.get({                // Gets a file's metadata by ID
+        fileId: _this.fileId,                       //   fileId
+        alt: 'media'                                //   respond with the file contents in 
+                                                    //   the response body
+      }) 
+      .then(
+        function (response) {                       // opt_onFulfilled for drive.files.get
+          var res = response.result;
+          if (res) {
+            onFileLoadedCallback(res);              // perform provided routine
+          } else {
+            needInitializeFileCallback();           // no result (data) returned
+          }
+        },
+        function(reason){                           // opt_onRejected for drive.files.get
+          handleError(reason);
+        }
+      );
+    },
+    function(reason){                               // opt_onRejected for .load
       handleError(reason);
-    });
-  },function(reason){
-    handleError(reason);
-  });
+    }
+  );
 };
 
+// saveFile
+//   data - the data to be saved
 window.plugin.sync.DataManager.prototype.saveFile = function(data) {
   var _this = this;
-
-  gapi.client.load('drive', 'v3').then(function () {
-    gapi.client.request({
-      path: '/upload/drive/v3/files/'+_this.fileId,
-      method: 'PATCH',
-      params: { uploadType: 'media' },
-      body: JSON.stringify(data)
-    }).execute();
-  });
+  
+  gapi.client.load('drive', 'v3').then(
+    function () {        
+      gapi.client.request({
+        path: '/upload/drive/v3/files/'+_this.fileId,
+        method: 'PATCH',                                    // why patch? 
+        params: { uploadType: 'media' },
+        body: JSON.stringify(data)
+      }).execute();                                         // write (patch) the file on drive
+    }
+                                                            // no errorhandling here?!
+  );
 };
 
 window.plugin.sync.DataManager.prototype.searchFile = function(callback) {
@@ -523,8 +580,11 @@ window.plugin.sync.DataManager.prototype.loadFileId = function() {
 
 
 
-//// Authorizer
+//// Authorizer ****************************************************************************
 // authorize user's google account
+// options: (type: object)
+//    'authCallback' - array of functions to execute after sucessfull authorization
+//    
 window.plugin.sync.Authorizer = function(options) {
   this.authCallback = options['authCallback'];
   this.authorizing = false;
@@ -533,22 +593,27 @@ window.plugin.sync.Authorizer = function(options) {
   this.isAuthorizing = this.isAuthorizing.bind(this);
   this.authorize = this.authorize.bind(this);
 };
-
+// values that are static at the moment
 window.plugin.sync.Authorizer.prototype.CLIENT_ID = '1099227387115-osrmhfh1i6dto7v7npk4dcpog1cnljtb.apps.googleusercontent.com';
 window.plugin.sync.Authorizer.prototype.SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
+// method to tell if SYNC is authorized
 window.plugin.sync.Authorizer.prototype.isAuthed = function() {
   return this.authorized;
 };
 
+// method to tell if authorization is in progress
 window.plugin.sync.Authorizer.prototype.isAuthorizing = function() {
   return this.authorizing;
 };
+
+// (external) method to add an other authCallback function 
 window.plugin.sync.Authorizer.prototype.addAuthCallback = function(callback) {
   if(typeof(this.authCallback) === 'function') this.authCallback = [this.authCallback];
   this.authCallback.push(callback);
 };
 
+// (internal) function that will execute all enregistered authCallback functions 
 window.plugin.sync.Authorizer.prototype.authComplete = function() {
   this.authorizing = false;
   if(this.authCallback) {
@@ -561,6 +626,9 @@ window.plugin.sync.Authorizer.prototype.authComplete = function() {
   }
 };
 
+// (external) function that will initiate the authorization
+// redirect: (type: boolean) 
+//   true: call from dialog
 window.plugin.sync.Authorizer.prototype.authorize = function() {
   this.authorizing = true;
   this.authorized = false;
@@ -606,7 +674,7 @@ window.plugin.sync.Authorizer.prototype.authorize = function() {
 
 
 
-//// Logger
+//// Logger ********************************************************************************
 window.plugin.sync.Logger = function(options) {
   this.logLimit = options['logLimit'];
   this.logUpdateCallback = options['logUpdateCallback'];
@@ -633,7 +701,7 @@ window.plugin.sync.Logger.prototype.getLogs = function() {
   var allLogs = '';
   Object.keys(this.logs).forEach((key) => {
     var value = this.logs[key];
-    allLogs += '<div class="sync-log-block"><p class="sync-log-file">'+key+':</p><p class="sync-log-message">' + value.message+' ('+value.time.toLocaleTimeString()+')</p></div>';
+    allLogs += '<div class="sync-log-block"><p class="sync-log-file">'+key+':</p><p class="sync-log-message">' + value.message+' ('+value.time.toLocaleTimeString("en-GB")+')</p></div>';
   });
 
   return allLogs;
@@ -644,7 +712,7 @@ window.plugin.sync.Logger.prototype.getLogs = function() {
 
 
 
-
+// generate a GUID that identifies this client
 // http://stackoverflow.com/a/8809472/2322660
 // http://stackoverflow.com/a/7221797/2322660
 // With format fixing: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where y in [8,9,a,b]
@@ -671,6 +739,7 @@ window.plugin.sync.generateUUID = function() {
   }
 };
 
+// save the Drive file-ID that relates to [pluginname].[field]
 window.plugin.sync.storeLocal = function(mapping) {
   if(typeof(plugin.sync[mapping.field]) !== 'undefined' && plugin.sync[mapping.field] !== null) {
     localStorage[mapping.key] = JSON.stringify(plugin.sync[mapping.field]);
@@ -679,6 +748,7 @@ window.plugin.sync.storeLocal = function(mapping) {
   }
 };
 
+// load the Drive file-ID that relates to [pluginname].[field]
 window.plugin.sync.loadLocal = function(mapping) {
   var objectJSON = localStorage[mapping.key];
   if(!objectJSON) return;
@@ -694,6 +764,7 @@ window.plugin.sync.loadLocal = function(mapping) {
                           : obj;
 };
 
+//load a previously generated UUUID (or generate a new one)
 window.plugin.sync.loadUUID = function() {
   plugin.sync.loadLocal(plugin.sync.KEY_UUID);
   if(!plugin.sync.uuid) {
@@ -702,10 +773,12 @@ window.plugin.sync.loadUUID = function() {
   }
 };
 
+
 window.plugin.sync.updateLog = function(messages) {
   $('#sync-log').html(messages);
 };
 
+// AuthButon that shows IN the dialog
 window.plugin.sync.toggleAuthButton = function() {
   var authed, authorizing;
   authed = plugin.sync.authorizer.isAuthed();
@@ -717,6 +790,7 @@ window.plugin.sync.toggleAuthButton = function() {
   $('#sync-authButton').toggleClass('sync-authButton-dimmed', authed || authorizing);
 };
 
+// Sync menuitem in the toolbox
 window.plugin.sync.toggleDialogLink = function() {
   var authed, anyFail;
   authed = plugin.sync.authorizer.isAuthed();
@@ -725,6 +799,7 @@ window.plugin.sync.toggleDialogLink = function() {
   $('#sync-show-dialog').toggleClass('sync-show-dialog-error', !authed || anyFail);
 };
 
+// open the dialog
 window.plugin.sync.showDialog = function() {
   window.dialog({html: plugin.sync.dialogHTML, title: 'Sync', modal: true, id: 'sync-setting'});
   plugin.sync.toggleAuthButton();
@@ -732,6 +807,7 @@ window.plugin.sync.showDialog = function() {
   plugin.sync.updateLog(plugin.sync.logger.getLogs());
 };
 
+// create the dialog
 window.plugin.sync.setupDialog = function() {
   plugin.sync.dialogHTML = '<div id="sync-dialog">'
                          + '<button id="sync-authButton" class="sync-authButton-dimmed" '
@@ -742,6 +818,7 @@ window.plugin.sync.setupDialog = function() {
   $('#toolbox').append('<a id="sync-show-dialog" onclick="window.plugin.sync.showDialog();">Sync</a> ');
 };
 
+// add some CSS for the changing buttons
 window.plugin.sync.setupCSS = function() {
   $("<style>")
     .prop("type", "text/css")
@@ -774,23 +851,32 @@ window.plugin.sync.setupCSS = function() {
   .appendTo("head");
 };
 
+////////////////////////////////////////////////////
+//// Main **********************************************************************************
 var setup = function() {
-  window.plugin.sync.logger = new plugin.sync.Logger({'logLimit':10, 'logUpdateCallback': plugin.sync.updateLog});
+  window.plugin.sync.logger = new plugin.sync.Logger(
+    {'logLimit':10, 'logUpdateCallback': plugin.sync.updateLog}
+  );
   window.plugin.sync.loadUUID();
   window.plugin.sync.setupCSS();
   window.plugin.sync.setupDialog();
-
-  window.plugin.sync.authorizer = new window.plugin.sync.Authorizer({
-    'authCallback': [plugin.sync.toggleAuthButton, plugin.sync.toggleDialogLink]
-  });
+// create an authorizer structure
+  window.plugin.sync.authorizer = new window.plugin.sync.Authorizer(
+    {
+    'authCallback': [plugin.sync.toggleAuthButton,          // functions to execute after 
+                     plugin.sync.toggleDialogLink           // successfull authorization
+                    ]
+    }
+  );
+  // create base structure
   window.plugin.sync.registeredPluginsFields = new window.plugin.sync.RegisteredPluginsFields({
     'authorizer': window.plugin.sync.authorizer
   });
-
+  // load the Google API and authorize.
   var GOOGLEAPI = 'https://apis.google.com/js/api.js';
   $.getScript(GOOGLEAPI).done(function () {
     gapi.load('client:auth2', window.plugin.sync.authorizer.authorize);
   });
 };
-
+// start this plugin with high priority during IITCs boot
 setup.priority = 'high';
