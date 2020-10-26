@@ -786,11 +786,11 @@ window.plugin.uniques.optImport = function() {
         if (!confirm("Please only confirm this if you know what you are doing!!\nAre you sure you want to save your Unique visits/captures back to IITC?")) return;
         var data = JSON.parse(e.reader.result);
 
-        if (!data.length === 0) window.plugin.uniques.uniques = data;
+        if (Object.keys(data).length) window.plugin.uniques.uniques = data;
         console.log('UNIQUES: reset and imported uniques.');
         confirm('Import Successful.');
         // to write back the data to localStorage
-        window.plugin.uniques.storeLocal();
+        window.plugin.uniques.storeLocal('uniques');
       } catch(e) {
         console.warn('UNIQUES: failed to import data: '+e);
       }
@@ -860,8 +860,8 @@ window.plugin.uniques.options = function (){
       + '<div id="missedPL" style="height:150px;overflow:auto">'
       + window.plugin.uniques.genList()
       + '</div><hr>'
-      + '<a onclick=\"window.plugin.uniques.optExport();\" title=\"Export portals\' unique info to IITC.\">Backup</a> / '
-      + '<a onclick=\"window.plugin.uniques.optImport();\" title=\"Import portals\' unique info to IITC.\">Restore</a> Uniques'
+      + '<a onclick=\"window.plugin.uniques.optExport();return false\" title=\"Export portals\' unique info to IITC.\">Backup</a> / '
+      + '<a onclick=\"window.plugin.uniques.optImport();return false\" title=\"Import portals\' unique info to IITC.\">Restore</a> Uniques'
   var dialog = window.dialog ({
     title: "Uniques",
     html: list,
@@ -901,7 +901,7 @@ var setup = function() {
 
   // add controls to toolbox
 
-  link = $("<a onclick=\"window.plugin.uniques.options();\" title=\"Manage UNIQUES\">Uniques</a>");
+  link = $("<a onclick=\"window.plugin.uniques.options();return false\" title=\"Manage UNIQUES\">Uniques</a>");
   $("#toolbox").append(link);
 
   if (window.plugin.portalslist) {
