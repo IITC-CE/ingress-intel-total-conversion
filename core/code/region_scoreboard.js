@@ -121,9 +121,24 @@ window.RegionScoreboard = (function() {
       return this.getCheckpointEnd(this.MAX_CYCLES);
     };
 
-    this.getCheckpointEnd = function(cp) {
+    this.isDstObserved = function (date) {
+      var jan = new Date(date.getFullYear(), 0, 1);
+      var jul = new Date(date.getFullYear(), 6, 1);
+      var stdTimezoneOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+      return date.getTimezoneOffset() < stdTimezoneOffset;
+    };
+
+    this.getCheckpointEnd = function (cp) {
       var end = new Date(this.cycleStartTime.getTime());
-      end.setHours(end.getHours() + cp*5);
+      var startDST = this.isDstObserved(end);
+
+      end.setHours(end.getHours() + cp * 5);
+      var endDST = this.isDstObserved(end);
+
+      if (startDST !== endDST) {
+        end.setHours(end.getHours() + (startDST ? -1 : 1));
+      }
+
       return end;
     };
 
