@@ -50,8 +50,8 @@
 //              displayed. The data hash contains both the unprocessed
 //              raw ajax response as well as the processed chat data
 //              that is going to be used for display.
-//     WARNING: this hook was disabled in earlier versions
-//              sideeffects possible but unknown. Use with care!
+//              This hook was implemented in earlier versions
+//              but commented out and never used before.
 // requestFinished: DEPRECATED: best to use mapDataRefreshEnd instead
 //              called after each map data request finished. Argument is
 //              {success: boolean} indicated the request success or fail.
