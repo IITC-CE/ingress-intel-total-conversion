@@ -202,25 +202,32 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     _this.map = data['map'];
     _this.lastUpdateUUID = data['last-update-uuid'];
 
-    if (!_this.intervalID) {
-      _this.intervalID = setInterval(function() {
-        _this.loadDocument();
-      }, window.plugin.sync.checkInterval);
+    if (!_this.intervalID) {                        // if the DL-interval is not set
+      _this.intervalID = setInterval(function() {   // create a new timer to load
+        _this.loadDocument();                       // the file from drive
+      }, window.plugin.sync.checkInterval);         // every <checkInterval> ms
     }
 
     // Replace local value if data is changed by others
-    if(_this.isUpdatedByOthers()) {
-      plugin.sync.logger.log(_this.getFileName(), 'Updated by others, replacing content');
-      window.plugin[_this.pluginName][_this.fieldName] = {};
-      $.each(_this.map, function(key, value) {
-        window.plugin[_this.pluginName][_this.fieldName][key] = _this.map[key];
+    if(_this.isUpdatedByO\thers()) {
+      plugin.sync.logger.log(_this.getFileName(), 'Updated by others, replacing content from ';
+      window.plugin[_this.pluginName][_this.fieldName] = {};// clear the plugin's dataobject
+      $.each(_this.map, function(key, value) {          // fill the dataobject with data from drive
+        window.plugin[_this.pluginName][_this.fieldName][key] = _this.map[key]; 
       });
-      if(_this.callback) _this.callback(_this.pluginName, _this.fieldName, null, true);
+      if(_this.callback) _this.callback(                // execute the callback functions with
+       _this.pluginName,                                //    pluginName
+       _this.fieldName,                                 //    fieldName
+       null,                                            //    null (for backwards compatibility)
+       true                                             //    true = full file load from Drive
+      );
     }
 
-    _this.initialized = true;
-    _this.initializing = false;
-    plugin.sync.logger.log(_this.getFileName(), 'Data loaded');
+    _this.initialized = true;                       // connection to drive is "initalized"
+    _this.initializing = false;                     // remove semaphore
+    plugin.sync.logger.log(_this.getFileName(), 'Data loaded from: '); 
+                                                            // execute the callback functions
+
     if(_this.callback) _this.callback();
     if(_this.initializedCallback) _this.initializedCallback(_this.pluginName, _this.fieldName);
   };
