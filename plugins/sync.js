@@ -98,7 +98,12 @@ window.plugin.sync.RegisteredMap = function(options) {
   this.initializing = false;
   this.initialized = false;
   this.failed = false;
-
+  this.doSync = 'remote';                                   // normal 'sync'
+                                                            // 'no' sync needed
+                                                            // force 'remote' (1st sync)
+                                                            // force 'local'
+                                                            // sync is on 'stop'
+  
   this.initialize = this.initialize.bind(this);
   this.loadDocument = this.loadDocument.bind(this);
 };
@@ -122,11 +127,6 @@ window.plugin.sync.RegisteredMap.prototype.updateMap = function(keyArray) {
   } finally {
     _this.dataStorage.saveFile(_this.prepareFileData());    // save data and UUID to drive
   }
-};
-
-window.plugin.sync.RegisteredMap.prototype.isUpdatedByOthers = function() {
-  var remoteUUID = this.lastUpdateUUID.toString();
-  return (remoteUUID !== '') && (remoteUUID !== this.uuid);
 };
 
 // concatenate a the filename for the drive "pluginName[fieldName]"
@@ -195,41 +195,97 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
     setTimeout(function() {_this.loadDocument();}, window.plugin.sync.checkInterval);
   };
 
-  // this function called when the document is loaded
-  // update local data if the document is updated by other (overwrite!)
-  // and adding a timer to further check for updates
+  // this function gets called when the document is loaded
   onFileLoaded = function(data) {
-    _this.map = data['map'];
-    _this.lastUpdateUUID = data['last-update-uuid'];
-
+    
     if (!_this.intervalID) {                        // if the DL-interval is not set
       _this.intervalID = setInterval(function() {   // create a new timer to load
         _this.loadDocument();                       // the file from drive
       }, window.plugin.sync.checkInterval);         // every <checkInterval> ms
     }
 
-    // Replace local value if data is changed by others
-    if(_this.isUpdatedByO\thers()) {
-      plugin.sync.logger.log(_this.getFileName(), 'Updated by others, replacing content from ';
+    /* Sync only checks the drive every 3 mins. But changes to local data get pushed
+       immediately. Two or more clients that do changes might might store data, that the 
+       other is not aware of. We are trying to identify crititcal changes. Following 
+       situations have been identified and should be coverd by the logic:
+       
+       Status-table:
+       0: init, first start, always load from remote
+       1: lastUUID and remoteUUID show the same UUID, load from remote
+       2: lastUUID and remoteUUID show local UUID, no load needed
+       3: lastUUID and remoteUUID show different, not local UUIDs, load remote
+       4: lastUUID is local and remoteUIID is different, CONFLICT! Stop sync and ask user
+    */
+    _this.remoteUUID = data['last-update-uuid'];    // get the UUID of the data on drive 
+// -----------------------------------------------------------------------------------------    
+    // the initial value for doSync is 'remote', so initially loading from drive 
+    if (_this.doSync == 'sync') {
+      let conflict = true;                                   // 
+      // check for conflict
+      if (_this.remoteUUID == _this.lastUpdateUUID) {       // last Update was done on drive
+        conflict = false;                                   // so there is not a conflict
+      }; 
+      if (_this.remoteUUID != _this.lastUpdateUUID &&       // 3rd client modified the drive
+          _this.lastUpdateUUID != _this.uuid) {
+        // maybe issue a warning
+        console.log ('SYNC detected a 3rd client that modified the drive');
+        conflict = false;                                   // but not a conflict here
+      };
+      
+      if (conflict) {                                       // some other client changed the
+        _this.doSync = 'stop';                              // data on the drive, after we
+                                                            // did a change. So we need
+        _this.conflictHandler();                            // to stop sync and ask the user
+        plugin.sync.logger.log(_this.getFileName(), 'SYNC detected a conflict caused by '+ _this.lastRemoteUUID); 
+      } else {                                              // ELSE no conflict found: 
+        if (_this.remoteUUID == _this.uuid) {               // local data still is on drive?
+          _this.doSync = 'sync';                            // no need to do anything
+        } else {                                            // otherwise
+          _this.doSync = 'remote';                          // load remote data 
+        };                                                  // (it might have changed)
+      };      
+    };
+// -----------------------------------------------------------------------------------------    
+    if (_this.doSync == 'remote') {
+      // load the remote data to the plugin's dataobject
+      _this.lastUpdateUUID = _this.remoteUUID;      // remember last client on drive
+      _this.map = data['map'];                      // map from the loaded data
+
       window.plugin[_this.pluginName][_this.fieldName] = {};// clear the plugin's dataobject
-      $.each(_this.map, function(key, value) {          // fill the dataobject with data from drive
+      $.each(_this.map, function(key, value) {      // fill the dataobject with data from drive
         window.plugin[_this.pluginName][_this.fieldName][key] = _this.map[key]; 
       });
-      if(_this.callback) _this.callback(                // execute the callback functions with
-       _this.pluginName,                                //    pluginName
-       _this.fieldName,                                 //    fieldName
-       null,                                            //    null (for backwards compatibility)
-       true                                             //    true = full file load from Drive
+
+      // execute the callback functions             
+      if(_this.callback) _this.callback(            // execute the callback functions with
+        _this.pluginName,                           //    pluginName
+        _this.fieldName,                            //    fieldName
+        null,                                       //    null (for backwards compatibility)
+        true                                        //    true = full file load from Drive
       );
-    }
-
-    _this.initialized = true;                       // connection to drive is "initalized"
-    _this.initializing = false;                     // remove semaphore
-    plugin.sync.logger.log(_this.getFileName(), 'Data loaded from: '); 
-                                                            // execute the callback functions
-
-    if(_this.callback) _this.callback();
-    if(_this.initializedCallback) _this.initializedCallback(_this.pluginName, _this.fieldName);
+    
+      if (_this.initializing) {
+        _this.initialized = true;                   // connection to drive is "initalized"
+        _this.initializing = false;                 // remove semaphore
+        if(_this.initializedCallback) _this.initializedCallback( 
+          _this.pluginName, 
+          _this.fieldName
+        );
+      }
+      plugin.sync.logger.log(_this.getFileName(), 'Data loaded from: '+ _this.lastUpdateUUID); 
+      _this.doSync = 'sync';                        // return to normal sync
+    };
+// -----------------------------------------------------------------------------------------    
+    if (_this.doSync == 'local') {                  // User decided for 'local' data.
+      _this.lastUpdateUUID = _this.uuid;            // 
+      _this.updateMap({});                          // push local data to drive
+      _this.doSync = 'sync';                        // resume normal sync
+    };
+// -----------------------------------------------------------------------------------------     
+    if (_this.doSync == 'stop') {
+      // do nothing
+      console.log('SYNC stopped synching data for plugin '+_this.pluginName);
+    };
   };
 
   // Stop the sync if any error occur and try to re-authorize
@@ -256,6 +312,50 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
   // finally execute readFile
   this.dataStorage.readFile(initializeFile, onFileLoaded, handleError);
 };
+
+// conflict handler to decide between remote or local data
+//   results: 'remote', 'local', 'stop'
+window.plugin.sync.RegisteredMap.prototype.conflictHandler = function () {
+  var _this;
+  _this = this;
+  
+  window.dialog ({
+    title: "SYNC Conflict Handling",
+    html: "<div>SYNC found a conflict. The remote data stored on the drive "
+        + "was changed while you did local changes . "
+        + "Please decide which data shall be used. <br>"
+        + "Your decission will overwrite the other changes. "
+        + "It is impossible to merge the data!</div><br>"
+        + "",
+    buttons: [
+      { text: "remote",
+        click: function() {
+          _this.doSync = 'remote';
+          $( this ).dialog( "close" );
+        }
+      },
+      { text: "local",
+        click: function() {
+          _this.doSync = 'local';
+          $( this ).dialog( "close" );
+        }
+      },
+      { text: "STOP SYNC",
+        click: function() {
+          _this.doSync = 'stop';
+          $( this ).dialog( "close" );
+        }
+      }
+    ],
+    closeCallback: function() {
+       _this.loadDocument(); 
+    },
+    maxHeight: 300
+  });
+  
+};
+
+
 //// end RegisteredMap
 
 
@@ -771,7 +871,7 @@ window.plugin.sync.loadLocal = function(mapping) {
                           : obj;
 };
 
-//load a previously generated UUUID (or generate a new one)
+//load a previously generated UUID (or generate a new one)
 window.plugin.sync.loadUUID = function() {
   plugin.sync.loadLocal(plugin.sync.KEY_UUID);
   if(!plugin.sync.uuid) {
