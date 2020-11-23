@@ -13,6 +13,11 @@ if (document.documentElement.getAttribute('itemscope') !== null) {
 }
 window.iitcBuildDate = '@build_date@';
 
+// force https
+if (location.protocol !== 'https:') {
+  location.replace('https:' + location.href.substring(location.protocol.length));
+}
+
 // disable vanilla JS
 window.onload = function() {};
 document.body.onload = function() {};

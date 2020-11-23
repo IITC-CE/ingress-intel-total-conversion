@@ -22,7 +22,7 @@ defaults = {  # common for all build targets
 
     # these settings should not be touched unless intel url(s) changed
     'url_intel_base': 'https://intel.ingress.com/',
-    'match': 'https://intel.ingress.com/*',
+    'match': '*://intel.ingress.com/*',
 
     'plugin_wrapper': 'pluginwrapper', # use wrapper from pluginwrapper.py
 
