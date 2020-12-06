@@ -2,7 +2,7 @@
 // @name           Draw tools
 // @category       Draw
 // @version        0.8.2
-// @description    Allow drawing things onto the current map so you may plan your next move.M EDF-Support
+// @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension and Empty Drawn Fields (EDF)
 
 
 // HOOK: pluginDrawTools
@@ -763,10 +763,6 @@ window.plugin.drawTools.mpe.initMPE = function(){
   });
 }
 
-function setup () {
-  loadExternals();                              // initialize leaflet
-  window.plugin.drawTools.boot();               // initialize drawtools
-  window.plugin.drawTools.mpe.boot();           // register to MPE if available
 // EXPORT (POLYS AS LINES)
 // ---------------------------------------------------------------------------------
 window.plugin.drawTools.getDrawAsLines = function(){
@@ -872,6 +868,7 @@ function setup () {
   window.plugin.drawTools.boot();
   window.plugin.drawTools.setupCSS();
   window.plugin.drawTools.edf.boot();
+  window.plugin.drawTools.mpe.boot();           // register to MPE if available
 }
 
 function loadExternals () {
