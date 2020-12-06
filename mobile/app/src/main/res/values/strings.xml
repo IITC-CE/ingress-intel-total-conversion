@@ -48,39 +48,12 @@
         ${ISC_license_text}
         ]]>
     </string>
-    <string name="notice_how_to">
-        <![CDATA[
-        <h3>How to use IITCm:</h3>
-
-        • Navigation: swipe from the left edge of your screen (or click the app icon)
-          to evoke the <em>Navigation Drawer</em>.<br>
-          Click the app icon again to return to the map.<br>
-        • Layers/Highlights: swipe from the right edge of your screen 
-          (or click the layer-chooser icon in the ActionBar)
-          to evoke the <em>Layer Drawer</em>.<br>
-        • You can quickly send the current portal link/permalink to another device
-          if both devices support NFC (hold both devices back-to-back and
-          tap the screen to beam the map to the other device).<br>
-        • You can add official plugins in the settings.<br>
-        • For external plugins please have a look at the
-          <a href="https://iitc.modos189.ru/faq.html">FAQ.<br>
-        ]]>
-    </string>
     <string name="notice_info">
         <![CDATA[
         <p>Hint: Alternative ways to open the info screen:
         <p>
         • tap and hold a portal for a second<br>
         • tap on the left half of the status bar<br>
-        ]]>
-    </string>
-    <string name="notice_panes">
-        <![CDATA[
-        <p>Hint:
-        <p>Some plugins (e.g. <em>portals list</em> and <em>bookmarks</em>) now appear
-        in the <em>Navigation Drawer</em> for quick access.
-        <p>They won\'t appear in the info pane any more.
-        <p>Swipe from the left edge of your screen (or click the app icon) to seem them.
         ]]>
     </string>
     <string name="notice_extplugins">
@@ -122,6 +95,7 @@
     <string name="pref_force_desktop_sum">Nice for tablets, looks awful on smartphones</string>
     <string name="pref_dex_desktop">Support Samsung DeX Mode</string>
     <string name="pref_dex_desktop_sum">Force desktop mode when DeX mode is active</string>
+    <string name="pref_language">Language</string>
     <string name="pref_external_storage">Move tiles cache to external storage</string>
     <string name="pref_external_storage_sum">Restart required! Write cache to sdCard.
         External storage has to be mounted.</string>
@@ -145,6 +119,22 @@
     <string name="pref_force_plugin_update_sum">Update all enabled user plugins</string>
     <string name="pref_secure_updates">Require secure updates</string>
     <string name="pref_secure_updates_sum">If enabled, only https updates are handled</string>
+
+    <string name="pref_hide_fullscreen_notification_bar">System Notification Bar</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC Action Bar</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC Status Bar</string>
+    <string name="pref_hide_fullscreen_navigation_bar">System Navigation Bar</string>
+
+    <string name="pref_user_location_dont_show">Don\'t show user position</string>
+    <string name="pref_user_location_show_position">Show user position on map</string>
+    <string name="pref_user_location_show_position_and_orientation">Show user position and orientation on map</string>
+
+    <string name="pref_update_plugins_interval_disable">Disable</string>
+    <string name="pref_update_plugins_interval_1_day">1 day</string>
+    <string name="pref_update_plugins_interval_2_days">2 days</string>
+    <string name="pref_update_plugins_interval_1_week">1 week</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 weeks</string>
+
     <string name="menu_reload">Reload IITC</string>
     <string name="menu_toggle_fullscreen">Fullscreen</string>
     <string name="menu_layer_chooser">Layer Chooser</string>
@@ -165,16 +155,20 @@
     <string name="msg_prepare_screenshot">Preparing…</string>
     <string name="msg_take_screenshot">Taking screenshot…</string>
     <string name="notice_do_not_show_again">Do not show again</string>
+
     <string name="sign_in_to">Sign in to %1$s %2$s"</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="sign_in_action">Sign in</string>
+
     <string name="tab_map">Locate</string>
     <string name="tab_share">Share</string>
     <string name="tab_browser">Intel</string>
+
     <string name="label_highlighter">Highlighter</string>
     <string name="label_base_layer">Base Layer</string>
     <string name="label_overlay_layers">Overlay Layers</string>
+
     <string name="install_dialog_top">Install external plugin?</string>
     <string name="install_dialog_msg">
         <![CDATA[
@@ -183,4 +177,102 @@
         <p><b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!
         <p>Are you sure you want to proceed?]]>
     </string>
+
+    <string name="appintro_welcome_description">
+        This is a mobile version of the indispensable helper for the Ingress player.\n\n
+        Ingress Intel Total Conversion (IITC) is an add-on that works as an overlay for the official Intel Ingress map.\n\n
+        IITC completely changes the way you work with the map, significantly increases efficiency by applying hardware acceleration and expands the capabilities vía the use of various plugins.
+    </string>
+
+    <string name="appintro_location_title">Location permission</string>
+    <string name="appintro_location_description">
+        IITC-CE Mobile requires permission to access your location for easy navigation.\n\n
+        But don\'t worry: we don\'t send data about your location anywhere.
+    </string>
+
+    <string name="appintro_nfc_title">NFC permission</string>
+    <string name="appintro_nfc_description">
+        You can quickly send the current portal link/permalink to another device if both devices support NFC.\n\n
+        Hold both devices back-to-back and tap the screen to beam the map to the other device.
+    </string>
+
+    <string name="appintro_navigation_title">Navigation</string>
+    <string name="appintro_navigation_description">
+        Swipe from the left edge of your screen (or click the menu icon) to evoke the <i>Navigation Drawer</i>.\n
+        Click the back icon to return to the map.\n\n
+        Some plugins (e.g. <i>portals list</i> and <i>bookmarks</i>) now appear in the <i>Navigation Drawer</i> for quick access.\n
+        They won\'t appear in the info pane any more.
+    </string>
+
+    <string name="appintro_layers_title">Layers/Highlights</string>
+    <string name="appintro_layers_description">
+        Swipe from the right edge of your screen (or click the layer-chooser icon in the ActionBar) to evoke the <i>Layer Drawer</i>.\n\n
+        Here you can change the online map service or enable/disable display of necessary elements on the map.
+    </string>
+
+    <string name="appintro_plugins_title">Plugins</string>
+    <string name="appintro_plugins_description">
+        You can start using IITC-CE right now.\n\n
+        But the main advantage over the official Intel Ingress map is the abundance of plugins that expand capabilities.\n\n
+        You can add official or external plugins in the settings.
+    </string>
+
+    <string name="show_appintro_screen_title">Show intro screen</string>
+
+    <string name="plugins_permission_denied">Permission denied. You cannot add plugins.</string>
+    <string name="plugins_permission_granted">Permission granted. Please repeat the action.</string>
+    <string name="file_browser_is_required">No activity to select a file found. Please install a file browser of your choice!</string>
+    <string name="file_browser_choose_file">Choose file</string>
+    <string name="plugins_user_plugins">User Plugins</string>
+    <string name="plugins_official_plugins">Official Plugins</string>
+    <string name="toast_press_twice_to_exit">Press twice to exit</string>
+    <string name="plugin_updated">Plugin updated</string>
+
+    <string name="pane_all">All</string>
+    <string name="pane_faction">Faction</string>
+    <string name="pane_alerts">Alerts</string>
+    <string name="pane_info">Info</string>
+    <string name="pane_map">Map</string>
+
+    <string name="cradle_url" translatable="false">https://github.com/leCradle</string>
+    <string name="fkloft_url" translatable="false">https://github.com/fkloft</string>
+    <string name="giuseppe_lucido_url" translatable="false">http://be.net/giuseppelucido</string>
+    <string name="iitc_tg_news_url" translatable="false">https://t.me/iitc_news</string>
+    <string name="iitc_tg_group_url" translatable="false">https://t.me/iitc_group</string>
+    <string name="iitc_reddit_url" translatable="false">https://www.reddit.com/r/IITC/</string>
+    <string name="iitc_bugtracker_url" translatable="false">https://github.com/IITC-CE/ingress-intel-total-conversion/issues/new</string>
+    <string name="iitc_website_url" translatable="false">https://iitc.app/</string>
+    <string name="iitc_github_url" translatable="false">https://github.com/IITC-CE/ingress-intel-total-conversion</string>
+
+    <string name="iitc_ce_format" translatable="false"><![CDATA[ IITC <i>"Community Edition"</i> ]]></string>
+
+    <string name="link_template" translatable="false"><![CDATA[ <a href="%1$s">%2$s</a> ]]></string>
+
+    <string name="ISC_license_text" translatable="false">
+        <![CDATA[
+        <tt>
+        <p>Copyright © 2018-2020 Ingress Intel Total Conversion - Community Edition ("IITC-CE")
+        <br>Copyright © 2013-2018 Ingress Intel Total Conversion ("IITC")
+        <br>Copyright © 2013 Stefan Breunig
+
+        <p>Permission to use, copy, modify, and/or distribute this software for
+        any purpose with or without fee is hereby granted, provided that the
+        above copyright notice and this permission notice appear in all
+        copies.
+
+        <p>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL
+        WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+        WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+        AUTHORS BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+        DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
+        OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+        TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+        PERFORMANCE OF THIS SOFTWARE.
+        </tt>
+        ]]>
+    </string>
+
+    <string name="iitc_ce_mobile" translatable="false">IITC-CE Mobile</string>
+    <string name="continue_in_english" translatable="false">Continue in English</string>
+
 </resources>

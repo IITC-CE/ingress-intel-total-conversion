@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name="org.exarhteam.iitc_mobile.IITC_Application"
@@ -15,6 +16,9 @@
         android:icon="@drawable/ic_iitcm"
         android:label="@string/app_name"
         android:theme="@style/AppBaseTheme">
+        <activity android:name="org.exarhteam.iitc_mobile.IntroActivity"
+            android:label="app_intro" />
+
         <activity
             android:name="org.exarhteam.iitc_mobile.IITC_Mobile"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|uiMode"

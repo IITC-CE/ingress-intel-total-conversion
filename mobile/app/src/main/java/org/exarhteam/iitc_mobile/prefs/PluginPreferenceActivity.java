@@ -154,10 +154,9 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     target.addCategory(Intent.CATEGORY_OPENABLE);
 
                     try {
-                        startActivityForResult(Intent.createChooser(target, "Choose file"), COPY_PLUGIN_REQUEST);
+                        startActivityForResult(Intent.createChooser(target, getString(R.string.file_browser_choose_file)), COPY_PLUGIN_REQUEST);
                     } catch (final ActivityNotFoundException e) {
-                        Toast.makeText(this, "No activity to select a file found." +
-                                "Please install a file browser of your choice!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
                     }
                 }
             default:
@@ -170,10 +169,10 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission denied. You cannot add plugins.",
+                    Toast.makeText(this, getString(R.string.plugins_permission_denied),
                             Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(this, "Permission granted. Please repeat the action.",
+                    Toast.makeText(this, getString(R.string.plugins_permission_granted),
                             Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -324,7 +323,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     void addHeaders() {
         if (sUserPlugins.size() > 0) {
             final Header category = new Header();
-            category.title = "User Plugins";
+            category.title = getString(R.string.plugins_user_plugins);
             mHeaders.add(category);
             for (final Map.Entry<String, ArrayList<PluginPreference>> entry : sUserPlugins.entrySet()) {
                 addHeader(entry.getKey(), true);
@@ -332,7 +331,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         }
         if (sAssetPlugins.size() > 0) {
             final Header category = new Header();
-            category.title = "Official Plugins";
+            category.title = getString(R.string.plugins_official_plugins);
             mHeaders.add(category);
             for (final Map.Entry<String, ArrayList<PluginPreference>> entry : sAssetPlugins.entrySet()) {
                 addHeader(entry.getKey(), false);

@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
@@ -45,6 +46,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+
+import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
+import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -64,6 +68,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
@@ -71,9 +76,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IITC_Mobile extends AppCompatActivity
-        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback {
+        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnLocaleChangedListener {
     private static final String mIntelUrl = "https://intel.ingress.com/";
 
+    private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
     private SharedPreferences mSharedPrefs;
     private IITC_FileManager mFileManager;
     private IITC_WebView mIitcWebView;
@@ -221,7 +227,7 @@ public class IITC_Mobile extends AppCompatActivity
         // enable/disable advance menu
         final String[] menuDefaults = getResources().getStringArray(R.array.pref_android_menu_default);
         mAdvancedMenu = mSharedPrefs
-                .getStringSet("pref_android_menu", new HashSet<String>(Arrays.asList(menuDefaults)));
+                .getStringSet("pref_android_menu_options", new HashSet<String>(Arrays.asList(menuDefaults)));
 
         mPersistentZoom = mSharedPrefs.getBoolean("pref_persistent_zoom", false);
 
@@ -267,6 +273,8 @@ public class IITC_Mobile extends AppCompatActivity
         final NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
         if (nfc != null) nfc.setNdefPushMessageCallback(this, this);
 
+        this.firstTimeIntro();
+
         handleIntent(getIntent(), true);
     }
 
@@ -283,6 +291,10 @@ public class IITC_Mobile extends AppCompatActivity
             if (mUserLocation.setLocationMode(mode))
                 mReloadNeeded = true;
             return;
+        } else if (key.equals("pref_language")) {
+            final String lang = mSharedPrefs.getString("pref_language", this.getCurrentLanguage().toString());
+            this.setLanguage(lang);
+            return;
         } else if (key.equals("pref_persistent_zoom")) {
             mPersistentZoom = mSharedPrefs.getBoolean("pref_persistent_zoom", false);
             return;
@@ -290,11 +302,11 @@ public class IITC_Mobile extends AppCompatActivity
             mIitcWebView.updateFullscreenStatus();
             mNavigationHelper.onPrefChanged();
             return;
-        } else if (key.equals("pref_android_menu")) {
+        } else if (key.equals("pref_android_menu_options")) {
             final String[] menuDefaults = getResources().getStringArray(R.array.pref_android_menu_default);
-            mAdvancedMenu = mSharedPrefs.getStringSet("pref_android_menu",
+            mAdvancedMenu = mSharedPrefs.getStringSet("pref_android_menu_options",
                     new HashSet<String>(Arrays.asList(menuDefaults)));
-            mNavigationHelper.setDebugMode(mAdvancedMenu.contains(R.string.menu_debug));
+            mNavigationHelper.setDebugMode(mAdvancedMenu.contains("menu_debug"));
             invalidateOptionsMenu();
             // no reload needed
             return;
@@ -482,6 +494,36 @@ public class IITC_Mobile extends AppCompatActivity
         super.onResume();
         mIitcWebView.resumeTimers();
         mIitcWebView.onResume();
+        localizationDelegate.onCreate();
+        localizationDelegate.onResume(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(localizationDelegate.attachBaseContext(newBase));
+    }
+
+    @Override
+    public Context getApplicationContext() {
+        return localizationDelegate.getApplicationContext(super.getApplicationContext());
+    }
+
+    @Override
+    public Resources getResources() {
+        return localizationDelegate.getResources(super.getResources());
+    }
+
+    // Just override method locale change event
+    @Override
+    public void onBeforeLocaleChanged() { }
+
+    @Override
+    public void onAfterLocaleChanged() { }
+
+    public final void setLanguage(String language) { localizationDelegate.setLanguage(this, language); }
+
+    public final Locale getCurrentLanguage() {
+        return localizationDelegate.getLanguage(this);
     }
 
     @Override
@@ -502,6 +544,7 @@ public class IITC_Mobile extends AppCompatActivity
     @Override
     protected void onDestroy() {
         unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mDesktopModeReceiver);
         super.onDestroy();
     }
 
@@ -558,7 +601,7 @@ public class IITC_Mobile extends AppCompatActivity
             super.onBackPressed();
         } else {
             mBackButtonPressed = true;
-            Toast.makeText(this, "Press twice to exit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_press_twice_to_exit), Toast.LENGTH_SHORT).show();
             // reset back button after 2 seconds
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -670,7 +713,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         for (int i = 0; i < menu.size(); i++) {
             final MenuItem item = menu.getItem(i);
-            final boolean enabled = mAdvancedMenu.contains(item.getTitle());
+            final boolean enabled = mAdvancedMenu.contains( getResources().getResourceEntryName(item.getItemId()) );
 
             switch (item.getItemId()) {
                 case R.id.action_settings:
@@ -681,14 +724,14 @@ public class IITC_Mobile extends AppCompatActivity
                     item.setVisible(enabled);
                     break;
 
-                case R.id.toggle_fullscreen:
+                case R.id.menu_toggle_fullscreen:
                     item.setChecked(mIitcWebView.isInFullscreen());
                     item.setIcon(mIitcWebView.isInFullscreen()
                             ? R.drawable.ic_action_return_from_full_screen
                             : R.drawable.ic_action_full_screen);
                     break;
 
-                case R.id.locate:
+                case R.id.menu_locate:
                     item.setVisible(enabled && visible);
                     item.setEnabled(!mIsLoading);
                     item.setIcon(mUserLocation.isFollowing()
@@ -720,16 +763,16 @@ public class IITC_Mobile extends AppCompatActivity
             case android.R.id.home:
                 switchToPane(Pane.MAP);
                 return true;
-            case R.id.reload_button:
+            case R.id.menu_reload:
                 reloadIITC();
                 return true;
-            case R.id.toggle_fullscreen:
+            case R.id.menu_toggle_fullscreen:
                 mIitcWebView.toggleFullscreen();
                 return true;
-            case R.id.layer_chooser:
+            case R.id.menu_layer_chooser:
                 mNavigationHelper.openRightDrawer();
                 return true;
-            case R.id.locate: // get the users current location and focus it on map
+            case R.id.menu_locate: // get the users current location and focus it on map
                 switchToPane(Pane.MAP);
 
                 if (mUserLocation.hasCurrentLocation()) {
@@ -1077,6 +1120,17 @@ public class IITC_Mobile extends AppCompatActivity
 
     public boolean isLoading() {
         return mIsLoading;
+    }
+
+    public void firstTimeIntro() {
+        Thread t = new Thread(() -> {
+            boolean isFirstStart = mSharedPrefs.getBoolean("firstStart", true);
+            if (isFirstStart) {
+                final Intent i = new Intent(IITC_Mobile.this, IntroActivity.class);
+                runOnUiThread(() -> startActivity(i));
+            }
+        });
+        t.start();
     }
 
     /**

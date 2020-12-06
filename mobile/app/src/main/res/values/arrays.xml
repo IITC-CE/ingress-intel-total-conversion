@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_hide_fullscreen">
-        <item>System Notification Bar</item>
-        <item>IITC Action Bar</item>
-        <item>IITC Status Bar</item>
-        <item>System Navigation Bar</item>
+        <item>@string/pref_hide_fullscreen_notification_bar</item>
+        <item>@string/pref_hide_fullscreen_action_bar</item>
+        <item>@string/pref_hide_fullscreen_status_bar</item>
+        <item>@string/pref_hide_fullscreen_navigation_bar</item>
     </string-array>
     <string-array name="pref_hide_fullscreen_vals">
         <item>2</item>
@@ -17,7 +17,7 @@
         <item>4</item>
     </string-array>
 
-    <string-array name="pref_android_menu_entries">
+    <string-array name="pref_android_menu_titles">
         <item>@string/menu_search</item>
         <item>@string/menu_locate</item>
         <item>@string/menu_layer_chooser</item>
@@ -28,19 +28,30 @@
         <item>@string/menu_open_plugins</item>
         <item>@string/menu_debug</item>
     </string-array>
+    <string-array name="pref_android_menu_values">
+        <item>menu_search</item>
+        <item>menu_locate</item>
+        <item>menu_layer_chooser</item>
+        <item>menu_toggle_fullscreen</item>
+        <item>menu_reload</item>
+        <item>menu_send_screenshot</item>
+        <item>menu_clear_cookies</item>
+        <item>menu_open_plugins</item>
+        <item>menu_debug</item>
+    </string-array>
     <string-array name="pref_android_menu_default">
-        <item>@string/menu_search</item>
-        <item>@string/menu_locate</item>
-        <item>@string/menu_layer_chooser</item>
-        <item>@string/menu_toggle_fullscreen</item>
-        <item>@string/menu_reload</item>
-        <item>@string/menu_open_plugins</item>
+        <item>menu_search</item>
+        <item>menu_locate</item>
+        <item>menu_layer_chooser</item>
+        <item>menu_toggle_fullscreen</item>
+        <item>menu_reload</item>
+        <item>menu_open_plugins</item>
     </string-array>
 
     <string-array name="pref_user_location_titles">
-        <item>Don\'t show user position</item>
-        <item>Show user position on map</item>
-        <item>Show user position and orientation on map</item>
+        <item>@string/pref_user_location_dont_show</item>
+        <item>@string/pref_user_location_show_position</item>
+        <item>@string/pref_user_location_show_position_and_orientation</item>
     </string-array>
     <string-array name="pref_user_location_values">
         <item>0</item>
@@ -49,11 +60,11 @@
     </string-array>
 
     <string-array name="pref_update_plugins_interval_titles">
-        <item>Disable</item>
-        <item>1 day</item>
-        <item>2 days</item>
-        <item>1 week</item>
-        <item>2 weeks</item>
+        <item>@string/pref_update_plugins_interval_disable</item>
+        <item>@string/pref_update_plugins_interval_1_day</item>
+        <item>@string/pref_update_plugins_interval_2_days</item>
+        <item>@string/pref_update_plugins_interval_1_week</item>
+        <item>@string/pref_update_plugins_interval_2_weeks</item>
     </string-array>
 
     <string-array name="pref_update_plugins_interval_values">
@@ -62,5 +73,47 @@
         <item>2</item>
         <item>7</item>
         <item>14</item>
+    </string-array>
+
+    <string-array name="pref_languages_titles">
+        <item>Catalan</item>
+        <item>Chinese (Simplified)</item>
+        <item>Czech</item>
+        <item>English</item>
+        <item>French</item>
+        <item>Galician</item>
+        <item>German</item>
+        <item>Greek</item>
+        <item>Italian</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Polish</item>
+        <item>Portuguese (Brazil)</item>
+        <item>Portuguese (Portugal)</item>
+        <item>Russian</item>
+        <item>Spanish (Latin America)</item>
+        <item>Spanish (Spain)</item>
+        <item>Thai</item>
+    </string-array>
+
+    <string-array name="pref_languages_values">
+        <item>ca</item>
+        <item>zh_Hans</item>
+        <item>cs</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>gl</item>
+        <item>de</item>
+        <item>el</item>
+        <item>it</item>
+        <item>ja</item>
+        <item>ko</item>
+        <item>pl</item>
+        <item>pt_BR</item>
+        <item>pt_PT</item>
+        <item>ru</item>
+        <item>es_419</item>
+        <item>es</item>
+        <item>th</item>
     </string-array>
 </resources>
