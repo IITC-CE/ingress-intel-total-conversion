@@ -152,6 +152,9 @@ a:hover {
   display: none;
 }
 
+.leaflet-control-container .leaflet-bottom {
+  margin-bottom: 0 !important;
+}
 
 
 .help {
