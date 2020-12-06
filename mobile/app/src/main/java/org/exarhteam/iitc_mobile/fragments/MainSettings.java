@@ -1,13 +1,13 @@
 package org.exarhteam.iitc_mobile.fragments;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.view.View;
@@ -16,6 +16,7 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.prefs.AboutDialogPreference;
@@ -40,17 +41,28 @@ public class MainSettings extends PreferenceFragment {
             Log.w(e);
         }
 
+        // Button to open the start screen
+        Preference show_appintro_screen = findPreference("show_appintro_screen");
+        show_appintro_screen.setOnPreferenceClickListener((preference) -> {
+            final Intent i = new Intent((getActivity()), IntroActivity.class);
+            startActivity(i);
+            return true;
+        });
+
+        Preference pref_language = findPreference("pref_language");
+        pref_language.setOnPreferenceChangeListener((preference, newValue) -> {
+            (getActivity()).recreate();
+            return true;
+        });
+
         final AboutDialogPreference pref_about = (AboutDialogPreference) findPreference("pref_about");
         pref_about.setVersions(iitcVersion, buildVersion);
 
         final ListPreference pref_user_location_mode = (ListPreference) findPreference("pref_user_location_mode");
-        pref_user_location_mode.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(final Preference preference, final Object newValue) {
-                final int mode = Integer.parseInt((String) newValue);
-                preference.setSummary(getResources().getStringArray(R.array.pref_user_location_titles)[mode]);
-                return true;
-            }
+        pref_user_location_mode.setOnPreferenceChangeListener((preference, newValue) -> {
+            final int mode = Integer.parseInt((String) newValue);
+            preference.setSummary(getResources().getStringArray(R.array.pref_user_location_titles)[mode]);
+            return true;
         });
 
         final String value = getPreferenceManager().getSharedPreferences().getString("pref_user_location_mode", "0");

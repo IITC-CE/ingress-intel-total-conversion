@@ -79,8 +79,6 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
                 mIitc.switchToPane(Pane.MAP);
             }
         });
-
-        mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_HOWTO);
     }
 
     private void updateViews() {
@@ -134,8 +132,6 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     }
 
     public void addPane(final String name, final String label, final String icon) {
-        mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_PANES);
-
         final Resources res = mIitc.getResources();
         final String packageName = res.getResourcePackageName(R.string.app_name);
         /*
@@ -283,6 +279,11 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
         public View getView(final int position, final View convertView, final ViewGroup parent) {
             final TextView view = (TextView) super.getView(position, convertView, parent);
             final Pane item = getItem(position);
+
+            if (item.label_resource != 0) {
+                item.label = mIitc.getString(item.label_resource);
+            }
+
             view.setText(item.label);
 
             if (item.icon != 0) {
@@ -303,16 +304,23 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     }
 
     public static class Pane {
-        public static final Pane ALL = new Pane("all", "All", R.drawable.ic_action_view_as_list);
-        public static final Pane FACTION = new Pane("faction", "Faction", R.drawable.ic_action_cc_bcc);
-        public static final Pane ALERTS = new Pane("alerts", "Alerts", R.drawable.ic_action_warning);
-        public static final Pane INFO = new Pane("info", "Info", R.drawable.ic_action_about);
-        public static final Pane MAP = new Pane("map", "Map", R.drawable.ic_map_white);
+        public static final Pane ALL = new Pane("all", R.string.pane_all, R.drawable.ic_action_view_as_list);
+        public static final Pane FACTION = new Pane("faction", R.string.pane_faction, R.drawable.ic_action_cc_bcc);
+        public static final Pane ALERTS = new Pane("alerts", R.string.pane_alerts, R.drawable.ic_action_warning);
+        public static final Pane INFO = new Pane("info", R.string.pane_info, R.drawable.ic_action_about);
+        public static final Pane MAP = new Pane("map", R.string.pane_map, R.drawable.ic_map_white);
 
         private final int icon;
         public String label;
+        public int label_resource;
         public String name;
 
+        public Pane(final String name, final int label_resource, final int icon) {
+            this.name = name;
+            this.label_resource = label_resource;
+            this.icon = icon;
+        }
+        
         public Pane(final String name, final String label, final int icon) {
             this.name = name;
             this.label = label;

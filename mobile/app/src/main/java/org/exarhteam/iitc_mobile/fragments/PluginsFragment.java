@@ -36,7 +36,7 @@ public class PluginsFragment extends PreferenceFragment {
 
             // set action bar stuff
             ActionBar bar = getActivity().getActionBar();
-            bar.setTitle("IITC Plugins: " + category);
+            bar.setTitle(getString(R.string.pref_plugins)+": " + category);
             bar.setDisplayHomeAsUpEnabled(true);
         }
     }

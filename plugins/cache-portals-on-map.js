@@ -29,11 +29,11 @@ window.plugin.cachePortalDetailsOnMap.entityInject = function(data) {
   }
   data.callback(ents);
 };
-/****************************************************************************************/
-/* extend portal's GUID lookup to search in cached portals as well                      */
 
+// extend portal's GUID lookup to search in cached portals as well
 window.plugin.cachePortalDetailsOnMap.findPortalGuidByCacheE6 = function(latE6, lngE6) {
   let guid = window.plugin.cachePortalDetailsOnMap.findPortalGuidByPositionE6old(latE6, lngE6);
+
   // PLUGIN: cache > cache
   if (guid == null) {
     const cache = window.plugin.cachePortalDetailsOnMap;
@@ -56,7 +56,7 @@ window.plugin.cachePortalDetailsOnMap.searchInit = function () {
     window.findPortalGuidByPositionE6 = window.plugin.cachePortalDetailsOnMap.findPortalGuidByCacheE6;
     console.log ("findPortalGuidByCacheE6 code injected");
 }
-/****************************************************************************************/
+
 window.plugin.cachePortalDetailsOnMap.setup  = function() {
 
   window.plugin.cachePortalDetailsOnMap.cache = {};
