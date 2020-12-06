@@ -4,7 +4,6 @@
 // @version        0.8.2
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension and Empty Drawn Fields (EDF)
 
-
 // HOOK: pluginDrawTools
 // custom hook for draw tools to share it's activity with other plugins
 
