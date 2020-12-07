@@ -307,6 +307,30 @@ window.chat.nicknameClicked = function(event, nickname) {
 }
 
 window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs) {
+
+  if (newData.result.length > 0) {
+    //track oldest + newest timestamps/GUID
+    let first = {
+      guid: newData.result[0][0],
+      time: newData.result[0][1]
+    };
+    let last = {
+      guid: newData.result[newData.result.length-1][0],
+      time: newData.result[newData.result.length-1][1]
+    };
+    if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp >= last.time) {
+      if (isOlderMsgs || storageHash.oldestTimestamp != last.time) {
+        storageHash.oldestTimestamp = last.time;
+        storageHash.oldestGUID = last.guid;
+      }
+    }
+    if (storageHash.newestTimestamp === -1 || storageHash.newestTimestamp <= first.time) {
+      if (!isOlderMsgs || storageHash.newestTimestamp != first.time) {
+        storageHash.newestTimestamp = first.time;
+        storageHash.newestGUID = first.guid;
+      }
+    }
+  }
   $.each(newData.result, function(ind, json) {
     // avoid duplicates
     if(json[0] in storageHash.data) return true;
@@ -314,21 +338,10 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
     var isSecureMessage = false;
     var msgToPlayer = false;
 
-    var guid = json[0];
     var time = json[1];
     var team = json[2].plext.team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
     var auto = json[2].plext.plextType !== 'PLAYER_GENERATED';
     var systemNarrowcast = json[2].plext.plextType === 'SYSTEM_NARROWCAST';
-
-    //track oldest + newest timestamps/GUID
-    if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp > time) {
-      storageHash.oldestTimestamp = time;
-      storageHash.oldestGUID = guid;
-    }
-    if (storageHash.newestTimestamp === -1 || storageHash.newestTimestamp < time) {
-      storageHash.newestTimestamp = time;
-      storageHash.newestGUID = guid;
-    }
 
     //remove "Your X on Y was destroyed by Z" from the faction channel
 //    if (systemNarrowcast && !isPublicChannel) return true;
