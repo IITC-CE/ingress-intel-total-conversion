@@ -105,8 +105,10 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
 
   if(getOlderMsgs) {
     // ask for older chat when scrolling up
-    // "-1" to avoid looping at the same timestamp if many msgs are returned
-    data = $.extend(data, {maxTimestampMs: storageHash.oldestTimestamp -1});
+    data = $.extend(data, {
+      maxTimestampMs: storageHash.oldestTimestamp,
+      plextContinuationGuid: storageHash.oldestGUID
+    });
   } else {
     // ask for newer chat
     var min = storageHash.newestTimestamp;
@@ -125,7 +127,10 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     // work.
     // Currently this edge case is not handled. Let’s see if this is a
     // problem in crowded areas.
-    $.extend(data, {minTimestampMs: min});
+    $.extend(data, {
+      minTimestampMs: min,
+      plextContinuationGuid: storageHash.newestGUID
+    });
     // when requesting with an actual minimum timestamp, request oldest rather than newest first.
     // this matches the stock intel site, and ensures no gaps when continuing after an extended idle period
     if (min > -1) $.extend(data, {ascendingTimestampOrder: true});
@@ -309,14 +314,21 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
     var isSecureMessage = false;
     var msgToPlayer = false;
 
+    var guid = json[0];
     var time = json[1];
     var team = json[2].plext.team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
     var auto = json[2].plext.plextType !== 'PLAYER_GENERATED';
     var systemNarrowcast = json[2].plext.plextType === 'SYSTEM_NARROWCAST';
 
-    //track oldest + newest timestamps
-    if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp > time) storageHash.oldestTimestamp = time;
-    if (storageHash.newestTimestamp === -1 || storageHash.newestTimestamp < time) storageHash.newestTimestamp = time;
+    //track oldest + newest timestamps/GUID
+    if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp > time) {
+      storageHash.oldestTimestamp = time;
+      storageHash.oldestGUID = guid;
+    }
+    if (storageHash.newestTimestamp === -1 || storageHash.newestTimestamp < time) {
+      storageHash.newestTimestamp = time;
+      storageHash.newestGUID = guid;
+    }
 
     //remove "Your X on Y was destroyed by Z" from the faction channel
 //    if (systemNarrowcast && !isPublicChannel) return true;
