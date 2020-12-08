@@ -155,7 +155,7 @@ window.chat.requestFaction = function(getOlderMsgs, isRetry) {
   var r = window.postAjax(
     'getPlexts',
     d,
-    function(data, textStatus, jqXHR) { chat.handleFaction(data, getOlderMsgs); },
+    function(data, textStatus, jqXHR) { chat.handleFaction(data, getOlderMsgs, d.ascendingTimestampOrder); },
     isRetry
       ? function() { window.chat._requestFactionRunning = false; }
       : function() { window.chat.requestFaction(getOlderMsgs, true) }
@@ -164,7 +164,7 @@ window.chat.requestFaction = function(getOlderMsgs, isRetry) {
 
 
 window.chat._faction = {data:{}, oldestTimestamp:-1, newestTimestamp:-1};
-window.chat.handleFaction = function(data, olderMsgs) {
+window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
   chat._requestFactionRunning = false;
   $("#chatcontrols a:contains('faction')").removeClass('loading');
 
@@ -176,7 +176,7 @@ window.chat.handleFaction = function(data, olderMsgs) {
   if(data.result.length === 0) return;
 
   var old = chat._faction.oldestTimestamp;
-  chat.writeDataToHash(data, chat._faction, false, olderMsgs);
+  chat.writeDataToHash(data, chat._faction, false, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._faction.oldestTimestamp;
 
   runHooks('factionChatDataAvailable', {raw: data, result: data.result, processed: chat._faction.data});
@@ -204,7 +204,7 @@ window.chat.requestPublic = function(getOlderMsgs, isRetry) {
   var r = window.postAjax(
     'getPlexts',
     d,
-    function(data, textStatus, jqXHR) { chat.handlePublic(data, getOlderMsgs); },
+    function(data, textStatus, jqXHR) { chat.handlePublic(data, getOlderMsgs, d.ascendingTimestampOrder); },
     isRetry
       ? function() { window.chat._requestPublicRunning = false; }
       : function() { window.chat.requestPublic(getOlderMsgs, true) }
@@ -212,7 +212,7 @@ window.chat.requestPublic = function(getOlderMsgs, isRetry) {
 }
 
 window.chat._public = {data:{}, oldestTimestamp:-1, newestTimestamp:-1};
-window.chat.handlePublic = function(data, olderMsgs) {
+window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
   chat._requestPublicRunning = false;
   $("#chatcontrols a:contains('all')").removeClass('loading');
 
@@ -224,7 +224,7 @@ window.chat.handlePublic = function(data, olderMsgs) {
   if(data.result.length === 0) return;
 
   var old = chat._public.oldestTimestamp;
-  chat.writeDataToHash(data, chat._public, undefined, olderMsgs);   //NOTE: isPublic passed as undefined - this is the 'all' channel, so not really public or private
+  chat.writeDataToHash(data, chat._public, undefined, olderMsgs, ascendingTimestampOrder);   //NOTE: isPublic passed as undefined - this is the 'all' channel, so not really public or private
   var oldMsgsWereAdded = old !== chat._public.oldestTimestamp;
 
   runHooks('publicChatDataAvailable', {raw: data, result: data.result, processed: chat._public.data});
@@ -253,7 +253,7 @@ window.chat.requestAlerts = function(getOlderMsgs, isRetry) {
   var r = window.postAjax(
     'getPlexts',
     d,
-    function(data, textStatus, jqXHR) { chat.handleAlerts(data, getOlderMsgs); },
+    function(data, textStatus, jqXHR) { chat.handleAlerts(data, getOlderMsgs, d.ascendingTimestampOrder); },
     isRetry
       ? function() { window.chat._requestAlertsRunning = false; }
       : function() { window.chat.requestAlerts(getOlderMsgs, true) }
@@ -262,7 +262,7 @@ window.chat.requestAlerts = function(getOlderMsgs, isRetry) {
 
 
 window.chat._alerts = {data:{}, oldestTimestamp:-1, newestTimestamp:-1};
-window.chat.handleAlerts = function(data, olderMsgs) {
+window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
   chat._requestAlertsRunning = false;
   $("#chatcontrols a:contains('alerts')").removeClass('loading');
 
@@ -274,7 +274,7 @@ window.chat.handleAlerts = function(data, olderMsgs) {
   if(data.result.length === 0) return;
 
   var old = chat._alerts.oldestTimestamp;
-  chat.writeDataToHash(data, chat._alerts, undefined, olderMsgs); //NOTE: isPublic passed as undefined - it's nether public or private!
+  chat.writeDataToHash(data, chat._alerts, undefined, olderMsgs, ascendingTimestampOrder); //NOTE: isPublic passed as undefined - it's nether public or private!
   var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
 
 // no hoot for alerts - API change planned here...
@@ -306,7 +306,7 @@ window.chat.nicknameClicked = function(event, nickname) {
   return false;
 }
 
-window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs) {
+window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
 
   if (newData.result.length > 0) {
     //track oldest + newest timestamps/GUID
@@ -318,6 +318,8 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
       guid: newData.result[newData.result.length-1][0],
       time: newData.result[newData.result.length-1][1]
     };
+    if (isAscendingOrder)
+      [first, last] = [last, first];
     if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp >= last.time) {
       if (isOlderMsgs || storageHash.oldestTimestamp != last.time) {
         storageHash.oldestTimestamp = last.time;
