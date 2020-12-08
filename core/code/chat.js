@@ -310,11 +310,11 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
 
   if (newData.result.length > 0) {
     //track oldest + newest timestamps/GUID
-    let first = {
+    var first = {
       guid: newData.result[0][0],
       time: newData.result[0][1]
     };
-    let last = {
+    var last = {
       guid: newData.result[newData.result.length-1][0],
       time: newData.result[newData.result.length-1][1]
     };
