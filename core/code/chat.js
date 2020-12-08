@@ -78,14 +78,20 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     chat._faction.data = {};
     chat._faction.oldestTimestamp = -1;
     chat._faction.newestTimestamp = -1;
+    delete chat._faction.oldestGUID;
+    delete chat._faction.newestGUID;
 
     chat._public.data = {};
     chat._public.oldestTimestamp = -1;
     chat._public.newestTimestamp = -1;
+    delete chat._public.oldestGUID;
+    delete chat._public.newestGUID;
 
     chat._alerts.data = {};
     chat._alerts.oldestTimestamp = -1;
     chat._alerts.newestTimestamp = -1;
+    delete chat._alerts.oldestGUID;
+    delete chat._alerts.newestGUID;
 
     chat._oldBBox = b;
   }
@@ -175,9 +181,9 @@ window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
 
   if(data.result.length === 0) return;
 
-  var old = chat._faction.oldestTimestamp;
+  var old = chat._faction.oldestGUID;
   chat.writeDataToHash(data, chat._faction, false, olderMsgs, ascendingTimestampOrder);
-  var oldMsgsWereAdded = old !== chat._faction.oldestTimestamp;
+  var oldMsgsWereAdded = old !== chat._faction.oldestGUID;
 
   runHooks('factionChatDataAvailable', {raw: data, result: data.result, processed: chat._faction.data});
 
@@ -223,9 +229,9 @@ window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
 
   if(data.result.length === 0) return;
 
-  var old = chat._public.oldestTimestamp;
+  var old = chat._public.oldestGUID;
   chat.writeDataToHash(data, chat._public, undefined, olderMsgs, ascendingTimestampOrder);   //NOTE: isPublic passed as undefined - this is the 'all' channel, so not really public or private
-  var oldMsgsWereAdded = old !== chat._public.oldestTimestamp;
+  var oldMsgsWereAdded = old !== chat._public.oldestGUID;
 
   runHooks('publicChatDataAvailable', {raw: data, result: data.result, processed: chat._public.data});
 
