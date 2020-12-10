@@ -3,10 +3,17 @@ apply plugin: 'com.android.application'
 final BUILD_DATE = new Date().format('yyyy.MM.dd-HH:mm')
 
 def getVersionCodeTimeStamps = { ->
-    def date = new Date()
-    def formattedDate = date.format('yyMMddHH')
-    def result = formattedDate.toInteger() / 10 // maximum allowed value in Google Play is 2100000000
-    return result
+    def git = 'git log -1 --pretty=format:%ct'
+
+    def proc = git.execute()
+    proc.waitFor()
+    def unixtime = "${proc.in.text}".trim()
+
+    if (unixtime.isEmpty()) {
+        println "Failed to get commit date"
+        return -1
+    }
+    return Integer.parseInt(unixtime)
 }
 
 android {
