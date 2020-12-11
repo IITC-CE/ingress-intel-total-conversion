@@ -1,6 +1,5 @@
 package org.exarhteam.iitc_mobile.prefs;
 
-import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -20,8 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
 
 import org.exarhteam.iitc_mobile.IITC_FileManager;
 import org.exarhteam.iitc_mobile.IITC_NotificationHelper;

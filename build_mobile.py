@@ -19,7 +19,7 @@ defaults = {
     ],
 }
 iitc_script = 'total-conversion-build.user.js'
-buildtypes = {'debug', 'release'}
+buildtypes = {'debug', 'beta', 'release'}
 
 
 def add_default_settings(build_source):

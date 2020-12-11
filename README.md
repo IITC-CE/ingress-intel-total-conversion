@@ -2,6 +2,7 @@ Ingress Intel Total Conversion (IITC)
 =====================================
 
 <!-- [START badges] -->
+[![Build Status](http://img.shields.io/travis/IITC-CE/ingress-intel-total-conversion/master.svg?label=beta)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
 [![Build Status](http://img.shields.io/travis/IITC-CE/ingress-intel-total-conversion/test-builds.svg?label=test-builds)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
 [![Docs Status](https://readthedocs.org/projects/iitc-ce/badge/?version=latest)](https://readthedocs.org/projects/iitc-ce/)
 [![LICENSE](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)

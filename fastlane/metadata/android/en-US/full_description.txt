@@ -1,0 +1,8 @@
+IMPORTANT NOTE: this app runs on data hosted by Ingress. Prior to leaving a bad rating please try https://intel.ingress.com/ and note the load time and please take that in consideration when leaving your review thank you.
+
+Ingress Intel Total Conversion - Community Edition (IITC-CE) is a browser addon for the Ingress augmented reality game. It is faster than the standard Ingress map, and offers many more features.
+
+It is available for desktop browsers, such as Firefox and Chrome, and as a mobile application.
+
+Website: https://iitc.app
+GitHub Repository: https://github.com/IITC-CE/ingress-intel-total-conversion/
