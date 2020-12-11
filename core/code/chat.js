@@ -380,30 +380,17 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
         break;
 
       case 'TEXT':
-        msg += $('<div/>').text(markup[1].plain).html().autoLink();
+        msg += chat.renderText(markup[1]);
         break;
 
       case 'AT_PLAYER':
         var thisToPlayer = (markup[1].plain == ('@'+window.PLAYER.nickname));
-        var spanClass = thisToPlayer ? "pl_nudge_me" : (markup[1].team + " pl_nudge_player");
-        var atPlayerName = markup[1].plain.replace(/^@/, "");
-        msg += $('<div/>').html($('<span/>')
-                          .attr('class', spanClass)
-                          .attr('onclick',"window.chat.nicknameClicked(event, '"+atPlayerName+"')")
-                          .text(markup[1].plain)).html();
+        msg += chat.renderPlayer(markup[1], true);
         msgToPlayer = msgToPlayer || thisToPlayer;
         break;
 
       case 'PORTAL':
-        var lat = markup[1].latE6/1E6, lng = markup[1].lngE6/1E6;
-        var perma = window.makePermalink([lat,lng]);
-        var js = 'window.selectPortalByLatLng('+lat+', '+lng+');return false';
-
-        msg += '<a onclick="'+js+'"'
-          + ' title="'+markup[1].address+'"'
-          + ' href="'+perma+'" class="help">'
-          + window.chat.getChatPortalName(markup[1])
-          + '</a>';
+        msg += chat.renderPortal(markup[1]);
         break;
 
       case 'SECURE':
@@ -413,7 +400,7 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
 
       default:
         //handle unknown types by outputting the plain text version, marked with it's type
-        msg += $('<div/>').text(markup[0]+':<'+markup[1].plain+'>').html();
+        msg += chat.renderMarkupEntity(markup);
         break;
       }
     });
@@ -450,6 +437,60 @@ window.chat.getChatPortalName = function(markup) {
     name = 'USPS: ' + address[0];
   }
   return name;
+}
+
+window.chat.renderText = function (text) {
+  return $('<div/>').text(text.plain).html().autoLink();
+}
+
+window.chat.renderPortal = function (portal) {
+  var lat = portal.latE6/1E6, lng = portal.lngE6/1E6;
+  var perma = window.makePermalink([lat,lng]);
+  var js = 'window.selectPortalByLatLng('+lat+', '+lng+');return false';
+  return '<a onclick="'+js+'"'
+    + ' title="'+portal.address+'"'
+    + ' href="'+perma+'" class="help">'
+    + window.chat.getChatPortalName(portal)
+    + '</a>';
+}
+
+window.chat.renderFactionEnt = function (faction) {
+  var name = faction.team == "ENLIGHTENED" ? "Enlightened" : "Resistance";
+  var spanClass = faction.team == "ENLIGHTENED" ? TEAM_ENL : TEAM_RES;
+  return $('<div/>').html($('<span/>')
+                    .attr('class', spanClass)
+                    .text(name)).html();
+}
+
+window.chat.renderPlayer = function (player, at, sender) {
+  var name = (sender) ? player.plain.slice(0, -2) : (at) ? player.plain.slice(1) : player.plain;
+  var thisToPlayer = name == window.PLAYER.nickname;
+  var spanClass = thisToPlayer ? "pl_nudge_me" : (player.team + " pl_nudge_player");
+  return $('<div/>').html($('<span/>')
+                    .attr('class', spanClass)
+                    .attr('onclick',"window.chat.nicknameClicked(event, '"+name+"')")
+                    .text((at ? '@' : '') + name)).html();
+}
+
+window.chat.renderMarkupEntity = function (ent) {
+  switch (ent[0]) {
+  case 'TEXT':
+    return chat.renderText(ent[1]);
+  case 'PORTAL':
+    return chat.renderPortal(ent[1]);
+  case 'FACTION':
+    return chat.renderFactionEnt(ent[1]);
+  case 'SENDER':
+    return chat.renderPlayer(ent[1], false, true);
+  case 'PLAYER':
+    return chat.renderPlayer(ent[1]);
+  case 'AT_PLAYER':
+    return chat.renderPlayer(ent[1], true);
+  case 'TEXT':
+    return $('<div/>').text(ent[1].plain).html().autoLink();
+  default:
+  }
+  return $('<div/>').text(ent[0]+':<'+ent[1].plain+'>').html();
 }
 
 // renders data from the data-hash to the element defined by the given
