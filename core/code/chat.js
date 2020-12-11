@@ -323,8 +323,8 @@ window.chat.nicknameClicked = function(event, nickname) {
 
 window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
 
+  //track oldest + newest timestamps/GUID
   if (newData.result.length > 0) {
-    //track oldest + newest timestamps/GUID
     var first = {
       guid: newData.result[0][0],
       time: newData.result[0][1]
@@ -369,9 +369,6 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
 
     var markup = json[2].plext.markup;
 
-    //remove "Your X on Y was destroyed by Z" from the faction channel
-//    if (systemNarrowcast && !isPublicChannel) return true;
-
     var nick = '';
     $.each(markup, function(ind, markup) {
       switch(markup[0]) {
@@ -388,22 +385,6 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
         break;
       }
     });
-
-//    //skip secure messages on the public channel
-//    if (isPublicChannel && isSecureMessage) return true;
-
-//    //skip public messages (e.g. @player mentions) on the secure channel
-//    if ((!isPublicChannel) && (!isSecureMessage)) return true;
-
-
-    // //NOTE: these two are redundant with the above two tests in place - but things have changed...
-    // //from the server, private channel messages are flagged with a SECURE string '[secure] ', and appear in
-    // //both the public and private channels
-    // //we don't include this '[secure]' text above, as it's redundant in the faction-only channel
-    // //let's add it here though if we have a secure message in the public channel, or the reverse if a non-secure in the faction one
-    // if (!auto && !(isPublicChannel===false) && isSecure) msg = '<span style="color: #f88; background-color: #500;">[faction]</span> ' + msg;
-    // //and, add the reverse - a 'public' marker to messages in the private channel
-    // if (!auto && !(isPublicChannel===true) && (!isSecure)) msg = '<span style="color: #ff6; background-color: #550">[public]</span> ' + msg;
 
     var msg = chat.renderMarkup(markup);
 
