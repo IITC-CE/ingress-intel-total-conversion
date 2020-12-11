@@ -383,24 +383,12 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
         if(ind > 0) msg += nick; // don’t repeat nick directly
         break;
 
-      case 'TEXT':
-        msg += chat.renderText(markup[1]);
-        break;
-
-      case 'AT_PLAYER':
-        msg += chat.renderPlayer(markup[1], true);
-        break;
-
-      case 'PORTAL':
-        msg += chat.renderPortal(markup[1]);
-        break;
-
       case 'SECURE':
         //NOTE: we won't add the '[secure]' string here - it'll be handled below instead
         break;
 
       default:
-        //handle unknown types by outputting the plain text version, marked with it's type
+        // add other enitities whatever the type
         msg += chat.renderMarkupEntity(markup);
         break;
       }
