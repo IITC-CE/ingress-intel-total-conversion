@@ -521,12 +521,12 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
   //add <small> tags around the milliseconds
   tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  // help cursor via “#chat time”
-  var t = '<time title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time>';
-  if ( msgToPlayer )
-  {
-    t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';
-  }
+  var timeClass = (msgToPlayer) ? 'pl_nudge_date' : '';
+  var t = '<time class="' + timeClass + '"title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time>';
+  // if ( msgToPlayer )
+  // {
+  //   t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';
+  // }
   if (systemNarrowcast)
   {
     msg = '<div class="system_narrowcast">' + msg + '</div>';

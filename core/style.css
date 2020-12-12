@@ -1123,25 +1123,28 @@ td + td {
 }
 */
 
+.pl_nudge_date:after {
+  background: no-repeat url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
+  position:absolute;
+  content:"";
+  height:20px;
+  width: 5px;
+  right:-5px;
+  top:-1px
+}
+
 .pl_nudge_date {
   background-color: #724510;
   border-left: 1px solid #ffd652;
   border-bottom: 1px solid #ffd652;
   border-top: 1px solid #ffd652;
   color: #ffd652;
-  display: inline-block;
-  float: left;
+  display: block;
+  position:relative;
   height: 18px;
-  text-align: center;
-}
-
-.pl_nudge_pointy_spacer {
-  background: no-repeat url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
-  display: inline-block;
-  float: left;
-  height: 20px;
-  left: 47px;
-  width: 5px;
+  width: 36px;
+  padding-left: 2px;
+  left: -2px;
 }
 
 .pl_nudge_player {
