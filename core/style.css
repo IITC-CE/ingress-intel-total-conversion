@@ -99,11 +99,11 @@ i.large { font-size: 6rem; }
 }
 
 .enl {
-  color: #03fe03 !important;
+  color: #03fe03;
 }
 
 .res {
-  color: #00c5ff !important;
+  color: #00c5ff;
 }
 
 .none {
@@ -111,7 +111,7 @@ i.large { font-size: 6rem; }
 }
 
 .nickname {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 a {
@@ -208,7 +208,7 @@ a:hover {
 
 #chatcontrols a:first-child {
   letter-spacing:-1px;
-  text-decoration: none !important;
+  text-decoration: none;
 }
 
 #chatcontrols a.active {
@@ -339,7 +339,7 @@ em {
 }
 
 #chat td.system_narrowcast {
-  color: #f66 !important;
+  color: #f66;
 }
 
 #chatall tr.faction td:nth-child(3):before,
