@@ -99,7 +99,6 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
   var ne = b.getNorthEast();
   var sw = b.getSouthWest();
   var data = {
-//    desiredNumItems: isFaction ? CHAT_FACTION_ITEMS : CHAT_PUBLIC_ITEMS ,
     minLatE6: Math.round(sw.lat*1E6),
     minLngE6: Math.round(sw.lng*1E6),
     maxLatE6: Math.round(ne.lat*1E6),
@@ -119,18 +118,14 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     // ask for newer chat
     var min = storageHash.newestTimestamp;
     // the initial request will have both timestamp values set to -1,
-    // thus we receive the newest desiredNumItems. After that, we will
-    // only receive messages with a timestamp greater or equal to min
-    // above.
+    // thus we receive the newest 50. After that, we will only receive
+    // messages with a timestamp greater or equal to min above.
     // After resuming from idle, there might be more new messages than
     // desiredNumItems. So on the first request, we are not really up to
     // date. We will eventually catch up, as long as there are less new
-    // messages than desiredNumItems per each refresh cycle.
+    // messages than 50 per each refresh cycle.
     // A proper solution would be to query until no more new results are
-    // returned. Another way would be to set desiredNumItems to a very
-    // large number so we really get all new messages since the last
-    // request. Setting desiredNumItems to -1 does unfortunately not
-    // work.
+    // returned.
     // Currently this edge case is not handled. Let’s see if this is a
     // problem in crowded areas.
     $.extend(data, {
