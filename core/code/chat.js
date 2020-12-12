@@ -522,16 +522,17 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
   // {
   //   t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';
   // }
-  if (systemNarrowcast)
-  {
-    msg = '<div class="system_narrowcast">' + msg + '</div>';
-  }
+  var msgClass = (systemNarrowcast) ? 'system_narrowcast' : '';
   var color = COLORS[team];
   if (nick === window.PLAYER.nickname) color = '#fd6';    //highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
   var s = 'style="cursor:pointer; color:'+color+'"';
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
   var className = (isPublic) ? 'public' : (isSecure) ? 'faction' : '';
-  return '<tr class="' + className + '"><td>'+t+'</td><td>'+i[0]+'<mark class="nickname" ' + s + '>'+ nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
+  return '<tr class="' + className + '">'
+       + '<td>'+t+'</td>'
+       + '<td>'+i[0]+'<mark class="nickname" ' + s + '>'+ nick+'</mark>'+i[1]+'</td>'
+       + '<td class="' + msgClass + '">'+msg+'</td>'
+       + '</tr>';
 }
 
 window.chat.addNickname= function(nick) {
