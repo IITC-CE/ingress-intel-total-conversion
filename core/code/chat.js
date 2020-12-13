@@ -304,6 +304,12 @@ window.chat.renderAlerts = function(oldMsgsWereAdded) {
 // common
 //
 
+window.chat.addNickname= function(nick) {
+  var c = document.getElementById("chattext");
+  c.value = [c.value.trim(), nick].join(" ").trim() + " ";
+  c.focus()
+}
+
 window.chat.nicknameClicked = function(event, nickname) {
   var hookData = { event: event, nickname: nickname };
 
@@ -411,6 +417,14 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
   });
 }
 
+//
+// Rendering primitive for markup, chat cells (td) and chat row (tr)
+//
+
+window.chat.renderText = function (text) {
+  return $('<div/>').text(text.plain).html().autoLink();
+}
+
 // Override portal names that are used over and over, such as 'US Post Office'
 window.chat.getChatPortalName = function(markup) {
   var name = markup.name;
@@ -419,10 +433,6 @@ window.chat.getChatPortalName = function(markup) {
     name = 'USPS: ' + address[0];
   }
   return name;
-}
-
-window.chat.renderText = function (text) {
-  return $('<div/>').text(text.plain).html().autoLink();
 }
 
 window.chat.renderPortal = function (portal) {
@@ -497,40 +507,6 @@ window.chat.renderMarkup = function (markup) {
   return msg;
 }
 
-// renders data from the data-hash to the element defined by the given
-// ID. Set 3rd argument to true if it is likely that old data has been
-// added. Latter is only required for scrolling.
-window.chat.renderData = function(data, element, likelyWereOldMsgs) {
-  var elm = $('#'+element);
-  if(elm.is(':hidden')) return;
-
-  // discard guids and sort old to new
-//TODO? stable sort, to preserve server message ordering? or sort by GUID if timestamps equal?
-  var vals = $.map(data, function(v, k) { return [v]; });
-  vals = vals.sort(function(a, b) { return a[0]-b[0]; });
-
-  // render to string with date separators inserted
-  var msgs = '';
-  var prevTime = null;
-  $.each(vals, function(ind, msg) {
-    var nextTime = new Date(msg[0]).toLocaleDateString();
-    if(prevTime && prevTime !== nextTime)
-      msgs += chat.renderDivider(nextTime);
-    msgs += msg[2];
-    prevTime = nextTime;
-  });
-
-  var scrollBefore = scrollBottom(elm);
-  elm.html('<table>' + msgs + '</table>');
-  chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
-}
-
-
-window.chat.renderDivider = function(text) {
-  var d = ' ──────────────────────────────────────────────────────────────────────────';
-  return '<tr><td colspan="3" style="padding-top:3px"><summary>─ ' + text + d + '</summary></td></tr>';
-}
-
 window.chat.renderTimeCell = function(time, classNames) {
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
@@ -566,6 +542,7 @@ window.chat.renderMsgRow = function(data) {
   return '<tr data-guid="' + data.guid + '" class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
 }
 
+// legacy rendering, not used internaly, but left there for backward compatibilty in case a plugin uses it directly
 window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
@@ -590,13 +567,38 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
   return '<tr><td>'+t+'</td><td>'+i[0]+'<mark class="nickname" ' + s + '>'+ nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
 }
 
-window.chat.addNickname= function(nick) {
-  var c = document.getElementById("chattext");
-  c.value = [c.value.trim(), nick].join(" ").trim() + " ";
-  c.focus()
+window.chat.renderDivider = function(text) {
+  var d = ' ──────────────────────────────────────────────────────────────────────────';
+  return '<tr><td colspan="3" style="padding-top:3px"><summary>─ ' + text + d + '</summary></td></tr>';
 }
 
+// renders data from the data-hash to the element defined by the given
+// ID. Set 3rd argument to true if it is likely that old data has been
+// added. Latter is only required for scrolling.
+window.chat.renderData = function(data, element, likelyWereOldMsgs) {
+  var elm = $('#'+element);
+  if(elm.is(':hidden')) return;
 
+  // discard guids and sort old to new
+//TODO? stable sort, to preserve server message ordering? or sort by GUID if timestamps equal?
+  var vals = $.map(data, function(v, k) { return [v]; });
+  vals = vals.sort(function(a, b) { return a[0]-b[0]; });
+
+  // render to string with date separators inserted
+  var msgs = '';
+  var prevTime = null;
+  $.each(vals, function(ind, msg) {
+    var nextTime = new Date(msg[0]).toLocaleDateString();
+    if(prevTime && prevTime !== nextTime)
+      msgs += chat.renderDivider(nextTime);
+    msgs += msg[2];
+    prevTime = nextTime;
+  });
+
+  var scrollBefore = scrollBottom(elm);
+  elm.html('<table>' + msgs + '</table>');
+  chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
+}
 
 
 window.chat.getActive = function() {
