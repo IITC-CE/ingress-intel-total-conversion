@@ -58,9 +58,7 @@ deploy:
   # deploy to google play
   - provider: script
     skip_cleanup: true
-    script:
-      - echo $GOOGLE_PLAY_ACCOUNT > gplay_api.json
-      - bundle exec fastlane deploy_$BUILD_TYPE
+    script: bundle exec fastlane deploy_$BUILD_TYPE
     on:
       branch: master
 

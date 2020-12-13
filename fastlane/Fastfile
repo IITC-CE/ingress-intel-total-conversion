@@ -17,14 +17,16 @@ platform :android do
   lane :deploy_beta do
     upload_to_play_store(track: "beta",
            package_name: "org.exarhteam.iitc_mobile",
-           apk: "build/beta/IITC_Mobile-beta.apk")
+           apk: "build/beta/IITC_Mobile-beta.apk",
+           json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'])
   end
 
   desc "Deploy of release to Google Play"
   lane :deploy_release do
     upload_to_play_store(track: "release",
            package_name: "org.exarhteam.iitc_mobile",
-           apk: "build/release/IITC_Mobile-release.apk")
+           apk: "build/release/IITC_Mobile-release.apk",
+           json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'])
   end
 end
 
