@@ -317,8 +317,7 @@ window.chat.nicknameClicked = function(event, nickname) {
 }
 
 window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
-
-  //track oldest + newest timestamps/GUID
+  // track oldest + newest timestamps/GUID
   if (newData.result.length > 0) {
     var first = {
       guid: newData.result[0][0],
@@ -526,7 +525,7 @@ window.chat.renderDivider = function(text) {
 window.chat.renderTimeCell = function(time, classNames) {
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
-  //add <small> tags around the milliseconds
+  // add <small> tags around the milliseconds
   tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   return '<td><time class="' + classNames + '" title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time></td>';
 }
@@ -546,7 +545,8 @@ window.chat.renderMsgRow = function(data) {
 
   var nickClasses = ['nickname'];
   if (data.player.team == TEAM_ENL || data.player.team == TEAM_RES) nickClasses.push(TEAM_TO_CSS[data.player.team]);
-  if (data.player.name === window.PLAYER.nickname) nickClasses.push('pl_nudge_me');    //highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
+  // highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
+  if (data.player.name === window.PLAYER.nickname) nickClasses.push('pl_nudge_me');
   var nickCell = chat.renderNickCell(data.player.name, nickClasses.join(' '));
 
   var msg = chat.renderMarkup(data.markup)
@@ -560,7 +560,7 @@ window.chat.renderMsgRow = function(data) {
 window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
-  //add <small> tags around the milliseconds
+  // add <small> tags around the milliseconds
   tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
   // help cursor via “#chat time”
@@ -574,7 +574,8 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
     msg = '<div class="system_narrowcast">' + msg + '</div>';
   }
   var color = COLORS[team];
-  if (nick === window.PLAYER.nickname) color = '#fd6';    //highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
+  // highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
+  if (nick === window.PLAYER.nickname) color = '#fd6';
   var s = 'style="cursor:pointer; color:'+color+'"';
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
   return '<tr><td>'+t+'</td><td>'+i[0]+'<mark class="nickname" ' + s + '>'+ nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
