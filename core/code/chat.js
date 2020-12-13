@@ -509,30 +509,37 @@ window.chat.renderDivider = function(text) {
   return '<tr><td colspan="3" style="padding-top:3px"><summary>─ ' + text + d + '</summary></td></tr>';
 }
 
-
-window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast, isPublic, isSecure, msgAlert) {
+window.chat.renderTimeCell = function(time, classNames) {
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
   //add <small> tags around the milliseconds
   tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return '<td><time class="' + classNames + '" title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time></td>';
+}
 
+window.chat.renderNickCell = function(nick, classNames) {
+  var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
+  return '<td>'+i[0]+'<mark class="' + classNames + '">'+ nick+'</mark>'+i[1]+'</td>';
+}
+
+window.chat.renderMsgCell = function(msg, classNames) {
+  return '<td class="' + classNames + '">'+msg+'</td>';
+}
+
+window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast, isPublic, isSecure, msgAlert) {
   var timeClass = (msgToPlayer) ? 'pl_nudge_date' : '';
-  var t = '<time class="' + timeClass + '"title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time>';
-  // if ( msgToPlayer )
-  // {
-  //   t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';
-  // }
-  var msgClass = (systemNarrowcast) ? 'system_narrowcast' : '';
+  var timeCell = chat.renderTimeCell(time, timeClass);
+
   var nickClasses = ['nickname'];
   if (team == TEAM_ENL || team == TEAM_RES) nickClasses.push(TEAM_TO_CSS[team]);
   if (nick === window.PLAYER.nickname) nickClasses.push('pl_nudge_me');    //highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
-  var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
+  var nickCell = chat.renderNickCell(nick, nickClasses.join(' '));
+
+  var msgClass = (systemNarrowcast) ? 'system_narrowcast' : '';
+  var msgCell = chat.renderMsgCell(msg, msgClass);
+
   var className = (isPublic) ? 'public' : (isSecure) ? 'faction' : '';
-  return '<tr class="' + className + '">'
-       + '<td>'+t+'</td>'
-       + '<td>'+i[0]+'<mark class="' + nickClasses.join(' ') + '">'+ nick+'</mark>'+i[1]+'</td>'
-       + '<td class="' + msgClass + '">'+msg+'</td>'
-       + '</tr>';
+  return '<tr class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
 }
 
 window.chat.addNickname= function(nick) {
