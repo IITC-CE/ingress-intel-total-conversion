@@ -554,7 +554,7 @@ window.chat.renderMsgRow = function(data) {
   var msgCell = chat.renderMsgCell(msg, msgClass);
 
   var className = (data.public) ? 'public' : (data.secure) ? 'faction' : '';
-  return '<tr class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
+  return '<tr data-guid="' + data.guid + '" class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
 }
 
 window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
