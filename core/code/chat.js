@@ -339,13 +339,13 @@ window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAsc
       last = temp;
     }
     if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp >= last.time) {
-      if (isOlderMsgs || storageHash.oldestTimestamp != last.time) {
+      if (isOlderMsgs || storageHash.oldestTimestamp !== last.time) {
         storageHash.oldestTimestamp = last.time;
         storageHash.oldestGUID = last.guid;
       }
     }
     if (storageHash.newestTimestamp === -1 || storageHash.newestTimestamp <= first.time) {
-      if (!isOlderMsgs || storageHash.newestTimestamp != first.time) {
+      if (!isOlderMsgs || storageHash.newestTimestamp !== first.time) {
         storageHash.newestTimestamp = first.time;
         storageHash.newestGUID = first.guid;
       }
@@ -355,9 +355,9 @@ window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAsc
 
 window.chat.parseMsgData = function(data) {
   var categories = data[2].plext.categories;
-  var isPublic = (categories & 1) == 1;
-  var isSecure = (categories & 2) == 2;
-  var msgAlert = (categories & 4) == 4;
+  var isPublic = (categories & 1) === 1;
+  var isSecure = (categories & 2) === 2;
+  var msgAlert = (categories & 4) === 4;
 
   var msgToPlayer = msgAlert && (isPublic || isSecure);
 
@@ -447,8 +447,8 @@ window.chat.renderPortal = function (portal) {
 }
 
 window.chat.renderFactionEnt = function (faction) {
-  var name = faction.team == "ENLIGHTENED" ? "Enlightened" : "Resistance";
-  var spanClass = faction.team == "ENLIGHTENED" ? TEAM_ENL : TEAM_RES;
+  var name = faction.team === "ENLIGHTENED" ? "Enlightened" : "Resistance";
+  var spanClass = faction.team === "ENLIGHTENED" ? TEAM_ENL : TEAM_RES;
   return $('<div/>').html($('<span/>')
                     .attr('class', spanClass)
                     .text(name)).html();
@@ -456,7 +456,7 @@ window.chat.renderFactionEnt = function (faction) {
 
 window.chat.renderPlayer = function (player, at, sender) {
   var name = (sender) ? player.plain.slice(0, -2) : (at) ? player.plain.slice(1) : player.plain;
-  var thisToPlayer = name == window.PLAYER.nickname;
+  var thisToPlayer = name === window.PLAYER.nickname;
   var spanClass = thisToPlayer ? "pl_nudge_me" : (player.team + " pl_nudge_player");
   return $('<div/>').html($('<span/>')
                     .attr('class', spanClass)
@@ -529,7 +529,7 @@ window.chat.renderMsgRow = function(data) {
   var timeCell = chat.renderTimeCell(data.time, timeClass);
 
   var nickClasses = ['nickname'];
-  if (data.player.team == TEAM_ENL || data.player.team == TEAM_RES) nickClasses.push(TEAM_TO_CSS[data.player.team]);
+  if (data.player.team === TEAM_ENL || data.player.team === TEAM_RES) nickClasses.push(TEAM_TO_CSS[data.player.team]);
   // highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
   if (data.player.name === window.PLAYER.nickname) nickClasses.push('pl_nudge_me');
   var nickCell = chat.renderNickCell(data.player.name, nickClasses.join(' '));
