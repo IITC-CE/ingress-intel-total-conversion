@@ -316,7 +316,7 @@ window.chat.nicknameClicked = function(event, nickname) {
   return false;
 }
 
-window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
+window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAscendingOrder) {
   // track oldest + newest timestamps/GUID
   if (newData.result.length > 0) {
     var first = {
@@ -345,6 +345,11 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
       }
     }
   }
+}
+
+window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
+  window.chat.updateOldNewHash(newData, storageHash, isOldMsgs, isAscendingOrder);
+
   $.each(newData.result, function(ind, json) {
     // avoid duplicates
     if(json[0] in storageHash.data) return true;
