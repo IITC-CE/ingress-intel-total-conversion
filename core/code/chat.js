@@ -595,9 +595,14 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs) {
     prevTime = nextTime;
   });
 
+  var firstRender = elm.is(':empty');
   var scrollBefore = scrollBottom(elm);
   elm.html('<table>' + msgs + '</table>');
-  chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
+
+  if (firstRender)
+    elm.data('needsScrollTop', 99999999);
+  else
+    chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
 }
 
 
