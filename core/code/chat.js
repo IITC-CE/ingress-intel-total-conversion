@@ -616,7 +616,8 @@ window.chat.chooseTab = function(tab) {
 
   $('#chat > div').hide();
 
-  var elm;
+  var elm = $('#chat' + tab);
+  elm.show();
 
   switch(tab) {
     case 'faction':
@@ -646,9 +647,6 @@ window.chat.chooseTab = function(tab) {
     default:
       throw new Error('chat.chooser was asked to handle unknown button: ' + tt);
   }
-
-  var elm = $('#chat' + tab);
-  elm.show();
 
   if(elm.data('needsScrollTop')) {
     elm.data('ignoreNextScroll', true);
