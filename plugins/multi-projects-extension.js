@@ -344,15 +344,22 @@ window.plugin.mpe.data.toggleManager = function(PJ){
 window.plugin.mpe.ui.toggleSidebar = function(PJ){
   var s = '.mpeSidebar .mpe.'+PJ;
   var elem = $(s);
+  var prep = ''
   var fa = window.plugin.mpe.data.getFaClass(PJ);
   fa = (fa.length !== 0)? fa : 'nofa';
-
   var title = window.plugin.mpe.data.getTitle(PJ);
+  var short = (title) ? title.substr(0, 3): 'n/a'
+
+  if(window.plugin.faIcon){
+    prep = '<i class="left fa '+fa+'" title="'+title+'"></i>';
+  } else {
+    prep = '<i class="left fa" title="'+title+'">'+short+'</i>';
+  };
 
   if(window.plugin.mpe.data.isInSidebar(PJ) >= 0){
     if(!elem.length){
       $('.mpeSidebar').append(window.plugin.mpe.getHTML.project(PJ));
-      $(s).prepend('<i class="left fa '+fa+'" title="'+title+'"></i>');
+      $(s).prepend(prep);
     }
   }else{
     elem.remove();
