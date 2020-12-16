@@ -200,7 +200,7 @@ public class IITC_WebViewClient extends WebViewClient {
                 handler.proceed();
             }
         });
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 handler.cancel();
@@ -283,7 +283,8 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("redirect to: " + uriQuery);
             return shouldOverrideUrlLoading(view, uriQuery);
         }
-        if (uriHost.equals("facebook.com") && uriPath.contains("oauth")) {
+        if (uriHost.endsWith("facebook.com")
+                && (uriPath.contains("oauth") || uriPath.equals("/login.php") || uriPath.equals("/checkpoint/"))) {
             Log.d("Facebook login");
             return false;
         }

@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
@@ -34,13 +35,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Build;
@@ -49,7 +46,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
+
+import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
+import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.melnykov.fab.FloatingActionButton;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
@@ -65,6 +68,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
@@ -72,9 +76,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IITC_Mobile extends AppCompatActivity
-        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnItemLongClickListener {
+        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnLocaleChangedListener {
     private static final String mIntelUrl = "https://intel.ingress.com/";
 
+    private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
     private SharedPreferences mSharedPrefs;
     private IITC_FileManager mFileManager;
     private IITC_WebView mIitcWebView;
@@ -89,8 +94,11 @@ public class IITC_Mobile extends AppCompatActivity
     private Set<String> mAdvancedMenu;
     private MenuItem mSearchMenuItem;
     private View mImageLoading;
-    private ListView mLvDebug;
+    public RecyclerView mLvDebug;
+    private View mLayoutDebug;
     private View mViewDebug;
+    private LinearLayoutManager llm;
+    public FloatingActionButton debugScrollButton;
     private ImageButton mBtnToggleMap;
     private EditText mEditCommand;
     private boolean mDebugging = false;
@@ -102,6 +110,9 @@ public class IITC_Mobile extends AppCompatActivity
     private String mPermalink = null;
     private String mSearchTerm = "";
     private IntentFilter mDesktopFilter;
+    private IITC_DebugHistory debugHistory;
+    private int debugHistoryPosition = -1;
+    private String debugInputStore = "";
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -132,7 +143,7 @@ public class IITC_Mobile extends AppCompatActivity
         	}
     	}
 	};
-	
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
@@ -158,10 +169,15 @@ public class IITC_Mobile extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
 
+        debugHistory = new IITC_DebugHistory(50);
+
         setContentView(R.layout.activity_main);
+        debugScrollButton = findViewById(R.id.debugScrollButton);
+
         mImageLoading = findViewById(R.id.imageLoading);
         mIitcWebView = (IITC_WebView) findViewById(R.id.iitc_webview);
-        mLvDebug = (ListView) findViewById(R.id.lvDebug);
+        mLayoutDebug = findViewById(R.id.layoutDebug);
+        mLvDebug = (RecyclerView) findViewById(R.id.lvDebug);
         mViewDebug = findViewById(R.id.viewDebug);
         mBtnToggleMap = (ImageButton) findViewById(R.id.btnToggleMapVisibility);
         mEditCommand = (EditText) findViewById(R.id.editCommand);
@@ -193,7 +209,10 @@ public class IITC_Mobile extends AppCompatActivity
         });
 
         mLvDebug.setAdapter(new IITC_LogAdapter(this));
-        mLvDebug.setOnItemLongClickListener(this);
+
+        llm = new LinearLayoutManager(this);
+        llm.setStackFromEnd(true);
+        mLvDebug.setLayoutManager(llm);
 
         // do something if user changed something in the settings
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -208,9 +227,17 @@ public class IITC_Mobile extends AppCompatActivity
         // enable/disable advance menu
         final String[] menuDefaults = getResources().getStringArray(R.array.pref_android_menu_default);
         mAdvancedMenu = mSharedPrefs
-                .getStringSet("pref_android_menu", new HashSet<String>(Arrays.asList(menuDefaults)));
+                .getStringSet("pref_android_menu_options", new HashSet<String>(Arrays.asList(menuDefaults)));
 
         mPersistentZoom = mSharedPrefs.getBoolean("pref_persistent_zoom", false);
+
+        Set<String> restoreDebugHstory = mSharedPrefs.getStringSet("debug_history", new HashSet<>());
+
+        if (restoreDebugHstory != null) {
+            for (String item : restoreDebugHstory) {
+                debugHistory.push(item);
+            }
+        }
 
         // get fullscreen status from settings
         mIitcWebView.updateFullscreenStatus();
@@ -246,6 +273,8 @@ public class IITC_Mobile extends AppCompatActivity
         final NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
         if (nfc != null) nfc.setNdefPushMessageCallback(this, this);
 
+        this.firstTimeIntro();
+
         handleIntent(getIntent(), true);
     }
 
@@ -262,6 +291,10 @@ public class IITC_Mobile extends AppCompatActivity
             if (mUserLocation.setLocationMode(mode))
                 mReloadNeeded = true;
             return;
+        } else if (key.equals("pref_language")) {
+            final String lang = mSharedPrefs.getString("pref_language", this.getCurrentLanguage().toString());
+            this.setLanguage(lang);
+            return;
         } else if (key.equals("pref_persistent_zoom")) {
             mPersistentZoom = mSharedPrefs.getBoolean("pref_persistent_zoom", false);
             return;
@@ -269,11 +302,11 @@ public class IITC_Mobile extends AppCompatActivity
             mIitcWebView.updateFullscreenStatus();
             mNavigationHelper.onPrefChanged();
             return;
-        } else if (key.equals("pref_android_menu")) {
+        } else if (key.equals("pref_android_menu_options")) {
             final String[] menuDefaults = getResources().getStringArray(R.array.pref_android_menu_default);
-            mAdvancedMenu = mSharedPrefs.getStringSet("pref_android_menu",
+            mAdvancedMenu = mSharedPrefs.getStringSet("pref_android_menu_options",
                     new HashSet<String>(Arrays.asList(menuDefaults)));
-            mNavigationHelper.setDebugMode(mAdvancedMenu.contains(R.string.menu_debug));
+            mNavigationHelper.setDebugMode(mAdvancedMenu.contains("menu_debug"));
             invalidateOptionsMenu();
             // no reload needed
             return;
@@ -461,6 +494,36 @@ public class IITC_Mobile extends AppCompatActivity
         super.onResume();
         mIitcWebView.resumeTimers();
         mIitcWebView.onResume();
+        localizationDelegate.onCreate();
+        localizationDelegate.onResume(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(localizationDelegate.attachBaseContext(newBase));
+    }
+
+    @Override
+    public Context getApplicationContext() {
+        return localizationDelegate.getApplicationContext(super.getApplicationContext());
+    }
+
+    @Override
+    public Resources getResources() {
+        return localizationDelegate.getResources(super.getResources());
+    }
+
+    // Just override method locale change event
+    @Override
+    public void onBeforeLocaleChanged() { }
+
+    @Override
+    public void onAfterLocaleChanged() { }
+
+    public final void setLanguage(String language) { localizationDelegate.setLanguage(this, language); }
+
+    public final Locale getCurrentLanguage() {
+        return localizationDelegate.getLanguage(this);
     }
 
     @Override
@@ -481,6 +544,7 @@ public class IITC_Mobile extends AppCompatActivity
     @Override
     protected void onDestroy() {
         unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mDesktopModeReceiver);
         super.onDestroy();
     }
 
@@ -537,7 +601,7 @@ public class IITC_Mobile extends AppCompatActivity
             super.onBackPressed();
         } else {
             mBackButtonPressed = true;
-            Toast.makeText(this, "Press twice to exit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_press_twice_to_exit), Toast.LENGTH_SHORT).show();
             // reset back button after 2 seconds
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -649,7 +713,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         for (int i = 0; i < menu.size(); i++) {
             final MenuItem item = menu.getItem(i);
-            final boolean enabled = mAdvancedMenu.contains(item.getTitle());
+            final boolean enabled = mAdvancedMenu.contains( getResources().getResourceEntryName(item.getItemId()) );
 
             switch (item.getItemId()) {
                 case R.id.action_settings:
@@ -660,14 +724,14 @@ public class IITC_Mobile extends AppCompatActivity
                     item.setVisible(enabled);
                     break;
 
-                case R.id.toggle_fullscreen:
+                case R.id.menu_toggle_fullscreen:
                     item.setChecked(mIitcWebView.isInFullscreen());
                     item.setIcon(mIitcWebView.isInFullscreen()
                             ? R.drawable.ic_action_return_from_full_screen
                             : R.drawable.ic_action_full_screen);
                     break;
 
-                case R.id.locate:
+                case R.id.menu_locate:
                     item.setVisible(enabled && visible);
                     item.setEnabled(!mIsLoading);
                     item.setIcon(mUserLocation.isFollowing()
@@ -699,16 +763,16 @@ public class IITC_Mobile extends AppCompatActivity
             case android.R.id.home:
                 switchToPane(Pane.MAP);
                 return true;
-            case R.id.reload_button:
+            case R.id.menu_reload:
                 reloadIITC();
                 return true;
-            case R.id.toggle_fullscreen:
+            case R.id.menu_toggle_fullscreen:
                 mIitcWebView.toggleFullscreen();
                 return true;
-            case R.id.layer_chooser:
+            case R.id.menu_layer_chooser:
                 mNavigationHelper.openRightDrawer();
                 return true;
-            case R.id.locate: // get the users current location and focus it on map
+            case R.id.menu_locate: // get the users current location and focus it on map
                 switchToPane(Pane.MAP);
 
                 if (mUserLocation.hasCurrentLocation()) {
@@ -881,7 +945,7 @@ public class IITC_Mobile extends AppCompatActivity
     private void updateViews() {
         if (!mDebugging) {
             mViewDebug.setVisibility(View.GONE);
-            mLvDebug.setVisibility(View.GONE);
+            mLayoutDebug.setVisibility(View.GONE);
 
             if (mIsLoading && !mSharedPrefs.getBoolean("pref_disable_splash", false)) {
                 mIitcWebView.setVisibility(View.GONE);
@@ -903,13 +967,13 @@ public class IITC_Mobile extends AppCompatActivity
             }
 
             if (mShowMapInDebug) {
-                mBtnToggleMap.setImageResource(R.drawable.ic_action_view_as_list);
+                mBtnToggleMap.setImageResource(R.drawable.ic_view_list_white);
                 mIitcWebView.setVisibility(View.VISIBLE);
-                mLvDebug.setVisibility(View.GONE);
+                mLayoutDebug.setVisibility(View.GONE);
             } else {
-                mBtnToggleMap.setImageResource(R.drawable.ic_action_map);
+                mBtnToggleMap.setImageResource(R.drawable.ic_map_white);
                 mIitcWebView.setVisibility(View.GONE);
-                mLvDebug.setVisibility(View.VISIBLE);
+                mLayoutDebug.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -923,6 +987,12 @@ public class IITC_Mobile extends AppCompatActivity
             Log.w(e);
             return;
         }
+        debugHistoryPosition = -1;
+        debugHistory.push(code);
+        mEditCommand.setText("");
+
+        Set<String> in = new HashSet<>(Arrays.asList(debugHistory.getStackArray()));
+        mSharedPrefs.edit().putStringSet("debug_history", in).apply();
 
         // throwing an exception will be reported by WebView
         final String js = "(function(obj){var result;" +
@@ -949,6 +1019,75 @@ public class IITC_Mobile extends AppCompatActivity
     public void onClearLog(final View v)
     {
         ((IITC_LogAdapter) mLvDebug.getAdapter()).clear();
+    }
+
+    private void setDebugCursorToEnd() {
+        mEditCommand.setSelection(mEditCommand.getText().length());
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugUp, assigned in activity_main.xml
+     */
+    public void onDebugHistoryUp(final View v)
+    {
+        if (debugHistoryPosition >= debugHistory.getSize()-1) return;
+
+        if (debugHistoryPosition < 0) {
+            debugInputStore = mEditCommand.getText().toString();
+        }
+
+        debugHistoryPosition += 1;
+        mEditCommand.setText(debugHistory.peek(debugHistoryPosition));
+        setDebugCursorToEnd();
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugDown, assigned in activity_main.xml
+     */
+    public void onDebugHistoryDown(final View v)
+    {
+        if (debugHistoryPosition < 0) return;
+        debugHistoryPosition -= 1;
+
+        String text;
+        if (debugHistoryPosition < 0) {
+            text = debugInputStore;
+        } else {
+            text = debugHistory.peek(debugHistoryPosition);
+        }
+
+        mEditCommand.setText(text);
+        setDebugCursorToEnd();
+    }
+
+    private int debugCursorMove(boolean right) {
+        mEditCommand.requestFocus();
+        int pos = mEditCommand.getSelectionEnd();
+        int len = mEditCommand.length();
+
+        if (right && pos < len) {
+            pos += 1;
+        } else if (!right && pos > 0) {
+            pos -= 1;
+        }
+
+        return pos;
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugLeft, assigned in activity_main.xml
+     */
+    public void onDebugCursorMoveRight(final View v)
+    {
+        mEditCommand.setSelection(debugCursorMove(true));
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugRight, assigned in activity_main.xml
+     */
+    public void onDebugCursorMoveLeft(final View v)
+    {
+        mEditCommand.setSelection(debugCursorMove(false));
     }
 
     private void deleteUpdateFile() {
@@ -981,6 +1120,17 @@ public class IITC_Mobile extends AppCompatActivity
 
     public boolean isLoading() {
         return mIsLoading;
+    }
+
+    public void firstTimeIntro() {
+        Thread t = new Thread(() -> {
+            boolean isFirstStart = mSharedPrefs.getBoolean("firstStart", true);
+            if (isFirstStart) {
+                final Intent i = new Intent(IITC_Mobile.this, IntroActivity.class);
+                runOnUiThread(() -> startActivity(i));
+            }
+        });
+        t.start();
     }
 
     /**
@@ -1073,33 +1223,17 @@ public class IITC_Mobile extends AppCompatActivity
         return new NdefMessage(records);
     }
 
-    @Override
-    public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
-        if (parent == mLvDebug) {
-            final IITC_LogAdapter adapter = ((IITC_LogAdapter) parent.getAdapter());
-            final Log.Message item = adapter.getItem(position);
+    public void clipboardCopy(String msg) {
+        mIitcWebView.getJSInterface().copy(msg);
+    }
 
-            final PopupMenu popupMenu = new PopupMenu(this, view);
-            popupMenu.getMenuInflater().inflate(R.menu.debug, popupMenu.getMenu());
+    public boolean isDebugEnd() {
+        int visibleItemCount = mLvDebug.getChildCount();
+        int totalItemCount = llm.getItemCount();
+        int firstVisibleItemPosition = llm.findFirstVisibleItemPosition();
 
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(final MenuItem menuitem) {
-                    switch (menuitem.getItemId()) {
-                        case R.id.menu_copy:
-                            mIitcWebView.getJSInterface().copy(item.toString());
-                            return true;
-                        case R.id.menu_delete:
-                            adapter.remove(item);
-                            return true;
-                    }
-                    return false;
-                }
-            });
-
-            popupMenu.show();
-        }
-        return false;
+        return ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                && firstVisibleItemPosition >= 0 || llm.getItemCount() < 1);
     }
 
     @Override

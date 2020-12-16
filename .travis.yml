@@ -1,54 +1,68 @@
 language: android
 jdk: oraclejdk8
+
 branches:
   only:
-  - test-builds
-  - /^v([0-9]+)\.([0-9]+).*$/
+    - master
+    - test-builds
+    - /^v([0-9]+)\.([0-9]+).*$/
+
 android:
   components:
   - platform-tools
   - tools
-  - build-tools-28.0.3
-  - android-28
+  - build-tools-29.0.3
+  - android-29
   - extra-android-m2repository
+
 addons:
   apt:
     sources: deadsnakes
     packages: python3.7
-  ssh_known_hosts: ssh.modos189.ru
+  ssh_known_hosts: ssh.iitc.app
+
 notifications:
   email:
     on_success: change
     on_failure: always
+
 jobs:
   include:
     - stage: test-builds
       if: branch = test-builds
       env: BUILD_TYPE=test
+    - stage: beta
+      if: branch = master
+      env: BUILD_TYPE=beta
     - stage: release
-      if: branch != test-builds
+      if: NOT branch IN (test-builds, master)
       env: BUILD_TYPE=release
 
-before_install: sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+before_install:
+  - sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+  - bundle install --path vendor/bundle
 
 before_script:
-  - git fetch --unshallow
-  - wget https://iitc.modos189.ru/deploy/localbuildsettings.py
+  - wget https://iitc.app/deploy/localbuildsettings.py
 
 script: ./build.py $BUILD_TYPE
 
 deploy:
+  # deploy to iitc site
   - provider: script
     skip_cleanup: true
-    script: curl -s https://iitc.modos189.ru/deploy/deploy.sh | bash -s -- $BUILD_TYPE
+    script: curl -s https://iitc.app/deploy/deploy.sh | bash -s -- $BUILD_TYPE
     on:
-      branch: test-builds
+      all_branches: true
+
+  # deploy to google play
   - provider: script
     skip_cleanup: true
-    script: curl -s https://iitc.modos189.ru/deploy/deploy.sh | bash -s -- $BUILD_TYPE
+    script: bundle exec fastlane deploy_$BUILD_TYPE
     on:
-      tags: true
       branch: master
+
+  # deploy to github releases
   - provider: releases
     skip_cleanup: true
     name: $TRAVIS_TAG
@@ -60,4 +74,3 @@ deploy:
     - ./build/release/*.zip
     on:
       tags: true
-      branch: master

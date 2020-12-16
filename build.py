@@ -17,7 +17,7 @@ def run_python(cmd):
         cmd = Path(__file__).with_name(cmd)
         if not cmd.is_file():
             raise UserWarning(f'no such file: {original}')
-    return run_path(cmd)
+    return run_path(str(cmd))
 
 
 def run_system(cmd):

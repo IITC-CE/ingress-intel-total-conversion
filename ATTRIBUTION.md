@@ -10,7 +10,7 @@ Parts imported from other projects remain under their respective licenses:
 - [**Spectrum** colorpicker](https://github.com/bgrins/spectrum) © [_Brian Grinstead_](https://briangrinstead.com/):  [[MIT](https://github.com/bgrins/spectrum/blob/master/LICENSE)]
 
 ### [Leaflet](https://leafletjs.com/)-related components:
-- [**Leaflet**](https://github.com/Leaflet/Leaflet) © [_Vladimir Agafonkin_](https://agafonkin.com/), [_CloudMade_](https://cloudmade.com/): [[LICENCE](https://github.com/Leaflet/Leaflet/blob/master/LICENSE)]
+- [**Leaflet**](https://github.com/Leaflet/Leaflet) © [_Vladimir Agafonkin_](https://agafonkin.com/), [_CloudMade_](https://cloudmade.com/): [[BSD-2-Clause](https://github.com/Leaflet/Leaflet/blob/master/LICENSE)]
 - [**Leaflet.draw**](https://github.com/Leaflet/Leaflet.draw) © [_Jon West_](https://github.com/ddproxy), [_Jacob Toye_](https://github.com/jacobtoye), and _Leaflet_: [[MIT](https://github.com/Leaflet/Leaflet.draw/blob/develop/MIT-LICENSE.md)]
 - [Shramov **leaflet-plugins**](https://github.com/shramov/leaflet-plugins) © _Pavel Shramov_, [_Bruno Bergot_](https://www.eliaz.fr/): [[MIT](https://github.com/shramov/leaflet-plugins/blob/master/LICENSE)]
 - [**toGeoJSON**](https://github.com/mapbox/togeojson) © [_Mapbox_](https://www.mapbox.com/): [[BSD-2-Clause](https://github.com/mapbox/togeojson/blob/master/LICENSE)]

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toggle_map">マップ表示on/off</string>
+    <string name="clear_log">ログ消去</string>
+    <string name="debug_run">実行</string>
+    <string name="activity_settings">IITC Mobile の設定</string>
+    <string name="activity_plugins">IITC プラグイン</string>
+    <string name="activity_share_to_clipboard">クリップボードにコピー</string>
+    <string name="activity_save_to_file">ファイルに保存</string>
+    <string name="action_settings">設定</string>
+    <string name="drawer_open">ナビゲーションメニューを表示</string>
+    <string name="close">閉じる</string>
+    <string name="download_description">最新のIntelパッケージを取得中…</string>
+    <string name="pref_about_title">IITC Mobileについて</string>
+    <string name="pref_misc_cat">その他</string>
+    <string name="activity_share">以下の方法で共有…</string>
+    <string name="drawer_close">ナビゲーションメニューを閉じる</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; 
+\n&lt;p&gt;&lt;b&gt;ビルドバージョン：${build_version}&lt;/b&gt;&lt;br&gt;&lt;b&gt;IITCバージョン：${build_version}&lt;/b&gt; 
+\n&lt;p&gt;&lt;b&gt;${cradle_link}、${fkloft_link}および寄稿者&lt;/b&gt; 
+\n&lt;p&gt;&lt;b&gt;アイコン：${giuseppe_lucido_link}&lt;/b&gt; 
+\n&lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt;は、&lt;i&gt;Ingress Intel Total Conversion（IITC）&lt;/i&gt;ユーザースクリプトに最適化されたモバイルブラウザです。 
+\n&lt;h3&gt;コミュニティ：&lt;/h3&gt; 
+\n•新しいリリースとデスクトップバージョンについては、${website_link}にアクセスしてください。&lt;br&gt; 
+\n•${tg_iitc_news_link}アナウンスメント用のテレグラムチャンネル,${tg_iitc_group_link}テレグラムチャットに参加。&lt;br&gt; 
+\n•${reddit_iitc_link}Redditコミュニティ-助けを求め、他のユーザーと議論する場所。&lt;br&gt; 
+\n•問題を報告し、${bugtracker_link}で機能強化を提案してください。&lt;br&gt; 
+\n&lt;h3&gt;開発者：&lt;/h3&gt;${github_iitc_link}。 
+\n&lt;h3&gt;IITCライセンス：&lt;/h3&gt;${ISC_license_text}</string>
+    <string name="version">バージョン表示</string>
+    <string name="pref_ui_cat">ユーザーインタフェース</string>
+    <string name="pref_plugins">IITCプラグイン</string>
+    <string name="sign_in_action">サインイン</string>
+    <string name="pref_plugins_sum">プラグインはIITCの動作を拡張/変更します。 デスクトップ版IITCにも使われているプラグインは、ほぼ全てこちらにもあります。</string>
+    <string name="pref_user_zoom_sum">マルチタッチ可能な機種でも+/-ボタンを表示します。</string>
+    <string name="pref_fullscreen_sum">全画面表示の際に隠す項目。 ※この状態でも、ナビゲーションドロワー（左スワイプ）によりIITCmを操作できます</string>
+    <string name="notice_info">&lt;p&gt;ヒント：詳細画面を開く別のやり方: &lt;p&gt; • ポータルを1秒間押し続けます&lt;br&gt; • ステータスバーの左半分をタップします&lt;br&gt;</string>
+    <string name="pref_tweaks_cat">その他の微調整</string>
+    <string name="pref_user_location">ユーザーの場所を地図上に表示</string>
+    <string name="pref_user_zoom">拡大・縮小を表示</string>
+    <string name="pref_fullscreen">全画面表示で表示する項目</string>
+    <string name="pref_dex_desktop_sum">DeX モード時はデスクトップ版表示を強制します</string>
+    <string name="pref_press_twice_to_exit_sum">予期しないアプリ終了操作を防ぎます</string>
+    <string name="pref_advanced_options_sum">開発者向けのオプションと詳細な微調整</string>
+    <string name="pref_plugins_title">利用可能なプラグイン</string>
+    <string name="pref_persistent_zoom">ズームレベルを維持</string>
+    <string name="pref_persistent_zoom_sum">現在地ボタンをタップした時もズームレベルを維持します</string>
+    <string name="pref_force_desktop">デスクトップ版表示を強制する</string>
+    <string name="pref_force_desktop_sum">タブレットでの使用に適します。スマートフォンには適しません</string>
+    <string name="pref_dex_desktop">Samsung DeXモードのサポート</string>
+    <string name="pref_external_storage">タイルキャッシュを外部ストレージに移動</string>
+    <string name="pref_press_twice_to_exit">戻るボタンを2回押して終了</string>
+    <string name="pref_advanced_options">詳細設定</string>
+    <string name="pref_enable_dev_mode">開発者モードを有効にする</string>
+    <string name="pref_disable_splash">スプラッシュ画面をオフにする</string>
+    <string name="pref_update_plugins_cat">ユーザープラグインの更新</string>
+    <string name="pref_update_plugins_interval_sum">IITCmがプラグインの新しいバージョンを確認する間隔を設定できます</string>
+    <string name="menu_toggle_fullscreen">全画面表示</string>
+    <string name="menu_locate">現在地を表示</string>
+    <string name="menu_clear_cookies">Cookieを消去</string>
+    <string name="menu_search">検索</string>
+    <string name="menu_open_plugins">プラグイン</string>
+    <string name="menu_debug">デバッグ</string>
+    <string name="menu_plugins_add">外部プラグインの追加</string>
+    <string name="menu_copy">コピー</string>
+    <string name="menu_delete">削除</string>
+    <string name="choose_account_to_login">ログインに使用するアカウントを選択</string>
+    <string name="login_failed">ログイン失敗。</string>
+    <string name="search_hint">場所を検索</string>
+    <string name="msg_copied">クリップボードにコピーしました…</string>
+    <string name="msg_prepare_screenshot">準備しています…</string>
+    <string name="menu_reload">IITCを再読込する</string>
+    <string name="pref_force_plugin_update_sum">現在有効なユーザプラグインをすべて更新します</string>
+    <string name="pref_force_plugin_update">強制的にプラグインを更新する</string>
+    <string name="pref_secure_updates">安全な更新のみ使用</string>
+    <string name="pref_secure_updates_sum">有効時は、httpsによる更新に限定されます</string>
+    <string name="pref_fake_user_agent">ユーザーエージェント文字列を偽装</string>
+    <string name="pref_android_menu">IITCm メニューの設定</string>
+    <string name="pref_android_menu_sum">IITCm メニューに表示する項目を選択できます</string>
+    <string name="notice_do_not_show_again">次回からは表示しない</string>
+    <string name="sign_in_to">ログイン先: %1$s %2$s</string>
+    <string name="username">ユーザー名</string>
+    <string name="password">パスワード</string>
+    <string name="tab_map">場所を開く</string>
+    <string name="tab_share">共有</string>
+    <string name="tab_browser">公式Intel</string>
+    <string name="label_highlighter">ハイライト表示</string>
+    <string name="label_base_layer">ベースレイヤー</string>
+    <string name="label_overlay_layers">オーバーレイ レイヤー</string>
+    <string name="install_dialog_top">外部プラグインをインストールしますか？</string>
+    <string name="pref_external_storage_sum">再起動が必要です: キャッシュをSDカードに書き込みます。外部ストレージをマウントする必要があります。</string>
+    <string name="pref_enable_dev_mode_sum">有効にすると、すべてのIITCソースがAndroidデバイスの外部ストレージからロードされます。すべてのソースを $IITC_folder/build/mobile/ から /sdcard/IITC_Mobile/dev/ にコピーしてください。</string>
+    <string name="menu_send_screenshot">スクリーンショットを送る</string>
+    <string name="intent_error">アドレスを開けませんでした</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCmに以下のJavaScriptファイルをインストールしようとしています: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;注意:&lt;/b&gt; 外部のJavascriptには有害なコード(スパイウェアなど)が含まれる場合もあります! &lt;p&gt;続行しますか？</string>
+    <string name="msg_take_screenshot">スクリーンショットを取得しています…</string>
+    <string name="notice_extplugins">&lt;p&gt;ヒント: &lt;p&gt;IITC Mobileは外部プラグインも読み込めます。 &lt;p&gt;右上の（+）アイコンをクリックして、プラグインを追加します。 プラグインのファイル名は「.user.js」で終わる必要があります。ファイルのコピー先は以下のとおりです: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="notice_sharing">&lt;p&gt;&lt;em&gt;ポータルの共有&lt;/em&gt;では、次のことができます。&lt;p&gt;•ポータルリンクを他の人に送信する&lt;br&gt;•選択したポータルの位置を別のアプリで表示する&lt;br&gt;•Webブラウザでポータルリンクを開く&lt;br&gt;&lt;p&gt;ヒント：Googleマップ（またはインストールされているその他のナビアプリ）を選択すると、選択したポータルにすばやく移動できます。&lt;p&gt;これらのヒントは、&lt;em&gt;パーマリンク&lt;/em&gt;にも適用されます。</string>
+    <string name="pref_fake_user_agent_sum">IITCmはIntelサイトのデスクトップブラウザーとして振る舞います。 ※デスクトップ版IITCを使いたい場合は、設定の「デスクトップ版表示を強制する」を使用します</string>
+    <string name="menu_layer_chooser">レイヤーを選択</string>
+    <string name="pref_update_plugins_interval">プラグイン更新チェック間隔</string>
+</resources>

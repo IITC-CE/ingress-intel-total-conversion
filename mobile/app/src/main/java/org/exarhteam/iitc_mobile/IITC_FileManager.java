@@ -259,13 +259,13 @@ public class IITC_FileManager {
                     .setTitle(mActivity.getString(R.string.install_dialog_top))
                     .setMessage(Html.fromHtml(text))
                     .setCancelable(true)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface dialog, final int which) {
                             copyPlugin(uri, invalidateHeaders);
                         }
                     })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface dialog, final int which) {
                             dialog.cancel();
@@ -354,16 +354,16 @@ public class IITC_FileManager {
                 return;
             }
             new AlertDialog.Builder(mActivity)
-                    .setTitle("Plugin updated")
+                    .setTitle(mActivity.getString(R.string.plugin_updated))
                     .setMessage(scriptName)
                     .setCancelable(true)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface dialog, final int which) {
                             dialog.cancel();
                         }
                     })
-                    .setNegativeButton("Reload", new DialogInterface.OnClickListener() {
+                    .setNegativeButton(mActivity.getString(R.string.menu_reload), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface dialog, final int which) {
                             dialog.cancel();
@@ -421,10 +421,9 @@ public class IITC_FileManager {
             Log.d("Request permissions");
 
             try {
-                iitc.startActivityForResult(Intent.createChooser(target, "Choose file"), this);
+                iitc.startActivityForResult(Intent.createChooser(target, mActivity.getString(R.string.file_browser_choose_file)), this);
             } catch (final ActivityNotFoundException e) {
-                Toast.makeText(mActivity, "No activity to select a file found." +
-                        "Please install a file browser of your choice!", Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivity, mActivity.getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
             }
         }
 

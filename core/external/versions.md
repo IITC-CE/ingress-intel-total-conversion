@@ -28,8 +28,7 @@
   Leaflet.GoogleMutant.js
 
 * https://github.com/IITC-CE/Leaflet.Geodesic
-  L.Geodesic.js: 95e8bb77e344ec2894f92820aabbc0afcb930a50
-  (https://github.com/IITC-CE/Leaflet.Geodesic/pull/3)
+  L.Geodesic.js: c9f84ab763e89fa172ed410037a67151ef56d06c
 
 * https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet
   v0.2.6
@@ -39,10 +38,8 @@
   used in: bookmarks, draw-tools, player-activity-tracker
 
 * https://github.com/IITC-CE/Leaflet.Canvas-Markers
-  leaflet.canvas-markers.js: 12fb5afd0a8cb7101a2e8f931e20be76818fe917
+  leaflet.canvas-markers.js: affa3f5c1c5b8aee979fa79532a1223dcb3f7e34
   (https://github.com/Spaction/Leaflet.Canvas-Markers/pull/3)
-  + quickfix https://github.com/IITC-CE/Leaflet.Canvas-Markers/pull/14
-  https://github.com/IITC-CE/Leaflet.Canvas-Markers/blob/83d8ea3f0fb4d7e242914a9021270326a7a5c03b/src/plugin/leaflet.canvas-markers.js
   used in: ornaments.js
 
 

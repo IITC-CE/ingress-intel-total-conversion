@@ -10,26 +10,26 @@
         app:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_search"/>
     <item
-        android:id="@+id/locate"
+        android:id="@+id/menu_locate"
         android:icon="@drawable/ic_action_location_found"
         android:orderInCategory="100"
         app:showAsAction="ifRoom"
         android:title="@string/menu_locate"/>
     <item
-        android:id="@+id/layer_chooser"
+        android:id="@+id/menu_layer_chooser"
         android:icon="@drawable/ic_action_add_to_queue"
         android:orderInCategory="105"
         app:showAsAction="ifRoom"
         android:title="@string/menu_layer_chooser"/>
     <item
-        android:id="@+id/toggle_fullscreen"
+        android:id="@+id/menu_toggle_fullscreen"
         android:checkable="true"
         android:icon="@drawable/ic_action_full_screen"
         android:orderInCategory="110"
         app:showAsAction="ifRoom"
         android:title="@string/menu_toggle_fullscreen"/>
     <item
-        android:id="@+id/reload_button"
+        android:id="@+id/menu_reload"
         android:icon="@drawable/ic_action_refresh"
         android:orderInCategory="120"
         app:showAsAction="ifRoom"

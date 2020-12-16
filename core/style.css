@@ -11,6 +11,15 @@
   #portal_highlight_select { display: none !important; }
 }
 
+.text-overflow-ellipsis {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: text-bottom;
+  width: 100%;
+}
+
 
 html, body {
   height: 100%;
@@ -143,6 +152,9 @@ a:hover {
   display: none;
 }
 
+.leaflet-control-container .leaflet-bottom {
+  margin-bottom: 0 !important;
+}
 
 
 .help {
@@ -861,7 +873,7 @@ h3.title {
  */
 .ui-tooltip, .ui-dialog {
   position: absolute;
-  z-index: 9999;
+  z-index: 9500;
   background-color: rgba(8, 48, 78, 0.9);
   border: 1px solid #20A8B1;
   color: #eee;
@@ -912,12 +924,13 @@ h3.title {
   text-align: center;
   padding: 4px;
   background-color: rgba(8, 60, 78, 0.9);
-  min-width: 250px;
 }
 
 .ui-dialog-title {
-  padding: 2px;
   font-weight: bold;
+  margin-left: 8px;
+  margin-right: 45px;
+  width: calc(100% - 45px);
 }
 
 .ui-dialog-title-active {
@@ -993,11 +1006,24 @@ h3.title {
 
 .ui-dialog-content {
   padding: 12px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 600px !important;
-  max-width: 700px !important;
+  overflow: auto;
   position: relative;
+
+  /* Limiting the height of dialog content on small screens */
+  /* 57px – height .ui-dialog-titlebar + .ui-dialog-buttonpane */
+  /* 24px – padding 12px * 2 */
+  /*  2px – border 1px * 2 */
+  max-height: calc(100vh - 57px - 24px - 2px) !important;
+}
+
+.ui-dialog {
+  max-width: calc(100vw - 2px);
+}
+
+@media (min-width: 700px) {
+  .ui-dialog {
+    max-width: 600px;
+  }
 }
 
 .ui-dialog-content-hidden {
@@ -1024,12 +1050,6 @@ h3.title {
 
 .ui-dialog-buttonset button:hover {
   text-decoration: underline;
-}
-
-.ui-dialog-aboutIITC {
-  width: auto !important;
-  min-width: 400px !important;
-  max-width: 600px !important;
 }
 
 td {
@@ -1223,11 +1243,29 @@ table.artifact .portal {
 .cellscore .ui-accordion-header-active:before {
 	content: "⊟";
 }
+.cellscore table {
+	width: 90%;
+	max-width: 360px; /* prevent width change on scrollbar appearance (after animation) */
+}
+
+/* prevent nonfunctional horizontal scrollbar in Chrome (perhaps jQuery issue) */
+.cellscore .historychart > div {
+  overflow: auto; 
+}
+
+.cellscore .logscale {
+  vertical-align: middle;
+  margin-top: 0;
+}
 
 @-moz-document url-prefix() {
  .cellscore .logscale {
-    transform: scale(0.5) translate(0,-18px);
-    vertical-align: top !important;
+    transform: scale(0.8);
+  }
+
+  /* prevent nonfunctional vertical scrollbar in Firefox (perhaps jQuery issue) */
+  .cellscore > .historychart {
+    overflow-y: hidden !important;
   }
 }
 
@@ -1235,21 +1273,16 @@ g.checkpoint:hover circle {
   fill-opacity: 1;
   stroke-width: 2px;
 }
+
+.cellscore th, .cellscore td {
+	text-align: left;
+	padding-left: 5px;
+}
 .checkpoint_table {
 	border-collapse: collapse;
 }
-.checkpoint_table td {
+.checkpoint_table th, .checkpoint_table td {
 	text-align: right;
-	padding-left: 10px;
-}
-
-.text-overflow-ellipsis {
-	display: inline-block;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	vertical-align: text-bottom;
-	width: 100%;
 }
 
 .cellscore #overview {
@@ -1271,6 +1304,11 @@ g.checkpoint:hover circle {
 
 .checkpointtooltip {
   min-width: 180px;
+}
+
+.checkpoint_timers table {
+  padding-top: 4px;
+  width: 100%;
 }
 
 /* tabs */

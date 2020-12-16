@@ -22,7 +22,7 @@ public class ForceUpdatePreference extends Preference {
                 .setTitle(R.string.pref_force_plugin_update)
                 .setMessage(R.string.pref_force_plugin_update_sum)
                 .setCancelable(true)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         PreferenceManager.getDefaultSharedPreferences(getContext())
@@ -32,7 +32,7 @@ public class ForceUpdatePreference extends Preference {
                         dialog.cancel();
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();

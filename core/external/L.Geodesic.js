@@ -8,42 +8,40 @@
   // as north/south lines have very little curvature in the projection, we can use longitude (east/west) seperation
   // to calculate intermediate points. hopefully this will avoid the rounding issues seen in the full intermediate
   // points code that have been seen
-  function geodesicConvertLine (start, end, convertedPoints) {
+  function geodesicConvertLine (start, end, convertedPoints) { // push intermediate points into convertedPoints
 
     var lng1 = start.lng * d2r;
     var lng2 = end.lng * d2r;
     var dLng = lng1-lng2;
 
     var segments = Math.floor(Math.abs(dLng * earthR / this.options.segmentsCoeff));
+    if (segments < 2) { return; }
 
-    if (segments > 1) {
-      // maths based on https://edwilliams.org/avform.htm#Int
+    // maths based on https://edwilliams.org/avform.htm#Int
 
-      // pre-calculate some constant values for the loop
-      var lat1 = start.lat * d2r;
-      var lat2 = end.lat * d2r;
-      var sinLat1 = Math.sin(lat1);
-      var sinLat2 = Math.sin(lat2);
-      var cosLat1 = Math.cos(lat1);
-      var cosLat2 = Math.cos(lat2);
-      var sinLat1CosLat2 = sinLat1*cosLat2;
-      var sinLat2CosLat1 = sinLat2*cosLat1;
-      var cosLat1CosLat2SinDLng = cosLat1*cosLat2*Math.sin(dLng);
+    // pre-calculate some constant values for the loop
+    var lat1 = start.lat * d2r;
+    var lat2 = end.lat * d2r;
+    var sinLat1 = Math.sin(lat1);
+    var sinLat2 = Math.sin(lat2);
+    var cosLat1 = Math.cos(lat1);
+    var cosLat2 = Math.cos(lat2);
+    var sinLat1CosLat2 = sinLat1*cosLat2;
+    var sinLat2CosLat1 = sinLat2*cosLat1;
+    var cosLat1CosLat2SinDLng = cosLat1*cosLat2*Math.sin(dLng);
 
-      for (var i=1; i < segments; i++) {
-        var iLng = lng1-dLng*(i/segments);
-        var iLat = Math.atan(
-          (sinLat1CosLat2 * Math.sin(iLng-lng2) - sinLat2CosLat1 * Math.sin(iLng-lng1))
-            / cosLat1CosLat2SinDLng
-        );
-        convertedPoints.push(L.latLng(iLat*r2d, iLng*r2d));
-      }
+    for (var i=1; i < segments; i++) {
+      var iLng = lng1-dLng*(i/segments);
+      var iLat = Math.atan(
+        (sinLat1CosLat2 * Math.sin(iLng-lng2) - sinLat2CosLat1 * Math.sin(iLng-lng1))
+          / cosLat1CosLat2SinDLng
+      );
+      convertedPoints.push(L.latLng(iLat*r2d, iLng*r2d));
     }
-
-    convertedPoints.push(end);
   }
 
 
+  // iterate pairs of connected vertices with fn(), adding new intermediate vertices (if returned)
   function processPoly (latlngs, fn) {
     var result = [];
 
@@ -55,7 +53,7 @@
       result.push(latlngs[0]);
     }
     for (var i = 0, len = latlngs.length - 1; i < len; i++) {
-      fn.call(this,latlngs[i], latlngs[i+1], result);
+      fn.call(this, latlngs[i], latlngs[i+1], result);
       result.push(latlngs[i+1]);
     }
     return result;

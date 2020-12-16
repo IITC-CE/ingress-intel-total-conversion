@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="iitc_blue">#ff0e3d4e</color>
+    <color name="iitc_blue_lighten_4">#ff1e82a6</color>
+    <color name="iitc_blue_lighten_3">#ff196e8c</color>
+    <color name="iitc_blue_lighten_2">#ff155a73</color>
+    <color name="iitc_blue_lighten">#ff104659</color>
     <color name="iitc_blue_dark">#ff0b303e</color>
     <color name="drawer_background">#990e3d4e</color>
+
+    <!-- debug views -->
+    <color name="debug_panel_background">#ff092733</color>
+    <color name="debug_button_background">#ff0b303e</color>
 </resources>

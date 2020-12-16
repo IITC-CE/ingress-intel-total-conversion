@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="activity_save_to_file">Dosyaya Kaydet</string>
+    <string name="action_settings">Ayarlar</string>
+    <string name="drawer_open">Gezinme menüsünü göster</string>
+    <string name="drawer_close">Gezinme menüsünü gizle</string>
+    <string name="version">Yazıcı görünümü</string>
+    <string name="close">Kapat</string>
+    <string name="clear_log">Logları temizle</string>
+    <string name="activity_settings">IITC Mobile Ayarlar</string>
+    <string name="activity_plugins">IITC Eklentiler</string>
+    <string name="activity_share_to_clipboard">Arabelleğe Kopyala</string>
+    <string name="toggle_map">Harita görünümü</string>
+    <string name="debug_run">Çalıştır</string>
+    <string name="activity_share">Paylaş…</string>
+</resources>

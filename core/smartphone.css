@@ -102,6 +102,13 @@ body {
   margin-left: 5px !important;
 }
 
+.leaflet-control-container .leaflet-bottom {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  margin-bottom: 24px !important;
+}
+
 #searchwrapper {
   font-size: 1.2em;
 }

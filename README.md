@@ -2,6 +2,7 @@ Ingress Intel Total Conversion (IITC)
 =====================================
 
 <!-- [START badges] -->
+[![Build Status](http://img.shields.io/travis/IITC-CE/ingress-intel-total-conversion/master.svg?label=beta)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
 [![Build Status](http://img.shields.io/travis/IITC-CE/ingress-intel-total-conversion/test-builds.svg?label=test-builds)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
 [![Docs Status](https://readthedocs.org/projects/iitc-ce/badge/?version=latest)](https://readthedocs.org/projects/iitc-ce/)
 [![LICENSE](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
@@ -13,12 +14,12 @@ It is available for desktop browsers, such as Firefox and Chrome, and as a mobil
 
 **IITC "Community Edition"** (**_IITC-CE_**) started by [modos189](https://github.com/modos189) to continue development of stalled [iitc-project](https://github.com/iitc-project/ingress-intel-total-conversion).
 
-**[Website](https://iitc.modos189.ru/) | [Documentation](http://iitc-ce.rtfd.io/) | [Telegram channel](https://teleg.run/iitc_news)**
+**[Website](https://iitc.app/) | [Documentation](http://iitc-ce.rtfd.io/) | [Telegram channel](https://t.me/iitc_news)**
 
 
 ## Users
 
-Install IITC: https://iitc.modos189.ru/
+Install IITC: https://iitc.app/
 
 Latest news, release announcements, etc:
 - https://www.reddit.com/r/IITC/
@@ -35,7 +36,7 @@ and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/
 
 ## Related projects
 
-- **https://iitc.modos189.ru**: IITC-CE homepage, template developed [here][iitc.modos189.ru].
+- **https://iitc.app**: IITC-CE homepage, template developed [here][iitc.app].
 
 - **[IITC-Button]**: browser extension, the easiest (though not sole) way to use IITC on desktop.
 
@@ -43,7 +44,7 @@ and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/
 
 - **[IITC-Mobile for iOS]**: 3rd-party application, developed by [_Yangkun Zhang_](https://github.com/HubertZhang).
 
-[iitc.modos189.ru]: https://github.com/IITC-CE/iitc.modos189.ru
+[iitc.app]: https://github.com/IITC-CE/iitc.app
 [IITC-Button]: https://github.com/IITC-CE/IITC-Button
 [IITC Mobile]: https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/IITC-Mobile-(Android-app)
-[IITC-Mobile for iOS]: https://apps.apple.com/app/iitc-mobile/id1032695947
+[IITC-Mobile for iOS]: https://github.com/HubertZhang/IITC-Mobile

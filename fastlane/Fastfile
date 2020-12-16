@@ -1,0 +1,34 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+default_platform(:android)
+
+platform :android do
+  desc "Deploy of beta version to Google Play"
+  lane :deploy_beta do
+    upload_to_play_store(track: "beta",
+           package_name: "org.exarhteam.iitc_mobile",
+           apk: "build/beta/IITC_Mobile-beta.apk",
+           json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'])
+  end
+
+  desc "Deploy of release to Google Play"
+  lane :deploy_release do
+    upload_to_play_store(track: "release",
+           package_name: "org.exarhteam.iitc_mobile",
+           apk: "build/release/IITC_Mobile-release.apk",
+           json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'])
+  end
+end
+
+
+

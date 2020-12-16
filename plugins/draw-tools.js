@@ -1,8 +1,8 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.8.1
-// @description    Allow drawing things onto the current map so you may plan your next move.
+// @version        0.8.0
+// @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 
 // HOOK: pluginDrawTools
@@ -15,7 +15,7 @@ window.plugin.drawTools.KEY_STORAGE = 'plugin-draw-tools-layer';
 
 window.plugin.drawTools.merge = {};
 window.plugin.drawTools.merge.status = true;
-window.plugin.drawTools.merge.toggle() = function() {
+window.plugin.drawTools.merge.toggle = function() {
   var status = window.plugin.drawTools.merge.status;
   status = Boolean(!status);
   window.plugin.drawTools.merge.status = status;
@@ -211,7 +211,6 @@ window.plugin.drawTools.save = function() {
 
     data.push(item);
   });
-
   localStorage[window.plugin.drawTools.KEY_STORAGE] = JSON.stringify(data);
 
   console.log('draw-tools: saved to localStorage');
@@ -267,6 +266,7 @@ window.plugin.drawTools.import = function(data) {
 
 
 //Draw Tools Options
+
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function() {
 	var mergeStatusCheck = '';
@@ -282,7 +282,6 @@ window.plugin.drawTools.manualOpt = function() {
            + '<a onclick="window.plugin.drawTools.optCopy();" tabindex="0">Copy Drawn Items</a>'
            + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
            +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
-           //+ '<center><input type="checkbox" name="merge" id="drawtools_merge"></input> Do not overwrite, merge!</center>' 
            + '<a onclick="window.plugin.drawTools.optPaste();return false;" tabindex="0">Paste Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>'
@@ -294,7 +293,6 @@ window.plugin.drawTools.manualOpt = function() {
     html: html,
     id: 'plugin-drawtools-options',
     dialogClass: 'ui-dialog-drawtoolsSet',
-    id: 'plugin-drawtools-options',
     title: 'Draw Tools Options'
   });
 
@@ -322,8 +320,19 @@ window.plugin.drawTools.optAlert = function(message) {
 }
 
 window.plugin.drawTools.optCopy = function() {
-    if (typeof android !== 'undefined' && android && android.shareString) {
-        android.shareString(localStorage[window.plugin.drawTools.KEY_STORAGE]);
+    if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
+        window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
+    {
+      dialog({
+        html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
+        width: 250,
+        dialogClass: 'ui-dialog-drawtools-message',
+        title: 'Draw Tools Message'
+      });
+      return;
+    }
+    if(typeof android !== 'undefined' && android && android.shareString){
+        android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
     } else {
       var stockWarnings = {};
       var stockLinks = [];
@@ -366,7 +375,7 @@ window.plugin.drawTools.optCopy = function() {
       if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
 
       var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
+                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
                 +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
                 +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
       if (stockWarnTexts.length>0) {
@@ -384,12 +393,15 @@ window.plugin.drawTools.optCopy = function() {
 }
 
 window.plugin.drawTools.optExport = function() {
-  var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
-  window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
+  if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
+      window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
+  {
+    var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
+    window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
+  }
 }
 
-window.plugin.drawTools.optPaste = function() { 
-//  if (merge === undefined) merge = true;   //default to true
+window.plugin.drawTools.optPaste = function() {
   var promptAction = prompt('Press CTRL+V to paste (draw-tools data or stock intel URL).', '');
   promptAction = promptAction && promptAction.trim();
   if (promptAction) {
@@ -447,9 +459,9 @@ window.plugin.drawTools.optPaste = function() {
           promptAction = (typeof(
             window.localStorage[window.plugin.drawTools.KEY_STORAGE]) !== 'undefined' &&
             window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
-              ? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0,-1) + ',' + promptAction.slice(1) 
+              ? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0,-1) + ',' + promptAction.slice(1)
               : promptAction);
-        }     
+        }
         var data;
           try{
             data = JSON.parse(promptAction);
@@ -503,7 +515,7 @@ window.plugin.drawTools.optImport = function() {
 window.plugin.drawTools.optReset = function() {
   var promptAction = confirm('All drawn items will be deleted. Are you sure?', '');
   if(promptAction) {
-    delete localStorage[window.plugin.drawTools.KEY_STORAGE];
+    localStorage[window.plugin.drawTools.KEY_STORAGE] = '[]';
     window.plugin.drawTools.drawnItems.clearLayers();
     window.plugin.drawTools.load();
     console.log('DRAWTOOLS: reset all drawn items');
@@ -604,27 +616,7 @@ window.plugin.drawTools.snapToPortals = function() {
   window.plugin.drawTools.save();
 }
 
-window.plugin.drawTools.patch789 = function (e) {
-  var mouseActive = L.Browser.touch && matchMedia('(hover:hover)').matches; // workaround for https://github.com/IITC-CE/ingress-intel-total-conversion/issues/162
-  if (mouseActive || e.layerType === 'circle' || e.layerType === 'rectangle') {
-    e.target.touchExtend.enable()
-  } else {
-    e.target.touchExtend.disable()
-  };
-}
-
 window.plugin.drawTools.boot = function() {
-  // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
-  map.addHandler('touchExtend', L.Map.TouchExtend);
-
-  // trying to circumvent touch bugs: https://github.com/Leaflet/Leaflet.draw/issues/789
-  // Browsers where leaflet.draw misbehaves:
-  // - all Chrominium-based
-  // - Firefox (except Android version up to 68)
-  // following condition was empirically picked and currently it covers all known cases:
-  if ('PointerEvent' in window && !L.Browser.safari) {
-    map.on('draw:drawstart', plugin.drawTools.patch789);
-  }
 
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
@@ -692,9 +684,61 @@ window.plugin.drawTools.boot = function() {
 
 }
 
+// ---------------------------------------------------------------------------------
+// MPE - MULTI PROJECTS EXTENSION
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.mpe = {};
+window.plugin.drawTools.mpe.ui = {};
+
+window.plugin.drawTools.mpe.boot = function(){
+  window.plugin.drawTools.mpe.initMPE();
+};
+
+
+window.plugin.drawTools.mpe.initMPE = function(){
+  // Not launch the code if the MPE plugin there isn't.
+  if(!window.plugin.mpe){ return; }
+
+  // The MPE function to set a MultiProjects type
+  window.plugin.mpe.setMultiProjects({
+    namespace: 'drawTools',
+    title: 'Draw Tools Layer',
+    // Font awesome css class
+    fa: 'fa-pencil',
+    // Function to change a localstorage key
+    func_setKey: function(newKey){
+      window.plugin.drawTools.KEY_STORAGE = newKey;
+    },
+    // Native value of localstorage key
+    defaultKey: 'plugin-draw-tools-layer',
+    // This function is run before the localstorage key change
+    func_pre: function(){},
+    // This function is run after the localstorage key change
+    func_post: function(){
+      window.plugin.drawTools.drawnItems.clearLayers();
+      window.plugin.drawTools.load();
+      console.log('DRAWTOOLS: reset all drawn items (func_post)');
+
+      if (window.plugin.crossLinks !== undefined && window.overlayStatus['Cross Links']) {
+        window.plugin.crossLinks.checkAllLinks();
+
+        if (window.plugin.destroyedLinks !== undefined && window.overlayStatus['Destroyed Links Simulator']){
+          window.plugin.destroyedLinks.cross.removeCrossAll();
+        }
+      }
+
+      // Code to:
+      // hide/remove elements from DOM, layers, variables, etc...
+      // load data from window.localStorage[window.plugin.myPlugin.KEY_STORAGE]
+      // show/add/draw elements in the DOM, layers, variables, etc...
+    }
+  });
+}
+
 function setup () {
-  loadExternals();
-  window.plugin.drawTools.boot();
+  loadExternals();                              // initialize leaflet
+  window.plugin.drawTools.boot();               // initialize drawtools
+  window.plugin.drawTools.mpe.boot();           // register to MPE if available
 }
 
 function loadExternals () {
@@ -705,11 +749,30 @@ function loadExternals () {
 
     $('<style>').html('@include_css:external/leaflet.draw-fix.css@').appendTo('head');
 
-    '@include_raw:external/leaflet.draw-fix.js@';
-
     '@include_raw:external/leaflet.draw-snap.js@';
 
     '@include_raw:external/leaflet.draw-geodesic.js@';
+
+    // support Leaflet >= 1
+    // https://github.com/Leaflet/Leaflet.draw/pull/911
+    L.Draw.Polyline.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Polygon.prototype.options.shapeOptions.interactive = true;
+    L.Draw.Rectangle.prototype.options.shapeOptions.interactive = true;
+    L.Draw.CircleMarker.prototype.options.interactive = true;
+    L.Draw.Circle.prototype.options.shapeOptions.interactive = true;
+
+    // https://github.com/Leaflet/Leaflet.draw/issues/789
+    // https://github.com/Leaflet/Leaflet.draw/issues/695
+    L.Draw.Polyline.prototype._onTouch_original = L.Draw.Polyline.prototype._onTouch; // just in case
+    L.Draw.Polyline.prototype._onTouch = L.Util.falseFn;
+
+    // workaround for https://github.com/Leaflet/Leaflet.draw/issues/923
+    map.addHandler('touchExtend', L.Map.TouchExtend);
+
+    // disable tap handler as it conflicts with leaflet.draw
+    // https://github.com/Leaflet/Leaflet/issues/6977
+    // !Note: currently this may brake `contextmenu` handling on iOS
+    map.tap = map.tap ? map.tap.disable() : false;
 
   } catch (e) {
     console.error('leaflet.draw-src.js loading failed');

@@ -23,3 +23,6 @@
 -keepclassmembers class * extends android.webkit.WebChromeClient{
     public void openFileChooser(...);
 }
+
+-dontwarn javax.script.ScriptEngine
+-dontwarn javax.script.ScriptEngineManager

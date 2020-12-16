@@ -14,9 +14,7 @@ import android.widget.TextView;
 
 public class IITC_NotificationHelper {
 
-    public static final int NOTICE_HOWTO = 1 << 0;
     public static final int NOTICE_INFO = 1 << 1;
-    public static final int NOTICE_PANES = 1 << 2;
     public static final int NOTICE_EXTPLUGINS = 1 << 3;
     public static final int NOTICE_SHARING = 1 << 4;
     // next one would be 1<<5; (this results in 1,2,4,8,...)
@@ -35,14 +33,8 @@ public class IITC_NotificationHelper {
 
         String text;
         switch (which) {
-            case NOTICE_HOWTO:
-                text = mActivity.getString(R.string.notice_how_to);
-                break;
             case NOTICE_INFO:
                 text = mActivity.getString(R.string.notice_info);
-                break;
-            case NOTICE_PANES:
-                text = mActivity.getString(R.string.notice_panes);
                 break;
             case NOTICE_EXTPLUGINS:
                 text = mActivity.getString(R.string.notice_extplugins);

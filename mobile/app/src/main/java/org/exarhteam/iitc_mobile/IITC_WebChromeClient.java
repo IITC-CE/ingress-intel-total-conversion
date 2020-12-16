@@ -81,8 +81,7 @@ public class IITC_WebChromeClient extends WebChromeClient {
         try {
             mIitc.startActivityForResult(intent, new FileRequestHandlerBelowLollipop(uploadFile));
         } catch (final ActivityNotFoundException e) {
-            Toast.makeText(mIitc, "No activity to select a file found." +
-                    "Please install a file browser of your choice!", Toast.LENGTH_LONG).show();
+            Toast.makeText(mIitc, mIitc.getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -147,8 +146,7 @@ public class IITC_WebChromeClient extends WebChromeClient {
 
             mIitc.startActivityForResult(intent, handler);
         } catch (final ActivityNotFoundException e) {
-            Toast.makeText(mIitc, "No activity to select a file found." +
-                    "Please install a file browser of your choice!", Toast.LENGTH_LONG).show();
+            Toast.makeText(mIitc, mIitc.getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
             handler.cancel();
             return false;
         }

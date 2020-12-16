@@ -165,16 +165,20 @@ window.setupMap = function() {
   window.map = new L.Map('map', {
     center: [0,0],
     zoom: 1,
+    crs: L.CRS.S2,
     zoomControl: (typeof android !== 'undefined' && android && android.showZoom) ? android.showZoom() : true,
     minZoom: MIN_ZOOM,
 //    zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
+    maxBoundsViscosity: 0.7,
+    worldCopyJump: true, // wrap longitude to not find ourselves looking beyond +-180 degrees
     preferCanvas: 'PREFER_CANVAS' in window
       ? window.PREFER_CANVAS
       : true // default
   });
-  if (L.CRS.S2) { map.options.crs = L.CRS.S2; }
+  var max_lat = map.options.crs.projection.MAX_LATITUDE;
+  map.setMaxBounds([[max_lat,360],[-max_lat,-360]]);
 
   L.Renderer.mergeOptions({
     padding: window.RENDERER_PADDING || 0.5
@@ -299,32 +303,10 @@ window.setupMap = function() {
   // listen for changes and store them in cookies
   map.on('moveend', window.storeMapPosition);
 
-  map.on('moveend', function(e) {
-    // two limits on map position
-    // we wrap longitude (the L.LatLng 'wrap' method) - so we don't find ourselves looking beyond +-180 degrees
-    // then latitude is clamped with the clampLatLng function (to the 85 deg north/south limits)
-    var newPos = clampLatLng(map.getCenter().wrap());
-    if (!map.getCenter().equals(newPos)) {
-      map.panTo(newPos,{animate:false})
-    }
-  });
-
   // map update status handling & update map hooks
   // ensures order of calls
   map.on('movestart', function() { window.mapRunsUserAction = true; window.requests.abort(); window.startRefreshTimeout(-1); });
   map.on('moveend', function() { window.mapRunsUserAction = false; window.startRefreshTimeout(ON_MOVE_REFRESH*1000); });
-
-  // on zoomend, check to see the zoom level is an int, and reset the view if not
-  // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
-  map.on('zoomend', function() {
-    var z = map.getZoom();
-    if (z != parseInt(z))
-    {
-      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
-      map.setZoom(parseInt(z), {animate:false});
-    }
-  });
-
 
   // set a 'moveend' handler for the map to clear idle state. e.g. after mobile 'my location' is used.
   // possibly some cases when resizing desktop browser too
@@ -617,35 +599,51 @@ window.extendLeaflet = function() {
     return new L.DivIcon.ColoredSvg(color, options);
   };
 
-  /* !!This block is commented out as it's unclear if we really need this patch
+  // use the earth radius value from s2 geometry library
+  // https://github.com/google/s2-geometry-library-java/blob/c28f287b996c0cedc5516a0426fbd49f6c9611ec/src/com/google/common/geometry/S2LatLng.java#L31
+  var EARTH_RADIUS_METERS = 6367000.0;
+  // distance calculations with that constant are a little closer to values observable in Ingress client.
+  // difference is:
+  // - ~0.06% when using LatLng.distanceTo() (R is 6371 vs 6367)
+  // - ~0.17% when using Map.distance() / CRS.destance() (R is 6378.137 vs 6367)
+  // (Yes, Leaflet is not consistent here, e.g. see https://github.com/Leaflet/Leaflet/pull/6928)
 
-  // See https://github.com/IITC-CE/ingress-intel-total-conversion/issues/122
+  // this affects LatLng.distanceTo(), which is currently used in most iitc plugins
+  L.CRS.Earth.R = EARTH_RADIUS_METERS;
 
-  // use the earth radius value used by the s2 geometry library
-  // this library is used in the ingress backend, so distance calculation, etc
-  // are far closer if we use the value from that
-
-  L.CRS.Earth.R = 6367000;
-
-  var s2SphericalMercator = L.Util.extend({}, L.Projection.SphericalMercator, {
-    R: window.EARTH_RADIUS,
+  // this affects Map.distance(), which is known to be used in draw-tools
+  var SphericalMercator = L.Projection.SphericalMercator;
+  SphericalMercator.S2 = L.Util.extend({}, SphericalMercator, {
+    R: EARTH_RADIUS_METERS,
     bounds: (function () {
-      var d = window.EARTH_RADIUS * Math.PI;
+      var d = EARTH_RADIUS_METERS * Math.PI;
       return L.bounds([-d, -d], [d, d]);
     })()
   });
 
   L.CRS.S2 = L.Util.extend({}, L.CRS.Earth, {
-    code: 'EPSG:S2',
-    projection: s2SphericalMercator,
+    code: 'Ingress',
+    projection: SphericalMercator.S2,
     transformation: (function () {
-      var scale = 0.5 / (Math.PI * s2SphericalMercator.R);
+      var scale = 0.5 / (Math.PI * SphericalMercator.S2.R);
       return L.transformation(scale, 0.5, -scale, 0.5);
     }())
   });
 
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
+  // on zoomend, check to see the zoom level is an int, and reset the view if not
+  // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
+  map.on('zoomend', function() {
+    var z = map.getZoom();
+    if (z != parseInt(z))
+    {
+      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
+      map.setZoom(parseInt(z), {animate:false});
+    }
+  });
   */
 
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
   // Fix Leaflet: handle touchcancel events in Draggable
   L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
   L.Draggable.prototype._onDown = function(e) {
@@ -655,6 +653,7 @@ window.extendLeaflet = function() {
       L.DomEvent.on(document, "touchcancel", this._onUp, this);
     }
   };
+  */
 };
 
 // BOOTING ///////////////////////////////////////////////////////////
