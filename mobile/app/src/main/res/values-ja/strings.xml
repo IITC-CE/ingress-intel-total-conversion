@@ -27,7 +27,6 @@
 \n•問題を報告し、${bugtracker_link}で機能強化を提案してください。&lt;br&gt; 
 \n&lt;h3&gt;開発者：&lt;/h3&gt;${github_iitc_link}。 
 \n&lt;h3&gt;IITCライセンス：&lt;/h3&gt;${ISC_license_text}</string>
-    <string name="notice_how_to">&lt;h3&gt;IITCmの使用方法：&lt;/h3&gt;•ナビゲーション：画面の左端からスワイプして（またはアプリのアイコンをクリックして）、&lt;em&gt;ナビゲーション ドロワー&lt;/em&gt;を呼び出します。&lt;br&gt;アプリのアイコンをタップして、再びマップに戻ります。&lt;br&gt;•レイヤー/ハイライト：画面の右端からスワイプして（またはアクションバーのレイヤー選択アイコンをタップして）、&lt;em&gt;レイヤー ドロワー&lt;/em&gt;を呼び出します。&lt;br&gt;•両方のデバイスがNFCをサポートしている場合、現在のポータルリンク/パーマリンクを別のデバイスにすばやく送信できます（両方のデバイスを背中合わせに押し、画面をタップしてマップを他のデバイスに送信します）。&lt;br&gt;•設定より、公式プラグインを追加できます。&lt;br&gt;•外部プラグインについては、&lt;ahref=https://iitc.modos189.ru/faq.html&gt;FAQ&lt;/a&gt;をご覧ください。&lt;br&gt;</string>
     <string name="version">バージョン表示</string>
     <string name="pref_ui_cat">ユーザーインタフェース</string>
     <string name="pref_plugins">IITCプラグイン</string>
@@ -95,7 +94,6 @@
     <string name="intent_error">アドレスを開けませんでした</string>
     <string name="install_dialog_msg">&lt;p&gt;IITCmに以下のJavaScriptファイルをインストールしようとしています: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;注意:&lt;/b&gt; 外部のJavascriptには有害なコード(スパイウェアなど)が含まれる場合もあります! &lt;p&gt;続行しますか？</string>
     <string name="msg_take_screenshot">スクリーンショットを取得しています…</string>
-    <string name="notice_panes">&lt;p&gt;ヒント: &lt;p&gt;プラグインの中には (例. &lt;em&gt;ポータルリスト&lt;/em&gt;、&lt;em&gt;ブックマーク&lt;/em&gt;) 簡便のため &lt;em&gt;ナビゲーションドロワー&lt;/em&gt;に表示されるものがあります。 &lt;p&gt;これらはポータル詳細画面には表示されません。&lt;p&gt;画面の左端からスワイプして（またはメニューアイコンをタップして）表示します。</string>
     <string name="notice_extplugins">&lt;p&gt;ヒント: &lt;p&gt;IITC Mobileは外部プラグインも読み込めます。 &lt;p&gt;右上の（+）アイコンをクリックして、プラグインを追加します。 プラグインのファイル名は「.user.js」で終わる必要があります。ファイルのコピー先は以下のとおりです: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="notice_sharing">&lt;p&gt;&lt;em&gt;ポータルの共有&lt;/em&gt;では、次のことができます。&lt;p&gt;•ポータルリンクを他の人に送信する&lt;br&gt;•選択したポータルの位置を別のアプリで表示する&lt;br&gt;•Webブラウザでポータルリンクを開く&lt;br&gt;&lt;p&gt;ヒント：Googleマップ（またはインストールされているその他のナビアプリ）を選択すると、選択したポータルにすばやく移動できます。&lt;p&gt;これらのヒントは、&lt;em&gt;パーマリンク&lt;/em&gt;にも適用されます。</string>
     <string name="pref_fake_user_agent_sum">IITCmはIntelサイトのデスクトップブラウザーとして振る舞います。 ※デスクトップ版IITCを使いたい場合は、設定の「デスクトップ版表示を強制する」を使用します</string>
