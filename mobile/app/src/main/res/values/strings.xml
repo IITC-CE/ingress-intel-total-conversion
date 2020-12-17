@@ -177,6 +177,7 @@
         <p><b>Be careful:</b> Javascript from external sources may contain harmful code (spyware etc.)!
         <p>Are you sure you want to proceed?]]>
     </string>
+    <string name="send_to">Send to...</string>
 
     <string name="appintro_welcome_description">
         This is a mobile version of the indispensable helper for the Ingress player.\n\n
