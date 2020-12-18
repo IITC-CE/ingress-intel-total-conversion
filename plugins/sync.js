@@ -1,7 +1,7 @@
 // @author         xelio
 // @name           Sync
 // @category       Misc
-// @version        0.4.1
+// @version        0.4.0
 // @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 
@@ -103,7 +103,7 @@ window.plugin.sync.RegisteredMap.prototype.updateMap = function(keyArray) {
   var _this = this;
   try {
     this.lastUpdateUUID = this.uuid;
-
+  
     $.each(keyArray, function(ind, key) {
       var value = window.plugin[_this.pluginName][_this.fieldName][key];
       if(typeof(value) !== 'undefined') {
@@ -180,13 +180,13 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
   onFileLoaded = function(data) {
     _this.map = data['map'];
     _this.lastUpdateUUID = data['last-update-uuid'];
-
+    
     if (!_this.intervalID) {
       _this.intervalID = setInterval(function() {
         _this.loadDocument();
       }, window.plugin.sync.checkInterval);
     }
-
+    
     // Replace local value if data is changed by others
     if(_this.isUpdatedByOthers()) {
       plugin.sync.logger.log(_this.getFileName(), 'Updated by others, replacing content');
@@ -208,11 +208,11 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function(callback) {
   handleError = function(e) {
     var isNetworkError = e.type;
     var errorMessage = (e.error !== undefined) ? e.error.message : e.result.error.message;
-
+    
     if(errorMessage === "A network error occurred, and the request could not be completed.") {
       isNetworkError = true;
     }
-
+    
     plugin.sync.logger.log(_this.getFileName(), errorMessage);
     if(isNetworkError === true) {
       setTimeout(function() {_this.authorizer.authorize();}, 50*1000);
@@ -342,7 +342,7 @@ window.plugin.sync.DataManager.prototype.initialize = function(force, assignIdCa
     return;
   }
   if(this.force) this.retryCount++;
-
+  
   this.initParent(assignIdCallback, failedCallback);
 };
 
@@ -397,7 +397,7 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
   if(plugin.sync.parentFolderID) {
     return _this.initFile(assignIdCallback, failedCallback);
   }
-
+  
   parentAssignIdCallback = function(id) {
     plugin.sync.parentFolderID = id;
     plugin.sync.logger.log('all', 'Parent folder success initialized');
@@ -414,21 +414,21 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
     plugin.sync.logger.log('all', 'Create folder operation failed: ' + (resp.error || 'unknown error'));
     failedCallback(resp);
   };
-
+  
   // Several plugins at the same time has requested to create a folder
   if (!plugin.sync.parentFolderID && plugin.sync.parentFolderIDrequested) {
     return;
   }
-
+  
   plugin.sync.parentFolderIDrequested = true;
 
   gapi.client.load('drive', 'v3').then(function() {
-
+  
     gapi.client.drive.files.list(
       { q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false" }
     ).then(function(files) {
       var directory = files.result.files;
-
+    
       if(!directory.length) {
         gapi.client.drive.files.create({
           resource: { name: _this.parentName, description: _this.parentDescription, mimeType: _this.MIMETYPE_FOLDER }
@@ -439,7 +439,7 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
         parentAssignIdCallback(directory[ 0 ].id);
       }
     });
-
+  
   }, function(reason) {
     parentFailedCallback(reason);
   });
@@ -447,7 +447,7 @@ window.plugin.sync.DataManager.prototype.initParent = function(assignIdCallback,
 
 window.plugin.sync.DataManager.prototype.createFile = function(callback) {
   var _this = this;
-
+  
   gapi.client.load('drive', 'v3').then(function () {
     gapi.client.drive.files.create({
         fields  : 'id',
@@ -479,7 +479,7 @@ window.plugin.sync.DataManager.prototype.readFile = function(needInitializeFileC
 
 window.plugin.sync.DataManager.prototype.saveFile = function(data) {
   var _this = this;
-
+  
   gapi.client.load('drive', 'v3').then(function () {
     gapi.client.request({
       path: '/upload/drive/v3/files/'+_this.fileId,
@@ -561,46 +561,53 @@ window.plugin.sync.Authorizer.prototype.authComplete = function() {
   }
 };
 
-window.plugin.sync.Authorizer.prototype.authorize = function() {
+window.plugin.sync.Authorizer.prototype.authorize = function(redirect) {
   this.authorizing = true;
   this.authorized = false;
+  var handleAuthResult, _this;
+  _this = this;
 
-  const doAuth = prompt => gapi.auth2.authorize({
-    client_id: this.CLIENT_ID,
-    scope: this.SCOPES,
-    prompt,
-  }, response => {
-      if (response.error) {
-          if (response.error === 'user_logged_out' || response.error === 'immediate_failed') {
-              doAuth('select_account')
-          } else {
-            const error = (authResult && authResult.error) ? authResult.error : 'not authorized';
-
-            plugin.sync.logger.log('all', 'Authorization error: ' + error);
-
-            if (error === "idpiframe_initialization_failed") {
-              plugin.sync.logger.log('all', 'You need enable 3rd-party cookies in your browser or allow [*.]google.com');
-            }
-          }
-
-          this.authorizing = false;
-          this.authorized = false;
-
-          return;
+  handleAuthResult = function(authResult) {
+    if(authResult && !authResult.error) {
+      _this.authorized = true;
+      plugin.sync.logger.log('all', 'Authorized');
+    } else {
+      _this.authorized = false;
+      var error = (authResult && authResult.error) ? authResult.error : 'not authorized';
+      plugin.sync.logger.log('all', 'Authorization error: ' + error);
+      if (error === "idpiframe_initialization_failed") {
+        plugin.sync.logger.log('all', 'You need enable 3rd-party cookies in your browser or allow [*.]google.com');
       }
+    }
+    _this.authComplete();
+  };
 
-      this.authorizing = false;
-      this.authorized = true;
+  var GoogleAuth;
+  gapi.auth2.init({
+    'client_id': this.CLIENT_ID,
+    'scope': this.SCOPES,
+    ux_mode: 'redirect',
+    redirect_uri: '@url_intel_base@'
+  }).then(function() {
+    
+    GoogleAuth = gapi.auth2.getAuthInstance();
+    var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
 
+    if(isSignedIn) {
+      _this.authorized = true;
       plugin.sync.logger.log('all', 'Authorized');
 
-      this.authComplete();
-  });
+    } else {
+      _this.authorized = false;
 
-  doAuth('none');
+      if (redirect) {
+        GoogleAuth.signIn().then(handleAuthResult);
+      }
+    }
+    _this.authComplete();
+    
+  }, handleAuthResult);
 };
-
-
 //// end Authorizer
 
 
@@ -617,7 +624,7 @@ window.plugin.sync.Logger = function(options) {
 
 window.plugin.sync.Logger.prototype.log = function(filename, message) {
   var entity = {'time': new Date(), 'message': message};
-
+  
   if (filename === 'all') {
     Object.keys(this.logs).forEach((key) => {
       this.logs[key] = entity;
@@ -625,7 +632,7 @@ window.plugin.sync.Logger.prototype.log = function(filename, message) {
   } else {
     this.logs[filename] = entity;
   }
-
+  
   if(this.logUpdateCallback) this.logUpdateCallback(this.getLogs());
 };
 

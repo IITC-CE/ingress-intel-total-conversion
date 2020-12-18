@@ -991,8 +991,6 @@ window.plugin.bookmarks.loadStorageBox = function() {
       // All data is replaced if other client update the data during this client offline,
       if(fullUpdated) {
         window.plugin.bookmarks.refreshBkmrks();
-        window.plugin.bookmarks.resetAllStars();
-        console.log('BOOKMARKS: synchronized all after offline');
         return;
       }
 
@@ -1005,9 +1003,8 @@ window.plugin.bookmarks.loadStorageBox = function() {
         delete window.plugin.bookmarks.updateQueue[e.property];
         window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
         window.plugin.bookmarks.refreshBkmrks();
-        window.plugin.bookmarks.resetAllStars();
         window.runHooks('pluginBkmrksSyncEnd', {"target": "all", "action": "sync"});
-        console.log('BOOKMARKS: synchronized all from remote');
+        console.log('BOOKMARKS: synchronized all');
       }
     }
   }
@@ -1095,7 +1092,6 @@ window.plugin.bookmarks.loadStorageBox = function() {
       delete window.plugin.bookmarks.starLayers[guid];
     }
     window.plugin.bookmarks.addAllStars();
-    console.log("resetAllStars done");
   }
 
   window.plugin.bookmarks.addStar = function(guid, latlng, lbl) {
