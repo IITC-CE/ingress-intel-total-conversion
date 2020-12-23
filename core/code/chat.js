@@ -105,8 +105,7 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
 
   if(getOlderMsgs) {
     // ask for older chat when scrolling up
-    // "-1" to avoid looping at the same timestamp if many msgs are returned
-    data = $.extend(data, {maxTimestampMs: storageHash.oldestTimestamp -1});
+    data = $.extend(data, {maxTimestampMs: storageHash.oldestTimestamp});
   } else {
     // ask for newer chat
     var min = storageHash.newestTimestamp;
@@ -273,8 +272,7 @@ window.chat.handleAlerts = function(data, olderMsgs) {
   var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
 
 // no hoot for alerts - API change planned here...
-// re-enabling hook 
-  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
+//  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
 
   window.chat.renderAlerts(oldMsgsWereAdded);
 }
