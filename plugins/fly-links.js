@@ -1,7 +1,7 @@
-// @author         fly
+// @author         Fly33
 // @name           Fly Links
 // @category       Draw
-// @version        0.2.1
+// @version        0.4.0
 // @description    Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 
 
@@ -27,21 +27,6 @@ window.plugin.flyLinks.updateLayer = function() {
   window.plugin.flyLinks.fieldsLayerGroup.clearLayers();
   var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(), 
               $('.leaflet-control-layers-selector + span:contains("Fly fields")').parent()];
-  if (Object.keys(window.portals).length > window.plugin.flyLinks.MAX_PORTALS_TO_OBSERVE) {
-    $.each(ctrl, function(guid, ctl) {ctl.addClass('disabled').attr('title', 'Too many portals: ' + Object.keys(window.portals).length);});
-    return;
-  }
-  
-  var locations = [];
-
-  var bounds = map.getBounds();
-  $.each(window.portals, function(guid, portal) {
-    var ll = portal.getLatLng();
-    if (bounds.contains(ll)) {
-      var p = map.project(portal.getLatLng(), window.plugin.flyLinks.PROJECT_ZOOM);
-      locations.push(p);
-    }
-  });
 
   var distance = function(a, b) {
     return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
@@ -63,12 +48,6 @@ window.plugin.flyLinks.updateLayer = function() {
     var poly = L.polygon([alatlng, blatlng, clatlng], style);
     poly.addTo(window.plugin.flyLinks.fieldsLayerGroup);
   }
-  
-  if (locations.length > window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
-    $.each(ctrl, function(guid, ctl) {ctl.addClass('disabled').attr('title', 'Too many portals (linked/observed): ' + locations.length + '/' + Object.keys(window.portals).length);});
-    return;
-  }
-  $.each(ctrl, function(guid, ctl) {ctl.removeClass('disabled').attr('title', 'portals (linked/observed): ' + locations.length + '/' + Object.keys(window.portals).length);});
   
   var EPS = 1e-9;
   var det = function(a, b, c) {
@@ -118,9 +97,7 @@ window.plugin.flyLinks.updateLayer = function() {
     return result;
   }
   
-  var index = convexHull(locations);
-  
-  var triangulate = function(index, locations) {
+  var triangulate2 = function(index, line_indexes, line_edge_indexes, locations) {
     if (index.length == 0)
       return {edges: [], triangles: []};
     var data = [];
@@ -142,7 +119,19 @@ window.plugin.flyLinks.updateLayer = function() {
         }
         var besth = 0;
         var besthi = -1;
-        if (_index.length == 0) {
+        var i
+        for (i = 0; i < line_indexes.length; ++i) {
+          var f0 = _index.indexOf(line_indexes[i][0]) != -1
+          var f1 = _index.indexOf(line_indexes[i][1]) != -1
+          if (f0 && !f1 && _i.indexOf(line_indexes[i][1]) == -1)
+            break
+          if (f1 && !f0 && _i.indexOf(line_indexes[i][0]) == -1)
+            break
+        }
+        if (i < line_indexes.length) {
+          besth = 0;
+          besthi = -1;
+        } else if (_index.length == 0) {
           var a = locations[ai];
           var b = locations[bi];
           var c = locations[ci];
@@ -176,28 +165,35 @@ window.plugin.flyLinks.updateLayer = function() {
       subindex.push(i);
     }
     var best = [];
-    for (var len = 1; len <= index.length - 1; ++len) {
+    best[1] = []
+    for (var k = 0; k < index.length - 1; ++k) {
+      best[1][k] = {height: Infinity, length: -1};
+    }
+    for (var len = 2; len <= index.length - 1; ++len) {
       best[len] = [];
       for (var k = 0; k < index.length - len; ++k) {
         var t = 0;
         var tlen = -1;
-        for (var _len = 1; _len <= len - 1; ++_len) {
-          var _t = 0;
-          $.each([best[_len][k].height, best[len-_len][k+_len].height, subtriangulate(index[k], index[k+_len], index[k+len], subindex)], function(guid, __t) {
-            if (__t == 0)
-              return;
-            if (_t == 0 || _t > __t)
-              _t = __t;
-          });
-          if (t == 0 || t < _t) {
-            t = _t;
-            tlen = _len;
+        var i
+        for (i = 0; i < line_edge_indexes.length; ++i) {
+          var [i0, i1] = line_edge_indexes[i]
+          if (k < i0 && i0 < k+len && (i1 < k || k+len < i1) ||
+              k < i1 && i1 < k+len && (i0 < k || k+len < i0))
+            break
+        }
+        if (i >= line_edge_indexes.length) {
+          for (var _len = 1; _len <= len - 1; ++_len) {
+            var _t = Math.min(best[_len][k].height, best[len-_len][k+_len].height, subtriangulate(index[k], index[k+_len], index[k+len], subindex))
+            if (t < _t) {
+              t = _t;
+              tlen = _len;
+            }
           }
         }
         best[len][k] = {height: t, length: tlen};
       }
     }
-    
+
     var edges = [];
     var triangles = [];
     var makesubtriangulation = function _makesubtriangulation(ai, bi, ci, depth) {
@@ -221,14 +217,150 @@ window.plugin.flyLinks.updateLayer = function() {
       _maketriangulation(best[len][a].length, a);
       _maketriangulation(len - best[len][a].length, a + best[len][a].length);
     }
-    maketriangulation(index.length - 1, 0);
+    if (best[index.length - 1][0].height > 0)
+      maketriangulation(index.length - 1, 0)
+    else
+      console.log("Fly links: no triangulation")
     return {edges: edges, triangles: triangles};
   }
-  
-  var triangulation = triangulate(index, locations);
-  var edges = triangulation.edges;
-  var triangles = triangulation.triangles;
 
+  var triangulate = function(locations, lines) {
+    var index = convexHull(locations);
+    var line_indexes = filterLines(locations, lines)
+    var line_edge_indexes = []
+    for (var i = 0; i < line_indexes.length; ++i) {
+      var i0 = index.indexOf(line_indexes[i][0])
+      var i1 = index.indexOf(line_indexes[i][1])
+      if (i0 == -1 || i1 == -1)
+        continue
+      line_edge_indexes.push([i0, i1])
+    }
+    return triangulate2(index, line_indexes, line_edge_indexes, locations);
+  }
+
+  var locations = [];
+
+  var bounds = map.getBounds();
+  $.each(window.portals, function(guid, portal) {
+    var ll = portal.getLatLng();
+    var p = map.project(ll, window.plugin.flyLinks.PROJECT_ZOOM);
+    locations.push(p);
+  });
+
+  var edges = [];
+  var triangles = [];
+
+  var markers = [];
+  var lines = [];
+  for (var i in plugin.drawTools.drawnItems._layers) {
+    var layer = plugin.drawTools.drawnItems._layers[i];
+    if (layer instanceof L.Marker) {
+      var ll = layer.getLatLng();
+      var p = map.project(ll, window.plugin.flyLinks.PROJECT_ZOOM);
+      markers.push(p);
+    } else if (layer instanceof L.GeodesicPolyline) {
+      var p = []
+      var ll = layer.getLatLngs();
+      for (var j = 0; j < ll.length; ++j) {
+        p.push(map.project(ll[j], window.plugin.flyLinks.PROJECT_ZOOM))
+      }
+      for (var j = 1; j < p.length; ++j) {
+        lines.push([p[j-1], p[j]])
+      }
+    }
+  }
+
+  var filterMarkers = function(points, except) {
+    var result = [];
+    for (var i = 0; i < points.length; ++i) {
+      for (var j = 0; j < except.length; ++j) {
+        if (points[i].x === except[j].x && points[i].y === except[j].y)
+          break;
+      }
+      if (j < except.length)
+        continue;
+      result.push(points[i]);
+    }
+    return result;
+  };
+
+  var filterLines = function(points, lines) {
+    var result = [];
+    var findPoint = function(points, point) {
+      for (var i = 0; i < points.length; ++i) {
+        if (points[i].x === point.x && points[i].y === point.y)
+          return i
+      }
+      return -1
+    }
+    for (var i = 0; i < lines.length; ++i) {
+      var a = findPoint(points, lines[i][0])
+      if (a == -1)
+        continue
+      var b = findPoint(points, lines[i][1])
+      if (b == -1)
+        continue
+      result.push([a, b])
+    }
+    return result
+  }
+
+  var filterPolygon = function(points, polygon) {
+    var result = [];
+    for (var p = 0; p < points.length; ++p) {
+      var asum = 0;
+      for (var i = 0, j = polygon.length-1; i < polygon.length; j = i, ++i) {
+        var ax = polygon[i].x-points[p].x;
+        var ay = polygon[i].y-points[p].y;
+        var bx = polygon[j].x-points[p].x;
+        var by = polygon[j].y-points[p].y;
+        var la = Math.sqrt(ax*ax+ay*ay);
+        var lb = Math.sqrt(bx*bx+by*by);
+        if (Math.abs(la) <= EPS || Math.abs(lb) <= EPS) // the point is a vertex of the polygon
+          break;
+        var cos = (ax*bx+ay*by)/la/lb;
+        if (cos < -1)
+          cos = -1;
+        if (cos > 1)
+          cos = 1;
+        var alpha = Math.acos(cos);
+        var det = ax*by-ay*bx;
+        if (Math.abs(det) <= EPS && Math.abs(alpha - Math.PI) <= EPS) // the point is on a rib of the polygon
+          break;
+        if (det >= 0)
+          asum += alpha;
+        else
+          asum -= alpha;
+      }
+      if (i == polygon.length && Math.round(asum / Math.PI / 2) % 2 == 0)
+        continue;
+      result.push(points[p]);
+    }
+    return result;
+  };
+
+  locations = filterMarkers(locations, markers);
+
+  for (var i in plugin.drawTools.drawnItems._layers) {
+    var layer = plugin.drawTools.drawnItems._layers[i];
+    if (layer instanceof L.GeodesicPolygon) {
+      var ll = layer.getLatLngs();
+      var polygon = [];
+      for (var i = 0; i < ll.length; ++i) {
+        var p = map.project(ll[i], window.plugin.flyLinks.PROJECT_ZOOM);
+        polygon.push(p);
+      }
+      var points = filterPolygon(locations, polygon);
+      if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
+        //alert("Some polygon contains more than 100 portals.");
+        continue;
+      }
+      var triangulation = triangulate(points, lines);
+      edges = edges.concat(triangulation.edges);
+      triangles = triangles.concat(triangulation.triangles);
+    }
+  }
+  
   $.each(edges, function(idx, edge) {
     drawLink(edge.a, edge.b, {
       color: '#FF0000',
@@ -236,10 +368,10 @@ window.plugin.flyLinks.updateLayer = function() {
       weight: 1.5,
       interactive: false,
       smoothFactor: 10,
-      dashArray: '6, 4',
+      dashArray: [6, 4],
     });
   });
-  
+
   $.each(triangles, function(idx, triangle) {
     drawField(triangle.a, triangle.b, triangle.c, {
       stroke: false,

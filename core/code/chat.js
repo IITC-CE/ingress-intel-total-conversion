@@ -284,8 +284,7 @@ window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
   var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
 
 // no hoot for alerts - API change planned here...
-// re-enabling hook 
-  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
+//  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
 
   window.chat.renderAlerts(oldMsgsWereAdded);
 }

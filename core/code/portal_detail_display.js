@@ -78,27 +78,30 @@ window.renderPortalDetails = function(guid) {
   levelDetails = "Level " + levelDetails;
 
 
-  var linkDetails = [];
+  var linkDetails = $('<div>', { class: 'linkdetails' });
 
-  var posOnClick = 'window.showPortalPosLinks('+lat+','+lng+',\''+escapeJavascriptString(title)+'\')';
-  var permalinkUrl = window.makePermalink([lat,lng]);
+  var posOnClick = window.showPortalPosLinks.bind(this,lat,lng,title);
 
   if (typeof android !== 'undefined' && android && android.intentPosLink) {
     // android devices. one share link option - and the android app provides an interface to share the URL,
     // share as a geo: intent (navigation via google maps), etc
 
-    var shareLink = $('<div>').html( $('<a>').attr({onclick:posOnClick}).text('Share portal') ).html();
-    linkDetails.push('<aside>'+shareLink+'</aside>');
+    var shareLink = $('<a>').text('Share portal').click(posOnClick);
+    linkDetails.append($('<aside>').append($('<div>').append(shareLink)));
 
   } else {
     // non-android - a permalink for the portal
-    var permaHtml = $('<div>').html( $('<a>').attr({href:permalinkUrl, title:'Create a URL link to this portal'}).text('Portal link') ).html();
-    linkDetails.push ( '<aside>'+permaHtml+'</aside>' );
+    var permaHtml = $('<a>').attr({
+      href: window.makePermalink([lat,lng]),
+      title: 'Create a URL link to this portal'}
+    ).text('Portal link');
+    linkDetails.append($('<aside>').append($('<div>').append(permaHtml)));
 
     // and a map link popup dialog
-    var mapHtml = $('<div>').html( $('<a>').attr({onclick:posOnClick, title:'Link to alternative maps (Google, etc)'}).text('Map links') ).html();
-    linkDetails.push('<aside>'+mapHtml+'</aside>');
-
+    var mapHtml = $('<a>').attr({
+      title: 'Link to alternative maps (Google, etc)'
+    }).text('Map links').click(posOnClick);
+    linkDetails.append($('<aside>').append($('<div>').append(mapHtml)));
   }
   
   $('#portaldetails')
@@ -145,9 +148,7 @@ window.renderPortalDetails = function(guid) {
       miscDetails,
       resoDetails,
       statusDetails,
-
-      $('<div>', { class: 'linkdetails' })
-        .html(linkDetails.join(''))
+      linkDetails
     );
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
