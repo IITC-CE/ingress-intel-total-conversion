@@ -350,7 +350,7 @@ em {
   margin-right: .5rem;
 }
 
-#chatfaction tr.public td:nth-child(3):before,
+#chatall tr.public td:nth-child(3):before,
 #chatalerts tr.public td:nth-child(3):before {
   content: '[public]';
   color: #ff6;

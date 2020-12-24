@@ -545,7 +545,11 @@ window.chat.renderMsgRow = function(data) {
   var msgClass = (data.narrowcast) ? 'system_narrowcast' : '';
   var msgCell = chat.renderMsgCell(msg, msgClass);
 
-  var className = (data.public) ? 'public' : (data.secure) ? 'faction' : '';
+  var className = '';
+  if (!data.auto && data.public)
+    className = 'public';
+  else if (!data.auto && data.secure)
+    className = 'faction';
   return '<tr data-guid="' + data.guid + '" class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
 }
 
