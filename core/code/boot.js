@@ -845,7 +845,7 @@ try {
     return module;
   }({})).exports(L);
 
-  '@include_raw:external/jquery-3.4.1.min.js@';
+  '@include_raw:external/jquery-3.5.1.min.js@';
   '@include_raw:external/jquery-ui-1.12.1.min.js@';
   '@include_raw:external/taphold.js@';
   '@include_raw:external/jquery.qrcode.min.js@';
