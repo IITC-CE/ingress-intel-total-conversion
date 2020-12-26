@@ -418,12 +418,12 @@ window.setupSidebarToggle = function() {
     var toggle = $('#sidebartoggle');
     var sidebar = $('#scrollwrapper');
     if(sidebar.is(':visible')) {
-      sidebar.hide().css('z-index', 1);
+      sidebar.hide();
       $('.leaflet-right').css('margin-right','0');
       toggle.html('<span class="toggle open"></span>');
       toggle.css('right', '0');
     } else {
-      sidebar.css('z-index', 1001).show();
+      sidebar.show();
       window.resetScrollOnNewPortal();
       $('.leaflet-right').css('margin-right', SIDEBAR_WIDTH+1+'px');
       toggle.html('<span class="toggle close"></span>');
