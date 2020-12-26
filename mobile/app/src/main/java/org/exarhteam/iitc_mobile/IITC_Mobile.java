@@ -835,6 +835,7 @@ public class IITC_Mobile extends AppCompatActivity
         mNavigationHelper.reset();
         mMapSettings.reset();
         mUserLocation.reset();
+        mIitcWebView.removeAllViews();
         mIitcWebView.getWebViewClient().reset();
         mBackStack.clear();
         mCurrentPane = Pane.MAP;
