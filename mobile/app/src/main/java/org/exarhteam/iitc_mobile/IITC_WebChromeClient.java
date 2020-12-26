@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Message;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
@@ -214,5 +215,22 @@ public class IITC_WebChromeClient extends WebChromeClient {
     public boolean onJsPrompt(final WebView view, final String url, final String message, final String defaultValue, final JsPromptResult result) {
         return new IITC_JsDialogHelper(IITC_JsDialogHelper.PROMPT, view, url, message, defaultValue, result)
                 .shouldInterrupt();
+    }
+
+    @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+
+        IITC_WebView newWebView = new IITC_WebView(mIitc);
+        view.addView(newWebView);
+        WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+        transport.setWebView(newWebView);
+        resultMsg.sendToTarget();
+
+        return true;
+    }
+
+    public void onCloseWindow(WebView view){
+        if (mIitc.getWebView() != view)
+            mIitc.getWebView().removeView(view);
     }
 }
