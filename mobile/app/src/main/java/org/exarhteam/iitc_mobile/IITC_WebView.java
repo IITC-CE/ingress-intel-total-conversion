@@ -43,7 +43,7 @@ public class IITC_WebView extends WebView {
     private final String mDesktopUserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0)" +
             " Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
     private String mMobileUserAgent;
-            
+
 
     // init web view
     private void iitc_init(final Context c) {
