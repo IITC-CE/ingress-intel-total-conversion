@@ -572,8 +572,10 @@ public class IITC_Mobile extends AppCompatActivity
             WebView view = (WebView) mIitcWebView.getChildAt(0);
             if (view.canGoBack())
                 view.goBack();
-            else
+            else {
+                Log.d("Close Popup");
                 mIitcWebView.removeView(view);
+            }
             return;
         }
 
