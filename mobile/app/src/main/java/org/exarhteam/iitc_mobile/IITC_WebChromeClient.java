@@ -219,7 +219,7 @@ public class IITC_WebChromeClient extends WebChromeClient {
 
     @Override
     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-
+        Log.d("Open popup");
         IITC_WebView newWebView = new IITC_WebView(mIitc);
         view.addView(newWebView);
         WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
@@ -230,7 +230,9 @@ public class IITC_WebChromeClient extends WebChromeClient {
     }
 
     public void onCloseWindow(WebView view){
-        if (mIitc.getWebView() != view)
+        if (mIitc.getWebView() != view) {
+            Log.d("Close popup");
             mIitc.getWebView().removeView(view);
+        }
     }
 }
