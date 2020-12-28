@@ -24,6 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IITC_WebViewClient extends WebViewClient {
 
@@ -283,17 +285,17 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("redirect to: " + uriQuery);
             return shouldOverrideUrlLoading(view, uriQuery);
         }
-        if (uriHost.endsWith("facebook.com")
-                && (uriPath.contains("oauth") || uriPath.equals("/login.php") || uriPath.equals("/checkpoint/"))) {
-            Log.d("Facebook login");
-            return false;
+
+        Log.d( "URL test: '" + (uriHost+uriPath)+"'");
+        for (String s : mIitc.getLoginPages()) {
+            Pattern pattern = Pattern.compile(s);
+            Matcher matcher = pattern.matcher(uriHost+uriPath);
+            if (matcher.find()) {
+                Log.d( "URL Match: " + s);
+                return false;
+            }
         }
-        if (uriHost.startsWith("accounts.google.") ||
-                 uriHost.startsWith("appengine.google.") ||
-                 uriHost.startsWith("accounts.youtube.")) {
-            Log.d("Google login");
-            return false;
-        }
+
         Log.d("no ingress intel link, start external app to load url: " + url);
         final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         // make new activity independent from iitcm

@@ -218,4 +218,9 @@ public class IITC_JSInterface {
             mIitc.reloadIITC();
         });
     }
+
+    @JavascriptInterface
+    public void registerLoginPage(final String regex) {
+        mIitc.registerLoginPage(regex);
+    }
 }

@@ -16,6 +16,12 @@ window.iitcBuildDate = '@build_date@';
 // disable vanilla JS
 window.onload = function() {};
 document.body.onload = function() {};
+if (android && android.registerLoginPage) {
+  android.registerLoginPage("^facebook\\.com\\/(.*oauth|login.php$|checkpoint\/$)");
+  android.registerLoginPage("^accounts\\.google\\.");
+  android.registerLoginPage("^appengine\\.google\\.");
+  android.registerLoginPage("^accounts\\.youtube\\.");
+}
 
 //originally code here parsed the <Script> tags from the page to find the one that defined the PLAYER object
 //however, that's already been executed, so we can just access PLAYER - no messing around needed!

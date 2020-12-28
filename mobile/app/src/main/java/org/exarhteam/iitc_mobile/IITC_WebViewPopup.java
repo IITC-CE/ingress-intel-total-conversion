@@ -15,6 +15,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class IITC_WebViewPopup extends WebView {
@@ -62,16 +64,15 @@ public class IITC_WebViewPopup extends WebView {
                     Log.d("popup: redirect to: " + uriQuery);
                     return shouldOverrideUrlLoading(view, uriQuery);
                 }
-                if (uriHost.endsWith("facebook.com")
-                        && (uriPath.contains("oauth") || uriPath.equals("/login.php") || uriPath.equals("/checkpoint/"))) {
-                    Log.d("popup: Facebook login");
+
+                Log.d("URL test: '" + (uriHost + uriPath) + "'");
+                for (String s : mIitc.getLoginPages()) {
+                    Pattern pattern = Pattern.compile(s);
+                    Matcher matcher = pattern.matcher(uriHost + uriPath);
+                    if (matcher.find()) {
+                        Log.d("URL Match: " + s);
                     return false;
                 }
-                if (uriHost.startsWith("accounts.google.") ||
-                         uriHost.startsWith("appengine.google.") ||
-                         uriHost.startsWith("accounts.youtube.")) {
-                    Log.d("popup: Google login");
-                    return false;
                 }
                 Log.d("popup: no login link, start external app to load url: " + url);
 

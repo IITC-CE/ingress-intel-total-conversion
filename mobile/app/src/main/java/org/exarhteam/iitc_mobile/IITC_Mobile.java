@@ -66,6 +66,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
@@ -112,6 +113,7 @@ public class IITC_Mobile extends AppCompatActivity
     private IITC_DebugHistory debugHistory;
     private int debugHistoryPosition = -1;
     private String debugInputStore = "";
+    private final ArrayList<String> registeredLoginPages = new ArrayList<>();
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -1244,5 +1246,15 @@ public class IITC_Mobile extends AppCompatActivity
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public void registerLoginPage(final String regex) {
+        if (this.registeredLoginPages.indexOf(regex)==-1) {
+            this.registeredLoginPages.add(regex);
+        }
+    }
+
+    public ArrayList<String> getLoginPages() {
+        return this.registeredLoginPages;
     }
 }
