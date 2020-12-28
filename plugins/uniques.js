@@ -1,8 +1,8 @@
-// @author				 3ch01c
-// @name					 Uniques
-// @category			 Misc
-// @version				0.3.9
-// @description		Allow manual entry of portals visited/captured, scouted or droned. Highlighters for all three help to identify new portals. Uniques uses the 'sync'-plugin to share between multiple browsers or desktop/mobile. COMM and portal details are analyzed to fill the fields automatically (but this will not catch every case).
+// @author         3ch01c
+// @name           Uniques
+// @category       Misc
+// @version        0.3.9
+// @description    Allow manual entry of portals visited/captured, scouted or droned. Highlighters for all three help to identify new portals. Uniques uses the 'sync'-plugin to share between multiple browsers or desktop/mobile. COMM and portal details are analyzed to fill the fields automatically (but this will not catch every case).
 
 //use own namespace for plugin
 window.plugin.uniques = function() {};
