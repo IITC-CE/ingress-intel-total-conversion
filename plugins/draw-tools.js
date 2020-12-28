@@ -305,18 +305,23 @@ window.plugin.drawTools.optAlert = function(message) {
     $('.drawtools-alert').delay(2500).fadeOut();
 }
 
+window.plugin.drawTools.checkEmpty = function() {
+  if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined ||
+    window.localStorage[window.plugin.drawTools.KEY_STORAGE].length <= 2)
+  {
+    dialog({
+      html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
+      width: 250,
+      dialogClass: 'ui-dialog-drawtools-message',
+      title: 'Draw Tools Message'
+    });
+    return true
+  }
+}
+
 window.plugin.drawTools.optCopy = function() {
-    if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
-        window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
-    {
-      dialog({
-        html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
-        width: 250,
-        dialogClass: 'ui-dialog-drawtools-message',
-        title: 'Draw Tools Message'
-      });
-      return;
-    }
+    if (window.plugin.drawTools.checkEmpty()) return;
+
     if(typeof android !== 'undefined' && android && android.shareString){
         android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
     } else {
@@ -379,12 +384,10 @@ window.plugin.drawTools.optCopy = function() {
 }
 
 window.plugin.drawTools.optExport = function() {
-  if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
-      window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
-  {
-    var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
-    window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
-  }
+  if (window.plugin.drawTools.checkEmpty()) return;
+
+  var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
+  window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
 }
 
 window.plugin.drawTools.optPaste = function() {
