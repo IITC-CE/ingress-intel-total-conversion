@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.31.0
+// @version        0.31.1
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -31,13 +31,13 @@ if (!window.PLAYER || !PLAYER.nickname) {
     throw new Error("Logged in but page doesn't have player data");
   }
   // FIXME: handle nia takedown in progress
-  
+
   // add login form stylesheet
   var style = document.createElement('style');
   style.type = 'text/css';
   style.appendChild(document.createTextNode('@include_string:login.css@'));
   document.head.appendChild(style);
-  
+
   throw new Error("Couldn't retrieve player data. Are you logged in?");
 }
 
