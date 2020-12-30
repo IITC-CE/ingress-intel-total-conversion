@@ -56,14 +56,6 @@ def exec_gradle(source):
     return source / 'app/build/outputs/apk' / buildtype / f'app-{buildtype}.apk'
 
 
-def make_fdroid_meta(source, output):
-    buildtype = settings.gradle_buildtype
-    shutil.copy(
-        source / 'app/build/outputs/apk' / buildtype / 'version_fdroid.txt',
-        output,
-    )
-
-
 def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
     """Build IITC-Mobile apk file, embedding scripts from given directory."""
     assets_dir = source / 'assets'
@@ -78,12 +70,10 @@ def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
     user_location_plug = source / 'plugins' / 'user-location.js'
     build_plugin.process_file(user_location_plug, assets_dir)
 
+    apk = exec_gradle(source)
     out_name = out_name or 'IITC_Mobile-{.build_name}.apk'.format(settings)
-    shutil.copy(
-        exec_gradle(source),
-        (out_dir or scripts_dir) / out_name,
-    )
-    make_fdroid_meta(source, out_dir or scripts_dir)
+    shutil.copy(apk, (out_dir or scripts_dir) / out_name)
+    shutil.copy(apk.with_name('version_fdroid.txt'), out_dir or scripts_dir)
 
 
 def iitc_build(iitc_source, build_outdir):
