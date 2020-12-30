@@ -16,6 +16,15 @@ def getVersionCodeTimeStamps = { ->
     return Integer.parseInt(unixtime)
 }
 
+def metaFDroid(outputFileName) {
+    if( outputFileName.exists() ) {
+        new File(outputFileName, "version_fdroid.txt").text = [
+                ["versionName", android.defaultConfig.versionName].join("="),
+                ["versionCode", android.defaultConfig.versionCode].join("="),
+        ].join("\n")
+    }
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion = '29.0.3'
@@ -80,6 +89,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.resValue  "string", "application_id", variant.applicationId
+        metaFDroid(new File("${rootProject.rootDir.absolutePath}/app/build/outputs/apk/${variant.name}/"))
     }
 }
 
