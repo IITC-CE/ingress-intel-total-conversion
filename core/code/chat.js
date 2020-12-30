@@ -109,9 +109,9 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     minTimestampMs: -1,
     maxTimestampMs: -1,
     tab: channel,
-  }
+  };
 
-  if(getOlderMsgs) {
+  if (getOlderMsgs) {
     // ask for older chat when scrolling up
     data = $.extend(data, {
       maxTimestampMs: storageHash.oldestTimestamp,
@@ -140,7 +140,7 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     if (min > -1) $.extend(data, {ascendingTimestampOrder: true});
   }
   return data;
-}
+};
 
 
 
@@ -354,7 +354,7 @@ window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAsc
       }
     }
   }
-}
+};
 
 window.chat.parseMsgData = function(data) {
   var categories = data[2].plext.categories;
@@ -372,15 +372,15 @@ window.chat.parseMsgData = function(data) {
   var markup = data[2].plext.markup;
 
   var nick = '';
-  $.each(markup, function(ind, markup) {
-    switch(markup[0]) {
+  markup.forEach(function(ent) {
+    switch (ent[0]) {
     case 'SENDER': // user generated messages
-      nick = markup[1].plain.slice(0, -2); // cut “: ” at end
+      nick = ent[1].plain.slice(0, -2); // cut “: ” at end
       break;
 
     case 'PLAYER': // automatically generated messages
-      nick = markup[1].plain;
-      team = markup[1].team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
+      nick = ent[1].plain;
+      team = ent[1].team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
       break;
 
     default:
@@ -404,14 +404,14 @@ window.chat.parseMsgData = function(data) {
     },
     markup: markup,
   };
-}
+};
 
 window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
   window.chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
-  $.each(newData.result, function(ind, json) {
+  newData.result.forEach(function(json) {
     // avoid duplicates
-    if(json[0] in storageHash.data) return true;
+    if (json[0] in storageHash.data) return true;
 
     var parsedData = chat.parseMsgData(json);
 
@@ -422,7 +422,7 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
     else
       storageHash.guids.unshift(parsedData.guid);
   });
-}
+};
 
 //
 // Rendering primitive for markup, chat cells (td) and chat row (tr)
@@ -430,17 +430,17 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
 
 window.chat.renderText = function (text) {
   return $('<div/>').text(text.plain).html().autoLink();
-}
+};
 
 // Override portal names that are used over and over, such as 'US Post Office'
 window.chat.getChatPortalName = function(markup) {
   var name = markup.name;
-  if(name === 'US Post Office') {
+  if (name === 'US Post Office') {
     var address = markup.address.split(',');
     name = 'USPS: ' + address[0];
   }
   return name;
-}
+};
 
 window.chat.renderPortal = function (portal) {
   var lat = portal.latE6/1E6, lng = portal.lngE6/1E6;
@@ -451,25 +451,25 @@ window.chat.renderPortal = function (portal) {
     + ' href="'+perma+'" class="help">'
     + window.chat.getChatPortalName(portal)
     + '</a>';
-}
+};
 
 window.chat.renderFactionEnt = function (faction) {
-  var name = faction.team === "ENLIGHTENED" ? "Enlightened" : "Resistance";
-  var spanClass = faction.team === "ENLIGHTENED" ? TEAM_ENL : TEAM_RES;
+  var name = faction.team === 'ENLIGHTENED' ? 'Enlightened' : 'Resistance';
+  var spanClass = faction.team === 'ENLIGHTENED' ? TEAM_ENL : TEAM_RES;
   return $('<div/>').html($('<span/>')
-                    .attr('class', spanClass)
-                    .text(name)).html();
-}
+    .attr('class', spanClass)
+    .text(name)).html();
+};
 
 window.chat.renderPlayer = function (player, at, sender) {
   var name = (sender) ? player.plain.slice(0, -2) : (at) ? player.plain.slice(1) : player.plain;
   var thisToPlayer = name === window.PLAYER.nickname;
-  var spanClass = thisToPlayer ? "pl_nudge_me" : (player.team + " pl_nudge_player");
+  var spanClass = thisToPlayer ? 'pl_nudge_me' : (player.team + 'pl_nudge_player');
   return $('<div/>').html($('<span/>')
-                    .attr('class', spanClass)
-                    .attr('onclick',"window.chat.nicknameClicked(event, '"+name+"')")
-                    .text((at ? '@' : '') + name)).html();
-}
+    .attr('class', spanClass)
+    .attr('onclick',"window.chat.nicknameClicked(event, '"+name+"')")
+    .text((at ? '@' : '') + name)).html();
+};
 
 window.chat.renderMarkupEntity = function (ent) {
   switch (ent[0]) {
@@ -485,34 +485,32 @@ window.chat.renderMarkupEntity = function (ent) {
     return chat.renderPlayer(ent[1]);
   case 'AT_PLAYER':
     return chat.renderPlayer(ent[1], true);
-  case 'TEXT':
-    return $('<div/>').text(ent[1].plain).html().autoLink();
   default:
   }
   return $('<div/>').text(ent[0]+':<'+ent[1].plain+'>').html();
-}
+};
 
 window.chat.renderMarkup = function (markup) {
   var msg = '';
-  $.each(markup, function(ind, markup) {
-    switch(markup[0]) {
+  markup.forEach(function(ent, ind) {
+    switch (ent[0]) {
     case 'SENDER':
     case 'SECURE':
       // skip as already handled
       break;
 
     case 'PLAYER': // automatically generated messages
-      if(ind > 0) msg += chat.renderMarkupEntity(markup); // don’t repeat nick directly
+      if (ind > 0) msg += chat.renderMarkupEntity(ent); // don’t repeat nick directly
       break;
 
     default:
       // add other enitities whatever the type
-      msg += chat.renderMarkupEntity(markup);
+      msg += chat.renderMarkupEntity(ent);
       break;
     }
   });
   return msg;
-}
+};
 
 window.chat.renderTimeCell = function(time, classNames) {
   var ta = unixTimeToHHmm(time);
@@ -520,16 +518,16 @@ window.chat.renderTimeCell = function(time, classNames) {
   // add <small> tags around the milliseconds
   tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   return '<td><time class="' + classNames + '" title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time></td>';
-}
+};
 
 window.chat.renderNickCell = function(nick, classNames) {
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
   return '<td>'+i[0]+'<mark class="' + classNames + '">'+ nick+'</mark>'+i[1]+'</td>';
-}
+};
 
 window.chat.renderMsgCell = function(msg, classNames) {
   return '<td class="' + classNames + '">'+msg+'</td>';
-}
+};
 
 window.chat.renderMsgRow = function(data) {
   var timeClass = (data.msgToPlayer) ? 'pl_nudge_date' : '';
@@ -541,7 +539,7 @@ window.chat.renderMsgRow = function(data) {
   if (data.player.name === window.PLAYER.nickname) nickClasses.push('pl_nudge_me');
   var nickCell = chat.renderNickCell(data.player.name, nickClasses.join(' '));
 
-  var msg = chat.renderMarkup(data.markup)
+  var msg = chat.renderMarkup(data.markup);
   var msgClass = (data.narrowcast) ? 'system_narrowcast' : '';
   var msgCell = chat.renderMsgCell(msg, msgClass);
 
@@ -551,7 +549,7 @@ window.chat.renderMsgRow = function(data) {
   else if (!data.auto && data.secure)
     className = 'faction';
   return '<tr data-guid="' + data.guid + '" class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
-}
+};
 
 // legacy rendering, not used internaly, but left there for backward compatibilty in case a plugin uses it directly
 window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
@@ -581,14 +579,14 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
 window.chat.renderDivider = function(text) {
   var d = ' ──────────────────────────────────────────────────────────────────────────';
   return '<tr><td colspan="3" style="padding-top:3px"><summary>─ ' + text + d + '</summary></td></tr>';
-}
+};
 
 // renders data from the data-hash to the element defined by the given
 // ID. Set 3rd argument to true if it is likely that old data has been
 // added. Latter is only required for scrolling.
 window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
   var elm = $('#'+element);
-  if(elm.is(':hidden')) return;
+  if (elm.is(':hidden')) return;
 
   // discard guids and sort old to new
 //TODO? stable sort, to preserve server message ordering? or sort by GUID if timestamps equal?
@@ -596,7 +594,7 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
   if (vals === undefined) {
     vals = $.map(data, function(v, k) { return [[v[0], k]]; });
     vals = vals.sort(function(a, b) { return a[0]-b[0]; });
-    vals = vals.map(function(v) { return v[1]});
+    vals = vals.map(function(v) { return v[1]; });
   }
 
   // render to string with date separators inserted
@@ -605,7 +603,7 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
   vals.forEach(function(guid) {
     var msg = data[guid];
     var nextTime = new Date(msg[0]).toLocaleDateString();
-    if(prevTime && prevTime !== nextTime)
+    if (prevTime && prevTime !== nextTime)
       msgs += chat.renderDivider(nextTime);
     msgs += msg[2];
     prevTime = nextTime;
@@ -619,7 +617,7 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
     elm.data('needsScrollTop', 99999999);
   else
     chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
-}
+};
 
 
 window.chat.getActive = function() {
