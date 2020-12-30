@@ -269,10 +269,10 @@ window.plugin.drawTools.import = function(data) {
 
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function() {
-	var mergeStatusCheck = '';
-	if(!window.plugin.drawTools.merge.status){
-		mergeStatusCheck = 'checked';
-	}
+  var mergeStatusCheck = '';
+  if(!window.plugin.drawTools.merge.status){
+    mergeStatusCheck = 'checked';
+  }
 
   var html = '<div class="drawtoolsStyles">'
            + '<input type="color" name="drawColor" id="drawtools_color"></input>'
@@ -280,13 +280,13 @@ window.plugin.drawTools.manualOpt = function() {
            + '</div>'
            + '<div class="drawtoolsSetbox">'
            + '<a onclick="window.plugin.drawTools.optCopy();" tabindex="0">Copy Drawn Items</a>'
-           + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
-           +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
            + '<a onclick="window.plugin.drawTools.optPaste();return false;" tabindex="0">Paste Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optReset();return false;" tabindex="0">Reset Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>'
+           + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
+           +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
            + '</div>';
 
   dialog({
