@@ -301,90 +301,92 @@ window.plugin.drawTools.manualOpt = function() {
 }
 
 window.plugin.drawTools.optAlert = function(message) {
-    $('.ui-dialog-drawtoolsSet .ui-dialog-buttonset').prepend('<p class="drawtools-alert" style="float:left;margin-top:4px;">'+message+'</p>');
-    $('.drawtools-alert').delay(2500).fadeOut();
+  $('.ui-dialog-drawtoolsSet .ui-dialog-buttonset').prepend('<p class="drawtools-alert" style="float:left;margin-top:4px;">'+message+'</p>');
+  $('.drawtools-alert').delay(2500).fadeOut();
+}
+
+window.plugin.drawTools.isEmpty = function() {
+  var data = window.localStorage[window.plugin.drawTools.KEY_STORAGE];
+  if (!data || data.length <= 2) {
+    dialog({
+      html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
+      width: 250,
+      dialogClass: 'ui-dialog-drawtools-message',
+      title: 'Draw Tools Message'
+    });
+    return true
+  }
 }
 
 window.plugin.drawTools.optCopy = function() {
-    if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
-        window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
-    {
-      dialog({
-        html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
-        width: 250,
-        dialogClass: 'ui-dialog-drawtools-message',
-        title: 'Draw Tools Message'
-      });
-      return;
-    }
-    if(typeof android !== 'undefined' && android && android.shareString){
-        android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
-    } else {
-      var stockWarnings = {};
-      var stockLinks = [];
-      window.plugin.drawTools.drawnItems.eachLayer( function(layer) {
-        if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
-          stockWarnings.noCircle = true;
-          return; //.eachLayer 'continue'
-        } else if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
-          stockWarnings.polyAsLine = true;
-          // but we can export them
-        } else if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
-          // polylines are fine
-        } else if (layer instanceof L.Marker) {
-          stockWarnings.noMarker = true;
-          return; //.eachLayer 'continue'
-        } else {
-          stockWarnings.unknown = true; //should never happen
-          return; //.eachLayer 'continue'
-        }
-        // only polygons and polylines make it through to here
-        var latLngs = layer.getLatLngs();
-        // stock only handles one line segment at a time
-        for (var i=0; i<latLngs.length-1; i++) {
-          stockLinks.push([latLngs[i].lat,latLngs[i].lng,latLngs[i+1].lat,latLngs[i+1].lng]);
-        }
-        // for polygons, we also need a final link from last to first point
-        if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
-          stockLinks.push([latLngs[latLngs.length-1].lat,latLngs[latLngs.length-1].lng,latLngs[0].lat,latLngs[0].lng]);
-        }
-      });
-      var stockUrl = window.makePermalink(null, {
-        includeMapView: true,
-        fullURL: true
-      }) + '&pls='+stockLinks.map(function(link){return link.join(',');}).join('_');
-      var stockWarnTexts = [];
-      if (stockWarnings.polyAsLine) stockWarnTexts.push('Note: polygons are exported as lines');
-      if (stockLinks.length>40) stockWarnTexts.push('Warning: Stock intel may not work with more than 40 line segments - there are '+stockLinks.length);
-      if (stockWarnings.noCircle) stockWarnTexts.push('Warning: Circles cannot be exported to stock intel');
-      if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
-      if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
+  if (window.plugin.drawTools.isEmpty()) { return; }
 
-      var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
-                +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
-                +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
-      if (stockWarnTexts.length>0) {
-        html += '<ul><li>'+stockWarnTexts.join('</li><li>')+'</li></ul>';
+  if (typeof android !== 'undefined' && android.shareString) {
+    android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
+  } else {
+    var stockWarnings = {};
+    var stockLinks = [];
+    window.plugin.drawTools.drawnItems.eachLayer( function(layer) {
+      if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
+        stockWarnings.noCircle = true;
+        return; //.eachLayer 'continue'
+      } else if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
+        stockWarnings.polyAsLine = true;
+        // but we can export them
+      } else if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
+        // polylines are fine
+      } else if (layer instanceof L.Marker) {
+        stockWarnings.noMarker = true;
+        return; //.eachLayer 'continue'
+      } else {
+        stockWarnings.unknown = true; //should never happen
+        return; //.eachLayer 'continue'
       }
+      // only polygons and polylines make it through to here
+      var latLngs = layer.getLatLngs();
+      // stock only handles one line segment at a time
+      for (var i=0; i<latLngs.length-1; i++) {
+        stockLinks.push([latLngs[i].lat,latLngs[i].lng,latLngs[i+1].lat,latLngs[i+1].lng]);
+      }
+      // for polygons, we also need a final link from last to first point
+      if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
+        stockLinks.push([latLngs[latLngs.length-1].lat,latLngs[latLngs.length-1].lng,latLngs[0].lat,latLngs[0].lng]);
+      }
+    });
+    var stockUrl = window.makePermalink(null, {
+      includeMapView: true,
+      fullURL: true
+    }) + '&pls='+stockLinks.map(function(link){return link.join(',');}).join('_');
+    var stockWarnTexts = [];
+    if (stockWarnings.polyAsLine) stockWarnTexts.push('Note: polygons are exported as lines');
+    if (stockLinks.length>40) stockWarnTexts.push('Warning: Stock intel may not work with more than 40 line segments - there are '+stockLinks.length);
+    if (stockWarnings.noCircle) stockWarnTexts.push('Warning: Circles cannot be exported to stock intel');
+    if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
+    if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
 
-      dialog({
-        html: html,
-        width: 600,
-        dialogClass: 'ui-dialog-drawtoolsSet-copy',
-        id: 'plugin-drawtools-export',
-        title: 'Draw Tools Export'
-        });
+    var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+              +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
+              +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
+              +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
+    if (stockWarnTexts.length>0) {
+      html += '<ul><li>'+stockWarnTexts.join('</li><li>')+'</li></ul>';
     }
+
+    dialog({
+      html: html,
+      width: 600,
+      dialogClass: 'ui-dialog-drawtoolsSet-copy',
+      id: 'plugin-drawtools-export',
+      title: 'Draw Tools Export'
+      });
+  }
 }
 
 window.plugin.drawTools.optExport = function() {
-  if (window.localStorage[window.plugin.drawTools.KEY_STORAGE] === '' ||
-      window.localStorage[window.plugin.drawTools.KEY_STORAGE] === undefined)
-  {
-    var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
-    window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
-  }
+  if (window.plugin.drawTools.isEmpty()) { return };
+
+  var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
+  window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
 }
 
 window.plugin.drawTools.optPaste = function() {

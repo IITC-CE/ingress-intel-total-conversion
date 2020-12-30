@@ -168,6 +168,13 @@ public class IITC_WebChromeClient extends WebChromeClient {
         @Override
         public void onActivityResult(final int resultCode, final Intent data) {
             mIitc.deleteResponseHandler(this); // to enable garbage collection
+
+            // If no file is specified
+            if (data == null) {
+                filePathCallback.onReceiveValue(null);
+                return;
+            }
+
             Uri[] uris = null;
             if (data.getData() != null) {
                 uris = parseResult(resultCode, data);
