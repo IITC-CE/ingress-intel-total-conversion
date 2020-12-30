@@ -72,8 +72,9 @@ def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
 
     apk = exec_gradle(source)
     out_name = out_name or 'IITC_Mobile-{.build_name}.apk'.format(settings)
-    shutil.copy(apk, (out_dir or scripts_dir) / out_name)
-    shutil.copy(apk.with_name('version_fdroid.txt'), out_dir or scripts_dir)
+    out_dir = out_dir or scripts_dir
+    shutil.copy(apk, out_dir / out_name)
+    shutil.copy(apk.with_name('version_fdroid.txt'), out_dir)
 
 
 def iitc_build(iitc_source, build_outdir):
