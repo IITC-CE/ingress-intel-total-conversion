@@ -1,0 +1,8 @@
+VIKTIGT: Den här appen körs på data från Ingress. Innan du lämnar ett dåligt betyg testa https://intel.ingress.com/ och notera tiden det tar att ladda. Ha det i åtanke när du skriver en recension, tack.
+
+Ingress Intel Total Conversion - Community Edition (IITC-CE) är ett webbläsartillägg för augumenterade-verklighetsspelet Ingress. Det är snabbare än Ingress standardkarta, och erbjuder många fler funktioner.
+
+Det finns tillgängligt för datorwebbläsare som Firefox och Chrome, samt som en mobilapp.
+
+Hemsida: https://iitc.app
+GitHub Repository: https://github.com/IITC-CE/ingress-intel-total-conversion/

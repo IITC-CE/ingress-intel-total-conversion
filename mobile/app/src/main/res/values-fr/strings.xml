@@ -88,4 +88,62 @@
     <string name="notice_sharing">&lt;p&gt;Avec &lt;em&gt;Partage un portail&lt;/em&gt; vous pouvez : &lt;p&gt; • Envoyer le lien du portail à d\'autres personnes&lt;br&gt; • Voir la position du portail sélectionné dans une autre application&lt;br&gt; • Ouvrir le lien du portail dans un navigateur web&lt;br&gt; &lt;p&gt;Conseil : En sélectionnant Google Maps (ou tout autre logiciel de navigation installé), vous pouvez facilement être guidé vers le portail sélectionné. &lt;p&gt;Ces conseils s\'appliquent aussi aux &lt;em&gt;permalien&lt;/em&gt;.</string>
     <string name="label_highlighter">Mise en avant</string>
     <string name="pref_tweaks_cat">Améliorations</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 semaines</string>
+    <string name="pref_update_plugins_interval_1_week">1 semaine</string>
+    <string name="pref_update_plugins_interval_2_days">2 jours</string>
+    <string name="pref_update_plugins_interval_1_day">1 jour</string>
+    <string name="pref_update_plugins_interval_disable">Désactiver</string>
+    <string name="pref_language">Langue</string>
+    <string name="iitc_website">Site web d\'IITC</string>
+    <string name="appintro_location_title">Autorisation de localisation</string>
+    <string name="appintro_navigation_title">Navigation</string>
+    <string name="appintro_plugins_description">Vous pouvez commencer à utiliser IITC-CE dès maintenant.
+\n
+\nMais le principal avantage par rapport à la carte officielle Intel Ingress est l\'abondance de plugins qui étendent les capacités.
+\n
+\nVous pouvez ajouter des plugins officiels ou externes dans les paramètres.</string>
+    <string name="appintro_plugins_title">Plugin</string>
+    <string name="bugtracker">Suivi des bugs</string>
+    <string name="pane_map">Carte</string>
+    <string name="pane_info">Info</string>
+    <string name="pane_alerts">Alertes</string>
+    <string name="plugin_updated">Plugin mis à jour</string>
+    <string name="toast_press_twice_to_exit">Appuyez deux fois sur pour sortir</string>
+    <string name="plugins_official_plugins">Plugins officiels</string>
+    <string name="file_browser_choose_file">Choisissez un fichier</string>
+    <string name="file_browser_is_required">Aucune activité pour sélectionner un fichier détectée. Veuillez installer un navigateur de fichiers de votre choix !</string>
+    <string name="plugins_permission_granted">Autorisation accordée. Veuillez répéter l\'action.</string>
+    <string name="plugins_permission_denied">Autorisation refusée. Vous ne pouvez pas ajouter de plugins.</string>
+    <string name="show_appintro_screen_title">Afficher l\'écran d\'introduction</string>
+    <string name="appintro_welcome_description">Ceci est la version mobile de l\'outil indispensable à tout joueur d\'Ingress.
+\n
+\nIngress Intel Total Conversion (IITC) est un add-on qui fonctionne comme une surcouche appliquée à l\'Intel, la carte officielle d\'Ingress.
+\n
+\nIITC change complètement la façon dont vous travaillez avec la carte, augmente considérablement l\'efficacité en appliquant une accélération matérielle, et étend les capacités grâce à l\'utilisation de divers plugins.</string>
+    <string name="pref_hide_fullscreen_notification_bar">Barre de notifications système</string>
+    <string name="pref_hide_fullscreen_action_bar">Barre d\'activité IITC</string>
+    <string name="pref_hide_fullscreen_status_bar">Barre de statut IITC</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Barre de navigation système</string>
+    <string name="pref_user_location_dont_show">Ne pas afficher la position de l\'utilisateur</string>
+    <string name="pref_user_location_show_position">Afficher la position de l\'utilisateur</string>
+    <string name="pref_user_location_show_position_and_orientation">Afficher la position et l\'orientation de l\'utilisateur sur la carte</string>
+    <string name="appintro_location_description">IITC-CE Mobile requiert l\'autorisation d\'accéder à votre emplacement afin de faciliter la navigation.
+\n
+\nMais rassurez-vous : nous n\'envoyons vos données de localisation nulle part.</string>
+    <string name="appintro_nfc_title">Autorisation NFC</string>
+    <string name="appintro_nfc_description">Vous pouvez rapidement envoyer le lien/permalien du portail actuel vers un autre appareil si les deux appareils prennent en charge le NFC.
+\n
+\nTenez les deux appareils dos à dos et touchez l\'écran pour transmettre la carte à l\'autre appareil.</string>
+    <string name="appintro_layers_title">Calques/Éléments mis en avant</string>
+    <string name="appintro_layers_description"> Faites glisser votre doigt depuis le bord droit de votre écran (ou cliquez sur l\'icône du sélecteur de calques dans la barre d\'action) pour afficher le <i>Menu des calques</i>.
+\n
+\nVous pouvez ici modifier le service d\'affichage des cartes en ligne ou activer/désactiver l\'affichage des éléments nécessaires sur la carte. </string>
+    <string name="plugins_user_plugins">Plugins utilisateur</string>
+    <string name="pane_all">Tout</string>
+    <string name="pane_faction">Faction</string>
+    <string name="appintro_navigation_description"> Faites glissez votre doigt depuis le bord gauche de votre écran (ou cliquez sur l\'icône du menu) pour afficher le <i>Menu de navigation</i>.
+\nCliquez sur l\'icône de retour pour revenir à la carte.
+\n
+\nCertains plugins (par exemple <i>Liste des portails</i> et <i>Favoris</i>) apparaissent désormais dans le <i>Menu de navigation</i> pour un accès rapide.
+\nIls n\'apparaîtront plus dans le volet d\'information. </string>
 </resources>

@@ -90,4 +90,40 @@
     <string name="iitc_website">Sito web IITC</string>
     <string name="bugtracker">bug tracker</string>
     <string name="version">Visualizza Versione</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 settimane</string>
+    <string name="pref_update_plugins_interval_1_week">1 settimana</string>
+    <string name="pref_update_plugins_interval_2_days">2 giorni</string>
+    <string name="pref_update_plugins_interval_1_day">1 giorno</string>
+    <string name="pref_update_plugins_interval_disable">Disabilita</string>
+    <string name="pref_language">Lingua</string>
+    <string name="appintro_welcome_description">Questa è la versione mobile d\'aiuto indispensabile per un giocatore di ingress. 
+\n
+\nIngress Intel Total Conversion (IITC) è un add-on che funziona come alternativa in sovrapposizione all\'ufficiale intel map.
+\n
+\nIITC cambia completamente il modo in cui interagisci con la mappa, incrementa significativamente l\'efficenza semplicemente applicando un accelerazione hardware e espandendo le sue capacità tramite uso di vari plugins.</string>
+    <string name="appintro_plugins_title">Plugins</string>
+    <string name="appintro_navigation_title">Navigazione</string>
+    <string name="appintro_nfc_description">Puoi inviare rapidamente il link del portale/permalink corrente su un altro dispositivo se entrambi supportano NFC.
+\n 
+\nAvvicina la parte posteriore/parte di dietro di entrambi i dispositivi l\'un con l\'altro e clicca lo schermo per spedire la mappa verso l\'altro dispositivo.</string>
+    <string name="appintro_nfc_title">Permesso di NFC</string>
+    <string name="appintro_location_description">IITC-CE Mobile chiede permesso di accedere alla tua posizione per facilitare la navigazione.
+\n
+\n Ma non preoccuparti: noi non inviamo informazioni riguardo la tua posizione a nessuno.</string>
+    <string name="pane_map">Mappa</string>
+    <string name="pane_info">Info</string>
+    <string name="pane_faction">Fazione</string>
+    <string name="pane_all">Tutto</string>
+    <string name="plugin_updated">Plugin aggiornato</string>
+    <string name="toast_press_twice_to_exit">Premi due volte per uscire</string>
+    <string name="plugins_official_plugins">Plugins ufficiali</string>
+    <string name="plugins_user_plugins">Plugins utente</string>
+    <string name="file_browser_choose_file">Scegli file</string>
+    <string name="plugins_permission_denied">Permesso declinato. Non puoi aggiungere plugins.</string>
+    <string name="show_appintro_screen_title">Mostra screen iniziale</string>
+    <string name="appintro_plugins_description">Puoi iniziare a usare IITC-CE adesso.
+\n
+\nIl vantaggio principale a differenza dell\'intel ingress map ufficiale è l\'abbondanza di plugins che espandono le sue capacità base.
+\n
+\nPuoi aggiungere plugins ufficiali o esterni dalle impostazioni.</string>
 </resources>

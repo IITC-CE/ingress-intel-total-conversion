@@ -85,7 +85,65 @@
     <string name="activity_share">แชร์ผ่าน…</string>
     <string name="activity_plugins">ปลั๊กอิน IITC</string>
     <string name="activity_settings">การตั้งค่า IITC Mobile</string>
-    <string name="debug_run">ทำงาน</string>
+    <string name="debug_run">กำลังทำงาน</string>
     <string name="clear_log">ล้างการบันทึกข้อมูล</string>
     <string name="toggle_map">สลับการแสดงแผนที่</string>
+    <string name="appintro_plugins_description">คุณสามารถเริ่มใช้ IITC-CE ได้แล้ว!
+\n
+\n แต่ข้อได้เปรียบหลักของแผนที่ Intel Ingress ดั่งเดิม คือปลั๊กอินมากมายที่ขยายขีดความสามารถ
+\n
+\n คุณสามารถเพิ่มออฟฟิเชียลปลั๊กอิน หรือภายนอกได้ในการตั้งค่า</string>
+    <string name="pane_map">แผนที่</string>
+    <string name="pane_info">ข้อมูล</string>
+    <string name="pane_alerts">การแจ้งเตือน</string>
+    <string name="pane_faction">ฝ่าย</string>
+    <string name="pane_all">ทั้งหมด</string>
+    <string name="plugin_updated">อัปเดตปลั๊กอินเรียบร้อย</string>
+    <string name="toast_press_twice_to_exit">กดสองครั้งเพื่อออก</string>
+    <string name="plugins_official_plugins">ออฟฟิเชียลปลั๊กอิน</string>
+    <string name="plugins_user_plugins">ปลั๊กอินของผู้ใช้</string>
+    <string name="file_browser_choose_file">เลือกไฟล์</string>
+    <string name="file_browser_is_required">ไม่พบกิจกรรมให้เลือกไฟล์ กรุณาติดตั้งไฟล์เบราว์เซอร์ที่คุณต้องการ!</string>
+    <string name="plugins_permission_granted">การเข้าถึงได้รับอนุมัติ. โปรดทำซ้ำอีกครั้ง</string>
+    <string name="plugins_permission_denied">การปฏิเสธการอนุญาต คุณไม่สามารถเพิ่มปลั๊กอินได้</string>
+    <string name="show_appintro_screen_title">แสดงหน้าจอแนะนำ</string>
+    <string name="appintro_plugins_title">ปลั๊กอิน</string>
+    <string name="appintro_navigation_description"> ปัดจากขอบด้านซ้ายของหน้าจอ (หรือคลิกไอคอนเมนู) เพื่อทำให้เกิด <i> ลิ้นชักการนำทาง </i>
+\n คลิกไอคอนย้อนกลับเพื่อกลับไปที่แผนที่
+\n
+\n ปลั๊กอินบางตัว (เช่น <i> รายการพอร์ทัล </i> และ <i> บุ๊กมาร์ก </i>) จะปรากฏใน <i> ลิ้นชักการนำทาง </i> เพื่อการเข้าถึงที่รวดเร็ว
+\n จะไม่ปรากฏในบานหน้าต่างข้อมูลอีกต่อไป </string>
+    <string name="appintro_nfc_description">คุณสามารถส่งลิงค์พอร์ทัลปัจจุบัน/ลิงก์ถาวร ไปยังอุปกรณ์อื่นได้อย่างรวดเร็วหากอุปกรณ์ทั้งสองรองรับ NFC
+\n
+\n ถืออุปกรณ์ทั้งสอง ด้านหลังชนกัน แล้วแตะหน้าจอเพื่อส่งแผนที่ไปยังอุปกรณ์อีกเครื่อง</string>
+    <string name="appintro_location_description">IITC-CE Mobile ต้องได้รับอนุญาตในการเข้าถึงตำแหน่งของคุณ เพื่อความสะดวกในการนำทาง
+\n
+\n แต่ไม่ต้องกังวล เราจะไม่ส่งข้อมูลเกี่ยวกับตำแหน่งของคุณไปยังที่ใดก็ตาม</string>
+    <string name="appintro_layers_description"> ปัดจากขอบด้านขวาของหน้าจอ (หรือคลิกไอคอนตัวเลือกเลเยอร์ใน Action Bar) เพื่อทำให้เกิด <i> Layer Drawer </i>
+\n
+\n ที่นี่คุณสามารถเปลี่ยนบริการแผนที่ออนไลน์ หรือเปิด/ปิดการแสดงองค์ประกอบที่จำเป็นบนแผนที่ </string>
+    <string name="appintro_layers_title">เลเยอร์/ไฮไลท์</string>
+    <string name="appintro_navigation_title">การนำทาง</string>
+    <string name="appintro_nfc_title">การขออนุญาตใช้งาน NFC</string>
+    <string name="appintro_location_title">การขออนุญาตใช้ตำแหน่งที่ตั้ง</string>
+    <string name="appintro_welcome_description">นี่คือเวอร์ชันมือถือ ตัวช่วยที่ขาดไม่ได้สำหรับผู้เล่น Ingress
+\n
+\nIngress Intel Total Conversion (IITC) เป็นส่วนเสริมที่ทำงานเป็นภาพซ้อนทับบนแผนที่ Intel Ingress
+\n
+\n IITC เปลี่ยนวิธีการใช้งานของคุณกับแผนที่โดยสิ้นเชิง เพิ่มประสิทธิภาพอย่างมาก โดยใช้การเร่งความเร็วฮาร์ดแวร์ และขยายขีดความสามารถผ่านการใช้ปลั๊กอินต่างๆ</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 สัปดาห์</string>
+    <string name="pref_update_plugins_interval_1_week">1 สัปดาห์</string>
+    <string name="pref_update_plugins_interval_2_days">2 วัน</string>
+    <string name="pref_update_plugins_interval_1_day">1 วัน</string>
+    <string name="pref_update_plugins_interval_disable">ปิดการใช้งาน</string>
+    <string name="pref_user_location_show_position_and_orientation">แสดงตำแหน่งของผู้ใช้ และการวางแนวบนแผนที่</string>
+    <string name="pref_user_location_show_position">แสดงตำแหน่งของผู้ใช้บนแผนที่</string>
+    <string name="pref_user_location_dont_show">ไม่แสดงตำแหน่งของผู้ใช้</string>
+    <string name="pref_hide_fullscreen_navigation_bar">แถบนำทางระบบ</string>
+    <string name="pref_hide_fullscreen_status_bar">แถบสถานะ IITC</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC Action Bar</string>
+    <string name="pref_hide_fullscreen_notification_bar">แถบการแจ้งเตือนของระบบ</string>
+    <string name="pref_language">ภาษา</string>
+    <string name="iitc_website">เว็บไซต์ IITC</string>
+    <string name="bugtracker">ตัวติดตามข้อผิดพลาด</string>
 </resources>

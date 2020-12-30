@@ -17,7 +17,7 @@
     <string name="activity_plugins">IITC插件</string>
     <string name="pref_external_storage">将缓存移至外部储存卡</string>
     <string name="pref_external_storage_sum">需要重启IITC！ 将缓存写入sd卡。必须安装外部存储卡。</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm was requested to install the following javascript file: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Be careful:&lt;/b&gt; Javascript from external sources may contain harmful code (spyware etc.)! &lt;p&gt;Are you sure you want to proceed\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm 正在安装以下 JavaScript 文件：&lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;请注意：&lt;/b&gt;外部 JavaScript 可能包含有害代码（例如间谍代码）！ &lt;p&gt;是否继续？</string>
     <string name="sign_in_to">登录至%1$s %2$s</string>
     <string name="pref_update_plugins_interval_sum">IITC更新插件版本的频率</string>
     <string name="pref_android_menu_sum">切换菜单目录的可见性</string>
@@ -30,7 +30,7 @@
     <string name="notice_info">&lt;p&gt;Hint: Alternative ways to open the info screen: &lt;p&gt; • tap and hold a portal for a second&lt;br&gt; • tap on the left half of the status bar&lt;br&gt;</string>
     <string name="pref_fullscreen_sum">全屏模式下某些部件会被隐藏。 注意：仍可通过导航栏控制IITC</string>
     <string name="pref_fullscreen">设置全屏模式</string>
-    <string name="pref_user_zoom_sum">在多点触控设备上显示 +/- 按键</string>
+    <string name="pref_user_zoom_sum">在多点触控设备上显示 +/- 按键。</string>
     <string name="pref_user_zoom">显示缩放</string>
     <string name="pref_plugins_sum">插件扩展/修改IITC的体验。 在这里寻找电脑端的已知插件。</string>
     <string name="pref_tweaks_cat">调整</string>
@@ -88,4 +88,62 @@
     <string name="pref_plugins">IITC 插件</string>
     <string name="download_description">加载最新局势详情…</string>
     <string name="activity_share">分享…</string>
+    <string name="pref_hide_fullscreen_navigation_bar">系统导航栏</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC 状态栏</string>
+    <string name="pref_hide_fullscreen_notification_bar">系统通知栏</string>
+    <string name="pref_language">语言</string>
+    <string name="iitc_website">IITC 网站</string>
+    <string name="bugtracker">问题追踪</string>
+    <string name="appintro_location_title">定位权限</string>
+    <string name="appintro_welcome_description">这是Ingress玩家必备辅助工具IITC-CE的移动版本。
+\n
+\nIngress Intel Total Conversion (IITC) 是一个基于官方Intel地图的插件。
+\n
+\nIITC将完全改变您对地图的使用方式，它使用硬件加速显著提高效能，并可通过插件带来更多的可能性。</string>
+    <string name="pref_update_plugins_interval_1_week">1 周</string>
+    <string name="pref_update_plugins_interval_2_days">2 天</string>
+    <string name="pref_update_plugins_interval_1_day">1 天</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 周</string>
+    <string name="pref_update_plugins_interval_disable">禁用</string>
+    <string name="pref_user_location_show_position_and_orientation">在地图中显示用户定位和方向</string>
+    <string name="pref_user_location_show_position">在地图中显示用户定位</string>
+    <string name="pref_user_location_dont_show">隐藏用户定位</string>
+    <string name="appintro_layers_title">图层/高亮</string>
+    <string name="appintro_navigation_description"> 从屏幕左侧向右滑动（或轻触菜单按钮）以打开<i>导航抽屉</i>。
+\n轻触后退图标以返回地图。
+\n
+\n<i>导航抽屉</i>内会显示部分插件（例如<i>能量塔列表</i>和<i>书签</i>）以供快速访问。
+\n它们将不再于信息板中显示。 </string>
+    <string name="appintro_navigation_title">导航</string>
+    <string name="appintro_nfc_description">如果您的设备支持 NFC，您可以将当前能量塔或位置的链接通过 NFC 发送给其它支持的设备。
+\n
+\n将两台设备贴在一起，并轻触屏幕以传送地图。</string>
+    <string name="appintro_nfc_title">NFC 权限</string>
+    <string name="appintro_location_description">IITC-CE 移动版需要获取定位权限以进行导航。
+\n
+\n请不用担心，我们不会将您的定位发送到任何地方。</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC 动作栏</string>
+    <string name="appintro_layers_description"> 从屏幕右侧向左滑动（或轻触动作栏内的图层选择图标）以打开<i>图层抽屉</i>。
+\n
+\n您可以在此处切换地图提供商或启用/禁用地图中的元素。 </string>
+    <string name="appintro_plugins_title">插件</string>
+    <string name="appintro_plugins_description">您现在即可使用IITC-CE。
+\n
+\n但IITC-CE相对于官方Intel地图的最大优势在于丰富插件带来的可能性。
+\n
+\n您可以在设置中加入官方或第三方插件。</string>
+    <string name="show_appintro_screen_title">显示欢迎屏幕</string>
+    <string name="plugins_permission_denied">权限请求被拒。无法添加插件。</string>
+    <string name="plugins_permission_granted">已获得权限。请重新操作一次。</string>
+    <string name="file_browser_choose_file">选择文件</string>
+    <string name="plugins_user_plugins">用户插件</string>
+    <string name="plugins_official_plugins">官方插件</string>
+    <string name="toast_press_twice_to_exit">轻触两次以退出</string>
+    <string name="plugin_updated">插件已更新</string>
+    <string name="pane_all">全部</string>
+    <string name="pane_alerts">警报</string>
+    <string name="pane_faction">阵营</string>
+    <string name="pane_info">信息</string>
+    <string name="pane_map">地图</string>
+    <string name="file_browser_is_required">未找到文件选择器。请安装一个文件浏览器！</string>
 </resources>

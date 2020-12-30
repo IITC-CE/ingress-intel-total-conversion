@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Instellingen</string>
+    <string name="activity_save_to_file">Opslaan naar bestand</string>
+    <string name="activity_share_to_clipboard">Kopieer naar klembord</string>
+    <string name="activity_settings">IITC Mobile instellingen</string>
+    <string name="debug_run">Uitvoeren</string>
+    <string name="notice_info">&lt;p&gt;Hint: Andere manieren om het infoscherm te openen: &lt;p&gt; • Klik op een portal en houd ingedrukt voor een seconde&lt;br&gt; • Klik op de linkerhelft van de statusbalk&lt;br&gt;</string>
+    <string name="pref_about_title">Over IITC Mobile</string>
+    <string name="close">Sluit</string>
+    <string name="version">Printversie</string>
+    <string name="drawer_close">Verberg navigatiemenu</string>
+    <string name="drawer_open">Laat navigatiemenu zien</string>
+</resources>

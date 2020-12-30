@@ -90,4 +90,60 @@
     <string name="pref_persistent_zoom_sum">Não altere o nível de zoom quando o botão localizar estiver pressionado</string>
     <string name="iitc_website">Site IITC</string>
     <string name="bugtracker">bugtracker</string>
+    <string name="appintro_nfc_description">Você pode enviar rapidamente o link/link permanente do portal atual para outro dispositivo se ambos os dispositivos suportarem NFC.
+\n
+\nSegure ambos os dispositivos costas com costas e toque na tela para enviar o mapa para o outro dispositivo.</string>
+    <string name="plugins_permission_denied">Permissão negada. Você não pode adicionar plugins.</string>
+    <string name="appintro_plugins_description">Você pode começar a usar o IITC-CE agora.
+\n
+\n Mas a principal vantagem sobre o mapa oficial Intel do Ingress é a abundância de plugins que expandem os recursos.
+\n
+\n Você pode adicionar plug-ins oficiais ou externos nas configurações.</string>
+    <string name="appintro_navigation_description"> Deslize a partir da borda esquerda da tela (ou clique no ícone de menu) para abrir a <i>gaveta de navegação</i>.
+\n Clique no ícone voltar para retornar ao mapa.
+\n
+\n Alguns plugins (por exemplo, <i>lista de portais</i> e <i>favoritos</i>) agora aparecem na <i>gaveta de navegação</i> para acesso rápido.
+\n Eles não aparecerão mais no painel de informações. </string>
+    <string name="appintro_welcome_description">Esta é uma versão móvel do auxiliar indispensável para o player do Ingress.
+\n
+\n Ingress Intel Total Conversion (IITC) é um add-on que funciona como uma sobreposição para o mapa oficial Intel do Ingress.
+\n
+\n O IITC muda completamente a maneira como você trabalha com o mapa, aumenta significativamente a eficiência aplicando aceleração de hardware e expande os recursos através do uso de vários plugins.</string>
+    <string name="pane_map">Mapa</string>
+    <string name="pane_info">Informações</string>
+    <string name="pane_alerts">Alertas</string>
+    <string name="pane_faction">Facção</string>
+    <string name="pane_all">Todos</string>
+    <string name="plugin_updated">Plugin atualizado</string>
+    <string name="toast_press_twice_to_exit">Pressione duas vezes para sair</string>
+    <string name="plugins_user_plugins">Plugins do usuário</string>
+    <string name="plugins_official_plugins">Plugins oficiais</string>
+    <string name="file_browser_choose_file">Escolher arquivo</string>
+    <string name="file_browser_is_required">Nenhuma aplicação para selecionar um arquivo foi encontrada. Instale um navegador de arquivos de sua escolha!</string>
+    <string name="plugins_permission_granted">Permissão garantida. Repita a ação.</string>
+    <string name="show_appintro_screen_title">Mostrar tela de introdução</string>
+    <string name="appintro_plugins_title">Plugins</string>
+    <string name="appintro_layers_description"> Deslize a partir da borda direita da tela (ou clique no ícone do seletor de camadas na barra de navegação) para invocar a <i>Gaveta de camadas</i>.
+\n
+\n Aqui você pode alterar o serviço de mapas online ou habilitar/desabilitar a exibição de elementos necessários no mapa. </string>
+    <string name="appintro_layers_title">Camadas/Destaques</string>
+    <string name="appintro_navigation_title">Navegação</string>
+    <string name="appintro_nfc_title">Permissão NFC</string>
+    <string name="appintro_location_description">O IITC-CE Mobile requer permissão para acessar sua localização para facilitar a navegação.
+\n
+\n Mas não se preocupe: não enviamos dados sobre sua localização para lugar nenhum.</string>
+    <string name="appintro_location_title">Permissão de localização</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 Semanas</string>
+    <string name="pref_update_plugins_interval_1_week">1 Semana</string>
+    <string name="pref_update_plugins_interval_2_days">2 Dias</string>
+    <string name="pref_update_plugins_interval_1_day">1 dia</string>
+    <string name="pref_update_plugins_interval_disable">Desabilitar</string>
+    <string name="pref_user_location_show_position_and_orientation">Mostrar a posição e orientação do usuário no mapa</string>
+    <string name="pref_user_location_show_position">Mostrar a posição do usuário no mapa</string>
+    <string name="pref_user_location_dont_show">Não mostrar a posição do usuário</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Barra de navegação do sistema</string>
+    <string name="pref_hide_fullscreen_status_bar">Barra de status do IITC</string>
+    <string name="pref_hide_fullscreen_action_bar">Barra de Ação do IITC</string>
+    <string name="pref_hide_fullscreen_notification_bar">Barra de Notificação do Sistema</string>
+    <string name="pref_language">Idioma</string>
 </resources>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="clear_log">נקה יומן</string>
+    <string name="debug_run">הפעל</string>
+    <string name="toggle_map">החלף את נראות המפה</string>
+    <string name="install_dialog_msg">&lt;p&gt;אייאייטיסי לניידהתבקש להתקין את קובץ הג\'אווה סקריפט הבא:&lt;p&gt;%1$s&lt;p&gt;&lt;b&gt;הזהר:&lt;/ b&gt;ג\'אווה סקריפט ממקורות חיצוניים עשוי להכיל קוד מזיק (תוכנות ריגול וכו \')!&lt;p&gt; האם אתה בטוח שברצונך להמשיך\?</string>
+    <string name="appintro_welcome_description">זו הגרסה הניידת של העוזר החיוני לשחקן אינגרס.
+\n
+\nאינגרס אינטל המרה מוחלטת (אייאייטיסי) הוא תוסף שעובד ככיסוי על מפת האינטל הרשמית של אינגרס.
+\n
+\nאייאייטיסי משנה לחלוטין את אופן העבודה עם המפה, מגדילה משמעותית את היעילות באמצעות יישום האצת חומרה ומרחיבה את היכולות באמצעות השימוש בתוספים שונים.</string>
+    <string name="appintro_location_description">אייאייטיסי-סיאי דורשת הרשאת גישה למיקום שלך לצורכי ניווט בקלות.
+\n
+\nאבל אל דאגה: אנחנו לא שולחים נתונים על המיקום שלך לשום מקום.</string>
+    <string name="appintro_nfc_description">באפשרותך לשלוח במהירות קישור לפורטל הנוכחי/קישור קבוע למכשיר אחר אם שני המכשירים תומכים בתקשורת טווח אפס (NFC).
+\n
+\nהחזק את שני המכשירים גב אל גב והקש על המסך כדי להקרין את המפה למכשיר השני.</string>
+    <string name="appintro_navigation_description"> החלק מהקצה השמאלי של המסך (או לחץ על סמל התפריט) כדי לעורר את <i>מגירת ניווט</i>.
+\nלחץ על סמל הגב כדי לחזור למפה.
+\n
+\nתוספים מסוימים (למשל <i>רשימת פורטלים</i> ו<i>סימניות</i>) מופיעים כעת ב<i>מגירת ניווט</i> לגישה מהירה.
+\nהם לא יופיעו יותר בחלונית המידע. </string>
+    <string name="appintro_layers_description"> החלק מהקצה הימני של המסך (או לחץ על סמל בוחר השכבות בסרגל הפעולות) כדי לעורר את <i>מגירת השכבה</i>.
+\n
+\nכאן תוכלו לשנות את שירות המפות המקוון או לאפשר/להשבית את הצגת האלמנטים הדרושים במפה. </string>
+    <string name="appintro_plugins_description">אתה יכול להתחיל להשתמש באייאייטיסי-סיאי כבר עכשיו.
+\n
+\nאך היתרון העיקרי על פני מפת אינטל הרשמית של אינגרס הוא שפע התוספים המרחיבים את היכולות.
+\n
+\nניתן להוסיף תוספים רשמיים או חיצוניים בהגדרות.</string>
+    <string name="file_browser_is_required">לא נמצאה פעילות לבחירת קובץ. אנא התקן דפדפן קבצים לבחירתך!</string>
+    <string name="pane_faction">פלג</string>
+    <string name="pane_info">מידע</string>
+    <string name="activity_settings">הגדרות אייאייטיסי לנייד</string>
+    <string name="activity_plugins">תוספים לאייאייטיסי</string>
+    <string name="activity_share_to_clipboard">העתק ללוח</string>
+    <string name="action_settings">הגדרות</string>
+    <string name="drawer_open">הצג תפריט ניווט</string>
+    <string name="drawer_close">הסתר את תפריט הניווט</string>
+    <string name="version">גרסת הדפסה</string>
+    <string name="close">סגור</string>
+    <string name="bugtracker">מעקב אחר באגים</string>
+    <string name="iitc_website">אתר האייאייטיסי</string>
+    <string name="pref_about_title">אודות אייאייטיסי לנייד</string>
+    <string name="pref_ui_cat">ממשק משתמש</string>
+    <string name="pref_misc_cat">שונות</string>
+    <string name="pref_tweaks_cat">כיוונים</string>
+    <string name="pref_plugins">תוספים לאייאייטיסי</string>
+    <string name="pref_plugins_sum">תוספים מרחיבים/משנים את חווית האייאייטיסי. ניתן למצוא כאן את רוב התוספים המוכרים אייאייטיסי לשולחן העבודה.</string>
+    <string name="pref_plugins_title">תוספים זמינים</string>
+    <string name="pref_persistent_zoom">רמת זום מתמשכת</string>
+    <string name="pref_persistent_zoom_sum">אל תשנה את רמת הזום בזמן הלחיצה על כפתור האיתור</string>
+    <string name="pref_user_zoom">הצג בקרת זום</string>
+    <string name="pref_fullscreen">הגדר את מצב המסך המלא</string>
+    <string name="pref_force_desktop">כפה מצב שולחן העבודה</string>
+    <string name="pref_dex_desktop">תומך במצב DeX בסמסונג</string>
+    <string name="pref_dex_desktop_sum">כפה מצב שולחן העבודה כאשר מצב DeX פעיל</string>
+    <string name="pref_language">שפה</string>
+    <string name="pref_external_storage_sum">אתחול נדרש! כתוב מטמון לכרטיס SD. יש להתקין אחסון חיצוני.</string>
+    <string name="pref_press_twice_to_exit">לחץ פעמיים על כפתור החזרה בכדי לצאת</string>
+    <string name="pref_advanced_options_sum">אפשרויות למפתחים ושינויים מתקדמים</string>
+    <string name="pref_enable_dev_mode">אפשר מצב מפתח</string>
+    <string name="pref_disable_splash">מנע הצגת מסך פתיחה</string>
+    <string name="pref_fake_user_agent">זייף את סוכן המשתמש</string>
+    <string name="pref_update_plugins_cat">עדכוני פלאגין למשתמש</string>
+    <string name="pref_update_plugins_interval">הגדר את מרווח עדכון התוספים</string>
+    <string name="pref_force_plugin_update">כפה בכוח עדכון תוסף</string>
+    <string name="pref_force_plugin_update_sum">עדכן את כל תוספי המשתמש המופעלים</string>
+    <string name="pref_secure_updates">דרוש עדכונים מאובטחים</string>
+    <string name="pref_secure_updates_sum">אם מופעל, רק בעדכונים https מטופלים</string>
+    <string name="pref_hide_fullscreen_notification_bar">סרגל התראות מערכת</string>
+    <string name="pref_hide_fullscreen_status_bar">שורת המצב של אייאייטיסי</string>
+    <string name="pref_hide_fullscreen_navigation_bar">סרגל ניווט מערכת</string>
+    <string name="pref_user_location_dont_show">אל תציג מיקום משתמש</string>
+    <string name="pref_user_location_show_position">הצג את מיקום המשתמש במפה</string>
+    <string name="pref_update_plugins_interval_disable">השבת</string>
+    <string name="pref_update_plugins_interval_1_day">יום</string>
+    <string name="pref_update_plugins_interval_2_days">יומיים</string>
+    <string name="pref_update_plugins_interval_1_week">שבוע</string>
+    <string name="pref_update_plugins_interval_2_weeks">שבועיים</string>
+    <string name="menu_reload">טען מחדש את אייאייטיסי</string>
+    <string name="menu_toggle_fullscreen">מסך מלא</string>
+    <string name="menu_layer_chooser">בוחר שכבות</string>
+    <string name="menu_locate">השג מיקום</string>
+    <string name="menu_clear_cookies">נקה קוקיות</string>
+    <string name="menu_search">חפש</string>
+    <string name="menu_open_plugins">תוספים</string>
+    <string name="menu_debug">לנפות</string>
+    <string name="menu_plugins_add">הוסף תוספים חיצוניים</string>
+    <string name="menu_copy">העתק</string>
+    <string name="menu_delete">מחק</string>
+    <string name="choose_account_to_login">בחר חשבון להתחברות</string>
+    <string name="login_failed">ההתחברות נכשלה.</string>
+    <string name="intent_error">לא ניתן היה לפתוח את הכתובת</string>
+    <string name="msg_copied">הועתק ללוח…</string>
+    <string name="msg_prepare_screenshot">מכין…</string>
+    <string name="msg_take_screenshot">מצלם צילום מסך …</string>
+    <string name="sign_in_to">היכנס ל-%1$s %2$s</string>
+    <string name="username">שם משתמש</string>
+    <string name="password">סיסמה</string>
+    <string name="sign_in_action">התחבר</string>
+    <string name="tab_map">אתר</string>
+    <string name="tab_share">חלוק</string>
+    <string name="tab_browser">אינטל</string>
+    <string name="label_highlighter">מדגש</string>
+    <string name="label_base_layer">שכבת בסיס</string>
+    <string name="label_overlay_layers">שכבות כיסוי</string>
+    <string name="install_dialog_top">להתקין תוסף חיצוני\?</string>
+    <string name="appintro_nfc_title">הרשאות לתקשורת טווח אפס (NFC)</string>
+    <string name="appintro_location_title">הרשאת מיקום</string>
+    <string name="appintro_navigation_title">ניווט</string>
+    <string name="appintro_layers_title">שכבות/דגשים</string>
+    <string name="appintro_plugins_title">תוספים</string>
+    <string name="show_appintro_screen_title">הצג מסך מבוא</string>
+    <string name="plugins_permission_denied">ההרשאה נדחתה. אינך יכול להוסיף תוספים.</string>
+    <string name="plugins_permission_granted">ניתן אישור. אנא חזור על הפעולה.</string>
+    <string name="file_browser_choose_file">בחר קובץ</string>
+    <string name="plugins_user_plugins">תוספי משתמש</string>
+    <string name="plugins_official_plugins">תוספים רשמיים</string>
+    <string name="toast_press_twice_to_exit">לחץ פעמיים כדי לצאת</string>
+    <string name="plugin_updated">התוסף עודכן</string>
+    <string name="pane_all">הכול</string>
+    <string name="pane_alerts">התראות</string>
+    <string name="pane_map">מפה</string>
+    <string name="activity_save_to_file">שמור לקובץ</string>
+    <string name="download_description">מוריד את חבילת האינטל האחרונה …</string>
+    <string name="pref_about_text">&lt;h1&gt;אינגרס אינטל המרה מוחלטת לנייד&lt;/h1&gt;&lt;p&gt;&lt;b&gt;גרסת בנייה: ${build_version}&lt;/b&gt;&lt;br&gt;&lt;b&gt;גרסת אייאייטיסי: ${iitc_version}&lt;/b&gt;&lt;p&gt;&lt;b&gt;מאת ${cradle_link}, ${fkloft_link} ותורמים&lt;/ b&gt;&lt;p&gt;&lt;b&gt;אייקון מאת ${giuseppe_lucido_link}&lt;/b&gt;&lt;p&gt;&lt;b&gt;אייאייטיסי לנייד&lt;/b&gt; הוא דפדפן סלולרי מותאם עבור &lt;i&gt; אינגרס אינטל המרה מוחלטת (אייאייטיסי)&lt;/i&gt; יוזרסקריפט.&lt;h3&gt;קהילה:&lt;/ h3&gt;• בקר באתר ${website_link} עבור גרסאות חדשות וגרסת שולחן העבודה.&lt;br&gt;• עקוב אחר ערוץ הטלגרם ${tg_iitc_news_link} להודעות והצטרף לצ\'אט ${tg_iitc_group_link}.&lt;br&gt;• הצטרף לקהילת רדאיט ${reddit_iitc_link} - על מנת לבקש עזרה ודיונים עם משתמשים אחרים. &lt;br&gt;• דווח על בעיות והציע שיפורים באתר ${bugtracker_link}. &lt;br&gt;&lt;h3&gt;מפתחים:&lt;/ h3&gt;${github_iitc_link} בגיטהאב.&lt;h3&gt;רישיון אייאייטיסי:&lt;/ h3&gt;${ISC_license_text}</string>
+    <string name="notice_info">&lt;p&gt;רמז: דרכים חלופיות לפתיחת מסך המידע:&lt;p&gt; • הקש והחזק פורטל לשנייה&lt;br&gt;• הקש על המחצית השמאלית של שורת המצב&lt;br&gt;</string>
+    <string name="notice_extplugins">&lt;p&gt;רמז:&lt;p&gt;אייאייטיסי לנייד יכול לטעון גם תוספים חיצוניים!&lt;p&gt;הוסף אותם על ידי לחיצה על הסמל (+) בפינה השמאלית העליונה. קבצי התוסף חייבים להסתיים ב-\'.user.js\' ומועתקים אל &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="notice_sharing">&lt;p&gt;באמצעות &lt;em&gt;שיתוף פורטל&lt;/ em&gt; אתה יכול:&lt;p&gt;• לשלוח קישור לפורטל לאנשים אחרים&lt;br&gt;• לצפות במיקום הפורטל שנבחר באפליקציה אחרת&lt;br&gt;• לפתוח את הקישור לפורטל בדפדפן&lt;br&gt;&lt;p&gt;רמז: על ידי בחירה במפות של גוגל (או כל תוכנת ניווט מותקנת אחרת), תוכל לנווט במהירות לפורטל שנבחר.&lt;p&gt;רמזים אלה חלים גם על &lt;em&gt;קישורים קבועים&lt;/ em&gt;.</string>
+    <string name="pref_user_location">הצג את מיקום המשתמש על המפה</string>
+    <string name="pref_user_zoom_sum">הראה את לחצני +/- אפילו במכשירים בעלי יכולת מגע מרובה.</string>
+    <string name="pref_fullscreen_sum">אילו אלמנטים צריכים להיות מוסתרים במצב מסך מלא. הערה: עדיין ניתן לשלוט באייאייטיסי לנייד באמצעות מגירות הניווט</string>
+    <string name="pref_force_desktop_sum">נחמד לטאבלטים, נראה נורא בסמארטפונים</string>
+    <string name="pref_external_storage">העבר את מטמון האריחים לאחסון חיצוני‬‬‬</string>
+    <string name="pref_press_twice_to_exit_sum">מונע יציאה בטעות</string>
+    <string name="pref_advanced_options">הגדרות מתקדמות</string>
+    <string name="pref_enable_dev_mode_sum">אם מופעל, כל מקורות האייאייטיסי יטענו מהאחסון החיצוני של מכשיר האנדרואיד. אנא העתק את כל המקורות מ $IITC_folder/build/mobile/ ל /sdcard/IITC_Mobile/dev/.</string>
+    <string name="pref_fake_user_agent_sum">תן לאייאייטיסי לנייד להופיע כדפדפן שולחני עבור אתר האינטל. הערה: אם אתה רק רוצה להשתמש במצב שולחן העבודה השתמש בהגדרה \'כפה בכוח מצב שולחן עבודה\'</string>
+    <string name="pref_android_menu">הגדר את תפריט אייאייטיסי לנייד</string>
+    <string name="pref_android_menu_sum">החלף נראות של ערכי תפריט אייאייטיסי לנייד</string>
+    <string name="pref_update_plugins_interval_sum">באיזו תדירות אייאייטיסי לנייד צריך לחפש גרסאות חדשות לתוסף</string>
+    <string name="pref_hide_fullscreen_action_bar">סרגל הפעולה של אייאייטיסי</string>
+    <string name="pref_user_location_show_position_and_orientation">הצג את מיקום וכיוון המשתמש על המפה</string>
+    <string name="menu_send_screenshot">שלח צילום מסך</string>
+    <string name="search_hint">חפש מיקומים</string>
+    <string name="notice_do_not_show_again">אל תציג שוב</string>
+</resources>

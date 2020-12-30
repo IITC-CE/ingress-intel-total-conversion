@@ -99,4 +99,11 @@
     <string name="pref_fake_user_agent_sum">IITCmはIntelサイトのデスクトップブラウザーとして振る舞います。 ※デスクトップ版IITCを使いたい場合は、設定の「デスクトップ版表示を強制する」を使用します</string>
     <string name="menu_layer_chooser">レイヤーを選択</string>
     <string name="pref_update_plugins_interval">プラグイン更新チェック間隔</string>
+    <string name="pref_update_plugins_interval_1_day">"1  日"</string>
+    <string name="pane_map">マップ</string>
+    <string name="appintro_plugins_title">プラグイン</string>
+    <string name="pane_faction">陣営</string>
+    <string name="pane_alerts">通知</string>
+    <string name="pane_all">アクティビティ</string>
+    <string name="plugins_permission_denied">許可がありません。プラグインを追加できません。</string>
 </resources>

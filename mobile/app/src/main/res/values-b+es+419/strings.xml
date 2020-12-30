@@ -88,4 +88,14 @@
     <string name="notice_extplugins">&lt;p&gt;Consejo: &lt;p&gt;¡IITC Mobile es capaz también de cargar plugins externos! &lt;p&gt;Agrégalos haciendo clic en el ícono (+) en la esquina superior derecha. Los archivos de los plugins deben terminar con \'.user.js\' y se copian en &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="pref_fake_user_agent_sum">Deje que IITCm aparezca como un navegador de escritorio para el sitio de Intel. Nota: Si solo desea usar el modo de escritorio, use la configuración \'forzar modo de escritorio\'</string>
     <string name="pref_enable_dev_mode_sum">Si está habilitado, todas las fuentes IITC se cargarán desde el almacenamiento externo del dispositivo Android. Por favor, copia todas las fuentes de $IITC_folder/build/mobile/ a /sdcard/IITC_Mobile/dev/.</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 semanas</string>
+    <string name="pref_update_plugins_interval_1_week">1 semana</string>
+    <string name="pref_update_plugins_interval_2_days">2 días</string>
+    <string name="pref_update_plugins_interval_1_day">1 día</string>
+    <string name="pref_update_plugins_interval_disable">Deshabilitar</string>
+    <string name="pref_user_location_show_position_and_orientation">Mostrar posición y orientación del usuario en el mapa</string>
+    <string name="pref_user_location_show_position">Mostrar la posición de usuario en el mapa</string>
+    <string name="pref_language">Idioma</string>
+    <string name="iitc_website">Sitio web de IITC</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Barra de Navegación del Sistema</string>
 </resources>

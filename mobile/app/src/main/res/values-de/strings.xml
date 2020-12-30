@@ -87,6 +87,63 @@
     <string name="pref_fullscreen_sum">Welche Elemente Sollen im Vollbildmodus nicht angezeigt werden. Tipp: IITCm kann weiterhin über den Navigations Drawer bedient werden</string>
     <string name="pref_enable_dev_mode_sum">Wenn aktiviert werden alle IITC Quelldaten vom externen Speicher des Adroidgerätes geladen. Bitte kopieren Sie alle Quelldaten vom Ordner $IITC_folder/build/mobile/ in den Ordner /sdcard/IITC_Mobile/dev/.</string>
     <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Build version: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC version: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;by ${cradle_link}, ${fkloft_link} und Beitragende&lt;/b&gt; &lt;p&gt;&lt;b&gt;Icon by ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; ist ein optimierter mobiler Browser für das &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; Userscript. &lt;h3&gt;Community:&lt;/h3&gt; • Besuchen Sie die ${website_link} für neue Veröffentlichungen und die Desktop Version.&lt;br&gt; • Folgen Sie dem ${tg_iitc_news_link} Telegram Kanal für Ankündigungen und treten Sie dem ${tg_iitc_group_link} Chat bei .&lt;br&gt; • Treten Sie der ${reddit_iitc_link} Reddit Community bei - der Ort für Hilfefragen und zur Diskussion mit anderen Benutzern.&lt;br&gt; • Melden Sie Probleme und schlagen Sie Verbesserungen vor ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Entwickler:&lt;/h3&gt; ${github_iitc_link} auf Github. &lt;h3&gt;IITC Lizenz:&lt;/h3&gt; ${ISC_license_text}</string>
-    <string name="notice_panes">&lt;p&gt;Tipp: &lt;p&gt;Einige Plugins (bsp. die &lt;em&gt;Portalliste&lt;/em&gt; und &lt;em&gt;Bookmarks&lt;/em&gt;) befinden sich nun für den schnellen Zugriff im &lt;em&gt;Navigation Drawer&lt;/em&gt;. &lt;p&gt;Sie erscheinen nicht mehr im Infobereich. &lt;p&gt;Swipen Sie von der linken Ecke Ihres Bildschirms (oder klicken Sie auf das App Icon) um sie wieder anzuzeigen.</string>
     <string name="notice_sharing">&lt;p&gt;Mit der Funktion&lt;em&gt;Portal teilen&lt;/em&gt; können Sie: &lt;p&gt; • Einen Portallink an andere Menschen senden&lt;br&gt; • die ausgewählte Portalposition in einer anderen App ansehen&lt;br&gt; • den Portallink im Webbrowser öffnen&lt;br&gt; &lt;p&gt;Tipp: Durch die Auswahl von Google Maps (oder jeder anderen Navigationssoftware), können Sie schnell zum ausgewählten Portal navigieren. &lt;p&gt;Diese Tipps funktionieren auch für &lt;em&gt;Permalinks&lt;/em&gt;.</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 Wochen</string>
+    <string name="pref_update_plugins_interval_1_week">1 Woche</string>
+    <string name="pref_update_plugins_interval_2_days">2 Tage</string>
+    <string name="pref_update_plugins_interval_1_day">1 Tag</string>
+    <string name="pref_update_plugins_interval_disable">Ausschalten</string>
+    <string name="pref_user_location_show_position_and_orientation">Nutzerposition und Ausrichtung auf Karte anzeigen</string>
+    <string name="pref_user_location_show_position">Nutzerposition auf Karte anzeigen</string>
+    <string name="pref_user_location_dont_show">Nutzerposition nicht anzeigen</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Navigationsleiste</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC Statusleiste</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC Aktionsleiste</string>
+    <string name="pref_hide_fullscreen_notification_bar">System Statusleiste</string>
+    <string name="pref_language">Sprache</string>
+    <string name="iitc_website">IITC Webseite</string>
+    <string name="bugtracker">Bugtracker</string>
+    <string name="appintro_welcome_description">Dies ist eine mobile Version des unerlässlichen Helfers für jeden Ingress-Spieler.
+\n
+\nIngress Intel Total Conversion (IITC) ist ein Add-On, das als Overlay für die offizielle Intel-Map fungiert.
+\n
+\nIITC ändert die Art, mit der du mit der Karte arbeitest, erhöht die Effizient signifikant durch Anwenden von Hardware-Beschleunigung und erweitert die Möglichkeiten durch die Benutzung verschiedener Plugins.</string>
+    <string name="appintro_location_title">Standortzugriff erlauben</string>
+    <string name="appintro_location_description">IITC-CE benötigt die Erlaubnis deine Position (GPS) zu bestimmen um eine einfache Navigation zu ermöglichen.
+\n
+\nAber keine Sorge: Wir verschicken KEINE Daten über deine Position an Dritte.</string>
+    <string name="appintro_nfc_title">NFC Zugriff</string>
+    <string name="appintro_navigation_title">Navigation</string>
+    <string name="appintro_nfc_description">Du kannst den Link/Permalink zum aktuellen Portal schnell an ein anderes Gerät senden, wenn beide NFC unterstützen.
+\n
+\nHaltet beide Geräte Rücken an Rücken und tippt auf das Display, um die Karte auf das andere Gerät zu senden.</string>
+    <string name="appintro_navigation_description"> Wische vom linken Bildschirmrand (oder klicke auf das Menüsymbol), um die <i>Navigationsleiste</i> aufzurufen.
+\n Klicke auf das Zurück-Symbol, um zur Karte zurückzukehren.
+\n
+\n Einige Plugins (z.B. <i>Portalliste</i> und <i>Lesezeichen</i>) erscheinen jetzt in der <i>Navigationsleiste</i> für den schnellen Zugriff.
+\n Dieser werden nicht mehr im Infofenster angezeigt. </string>
+    <string name="appintro_layers_title">Ebenen/Markierungen</string>
+    <string name="appintro_layers_description"> Wische vom rechten Rand des Bildschirms (oder klicke auf das Layer-Auswahl-Symbol in der Aktionsleiste), um das <i>Layer Menü</i> aufzurufen.
+\n
+\n Hier kann der Online-Kartendienst geändert oder die Anzeige notwendiger Elemente in der Karte aktiviert/deaktiviert werden. </string>
+    <string name="appintro_plugins_title">Erweiterungen</string>
+    <string name="appintro_plugins_description">Du kannst sofort mit IITC-CE beginnen.
+\n
+\n Jedoch ist der größte Vorteil gegenüber der offiziellen Intel Ingress-Karte die Fülle an Plugins, welche die Möglichkeiten erweitern.
+\n
+\n Du kannst offizielle oder externe Plugins in den Einstellungen hinzufügen.</string>
+    <string name="show_appintro_screen_title">Intro-Bild anzeigen</string>
+    <string name="plugins_permission_denied">Zugriff verweigert. Du darfst keine Erweiterungen hinzufügen.</string>
+    <string name="plugins_permission_granted">Zugriff gewährt. Bitte wiederhole die Aktion.</string>
+    <string name="file_browser_is_required">Keine App zur Dateiauswahl gefunden. Bitte installiere einen Dateibrowser deiner Wahl!</string>
+    <string name="file_browser_choose_file">Datei auswählen</string>
+    <string name="plugins_user_plugins">Benutzer-Erweiterungen</string>
+    <string name="plugins_official_plugins">Offizielle Erweiterungen</string>
+    <string name="toast_press_twice_to_exit">Zum Beenden zweimal drücken</string>
+    <string name="plugin_updated">Erweiterung aktualisiert</string>
+    <string name="pane_all">Alle</string>
+    <string name="pane_faction">Fraktion</string>
+    <string name="pane_alerts">Hinweise</string>
+    <string name="pane_info">Info</string>
+    <string name="pane_map">Karte</string>
 </resources>

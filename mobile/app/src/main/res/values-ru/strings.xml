@@ -10,18 +10,17 @@
     <string name="activity_save_to_file">Сохранить в файл</string>
     <string name="action_settings">Настройки</string>
     <string name="drawer_close">Скрыть меню навигации</string>
-    <string name="version">Версия для печати</string>
+    <string name="version">Версия</string>
     <string name="close">Закрыть</string>
     <string name="pref_about_title">О IITC Mobile</string>
     <string name="debug_run">Выполнить</string>
-    <string name="activity_settings">Настройки</string>
+    <string name="activity_settings">Настройки IITC</string>
     <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Версия сборки: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;Версия IITC: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;от ${cradle_link}, ${fkloft_link} и иных разработчиков&lt;/b&gt; &lt;p&gt;&lt;b&gt;Иконка: ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; это оптимизированный мобильный браузер для пользовательских скриптов &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt;. &lt;h3&gt;Сообщество:&lt;/h3&gt; • Посетите ${website_link} для новых обновлений и версии для ПК.&lt;br&gt; • Подпишитесь на ${tg_iitc_news_link} Телеграм канал для обновлений и присоединитесь к чату ${tg_iitc_group_link}.&lt;br&gt; • Присоединяйтесь к ${reddit_iitc_link} Сообществу Reddit - место для вопросов, помощи, и дискуссий с другими пользователями.&lt;br&gt; • Сообщайте о проблемах и предлагайте улучшения на ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Разработчики:&lt;/h3&gt; ${github_iitc_link} на GitHub. &lt;h3&gt;Лицензия IITC:&lt;/h3&gt; ${ISC_license_text}</string>
     <string name="notice_info">&lt;p&gt; Совет: альтернативные способы открыть информационный экран: &lt;p&gt; • нажмите и удерживайте портал в течение секунды &lt;br&gt; • нажмите в левой половине строки состояния &lt;br&gt;</string>
     <string name="pref_misc_cat">Разное</string>
     <string name="msg_prepare_screenshot">Подготовка…</string>
     <string name="notice_sharing">&lt;p&gt; С помощью кнопки &lt;em&gt;Поделиться порталом&lt;/em&gt; вы можете: &lt;p&gt; • отправлять ссылку на портал другим людям &lt;br&gt; • просматривать позицию выбранного портала в другом приложении &lt;br&gt; • открывать ссылку на портал в веб-браузере &lt;br&gt; &lt;p&gt; Совет: выбрав Google Maps (или любое другое установленное навигационное программное обеспечение), вы можете быстро перейти к выбранному порталу. &lt;p&gt; Эти советы также применимы к &lt;em&gt;постоянным ссылкам&lt;/em&gt;.</string>
     <string name="pref_tweaks_cat">Дополнительные возможности</string>
-    <string name="notice_panes">&lt;p&gt; Совет: &lt;p&gt; Некоторые плагины (например, &lt;em&gt;список порталов&lt;/em&gt; и &lt;em&gt;закладки&lt;/em&gt;) теперь отображаются в &lt;em&gt;Навигационной панели&lt;/em&gt; для быстрого доступа. &lt;p&gt;Они больше не будут отображаться в информационной панели. &lt;p&gt; Проведите пальцем от левого края экрана (или щелкните значок приложения), чтобы отобразить их.</string>
     <string name="notice_extplugins">&lt;p&gt; Совет: &lt;p&gt; IITC Mobile также может загружать внешние плагины! &lt;p&gt; Добавьте их, нажав значок (+) в правом верхнем углу. Файлы плагинов должны заканчиваться на «.user.js» и копироваться в &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="pref_ui_cat">Интерфейс</string>
     <string name="pref_plugins_sum">Плагины расширяют/меняют функционал IITC. Большинство плагинов с десктопного приложения также представлены в мобильном.</string>
@@ -85,4 +84,66 @@
     <string name="install_dialog_msg">&lt;p&gt;IITCm было предложено установить следующий файл javascript: &lt;p&gt;%1$s &lt;p&gt; &lt;b&gt;Будьте осторожны:&lt;/b&gt; Javascript из внешних источников может содержать вредоносный код (шпионское ПО и т. д.)! &lt;p&gt;Вы уверены, что хотите продолжить\?</string>
     <string name="iitc_website">Вебсайт IITC</string>
     <string name="bugtracker">трекер ошибок</string>
+    <string name="pane_map">Карта</string>
+    <string name="pane_info">Информация</string>
+    <string name="pane_alerts">Оповещения</string>
+    <string name="pane_faction">Фракция</string>
+    <string name="pane_all">Все</string>
+    <string name="plugin_updated">Плагин обновлён</string>
+    <string name="toast_press_twice_to_exit">Нажмите дважды для выхода</string>
+    <string name="plugins_official_plugins">Официальные плагины</string>
+    <string name="plugins_user_plugins">Пользовательские плагины</string>
+    <string name="file_browser_choose_file">Выберите файл</string>
+    <string name="file_browser_is_required">Отсутствует activity для выбора файла. Пожалуйста, установите файловый менеджер!</string>
+    <string name="plugins_permission_granted">Разрешение получено. Пожалуйста, повторите действие.</string>
+    <string name="plugins_permission_denied">Отсутствует разрешение. Вы не можете добавлять плагины.</string>
+    <string name="show_appintro_screen_title">Показать стартовый экран</string>
+    <string name="appintro_plugins_description">Вы можете начать использовать IITC-CE прямо сейчас.
+\n
+\nНо главным преимуществом перед официальной Intel Ingress картой является обилие плагинов, расширяющих возможности.
+\n
+\nВы можете в настройках включить официальные или добавить сторонние плагины.</string>
+    <string name="appintro_plugins_title">Плагины</string>
+    <string name="appintro_layers_description"> Проведите пальцем от правого края экрана (или нажмите на иконку выбора слоя в панели действий) для вызова <i>панели слоёв</i>.
+\n
+\nЗдесь вы можете изменить провайдер онлайн карт или включить/выключить отображение необходимых элементов на карте. </string>
+    <string name="appintro_layers_title">Слои/Подсветки</string>
+    <string name="appintro_navigation_description"> Проведите пальцем от левого края экрана (или щелкните значок меню), чтобы вызвать <i>навигационную панель</i>.
+\nЩелкните кнопку назад, чтобы вернуться на карту.
+\n
+\nНекоторые плагины (например, <i>portals list</i> и <i>bookmarks</i>) теперь отображаются в <i>навигационной панели</i> для быстрого доступа.
+\nОни больше не будут появляться в панели информации. </string>
+    <string name="appintro_navigation_title">Навигация</string>
+    <string name="appintro_nfc_description">Вы можете быстро отправить ссылку на портал на другое устройство, если оба устройства поддерживают NFC.
+\n
+\nДержите оба устройства спина к спине и коснитесь экрана, чтобы передать карту на другое устройство.</string>
+    <string name="appintro_nfc_title">Разрешение для NFC</string>
+    <string name="appintro_location_description">IITC-CE Mobile требуется разрешение для доступа к вашему местоположению для упрощения навигации.
+\n
+\nНо не волнуйтесь: мы никуда не отправляем данные о вашем местоположении.</string>
+    <string name="appintro_location_title">Разрешение на запрос местоположения</string>
+    <string name="appintro_welcome_description">Это мобильная версия незаменимого помощника игрока Ingress.
+\n
+\nIngress Intel Total Conversion (IITC) — это дополнение, работающее поверх официальной Ingress карты Intel.
+\n
+\nIITC полностью меняет метод работы с картой, значительно повышает производительность за счёт задействования аппаратного ускорения и расширяет возможности с помощью использования плагинов.</string>
+    <string name="label_highlighter">Подсветка</string>
+    <string name="tab_map">Местоположение</string>
+    <string name="menu_locate">Показать местоположение</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 недели</string>
+    <string name="pref_update_plugins_interval_1_week">1 неделя</string>
+    <string name="pref_update_plugins_interval_2_days">2 дня</string>
+    <string name="pref_update_plugins_interval_1_day">1 день</string>
+    <string name="pref_update_plugins_interval_disable">Выключено</string>
+    <string name="pref_user_location_show_position_and_orientation">Показывать местоположение пользователя и его направление</string>
+    <string name="pref_user_location_show_position">Показывать местоположение пользователя на карте</string>
+    <string name="pref_user_location_dont_show">Не показывать местоположение пользователя</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Системная панель навигации</string>
+    <string name="pref_hide_fullscreen_status_bar">Панель статуса IITC</string>
+    <string name="pref_hide_fullscreen_action_bar">Панель действий IITC</string>
+    <string name="pref_hide_fullscreen_notification_bar">Системная панель уведомлений</string>
+    <string name="pref_fake_user_agent_sum">Пусть IITCm для сайта intel представится как десктопный браузер. Замечание: Если вы просто хотите использовать десктопный режим, используйте параметр \'принудительный десктопный режим\'</string>
+    <string name="pref_external_storage">Перемещать тайлы карт во внешнее хранилище</string>
+    <string name="pref_language">Язык</string>
+    <string name="pref_persistent_zoom_sum">Не изменять уровень масштабирования при включенном позиционировании</string>
 </resources>

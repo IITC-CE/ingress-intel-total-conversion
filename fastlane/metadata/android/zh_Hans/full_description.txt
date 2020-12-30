@@ -1,0 +1,8 @@
+重要提示：本应用依赖于Ingress提供的数据。在留下差评前请先尝试访问 https://intel.ingress.com/ 并检查其加载时间，谢谢。
+
+Ingress Intel Total Conversion - Community Edition (IITC-CE) 是一个为Ingress游戏开发的浏览器插件。它比原版Ingress地图更快，并且提供更加丰富的功能。
+
+IITC-CE可以在桌面浏览器（例如Firefox和Chrome）中运行，亦提供移动版应用。
+
+网站：https://iitc.app
+GitHub仓库：https://github.com/IITC-CE/ingress-intel-total-conversion/
