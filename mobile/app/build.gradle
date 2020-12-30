@@ -17,12 +17,10 @@ def getVersionCodeTimeStamps = { ->
 }
 
 def metaFDroid(outputFileName) {
-    if( outputFileName.exists() ) {
-        new File(outputFileName, "version_fdroid.txt").text = [
-                ["versionName", android.defaultConfig.versionName].join("="),
-                ["versionCode", android.defaultConfig.versionCode].join("="),
-        ].join("\n")
-    }
+    new File(outputFileName, "version_fdroid.txt").text = [
+            ["versionName", android.defaultConfig.versionName].join("="),
+            ["versionCode", android.defaultConfig.versionCode].join("="),
+    ].join("\n")
 }
 
 android {
@@ -89,7 +87,11 @@ android {
 
     applicationVariants.all { variant ->
         variant.resValue  "string", "application_id", variant.applicationId
-        metaFDroid(new File("${rootProject.rootDir.absolutePath}/app/build/outputs/apk/${variant.name}/"))
+        variant.getAssembleProvider().configure() {
+            it.doLast {
+                metaFDroid(project.file("build/outputs/apk/${variant.name}/"))
+            }
+        }
     }
 }
 
