@@ -13,6 +13,14 @@ window.plugin.drawTools = function() {};
 
 window.plugin.drawTools.KEY_STORAGE = 'plugin-draw-tools-layer';
 
+window.plugin.drawTools.merge = {};
+window.plugin.drawTools.merge.status = true;
+window.plugin.drawTools.merge.toggle = function() {
+  var status = window.plugin.drawTools.merge.status;
+  status = Boolean(!status);
+  window.plugin.drawTools.merge.status = status;
+ }
+
 window.plugin.drawTools.getMarkerIcon = function(color) {
   if (!color) {
     console.warn('Color is not set (default #a24ac3 will be used)');
@@ -261,6 +269,10 @@ window.plugin.drawTools.import = function(data) {
 
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function() {
+  var mergeStatusCheck = '';
+  if(!window.plugin.drawTools.merge.status){
+    mergeStatusCheck = 'checked';
+  }
 
   var html = '<div class="drawtoolsStyles">'
            + '<input type="color" name="drawColor" id="drawtools_color"></input>'
@@ -273,6 +285,8 @@ window.plugin.drawTools.manualOpt = function() {
            + '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.optReset();return false;" tabindex="0">Reset Drawn Items</a>'
            + '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>'
+           + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
+           +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
            + '</div>';
 
   dialog({
@@ -430,17 +444,26 @@ window.plugin.drawTools.optPaste = function() {
         }
 
         // all parsed OK - clear and insert
-        window.plugin.drawTools.drawnItems.clearLayers();
+        if (!window.plugin.drawTools.merge.status) {
+          window.plugin.drawTools.drawnItems.clearLayers();
+        }
         for (var i=0; i<newLines.length; i++) {
           window.plugin.drawTools.drawnItems.addLayer(newLines[i]);
         }
         runHooks('pluginDrawTools', {event: 'import'});
 
-        console.log('DRAWTOOLS: reset and imported drawn items from stock URL');
+        console.log('DRAWTOOLS: '+(window.plugin.drawTools.merge.status?'':'reset and ')+'pasted drawn items from stock URL');
         window.plugin.drawTools.optAlert('Import Successful.');
 
 
       } else {
+        if (window.plugin.drawTools.merge.status) {
+          promptAction = (typeof(
+            window.localStorage[window.plugin.drawTools.KEY_STORAGE]) !== 'undefined' &&
+            window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
+              ? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0,-1) + ',' + promptAction.slice(1)
+              : promptAction);
+        }
         var data;
           try{
             data = JSON.parse(promptAction);
@@ -457,7 +480,7 @@ window.plugin.drawTools.optPaste = function() {
         }
         window.plugin.drawTools.drawnItems.clearLayers();
         window.plugin.drawTools.import(data);
-        console.log('DRAWTOOLS: reset and imported drawn items');
+        console.log('DRAWTOOLS: '+(window.plugin.drawTools.merge.status?'':'reset and ')+'pasted drawn items');
         window.plugin.drawTools.optAlert('Import Successful.');
       }
 
@@ -475,9 +498,11 @@ window.plugin.drawTools.optImport = function() {
     .on('load',function (e) {
       try {
         var data = JSON.parse(e.reader.result);
-        window.plugin.drawTools.drawnItems.clearLayers();
+        if (!window.plugin.drawTools.merge.status) {
+          window.plugin.drawTools.drawnItems.clearLayers();
+        }
         window.plugin.drawTools.import(data);
-        console.log('DRAWTOOLS: reset and imported drawn tiems');
+        console.log('DRAWTOOLS: '+(window.plugin.drawTools.merge.status?'':'reset and ')+'imported drawn items');
         window.plugin.drawTools.optAlert('Import Successful.');
 
         // to write back the data to localStorage
