@@ -51,5 +51,5 @@
   used in: chat.js
 
 * https://github.com/Download/ulog
-  2.0.0-beta.6-2-gfc5a47e
-  ulog.min.js: 558b6c7dc071f877252509f104134eec0183ab4b
+  2.0.0-beta.7
+  ulog.min.js: 423ce1c6dc1c8c2a2ecae13e6dbb99308e301eba
