@@ -226,15 +226,13 @@ a:hover {
 #chatcontrols .toggle {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
+  border-bottom: 10px solid #FFCE00;
   margin: 6px auto auto;
 }
 
-#chatcontrols .expand {
-  border-bottom: 10px solid #FFCE00;
-}
-
-#chatcontrols .shrink {
+#chatcontrols.expand .toggle {
   border-top: 10px solid #FFCE00;
+  border-bottom: none;
 }
 
 #chatcontrols .loading {
