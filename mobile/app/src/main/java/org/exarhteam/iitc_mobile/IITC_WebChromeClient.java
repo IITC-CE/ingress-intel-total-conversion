@@ -219,7 +219,10 @@ public class IITC_WebChromeClient extends WebChromeClient {
 
     @Override
     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-        Log.d("Open popup");
+        // Disallow automatic popup
+        if (!isUserGesture)
+            return false;
+
         IITC_WebViewPopup newWebView = new IITC_WebViewPopup(mIitc);
         //view.addView(newWebView);
         WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;

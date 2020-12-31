@@ -1,20 +1,20 @@
 package org.exarhteam.iitc_mobile;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.view.WindowManager;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class IITC_WebViewPopup extends WebView {
@@ -45,13 +45,9 @@ public class IITC_WebViewPopup extends WebView {
         setWebChromeClient(new WebChromeClient() {
             @Override
             public void onCloseWindow(WebView view) {
-                Log.d("Close Popup");
-                try {
-                    mDialog.dismiss();
-                } catch (Exception k) {}
-                try {
-                    view.destroy();
-                } catch (Exception k) {}
+                Log.d("close popup window");
+                mDialog.dismiss();
+                view.destroy();
             }
         });
         setWebViewClient(new WebViewClient() {
@@ -63,29 +59,30 @@ public class IITC_WebViewPopup extends WebView {
                 final String uriQuery = uri.getQueryParameter("q");
                 if ((uriHost.startsWith("google.") || uriHost.contains(".google."))
                         && uriPath.equals("/url") && uriQuery != null) {
-                    Log.d("redirect to: " + uriQuery);
+                    Log.d("popup: redirect to: " + uriQuery);
                     return shouldOverrideUrlLoading(view, uriQuery);
                 }
                 if (uriHost.endsWith("facebook.com")
                         && (uriPath.contains("oauth") || uriPath.equals("/login.php") || uriPath.equals("/checkpoint/"))) {
-                    Log.d("Facebook login");
+                    Log.d("popup: Facebook login");
                     return false;
                 }
                 if (uriHost.startsWith("accounts.google.") ||
                          uriHost.startsWith("appengine.google.") ||
                          uriHost.startsWith("accounts.youtube.")) {
-                    Log.d("Google login");
+                    Log.d("popup: Google login");
                     return false;
                 }
                 Log.d("popup: no login link, start external app to load url: " + url);
 
+                Log.d("close popup");
                 mDialog.dismiss();
-                view.destroy();
 
                 final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 // make new activity independent from iitcm
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mIitc.startActivity(intent);
+
                 return true;
             }
         });
@@ -105,7 +102,15 @@ public class IITC_WebViewPopup extends WebView {
 
         mDialog = new Dialog(mIitc);
         mDialog.setContentView(this);
+        final WebView view = this;
+        mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                view.destroy();
+            }
+        });
 
+        Log.d("open popup");
         mDialog.show();
         mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
