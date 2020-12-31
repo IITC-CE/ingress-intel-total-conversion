@@ -828,20 +828,6 @@ window.plugin.drawTools.edf.hookManagement = function(data){
   }
 }
 
-window.plugin.drawTools.setupCSS = function(){
-	$("<style>").prop("type", "text/css").html(''
-		+'.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);}'
-		+'.leaflet-draw .leaflet-draw-section .leaflet-bar{box-shadow:none;}'
-		+'.leaflet-draw{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px;}'
-
-		+'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top a:last-child{border-bottom:2px solid #999;}'
-		+'.leaflet-draw .leaflet-draw-section .leaflet-bar a{border-radius:0;}'
-
-		+'.leaflet-draw .leaflet-draw-section .leaflet-bar{border-radius:0 0 4px 4px;overflow:hidden;margin-top:0;}'
-		+'.leaflet-draw .leaflet-draw-section .leaflet-bar.leaflet-draw-toolbar-top{border-radius:4px 4px 0 0;}'
-	).appendTo("head");
-}
-
 // ---------------------------------------------------------------------------------
 // MPE - MULTI PROJECTS EXTENSION
 // ---------------------------------------------------------------------------------
