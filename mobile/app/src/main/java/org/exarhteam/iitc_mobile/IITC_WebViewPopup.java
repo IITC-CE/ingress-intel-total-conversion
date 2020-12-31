@@ -57,17 +57,10 @@ public class IITC_WebViewPopup extends WebView {
         setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-                Log.d("load url: " + url);
                 final Uri uri = Uri.parse(url);
                 final String uriHost = uri.getHost();
                 final String uriPath = uri.getPath();
                 final String uriQuery = uri.getQueryParameter("q");
-                if (uriHost.equals("intel.ingress.com")) {
-                    Log.d("intel link requested, reset app and load " + url);
-                    mIitc.reset();
-                    mIitc.setLoadingState(true);
-                    return false;
-                }
                 if ((uriHost.startsWith("google.") || uriHost.contains(".google."))
                         && uriPath.equals("/url") && uriQuery != null) {
                     Log.d("redirect to: " + uriQuery);
@@ -84,7 +77,7 @@ public class IITC_WebViewPopup extends WebView {
                     Log.d("Google login");
                     return false;
                 }
-                Log.d("no ingress intel link, start external app to load url: " + url);
+                Log.d("popup: no login link, start external app to load url: " + url);
 
                 mDialog.dismiss();
                 view.destroy();
