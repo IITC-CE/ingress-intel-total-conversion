@@ -47,10 +47,10 @@ public class IITC_WebViewPopup extends WebView {
             public void onCloseWindow(WebView view) {
                 Log.d("Close Popup");
                 try {
-                    view.destroy();
+                    mDialog.dismiss();
                 } catch (Exception k) {}
                 try {
-                    mDialog.dismiss();
+                    view.destroy();
                 } catch (Exception k) {}
             }
         });
@@ -86,8 +86,8 @@ public class IITC_WebViewPopup extends WebView {
                 }
                 Log.d("no ingress intel link, start external app to load url: " + url);
 
-                view.destroy();
                 mDialog.dismiss();
+                view.destroy();
 
                 final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 // make new activity independent from iitcm
