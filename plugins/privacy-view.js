@@ -17,7 +17,7 @@ function setup () {
       '.privacy_active #chatinput,' +
       '.privacy_active #chatcontrols > a:not(#privacytoggle),' +
       '.privacy_active #chat { display: none; }' +
-      '.privacy_active #chatcontrols { bottom: 0; }')
+      '.privacy_active #chatcontrols { bottom: 0; top: auto }')
     .appendTo('head');
 
   var ctrl = $('<a id="privacytoggle" accesskey="9">')
