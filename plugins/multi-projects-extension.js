@@ -1,7 +1,7 @@
 // @author         ZasoGD
 // @name           Multi Projects Extension
 // @category       Control
-// @version        0.0.7
+// @version        0.1.0
 // @description    Create separated projects in some plugins.
 
 //
