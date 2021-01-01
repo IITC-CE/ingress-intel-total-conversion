@@ -44,7 +44,7 @@ function clone (layer) {
     return L.tileLayer(layer._url, options);
   } else if (L.GridLayer.GoogleMutant && layer instanceof L.GridLayer.GoogleMutant) {
     var gm = L.gridLayer.googleMutant(options);
-    layer._GAPIPromise.then(function () {
+    layer.whenReady(function () {
       for (var name in layer._subLayers) { gm.addGoogleLayer(name); }
     });
     return gm;
