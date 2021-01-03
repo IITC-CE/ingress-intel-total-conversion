@@ -77,6 +77,90 @@ window.plugin.drawTools.setDrawColor = function(color) {
   });
 }
 
+// Easy create a draw from an IITC-plugin, allow passing an optional color parameter
+  /*
+  // "color" is optional
+  window.plugin.drawTools.drawPolyline(arrCoordArr, color);
+  window.plugin.drawTools.drawPolygon(arrCoordArr, color);
+  window.plugin.drawTools.drawCircle(coord, radius, color);
+  window.plugin.drawTools.drawMarker(coord, color);
+  */
+
+window.plugin.drawTools.fireDraw = function(layer, layerType) {
+  map.fire('draw:created', {
+    layer: layer,
+    layerType: layerType
+  });
+}
+
+window.plugin.drawTools.drawPolyline = function(arrCoordArr, color) {
+  if (color !== undefined) {
+    var oldColor = window.plugin.drawTools.currentColor;
+    window.plugin.drawTools.setDrawColor(color);
+  }
+  var drawOpt = window.plugin.drawTools.lineOptions;
+
+  var layer = L.geodesicPolyline(arrCoordArr, drawOpt);
+  var layerType = 'polyline';
+  window.plugin.drawTools.fireDraw(layer, layerType);
+
+  if (color !== undefined) {
+    window.plugin.drawTools.setDrawColor(oldColor);
+  }
+
+  return layer;
+}
+window.plugin.drawTools.drawPolygon = function(arrCoordArr, color) {
+  if (color !== undefined) {
+    var oldColor = window.plugin.drawTools.currentColor;
+    window.plugin.drawTools.setDrawColor(color);
+  }
+  var drawOpt = window.plugin.drawTools.polygonOptions;
+
+  var layer = L.geodesicPolygon(arrCoordArr, drawOpt);
+  var layerType = 'polygon';
+  window.plugin.drawTools.fireDraw(layer, layerType);
+
+  if (color !== undefined) {
+    window.plugin.drawTools.setDrawColor(oldColor);
+  }
+
+  return layer;
+}
+window.plugin.drawTools.drawCircle = function(coord, radius, color) {
+  if (color !== undefined) {
+    var oldColor = window.plugin.drawTools.currentColor;
+    window.plugin.drawTools.setDrawColor(color);
+  }
+  var drawOpt = window.plugin.drawTools.polygonOptions;
+
+  var layer = L.geodesicCircle(coord, radius, drawOpt);
+  var layerType = 'circle';
+  window.plugin.drawTools.fireDraw(layer, layerType);
+
+  if (color !== undefined) {
+    window.plugin.drawTools.setDrawColor(oldColor);
+  }
+
+  return layer;
+}
+window.plugin.drawTools.drawMarker = function(coord, color) {
+  if (color !== undefined) {
+    var oldColor = window.plugin.drawTools.currentColor;
+    window.plugin.drawTools.setDrawColor(color);
+  }
+  var drawOpt = window.plugin.drawTools.markerOptions;
+
+  var layer = L.marker(coord, drawOpt);
+  var layerType = 'marker';
+  window.plugin.drawTools.fireDraw(layer, layerType);
+
+  if (color !== undefined) {
+    window.plugin.drawTools.setDrawColor(oldColor);
+  }
+
+  return layer;
+}  
 // renders the draw control buttons in the top left corner
 window.plugin.drawTools.addDrawControl = function() {
   var drawControl = new L.Control.Draw({
