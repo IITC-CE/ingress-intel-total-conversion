@@ -78,14 +78,8 @@ window.plugin.drawTools.setDrawColor = function(color) {
 }
 
 // Easy create a draw from an IITC-plugin, allow passing an optional color parameter
-  /*
-  // "color" is optional
-  window.plugin.drawTools.drawPolyline(arrCoordArr, color);
-  window.plugin.drawTools.drawPolygon(arrCoordArr, color);
-  window.plugin.drawTools.drawCircle(coord, radius, color);
-  window.plugin.drawTools.drawMarker(coord, color);
-  */
 
+// common function used by folloing functions to trigger display on new drawn item
 window.plugin.drawTools.fireDraw = function(layer, layerType) {
   map.fire('draw:created', {
     layer: layer,
@@ -93,6 +87,11 @@ window.plugin.drawTools.fireDraw = function(layer, layerType) {
   });
 }
 
+/**
+ * Create a polyline
+ * @param arrCoordArr Array of coordinates
+ * @param {string=] color (optional)
+ */
 window.plugin.drawTools.drawPolyline = function(arrCoordArr, color) {
   if (color !== undefined) {
     var oldColor = window.plugin.drawTools.currentColor;
@@ -109,7 +108,13 @@ window.plugin.drawTools.drawPolyline = function(arrCoordArr, color) {
   }
 
   return layer;
-}
+};
+
+/**
+ * Create a polygon
+ * @param arrCoordArr Array of coordinates
+ * @param {string=] color (optional)
+ */
 window.plugin.drawTools.drawPolygon = function(arrCoordArr, color) {
   if (color !== undefined) {
     var oldColor = window.plugin.drawTools.currentColor;
@@ -126,7 +131,14 @@ window.plugin.drawTools.drawPolygon = function(arrCoordArr, color) {
   }
 
   return layer;
-}
+};
+
+/**
+ * Create a marker
+ * @param coord coordinates [LatE6, LonE6]
+ * @param radius (in meters)
+ * @param {string=] color (optional)
+ */
 window.plugin.drawTools.drawCircle = function(coord, radius, color) {
   if (color !== undefined) {
     var oldColor = window.plugin.drawTools.currentColor;
@@ -143,7 +155,13 @@ window.plugin.drawTools.drawCircle = function(coord, radius, color) {
   }
 
   return layer;
-}
+};
+
+/**
+ * Create a marker
+ * @param coord coordinates (LatE6, LonE6)
+ * @param {string=] color (optional)
+ */
 window.plugin.drawTools.drawMarker = function(coord, color) {
   if (color !== undefined) {
     var oldColor = window.plugin.drawTools.currentColor;
@@ -160,7 +178,8 @@ window.plugin.drawTools.drawMarker = function(coord, color) {
   }
 
   return layer;
-}  
+};
+
 // renders the draw control buttons in the top left corner
 window.plugin.drawTools.addDrawControl = function() {
   var drawControl = new L.Control.Draw({
