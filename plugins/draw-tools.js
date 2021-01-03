@@ -90,7 +90,7 @@ window.plugin.drawTools.fireDraw = function(layer, layerType) {
 /**
  * Create a polyline
  * @param arrCoordArr Array of coordinates
- * @param {string=] color (optional)
+ * @param {string=} color (optional)
  */
 window.plugin.drawTools.drawPolyline = function(arrCoordArr, color) {
   if (color !== undefined) {
@@ -113,7 +113,7 @@ window.plugin.drawTools.drawPolyline = function(arrCoordArr, color) {
 /**
  * Create a polygon
  * @param arrCoordArr Array of coordinates
- * @param {string=] color (optional)
+ * @param {string=} color (optional)
  */
 window.plugin.drawTools.drawPolygon = function(arrCoordArr, color) {
   if (color !== undefined) {
@@ -137,7 +137,7 @@ window.plugin.drawTools.drawPolygon = function(arrCoordArr, color) {
  * Create a marker
  * @param coord coordinates [LatE6, LonE6]
  * @param radius (in meters)
- * @param {string=] color (optional)
+ * @param {string=} color (optional)
  */
 window.plugin.drawTools.drawCircle = function(coord, radius, color) {
   if (color !== undefined) {
@@ -160,7 +160,7 @@ window.plugin.drawTools.drawCircle = function(coord, radius, color) {
 /**
  * Create a marker
  * @param coord coordinates (LatE6, LonE6)
- * @param {string=] color (optional)
+ * @param {string=} color (optional)
  */
 window.plugin.drawTools.drawMarker = function(coord, color) {
   if (color !== undefined) {
