@@ -1,6 +1,7 @@
 package org.exarhteam.iitc_mobile.fragments;
 
 import android.os.Bundle;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,7 +10,6 @@ import android.view.ViewGroup;
 
 import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.R;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
@@ -44,7 +44,7 @@ public class IntroSlide extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NotNull View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         View btn = getView().findViewById(R.id.appintro_welcome_change_language);
         if (btn == null) return;
 
