@@ -464,7 +464,7 @@ window.chat.renderFactionEnt = function (faction) {
 window.chat.renderPlayer = function (player, at, sender) {
   var name = (sender) ? player.plain.slice(0, -2) : (at) ? player.plain.slice(1) : player.plain;
   var thisToPlayer = name === window.PLAYER.nickname;
-  var spanClass = thisToPlayer ? 'pl_nudge_me' : (player.team + 'pl_nudge_player');
+  var spanClass = thisToPlayer ? 'pl_nudge_me' : (player.team + ' pl_nudge_player');
   return $('<div/>').html($('<span/>')
     .attr('class', spanClass)
     .attr('onclick',"window.chat.nicknameClicked(event, '"+name+"')")
