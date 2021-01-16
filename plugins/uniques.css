@@ -17,3 +17,7 @@
   margin-top: -5px;
   margin-bottom: -5px;
 }
+
+.ui-dialog-portalslist {
+  max-width: none !important;
+}

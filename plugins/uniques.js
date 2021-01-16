@@ -520,32 +520,7 @@ window.plugin.uniques.highlighterDroned = {
 window.plugin.uniques.setupCSS = function() {
 	$("<style>")
 	.prop("type", "text/css")
-	.html('\
-#uniques-container {\
-	display: block;\
-	text-align: center;\
-	margin: 6px 3px 1px 3px;\
-	padding: 0 4px;\
-}\
-#uniques-container label {\
-	margin: 0 0.5em;\
-}\
-#uniques-container input {\
-	vertical-align: middle;\
-}\
-\
-.portal-list-uniques input[type=\'checkbox\'] {\
-	padding: 0;\
-	height: auto;\
-	margin-top: -5px;\
-	margin-bottom: -5px;\
-}\
-\
-.ui-dialog-portalslist {\
-	max-width: none !important;\
-}\
-\
-')
+	.html('@include_string:uniques.css@')
 	.appendTo("head");
 }
 
