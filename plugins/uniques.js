@@ -100,6 +100,28 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 		&& markup[0][0] == 'PLAYER'
 		&& markup[0][1].plain == nick
 		&& markup[1][0] == 'TEXT'
+		&& markup[1][1].plain == ' deployed a Beacon on '
+		&& markup[2][0] == 'PORTAL') {
+			// search for "x deployed a Beacon on z"
+			var portal = markup[2][1];
+			match = true;
+			plugin.uniques.setPortalAction(portal,'visited');
+		} else if(plext.plextType == 'SYSTEM_BROADCAST'
+		&& markup.length==3
+		&& markup[0][0] == 'PLAYER'
+		&& markup[0][1].plain == nick
+		&& markup[1][0] == 'TEXT'
+		&& markup[1][1].plain == ' deployed Fireworks on '
+		&& markup[2][0] == 'PORTAL') {
+			// search for "x deployed Fireworks on z"
+			var portal = markup[2][1];
+			match = true;
+			plugin.uniques.setPortalAction(portal,'visited');
+		} else if(plext.plextType == 'SYSTEM_BROADCAST'
+		&& markup.length==3
+		&& markup[0][0] == 'PLAYER'
+		&& markup[0][1].plain == nick
+		&& markup[1][0] == 'TEXT'
 		&& markup[1][1].plain == ' captured '
 		&& markup[2][0] == 'PORTAL') {
 			// search for "x captured y"
