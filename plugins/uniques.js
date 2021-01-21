@@ -774,7 +774,6 @@ window.plugin.uniques.checkMissionWaypoints = function(mission) {
 window.plugin.uniques.optExport = function() {
 	var data = localStorage['plugin-uniques-data'];
 	window.saveFile(data, 'IITC-uniques.json', 'application/json');
-	confirm ("IITC-Uniques exported to IITC-uniques.json");
 }
 window.plugin.uniques.optImport = function() {
 	L.FileListLoader.loadFiles({accept:'application/json'})
