@@ -132,6 +132,8 @@ window.plugin.userLocation.onOrientationChange = function(direction) {
 
   window.plugin.userLocation.user.direction = direction;
 
+  if (!window.plugin.userLocation.marker._icon) return;
+  
   var container = $(".container", window.plugin.userLocation.marker._icon);
 
   if(direction === null) {
