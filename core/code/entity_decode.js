@@ -73,7 +73,10 @@ function corePortalData(a) {
   }
 };
 
-var SUMMARY_PORTAL_DATA_LENGTH = 14;
+/* 
+history: bit_0 = visited, bit_1 = captured, bit_2 = scouted
+*/
+var SUMMARY_PORTAL_DATA_LENGTH = 19;
 function summaryPortalData(a) {
   return {
     level:         a[4],
@@ -85,7 +88,8 @@ function summaryPortalData(a) {
     mission:       a[10],
     mission50plus: a[11],
     artifactBrief: parseArtifactBrief(a[12]),
-    timestamp:     a[13]
+    timestamp:     a[13],
+    history:       a[18]
   };
 };
 
