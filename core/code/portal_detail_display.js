@@ -50,6 +50,7 @@ window.renderPortalDetails = function(guid) {
 //TODO? other status details...
   var statusDetails = details ? '' : '<div id="portalStatus">Loading details...</div>';
  
+  var historyDetails = data ? getPortalHistoryDetails(data) : '';
 
   var img = fixPortalImageUrl(details ? details.image : data.image);
   var title = (details && details.title) || (data && data.title) || 'null';
@@ -148,7 +149,8 @@ window.renderPortalDetails = function(guid) {
       miscDetails,
       resoDetails,
       statusDetails,
-      linkDetails
+      linkDetails,
+      historyDetails
     );
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
@@ -158,7 +160,18 @@ window.renderPortalDetails = function(guid) {
   }
 }
 
-
+window.getPortalHistoryDetails = function (d) {
+  let visited = ((d.history && 1) === 1) || ((d.history && 2) === 2);
+  let captured = ((d.history && 2) === 2);
+  let scouted = ((d.histroy && 4) ===4 );
+  let colors = {true:'#03fe03',false:'#ff4a4a'};
+  
+  return ('<div style="text-align: center; color: #ffce00">History:'
+  + ' <span id="history_visited" style="color:'+ colors[visited] + '">visited</span> |'
+  + ' <span id="history_captured" style="color:'+ colors[captured] + '">captured</span> |'
+  + ' <span id="history_scanned" style="color:' + colors[scouted]  + '">scouted</span>'
+  + '</div>'); 
+}
 
 window.getPortalMiscDetails = function(guid,d) {
 

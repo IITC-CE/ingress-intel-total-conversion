@@ -295,7 +295,9 @@ window.Render.prototype.createPortalEntity = function(ent) {
     // yes. now check to see if the entity data we have is newer than that in place
     var p = window.portals[ent[0]];
 
-    if (p.options.timestamp >= ent[1] && p.option.data.history === data.history) return; // this data is identical or older - abort processing
+    if (!data.history || p.options.data.history === data.history)
+      if (p.options.timestamp >= ent[1])
+        return; // this data is identical or older - abort processing
 
     // the data we have is newer. many data changes require re-rendering of the portal
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
@@ -532,5 +534,3 @@ window.Render.prototype.removePortalFromMapLayer = function(portal) {
   //remove it from the portalsLevels layer
   portalsFactionLayers[parseInt(portal.options.level)||0][portal.options.team].removeLayer(portal);
 }
-
-
