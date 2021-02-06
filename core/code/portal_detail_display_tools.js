@@ -2,6 +2,19 @@
 // hand any of these functions the details-hash of a portal, and they
 // will return pretty, displayable HTML or parts thereof.
 
+window.getPortalHistoryDetails = function (d) {
+  let visited = ((d.history & 1) === 1) || ((d.history & 2) === 2);
+  let captured = ((d.history & 2) === 2);
+  let scouted = ((d.histroy & 4) === 4);
+  let colors = {true:'#03fe03',false:'#ff4a4a'};
+
+  return ('<div style="text-align: center; color: #ffce00">History:'
+  + ' <span id="history_visited" style="color:'+ colors[visited] + '">visited</span> |'
+  + ' <span id="history_captured" style="color:'+ colors[captured] + '">captured</span> |'
+  + ' <span id="history_scanned" style="color:' + colors[scouted]  + '">scouted</span>'
+  + '</div>');
+}
+
 // returns displayable text+link about portal range
 window.getRangeText = function(d) {
   var range = getPortalRange(d);

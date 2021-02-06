@@ -37,6 +37,8 @@ window.renderPortalDetails = function(guid) {
   var data = portal.options.data;
   var details = portalDetail.get(guid);
 
+  var historyDetails = getPortalHistoryDetails(data);
+
   // details and data can get out of sync. if we have details, construct a matching 'data'
   if (details) {
     data = getPortalSummaryData(details);
@@ -49,8 +51,6 @@ window.renderPortalDetails = function(guid) {
 
 //TODO? other status details...
   var statusDetails = details ? '' : '<div id="portalStatus">Loading details...</div>';
- 
-  var historyDetails = data ? getPortalHistoryDetails(data) : '';
 
   var img = fixPortalImageUrl(details ? details.image : data.image);
   var title = (details && details.title) || (data && data.title) || 'null';
@@ -104,7 +104,7 @@ window.renderPortalDetails = function(guid) {
     }).text('Map links').click(posOnClick);
     linkDetails.append($('<aside>').append($('<div>').append(mapHtml)));
   }
-  
+
   $('#portaldetails')
     .html('') //to ensure it's clear
     .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
@@ -158,19 +158,6 @@ window.renderPortalDetails = function(guid) {
   if (details) {
     runHooks('portalDetailsUpdated', {guid: guid, portal: portal, portalDetails: details, portalData: data});
   }
-}
-
-window.getPortalHistoryDetails = function (d) {
-  let visited = ((d.history && 1) === 1) || ((d.history && 2) === 2);
-  let captured = ((d.history && 2) === 2);
-  let scouted = ((d.histroy && 4) ===4 );
-  let colors = {true:'#03fe03',false:'#ff4a4a'};
-  
-  return ('<div style="text-align: center; color: #ffce00">History:'
-  + ' <span id="history_visited" style="color:'+ colors[visited] + '">visited</span> |'
-  + ' <span id="history_captured" style="color:'+ colors[captured] + '">captured</span> |'
-  + ' <span id="history_scanned" style="color:' + colors[scouted]  + '">scouted</span>'
-  + '</div>'); 
 }
 
 window.getPortalMiscDetails = function(guid,d) {
@@ -238,7 +225,7 @@ window.getPortalMiscDetails = function(guid,d) {
 
     if (d.artifactBrief && d.artifactBrief.target && Object.keys(d.artifactBrief.target).length > 0) {
       var targets = Object.keys(d.artifactBrief.target);
-//currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s) 
+//currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s)
        randDetails += '<div id="artifact_target">Target portal: '+targets.map(function(x) { return x.capitalize(); }).join(', ')+'</div>';
     }
 
