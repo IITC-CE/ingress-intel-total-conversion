@@ -364,7 +364,9 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   var data = window.decodeArray.portal(ent[2], details);
 
   // check if entity already exists
-  if (ent[0] in window.portals) {
+  const oldPortal = ent[0] in window.portals;
+
+  if (oldPortal) {
     // yes. now check to see if the entity data we have is newer than that in place
     var p = window.portals[ent[0]];
 
@@ -375,18 +377,14 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
     // the data we have is newer. many data changes require re-rendering of the portal
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
-    // so to keep things simple we'll always re-create the entity in this case
 
     // remember the old details, for the callback
-
     previousData = p.options.data;
 
     // preserve history
     if (!data.history) {
       data.history = previousData.history;
     }
-
-    this.deletePortalEntity(ent[0]);
   }
 
   var portalLevel = parseInt(data.level) || 0;
@@ -407,45 +405,59 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
   window.pushPortalGuidPositionCache(ent[0], data.latE6, data.lngE6);
 
-  var marker = window.createMarker(latlng, dataOptions);
-
-  function handler_portal_click(e) {
-    window.renderPortalDetails(e.target.options.guid);
-  }
-  function handler_portal_dblclick(e) {
-    window.renderPortalDetails(e.target.options.guid);
-    window.map.setView(e.target.getLatLng(), window.DEFAULT_ZOOM);
-  }
-  function handler_portal_contextmenu(e) {
-    window.renderPortalDetails(e.target.options.guid);
-    if (window.isSmartphone()) {
-      window.show('info');
-    } else if (!$('#scrollwrapper').is(':visible')) {
-      $('#sidebartoggle').click();
-    }
-  }
-
-  marker.on('click', handler_portal_click);
-  marker.on('dblclick', handler_portal_dblclick);
-  marker.on('contextmenu', handler_portal_contextmenu);
-
-  window.runHooks('portalAdded', { portal: marker, previousData: previousData });
-
-  window.portals[ent[0]] = marker;
-
   // check for URL links to portal, and select it if this is the one
-  if (window.urlPortalLL && window.urlPortalLL[0] === marker.getLatLng().lat && window.urlPortalLL[1] === marker.getLatLng().lng) {
+  if (window.urlPortalLL && window.urlPortalLL[0] === latlng.lat && window.urlPortalLL[1] === latlng.lng) {
     // URL-passed portal found via pll parameter - set the guid-based parameter
-    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + window.urlPortalLL[1] + ' matches portal GUID ' + ent[0]);
+    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + urlPortalLL[1] + ' matches portal GUID ' + ent[0]);
 
     window.urlPortal = ent[0];
     window.urlPortalLL = undefined; // clear the URL parameter so it's not matched again
   }
   if (window.urlPortal === ent[0]) {
     // URL-passed portal found via guid parameter - set it as the selected portal
-    log.log('urlPortal GUID ' + window.urlPortal + ' found - selecting...');
+    log.log('urlPortal GUID ' + urlPortal + ' found - selecting...');
     window.selectedPortal = ent[0];
     window.urlPortal = undefined; // clear the URL parameter so it's not matched again
+  }
+
+  let marker = undefined;
+  if (oldPortal) {
+    // update marker style/highlight and layer
+    marker = window.portals[ent[0]];
+    // remove portal from its faction/level specific layer
+    this.removePortalFromMapLayer(marker);
+
+    $.extend(marker.options, dataOptions);
+
+    setMarkerStyle(marker, ent[0] === selectedPortal);
+
+    window.runHooks('portalAdded', {portal: marker, previousData: previousData});
+  } else {
+    marker = createMarker(latlng, dataOptions);
+
+    function handler_portal_click(e) {
+      window.renderPortalDetails(e.target.options.guid);
+    }
+    function handler_portal_dblclick(e) {
+      window.renderPortalDetails(e.target.options.guid);
+      window.map.setView(e.target.getLatLng(), window.DEFAULT_ZOOM);
+    }
+    function handler_portal_contextmenu(e) {
+      window.renderPortalDetails(e.target.options.guid);
+      if (window.isSmartphone()) {
+        window.show('info');
+      } else if (!$('#scrollwrapper').is(':visible')) {
+        $('#sidebartoggle').click();
+      }
+    }
+
+    marker.on('click', handler_portal_click);
+    marker.on('dblclick', handler_portal_dblclick);
+    marker.on('contextmenu', handler_portal_contextmenu);
+
+    window.runHooks('portalAdded', { portal: marker });
+
+    window.portals[ent[0]] = marker;
   }
 
   // (re-)select the portal, to refresh the sidebar on any changes
