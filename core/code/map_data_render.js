@@ -288,12 +288,14 @@ window.Render.prototype.createPortalEntity = function(ent) {
 
   var previousData = undefined;
 
+  var data = decodeArray.portalSummary(ent[2]);
+
   // check if entity already exists
   if (ent[0] in window.portals) {
     // yes. now check to see if the entity data we have is newer than that in place
     var p = window.portals[ent[0]];
 
-    if (p.options.timestamp >= ent[1]) return; // this data is identical or older - abort processing
+    if (p.options.timestamp >= ent[1] && p.option.data.history === data.history) return; // this data is identical or older - abort processing
 
     // the data we have is newer. many data changes require re-rendering of the portal
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
@@ -306,17 +308,17 @@ window.Render.prototype.createPortalEntity = function(ent) {
     this.deletePortalEntity(ent[0]);
   }
 
-  var portalLevel = parseInt(ent[2][4])||0;
-  var team = teamStringToId(ent[2][1]);
+  var portalLevel = parseInt(data.level)||0;
+  var team = teamStringToId(data.team);
   // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
   if (team == TEAM_NONE) portalLevel = 0;
 
-  var latlng = L.latLng(ent[2][2]/1E6, ent[2][3]/1E6);
+  var latlng = L.latLng(data.latE6/1E6, data.lngE6/1E6);
 
-  var data = decodeArray.portalSummary(ent[2]);
- 
-  var history = ent[2][18];
- 
+  // preserve history (bitwise or)
+  if (previousData && previousData.history)
+    data.history |= previousData.history;
+
   var dataOptions = {
     level: portalLevel,
     team: team,
@@ -324,7 +326,6 @@ window.Render.prototype.createPortalEntity = function(ent) {
     guid: ent[0],
     timestamp: ent[1],
     data: data,
-    history: history
   };
 
   window.pushPortalGuidPositionCache(ent[0], data.latE6, data.lngE6);
