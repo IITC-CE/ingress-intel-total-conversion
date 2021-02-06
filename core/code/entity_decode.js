@@ -76,7 +76,7 @@ function corePortalData(a) {
 /* 
 history: bit_0 = visited, bit_1 = captured, bit_2 = scouted
 */
-var SUMMARY_PORTAL_DATA_LENGTH = 19;
+var SUMMARY_PORTAL_DATA_LENGTH = 14;
 function summaryPortalData(a) {
   return {
     level:         a[4],
@@ -88,12 +88,12 @@ function summaryPortalData(a) {
     mission:       a[10],
     mission50plus: a[11],
     artifactBrief: parseArtifactBrief(a[12]),
-    timestamp:     a[13],
-    history:       a[18]
+    timestamp:     a[13]
   };
 };
 
 var DETAILED_PORTAL_DATA_LENGTH = SUMMARY_PORTAL_DATA_LENGTH+4;
+var EXTENDED_PORTAL_DATA_LENGTH = DETAILED_PORTAL_DATA_LENGTH+1;
 
 
 window.decodeArray.portalSummary = function(a) {
@@ -109,8 +109,10 @@ window.decodeArray.portalSummary = function(a) {
 
   // NOTE: allow for either summary or detailed portal data to be passed in here, as details are sometimes
   // passed into code only expecting summaries
-  if (a.length != SUMMARY_PORTAL_DATA_LENGTH && a.length != DETAILED_PORTAL_DATA_LENGTH) {
-    log.warn('Portal summary length changed - portal details likely broken!');
+  if (a.length != SUMMARY_PORTAL_DATA_LENGTH 
+      && a.length != DETAILED_PORTAL_DATA_LENGTH 
+      && a.length != EXTENDED_PORTAL_DATA_LENGTH) {
+    log.warn('Portal summary length changed - portal details likely broken!' );
     debugger;
   }
 
@@ -124,7 +126,8 @@ window.decodeArray.portalDetail = function(a) {
     throw new Error('Error: decodeArray.portalDetail - not a portal');
   }
 
-  if (a.length != DETAILED_PORTAL_DATA_LENGTH) {
+  if (a.length != DETAILED_PORTAL_DATA_LENGTH 
+      && a.length != EXTENDED_PORTAL_DATA_LENGTH) {
     log.warn('Portal detail length changed - portal details may be wrong');
     debugger;
   }
@@ -140,6 +143,7 @@ window.decodeArray.portalDetail = function(a) {
     resonators:a[SUMMARY_PORTAL_DATA_LENGTH+1].map(parseResonator),
     owner:     a[SUMMARY_PORTAL_DATA_LENGTH+2],
     artifactDetail:  parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH+3]),
+    history:   a[DETAILED_PORTAL_DATA_LENGTH+0]
   });
   
 }
