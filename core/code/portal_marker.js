@@ -1,6 +1,35 @@
 // PORTAL MARKER //////////////////////////////////////////////
 // code to create and update a portal marker
 
+L.PortalMarker = L.CircleMarker.extend({
+  options: {},
+
+  initialize: function(latlng, data) {
+    var styleOptions = window.getMarkerStyleOptions(data);
+    var options = L.extend({}, data, styleOptions, { interactive: true });
+
+    L.CircleMarker.prototype.initialize.call(this, latlng, options);
+
+    highlightPortal(this)
+  },
+  updateData: function(data) {
+    var styleOptions = window.getMarkerStyleOptions(data);
+    var options = L.extend({}, data, styleOptions, { interactive: true });
+    L.setOptions(this, options);
+
+    this.setStyle(styleOptions);
+  },
+  select: function (selected) {
+    var styleOptions = window.getMarkerStyleOptions(this.options);
+    this.setStyle(styleOptions);
+
+    highlightPortal(this);
+
+    if (selected) {
+      this.setStyle ({color: COLOR_SELECTED_PORTAL});
+    }
+  },
+});
 
 window.portalMarkerScale = function() {
   var zoom = map.getZoom();
@@ -12,31 +41,12 @@ window.portalMarkerScale = function() {
 
 // create a new marker. 'data' contain the IITC-specific entity data to be stored in the object options
 window.createMarker = function(latlng, data) {
-  var styleOptions = window.getMarkerStyleOptions(data);
-
-  var options = L.extend({}, data, styleOptions, { interactive: true });
-
-  var marker = L.circleMarker(latlng, options);
-
-  highlightPortal(marker);
-
-  return marker;
+  return new L.PortalMarker(latlng, data);
 }
 
 
 window.setMarkerStyle = function(marker, selected) {
-
-  var styleOptions = window.getMarkerStyleOptions(marker.options);
-
-  marker.setStyle(styleOptions);
-
-  // FIXME? it's inefficient to set the marker style (above), then do it again inside the highlighter
-  // the highlighter API would need to be changed for this to be improved though. will it be too slow?
-  highlightPortal(marker);
-
-  if (selected) {
-    marker.setStyle ({color: COLOR_SELECTED_PORTAL});
-  }
+  marker.select(selected);
 }
 
 
