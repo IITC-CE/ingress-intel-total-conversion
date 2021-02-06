@@ -63,7 +63,7 @@ function parseArtifactDetail(arr) {
 
 //there's also a 'placeholder' portal - generated from the data in links/fields. only has team/lat/lng
 
-var CORE_PORTA_DATA_LENGTH = 4;
+var CORE_PORTAL_DATA_LENGTH = 4;
 function corePortalData(a) {
   return {
     // a[0] == type (always 'p')
@@ -73,10 +73,9 @@ function corePortalData(a) {
   }
 };
 
-/* 
-history: bit_0 = visited, bit_1 = captured, bit_2 = scouted
-*/
 var SUMMARY_PORTAL_DATA_LENGTH = 14;
+var DETAILED_PORTAL_DATA_LENGTH = SUMMARY_PORTAL_DATA_LENGTH+4;
+var EXTENDED_PORTAL_DATA_LENGTH = DETAILED_PORTAL_DATA_LENGTH+1;
 function summaryPortalData(a) {
   return {
     level:         a[4],
@@ -88,12 +87,24 @@ function summaryPortalData(a) {
     mission:       a[10],
     mission50plus: a[11],
     artifactBrief: parseArtifactBrief(a[12]),
-    timestamp:     a[13]
+    timestamp:     a[13],
   };
 };
 
-var DETAILED_PORTAL_DATA_LENGTH = SUMMARY_PORTAL_DATA_LENGTH+4;
-var EXTENDED_PORTAL_DATA_LENGTH = DETAILED_PORTAL_DATA_LENGTH+1;
+function detailsPortalData(a) {
+  return {
+    mods:           a[SUMMARY_PORTAL_DATA_LENGTH+0].map(parseMod),
+    resonators:     a[SUMMARY_PORTAL_DATA_LENGTH+1].map(parseResonator),
+    owner:          a[SUMMARY_PORTAL_DATA_LENGTH+2],
+    artifactDetail: parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH+3]),
+  }
+};
+
+function historyPortalData(a) {
+  return {
+    history: a[DETAILED_PORTAL_DATA_LENGTH],
+  }
+};
 
 
 window.decodeArray.portalSummary = function(a) {
@@ -103,20 +114,20 @@ window.decodeArray.portalSummary = function(a) {
     throw new Error('Error: decodeArray.portalSUmmary - not a portal');
   }
 
-  if (a.length == CORE_PORTA_DATA_LENGTH) {
+  if (a.length == CORE_PORTAL_DATA_LENGTH) {
     return corePortalData(a);
   }
 
   // NOTE: allow for either summary or detailed portal data to be passed in here, as details are sometimes
   // passed into code only expecting summaries
-  if (a.length != SUMMARY_PORTAL_DATA_LENGTH 
-      && a.length != DETAILED_PORTAL_DATA_LENGTH 
+  if (a.length != SUMMARY_PORTAL_DATA_LENGTH
+      && a.length != DETAILED_PORTAL_DATA_LENGTH
       && a.length != EXTENDED_PORTAL_DATA_LENGTH) {
     log.warn('Portal summary length changed - portal details likely broken!' );
     debugger;
   }
 
-  return $.extend(corePortalData(a), summaryPortalData(a));
+  return $.extend(corePortalData(a), summaryPortalData(a), historyPortalData(a));
 }
 
 window.decodeArray.portalDetail = function(a) {
@@ -126,7 +137,7 @@ window.decodeArray.portalDetail = function(a) {
     throw new Error('Error: decodeArray.portalDetail - not a portal');
   }
 
-  if (a.length != DETAILED_PORTAL_DATA_LENGTH 
+  if (a.length != DETAILED_PORTAL_DATA_LENGTH
       && a.length != EXTENDED_PORTAL_DATA_LENGTH) {
     log.warn('Portal detail length changed - portal details may be wrong');
     debugger;
@@ -138,12 +149,5 @@ window.decodeArray.portalDetail = function(a) {
   // the portal details array is just an extension of the portal summary array
   // to allow for niantic adding new items into the array before the extended details start,
   // use the length of the summary array
-  return $.extend(corePortalData(a), summaryPortalData(a),{
-    mods:      a[SUMMARY_PORTAL_DATA_LENGTH+0].map(parseMod),
-    resonators:a[SUMMARY_PORTAL_DATA_LENGTH+1].map(parseResonator),
-    owner:     a[SUMMARY_PORTAL_DATA_LENGTH+2],
-    artifactDetail:  parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH+3]),
-    history:   a[DETAILED_PORTAL_DATA_LENGTH+0]
-  });
-  
+  return $.extend(corePortalData(a), summaryPortalData(a), detailsPortalData(a), historyPortalData(a));
 }

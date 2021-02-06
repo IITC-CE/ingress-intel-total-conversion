@@ -314,14 +314,17 @@ window.Render.prototype.createPortalEntity = function(ent) {
   var latlng = L.latLng(ent[2][2]/1E6, ent[2][3]/1E6);
 
   var data = decodeArray.portalSummary(ent[2]);
-
+ 
+  var history = ent[2][18];
+ 
   var dataOptions = {
     level: portalLevel,
     team: team,
     ent: ent,  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
     guid: ent[0],
     timestamp: ent[1],
-    data: data
+    data: data,
+    history: history
   };
 
   window.pushPortalGuidPositionCache(ent[0], data.latE6, data.lngE6);
