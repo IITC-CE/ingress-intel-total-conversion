@@ -5,6 +5,36 @@
  * @module portal_marker
  */
 
+L.PortalMarker = L.CircleMarker.extend({
+  options: {},
+
+  initialize: function(latlng, data) {
+    var styleOptions = window.getMarkerStyleOptions(data);
+    var options = L.extend({}, data, styleOptions, { interactive: true });
+
+    L.CircleMarker.prototype.initialize.call(this, latlng, options);
+
+    highlightPortal(this)
+  },
+  updateData: function(data) {
+    var styleOptions = window.getMarkerStyleOptions(data);
+    var options = L.extend({}, data, styleOptions, { interactive: true });
+    L.setOptions(this, options);
+
+    this.setStyle(styleOptions);
+  },
+  select: function (selected) {
+    var styleOptions = window.getMarkerStyleOptions(this.options);
+    this.setStyle(styleOptions);
+
+    highlightPortal(this);
+
+    if (selected) {
+      this.setStyle ({color: COLOR_SELECTED_PORTAL});
+    }
+  },
+});
+
 /**
  * Calculates the scale of portal markers based on the current zoom level of the map.
  *
@@ -25,17 +55,9 @@ window.portalMarkerScale = function () {
  * @param {Object} data - The IITC-specific entity data to be stored in the marker options.
  * @returns {L.circleMarker} A Leaflet circle marker representing the portal.
  */
-window.createMarker = function (latlng, data) {
-  var styleOptions = window.getMarkerStyleOptions(data);
-
-  var options = L.extend({}, data, styleOptions, { interactive: true });
-
-  var marker = L.circleMarker(latlng, options);
-
-  window.highlightPortal(marker);
-
-  return marker;
-};
+window.createMarker = function(latlng, data) {
+  return new L.PortalMarker(latlng, data);
+}
 
 /**
  * Sets the style of a portal marker, including options for when the portal is selected.
@@ -44,19 +66,9 @@ window.createMarker = function (latlng, data) {
  * @param {L.circleMarker} marker - The portal marker whose style will be set.
  * @param {boolean} selected - Indicates if the portal is selected.
  */
-window.setMarkerStyle = function (marker, selected) {
-  var styleOptions = window.getMarkerStyleOptions(marker.options);
-
-  marker.setStyle(styleOptions);
-
-  // FIXME? it's inefficient to set the marker style (above), then do it again inside the highlighter
-  // the highlighter API would need to be changed for this to be improved though. will it be too slow?
-  window.highlightPortal(marker);
-
-  if (selected) {
-    marker.setStyle({ color: window.COLOR_SELECTED_PORTAL });
-  }
-};
+window.setMarkerStyle = function(marker, selected) {
+  marker.select(selected);
+}
 
 /**
  * Determines the style options for a portal marker based on its details.
