@@ -14,7 +14,7 @@ L.PortalMarker = L.CircleMarker.extend({
 
     L.CircleMarker.prototype.initialize.call(this, latlng, options);
 
-    highlightPortal(this)
+    highlightPortal(this);
   },
   updateData: function(data) {
     var styleOptions = window.getMarkerStyleOptions(data);
@@ -22,8 +22,9 @@ L.PortalMarker = L.CircleMarker.extend({
     L.setOptions(this, options);
 
     this.setStyle(styleOptions);
+    thighlightPortal(this);
   },
-  select: function (selected) {
+  reset: function (selected) {
     var styleOptions = window.getMarkerStyleOptions(this.options);
     this.setStyle(styleOptions);
 
@@ -67,7 +68,7 @@ window.createMarker = function(latlng, data) {
  * @param {boolean} selected - Indicates if the portal is selected.
  */
 window.setMarkerStyle = function(marker, selected) {
-  marker.select(selected);
+  marker.reset(selected);
 }
 
 /**
