@@ -354,9 +354,7 @@ window.Render.prototype.createPortalEntity = function(ent, details) { // details
     // remove portal from its faction/level specific layer
     this.removePortalFromMapLayer(marker);
 
-    $.extend(marker.options, dataOptions);
-
-    setMarkerStyle(marker, ent[0] == selectedPortal);
+    marker.updateData(dataOptions, ent[0] == selectedPortal);
 
     window.runHooks('portalAdded', {portal: marker, previousData: previousData});
   } else {

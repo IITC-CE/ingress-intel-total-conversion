@@ -1,27 +1,37 @@
 // PORTAL MARKER //////////////////////////////////////////////
 // code to create and update a portal marker
+var portalBaseStyle = {
+  stroke: true,
+  opacity: 1,
+  fill: true,
+  fillOpacity: 0.5,
+  interactive: true
+};
 
 L.PortalMarker = L.CircleMarker.extend({
-  options: {},
+  options: {
+    guid: null,
+    level: 0,
+    team: 0,
+    timestamp: 0,
+    data: null,
+    ent: null,  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
+  },
 
   initialize: function(latlng, data) {
-    var styleOptions = window.getMarkerStyleOptions(data);
-    var options = L.extend({}, data, styleOptions, { interactive: true });
+    L.CircleMarker.prototype.initialize.call(this, latlng, data);
 
-    L.CircleMarker.prototype.initialize.call(this, latlng, options);
-
+    var styleOptions = this._style();
+    this.setStyle(styleOptions);
     highlightPortal(this);
   },
-  updateData: function(data) {
-    var styleOptions = window.getMarkerStyleOptions(data);
-    var options = L.extend({}, data, styleOptions, { interactive: true });
-    L.setOptions(this, options);
+  updateData: function(data, selected) {
+    L.setOptions(this, data);
 
-    this.setStyle(styleOptions);
-    thighlightPortal(this);
+    this.reset(selected);
   },
   reset: function (selected) {
-    var styleOptions = window.getMarkerStyleOptions(this.options);
+    var styleOptions = this._style();
     this.setStyle(styleOptions);
 
     highlightPortal(this);
@@ -29,6 +39,39 @@ L.PortalMarker = L.CircleMarker.extend({
     if (selected) {
       this.setStyle ({color: COLOR_SELECTED_PORTAL});
     }
+  },
+  _style: function () {
+    var dashArray = null;
+    // dashed outline for placeholder portals
+    if (this.options.team != TEAM_NONE && this.options.level==0) dashArray = '1,2';
+
+    return L.extend(this._scale(), portalBaseStyle, {
+      color: COLORS[this.options.team],
+      fillColor: COLORS[this.options.team],
+      dashArray: dashArray
+    });
+  },
+  _scale: function () {
+    var scale = window.portalMarkerScale();
+
+    //   portal level      0  1  2  3  4  5  6  7  8
+    var LEVEL_TO_WEIGHT = [2, 2, 2, 2, 2, 3, 3, 4, 4];
+    var LEVEL_TO_RADIUS = [7, 7, 7, 7, 8, 8, 9,10,11];
+
+    var level = Math.floor(this.options.level||0);
+
+    var lvlWeight = LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
+    var lvlRadius = LEVEL_TO_RADIUS[level] * scale;
+
+    // thinner outline for placeholder portals
+    if (this.options.team != TEAM_NONE && level==0) {
+      lvlWeight = 1;
+    }
+
+    return {
+      radius: lvlRadius,
+      weight: lvlWeight,
+    };
   },
 });
 
