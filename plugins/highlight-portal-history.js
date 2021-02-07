@@ -9,7 +9,7 @@
 window.plugin.portalHighlighterPortalsHistory = function() {};
 
 window.plugin.portalHighlighterPortalsHistory.visited = function(data) {
-  let visited = (data.portal.options.ent[2][18] & 3);
+  var visited = (data.portal.options.ent[2][18] & 3);
   if (visited !== undefined) {
     if (visited === 1) {
       var opacity = .6;
