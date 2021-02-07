@@ -9,26 +9,26 @@ window.getPortalHistoryDetails = function (d) {
 
   var visited = d.history.visited;
   var captured = d.history.captured;
-  var scouted = d.history.scanned;
+  var scanned = d.history.scanned;
   var colors = {true:'#03fe03',false:'#ff4a4a'};
 
   return ('<div style="text-align: center; color: #ffce00">History:'
   + ' <span id="history_visited" style="color:'+ colors[visited] + '">visited</span> |'
   + ' <span id="history_captured" style="color:'+ colors[captured] + '">captured</span> |'
-  + ' <span id="history_scanned" style="color:' + colors[scouted]  + '">scouted</span>'
+  + ' <span id="history_scanned" style="color:' + colors[scanned]  + '">scanned</span>'
   + '</div>');
 }
 
 // returns displayable text+link about portal range
 window.getRangeText = function(d) {
   var range = getPortalRange(d);
-  
+
   var title = 'Base range:\t' + digits(Math.floor(range.base))+'m'
     + '\nLink amp boost:\t×'+range.boost
     + '\nRange:\t'+digits(Math.floor(range.range))+'m';
-  
+
   if(!range.isLinkable) title += '\nPortal is missing resonators,\nno new links can be made';
-  
+
   return ['range',
       '<a onclick="window.rangeLinkClick()"'
     + (range.isLinkable ? '' : ' style="text-decoration:line-through;"')
