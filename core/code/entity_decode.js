@@ -60,6 +60,16 @@ function parseArtifactDetail(arr) {
   };
 }
 
+function parseHistoryDetail(bitarray) {
+  if (bitarray == null) { return null; }
+  return {
+    raw: bitarray,
+    visited: !!(bitarray & 1),
+    captured: !!(bitarray & 2),
+    scanned: !!(bitarray & 4),
+  };
+}
+
 
 //there's also a 'placeholder' portal - generated from the data in links/fields. only has team/lat/lng
 
@@ -100,9 +110,9 @@ function detailsPortalData(a) {
   }
 };
 
-function historyPortalData(a) {
+function extendedPortalData(a) {
   return {
-    history: a[DETAILED_PORTAL_DATA_LENGTH],
+    history: parseHistoryDetail(a[DETAILED_PORTAL_DATA_LENGTH]),
   }
 };
 
@@ -127,7 +137,7 @@ window.decodeArray.portalSummary = function(a) {
     debugger;
   }
 
-  return $.extend(corePortalData(a), summaryPortalData(a), historyPortalData(a));
+  return $.extend(corePortalData(a), summaryPortalData(a), extendedPortalData(a));
 }
 
 window.decodeArray.portalDetail = function(a) {
@@ -149,5 +159,5 @@ window.decodeArray.portalDetail = function(a) {
   // the portal details array is just an extension of the portal summary array
   // to allow for niantic adding new items into the array before the extended details start,
   // use the length of the summary array
-  return $.extend(corePortalData(a), summaryPortalData(a), detailsPortalData(a), historyPortalData(a));
+  return $.extend(corePortalData(a), summaryPortalData(a), detailsPortalData(a), extendedPortalData(a));
 }

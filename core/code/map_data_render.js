@@ -307,6 +307,10 @@ window.Render.prototype.createPortalEntity = function(ent) {
 
     previousData = p.options.data;
 
+    // preserve history
+    if (!data.history)
+      data.history = previousData.history;
+
     this.deletePortalEntity(ent[0]);
   }
 
@@ -316,10 +320,6 @@ window.Render.prototype.createPortalEntity = function(ent) {
   if (team == TEAM_NONE) portalLevel = 0;
 
   var latlng = L.latLng(data.latE6/1E6, data.lngE6/1E6);
-
-  // preserve history (bitwise or)
-  if (previousData && previousData.history)
-    data.history |= previousData.history;
 
   var dataOptions = {
     level: portalLevel,

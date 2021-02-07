@@ -3,9 +3,13 @@
 // will return pretty, displayable HTML or parts thereof.
 
 window.getPortalHistoryDetails = function (d) {
-  var visited = ((d.history & 1) === 1) || ((d.history & 2) === 2);
-  var captured = ((d.history & 2) === 2);
-  var scouted = ((d.histroy & 4) === 4);
+  if (!d.history) {
+    return ('<div style="text-align: center; color: #ffce00">History missing</div>')
+  }
+
+  var visited = d.history.visited || d.history.captured;
+  var captured = d.history.captured;
+  var scouted = d.history.scanned;
   var colors = {true:'#03fe03',false:'#ff4a4a'};
 
   return ('<div style="text-align: center; color: #ffce00">History:'
