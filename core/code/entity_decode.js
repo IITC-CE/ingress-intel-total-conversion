@@ -63,10 +63,10 @@ function parseArtifactDetail(arr) {
 function parseHistoryDetail(bitarray) {
   if (bitarray == null) { return null; }
   return {
-    raw: bitarray,
-    visited: !!(bitarray & 1),
+    _raw: bitarray,
+    visited:  !!(bitarray & (1|2|4)),
     captured: !!(bitarray & 2),
-    scanned: !!(bitarray & 4),
+    scanned:  !!(bitarray & 4),
   };
 }
 
