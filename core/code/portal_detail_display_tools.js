@@ -7,7 +7,7 @@ window.getPortalHistoryDetails = function (d) {
     return ('<div style="text-align: center; color: #ffce00">History missing</div>')
   }
 
-  var visited = d.history.visited || d.history.captured;
+  var visited = d.history.visited;
   var captured = d.history.captured;
   var scouted = d.history.scanned;
   var colors = {true:'#03fe03',false:'#ff4a4a'};
