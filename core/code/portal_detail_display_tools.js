@@ -3,10 +3,10 @@
 // will return pretty, displayable HTML or parts thereof.
 
 window.getPortalHistoryDetails = function (d) {
-  let visited = ((d.history & 1) === 1) || ((d.history & 2) === 2);
-  let captured = ((d.history & 2) === 2);
-  let scouted = ((d.histroy & 4) === 4);
-  let colors = {true:'#03fe03',false:'#ff4a4a'};
+  var visited = ((d.history & 1) === 1) || ((d.history & 2) === 2);
+  var captured = ((d.history & 2) === 2);
+  var scouted = ((d.histroy & 4) === 4);
+  var colors = {true:'#03fe03',false:'#ff4a4a'};
 
   return ('<div style="text-align: center; color: #ffce00">History:'
   + ' <span id="history_visited" style="color:'+ colors[visited] + '">visited</span> |'
