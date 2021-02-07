@@ -60,8 +60,9 @@ function parseArtifactDetail(arr) {
   };
 }
 
-function parseHistoryDetail(bitarray) {
-  if (bitarray == null) { return null; }
+function parseHistoryDetail(bitarray, required) {
+  if (bitarray == null && !required) return null;
+  if (bitarray == null) bitarray = 0;
   return {
     _raw: bitarray,
     visited:  !!(bitarray & (1|2|4)),
@@ -110,9 +111,9 @@ function detailsPortalData(a) {
   }
 };
 
-function extendedPortalData(a) {
+function extendedPortalData(a, required) {
   return {
-    history: parseHistoryDetail(a[DETAILED_PORTAL_DATA_LENGTH]),
+    history: parseHistoryDetail(a[DETAILED_PORTAL_DATA_LENGTH], required),
   }
 };
 
@@ -137,7 +138,10 @@ window.decodeArray.portalSummary = function(a) {
     debugger;
   }
 
-  return $.extend(corePortalData(a), summaryPortalData(a), extendedPortalData(a));
+  // on getEntities, intel send the history unless the user has never interacted with the portal
+  // raw data is either a summary or an extended data with null details
+  // in the first case, history is forced to 0 if missing
+  return $.extend(corePortalData(a), summaryPortalData(a), extendedPortalData(a, a.length === SUMMARY_PORTAL_DATA_LENGTH));
 }
 
 window.decodeArray.portalDetail = function(a) {
@@ -159,5 +163,5 @@ window.decodeArray.portalDetail = function(a) {
   // the portal details array is just an extension of the portal summary array
   // to allow for niantic adding new items into the array before the extended details start,
   // use the length of the summary array
-  return $.extend(corePortalData(a), summaryPortalData(a), detailsPortalData(a), extendedPortalData(a));
+  return $.extend(corePortalData(a), summaryPortalData(a), detailsPortalData(a), extendedPortalData(a, false));
 }
