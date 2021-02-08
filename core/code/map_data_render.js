@@ -296,8 +296,9 @@ window.Render.prototype.createPortalEntity = function(ent) {
     var p = window.portals[ent[0]];
 
     if (!data.history || p.options.data.history === data.history)
-      if (p.options.timestamp >= ent[1])
+      if (p.options.timestamp >= ent[1]) {
         return; // this data is identical or older - abort processing
+      }
 
     // the data we have is newer. many data changes require re-rendering of the portal
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
