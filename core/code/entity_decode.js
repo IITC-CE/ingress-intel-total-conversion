@@ -98,7 +98,7 @@ function summaryPortalData(a) {
     mission:       a[10],
     mission50plus: a[11],
     artifactBrief: parseArtifactBrief(a[12]),
-    timestamp:     a[13],
+    timestamp:     a[13]
   };
 };
 
@@ -107,7 +107,7 @@ function detailsPortalData(a) {
     mods:           a[SUMMARY_PORTAL_DATA_LENGTH+0].map(parseMod),
     resonators:     a[SUMMARY_PORTAL_DATA_LENGTH+1].map(parseResonator),
     owner:          a[SUMMARY_PORTAL_DATA_LENGTH+2],
-    artifactDetail: parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH+3]),
+    artifactDetail: parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH+3])
   }
 };
 
