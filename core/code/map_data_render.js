@@ -309,8 +309,9 @@ window.Render.prototype.createPortalEntity = function(ent) {
     previousData = p.options.data;
 
     // preserve history
-    if (!data.history)
+    if (!data.history) {
       data.history = previousData.history;
+    }
 
     this.deletePortalEntity(ent[0]);
   }
