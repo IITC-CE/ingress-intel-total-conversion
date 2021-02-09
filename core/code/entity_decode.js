@@ -65,9 +65,9 @@ function parseHistoryDetail(bitarray, required) {
   if (bitarray == null) bitarray = 0;
   return {
     _raw: bitarray,
-    visited:  !!(bitarray & (1|2|4)),
+    visited:  !!(bitarray & 1),
     captured: !!(bitarray & 2),
-    scanned:  !!(bitarray & 4),
+    scoutControlled:  !!(bitarray & 4),
   };
 }
 

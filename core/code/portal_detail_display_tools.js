@@ -9,13 +9,13 @@ window.getPortalHistoryDetails = function (d) {
 
   var visited = d.history.visited;
   var captured = d.history.captured;
-  var scanned = d.history.scanned;
+  var scoutControlled = d.history.scoutControlled;
   var colors = {true:'#03fe03',false:'#ff4a4a'};
 
   return ('<div style="text-align: center; color: #ffce00">History:'
   + ' <span id="history_visited" style="color:'+ colors[visited] + '">visited</span> |'
   + ' <span id="history_captured" style="color:'+ colors[captured] + '">captured</span> |'
-  + ' <span id="history_scanned" style="color:' + colors[scanned]  + '">scanned</span>'
+  + ' <span id="history_scout_controlled" style="color:' + colors[scoutControlled]  + '">scout controlled</span>'
   + '</div>');
 }
 
