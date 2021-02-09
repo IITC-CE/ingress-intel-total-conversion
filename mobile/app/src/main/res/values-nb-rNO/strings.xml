@@ -3,7 +3,7 @@
     <string name="toggle_map">Bytt kartgrensesnitt</string>
     <string name="clear_log">Tøm logg</string>
     <string name="debug_run">Kjør</string>
-    <string name="activity_settings">ITTC Mobil Innstillinger</string>
+    <string name="activity_settings">IITC Mobil Innstillinger</string>
     <string name="activity_share">Del via…</string>
     <string name="activity_share_to_clipboard">Kopier til utklippstavle</string>
     <string name="activity_save_to_file">Lagre til fil</string>
@@ -13,6 +13,6 @@
     <string name="version">Vis versjon</string>
     <string name="close">Lukk</string>
     <string name="pref_about_title">Om ITTC Mobile</string>
-    <string name="activity_plugins">ITTC Plugins</string>
+    <string name="activity_plugins">IITC Plugins</string>
     <string name="download_description">Last ned siste intelpakke</string>
 </resources>

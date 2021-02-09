@@ -126,4 +126,15 @@
 \nIl vantaggio principale a differenza dell\'intel ingress map ufficiale è l\'abbondanza di plugins che espandono le sue capacità base.
 \n
 \nPuoi aggiungere plugins ufficiali o esterni dalle impostazioni.</string>
+    <string name="pane_alerts">Notifiche</string>
+    <string name="file_browser_is_required">Non ci sono attività nel selezionare un file trovato. Installa un file browser di tua scelta!</string>
+    <string name="plugins_permission_granted">Permesso garantito. Ripetere cortesemente l\'azione.</string>
+    <string name="appintro_layers_title">Strati/più salienti</string>
+    <string name="appintro_location_title">Permesso di geolocalizzazione</string>
+    <string name="pref_user_location_show_position_and_orientation">Mostra posizione utente e orientamento su mappa</string>
+    <string name="pref_user_location_show_position">Mostra posizione giocatore su mappa</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Barra navigazione di sistema</string>
+    <string name="pref_hide_fullscreen_status_bar">Barra di Stato IITC</string>
+    <string name="pref_hide_fullscreen_action_bar">Barra Azioni IITC</string>
+    <string name="pref_hide_fullscreen_notification_bar">Barra Notifiche di Sistema</string>
 </resources>

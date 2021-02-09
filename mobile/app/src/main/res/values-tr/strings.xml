@@ -13,4 +13,13 @@
     <string name="toggle_map">Harita görünümü</string>
     <string name="debug_run">Çalıştır</string>
     <string name="activity_share">Paylaş…</string>
+    <string name="download_description">Son Intel paketi indiriliyor…</string>
+    <string name="pref_user_location">Haritada oyuncu yerini göster</string>
+    <string name="pref_plugins_title">Kullanılabilir Eklentiler</string>
+    <string name="pref_plugins">IITC Eklentiler</string>
+    <string name="pref_tweaks_cat">Yükseltmeler</string>
+    <string name="pref_misc_cat">Çeşitli</string>
+    <string name="pref_ui_cat">Arayüz</string>
+    <string name="iitc_website">IITC web sayfası</string>
+    <string name="pref_about_title">IITC Mobil hakkında</string>
 </resources>

@@ -1,0 +1,8 @@
+BELANGERIJK BERICHT: Deze app draait op data die gehost zijn door Ingress, Voordat u een slechte recensie geeft, probeer eerst https://intel.ingress.com/ en houd de laadtijd in overweging wanneer je een recensie achterlaat. Bedankt.
+
+Ingress Intel Total Conversion - Community Edition (IITC-CE) is a browser extensie voor het Augmented Reality spel Ingress Prime. Het is sneller dan de reguliere Ingress Intel kaart en biedt daarnaast veel meer functies.
+
+Het is beschikbaat voor desktopbrowser als Firefox en Chrome en als mobiele applicatie.
+
+Website: https://iitc.app
+GitHub Repository: https://github.com/IITC-CE/ingress-intel-total-conversion/

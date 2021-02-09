@@ -1,0 +1,8 @@
+NOTA IMPORTANTE: esta aplicación se ejecuta en datos alojados por Ingress. Antes de dejar una mala calificación, intente https://intel.ingress.com/ y observe el tiempo de carga y téngalo en cuenta al dejar su revisión, gracias.
+
+Ingress Intel Total Conversion - Community Edition (IITC-CE) es un complemento de navegador para el juego de realidad aumentada Ingress. Es más rápido que el mapa Ingress estándar y ofrece muchas más funciones.
+
+Está disponible para navegadores de escritorio, como Firefox y Chrome, y como aplicación móvil.
+
+Sitio web: https://iitc.app
+Repositorio de GitHub: https://github.com/IITC-CE/ingress-intel-total-conversion/

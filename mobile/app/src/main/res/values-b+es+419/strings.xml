@@ -98,4 +98,41 @@
     <string name="pref_language">Idioma</string>
     <string name="iitc_website">Sitio web de IITC</string>
     <string name="pref_hide_fullscreen_navigation_bar">Barra de Navegación del Sistema</string>
+    <string name="appintro_plugins_description">Puedes comenzar a utilizar IITC-CE ya mismo.
+\n
+\nPero la ventaja principal sobre el Intel Map oficial para Ingress es la abundancia de plugins que aumentan sus capacidades.
+\n
+\nPuedes agregar plugins oficiales o externos en la configuración.</string>
+    <string name="appintro_layers_title">Capas/Resaltadores</string>
+    <string name="appintro_navigation_title">Navegación</string>
+    <string name="appintro_nfc_description">Puedes enviar rápidamente el link/permalink del portal actual a otro dispositivo si ambos soportan NFC.
+\n
+\nColoca ambos dispositivos back-to-back y toca la pantalla para enviar el mapa al otro dispositivo.</string>
+    <string name="appintro_location_description">IITC-CE Mobile necesita permiso para acceder a tu ubicación para facilitar la navegación.
+\n
+\nPero no te preocupes: no enviamos datos de tu ubicación a ninguna parte.</string>
+    <string name="appintro_welcome_description">Esta es una versión para móvil del complemento indispensable para el jugador de Ingress
+\n
+\nIngress Intel Total Conversion (IITC) es un complemento que trabaja en superposición con el Intel Map oficial de Ingress.
+\n
+\nIITC cambia por completo la manera en que trabajas con el mapa, incrementa significativamente su eficiencia aplicando aceleración por hardware y amplía sus capacidades a través del uso de varios plugins.</string>
+    <string name="pref_user_location_dont_show">No mostrar la posición del usuario</string>
+    <string name="pref_hide_fullscreen_status_bar">Barra de Estado IITC</string>
+    <string name="pref_hide_fullscreen_action_bar">Barra de Acción de IITC</string>
+    <string name="pref_hide_fullscreen_notification_bar">Barra de Notificaciones del Sistema</string>
+    <string name="bugtracker">Reporte de bugs</string>
+    <string name="show_appintro_screen_title">Mostrar pantalla de inicio</string>
+    <string name="plugins_permission_denied">Permiso denegado. No puedes agregar plugins.</string>
+    <string name="plugins_permission_granted">Permiso otorgado. Por favor repite la acción.</string>
+    <string name="file_browser_is_required">No se ha encontrado una actividad para seleccionar un archivo. ¡Por favor instale un explorador de archivos de su elección!</string>
+    <string name="file_browser_choose_file">Seleccione archivo</string>
+    <string name="plugins_user_plugins">Plugins del usuario</string>
+    <string name="plugins_official_plugins">Plugins Oficiales</string>
+    <string name="toast_press_twice_to_exit">Presione dos veces para salir</string>
+    <string name="plugin_updated">Plugin actualizado</string>
+    <string name="pane_all">Todos</string>
+    <string name="pane_faction">Facción</string>
+    <string name="pane_alerts">Alertas</string>
+    <string name="pane_info">Información</string>
+    <string name="pane_map">Mapa</string>
 </resources>

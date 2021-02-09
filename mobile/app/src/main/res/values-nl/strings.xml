@@ -5,10 +5,21 @@
     <string name="activity_share_to_clipboard">Kopieer naar klembord</string>
     <string name="activity_settings">IITC Mobile instellingen</string>
     <string name="debug_run">Uitvoeren</string>
-    <string name="notice_info">&lt;p&gt;Hint: Andere manieren om het infoscherm te openen: &lt;p&gt; • Klik op een portal en houd ingedrukt voor een seconde&lt;br&gt; • Klik op de linkerhelft van de statusbalk&lt;br&gt;</string>
+    <string name="notice_info">&lt;p&gt;Hint: Andere manieren om het infoscherm te openen: &lt;p&gt; • Klik op een portal en houdt het voor een seconde vast&lt;br&gt; • Klik op de linkerhelft van de statusbalk&lt;br&gt;</string>
     <string name="pref_about_title">Over IITC Mobile</string>
     <string name="close">Sluit</string>
     <string name="version">Printversie</string>
     <string name="drawer_close">Verberg navigatiemenu</string>
     <string name="drawer_open">Laat navigatiemenu zien</string>
+    <string name="pref_misc_cat">Overige</string>
+    <string name="pref_ui_cat">UI</string>
+    <string name="notice_sharing">&lt;p&gt;Met &lt;em&gt;Portal delen&lt;/em&gt; kun je: &lt;p&gt; • een portal link sturen naar anderen&lt;br&gt; • de positie van de geselecteerde portal bekijken in een andere app&lt;br&gt; • de portal link openen in een webbrowser&lt;br&gt; &lt;p&gt;Hint: Door Google Maps te selecteren (of een andere geïnstalleerde navigatie software), kun je snel navigeren naar de geselecteerde portal. &lt;p&gt;Deze hints gelden ook voor de &lt;em&gt;permanente link&lt;/em&gt;.</string>
+    <string name="notice_extplugins">&lt;p&gt;Hint: &lt;p&gt;Met IITC Mobile is het ook mogelijk om externe plugins te laden! &lt;p&gt;Voeg deze toe door te klikken op de (+) icoon rechtsboven aan. De plugin bestanden dienen te eindigen op \'.user.js\' en dienen te worden gekopieerd naar &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Uitvoering versie: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC versie: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;by ${cradle_link}, ${fkloft_link} en bijdragen van&lt;/b&gt; &lt;p&gt;&lt;b&gt;Icoon van ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; is een geoptimaliseerde mobiele browser voor de &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; gebruikerstekst. &lt;h3&gt;Gemeenschap:&lt;/h3&gt; • Bezoek de ${website_link} voor nieuwe versies en de bureaublad versie.&lt;br&gt; • Volg het ${tg_iitc_news_link} Telegram kanaal voor berichtgevingen en neem deel aan de ${tg_iitc_group_link} chat.&lt;br&gt; • Neem deel aan de ${reddit_iitc_link} Reddit gemeenschap - een plek waar je hulp kunt vragen en waar je kunt discussiëren met andere gebruikers.&lt;br&gt; • Rapporteer problemen en stel verbeteringen voor via ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Ontwikkelaars:&lt;/h3&gt; ${github_iitc_link} op Github. &lt;h3&gt;IITC Licentie:&lt;/h3&gt; ${ISC_license_text}</string>
+    <string name="iitc_website">IITC webpagina</string>
+    <string name="bugtracker">Fout volgsysteem</string>
+    <string name="download_description">Actuele intel bestand downloaden…</string>
+    <string name="activity_plugins">IITC Toepassingen</string>
+    <string name="clear_log">Logboek leegmaken</string>
+    <string name="toggle_map">Wissel kaart zichtbaarheid</string>
 </resources>

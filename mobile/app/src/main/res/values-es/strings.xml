@@ -4,7 +4,7 @@
     <string name="clear_log">Borrar registro</string>
     <string name="activity_settings">Configuración móvil de IITC</string>
     <string name="activity_plugins">Plugins de IITC</string>
-    <string name="activity_share">Compartir actividad</string>
+    <string name="activity_share">Compartir usando…</string>
     <string name="activity_share_to_clipboard">Copiar al portapapeles</string>
     <string name="activity_save_to_file">Guardar a un archivo</string>
     <string name="action_settings">Configuración</string>
@@ -84,8 +84,8 @@
     <string name="pref_persistent_zoom_sum">No cambiar el nivel del zoom cuando el botón de ubicación está presionado</string>
     <string name="pref_tweaks_cat">Personalización</string>
     <string name="pref_ui_cat">Interfaz</string>
-    <string name="notice_sharing">&lt;p&gt; Con &lt;em&gt; Compartir portal &lt;/em&gt; puedes: &lt;p&gt; • enviar el enlace del portal a otras personas &lt;br&gt; • ver la posición del portal seleccionado en otra aplicación &lt;br&gt; • abrir el enlace del portal en un navegador web &lt;br&gt; &lt;p&gt; Sugerencia: Seleccionando Google Maps (o cualquier otro software de navegación instalado), puedes navegar rápidamente al portal seleccionado. &lt;p&gt; Estas sugerencias también se aplican al &lt;em&gt; enlace permanente &lt;/em&gt;.</string>
-    <string name="notice_extplugins">&lt;p&gt; Sugerencia: &lt;p&gt;¡ IITCm también puede cargar pluggins externos! &lt;p&gt; Agrégalos haciendo clic en el icono (+) en la esquina superior derecha. Los archivos de los pluggins deben terminar con \'.user.js\' y se copian en &lt;b&gt;% 1 $ s &lt;/b&gt;</string>
+    <string name="notice_sharing">&lt;p&gt; Con &lt;em&gt;Compartir portal&lt;/em&gt; puedes: &lt;p&gt; • enviar el enlace del portal a otras personas &lt;br&gt; • ver la posición del portal seleccionado en otra aplicación&lt;br&gt; • abrir el enlace del portal en un navegador web&lt;br&gt; &lt;p&gt;Consejo: Al seleccionar Google Maps (o cualquier otro software de navegación instalado), puede navegar rápidamente al portal seleccionado. &lt;p&gt;Estos consejos también se aplican al &lt;em&gt;enlace permanente&lt;/em&gt;.</string>
+    <string name="notice_extplugins">&lt;p&gt;Consejo: &lt;p&gt;¡IITC Mobile es capaz también de cargar plugins externos! &lt;p&gt;Agrégalos haciendo clic en el ícono (+) en la esquina superior derecha. Los archivos de los plugins deben terminar con \'.user.js\' y se copian en &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="notice_info">&lt;p&gt;Truco: formas alternativas de abrir la pantalla de información:&lt;p&gt; • toca y mantén presionado un portal durante un segundo&lt;br&gt; • toca en la mitad izquierda de la barra de estado&lt;br&gt;</string>
     <string name="notice_do_not_show_again">No mostrar más noticias</string>
     <string name="pref_hide_fullscreen_notification_bar">Barra de Notificaciones del Sistema</string>
@@ -112,7 +112,7 @@
 \n
 \n Pero no se preocupe: no enviamos datos sobre su ubicación a ningún lado.</string>
     <string name="appintro_nfc_title">Permisos NFC</string>
-    <string name="bugtracker">localizador de fallos</string>
+    <string name="bugtracker">Rastreador de bugs</string>
     <string name="appintro_nfc_description">Puedes enviar rápidamente el enlace del portal actual a otro dispositivo si ambos dispositivos son compatibles con NFC.
 \n
 \nSujeta ambos dispositivos juntos por su parte posterior uno al lado del otro y toque la pantalla para transmitir el mapa al otro dispositivo.</string>

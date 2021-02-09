@@ -13,7 +13,7 @@
     <string name="close">Schließen</string>
     <string name="download_description">Lade das neueste intel Paket herunter…</string>
     <string name="pref_about_title">Über IITC Mobile</string>
-    <string name="activity_share">Aktivität teilen…</string>
+    <string name="activity_share">Teilen…</string>
     <string name="activity_plugins">IITC Plugins</string>
     <string name="pref_misc_cat">Verschiedenes</string>
     <string name="pref_tweaks_cat">Optimierungen</string>

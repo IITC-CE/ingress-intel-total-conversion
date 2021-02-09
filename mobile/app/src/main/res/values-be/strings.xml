@@ -21,7 +21,7 @@
     <string name="show_appintro_screen_title">Паказаць уступны экран</string>
     <string name="pane_all">Усе</string>
     <string name="pane_faction">Фракцыя</string>
-    <string name="pane_alerts">Папярэджванне</string>
+    <string name="pane_alerts">Папярэджванні</string>
     <string name="pane_info">Інфармацыя</string>
     <string name="pane_map">Карта</string>
     <string name="notice_extplugins">&lt;p&gt; Падказка: &lt;p&gt; IITC Mobile таксама можа загружаць знешнія плагіны! &lt;p&gt; Дадайце іх, націснуўшы на значок (+) уверсе справа. Файлы плагіна павінны заканчвацца на \".user.js\" і капіююцца ў &lt;b&gt;%1$s&lt;/b&gt;</string>
@@ -29,10 +29,121 @@
     <string name="pref_plugins_title">Даступныя плагіны</string>
     <string name="pref_user_location">Паказаць месцазнаходжанне карыстальніка на карце</string>
     <string name="pref_persistent_zoom">Пастаянны ўзровень маштабавання</string>
-    <string name="pref_persistent_zoom_sum">Не змяняць узровень маштабавання пры ўключаным пазіцыянаванні</string>
-    <string name="pref_user_zoom_sum">Паказваць кнопкі +/- нават на прыладах з падтрымкай мультытач.</string>
+    <string name="pref_persistent_zoom_sum">Не змяняць узровень маштабавання пасля націску кнопкі пазіцыянавання</string>
+    <string name="pref_user_zoom_sum">Паказваць кнопкі +/- нават на прыладах з мультытачам.</string>
     <string name="pref_plugins">Плагіны IITC</string>
     <string name="pref_misc_cat">Рознае</string>
     <string name="pref_user_zoom">Паказаць кіраванне маштабаваннем</string>
     <string name="pref_ui_cat">Інтэрфейс</string>
+    <string name="pref_update_plugins_cat">Абнаўленні карыстальніцкіх плагінаў</string>
+    <string name="pref_fake_user_agent">Падробны User Agent</string>
+    <string name="pref_disable_splash">Адключыць стартавы экран</string>
+    <string name="pref_language">Мова</string>
+    <string name="pref_hide_fullscreen_action_bar">Панэль дзеянняў IITC</string>
+    <string name="pref_hide_fullscreen_status_bar">Панэль стану IITC</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Сістэмная панэль навігацыі</string>
+    <string name="pref_user_location_show_position">Паказваць месцазнаходжанне на мапе</string>
+    <string name="pref_user_location_show_position_and_orientation">Паказваць месцазнаходжанне і накіраванне</string>
+    <string name="pref_update_plugins_interval_disable">Адключыць</string>
+    <string name="pref_update_plugins_interval_1_day">1 дзень</string>
+    <string name="pref_update_plugins_interval_2_days">2 дня</string>
+    <string name="pref_update_plugins_interval_1_week">1 тыдзень</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 тыдні</string>
+    <string name="sign_in_to">Увайсці ў %1$s %2$s</string>
+    <string name="pref_fullscreen_sum">Выбар элементаў, якія будуць бачныя ў поўнаэкранным рэжыме. Заўвага: бакавыя панэлі будуць дасяжныя</string>
+    <string name="pref_force_desktop_sum">Выдатна выглядае на планшэтах, жудасна на смартфонах</string>
+    <string name="pref_dex_desktop">Падтрымка Samsung DeX</string>
+    <string name="tab_browser">Intel</string>
+    <string name="pref_dex_desktop_sum">Прымусова ўключаць дэсктопны рэжым падчас працы DeX</string>
+    <string name="install_dialog_top">Усталяваць знешні плагін\?</string>
+    <string name="tab_share">Падзяліцца</string>
+    <string name="label_base_layer">Базавы слой</string>
+    <string name="pref_external_storage_sum">Патрэбны перазапуск! Запіс кэша на SD-картку. Знешняе сховішча павінна быць падключана.</string>
+    <string name="sign_in_action">Увайсці</string>
+    <string name="tab_map">Месцазнаходжанне</string>
+    <string name="pref_press_twice_to_exit_sum">Прадухіляе выпадковы выхад</string>
+    <string name="username">Імя карыстальніка</string>
+    <string name="password">Пароль</string>
+    <string name="pref_advanced_options">Пашыраныя налады</string>
+    <string name="msg_take_screenshot">Робіцца здымак…</string>
+    <string name="pref_advanced_options_sum">Опцыі распрацоўшчыка і іншыя дадатковыя налады</string>
+    <string name="msg_copied">Скапіявана…</string>
+    <string name="pref_enable_dev_mode">Уключыць рэжым распрацоўшчыка</string>
+    <string name="intent_error">Адрас ня можа быць адкрыты</string>
+    <string name="pref_enable_dev_mode_sum">Калі ўключана, усе крыніцы IITC будуць загружацца са знешнчга сховішча. Калі ласка, скапіруйце усе крыніцы з $IITC_folder/build/mobile/ to /sdcard/IITC_Mobile/dev/.</string>
+    <string name="choose_account_to_login">Абраць акаунт для ўваходу</string>
+    <string name="pref_fake_user_agent_sum">IITCm будзе выглядаць для інтэла, як дэсктопны браўзер. Заўвага: калі вы проста жадаеце ўключыць дэсктопны рэжым, выкарыстайце наладу \"Прымусовы дэсктопны рэжым\"</string>
+    <string name="menu_copy">Капіяваць</string>
+    <string name="menu_delete">Выдаліць</string>
+    <string name="pref_android_menu">Наладзіць меню IITCm</string>
+    <string name="menu_send_screenshot">Даслаць скрыншот</string>
+    <string name="menu_plugins_add">Дадаць знешнія плагіны</string>
+    <string name="pref_android_menu_sum">Пераключае бачнасць пунктаў меню</string>
+    <string name="menu_open_plugins">Плагіны</string>
+    <string name="menu_debug">Адладка</string>
+    <string name="pref_hide_fullscreen_notification_bar">Сістэмная панэль паведамленняў</string>
+    <string name="menu_locate">Перайсці да месцазнаходжання</string>
+    <string name="menu_clear_cookies">Ачысціць cookies</string>
+    <string name="menu_search">Пошук</string>
+    <string name="pref_user_location_dont_show">Не паказваць месцазнаходжанне карыстальніка</string>
+    <string name="login_failed">Памылка ўваходу.</string>
+    <string name="menu_toggle_fullscreen">Поўны экран</string>
+    <string name="msg_prepare_screenshot">Падрыхтоўка…</string>
+    <string name="notice_do_not_show_again">Больш не паказваць</string>
+    <string name="menu_reload">Перазагрузіць IITC</string>
+    <string name="label_highlighter">Падсвятленне</string>
+    <string name="pref_secure_updates">Патрабаваць бяспечнае абнаўленне</string>
+    <string name="pref_force_plugin_update">Прымусовае абнаўленне плагінаў</string>
+    <string name="pref_force_plugin_update_sum">Абнавіць усе уключаныя плагіны</string>
+    <string name="pref_update_plugins_interval_sum">Як часта IITCm павінны шукаць новыя версіі плагінаў</string>
+    <string name="pref_update_plugins_interval">Наладзіць інтэрвал абнаўлення плагіна</string>
+    <string name="menu_layer_chooser">Выбар слоя</string>
+    <string name="search_hint">Пошук лакацый</string>
+    <string name="label_overlay_layers">Накладанне слаёў</string>
+    <string name="pref_press_twice_to_exit">Двойчы націснуць кнопку \"Назад\" для выхаду</string>
+    <string name="pref_external_storage">Перамясціць кэш тайлаў на знешняе сховішча</string>
+    <string name="pref_force_desktop">Прымусовы дэсктопны рэжым</string>
+    <string name="pref_fullscreen">Наладзіць поўнаэкранны рэжым</string>
+    <string name="pref_plugins_sum">Плагіны пашыраюць магчымасці IITC. Тут вы знойдзеце большасць плагінаў, існых на дэсктопнай версіі.</string>
+    <string name="appintro_navigation_title">Навігацыя</string>
+    <string name="activity_share">Падзяліцца праз…</string>
+    <string name="pref_secure_updates_sum">Калі ўключана, апрацоўвацца будуць толькі абнаўленні праз https</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm усталёўвае наступны файл: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Будзьце асцярожнымі: &lt;/b&gt; Javascript, атрыманы са знешніх крыніц, можа ўтрымліваць шкоднасны код (шпіёнскае ПЗ і г. д.)! &lt;p&gt;Вы ўпэўненыя, што жадаеце працягнуць\?</string>
+    <string name="notice_sharing">&lt;p&gt;Праз кнопку &lt;em&gt;Падзяліцца парталам&lt;/em&gt; вы можаце: &lt;p&gt; • даслаць спасылку на партал іншым людзям&lt;br&gt; • паглядзець месцазнаходжанне партала ў іншай прыладзе&lt;br&gt; • адкрыць спасылку ў браўзеры&lt;br&gt; &lt;p&gt;Парада: абраўшы Google Maps, або іншую навігацыйную прыладу, вы можаце хутка перайсці да абранага партала. &lt;p&gt;Гэтыя парады таксама дзейнічаюць і на &lt;em&gt;пастаянныя спасылкі&lt;/em&gt;.</string>
+    <string name="appintro_welcome_description">Гэта мабільная версія незаменнага памочніка гульца Ingress.
+\n
+\nIngress Intel Total Conversion (IITC) - гэта дадатак, якое працуе па-над афіцыйнай картай Ingress - Intel.
+\n
+\nIITC цалкам змяняе метад працы з картай, значна павышае прадукцыйнасць за кошт выкарыстання апаратнага паскарэння і пашырае магчымасці з дапамогай плагінаў.</string>
+    <string name="appintro_location_description">IITC-CE Mobile патрабуе дазволу на доступ да вашага месцазнаходжання для зручнай навігацыі.
+\n
+\n Але не хвалюйцеся: мы нікуды не адпраўляем дадзеныя пра ваша месцазнаходжанне.</string>
+    <string name="appintro_nfc_description">Вы можаце хутка адправіць бягучую спасылку на партал на іншую прыладу, калі абедзве прылады падтрымліваюць NFC.
+\n
+\n Утрымлівайце абедзве прылады спіна да спіны і націсніце экран, каб перакінуць карту на іншую прыладу.</string>
+    <string name="appintro_layers_title">Слаі/Падсветкі</string>
+    <string name="appintro_layers_description"> Правядзіце пальцам ад правага краю экрана (альбо націсніце на значок выбару слаёў у панэлі дзеянняў), каб выклікаць <i>скрыню слаёў</i>.
+\n
+\n Тут вы можаце змяніць службу анлайн-карт альбо ўключыць/выключыць адлюстраванне неабходных элементаў на карце. </string>
+    <string name="appintro_plugins_title">Плагіны</string>
+    <string name="file_browser_is_required">Адсутнічае прылада дзеля выбару файла. Усталюйце файлавы менеджэр!</string>
+    <string name="file_browser_choose_file">Выберыце файл</string>
+    <string name="plugins_user_plugins">Карыстальніцкія плагіны</string>
+    <string name="plugins_official_plugins">Афіцыйныя плагіны</string>
+    <string name="plugin_updated">Плагін абноўлены</string>
+    <string name="plugins_permission_denied">У доступе адмоўлена. Вы не можаце дадаваць плагіны.</string>
+    <string name="appintro_navigation_description"> Правядзіце пальцам ад левага краю экрана (альбо націсніце на значок меню), каб выклікаць <i>скрыню навігацыі</i>.
+\n Націсніце значок \"Назад\", каб вярнуцца на карту.
+\n
+\n Некаторыя плагіны (напрыклад, <i>спіс парталаў</i> і <i>закладкі</i>) цяпер знаходзяцца ў <i>скрыні навігацыі</i> для хуткага доступу.
+\n Яны больш не будуць з\'яўляцца на інфармацыйнай панэлі. </string>
+    <string name="appintro_plugins_description">Вы можаце пачаць выкарыстоўваць IITC-CE прама зараз.
+\n
+\n Але галоўная перавага перад афіцыйнай картай Intel Ingress - багацце плагінаў, якія пашыраюць магчымасці.
+\n
+\n Вы можаце дадаць афіцыйныя альбо знешнія плагіны ў наладах.</string>
+    <string name="toast_press_twice_to_exit">Націсніце двойчы каб выйсці</string>
+    <string name="plugins_permission_granted">Дазвол прадстаўлены. Калі ласка, паўтарыце.</string>
+    <string name="appintro_location_title">Дазвол атрымліваць лакацыю</string>
+    <string name="appintro_nfc_title">Дазвол NFC</string>
 </resources>

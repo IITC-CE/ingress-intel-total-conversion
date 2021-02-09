@@ -89,4 +89,22 @@
     <string name="notice_sharing">&lt;p&gt;Přes &lt;em&gt;Sdílení portálu&lt;/em&gt; můžete: &lt;p&gt; • poslat odkaz na portál ostatním lidem&lt;br&gt; • zobrazit polohu portálu v jiné aplikaci&lt;br&gt; • zobrazit portál v prohlížeči&lt;br&gt; &lt;p&gt;Nápověda: Výběrem Map Google (nebo jiné navigační aplikace) získáte rychle navigační instrukce k danému portálu. &lt;p&gt;Toto platí také pro &lt;em&gt;permalink&lt;/em&gt;.</string>
     <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Verze sestavení: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;Verze IITC: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;od ${cradle_link}, ${fkloft_link} a přispěvatelů&lt;/b&gt; &lt;p&gt;&lt;b&gt;Ikona od ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; je mobilní prohlížeč optimalizovaný pro &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; uživatelský skript. &lt;h3&gt;Komunita:&lt;/h3&gt; • Navštivte ${website_link} pro nové verze a verzi pro počítačový prohlížeč.&lt;br&gt; • Odebírejte kanál ${tg_iitc_news_link} na Telegramu pro oznámení a přidejte se do skupinového chatu ${tg_iitc_group_link}.&lt;br&gt; • Přidejte se na ${reddit_iitc_link} Subreddit - místo, kde můžete požádat o pomoc a diskutovat používání IITC s ostatními uživateli.&lt;br&gt; • Nahlašujte chyby a navrhujte vylepšení v ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Vývojáři:&lt;/h3&gt; ${github_iitc_link} na Githubu. ${ISC_license_text}</string>
     <string name="pref_language">Jazyk</string>
+    <string name="pref_hide_fullscreen_notification_bar">Lišta systémových upozornění</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Lišta systému</string>
+    <string name="pref_user_location_dont_show">Neukazovat polohu uživatele</string>
+    <string name="pref_user_location_show_position">Ukazovat polohu uživatele na mapě</string>
+    <string name="pref_update_plugins_interval_disable">Vypnout</string>
+    <string name="pref_update_plugins_interval_1_day">1 den</string>
+    <string name="pref_update_plugins_interval_2_days">2 dny</string>
+    <string name="pref_update_plugins_interval_1_week">1 týden</string>
+    <string name="appintro_location_title">Povolení polohy</string>
+    <string name="pref_hide_fullscreen_status_bar">Lišta stavu IITC</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 týdny</string>
+    <string name="bugtracker">Sledování chyb</string>
+    <string name="iitc_website">Stránka IITC</string>
+    <string name="appintro_welcome_description">Toto je mobilní verze nepostradatelného pomocníka hráčů Ingressu.
+\n
+\nIngress Intel Total Conversion (IITC) je doplněk, který funguje jako překrytí oficiální Intel Ingress mapy.
+\n
+\nIITC úplně změní způsob, jakým používáte mapu, podstatně zvyšuje efektivitu použitím hardwarové akcelerace a rozšiřuje možnosti využití přes různé přídavné moduly.</string>
 </resources>

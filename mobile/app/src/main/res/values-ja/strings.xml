@@ -99,11 +99,27 @@
     <string name="pref_fake_user_agent_sum">IITCmはIntelサイトのデスクトップブラウザーとして振る舞います。 ※デスクトップ版IITCを使いたい場合は、設定の「デスクトップ版表示を強制する」を使用します</string>
     <string name="menu_layer_chooser">レイヤーを選択</string>
     <string name="pref_update_plugins_interval">プラグイン更新チェック間隔</string>
-    <string name="pref_update_plugins_interval_1_day">"1  日"</string>
+    <string name="pref_update_plugins_interval_1_day">1日</string>
     <string name="pane_map">マップ</string>
     <string name="appintro_plugins_title">プラグイン</string>
     <string name="pane_faction">陣営</string>
     <string name="pane_alerts">通知</string>
     <string name="pane_all">アクティビティ</string>
     <string name="plugins_permission_denied">許可がありません。プラグインを追加できません。</string>
+    <string name="appintro_plugins_description">さあIITC-CEを使い始めましょう
+\n
+\n 公式のIngressインテルマップと比べて優れているところは機能を拡張してくれる豊富なプラグインにあります
+\n
+\n 公式提供のプラグインや外部プラインを設定から追加できます</string>
+    <string name="file_browser_choose_file">ファイルを選ぶ</string>
+    <string name="toast_press_twice_to_exit">2度押して終了</string>
+    <string name="plugin_updated">プラグインが更新されました</string>
+    <string name="pane_info">情報</string>
+    <string name="pref_language">言語</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC ステータスバー</string>
+    <string name="pref_update_plugins_interval_2_days">2日</string>
+    <string name="pref_update_plugins_interval_1_week">1週</string>
+    <string name="pref_update_plugins_interval_2_weeks">2週</string>
+    <string name="bugtracker">バグトラッカー</string>
+    <string name="iitc_website">IITC ウェブサイト</string>
 </resources>

@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="clear_log">清除記錄</string>
+    <string name="debug_run">運行</string>
+    <string name="activity_settings">IITC 設置</string>
+    <string name="activity_plugins">IITC 插件</string>
+    <string name="activity_share_to_clipboard">複製到剪貼板</string>
+    <string name="activity_save_to_file">保存至文件</string>
+    <string name="action_settings">設置</string>
+    <string name="drawer_open">顯示導航清單</string>
+    <string name="drawer_close">隱藏導航清單</string>
+    <string name="version">列印版本</string>
+    <string name="close">關閉</string>
+    <string name="download_description">正在下載最新Intel進程…</string>
+    <string name="bugtracker">問題追蹤</string>
+    <string name="iitc_website">IITC 網址</string>
+    <string name="pref_about_title">有關 IITC Mobile</string>
+    <string name="pref_ui_cat">界面</string>
+    <string name="pref_misc_cat">其餘</string>
+</resources>

@@ -145,4 +145,5 @@
     <string name="menu_send_screenshot">שלח צילום מסך</string>
     <string name="search_hint">חפש מיקומים</string>
     <string name="notice_do_not_show_again">אל תציג שוב</string>
+    <string name="activity_share">שיתוף באמצעות…</string>
 </resources>

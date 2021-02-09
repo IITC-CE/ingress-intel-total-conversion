@@ -1,2 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="toggle_map">Skift kortets synlighed</string>
+    <string name="clear_log">Ryd loggen</string>
+    <string name="debug_run">Løb</string>
+    <string name="activity_settings">IITC Mobile-indstillinger</string>
+    <string name="activity_plugins">IITC Plugins</string>
+    <string name="activity_share_to_clipboard">Kopier til udklipsholder</string>
+    <string name="activity_save_to_file">Gem som fil</string>
+    <string name="action_settings">Indstillinger</string>
+    <string name="drawer_open">Vis navigationsmenu</string>
+    <string name="drawer_close">Skjul navigationsmenuen</string>
+    <string name="close">Tæt</string>
+    <string name="download_description">Downloader den nyeste Intel-pakke…</string>
+    <string name="iitc_website">IITC hjemmeside</string>
+    <string name="pref_about_title">Om IITC Mobile</string>
+    <string name="notice_info">&lt;p&gt;Tip: Alternative måder at åbne informationsskærmen på: &lt;p&gt; • tryk og hold en portal i et sekund &lt;br&gt; • tryk på venstre halvdel af statuslinjen&lt;br&gt;</string>
+    <string name="notice_extplugins">&lt;p&gt;Tip: &lt;p&gt;IITC Mobile er også i stand til at indlæse eksterne plugins! &lt;p&gt;Tilføj dem ved at klikke på ikonet (+) øverst til højre. Pluginfilerne skal slutte med \'.user.js\' og kopieres til &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="notice_sharing">&lt;p&gt;Med &lt;em&gt;Del portal&lt;/em&gt; kan du: &lt;p&gt; • sende portallinket til andre mennesker&lt;br&gt; • se den valgte portalposition i en anden app&lt;br&gt; • åbne portallinket i en webbrowser&lt;br&gt; &lt;p&gt;Tip: Ved at vælge Google Maps (eller en hvilken som helst anden installeret navigationssoftware) kan du hurtigt navigere til den valgte portal. &lt;p&gt;Disse tip gælder også for &lt;em&gt;permalink&lt;/em&gt;.</string>
+    <string name="pref_misc_cat">Diverse</string>
+    <string name="pref_tweaks_cat">Justeringer</string>
+    <string name="pref_plugins_sum">Plugins udvider / ændrer IITC-oplevelsen. De fleste plugins, der er kendt fra desktop IITC, kan findes her.</string>
+    <string name="pref_user_location">Vis din placering på kortet</string>
+    <string name="activity_share">Del ved hjælp af…</string>
+    <string name="pref_persistent_zoom">Vedvarende zoomniveau</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt; &lt;b&gt;Build version: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC version: ${iitc_version}&lt;/b&gt; &lt;p&gt; &lt;b&gt;af ${cradle_link}, ${fkloft_link} og bidragydere&lt;/b&gt; &lt;p&gt;&lt;b&gt;Ikon af ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; er en optimeret mobil browser til &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; -brugerskrift. &lt;h3&gt;Fællesskab:&lt;/h3&gt; • Besøg ${website_link} for nye udgivelser og desktopversionen.&lt;br&gt; • Følg ${tg_iitc_news_link} Telegram-kanalen for meddelelser og deltag i ${tg_iitc_group_link} chat.&lt;br&gt; • Deltag i ${reddit_iitc_link} Reddit-gruppen - et sted at bede om hjælp og diskutere med andre brugere.&lt;br&gt; • Rapporter problemer og foreslå forbedringer på ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Udviklere:&lt;/h3&gt; ${github_iitc_link} på Github. &lt;h3&gt;IITC-licens:&lt;/h3&gt; ${ISC_license_text}</string>
+    <string name="pref_plugins_title">Tilgængelige plugins</string>
+</resources>
