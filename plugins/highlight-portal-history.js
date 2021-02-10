@@ -2,7 +2,7 @@
 // @name           Highlight portals based on history
 // @category       Highlighter
 // @version        0.1.0
-// @description    Use the portal fill color to denote the portal has been visited, caputured or scouted
+// @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 
 function setStyle (data, color, opacity) {
@@ -65,8 +65,8 @@ window.plugin.portalHighlighterPortalsHistory = {
 };
 
 var setup = function () {
-  window.addPortalHighlighter('Visited/captured', window.plugin.portalHighlighterPortalsHistory.visited);
-  window.addPortalHighlighter('Not visited/captured', window.plugin.portalHighlighterPortalsHistory.notVisited);
-  window.addPortalHighlighter('Scout controlled', window.plugin.portalHighlighterPortalsHistory.scoutControlled);
-  window.addPortalHighlighter('Not scout controlled', window.plugin.portalHighlighterPortalsHistory.notScoutControlled);
+  window.addPortalHighlighter('History: visited/captured', window.plugin.portalHighlighterPortalsHistory.visited);
+  window.addPortalHighlighter('History: not visited/captured', window.plugin.portalHighlighterPortalsHistory.notVisited);
+  window.addPortalHighlighter('History: scout controlled', window.plugin.portalHighlighterPortalsHistory.scoutControlled);
+  window.addPortalHighlighter('History: not scout controlled', window.plugin.portalHighlighterPortalsHistory.notScoutControlled);
 }
