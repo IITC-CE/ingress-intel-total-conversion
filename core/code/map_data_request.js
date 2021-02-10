@@ -74,7 +74,7 @@ window.MapDataRequest = function() {
   var _this = this;
   addHook('portalDetailLoaded', function(data){
     if(data.success) {
-      _this.render.processGameEntities([data.ent], 'detailed');
+      _this.render.createPortalEntity(data.ent, 'detailed');
     }
   });
 
