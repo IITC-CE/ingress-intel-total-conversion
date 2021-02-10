@@ -278,17 +278,17 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
     }
   }
 
-  this.createPortalEntity(ent);
+  this.createPortalEntity(ent, "placeholder");
 
 }
 
 
-window.Render.prototype.createPortalEntity = function(ent) {
+window.Render.prototype.createPortalEntity = function(ent, type) {
   this.seenPortalsGuid[ent[0]] = true;  // flag we've seen it
 
   var previousData = undefined;
 
-  var data = decodeArray.portalSummary(ent[2]);
+  var data = decodeArray.portal(ent[2], type === "placeholder" ? "core" : "extended");
 
   // check if entity already exists
   if (ent[0] in window.portals) {
@@ -329,7 +329,7 @@ window.Render.prototype.createPortalEntity = function(ent) {
     ent: ent,  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
     guid: ent[0],
     timestamp: ent[1],
-    data: data,
+    data: data
   };
 
   window.pushPortalGuidPositionCache(ent[0], data.latE6, data.lngE6);

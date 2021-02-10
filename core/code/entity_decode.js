@@ -111,57 +111,55 @@ function detailsPortalData(a) {
   }
 };
 
-function extendedPortalData(a, required) {
+function extendedPortalData(a) {
   return {
-    history: parseHistoryDetail(a[DETAILED_PORTAL_DATA_LENGTH], required),
+    history: parseHistoryDetail(a[DETAILED_PORTAL_DATA_LENGTH] || 0),
   }
 };
 
 
-window.decodeArray.portalSummary = function(a) {
+var dataLen = {
+  core: [CORE_PORTAL_DATA_LENGTH],
+  summary: [SUMMARY_PORTAL_DATA_LENGTH],
+  detailed: [DETAILED_PORTAL_DATA_LENGTH],
+  extended: [EXTENDED_PORTAL_DATA_LENGTH, SUMMARY_PORTAL_DATA_LENGTH]
+};
+
+window.decodeArray.portal = function(a, details) {
   if (!a) return undefined;
 
   if (a[0] !== 'p') {
     throw new Error('Error: decodeArray.portalSUmmary - not a portal');
   }
 
-  if (a.length == CORE_PORTAL_DATA_LENGTH) {
-    return corePortalData(a);
+  if (details) {
+    var expected = dataLen[details];
+    if (expected.indexOf(a.length) === -1) {
+      log.warn('Unexpected portal data length: ' + a.length + ' ('+details+')');
+      debugger;
+    }
   }
 
-  // NOTE: allow for either summary or detailed portal data to be passed in here, as details are sometimes
-  // passed into code only expecting summaries
-  if (a.length != SUMMARY_PORTAL_DATA_LENGTH
-      && a.length != DETAILED_PORTAL_DATA_LENGTH
-      && a.length != EXTENDED_PORTAL_DATA_LENGTH) {
-    log.warn('Portal summary length changed - portal details likely broken!' );
-    debugger;
-  }
+  var data = corePortalData(a);
 
-  // on getEntities, intel send the history unless the user has never interacted with the portal
-  // raw data is either a summary or an extended data with null details
-  // in the first case, history is forced to 0 if missing
-  return $.extend(corePortalData(a), summaryPortalData(a), extendedPortalData(a, a.length === SUMMARY_PORTAL_DATA_LENGTH));
+  if (a.length >= SUMMARY_PORTAL_DATA_LENGTH) {
+    $.extend(data, summaryPortalData(a));
+  }
+  if (a.length >= DETAILED_PORTAL_DATA_LENGTH) {
+    if (details !== 'extended' || a[SUMMARY_PORTAL_DATA_LENGTH]) {
+      $.extend(data, detailsPortalData(a));
+    }
+  }
+  if (a.length >= EXTENDED_PORTAL_DATA_LENGTH || details === 'extended') {
+    $.extend(data, extendedPortalData(a));
+  }
+  return data;
 }
 
-window.decodeArray.portalDetail = function(a) {
-  if (!a) return undefined;
+window.decodeArray.portalSummary = function(a) { // deprecated!!
+  return window.decodeArray.portal(a, 'summary');
+}
 
-  if (a[0] !== 'p') {
-    throw new Error('Error: decodeArray.portalDetail - not a portal');
-  }
-
-  if (a.length != DETAILED_PORTAL_DATA_LENGTH
-      && a.length != EXTENDED_PORTAL_DATA_LENGTH) {
-    log.warn('Portal detail length changed - portal details may be wrong');
-    debugger;
-  }
-
-  //TODO look at the array values, make a better guess as to which index the mods start at, rather than using the hard-coded SUMMARY_PORTAL_DATA_LENGTH constant
-
-
-  // the portal details array is just an extension of the portal summary array
-  // to allow for niantic adding new items into the array before the extended details start,
-  // use the length of the summary array
-  return $.extend(corePortalData(a), summaryPortalData(a), detailsPortalData(a), extendedPortalData(a, false));
+window.decodeArray.portalDetail = function(a) { // deprecated!!
+  return window.decodeArray.portal(a, 'detailed');
 }
