@@ -14,32 +14,40 @@ var portalBaseStyle = {
 };
 
 L.PortalMarker = L.CircleMarker.extend({
-  options: {
-    guid: null,
-    level: 0,
-    team: 0,
-    timestamp: 0,
-    data: null,
-    ent: null, // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
-  },
+  options: {},
 
   initialize: function(latlng, data) {
-    L.CircleMarker.prototype.initialize.call(this, latlng, data);
-
-    var styleOptions = this._style();
-    this.setStyle(styleOptions);
-    highlightPortal(this);
+    L.CircleMarker.prototype.initialize.call(this, latlng);
+    this.updateDetails(data);
   },
-  updateData: function(data, selected) {
-    L.setOptions(this, data);
+  updateDetails: function(details) {
+    // xxx: handle permanent data
+    this._details = details;
 
-    this.reset(selected);
+    this._level = parseInt(details.level) || 0;
+    this._team = window.teamStringToId(details.team);
+
+    // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
+    if (this._team === TEAM_NONE) this._level = 0;
+
+    // compatibility
+    var dataOptions = {
+      guid: this._details.guid,
+      level: this._level,
+      team: this._team,
+      ent: this._details.ent, // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
+      timestamp: this._details.timestamp,
+      data: this._details
+    };
+    L.setOptions(this, dataOptions);
+
+    this.reset();
   },
   getDetails: function () {
-    return this.options.data;
+    return this._details;
   },
   hasFullDetails: function () {
-    return !!this.options.data.mods
+    return !!this._details.mods
   },
   reset: function (selected) {
     var styleOptions = this._style();
@@ -54,11 +62,11 @@ L.PortalMarker = L.CircleMarker.extend({
   _style: function () {
     var dashArray = null;
     // dashed outline for placeholder portals
-    if (this.options.team != TEAM_NONE && this.options.level==0) dashArray = '1,2';
+    if (this._team !== TEAM_NONE && this._level === 0) dashArray = '1,2';
 
     return L.extend(this._scale(), portalBaseStyle, {
-      color: COLORS[this.options.team],
-      fillColor: COLORS[this.options.team],
+      color: COLORS[this._team],
+      fillColor: COLORS[this._team],
       dashArray: dashArray
     });
   },
@@ -69,13 +77,13 @@ L.PortalMarker = L.CircleMarker.extend({
     var LEVEL_TO_WEIGHT = [2, 2, 2, 2, 2, 3, 3, 4, 4];
     var LEVEL_TO_RADIUS = [7, 7, 7, 7, 8, 8, 9,10,11];
 
-    var level = Math.floor(this.options.level||0);
+    var level = Math.floor(this._level || 0);
 
     var lvlWeight = LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
     var lvlRadius = LEVEL_TO_RADIUS[level] * scale;
 
     // thinner outline for placeholder portals
-    if (this.options.team != TEAM_NONE && level==0) {
+    if (this._team !== TEAM_NONE && level === 0) {
       lvlWeight = 1;
     }
 

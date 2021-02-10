@@ -362,20 +362,21 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   var previousData = undefined;
 
   var data = window.decodeArray.portal(ent[2], details);
+  var guid = ent[0];
 
   // check if entity already exists
-  const oldPortal = ent[0] in window.portals;
+  const oldPortal = guid in window.portals;
 
   if (oldPortal) {
     // yes. now check to see if the entity data we have is newer than that in place
-    var p = window.portals[ent[0]];
+    var p = window.portals[guid];
 
     if (!data.history || p.options.data.history === data.history) {
       if (p.options.timestamp > ent[1]) {
         return p; // this data is older - abort processing
       }
 
-      if (p.options.timestamp == ent[1] && p.hasDetails()) // this data is identical - abort processing
+      if (p.options.timestamp == ent[1] && p.hasFullDetails()) // this data is identical - abort processing
         return p;
     }
 
@@ -383,7 +384,7 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
 
     // remember the old details, for the callback
-    previousData = p.options.data;
+    previousData = p.getDetails();
 
     // preserve history
     if (!data.history) {
@@ -391,51 +392,45 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     }
   }
 
-  var portalLevel = parseInt(data.level) || 0;
-  var team = window.teamStringToId(data.team);
-  // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
-  if (team === window.TEAM_NONE) portalLevel = 0;
+  // add missing fields
+  data.guid = guid;
+  if (!data.timestamp)
+    data.timestamp = ent[1];
+
+  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
+  data.ent = ent;
 
   var latlng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
-  var dataOptions = {
-    level: portalLevel,
-    team: team,
-    ent: ent, // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
-    guid: ent[0],
-    timestamp: ent[1],
-    data: data,
-  };
-
-  window.pushPortalGuidPositionCache(ent[0], data.latE6, data.lngE6);
+  window.pushPortalGuidPositionCache(data.guid, data.latE6, data.lngE6);
 
   // check for URL links to portal, and select it if this is the one
   if (window.urlPortalLL && window.urlPortalLL[0] === latlng.lat && window.urlPortalLL[1] === latlng.lng) {
     // URL-passed portal found via pll parameter - set the guid-based parameter
-    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + urlPortalLL[1] + ' matches portal GUID ' + ent[0]);
+    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + urlPortalLL[1] + ' matches portal GUID ' + data.guid);
 
-    window.urlPortal = ent[0];
+    window.urlPortal = data.guid;
     window.urlPortalLL = undefined; // clear the URL parameter so it's not matched again
   }
-  if (window.urlPortal === ent[0]) {
+  if (window.urlPortal === data.guid) {
     // URL-passed portal found via guid parameter - set it as the selected portal
     log.log('urlPortal GUID ' + urlPortal + ' found - selecting...');
-    window.selectedPortal = ent[0];
+    window.selectedPortal = data.guid;
     window.urlPortal = undefined; // clear the URL parameter so it's not matched again
   }
 
   let marker = undefined;
   if (oldPortal) {
     // update marker style/highlight and layer
-    marker = window.portals[ent[0]];
+    marker = window.portals[data.guid];
     // remove portal from its faction/level specific layer
     this.removePortalFromMapLayer(marker);
 
-    marker.updateData(dataOptions, ent[0] === selectedPortal);
+    marker.updateDetails(data);
 
     window.runHooks('portalAdded', {portal: marker, previousData: previousData});
   } else {
-    marker = createMarker(latlng, dataOptions);
+    marker = createMarker(latlng, data);
 
     function handler_portal_click(e) {
       window.renderPortalDetails(e.target.options.guid);
@@ -459,12 +454,12 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
     window.runHooks('portalAdded', { portal: marker });
 
-    window.portals[ent[0]] = marker;
+    window.portals[data.guid] = marker;
   }
 
   // (re-)select the portal, to refresh the sidebar on any changes
-  if (ent[0] === window.selectedPortal) {
-    log.log('portal guid ' + ent[0] + ' is the selected portal - re-rendering portal details');
+  if (data.guid === window.selectedPortal) {
+    log.log('portal guid ' + data.guid + ' is the selected portal - re-rendering portal details');
     window.renderPortalDetails(window.selectedPortal);
   }
 
