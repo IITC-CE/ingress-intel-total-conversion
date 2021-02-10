@@ -35,7 +35,10 @@ L.PortalMarker = L.CircleMarker.extend({
 
     this.reset(selected);
   },
-  hasDetails: function () {
+  getDetails: function () {
+    return this.options.data;
+  },
+  hasFullDetails: function () {
     return !!this.options.data.mods
   },
   reset: function (selected) {
