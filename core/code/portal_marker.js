@@ -76,9 +76,13 @@ L.PortalMarker = L.CircleMarker.extend({
 
     highlightPortal(this);
 
-    if (selected) {
+    if (selected === false)
+      this._selected = false;
+    else
+      this._selected = this._selected || selected;
+
+    if (this._selected)
       this.setStyle ({color: COLOR_SELECTED_PORTAL});
-    }
   },
   _style: function () {
     var dashArray = null;
