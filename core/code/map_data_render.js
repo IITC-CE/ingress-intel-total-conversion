@@ -370,10 +370,14 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     // yes. now check to see if the entity data we have is newer than that in place
     var p = window.portals[ent[0]];
 
-    if (!data.history || p.options.data.history === data.history)
-      if (p.options.timestamp >= ent[1]) {
-        return; // this data is identical or older - abort processing
+    if (!data.history || p.options.data.history === data.history) {
+      if (p.options.timestamp > ent[1]) {
+        return p; // this data is older - abort processing
       }
+
+      if (p.options.timestamp == ent[1] && p.hasDetails()) // this data is identical - abort processing
+        return p;
+    }
 
     // the data we have is newer. many data changes require re-rendering of the portal
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
@@ -468,6 +472,8 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
   // TODO? postpone adding to the map layer
   this.addPortalToMapLayer(marker);
+
+  return marker;
 };
 
 /**
