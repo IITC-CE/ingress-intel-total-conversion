@@ -60,9 +60,7 @@ function parseArtifactDetail(arr) {
   };
 }
 
-function parseHistoryDetail(bitarray, required) {
-  if (bitarray == null && !required) return null;
-  if (bitarray == null) bitarray = 0;
+function parseHistoryDetail(bitarray) {
   return {
     _raw: bitarray,
     visited:  !!(bitarray & 1),
