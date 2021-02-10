@@ -101,7 +101,7 @@ window.artifact.processResult = function (portals) {
 
   for (var guid in portals) {
     var ent = portals[guid];
-    var data = decodeArray.portal(ent, "summary");
+    var data = decodeArray.portal(ent, 'summary');
     
     if (!data.artifactBrief) {
       // 2/12/2017 - Shard removed from a portal leaves it in artifact results but has no artifactBrief

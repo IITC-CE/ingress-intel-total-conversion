@@ -36,6 +36,7 @@ window.renderPortalDetails = function(guid) {
   var portal = window.portals[guid];
   var data = portal.options.data;
   var details = portalDetail.get(guid);
+  var historyDetails = getPortalHistoryDetails(data);
 
   // details and data can get out of sync. if we have details, construct a matching 'data'
   if (details) {
@@ -148,7 +149,7 @@ window.renderPortalDetails = function(guid) {
       resoDetails,
       statusDetails,
       linkDetails,
-      getPortalHistoryDetails(data)
+      historyDetails
     );
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data

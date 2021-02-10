@@ -106,7 +106,7 @@ window.Render.prototype.processDeletedGameEntityGuids = function(deleted) {
 
 }
 
-window.Render.prototype.processGameEntities = function(entities) {
+window.Render.prototype.processGameEntities = function(entities, details) {
 
   // we loop through the entities three times - for fields, links and portals separately
   // this is a reasonably efficient work-around for leafletjs limitations on svg render order
@@ -131,7 +131,7 @@ window.Render.prototype.processGameEntities = function(entities) {
     var ent = entities[i];
 
     if (ent[2][0] == 'p' && !(ent[0] in this.deletedGuid)) {
-      this.createPortalEntity(ent);
+      this.createPortalEntity(ent, details);
     }
   }
 }
@@ -278,17 +278,17 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
     }
   }
 
-  this.createPortalEntity(ent, "placeholder");
+  this.createPortalEntity(ent, 'core'); // placeholder
 
 }
 
 
-window.Render.prototype.createPortalEntity = function(ent, type) {
+window.Render.prototype.createPortalEntity = function(ent, details) {
   this.seenPortalsGuid[ent[0]] = true;  // flag we've seen it
 
   var previousData = undefined;
 
-  var data = decodeArray.portal(ent[2], type === "placeholder" ? "core" : "extended");
+  var data = decodeArray.portal(ent[2], details || 'extended');
 
   // check if entity already exists
   if (ent[0] in window.portals) {
