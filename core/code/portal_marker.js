@@ -13,12 +13,33 @@ var portalBaseStyle = {
   interactive: true,
 };
 
+// portal hooks
+function handler_portal_click (e) {
+  window.renderPortalDetails(e.target.options.guid);
+}
+function handler_portal_dblclick (e) {
+  window.renderPortalDetails(e.target.options.guid);
+  window.map.setView(e.target.getLatLng(), DEFAULT_ZOOM);
+}
+function handler_portal_contextmenu (e) {
+  window.renderPortalDetails(e.target.options.guid);
+  if (window.isSmartphone()) {
+    window.show('info');
+  } else if (!$('#scrollwrapper').is(':visible')) {
+    $('#sidebartoggle').click();
+  }
+}
+
 L.PortalMarker = L.CircleMarker.extend({
   options: {},
 
   initialize: function(latlng, data) {
     L.CircleMarker.prototype.initialize.call(this, latlng);
     this.updateDetails(data);
+
+    this.on('click', handler_portal_click);
+    this.on('dblclick', handler_portal_dblclick);
+    this.on('contextmenu', handler_portal_contextmenu);
   },
   updateDetails: function(details) {
     // xxx: handle permanent data
