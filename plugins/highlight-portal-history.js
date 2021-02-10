@@ -5,127 +5,68 @@
 // @description    Use the portal fill color to denote the portal has been visited, caputured or scouted
 
 
+function setStyle (data, color, opacity) {
+  data.portal.setStyle({
+    fillColor: color,
+    fillOpacity: opacity
+  });
+}
+
+function visited (data) {
+  var history = data.portal.options.data.history;
+  if (!history || !(history.visited || !history.captured)) {
+    return;
+  }
+
+  if (history.captured) {
+    setStyle(data, 'red', 1);
+  } else if (history.visited) {
+    setStyle(data, 'yellow', 1);
+  }
+}
+
+function notVisited (data) {
+  var history = data.portal.options.data.history;
+  if (!history || history.visited || history.captured) {
+    return;
+  }
+
+  if (history.captured) {
+    setStyle(data, 'white', 0);
+  } else if (history.visited) {
+    setStyle(data, 'yellow', 1);
+  }
+}
+
+function scoutControlled (data) {
+  var history = data.portal.options.data.history;
+  if (!history || !history.scoutControlled) {
+    return;
+  }
+
+  setStyle(data, 'red', 1);
+}
+
+function notScoutControlled (data) {
+  var history = data.portal.options.data.history;
+  if (!history || history.scoutControlled) {
+    return;
+  }
+
+  setStyle(data, 'white', 0);
+}
+
 // use own namespace for plugin
-window.plugin.portalHighlighterPortalsHistory = function() {};
-
-window.plugin.portalHighlighterPortalsHistory.visited = function(data) {
-
-  var visited = false;
-  var captured = false;
-//  var scanned = false;
-  var opacity = 1;
-  var color = "red";
-
-if (data.portal.options.data.history) {
-    visited = (data.portal.options.data.history.visited);
-    captured = (data.portal.options.data.history.captured);
-//  scanned = (data.portal.options.data.history.scanned);
-  } else {
-    return;
-  };
-
-
-  if (visited) {
-    data.portal.setStyle(
-      {fillColor: 'yellow',
-       fillOpacity: opacity
-      }
-    );
-  };
-
-  if (captured) {
-    data.portal.setStyle(
-      {fillColor: 'red',
-       fillOpacity: opacity
-      }
-    );
-  };
+window.plugin.portalHighlighterPortalsHistory = {
+  visited: visited,
+  notVisited: notVisited,
+  scoutControlled: scoutControlled,
+  notScoutControlled: notScoutControlled,
 };
 
-window.plugin.portalHighlighterPortalsHistory.notVisited = function(data) {
-  var visited = false;
-  var captured = false;
-//  var scanned = false;
-  var opacity = 1;
-  var color = "red";
-
-if (data.portal.options.data.history) {
-    visited = (data.portal.options.data.history.visited);
-    captured = (data.portal.options.data.history.captured);
-//  scanned = (data.portal.options.data.history.scanned);
-  } else {
-    return;
-  };
-
-  if (visited) {
-    opacity = 1;
-    color = "yellow";
-  };
-  if (captured) {
-    opacity = 0;
-    color = "white";
-  };
-  data.portal.setStyle(
-    {fillColor: color,
-     fillOpacity: opacity
-    }
-  );
-};
-
-window.plugin.portalHighlighterPortalsHistory.scanned = function(data) {
-
-//  var visited = false;
-//  var captured = false;
-  var scanned = false;
-  var opacity = 1;
-  var color = "red";
-
-if (data.portal.options.data.history) {
-//    visited = (data.portal.options.data.history.visited);
-//    captured = (data.portal.options.data.history.captured);
-    scanned = (data.portal.options.data.history.scanned);
-  } else {
-    return;
-  };
-
-  if (scanned) {
-    data.portal.setStyle(
-      {fillColor: 'red',
-       fillOpacity: opacity
-      }
-    );
-  };
-};
-
-window.plugin.portalHighlighterPortalsHistory.notScanned = function(data) {
-//  var visited = false;
-//  var captured = false;
-  var scanned = false;
-  var opacity = 1;
-  var color = "red";
-
-if (data.portal.options.data.history) {
-//    visited = (data.portal.options.data.history.visited);
-//    captured = (data.portal.options.data.history.captured);
-    scanned = (data.portal.options.data.history.scanned);
-  } else {
-    return;
-  };
-
-  if (scanned) {
-    opacity = 0;
-    color = "white";
-  };
-  data.portal.setStyle(
-    {fillColor: color,
-     fillOpacity: opacity
-    }
-  );
-};
-
-var setup = function() {
-  window.addPortalHighlighter('Portals visited/captured', window.plugin.portalHighlighterPortalsHistory.visited);
-  window.addPortalHighlighter('Portals not visited/captured', window.plugin.portalHighlighterPortalsHistory.notVisited);
-  window.addPortalHighlighter('Portals scanned', window.plugin.portalHighlighterPortalsHistory.scanned);
-  window.addPortalHighlighter('Portals not scanned', window.plugin.portalHighlighterPortalsHistory.notScanned);
+var setup = function () {
+  window.addPortalHighlighter('Visited/captured', window.plugin.portalHighlighterPortalsHistory.visited);
+  window.addPortalHighlighter('Not visited/captured', window.plugin.portalHighlighterPortalsHistory.notVisited);
+  window.addPortalHighlighter('Scout controlled', window.plugin.portalHighlighterPortalsHistory.scoutControlled);
+  window.addPortalHighlighter('Not scout controlled', window.plugin.portalHighlighterPortalsHistory.notScoutControlled);
 }
