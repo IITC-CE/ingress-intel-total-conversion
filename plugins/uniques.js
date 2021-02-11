@@ -881,9 +881,9 @@ var setup = function() {
 
 	window.plugin.uniques.removeOldParsedMsgs();
 
-	window.addPortalHighlighter('Droned', window.plugin.uniques.highlighterDroned);
-	window.addPortalHighlighter('Scouted', window.plugin.uniques.highlighterScouted);
-	window.addPortalHighlighter('Visited/Captured', window.plugin.uniques.highlighterCaptured);
+	window.addPortalHighlighter('Uniques: droned', window.plugin.uniques.highlighterDroned);
+	window.addPortalHighlighter('Uniques: scout controlled', window.plugin.uniques.highlighterScouted);
+	window.addPortalHighlighter('Uniques: visited/captured', window.plugin.uniques.highlighterCaptured);
 
 	window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
 	window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
