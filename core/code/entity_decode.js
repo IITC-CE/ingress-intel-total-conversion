@@ -144,8 +144,10 @@ window.decodeArray.portal = function(a, details) {
     $.extend(data, summaryPortalData(a));
   }
   if (a.length >= DETAILED_PORTAL_DATA_LENGTH) {
-    if (details !== 'extended' || a[SUMMARY_PORTAL_DATA_LENGTH]) {
+    if (a[SUMMARY_PORTAL_DATA_LENGTH]) {
       $.extend(data, detailsPortalData(a));
+    } else if (details !== 'extended') {
+      log.warn('Portal details are missing  - portal details likely broken!');
     }
   }
   if (a.length >= EXTENDED_PORTAL_DATA_LENGTH || details === 'extended') {
