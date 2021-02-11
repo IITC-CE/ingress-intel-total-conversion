@@ -4,18 +4,18 @@
 
 window.getPortalHistoryDetails = function (d) {
   if (!d.history) {
-    return '<div style="text-align: center; color: #ffce00">History missing</div>';
+    return '<div id="historydetails" class="missing">History missing</div>';
   }
-  var visited = d.history.visited;
-  var captured = d.history.captured;
-  var scoutControlled = d.history.scoutControlled;
-  var colors = {true:'#03fe03', false:'#ff4a4a'};
+  var classParts = {};
+  ['visited', 'captured', 'scoutControlled'].forEach(function (k) {
+    classParts[k] = d.history[k] ? 'class="completed"' : "";
+  });
 
-  return '<div style="text-align: center; color: #ffce00">History: '
-  + '<span id="history_visited" style="color:'+ colors[visited] + '">visited</span> | '
-  + '<span id="history_captured" style="color:'+ colors[captured] + '">captured</span> | '
-  + '<span id="history_scout_controlled" style="color:' + colors[scoutControlled] + '">scout controlled</span>'
-  + '</div>';
+  return L.Util.template('<div id="historydetails">History: '
+  + '<span id="visited" {visited}>visited</span> | '
+  + '<span id="captured" {captured}>captured</span> | '
+  + '<span id="scout-controlled" {scoutControlled}>scout controlled</span>'
+  + '</div>', classParts);
 }
 
 // returns displayable text+link about portal range
