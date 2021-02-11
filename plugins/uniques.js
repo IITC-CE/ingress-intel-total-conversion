@@ -550,8 +550,8 @@ window.plugin.uniques.setupContent = function() {
 	plugin.uniques.contentHTML = '<div id="uniques-container">'
 		+ '<label><input type="checkbox" id="visited" onclick="window.plugin.uniques.updateVisited($(this).prop(\'checked\'))"> Visited</label>'
 		+ '<label><input type="checkbox" id="captured" onclick="window.plugin.uniques.updateCaptured($(this).prop(\'checked\'))"> Captured</label>'
-		+ '<label><input type="checkbox" id="scouted" onclick="window.plugin.uniques.updateScouted($(this).prop(\'checked\'))"> Scouted</label>'
-		+ '<label><input type="checkbox" id="droned" onclick="window.plugin.uniques.updateDroned($(this).prop(\'checked\'))"> Droned</label>'
+		+ '<label><input type="checkbox" id="scouted" onclick="window.plugin.uniques.updateScouted($(this).prop(\'checked\'))"> Scout controlled/label>'
+		+ '<label><input type="checkbox" id="droned" onclick="window.plugin.uniques.updateDroned($(this).prop(\'checked\'))"> Drone visited</label>'
 		+ '</div>';
 	plugin.uniques.disabledMessage = '<div id="uniques-container" class="help" title="Your browser does not support localStorage">Plugin Uniques disabled</div>';
 }
@@ -881,7 +881,7 @@ var setup = function() {
 
 	window.plugin.uniques.removeOldParsedMsgs();
 
-	window.addPortalHighlighter('Uniques: droned', window.plugin.uniques.highlighterDroned);
+	window.addPortalHighlighter('Uniques: drone visited', window.plugin.uniques.highlighterDroned);
 	window.addPortalHighlighter('Uniques: scout controlled', window.plugin.uniques.highlighterScouted);
 	window.addPortalHighlighter('Uniques: visited/captured', window.plugin.uniques.highlighterCaptured);
 
