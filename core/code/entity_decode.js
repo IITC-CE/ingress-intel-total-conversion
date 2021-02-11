@@ -7,7 +7,7 @@ window.decodeArray = function(){};
 
 
 function parseMod(arr) {
-  if(arr == null) { return null; }
+  if (!arr) { return null; }
   return {
     owner: arr[0],
     name: arr[1],
@@ -16,7 +16,7 @@ function parseMod(arr) {
   };
 }
 function parseResonator(arr) {
-  if(arr == null) { return null; }
+  if (!arr) { return null; }
   return {
     owner: arr[0],
     level: arr[1],
@@ -24,7 +24,7 @@ function parseResonator(arr) {
   };
 }
 function parseArtifactBrief(arr) {
-  if (arr === null) return null;
+  if (!arr) { return null; }
 
   // array index 0 is for fragments at the portal. index 1 is for target portals
   // each of those is two dimensional - not sure why. part of this is to allow for multiple types of artifacts,
@@ -50,9 +50,11 @@ function parseArtifactBrief(arr) {
 }
 
 function parseArtifactDetail(arr) {
-  if (arr == null) { return null; }
+  if (!arr) { return null; }
   // empty artifact data is pointless - ignore it
-  if (arr.length == 3 && arr[0] == "" && arr[1] == "" && arr[2].length == 0) { return null; }
+  if (arr.length === 3 && arr[0] === '' && arr[1] === '' && arr[2].length === 0) {
+    return null;
+  }
   return {
     type: arr[0],
     displayName: arr[1],
@@ -80,7 +82,7 @@ function corePortalData(a) {
     latE6:         a[2],
     lngE6:         a[3]
   }
-};
+}
 
 var SUMMARY_PORTAL_DATA_LENGTH = 14;
 var DETAILED_PORTAL_DATA_LENGTH = SUMMARY_PORTAL_DATA_LENGTH+4;
@@ -98,7 +100,7 @@ function summaryPortalData(a) {
     artifactBrief: parseArtifactBrief(a[12]),
     timestamp:     a[13]
   };
-};
+}
 
 function detailsPortalData(a) {
   return {
@@ -107,13 +109,13 @@ function detailsPortalData(a) {
     owner:          a[SUMMARY_PORTAL_DATA_LENGTH+2],
     artifactDetail: parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH+3])
   }
-};
+}
 
 function extendedPortalData(a) {
   return {
     history: parseHistoryDetail(a[DETAILED_PORTAL_DATA_LENGTH] || 0),
   }
-};
+}
 
 
 var dataLen = {
@@ -124,16 +126,19 @@ var dataLen = {
 };
 
 window.decodeArray.portal = function(a, details) {
-  if (!a) return undefined;
+  if (!a) {
+    log.warn('Argument not specified');
+    return;
+  }
 
   if (a[0] !== 'p') {
-    throw new Error('Error: decodeArray.portalSUmmary - not a portal');
+    throw new Error('decodeArray.portal: not a portal');
   }
 
   if (details) {
     var expected = dataLen[details];
     if (expected.indexOf(a.length) === -1) {
-      log.warn('Unexpected portal data length: ' + a.length + ' ('+details+')');
+      log.warn('Unexpected portal data length: ' + a.length + ' (' + details + ')');
       debugger;
     }
   }
@@ -143,23 +148,27 @@ window.decodeArray.portal = function(a, details) {
   if (a.length >= SUMMARY_PORTAL_DATA_LENGTH) {
     $.extend(data, summaryPortalData(a));
   }
+
   if (a.length >= DETAILED_PORTAL_DATA_LENGTH) {
     if (a[SUMMARY_PORTAL_DATA_LENGTH]) {
       $.extend(data, detailsPortalData(a));
     } else if (details !== 'extended') {
-      log.warn('Portal details are missing  - portal details likely broken!');
+      log.warn('Portal details missing');
+      debugger;
     }
   }
+
   if (a.length >= EXTENDED_PORTAL_DATA_LENGTH || details === 'extended') {
     $.extend(data, extendedPortalData(a));
   }
+
   return data;
-}
+};
 
 window.decodeArray.portalSummary = function(a) { // deprecated!!
   return window.decodeArray.portal(a, 'summary');
-}
+};
 
 window.decodeArray.portalDetail = function(a) { // deprecated!!
   return window.decodeArray.portal(a, 'detailed');
-}
+};
