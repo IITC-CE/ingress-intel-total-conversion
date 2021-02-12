@@ -16,7 +16,7 @@ var decodeWaypoint = function(data) {
 		objective: [null, 'Hack this Portal', 'Capture or Upgrade Portal', 'Create Link from Portal', 'Create Field from Portal', 'Install a Mod on this Portal', 'Take a Photo', 'View this Field Trip Waypoint', 'Enter the Passphrase'][data[4]],
 	};
 	if (result.typeNum === 1 && data[5]) {
-		result.portal = window.decodeArray.portalSummary(data[5]);
+		result.portal = window.decodeArray.portal(data[5], 'summary');
 		// Portal waypoints have the same guid as the respective portal.
 		result.portal.guid = result.guid;
 	}

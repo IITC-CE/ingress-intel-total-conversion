@@ -33,7 +33,7 @@ var handleResponse = function(deferred, guid, data, success) {
 
   if (success) {
 
-    var dict = decodeArray.portalDetail(data.result);
+    var dict = decodeArray.portal(data.result, 'detailed');
 
     // entity format, as used in map data
     var ent = [guid,dict.timestamp,data.result];

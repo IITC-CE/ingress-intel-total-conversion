@@ -131,7 +131,7 @@ window.Render.prototype.processGameEntities = function(entities) {
     var ent = entities[i];
 
     if (ent[2][0] == 'p' && !(ent[0] in this.deletedGuid)) {
-      this.createPortalEntity(ent);
+      this.createPortalEntity(ent, 'extended');
     }
   }
 }
@@ -278,22 +278,27 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
     }
   }
 
-  this.createPortalEntity(ent);
+  this.createPortalEntity(ent, 'core'); // placeholder
 
 }
 
 
-window.Render.prototype.createPortalEntity = function(ent) {
+window.Render.prototype.createPortalEntity = function(ent, details) {
   this.seenPortalsGuid[ent[0]] = true;  // flag we've seen it
 
   var previousData = undefined;
+
+  var data = decodeArray.portal(ent[2], details || 'extended');
 
   // check if entity already exists
   if (ent[0] in window.portals) {
     // yes. now check to see if the entity data we have is newer than that in place
     var p = window.portals[ent[0]];
 
-    if (p.options.timestamp >= ent[1]) return; // this data is identical or older - abort processing
+    if (!data.history || p.options.data.history === data.history)
+      if (p.options.timestamp >= ent[1]) {
+        return; // this data is identical or older - abort processing
+      }
 
     // the data we have is newer. many data changes require re-rendering of the portal
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
@@ -303,17 +308,20 @@ window.Render.prototype.createPortalEntity = function(ent) {
 
     previousData = p.options.data;
 
+    // preserve history
+    if (!data.history) {
+      data.history = previousData.history;
+    }
+
     this.deletePortalEntity(ent[0]);
   }
 
-  var portalLevel = parseInt(ent[2][4])||0;
-  var team = teamStringToId(ent[2][1]);
+  var portalLevel = parseInt(data.level)||0;
+  var team = teamStringToId(data.team);
   // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
   if (team == TEAM_NONE) portalLevel = 0;
 
-  var latlng = L.latLng(ent[2][2]/1E6, ent[2][3]/1E6);
-
-  var data = decodeArray.portalSummary(ent[2]);
+  var latlng = L.latLng(data.latE6/1E6, data.lngE6/1E6);
 
   var dataOptions = {
     level: portalLevel,
@@ -528,5 +536,3 @@ window.Render.prototype.removePortalFromMapLayer = function(portal) {
   //remove it from the portalsLevels layer
   portalsFactionLayers[parseInt(portal.options.level)||0][portal.options.team].removeLayer(portal);
 }
-
-

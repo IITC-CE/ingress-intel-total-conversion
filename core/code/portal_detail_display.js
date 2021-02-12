@@ -36,6 +36,7 @@ window.renderPortalDetails = function(guid) {
   var portal = window.portals[guid];
   var data = portal.options.data;
   var details = portalDetail.get(guid);
+  var historyDetails = getPortalHistoryDetails(data);
 
   // details and data can get out of sync. if we have details, construct a matching 'data'
   if (details) {
@@ -49,7 +50,6 @@ window.renderPortalDetails = function(guid) {
 
 //TODO? other status details...
   var statusDetails = details ? '' : '<div id="portalStatus">Loading details...</div>';
- 
 
   var img = fixPortalImageUrl(details ? details.image : data.image);
   var title = (details && details.title) || (data && data.title) || 'null';
@@ -103,7 +103,7 @@ window.renderPortalDetails = function(guid) {
     }).text('Map links').click(posOnClick);
     linkDetails.append($('<aside>').append($('<div>').append(mapHtml)));
   }
-  
+
   $('#portaldetails')
     .html('') //to ensure it's clear
     .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
@@ -148,7 +148,8 @@ window.renderPortalDetails = function(guid) {
       miscDetails,
       resoDetails,
       statusDetails,
-      linkDetails
+      linkDetails,
+      historyDetails
     );
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
@@ -157,8 +158,6 @@ window.renderPortalDetails = function(guid) {
     runHooks('portalDetailsUpdated', {guid: guid, portal: portal, portalDetails: details, portalData: data});
   }
 }
-
-
 
 window.getPortalMiscDetails = function(guid,d) {
 
