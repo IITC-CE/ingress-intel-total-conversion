@@ -37,6 +37,10 @@ L.PortalMarker = L.CircleMarker.extend({
     this.on('contextmenu', handler_portal_contextmenu);
   },
   updateDetails: function(details) {
+    // portal has been moved
+    if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
+      this.setLatLng(L.latLng(details.latE6/1E6, details.lngE6/1E6));
+
     // xxx: handle permanent data
     this._details = details;
 
