@@ -836,6 +836,23 @@ h3.title {
   font-size: 16px;
 }
 
+/* history details */
+#historydetails {
+  text-align: center;
+  color: #ffce00;
+}
+
+#historydetails .missing {
+}
+
+#historydetails span {
+  color: #ff4a4a;
+}
+
+#historydetails span.completed {
+  color: #03fe03;
+}
+
 /* update status */
 #updatestatus {
   background-color: rgba(8, 48, 78, 0.9);
