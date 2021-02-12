@@ -17,25 +17,28 @@ function visited (data) {
   if (!history || !(history.visited || !history.captured)) {
     return;
   }
-
   if (history.captured) {
     setStyle(data, 'red', 1);
-  } else if (history.visited) {
+    return;
+  }
+  if (history.visited) {
     setStyle(data, 'yellow', 1);
   }
 }
 
 function notVisited (data) {
   var history = data.portal.options.data.history;
-  if (!history || history.visited || history.captured) {
+  if (!history) {
     return;
   }
-
   if (history.captured) {
-    setStyle(data, 'white', 0);
-  } else if (history.visited) {
-    setStyle(data, 'yellow', 1);
+    return;
   }
+  if (history.visited) {
+    setStyle(data, 'yellow', 1);
+    return;
+  }
+  setStyle(data, 'red', 1);
 }
 
 function scoutControlled (data) {
@@ -43,7 +46,6 @@ function scoutControlled (data) {
   if (!history || !history.scoutControlled) {
     return;
   }
-
   setStyle(data, 'red', 1);
 }
 
@@ -52,8 +54,7 @@ function notScoutControlled (data) {
   if (!history || history.scoutControlled) {
     return;
   }
-
-  setStyle(data, 'white', 0);
+  setStyle(data, 'red', 1);
 }
 
 // use own namespace for plugin
