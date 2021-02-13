@@ -208,10 +208,7 @@ window.Render.prototype.endRenderPass = function () {
   // reorder portals to be after links/fields
   this.bringPortalsToFront();
 
-  // re-select the selected portal, to re-render the side-bar. ensures that any data calculated from the map data is up to date
-  if (window.selectedPortal) {
-    window.renderPortalDetails(window.selectedPortal);
-  }
+  this.isRendering = false;
 };
 
 /**
@@ -435,12 +432,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     window.runHooks('portalAdded', { portal: marker });
 
     window.portals[data.guid] = marker;
-  }
-
-  // (re-)select the portal, to refresh the sidebar on any changes
-  if (data.guid === window.selectedPortal) {
-    log.log('portal guid ' + data.guid + ' is the selected portal - re-rendering portal details');
-    window.renderPortalDetails(window.selectedPortal);
   }
 
   window.ornaments.addPortal(marker);

@@ -66,12 +66,6 @@ var handleResponse = function (deferred, guid, data, success) {
 
     cache.store(guid, portal.options.data);
 
-    // FIXME..? better way of handling sidebar refreshing...
-
-    if (guid === window.selectedPortal) {
-      window.renderPortalDetails(guid);
-    }
-
     deferred.resolve(portal.options.data);
     window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: portal.options.data, ent: ent });
   } else {

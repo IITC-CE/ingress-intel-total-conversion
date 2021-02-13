@@ -96,7 +96,7 @@ window.renderPortalDetails = function (guid) {
 
   var portal = window.portals[guid];
   var data = portal.options.data;
-  var details = window.portalDetail.get(guid);
+  var details = portal.hasFullDetails() ? portal.getDetails() : null;
   var historyDetails = window.getPortalHistoryDetails(data);
 
   // details and data can get out of sync. if we have details, construct a matching 'data'

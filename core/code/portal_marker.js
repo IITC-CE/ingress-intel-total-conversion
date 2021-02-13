@@ -15,14 +15,14 @@ var portalBaseStyle = {
 
 // portal hooks
 function handler_portal_click (e) {
-  window.renderPortalDetails(e.target.options.guid);
+  e.target.select(true);
 }
 function handler_portal_dblclick (e) {
-  window.renderPortalDetails(e.target.options.guid);
+  e.target.select(true);
   window.map.setView(e.target.getLatLng(), DEFAULT_ZOOM);
 }
 function handler_portal_contextmenu (e) {
-  window.renderPortalDetails(e.target.options.guid);
+  e.target.select(true);
   if (window.isSmartphone()) {
     window.show('info');
   } else if (!$('#scrollwrapper').is(':visible')) {
@@ -43,8 +43,9 @@ L.PortalMarker = L.CircleMarker.extend({
   },
   updateDetails: function(details) {
     // portal has been moved
-    if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
-      this.setLatLng(L.latLng(details.latE6/1E6, details.lngE6/1E6));
+    if (this.details)
+      if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
+        this.setLatLng(L.latLng(details.latE6/1E6, details.lngE6/1E6));
 
     // xxx: handle permanent data
     this._details = details;
@@ -66,13 +67,30 @@ L.PortalMarker = L.CircleMarker.extend({
     };
     L.setOptions(this, dataOptions);
 
+    if (this._selected) {
+      this.renderDetails();
+    }
+
     this.reset();
+  },
+  renderDetails() {
+    if (!this._rendering) {
+      this._rendering = true;
+      renderPortalDetails(this._details.guid);
+      this._rendering = false;
+    }
   },
   getDetails: function () {
     return this._details;
   },
   hasFullDetails: function () {
     return !!this._details.mods
+  },
+  select: function (selected) {
+    if (selected) {
+      this.renderDetails();
+    }
+    return this.reset(selected);
   },
   reset: function (selected) {
     var styleOptions = this._style();
@@ -155,7 +173,7 @@ window.createMarker = function(latlng, data) {
  * @param {boolean} selected - Indicates if the portal is selected.
  */
 window.setMarkerStyle = function(marker, selected) {
-  marker.reset(selected);
+  marker.select(selected);
 }
 
 /**
