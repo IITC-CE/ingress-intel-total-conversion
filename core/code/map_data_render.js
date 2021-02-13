@@ -170,11 +170,6 @@ window.Render.prototype.endRenderPass = function() {
   this.bringPortalsToFront();
 
   this.isRendering = false;
-
-  // re-select the selected portal, to re-render the side-bar. ensures that any data calculated from the map data is up to date
-  if (selectedPortal) {
-    renderPortalDetails (selectedPortal);
-  }
 }
 
 window.Render.prototype.bringPortalsToFront = function() {
@@ -362,12 +357,6 @@ window.Render.prototype.createPortalEntity = function(ent, details) { // details
     window.runHooks('portalAdded', {portal: marker});
 
     window.portals[data.guid] = marker;
-  }
-
-  // (re-)select the portal, to refresh the sidebar on any changes
-  if (data.guid == selectedPortal) {
-    log.log('portal guid '+data.guid+' is the selected portal - re-rendering portal details');
-    renderPortalDetails (selectedPortal);
   }
 
   window.ornaments.addPortal(marker);

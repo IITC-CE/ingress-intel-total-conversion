@@ -53,7 +53,7 @@ window.renderPortalDetails = function(guid) {
 
   var portal = window.portals[guid];
   var data = portal.options.data;
-  var details = portalDetail.get(guid);
+  var details = portal.hasFullDetails() ? portal.getDetails() : null;
   var historyDetails = getPortalHistoryDetails(data);
 
   // details and data can get out of sync. if we have details, construct a matching 'data'
@@ -217,7 +217,7 @@ window.getPortalMiscDetails = function(guid,d) {
 
     if (d.artifactBrief && d.artifactBrief.target && Object.keys(d.artifactBrief.target).length > 0) {
       var targets = Object.keys(d.artifactBrief.target);
-//currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s) 
+//currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s)
        randDetails += '<div id="artifact_target">Target portal: '+targets.map(function(x) { return x.capitalize(); }).join(', ')+'</div>';
     }
 
