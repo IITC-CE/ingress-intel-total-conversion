@@ -1,69 +1,77 @@
 // @author         Johtaja
 // @name           Highlight portals based on history
 // @category       Highlighter
-// @version        0.1.1
+// @version        0.2.0
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 
-function setStyle (data, color, opacity) {
-  data.portal.setStyle({
-    fillColor: color,
-    fillOpacity: opacity
-  });
-}
+// use own namespace for plugin
+var portalsHistory = {};
+window.plugin.portalHighlighterPortalsHistory = portalsHistory;
 
-function visited (data) {
+portalsHistory.styles = {
+  marked: {
+    fillColor: 'red',
+    fillOpacity: 1
+  },
+  semiMarked: {
+    fillColor: 'yellow',
+    fillOpacity: 1
+  }
+};
+
+portalsHistory.setStyle = function (data, name) {
+  data.portal.setStyle(portalsHistory.styles[name]);
+};
+
+portalsHistory.visited = function (data) {
   var history = data.portal.options.data.history;
   if (!history) {
     return;
   }
   if (history.captured) {
-    setStyle(data, 'red', 1);
+    data.portal.setStyle(portalsHistory.styles.captured);
   } else if (history.visited) {
-    setStyle(data, 'yellow', 1);
+    data.portal.setStyle(portalsHistory.styles.visited);
   }
-}
+};
 
-function notVisited (data) {
+portalsHistory.notVisited = function (data) {
   var history = data.portal.options.data.history;
   if (!history) {
     return;
   }
   if (!history.visited) {
-    setStyle(data, 'red', 1);
+    data.portal.setStyle(portalsHistory.styles.visitTarget);
   } else if (!history.captured) {
-    setStyle(data, 'yellow', 1);
+    data.portal.setStyle(portalsHistory.styles.captureTarget);
   }
-}
-
-function scoutControlled (data) {
-  var history = data.portal.options.data.history;
-  if (history && history.scoutControlled) {
-    setStyle(data, 'red', 1);
-  }
-}
-
-function notScoutControlled (data) {
-  var history = data.portal.options.data.history;
-  if (history && !history.scoutControlled) {
-    setStyle(data, 'red', 1);
-  }
-}
-
-// use own namespace for plugin
-var portalHighlighterPortalsHistory = {
-  visited: visited,
-  notVisited: notVisited,
-  scoutControlled: scoutControlled,
-  notScoutControlled: notScoutControlled,
 };
 
-// use own namespace for plugin
-window.plugin.portalHighlighterPortalsHistory = portalHighlighterPortalsHistory;
+portalsHistory.scoutControlled = function (data) {
+  var history = data.portal.options.data.history;
+  if (history && history.scoutControlled) {
+    data.portal.setStyle(portalsHistory.styles.scoutControlled);
+  }
+};
+
+portalsHistory.notScoutControlled = function (data) {
+  var history = data.portal.options.data.history;
+  if (history && !history.scoutControlled) {
+    data.portal.setStyle(portalsHistory.styles.scoutControllTarget);
+  }
+};
 
 var setup = function () {
-  window.addPortalHighlighter('History: visited/captured', portalHighlighterPortalsHistory.visited);
-  window.addPortalHighlighter('History: not visited/captured', portalHighlighterPortalsHistory.notVisited);
-  window.addPortalHighlighter('History: scout controlled', portalHighlighterPortalsHistory.scoutControlled);
-  window.addPortalHighlighter('History: not scout controlled', portalHighlighterPortalsHistory.notScoutControlled);
+  ['visited', 'captureTarget'].forEach(function (name) {
+    portalsHistory.styles[name] = portalsHistory.styles.semiMarked;
+  });
+  ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget'].forEach(function (name) {
+    portalsHistory.styles[name] = portalsHistory.styles.marked;
+  });
+
+  window.addPortalHighlighter('History: visited/captured', portalsHistory.visited);
+  window.addPortalHighlighter('History: not visited/captured', portalsHistory.notVisited);
+  window.addPortalHighlighter('History: scout controlled', portalsHistory.scoutControlled);
+  window.addPortalHighlighter('History: not scout controlled', portalsHistory.notScoutControlled);
 };
