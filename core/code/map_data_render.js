@@ -361,34 +361,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   var data = window.decodeArray.portal(ent[2], details);
   var guid = ent[0];
 
-  // check if entity already exists
-  const oldPortal = guid in window.portals;
-
-  if (oldPortal) {
-    // yes. now check to see if the entity data we have is newer than that in place
-    var p = window.portals[guid];
-
-    if (!data.history || p.options.data.history === data.history) {
-      if (p.options.timestamp > ent[1]) {
-        return p; // this data is older - abort processing
-      }
-
-      if (p.options.timestamp == ent[1] && p.hasFullDetails()) // this data is identical - abort processing
-        return p;
-    }
-
-    // the data we have is newer. many data changes require re-rendering of the portal
-    // (e.g. level changed, so size is different, or stats changed so highlighter is different)
-
-    // remember the old details, for the callback
-    previousData = p.getDetails();
-
-    // preserve history
-    if (!data.history) {
-      data.history = previousData.history;
-    }
-  }
-
   // add missing fields
   data.guid = guid;
   if (!data.timestamp)
@@ -396,6 +368,25 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
   // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
   data.ent = ent;
+
+  // check if entity already exists
+  const oldPortal = guid in window.portals;
+
+  if (oldPortal) {
+    // yes. now check to see if the entity data we have is newer than that in place
+    var p = window.portals[guid];
+
+    if (!p.willUpdate(data)) {
+      // this data doesn't bring new detail - abort processing
+      return p;
+    }
+
+    // the data we have is newer. many data changes require re-rendering of the portal
+    // (e.g. level changed, so size is different, or stats changed so highlighter is different)
+
+    // remember the old details, for the callback
+    previousData = $.extend(true, {}, p.getDetails());
+  }
 
   var latlng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
