@@ -113,7 +113,7 @@ window.changePortalHighlights = function (name) {
  */
 window.highlightPortal = function (p) {
   if (window._highlighters !== null && window._highlighters[window._current_highlighter] !== undefined) {
-    window._highlighters[window._current_highlighter].highlight({ portal: p });
+    return window._highlighters[window._current_highlighter].highlight({ portal: p });
   }
 };
 
