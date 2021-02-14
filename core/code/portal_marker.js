@@ -36,14 +36,53 @@ L.PortalMarker = L.CircleMarker.extend({
     this.on('dblclick', handler_portal_dblclick);
     this.on('contextmenu', handler_portal_contextmenu);
   },
+  willUpdate: function (details) {
+    // portal location edit
+    if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
+      return true;
+    // new data
+    if (this._details.timestamp < details.timestamp)
+      return true;
+    // even if we get history that was missing ? is it even possible ?
+    if (this._details.timestamp > details.timestamp)
+      return false;
+
+    // get new history
+    if (details.history) {
+      if (!this._details.history)
+        return true;
+      if (this._details.history._raw !== details.history._raw)
+        return true;
+    }
+
+    // get details portal data
+    if (!this._details.mods && details.mods)
+      return true;
+
+    // does portal picture/name/location modfication update the timestamp ?
+    return false;
+  },
   updateDetails: function(details) {
     // portal has been moved
-    if (this.details)
+    if (this._details) {
       if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
         this.setLatLng(L.latLng(details.latE6/1E6, details.lngE6/1E6));
 
-    // xxx: handle permanent data
-    this._details = details;
+      // we got more details
+      if (this._details.timestamp == details.timestamp) {
+        var localThis = this;
+        ["mods", "resonators", "owner", "artifactDetail", "history"].forEach(function (prop) {
+          if (details[prop]) localThis._details[prop] = details[prop];
+        });
+        // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
+        this._details.ent = details.ent;
+      } else {
+        // permanent data (history only)
+        if (!details.history) details.history = this._details.history;
+
+        this._details = details;
+      }
+    } else this._details = details;
 
     this._level = parseInt(details.level)||0;
     this._team = teamStringToId(details.team);
