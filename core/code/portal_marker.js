@@ -120,6 +120,22 @@ L.PortalMarker = L.CircleMarker.extend({
   hasFullDetails: function () {
     return !!this._details.mods
   },
+  setStyle: function (style) { // stub for highlighters
+    L.Util.setOptions(this, style);
+    return this;
+  },
+  setMarkerStyle: function (style) {
+    var styleOptions = L.Util.extend(this._style(), style);
+    L.Util.setOptions(this, styleOptions);
+
+    L.Util.setOptions(this, highlightPortal(this));
+
+    var selected = L.extend(
+      { radius: this.options.radius },
+      this._selected && { color: COLOR_SELECTED_PORTAL }
+    );
+    return L.CircleMarker.prototype.setStyle.call(this, selected);
+  },
   select: function (selected) {
     if (selected) {
       this.renderDetails();
@@ -127,18 +143,12 @@ L.PortalMarker = L.CircleMarker.extend({
     return this.reset(selected);
   },
   reset: function (selected) {
-    var styleOptions = this._style();
-    this.setStyle(styleOptions);
-
-    highlightPortal(this);
-
     if (selected === false)
       this._selected = false;
     else
       this._selected = this._selected || selected;
 
-    if (this._selected)
-      this.setStyle ({color: COLOR_SELECTED_PORTAL});
+    return this.setMarkerStyle();
   },
   _style: function () {
     var dashArray = null;
