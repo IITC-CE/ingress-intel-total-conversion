@@ -36,11 +36,11 @@ window.plugin.portalslist.filter = 0;
 
 window.plugin.portalslist.visitedValue = function (guid){
   var info = window.portals[guid].options.data.history;
-  if(!info) return 0;
-  if(info.visited === undefined) return 0;
-  if(!info.visited) return 0;
-  if(info.visited && info.captured) return 3;
-  if(info.visited) return 1;
+  if (!info) return 0;
+  if (info.visited === undefined) return 0;
+  if (!info.visited) return 0;
+  if (info.visited && info.captured) return 3;
+  if (info.visited) return 1;
 }
 
 window.plugin.portalslist.scoutControlledValue = fuction(guid) {
