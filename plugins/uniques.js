@@ -63,7 +63,7 @@ window.plugin.uniques.onPortalDetailsUpdated = function() {
 
 window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 	var nick = window.PLAYER.nickname;
-	let match = false;
+	var match = false;
 	data.result.forEach(function(msg) {
 		match = false;
 		if (!window.plugin.uniques.parsedMsgs[msg[0]]){
@@ -95,7 +95,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 			var portal = markup[2][1];
 			match = true;
 			plugin.uniques.setPortalAction(portal,'visited');
-		} else if(plext.plextType == 'SYSTEM_BROADCAST'
+		} else if (plext.plextType == 'SYSTEM_BROADCAST'
 		&& markup.length==3
 		&& markup[0][0] == 'PLAYER'
 		&& markup[0][1].plain == nick
@@ -106,7 +106,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 			var portal = markup[2][1];
 			match = true;
 			plugin.uniques.setPortalAction(portal,'visited');
-		} else if(plext.plextType == 'SYSTEM_BROADCAST'
+		} else if (plext.plextType == 'SYSTEM_BROADCAST'
 		&& markup.length==3
 		&& markup[0][0] == 'PLAYER'
 		&& markup[0][1].plain == nick
@@ -184,7 +184,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 			var portal = markup[1][1];
 			match = true;
 			plugin.uniques.setPortalAction(portal,'visited');
-		} else if(plext.plextType == 'SYSTEM_NARROWCAST'
+		} else if (plext.plextType == 'SYSTEM_NARROWCAST'
 			&& markup.length==3
 			&& markup[0][0] == 'TEXT'
 			&& markup[0][1].plain == 'You claimed Scout Controller on '
@@ -193,7 +193,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 				var portal = markup[1][1];
 				match = true;
 				plugin.uniques.setPortalAction(portal,'scouted');
-		} else if(plext.plextType == 'SYSTEM_NARROWCAST'
+		} else if (plext.plextType == 'SYSTEM_NARROWCAST'
 			&& markup.length==3
 			&& markup[0][0] == 'TEXT'
 			&& markup[0][1].plain == 'You were displaced as Scout Controller on '
@@ -235,13 +235,13 @@ window.plugin.uniques.updateCheckedAndHighlight = function(guid) {
 }
 
 window.plugin.uniques.setPortalAction = function(portal, action) {
-	let latE6 = portal.latE6;
-	let lngE6 = portal.lngE6;
-	let guid = window.findPortalGuidByPositionE6(latE6, lngE6);
-	let id = latE6 + "," + lngE6;
+	var latE6 = portal.latE6;
+	var lngE6 = portal.lngE6;
+	var guid = window.findPortalGuidByPositionE6(latE6, lngE6);
+	var id = latE6 + "," + lngE6;
 
 	if (guid) {
-		let uniqueInfo = window.plugin.uniques.uniques[guid];
+		var uniqueInfo = window.plugin.uniques.uniques[guid];
 		if (!uniqueInfo) uniqueInfo = {};
 				// merge ALL pending actions, then remove from missedLatLngs
 		if (window.plugin.uniques.missedLatLngs[id]) {
@@ -266,9 +266,9 @@ window.plugin.uniques.setPortalAction = function(portal, action) {
 		window.plugin.uniques.storeLocal('missedLatLngs');
 	}
 }
-// Visted
+// Visited
 window.plugin.uniques.updateVisited = function(visited, guid) {
-	if(guid == undefined) guid = window.selectedPortal;
+	if (guid == undefined) guid = window.selectedPortal;
 
 	var uniqueInfo = plugin.uniques.uniques[guid];
 	if (!uniqueInfo) {
@@ -278,7 +278,7 @@ window.plugin.uniques.updateVisited = function(visited, guid) {
 		};
 	}
 
-	if(visited == uniqueInfo.visited) return;
+	if (visited == uniqueInfo.visited) return;
 
 	if (visited) {
 		uniqueInfo.visited = true;
@@ -292,7 +292,7 @@ window.plugin.uniques.updateVisited = function(visited, guid) {
 }
 // Captured
 window.plugin.uniques.updateCaptured = function(captured, guid) {
-	if(guid == undefined) guid = window.selectedPortal;
+	if (guid == undefined) guid = window.selectedPortal;
 
 	var uniqueInfo = plugin.uniques.uniques[guid];
 	if (!uniqueInfo) {
@@ -302,7 +302,7 @@ window.plugin.uniques.updateCaptured = function(captured, guid) {
 		};
 	}
 
-	if(captured == uniqueInfo.captured) return;
+	if (captured == uniqueInfo.captured) return;
 
 	if (captured) { // captured --> visited
 		uniqueInfo.captured = true;
@@ -316,7 +316,7 @@ window.plugin.uniques.updateCaptured = function(captured, guid) {
 }
 // Scouted
 window.plugin.uniques.updateScouted = function(scouted, guid) {
-	if(guid == undefined) guid = window.selectedPortal;
+	if (guid == undefined) guid = window.selectedPortal;
 
 	var uniqueInfo = plugin.uniques.uniques[guid];
 	if (!uniqueInfo) {
@@ -325,7 +325,7 @@ window.plugin.uniques.updateScouted = function(scouted, guid) {
 		};
 	}
 
-	if(scouted == uniqueInfo.scouted) return;
+	if (scouted == uniqueInfo.scouted) return;
 
 	if (scouted) {
 		uniqueInfo.scouted = true;
@@ -338,7 +338,7 @@ window.plugin.uniques.updateScouted = function(scouted, guid) {
 }
 // Droned
 window.plugin.uniques.updateDroned = function(droned, guid) {
-	if(guid == undefined) guid = window.selectedPortal;
+	if (guid == undefined) guid = window.selectedPortal;
 
 	var uniqueInfo = plugin.uniques.uniques[guid];
 	if (!uniqueInfo) {
@@ -347,7 +347,7 @@ window.plugin.uniques.updateDroned = function(droned, guid) {
 		};
 	}
 
-	if(droned == uniqueInfo.droned) return;
+	if (droned == uniqueInfo.droned) return;
 
 	if (droned) {
 		uniqueInfo.droned = true;
@@ -560,7 +560,7 @@ window.plugin.uniques.setupPortalsList = function() {
 
 	window.addHook('pluginUniquesUpdateUniques', function(data) {
 		var info = plugin.uniques.uniques[data.guid];
-		if(!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+		if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
 
 		$('[data-list-uniques="'+data.guid+'"].visited').prop('checked', !!info.visited);
 		$('[data-list-uniques="'+data.guid+'"].captured').prop('checked', !!info.captured);
@@ -573,23 +573,23 @@ window.plugin.uniques.setupPortalsList = function() {
 			var guid = element.getAttribute("data-list-uniques");
 
 			var info = plugin.uniques.uniques[guid];
-			if(!info) info = { visited: false, captured: false, scouted: false, droned: false };
+			if (!info) info = { visited: false, captured: false, scouted: false, droned: false };
 
 			var e = $(element);
-			if(e.hasClass('visited')) e.prop('checked', !!info.visited);
-			if(e.hasClass('captured')) e.prop('checked', !!info.captured);
-			if(e.hasClass('scouted')) e.prop('checked', !!info.scouted);
-			if(e.hasClass('droned')) e.prop('checked', !!info.droned);
+			if (e.hasClass('visited')) e.prop('checked', !!info.visited);
+			if (e.hasClass('captured')) e.prop('checked', !!info.captured);
+			if (e.hasClass('scouted')) e.prop('checked', !!info.scouted);
+			if (e.hasClass('droned')) e.prop('checked', !!info.droned);
 		});
 	});
 
 	function uniqueValue(guid) {
 		var info = plugin.uniques.uniques[guid];
-		if(!info) return 0;
-		if(info.visited === undefined) return 0;
-		if(!info.visited) return 0;
-		if(info.visited && info.captured) return 2;
-		if(info.visited) return 1;
+		if (!info) return 0;
+		if (info.visited === undefined) return 0;
+		if (!info.visited) return 0;
+		if (info.visited && info.captured) return 2;
+		if (info.visited) return 1;
 	}
 
 	function scoutedValue(guid) {
@@ -614,7 +614,7 @@ window.plugin.uniques.setupPortalsList = function() {
 		},
 		format: function(cell, portal, guid) {
 			var info = plugin.uniques.uniques[guid];
-			if(!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+			if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
 
 			$(cell).addClass("portal-list-uniques");
 
@@ -657,7 +657,7 @@ window.plugin.uniques.setupPortalsList = function() {
 			},
 			format: function(cell, portal, guid) {
 			var info = plugin.uniques.uniques[guid];
-			if(!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+			if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
 
 			$(cell).addClass("portal-list-uniques");
 
@@ -686,7 +686,7 @@ window.plugin.uniques.setupPortalsList = function() {
 			},
 			format: function(cell, portal, guid) {
 			var info = plugin.uniques.uniques[guid];
-			if(!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+			if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
 
 			$(cell).addClass("portal-list-uniques");
 
@@ -803,9 +803,9 @@ window.plugin.uniques.optImport = function() {
 /** UNIQUES Backlog to be processed whenever a portal's LatLonE6 can be resolved to GUID */
 /*****************************************************************************************/
 window.plugin.uniques.onPortalAdded = function(data) {
-	let guid = data.portal.options.guid;
-	let p = data.portal.options.data;
-	let id = p.latE6 + "," + p.lngE6;
+	var guid = data.portal.options.guid;
+	var p = data.portal.options.data;
+	var id = p.latE6 + "," + p.lngE6;
 
 	//console.log("portal added: %s %s %o", guid, id, data);
 	// check if portal is in missedLatLngs
@@ -825,9 +825,9 @@ window.plugin.uniques.onPortalAdded = function(data) {
 
 window.plugin.uniques.removeOldParsedMsgs = function() {
 //	remove all timestamps older than 30 days
-	let old = (Date.now() - (30*24*60*60*1000)); //30 days in miliseconds
-	let count = 0;
-	for (let item in window.plugin.uniques.parsedMsgs){
+	var old = (Date.now() - (30*24*60*60*1000)); //30 days in miliseconds
+	var count = 0;
+	for (var item in window.plugin.uniques.parsedMsgs){
 		if (item < old) {
 			delete item;
 			count++;
@@ -837,10 +837,10 @@ window.plugin.uniques.removeOldParsedMsgs = function() {
 }
 
 window.plugin.uniques.genList = function (){
-	let mLL = window.plugin.uniques.missedLatLngs;
-	let list = '';
-	for (let item in mLL) {
-		let p = mLL[item].portal;
+	var mLL = window.plugin.uniques.missedLatLngs;
+	var list = '';
+	for (var item in mLL) {
+		var p = mLL[item].portal;
 		list = list + '<a onclick=\"map.setView(['+p.latE6/1E6+','+p.lngE6/1E6+'],15);\">'+p.name+'</a><br>';
 	}
 	return list
