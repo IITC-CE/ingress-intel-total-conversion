@@ -1,7 +1,7 @@
 // @author         teo96
 // @name           Portals list
 // @category       Info
-// @version        0.2.2
+// @version        0.3.0
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
 
@@ -34,6 +34,22 @@ window.plugin.portalslist.filter = 0;
  *     Which order should by default be used for this column. -1 means descending. Default: 1
  */
 
+window.plugin.portalslist.visitedValue = function (guid){
+  var info = window.portals[guid].options.data.history;
+  if(!info) return 0;
+  if(info.visited === undefined) return 0;
+  if(!info.visited) return 0;
+  if(info.visited && info.captured) return 3;
+  if(info.visited) return 1;
+}
+
+window.plugin.portalslist.scoutControlledValue = fuction(guid) {
+  var info = window.portals[guid].options.data.history
+  if (!info) return 0;
+  if (info.scoutControlled === undefined ) return 0;
+  if (!info.scoutControlled ) return 0;
+  if (info.scoutControlled ) return 4;
+}
 
 window.plugin.portalslist.fields = [
   {
@@ -134,6 +150,35 @@ window.plugin.portalslist.fields = [
     },
     defaultOrder: -1,
   },
+  { 
+    title: "V/C",
+    value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
+    sort: function(guidA, guidB) {
+      return window.plugin.portalslist.visitedValue(guidA) - window.plugin.portalslist.visitedValue(guidB);
+    },
+    format: function(cell, portal, guid) {
+      var info = window.portals[guid].options.data.history;
+      if(!info) info = { visited: false, captured: false, scoutControlled: false};
+
+      $(cell).addClass("portal-list-history");
+      cell.append((info.visited ? "V" : "_")+"/"+(info.captured ? "C" : "_"));
+
+    }
+  },
+  {
+    title: "S",
+    value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
+    sort:  function(guidA, guidB) {
+      return window.plugin.portalslist.scoutControlledValue(guidA) - window.plugin.portalslist.scoutControlledValue(guidB);
+    },
+    format: function(cell, portal, guid) {
+      var info = window.portals[guid].options.data.history;
+      if(!info) info = { visited: false, captured: false, scoutControlled: false};
+
+      $(cell).addClass("portal-list-history");
+      cell.append(info.scoutControlled ? "S" : "_");
+    }
+  }
 ];
 
 //fill the listPortals array with portals avaliable on the map (level filtered portals will not appear in the table)
@@ -237,6 +282,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 
   var portals = window.plugin.portalslist.listPortals;
   var sortField = window.plugin.portalslist.fields[sortBy];
+
 
   portals.sort(function(a, b) {
     var valueA = a.sortValues[sortBy];
