@@ -779,10 +779,16 @@ window.plugin.uniques.optImport = function() {
 	L.FileListLoader.loadFiles({accept:'application/json'})
 		.on('load',function (e) {
 			try {
-				if (!confirm("Please only confirm this if you know what you are doing!!\nAre you sure you want to save your Unique visits/captures back to IITC?")) return;
+				var msgExit = 'Please only confirm this if you know what you are doing!\n'
+				                    + 'Are you sure you want to save your Unique visits/captures back to IITC?';
+				if (!confirm(msgExit)) {
+				  return;
+				}
 				var data = JSON.parse(e.reader.result);
 
-				if (Object.keys(data).length) window.plugin.uniques.uniques = data;
+				if (Object.keys(data).length) {
+				  window.plugin.uniques.uniques = data;
+				}
 				console.log('UNIQUES: reset and imported uniques.');
 				confirm('Import Successful.');
 				// to write back the data to localStorage
@@ -897,7 +903,8 @@ var setup = function() {
 
 	// add controls to toolbox
 
-	link = $("<a onclick=\"window.plugin.uniques.options();return false\" title=\"Manage UNIQUES\">Uniques</a>");
+	var link = $('<a title="Manage UNIQUES">Uniques</a>')
+	  .click(window.plugin.uniques.options);
 	$("#toolbox").append(link);
 
 	if (window.plugin.portalslist) {
