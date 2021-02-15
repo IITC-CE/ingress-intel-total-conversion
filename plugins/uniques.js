@@ -504,8 +504,8 @@ window.plugin.uniques.highlighterScouted = {
 
 		var style = {};
 
-		if (uniqueInfo && uniqueInfo.scouted)
-		{ // scouted - no highlights
+		if (uniqueInfo && uniqueInfo.scouted) { 
+      // scouted - no highlights
 		} else {
 				style.fillColor = 'red';
 				style.fillOpacity = 0.7;
@@ -525,8 +525,8 @@ window.plugin.uniques.highlighterDroned = {
 
 		var style = {};
 
-		if (uniqueInfo && uniqueInfo.droned)
-		{ // droneded - no highlights
+		if (uniqueInfo && uniqueInfo.droned) { 
+      // droneded - no highlights
 		} else {
 				style.fillColor = 'red';
 				style.fillOpacity = 0.7;
@@ -650,7 +650,8 @@ window.plugin.uniques.setupPortalsList = function() {
 			},
 		},
 //---------------------------------------------------------------------------
-		{title: "S",
+		{
+      title: "S",
 			value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
 			sort:	function(guidA, guidB) {
 				return scoutedValue(guidA) - scoutedValue(guidB);
@@ -679,7 +680,8 @@ window.plugin.uniques.setupPortalsList = function() {
 		},
 	},
 //---------------------------------------------------------------------------
-		{title: "D",
+		{
+      title: "D",
 			value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
 			sort:	function(guidA, guidB) {
 				return dronedValue(guidA) - dronedValue(guidB);
