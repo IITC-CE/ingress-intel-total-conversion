@@ -52,36 +52,30 @@ window.renderPortalDetails = function(guid, dontSelect) {
   }
 
   var portal = window.portals[guid];
-  var data = portal.options.data;
-  var details = portal.hasFullDetails() ? portal.getDetails() : null;
-  var historyDetails = getPortalHistoryDetails(data);
+  var details = portal.getDetails();
+  var hasFullDetails = portal.hasFullDetails();
+  var historyDetails = getPortalHistoryDetails(details);
 
-  // details and data can get out of sync. if we have details, construct a matching 'data'
-  if (details) {
-    data = getPortalSummaryData(details);
-  }
-
-
-  var modDetails = details ? '<div class="mods">'+getModDetails(details)+'</div>' : '';
-  var miscDetails = details ? getPortalMiscDetails(guid,details) : '';
-  var resoDetails = details ? getResonatorDetails(details) : '';
+  var modDetails = hasFullDetails ? '<div class="mods">'+getModDetails(details)+'</div>' : '';
+  var miscDetails = hasFullDetails ? getPortalMiscDetails(guid,details) : '';
+  var resoDetails = hasFullDetails ? getResonatorDetails(details) : '';
 
 //TODO? other status details...
-  var statusDetails = details ? '' : '<div id="portalStatus">Loading details...</div>';
+  var statusDetails = hasFullDetails ? '' : '<div id="portalStatus">Loading details...</div>';
 
-  var img = fixPortalImageUrl(details ? details.image : data.image);
-  var title = (details && details.title) || (data && data.title) || 'null';
+  var img = fixPortalImageUrl(details.image);
+  var title = details.title || 'null';
 
-  var lat = data.latE6/1E6;
-  var lng = data.lngE6/1E6;
+  var lat = details.latE6/1E6;
+  var lng = details.lngE6/1E6;
 
   var imgTitle = title+'\n\nClick to show full image.';
 
 
   // portal level. start with basic data - then extend with fractional info in tooltip if available
-  var levelInt = (teamStringToId(data.team) == TEAM_NONE) ? 0 : data.level;
+  var levelInt = portal.options.level;
   var levelDetails = levelInt;
-  if (details) {
+  if (hasFullDetails) {
     levelDetails = getPortalLevel(details);
     if(levelDetails != 8) {
       if(levelDetails==Math.ceil(levelDetails))
@@ -97,7 +91,7 @@ window.renderPortalDetails = function(guid, dontSelect) {
 
   $('#portaldetails')
     .html('') //to ensure it's clear
-    .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
+    .attr('class', TEAM_TO_CSS[teamStringToId(details.team)])
     .append(
       $('<h3>', { class:'title' })
         .text(title)
@@ -108,7 +102,7 @@ window.renderPortalDetails = function(guid, dontSelect) {
               style: 'float: left'
             })
             .click(function() {
-              zoomToAndShowPortal(guid,[data.latE6/1E6,data.lngE6/1E6]);
+              zoomToAndShowPortal(guid,[details.latE6/1E6,details.lngE6/1E6]);
               if (isSmartphone()) { show('map') };
             })),
 
@@ -144,10 +138,13 @@ window.renderPortalDetails = function(guid, dontSelect) {
     );
 
   window.renderPortalUrl(lat, lng, title, guid);
+  
+  // compatibility
+  var data = hasFullDetails ? getPortalSummaryData(details) : details;
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?
-  if (details) {
+  if (hasFullDetails) {
     runHooks('portalDetailsUpdated', {guid: guid, portal: portal, portalDetails: details, portalData: data});
   }
 }
