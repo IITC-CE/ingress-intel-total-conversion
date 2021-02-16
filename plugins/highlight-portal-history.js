@@ -63,17 +63,19 @@ portalsHistory.notScoutControlled = function (data) {
   }
 };
 
-var setup = function () {
+// Creating styles based on a given template
+function inherit (parentName, childNames) {
   var styles = portalsHistory.styles;
-  ['marked', 'semiMarked'].forEach(function (name) {
-    styles[name] = L.extend(L.Util.create(styles.common), styles[name]);
+  childNames.forEach(function (name) {
+    // Extension of _styles_ with a new _name_ object, created based on _parentName_ object.
+    styles[name] = L.extend(L.Util.create(styles[parentName]), styles[name]);
   });
-  ['visited', 'captureTarget'].forEach(function (name) {
-    styles[name] = L.extend(L.Util.create(styles.semiMarked), styles[name]);
-  });
-  ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget'].forEach(function (name) {
-    styles[name] = L.extend(L.Util.create(styles.marked), styles[name]);
-  });
+}
+
+var setup = function () {
+  inherit('common', ['marked', 'semiMarked']);
+  inherit('semiMarked', ['visited', 'captureTarget']);
+  inherit('marked', ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget']);
 
   window.addPortalHighlighter('History: visited/captured', portalsHistory.visited);
   window.addPortalHighlighter('History: not visited/captured', portalsHistory.notVisited);
