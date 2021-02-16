@@ -25,6 +25,9 @@ window.portalDetail.isFresh = function(guid) {
   return cache.isFresh(guid);
 }
 
+window.portalDetail.remove = function(guid) {
+  return cache.remove(guid);
+}
 
 var handleResponse = function(deferred, guid, data, success) {
   if (!data || data.error || !data.result) {
