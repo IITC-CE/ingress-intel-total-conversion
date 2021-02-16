@@ -15,14 +15,17 @@ var portalBaseStyle = {
 
 // portal hooks
 function handler_portal_click (e) {
-  e.target.select(true);
+  window.selectPortal(e.target.options.guid, e.type);
+  window.renderPortalDetails(e.target.options.guid, true)
 }
 function handler_portal_dblclick (e) {
-  e.target.select(true);
+  window.selectPortal(e.target.options.guid, e.type);
+  window.renderPortalDetails(e.target.options.guid, true)
   window.map.setView(e.target.getLatLng(), DEFAULT_ZOOM);
 }
 function handler_portal_contextmenu (e) {
-  e.target.select(true);
+  window.selectPortal(e.target.options.guid, e.type);
+  window.renderPortalDetails(e.target.options.guid, true)
   if (window.isSmartphone()) {
     window.show('info');
   } else if (!$('#scrollwrapper').is(':visible')) {
@@ -107,15 +110,15 @@ L.PortalMarker = L.CircleMarker.extend({
     L.setOptions(this, dataOptions);
 
     if (this._selected) {
-      this.renderDetails();
+      this._renderDetails();
     }
 
     this.reset();
   },
-  renderDetails() {
+  _renderDetails() {
     if (!this._rendering) {
       this._rendering = true;
-      renderPortalDetails(this._details.guid);
+      renderPortalDetails(this._details.guid, true);
       this._rendering = false;
     }
   },
@@ -141,10 +144,7 @@ L.PortalMarker = L.CircleMarker.extend({
     );
     return L.CircleMarker.prototype.setStyle.call(this, selected);
   },
-  select: function (selected) {
-    if (selected) {
-      this.renderDetails();
-    }
+  setSelected: function (selected) {
     return this.reset(selected);
   },
   reset: function (selected) {
@@ -153,7 +153,10 @@ L.PortalMarker = L.CircleMarker.extend({
     else
       this._selected = this._selected || selected;
 
-    return this.setMarkerStyle();
+    this.setMarkerStyle();
+
+    if (this._selected && window.map.hasLayer(this))
+      this.bringToFront();
   },
   _style: function () {
     var dashArray = null;
@@ -222,7 +225,7 @@ window.createMarker = function(latlng, data) {
  * @param {boolean} selected - Indicates if the portal is selected.
  */
 window.setMarkerStyle = function(marker, selected) {
-  marker.select(selected);
+  marker.setSelected(selected);
 }
 
 /**

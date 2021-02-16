@@ -70,8 +70,8 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
  * @function renderPortalDetails
  * @param {string|null} guid - The globally unique identifier of the portal to display details for.
  */
-window.renderPortalDetails = function (guid) {
-  window.selectPortal(window.portals[guid] ? guid : null);
+window.renderPortalDetails = function (guid, dontSelect) {
+  if (!dontSelect) window.selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
@@ -337,7 +337,7 @@ window.setPortalIndicators = function (p) {
  * @param {string} guid - The GUID of the portal to select.
  * @returns {boolean} True if the same portal is re-selected (just an update), false if a different portal is selected.
  */
-window.selectPortal = function (guid) {
+window.selectPortal = function (guid, event) {
   var update = window.selectedPortal === guid;
   var oldPortalGuid = window.selectedPortal;
   window.selectedPortal = guid;
@@ -346,20 +346,14 @@ window.selectPortal = function (guid) {
   var newPortal = window.portals[guid];
 
   // Restore style of unselected portal
-  if (!update && oldPortal) window.setMarkerStyle(oldPortal, false);
+  if (!update && oldPortal) oldPortal.setSelected(false);
 
   // Change style of selected portal
-  if (newPortal) {
-    window.setMarkerStyle(newPortal, true);
-
-    if (window.map.hasLayer(newPortal)) {
-      newPortal.bringToFront();
-    }
-  }
+  if(newPortal) newPortal.setSelected(true);
 
   window.setPortalIndicators(newPortal);
 
-  window.runHooks('portalSelected', { selectedPortalGuid: guid, unselectedPortalGuid: oldPortalGuid });
+  window.runHooks('portalSelected', { selectedPortalGuid: guid, unselectedPortalGuid: oldPortalGuid, event: event });
   return update;
 };
 
