@@ -420,6 +420,13 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   } else {
     marker = createMarker(latlng, data);
 
+    // in case of incomplete data while having fresh details in cache, update the portal with those details
+    if (portalDetail.isFresh(guid)) {
+      var oldDetails = portalDetail.get(guid);
+      if (marker.willUpdate(oldDetails))
+        marker.updateDetails(oldDetails);
+    }
+
     window.runHooks('portalAdded', { portal: marker });
 
     window.portals[data.guid] = marker;
