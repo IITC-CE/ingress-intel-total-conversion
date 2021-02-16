@@ -10,13 +10,14 @@ var portalsHistory = {};
 window.plugin.portalHighlighterPortalsHistory = portalsHistory;
 
 portalsHistory.styles = {
-  marked: {
-    fillColor: 'red',
+  common: {
     fillOpacity: 1
   },
+  marked: {
+    fillColor: 'red'
+  },
   semiMarked: {
-    fillColor: 'yellow',
-    fillOpacity: 1
+    fillColor: 'yellow'
   }
 };
 
@@ -63,11 +64,15 @@ portalsHistory.notScoutControlled = function (data) {
 };
 
 var setup = function () {
+  var styles = portalsHistory.styles;
+  ['marked', 'semiMarked'].forEach(function (name) {
+    styles[name] = L.extend(L.Util.create(styles.common), styles[name]);
+  });
   ['visited', 'captureTarget'].forEach(function (name) {
-    portalsHistory.styles[name] = portalsHistory.styles.semiMarked;
+    styles[name] = L.extend(L.Util.create(styles.semiMarked), styles[name]);
   });
   ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget'].forEach(function (name) {
-    portalsHistory.styles[name] = portalsHistory.styles.marked;
+    styles[name] = L.extend(L.Util.create(styles.marked), styles[name]);
   });
 
   window.addPortalHighlighter('History: visited/captured', portalsHistory.visited);
