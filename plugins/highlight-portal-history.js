@@ -18,6 +18,9 @@ portalsHistory.styles = {
   },
   semiMarked: {
     fillColor: 'yellow'
+  },
+  commonOther: {
+    // no action by default
   }
 };
 
@@ -30,10 +33,13 @@ portalsHistory.visited = function (data) {
   if (!history) {
     return;
   }
+  var s = portalsHistory.styles;
   if (history.captured) {
-    data.portal.setStyle(portalsHistory.styles.captured);
+    data.portal.setStyle(s.captured);
   } else if (history.visited) {
-    data.portal.setStyle(portalsHistory.styles.visited);
+    data.portal.setStyle(s.visited);
+  } else if (!$.isEmptyObject(s.otherVC)) {
+    data.portal.setStyle(s.otherVC);
   }
 };
 
@@ -42,24 +48,39 @@ portalsHistory.notVisited = function (data) {
   if (!history) {
     return;
   }
+  var s = portalsHistory.styles;
   if (!history.visited) {
-    data.portal.setStyle(portalsHistory.styles.visitTarget);
+    data.portal.setStyle(s.visitTarget);
   } else if (!history.captured) {
-    data.portal.setStyle(portalsHistory.styles.captureTarget);
+    data.portal.setStyle(s.captureTarget);
+  } else if (!$.isEmptyObject(s.otherNotVC)) {
+    data.portal.setStyle(s.otherNotVC);
   }
 };
 
 portalsHistory.scoutControlled = function (data) {
   var history = data.portal.options.data.history;
-  if (history && history.scoutControlled) {
-    data.portal.setStyle(portalsHistory.styles.scoutControlled);
+  if (!history) {
+    return;
+  }
+  var s = portalsHistory.styles;
+  if (history.scoutControlled) {
+    data.portal.setStyle(s.scoutControlled);
+  } else if (!$.isEmptyObject(s.otherScout)) {
+    data.portal.setStyle(s.otherScout);
   }
 };
 
 portalsHistory.notScoutControlled = function (data) {
   var history = data.portal.options.data.history;
-  if (history && !history.scoutControlled) {
-    data.portal.setStyle(portalsHistory.styles.scoutControllTarget);
+  if (!history) {
+    return;
+  }
+  var s = portalsHistory.styles;
+  if (!history.scoutControlled) {
+    data.portal.setStyle(s.scoutControllTarget);
+  } else if (!$.isEmptyObject(s.otherNotScout)) {
+    data.portal.setStyle(s.otherNotScout);
   }
 };
 
@@ -76,6 +97,7 @@ var setup = function () {
   inherit('common', ['marked', 'semiMarked']);
   inherit('semiMarked', ['visited', 'captureTarget']);
   inherit('marked', ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget']);
+  inherit('commonOther', ['otherVC', 'otherNotVC', 'otherScout', 'otherNotScout']);
 
   window.addPortalHighlighter('History: visited/captured', portalsHistory.visited);
   window.addPortalHighlighter('History: not visited/captured', portalsHistory.notVisited);
