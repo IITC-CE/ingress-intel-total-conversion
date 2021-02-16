@@ -302,6 +302,7 @@ window.Render.prototype.deleteFieldEntity = function (guid) {
  * @param {number} latE6 - The latitude of the portal in E6 format.
  * @param {number} lngE6 - The longitude of the portal in E6 format.
  * @param {string} team - The team faction of the portal.
+ * @param {number} [timestamp=0] - Timestamp of the portal data. Defaults to 0 to allow newer data sources to override
  * @param {number} [timestamp] - The timestamp of the portal data.
  */
 window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, lngE6, team, timestamp) {
@@ -316,7 +317,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, l
 
   var ent = [
     guid, // ent[0] = guid
-    -1, // ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
+    timestamp, // ent[1] = timestamp
     // ent[2] = an array with the entity data
     [
       'p', // 0 - a portal
@@ -326,23 +327,8 @@ window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, l
     ],
   ];
 
-  // placeholder portals don't have a useful timestamp value - so the standard code that checks for updated
-  // portal details doesn't apply
-  // so, check that the basic details are valid and delete the existing portal if out of date
-  var portalMoved = false;
-  if (guid in window.portals) {
-    var p = window.portals[guid];
-    portalMoved = latE6 !== p.options.data.latE6 || lngE6 !== p.options.data.lngE6;
-    if (team !== p.options.data.team && p.options.timestamp < timestamp) {
-      // team - delete existing portal
-      this.deletePortalEntity(guid);
-    }
-  }
-
-  if (!portalMoved) {
-    this.createPortalEntity(ent, 'core'); // placeholder
-  }
-};
+  this.createPortalEntity(ent, 'core'); // placeholder
+}
 
 /**
  * Creates a portal entity from the provided game entity data.
