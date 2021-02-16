@@ -423,7 +423,10 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     // in case of incomplete data while having fresh details in cache, update the portal with those details
     if (portalDetail.isFresh(guid)) {
       var oldDetails = portalDetail.get(guid);
-      if (marker.willUpdate(oldDetails))
+      if (data.timestamp > oldDetails.timestamp) {
+        // data is more recent than the cached details so we remove them from the cache
+        portalDetail.remove(guid);
+      } else if (marker.willUpdate(oldDetails))
         marker.updateDetails(oldDetails);
     }
 
