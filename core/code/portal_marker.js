@@ -106,7 +106,7 @@ L.PortalMarker = L.CircleMarker.extend({
       this._renderDetails();
     }
 
-    this.reset();
+    this.setSelected();
   },
   _renderDetails() {
     if (!this._rendering) {
@@ -138,9 +138,6 @@ L.PortalMarker = L.CircleMarker.extend({
     return L.CircleMarker.prototype.setStyle.call(this, selected);
   },
   setSelected: function (selected) {
-    return this.reset(selected);
-  },
-  reset: function (selected) {
     if (selected === false)
       this._selected = false;
     else
