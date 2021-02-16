@@ -59,6 +59,13 @@ window.getCurrentPortalEnergy = function (d) {
   return nrg;
 };
 
+window.getPortalHealth = function(d) {
+  var max = getTotalPortalEnergy(d);
+  var cur = getCurrentPortalEnergy(d);
+
+  return max>0 ? Math.floor(cur/max*100) : 0;
+}
+
 /**
  * Calculates the range of a portal for creating links. The range depends on portal level and any installed Link Amps.
  *
@@ -68,7 +75,7 @@ window.getCurrentPortalEnergy = function (d) {
  *                   total range after applying the boost (`range`),
  *                   and a boolean indicating if the portal is linkable (`isLinkable`).
  */
-window.getPortalRange = function (d) {
+window.getPortalRange = function(d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
   var range = {
