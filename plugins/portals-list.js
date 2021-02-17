@@ -165,7 +165,11 @@ window.plugin.portalslist.fields = [
       if(!info) info = { visited: false, captured: false, scoutControlled: false};
 
       $(cell).addClass("portal-list-history");
-      cell.append((info.visited ? "V" : "_")+"/"+(info.captured ? "C" : "_"));
+      if (info.captured){ cell.append ("🔴");
+      } else { if (info.visited) { cell.append ("🟡");
+               } else {cell.append ("⚪️");}
+      }
+//      cell.append((info.visited ? "V" : "_")+"/"+(info.captured ? "C" : "_"));
 
     }
   },
