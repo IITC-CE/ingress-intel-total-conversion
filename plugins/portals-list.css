@@ -32,6 +32,9 @@
   text-align: right;
 }
 
+#portalslist table .alignC {
+  text-align: center;
+}
 #portalslist table.portals td {
   white-space: nowrap;
 }

@@ -164,12 +164,16 @@ window.plugin.portalslist.fields = [
       var info = window.portals[guid].options.data.history;
       if(!info) info = { visited: false, captured: false, scoutControlled: false};
 
-      $(cell).addClass("portal-list-history");
-      if (info.captured){ cell.append ("🔴");
-      } else { if (info.visited) { cell.append ("🟡");
-               } else {cell.append ("⚪️");}
+      $(cell).addClass("portal-list-history alignC");
+      if (info.captured){
+        cell.append (String.fromCodePoint(0x1F534)); // red dot
+      } else {
+        if (info.visited) {
+          cell.append (String.fromCodePoint(0x1F7E1)); //yellow dot
+        } else {
+          cell.append (String.fromCodePoint(0x26AA)); // white dot
+        }
       }
-//      cell.append((info.visited ? "V" : "_")+"/"+(info.captured ? "C" : "_"));
 
     }
   },
@@ -183,8 +187,8 @@ window.plugin.portalslist.fields = [
       var info = window.portals[guid].options.data.history;
       if(!info) info = { visited: false, captured: false, scoutControlled: false};
 
-      $(cell).addClass("portal-list-history");
-      cell.append(info.scoutControlled ? "S" : "_");
+      $(cell).addClass("portal-list-history allingC");
+      cell.append(String.fromCodePoint(info.scoutControlled ? 0x1F7E3 : 0x26AA)); // violet & white dot
     }
   }
 ];
@@ -329,7 +333,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
         case -4: {return (!obj.portal.options.data.history.visited)};
         case -5: {return (!obj.portal.options.data.history.captured)};
         case -6: {return (!obj.portal.options.data.history.scoutControlled)};
-      }: 
+      }; 
     });
   }
 
@@ -383,8 +387,11 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
       case 5:
         cell.textContent = window.plugin.portalslist.scoutControlledP + ' (' + Math.round(window.plugin.portalslist.scoutControlledP/length*100) + '%)';
     }
-    if (i = 2) {
+    if (i == 3) {
       // create a new row with an empty first cell
+       row = table.insertRow(-1);
+       cell = row.insertCell(-1); cell.textContent = (" ");
+       cell = row.insertCell(-1); cell.textContent = (" ");
     }
   });
 
@@ -430,7 +437,10 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
   });
 
   container.append('<div class="disclaimer">Click on portals table headers to sort by that column. '
-    + 'Click on <b>All, Neutral, Resistance, Enlightened</b> to only show portals owner by that faction or on the number behind the factions to show all but those portals.</div>');
+    + 'Click on <b>All, Neutral, Resistance, Enlightened</b> to only show portals owned '
+    + 'by that faction or on the number behind the factions to show all but those portals. '
+    + 'Click on <b>visited, captured or Sc. contr.</b> to only show portals the user has a history for '
+    + 'or on the number to hide those. </div>');
 
   return container;
 }
