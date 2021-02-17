@@ -349,6 +349,9 @@ window.Render.prototype.createPortalEntity = function(ent, details) { // details
     window.runHooks('portalAdded', {portal: marker});
 
     window.portals[data.guid] = marker;
+
+    if (selectedPortal === data.guid)
+      marker.renderDetails();
   }
 
   window.ornaments.addPortal(marker);
