@@ -44,8 +44,19 @@ L.PortalMarker = L.CircleMarker.extend({
     // portal location edit
     if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
       return true;
+    // placeholder
+    if (details.level === undefined) {
+      // if team differs and corresponding link/field is more recent
+      if (this._details.timestamp < details.timestamp && this._details.team !== details.team)
+        return true;
+      // in any other case
+      return false;
+    }
     // new data
     if (this._details.timestamp < details.timestamp)
+      return true;
+    // current marker is a placeholder, and details is real data
+    if (this.isPlaceholder())
       return true;
     // even if we get history that was missing ? is it even possible ?
     if (this._details.timestamp > details.timestamp)
@@ -67,13 +78,23 @@ L.PortalMarker = L.CircleMarker.extend({
     return false;
   },
   updateDetails: function(details) {
-    // portal has been moved
     if (this._details) {
+      // portal has been moved
       if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
         this.setLatLng(L.latLng(details.latE6/1E6, details.lngE6/1E6));
 
-      // we got more details
-      if (this._details.timestamp == details.timestamp) {
+      // core data from a placeholder
+      if (details.level === undefined) {
+        // if team has changed
+        if (this._details.timestamp < details.timestamp && this._details.team !== details.team) {
+          // keep history, title, image
+          details.title = this._details.title;
+          details.image = this._details.image;
+          details.history = this._details.history;
+          this._details = details;
+        }
+      } else if (this._details.timestamp == details.timestamp) {
+        // we got more details
         var localThis = this;
         ["mods", "resonators", "owner", "artifactDetail", "history"].forEach(function (prop) {
           if (details[prop]) localThis._details[prop] = details[prop];
@@ -120,6 +141,9 @@ L.PortalMarker = L.CircleMarker.extend({
   },
   getDetails: function () {
     return this._details;
+  },
+  isPlaceholder: function () {
+    return this._details.level === undefined;
   },
   hasFullDetails: function () {
     return !!this._details.mods
