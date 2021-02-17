@@ -38,6 +38,7 @@ L.PortalMarker = L.CircleMarker.extend({
 
   initialize: function(latlng, data) {
     L.CircleMarker.prototype.initialize.call(this, latlng);
+    this._selected = data.guid === selectedPortal;
     this.updateDetails(data);
 
     this.on('click', handler_portal_click);
