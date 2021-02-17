@@ -88,8 +88,8 @@ L.PortalMarker = L.CircleMarker.extend({
       }
     } else this._details = details;
 
-    this._level = parseInt(details.level)||0;
-    this._team = teamStringToId(details.team);
+    this._level = parseInt(this._details.level)||0;
+    this._team = teamStringToId(this._details.team);
 
     // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
     if (this._team == TEAM_NONE) this._level = 0;
