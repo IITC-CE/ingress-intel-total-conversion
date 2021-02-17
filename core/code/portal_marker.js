@@ -14,11 +14,13 @@ function handler_portal_click (e) {
   window.renderPortalDetails(e.target.options.guid, true)
 }
 function handler_portal_dblclick (e) {
-  handler_portal_click(e);
+  window.selectPortal(e.target.options.guid, e.type);
+  window.renderPortalDetails(e.target.options.guid, true)
   window.map.setView(e.target.getLatLng(), DEFAULT_ZOOM);
 }
 function handler_portal_contextmenu (e) {
-  handler_portal_click(e);
+  window.selectPortal(e.target.options.guid, e.type);
+  window.renderPortalDetails(e.target.options.guid, true)
   if (window.isSmartphone()) {
     window.show('info');
   } else if (!$('#scrollwrapper').is(':visible')) {
