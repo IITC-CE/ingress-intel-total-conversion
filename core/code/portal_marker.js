@@ -111,12 +111,12 @@ L.PortalMarker = L.CircleMarker.extend({
     L.setOptions(this, dataOptions);
 
     if (this._selected) {
-      this._renderDetails();
+      this.renderDetails();
     }
 
     this.setSelected();
   },
-  _renderDetails() {
+  renderDetails() {
     if (!this._rendering) {
       this._rendering = true;
       renderPortalDetails(this._details.guid, true);
