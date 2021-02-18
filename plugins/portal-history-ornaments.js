@@ -1,6 +1,6 @@
 // @author         Johtaja
 // @name           Portal History&Ornaments
-// @category       Highlighters
+// @category       Highlighter
 // @version        0.2.0
 // @description    display portal histroy as highlighters, ornaments
 
