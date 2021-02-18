@@ -606,8 +606,8 @@ window.plugin.uniques.setupPortalsList = function() {
 		if (info.droned === true) return 1;
 	}
 
-	window.plugin.portalslist.fields.push(
-		{title: "V/C",
+	window.plugin.portalslist.fields.push({
+		title: "V/C",
 		value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
 		sort: function(guidA, guidB) {
 			return uniqueValue(guidA) - uniqueValue(guidB);
