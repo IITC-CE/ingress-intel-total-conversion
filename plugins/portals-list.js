@@ -156,39 +156,22 @@ window.plugin.portalslist.fields = [
   },
   { 
     title: "V/C",
-    value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
-    sort: function(guidA, guidB) {
-      return window.plugin.portalslist.visitedValue(guidA) - window.plugin.portalslist.visitedValue(guidB);
-    },
-    format: function(cell, portal, guid) {
-      var info = window.portals[guid].options.data.history;
-      if(!info) info = { visited: false, captured: false, scoutControlled: false};
-
+    value: function(portal) { return window.plugin.portalslist.visitedValue(portal.options.guid); },
+    format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history alignC");
-      if (info.captured){
-        cell.append (String.fromCodePoint(0x1F534)); // red dot
-      } else {
-        if (info.visited) {
-          cell.append (String.fromCodePoint(0x1F7E1)); //yellow dot
-        } else {
-          cell.append (String.fromCodePoint(0x26AA)); // white dot
-        }
-      }
-
+      var codePoint = [0x26AA, 0x1F7E1, 0, 0x1F534][value];
+      cell.append (String.fromCodePoint(codePoint));
     }
   },
   {
     title: "S",
-    value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
-    sort:  function(guidA, guidB) {
-      return window.plugin.portalslist.scoutControlledValue(guidA) - window.plugin.portalslist.scoutControlledValue(guidB);
+    value: function(portal) { 
+      return window.plugin.portalslist.scoutControlledValue(portal.options.guid);
     },
-    format: function(cell, portal, guid) {
-      var info = window.portals[guid].options.data.history;
-      if(!info) info = { visited: false, captured: false, scoutControlled: false};
-
+    format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history allingC");
-      cell.append(String.fromCodePoint(info.scoutControlled ? 0x1F7E3 : 0x26AA)); // violet & white dot
+      var codePoint = [0x26AA, 0x1F7E1, 0, 0x1F534, 0x1F7E3][value];
+      cell.append(String.fromCodePoint(codePoint));
     }
   }
 ];
