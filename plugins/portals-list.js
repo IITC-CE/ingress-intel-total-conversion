@@ -20,6 +20,16 @@ window.plugin.portalslist.scoutControlledP =0;
 
 window.plugin.portalslist.filter = 0;
 
+window.plugin.portalslist.historyCodePoints =[];
+[0x026AA, // white dot
+ 0x1F7E1, // yellow dot
+ 0x02B55, // red empty dot (should never show)
+ 0x1F534, // red dot
+ 0x1F7E3  // violet dot
+ ].forEach (function (value) {
+   window.plugin.portalslist.historyCodePoints.push(String.fromCodePoint(value))
+});
+
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
  * title: String
@@ -40,19 +50,12 @@ window.plugin.portalslist.filter = 0;
 
 window.plugin.portalslist.visitedValue = function (guid){
   var info = window.portals[guid].options.data.history;
-  if (!info) return 0;
-  if (info.visited === undefined) return 0;
-  if (!info.visited) return 0;
-  if (info.visited && info.captured) return 3;
-  if (info.visited) return 1;
+  return ((info) ? (info.visited + info.captured * 2) : 0);
 }
 
 window.plugin.portalslist.scoutControlledValue = function(guid) {
   var info = window.portals[guid].options.data.history
-  if (!info) return 0;
-  if (info.scoutControlled === undefined ) return 0;
-  if (!info.scoutControlled ) return 0;
-  if (info.scoutControlled ) return 4;
+  return ((info) ? (info.scoutControlled * 4) : 0);
 }
 
 window.plugin.portalslist.fields = [
@@ -159,8 +162,9 @@ window.plugin.portalslist.fields = [
     value: function(portal) { return window.plugin.portalslist.visitedValue(portal.options.guid); },
     format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history alignC");
-      var codePoint = [0x26AA, 0x1F7E1, 0, 0x1F534][value];
-      cell.append (String.fromCodePoint(codePoint));
+//      var codePoint = [0x26AA, 0x1F7E1, 0, 0x1F534][value];
+//      cell.append (String.fromCodePoint(codePoint));
+      cell.append(window.plugin.portalslist.historyCodePoints[value]);
     }
   },
   {
@@ -170,8 +174,8 @@ window.plugin.portalslist.fields = [
     },
     format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history allingC");
-      var codePoint = [0x26AA, 0x1F7E1, 0, 0x1F534, 0x1F7E3][value];
-      cell.append(String.fromCodePoint(codePoint));
+//      var codePoint = [0x26AA, 0x1F7E1, 0x2BFF, 0x1F534, 0x1F7E3][value];
+      cell.append(window.plugin.portalslist.historyCodePoints[value]);
     }
   }
 ];
