@@ -347,7 +347,7 @@ em {
   content: '[faction]';
   color: #f88;
   background-color: #500;
-  margin-right: .5rem;
+  margin-right: .2rem;
 }
 
 #chatall tr.public td:nth-child(3):before,
@@ -355,7 +355,7 @@ em {
   content: '[public]';
   color: #ff6;
   background-color: #550;
-  margin-right: .5rem;
+  margin-right: .2rem;
 }
 
 mark {
