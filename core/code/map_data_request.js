@@ -241,11 +241,10 @@ window.MapDataRequest.prototype.refresh = function() {
 
   this.render.startRenderPass(tileParams.level, dataBounds);
 
-  var _render = this.render;
-  window.runHooks ('mapDataEntityInject', {callback: function(ents) { _render.processGameEntities(ents);}});
+  window.runHooks ('mapDataEntityInject', {callback: this.render.processGameEntities.bind(this.render)});
 
 
-  this.render.processGameEntities(artifact.getArtifactEntities());
+  this.render.processGameEntities(artifact.getArtifactEntities(), 'summary');
 
   var logMessage = 'requesting data tiles at zoom '+dataZoom;
   logMessage += ' (L'+tileParams.level+'+ portals';
@@ -701,7 +700,7 @@ window.MapDataRequest.prototype.processRenderQueue = function() {
     if (drawEntityLimit > 0 && current.entities.length > 0) {
       var drawThisPass = current.entities.splice(0,drawEntityLimit);
       drawEntityLimit -= drawThisPass.length;
-      this.render.processGameEntities(drawThisPass);
+      this.render.processGameEntities(drawThisPass, 'extended');
     }
 
     if (current.deleted.length == 0 && current.entities.length == 0) {
