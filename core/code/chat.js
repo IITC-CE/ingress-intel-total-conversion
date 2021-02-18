@@ -617,6 +617,12 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
     elm.data('needsScrollTop', 99999999);
   else
     chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
+
+  if(elm.data('needsScrollTop')) {
+    elm.data('ignoreNextScroll', true);
+    elm.scrollTop(elm.data('needsScrollTop'));
+    elm.data('needsScrollTop', null);
+  }
 };
 
 
@@ -757,12 +763,6 @@ window.chat.chooseTab = function(tab) {
 
     default:
       throw new Error('chat.chooser was asked to handle unknown button: ' + tt);
-  }
-
-  if(elm.data('needsScrollTop')) {
-    elm.data('ignoreNextScroll', true);
-    elm.scrollTop(elm.data('needsScrollTop'));
-    elm.data('needsScrollTop', null);
   }
 }
 
