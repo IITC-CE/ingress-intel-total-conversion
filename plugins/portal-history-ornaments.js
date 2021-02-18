@@ -2,7 +2,7 @@
 // @name           Portal History&Ornaments
 // @category       Highlighter
 // @version        0.2.0
-// @description    display portal histroy as highlighters, ornaments
+// @description    Display portal history as highlighters, ornaments
 
 
 // use own namespace for plugin
