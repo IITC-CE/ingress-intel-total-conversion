@@ -162,8 +162,6 @@ window.plugin.portalslist.fields = [
     value: function(portal) { return window.plugin.portalslist.visitedValue(portal.options.guid); },
     format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history alignC");
-//      var codePoint = [0x26AA, 0x1F7E1, 0, 0x1F534][value];
-//      cell.append (String.fromCodePoint(codePoint));
       cell.append(window.plugin.portalslist.historyCodePoints[value]);
     }
   },
@@ -174,7 +172,6 @@ window.plugin.portalslist.fields = [
     },
     format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history allingC");
-//      var codePoint = [0x26AA, 0x1F7E1, 0x2BFF, 0x1F534, 0x1F7E3][value];
       cell.append(window.plugin.portalslist.historyCodePoints[value]);
     }
   }
