@@ -6,21 +6,6 @@
 window.chat = function () {};
 var chat = window.chat;
 
-//WORK IN PROGRESS - NOT YET USED!!
-window.chat.commTabs = [
-// channel: the COMM channel ('tab' parameter in server requests)
-// name: visible name
-// inputPrompt: string for the input prompt
-// inputClass: (optional) class to apply to #chatinput
-// sendMessage: (optional) function to send the message (to override the default of sendPlext)
-// globalBounds: (optional) if true, always use global latLng bounds
-  {channel:'all', name:'All', inputPrompt: 'broadcast:', inputClass:'public'},
-  {channel:'faction', name:'Faction', inputPrompt: 'tell faction:', inputClass:'faction'},
-  {channel:'alerts', name:'Alerts', inputPrompt: 'tell Jarvis:', inputClass: 'alerts', globalBounds: true, sendMessage: function() {
-    alert("Jarvis: A strange game. The only winning move is not to play. How about a nice game of chess?\n(You can't chat to the 'alerts' channel!)");
-  }},
-];
-
 /**
  * Handles tab completion in chat input.
  *
@@ -61,14 +46,6 @@ window.chat.handleTabCompletion = function() {
 // clear management
 //
 
-window.chat.initChannelsData = function () {
-  window.chat._channels = {};
-  window.chat.commTabs.forEach(function (entry) {
-    window.chat._channels[entry.channel] = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
-  });
-};
-
-
 window.chat._oldBBox = null;
 
 /**
@@ -102,7 +79,9 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     // need to reset these flags now because clearing will only occur
     // after the request is finished – i.e. there would be one almost
     // useless request.
-    window.chat.initChannelsData();
+    window.chat.commTabs.forEach(function (entry) {
+      if (entry.localBounds) chat.initChannelData(entry);
+    });
 
     chat._oldBBox = b;
   }
@@ -849,6 +828,62 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
   }
 };
 
+//
+// Tabs
+//
+
+//WORK IN PROGRESS
+window.chat.commTabs = [
+  // channel: the COMM channel ('tab' parameter in server requests)
+  // name: visible name
+  // inputPrompt: string for the input prompt
+  // inputClass: (optional) class to apply to #chatinput
+  // sendMessage: (optional) function to send the message (to override the default of sendPlext)
+  // request: (optional) function to call to request new message
+  //          first argument is `channel`
+  //          second is true when trigger from scrolling to top
+  // render: (optional) function to render channel content
+  //          argument is `channel`
+  
+  // localBounds: (optional) if true, reset on view change
+  {
+    channel: 'all', name:'All', localBounds: true,
+    inputPrompt: 'broadcast:', inputClass:'public',
+    request: chat.requestChannel, render: chat.renderChannel
+  },
+  {
+    channel: 'faction', name:'Faction', localBounds: true,
+    inputPrompt: 'tell faction:', inputClass:'faction',
+    request: chat.requestChannel, render: chat.renderChannel
+  },
+  {
+    channel: 'alerts', name:'Alerts',
+    inputPrompt: 'tell Jarvis:', inputClass: 'alerts',
+    request: chat.requestChannel, render: chat.renderChannel,
+    sendMessage: function() {
+      alert("Jarvis: A strange game. The only winning move is not to play. How about a nice game of chess?\n(You can't chat to the 'alerts' channel!)");
+    }
+  },
+];
+
+/**
+ * Holds data related to each channel.
+ *
+ * @memberof window.chat
+ * @type {Object}
+ */
+window.chat._channels = {};
+
+/**
+ * Initialize the channel data.
+ *
+ * @function window.chat.initChannelData
+ * @returns {string} The channel object.
+ */
+window.chat.initChannelData = function (commTab) {
+  window.chat._channels[commTab.channel] = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
+};
+
 /**
  * Gets the name of the active chat tab.
  *
@@ -937,7 +972,8 @@ window.chat.request = function() {
   var channel = chat.getActive();
   chat.commTabs.forEach(function (entry) {
     if (channel === entry.channel || (window.chat.backgroundChannels && window.chat.backgroundChannels[entry.channel])) {
-      chat.requestChannel(entry.channel, false);
+      if (entry.request)
+        entry.request(entry.channel, false);
     }
   });
 }
@@ -950,9 +986,8 @@ window.chat.request = function() {
  */
 window.chat.needMoreMessages = function() {
   var activeTab = chat.getActive();
-  if (activeTab !== 'all' && activeTab !== 'faction' && activeTab !== 'alerts') {
-    return;
-  }
+  var commTab = chat.getCommTab(activeTab);
+  if(!commTab.request) return;
 
   var activeChat = $('#chat > :visible');
   if(activeChat.length === 0) return;
@@ -961,7 +996,7 @@ window.chat.needMoreMessages = function() {
   var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
   if(hasScrollbar && !nearTop) return;
 
-  chat.requestChannel(activeTab, true);
+  commTab.request(commTab.channel, false);
 };
 
 /**
@@ -1002,7 +1037,7 @@ window.chat.chooseTab = function(tab) {
   var elm = $('#chat' + tab);
   elm.show();
 
-  chat.renderChannel(tab, false);
+  if (commTab.render) commTab.render(tab);
 
   if(elm.data('needsScrollTop')) {
     elm.data('ignoreNextScroll', true);
@@ -1068,7 +1103,49 @@ window.chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
   }
 }
 
+//
+// comm tab api
+//
 
+function createCommTab (commTab) {
+  var chatControls = $('#chatcontrols');
+  var chatDiv = $('#chat');
+  var accessLink = L.Util.template(
+    '<a data-channel="{channel}" accesskey="{index}" title="[{index}]">{name}</a>',
+    commTab
+  );
+  $(accessLink).appendTo(chatControls).click(window.chat.chooser);
+
+  var channelDiv = L.Util.template(
+    '<div id="chat{channel}"></div>',
+    commTab
+  );
+  var elm = $(channelDiv).appendTo(chatDiv);
+  if (commTab.request) {
+    elm.scroll(function() {
+      var t = $(this);
+      if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
+      if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP)
+        commTab.request(commTab.channel, true);
+      if(scrollBottom(t) === 0)
+        commTab.request(commTab.channel, false);
+    });
+  }
+}
+
+window.chat.addCommTab = function (commTab) {
+  if (chat.getCommTab(commTab.channel)) {
+    log.warn('could not add commtab "' + commTab.channel + '": already exist');
+    return false;
+  }
+
+  chat.commTabs.push(commTab);
+  commTab.index = chat.commTabs.length;
+
+  createCommTab(commTab);
+
+  return true;
+};
 
 
 //
@@ -1076,28 +1153,10 @@ window.chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
 //
 
 window.chat.setupTabs = function () {
-  chat.initChannelsData();
-
-  var chatControls = $('#chatcontrols');
-  var chatDiv = $('#chat');
   window.chat.commTabs.forEach(function (entry, i) {
     entry.index = i+1;
-    var accessLink = L.Util.template(
-      '<a data-channel="{channel}" accesskey="{index}" title="[{index}]">{name}</a>',
-      entry
-    );
-    $(accessLink).appendTo(chatControls).click(window.chat.chooser);
-
-    var channelDiv = L.Util.template(
-      '<div id="chat{channel}"></div>',
-      entry
-    );
-    $(channelDiv).appendTo(chatDiv).scroll(function() {
-      var t = $(this);
-      if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-      if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestChannel(entry.channel, true);
-      if(scrollBottom(t) === 0) chat.requestChannel(entry.channel, false);
-    });
+    chat.initChannelData(entry);
+    createCommTab(entry);
   });
 };
 
@@ -1207,7 +1266,7 @@ window.chat.postMsg = function() {
   var msg = $.trim($('#chatinput input').val());
   if(!msg || msg === '') return;
 
-  if (c.sendMessage) return c.sendMessage(msg);
+  if (commTab.sendMessage) return commTab.sendMessage(msg);
 
   var latlng = map.getCenter();
 
