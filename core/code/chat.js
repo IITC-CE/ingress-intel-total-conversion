@@ -6,6 +6,21 @@
 window.chat = function () {};
 var chat = window.chat;
 
+//WORK IN PROGRESS - NOT YET USED!!
+window.chat.commTabs = [
+// channel: the COMM channel ('tab' parameter in server requests)
+// name: visible name
+// inputPrompt: string for the input prompt
+// inputColor: (optional) color for input
+// sendMessage: (optional) function to send the message (to override the default of sendPlext)
+// globalBounds: (optional) if true, always use global latLng bounds
+  {channel:'all', name:'All', inputPrompt: 'broadcast:', inputColor:'#f66'},
+  {channel:'faction', name:'Faction', inputPrompt: 'tell faction:'},
+  {channel:'alerts', name:'Alerts', inputPrompt: 'tell Jarvis:', inputColor: '#666', globalBounds: true, sendMessage: function() {
+    alert("Jarvis: A strange game. The only winning move is not to play. How about a nice game of chess?\n(You can't chat to the 'alerts' channel!)");
+  }},
+];
+
 /**
  * Handles tab completion in chat input.
  *
@@ -46,6 +61,13 @@ window.chat.handleTabCompletion = function() {
 // clear management
 //
 
+window.chat.initChannelsData = function () {
+  window.chat._channels = {};
+  window.chat.commTabs.forEach(function (entry) {
+    window.chat._channels[entry.channel] = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
+  });
+};
+
 
 window.chat._oldBBox = null;
 
@@ -80,26 +102,7 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     // need to reset these flags now because clearing will only occur
     // after the request is finished – i.e. there would be one almost
     // useless request.
-    chat._faction.data = {};
-    chat._faction.guids = [];
-    chat._faction.oldestTimestamp = -1;
-    chat._faction.newestTimestamp = -1;
-    delete chat._faction.oldestGUID;
-    delete chat._faction.newestGUID;
-
-    chat._public.data = {};
-    chat._public.guids = [];
-    chat._public.oldestTimestamp = -1;
-    chat._public.newestTimestamp = -1;
-    delete chat._public.oldestGUID;
-    delete chat._public.newestGUID;
-
-    chat._alerts.data = {};
-    chat._alerts.guids = [];
-    chat._alerts.oldestTimestamp = -1;
-    chat._alerts.newestTimestamp = -1;
-    delete chat._alerts.oldestGUID;
-    delete chat._alerts.newestGUID;
+    window.chat.initChannels();
 
     chat._oldBBox = b;
   }
@@ -147,13 +150,58 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
   return data;
 };
 
+window.chat._requestRunning = {}
+window.chat.requestChannel = function (channel, getOlderMsgs, isRetry) {
+  if(chat._requestRunning[channel] && !isRetry) return;
+  if(isIdle()) return renderUpdateStatus();
+  chat._requestRunning[channel] = true;
+  $("#chatcontrols a[data-channel='" + channel + "']").addClass('loading');
 
+  var d = chat.genPostData(channel, chat._channels[channel], getOlderMsgs);
+  var r = window.postAjax(
+    'getPlexts',
+    d,
+    function(data, textStatus, jqXHR) { chat.handleChannel(channel, data, getOlderMsgs, d.ascendingTimestampOrder); },
+    isRetry
+      ? function() { window.chat._requestRunning[channel] = false; }
+      : function() { window.chat.requestChannel(channel, getOlderMsgs, true) }
+  );
+};
+
+window.chat.handleChannel = function (channel, data, olderMsgs, ascendingTimestampOrder) {
+  chat._requestRunning[channel] = false;
+  $("#chatcontrols a[data-channel='" + channel + "']").removeClass('loading');
+
+  if(!data || !data.result) {
+    window.failedRequestCount++;
+    return log.warn(channel + ' chat error. Waiting for next auto-refresh.');
+  }
+
+  if (!data.result.length && !$('#chat'+channel).data('needsClearing')) {
+    // no new data and current data in chat._faction.data is already rendered
+    return;
+  }
+
+  $('#chat'+channel).data('needsClearing', null);
+
+  var old = chat._channels[channel].oldestGUID;
+  chat.writeDataToHash(data, chat._channels[channel], false, olderMsgs, ascendingTimestampOrder);
+  var oldMsgsWereAdded = old !== chat._channels[channel].oldestGUID;
+
+  runHooks(channel + 'ChatDataAvailable', {raw: data, result: data.result, processed: chat._channels[channel].data});
+
+  // runHooks('chatDataAvailable', {channel: channel, raw: data, result: data.result, processed: chat._channels[channel].data});
+
+  window.chat.renderChannel(channel, oldMsgsWereAdded);
+};
+
+window.chat.renderChannel = function(channel, oldMsgsWereAdded) {
+  chat.renderData(chat._channels[channel].data, 'chat' + channel, oldMsgsWereAdded, chat._channels[channel].guids);
+}
 
 //
 // faction
 //
-
-window.chat._requestFactionRunning = false;
 
 /**
  * Requests faction chat messages.
@@ -163,29 +211,8 @@ window.chat._requestFactionRunning = false;
  * @param {boolean} [isRetry=false] - Flag to indicate if this is a retry attempt.
  */
 window.chat.requestFaction = function(getOlderMsgs, isRetry) {
-  if(chat._requestFactionRunning && !isRetry) return;
-  if(isIdle()) return renderUpdateStatus();
-  chat._requestFactionRunning = true;
-  $("#chatcontrols a:contains('faction')").addClass('loading');
-
-  var d = chat.genPostData('faction', chat._faction, getOlderMsgs);
-  var r = window.postAjax(
-    'getPlexts',
-    d,
-    function(data, textStatus, jqXHR) { chat.handleFaction(data, getOlderMsgs, d.ascendingTimestampOrder); },
-    isRetry
-      ? function() { window.chat._requestFactionRunning = false; }
-      : function() { window.chat.requestFaction(getOlderMsgs, true) }
-  );
-}
-
-/**
- * Holds data related to faction chat.
- *
- * @memberof window.chat
- * @type {Object}
- */
-window.chat._faction = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
+  return window.chat.requestChannel('faction', getOlderMsgs, isRetry);
+};
 
 /**
  * Handles faction chat response.
@@ -196,29 +223,8 @@ window.chat._faction = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:
  * @param {boolean} ascendingTimestampOrder - Indicates if messages are in ascending timestamp order.
  */
 window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
-  chat._requestFactionRunning = false;
-  $("#chatcontrols a:contains('faction')").removeClass('loading');
-
-  if(!data || !data.result) {
-    window.failedRequestCount++;
-    return log.warn('faction chat error. Waiting for next auto-refresh.');
-  }
-
-  if (!data.result.length && !$('#chatfaction').data('needsClearing')) {
-    // no new data and current data in chat._faction.data is already rendered
-    return;
-  }
-
-  $('#chatfaction').data('needsClearing', null);
-
-  var old = chat._faction.oldestGUID;
-  chat.writeDataToHash(data, chat._faction, olderMsgs, ascendingTimestampOrder);
-  var oldMsgsWereAdded = old !== chat._faction.oldestGUID;
-
-  runHooks('factionChatDataAvailable', {raw: data, result: data.result, processed: chat._faction.data});
-
-  window.chat.renderFaction(oldMsgsWereAdded);
-}
+  return window.chat.handleChannel('faction', data, olderMsgs, ascendingTimestampOrder);
+};
 
 /**
  * Renders faction chat.
@@ -227,15 +233,13 @@ window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
  * @param {boolean} oldMsgsWereAdded - Indicates if old messages were added in the current rendering.
  */
 window.chat.renderFaction = function(oldMsgsWereAdded) {
-  chat.renderData(chat._faction.data, 'chatfaction', oldMsgsWereAdded, chat._faction.guids);
-}
+  return window.chat.renderChannel('faction', oldMsgsWereAdded);
+};
 
 
 //
 // all
 //
-
-window.chat._requestPublicRunning = false;
 
 /**
  * Initiates a request for public chat data.
@@ -245,29 +249,8 @@ window.chat._requestPublicRunning = false;
  * @param {boolean} [isRetry=false] - Whether the request is a retry.
  */
 window.chat.requestPublic = function(getOlderMsgs, isRetry) {
-  if(chat._requestPublicRunning && !isRetry) return;
-  if(isIdle()) return renderUpdateStatus();
-  chat._requestPublicRunning = true;
-  $("#chatcontrols a:contains('all')").addClass('loading');
-
-  var d = chat.genPostData('all', chat._public, getOlderMsgs);
-  var r = window.postAjax(
-    'getPlexts',
-    d,
-    function(data, textStatus, jqXHR) { chat.handlePublic(data, getOlderMsgs, d.ascendingTimestampOrder); },
-    isRetry
-      ? function() { window.chat._requestPublicRunning = false; }
-      : function() { window.chat.requestPublic(getOlderMsgs, true) }
-  );
-}
-
-/**
- * Holds data related to public chat.
- *
- * @memberof window.chat
- * @type {Object}
- */
-window.chat._public = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
+  return window.chat.requestChannel('all', getOlderMsgs, isRetry);
+};
 
 /**
  * Handles the public chat data received from the server.
@@ -278,30 +261,8 @@ window.chat._public = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-
  * @param {boolean} ascendingTimestampOrder - Whether messages are in ascending timestamp order.
  */
 window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
-  chat._requestPublicRunning = false;
-  $("#chatcontrols a:contains('all')").removeClass('loading');
-
-  if(!data || !data.result) {
-    window.failedRequestCount++;
-    return log.warn('public chat error. Waiting for next auto-refresh.');
-  }
-
-  if (!data.result.length && !$('#chatall').data('needsClearing')) {
-    // no new data and current data in chat._public.data is already rendered
-    return;
-  }
-
-  $('#chatall').data('needsClearing', null);
-
-  var old = chat._public.oldestGUID;
-  chat.writeDataToHash(data, chat._public, olderMsgs, ascendingTimestampOrder);
-  var oldMsgsWereAdded = old !== chat._public.oldestGUID;
-
-  runHooks('publicChatDataAvailable', {raw: data, result: data.result, processed: chat._public.data});
-
-  window.chat.renderPublic(oldMsgsWereAdded);
-
-}
+  return window.chat.handleChannel('all', data, olderMsgs, ascendingTimestampOrder);
+};
 
 /**
  * Renders public chat in the UI.
@@ -310,15 +271,13 @@ window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
  * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
  */
 window.chat.renderPublic = function(oldMsgsWereAdded) {
-  chat.renderData(chat._public.data, 'chatall', oldMsgsWereAdded, chat._public.guids);
-}
+  return window.chat.renderChannel('all', oldMsgsWereAdded);
+};
 
 
 //
 // alerts
 //
-
-window.chat._requestAlertsRunning = false;
 
 /**
  * Initiates a request for alerts chat data.
@@ -328,29 +287,8 @@ window.chat._requestAlertsRunning = false;
  * @param {boolean} [isRetry=false] - Whether the request is a retry.
  */
 window.chat.requestAlerts = function(getOlderMsgs, isRetry) {
-  if(chat._requestAlertsRunning && !isRetry) return;
-  if(isIdle()) return renderUpdateStatus();
-  chat._requestAlertsRunning = true;
-  $("#chatcontrols a:contains('alerts')").addClass('loading');
-
-  var d = chat.genPostData('alerts', chat._alerts, getOlderMsgs);
-  var r = window.postAjax(
-    'getPlexts',
-    d,
-    function(data, textStatus, jqXHR) { chat.handleAlerts(data, getOlderMsgs, d.ascendingTimestampOrder); },
-    isRetry
-      ? function() { window.chat._requestAlertsRunning = false; }
-      : function() { window.chat.requestAlerts(getOlderMsgs, true) }
-  );
-}
-
-/**
- * Holds data related to alerts chat.
- *
- * @memberof window.chat
- * @type {Object}
- */
-window.chat._alerts = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
+  return window.chat.requestChannel('alerts', getOlderMsgs, isRetry);
+};
 
 /**
  * Handles the alerts chat data received from the server.
@@ -361,25 +299,8 @@ window.chat._alerts = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-
  * @param {boolean} ascendingTimestampOrder - Whether messages are in ascending timestamp order.
  */
 window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
-  chat._requestAlertsRunning = false;
-  $("#chatcontrols a:contains('alerts')").removeClass('loading');
-
-  if(!data || !data.result) {
-    window.failedRequestCount++;
-    return log.warn('alerts chat error. Waiting for next auto-refresh.');
-  }
-
-  if(data.result.length === 0) return;
-
-  var old = chat._alerts.oldestTimestamp;
-  chat.writeDataToHash(data, chat._alerts, olderMsgs, ascendingTimestampOrder);
-  var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
-
-  // hook for alerts - API change planned here for next refactor
-  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
-
-  window.chat.renderAlerts(oldMsgsWereAdded);
-}
+  return window.chat.handleChannel('alerts', data, olderMsgs, ascendingTimestampOrder);
+};
 
 /**
  * Renders alerts chat in the UI.
@@ -388,9 +309,8 @@ window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
  * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
  */
 window.chat.renderAlerts = function(oldMsgsWereAdded) {
-  chat.renderData(chat._alerts.data, 'chatalerts', oldMsgsWereAdded, chat._alerts.guids);
-}
-
+  return window.chat.renderChannel('alerts', oldMsgsWereAdded);
+};
 
 
 //
@@ -936,7 +856,7 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
  * @returns {string} The name of the active chat tab.
  */
 window.chat.getActive = function() {
-  return $('#chatcontrols .active').text();
+  return $('#chatcontrols .active').data('channel');
 }
 
 /**
@@ -1070,7 +990,7 @@ window.chat.chooseTab = function(tab) {
   var input = $('#chatinput input');
 
   $('#chatcontrols .active').removeClass('active');
-  $("#chatcontrols a:contains('" + tab + "')").addClass('active');
+  $("#chatcontrols a[data-channel='" + tab + "']").addClass('active');
 
   if (tab != oldTab) startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a tab change
 
@@ -1131,7 +1051,7 @@ window.chat.show = function(name) {
  */
 window.chat.chooser = function(event) {
   var t = $(event.target);
-  var tab = t.text();
+  var tab = t.data('channel');
   window.chat.chooseTab(tab);
 }
 
@@ -1170,12 +1090,40 @@ window.chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
 // setup
 //
 
+window.chat.setupTabs = function () {
+  chat.initChannelsData();
+
+  var chatControls = $('#chatcontrols');
+  var chatDiv = $('#chat');
+  window.chat.commTabs.forEach(function (entry, i) {
+    entry.index = i+1;
+    var accessLink = L.Util.template(
+      '<a data-channel="{channel}" accesskey="{index}" title="[{index}]">{name}</a>',
+      entry
+    );
+    $(accessLink).appendTo(chatControls).click(window.chat.chooser);
+
+    var channelDiv = L.Util.template(
+      '<div id="chat{channel}"></div>',
+      entry
+    );
+    $(channelDiv).appendTo(chatDiv).scroll(function() {
+      var t = $(this);
+      if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
+      if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestChannel(entry.channel, true);
+      if(scrollBottom(t) === 0) chat.requestChannel(entry.channel, false);
+    });
+  });
+};
+
 /**
  * Sets up the chat interface.
  *
  * @function window.chat.setup
  */
 window.chat.setup = function() {
+  chat.setupTabs();
+
   if (localStorage['iitc-chat-tab']) {
     chat.chooseTab(localStorage['iitc-chat-tab']);
  }
@@ -1183,10 +1131,6 @@ window.chat.setup = function() {
   $('#chatcontrols, #chat, #chatinput').show();
 
   $('#chatcontrols a:first').click(window.chat.toggle);
-  $('#chatcontrols a').each(function(ind, elm) {
-    if($.inArray($(elm).text(), ['all', 'faction', 'alerts']) !== -1)
-      $(elm).click(window.chat.chooser);
-  });
 
 
   $('#chatinput').click(function() {
@@ -1195,27 +1139,6 @@ window.chat.setup = function() {
 
   window.chat.setupTime();
   window.chat.setupPosting();
-
-  $('#chatfaction').scroll(function() {
-    var t = $(this);
-    if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-    if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestFaction(true);
-    if(scrollBottom(t) === 0) chat.requestFaction(false);
-  });
-
-  $('#chatall').scroll(function() {
-    var t = $(this);
-    if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-    if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestPublic(true);
-    if(scrollBottom(t) === 0) chat.requestPublic(false);
-  });
-
-  $('#chatalerts').scroll(function() {
-    var t = $(this);
-    if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-    if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP) chat.requestAlerts(true);
-    if(scrollBottom(t) === 0) chat.requestAlerts(false);
-  });
 
   window.requests.addRefreshFunction(chat.request);
 
