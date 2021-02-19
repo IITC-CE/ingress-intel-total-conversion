@@ -291,8 +291,8 @@ window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
   chat.writeDataToHash(data, chat._alerts, undefined, olderMsgs, ascendingTimestampOrder); //NOTE: isPublic passed as undefined - it's nether public or private!
   var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
 
-// no hoot for alerts - API change planned here...
-//  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
+  // hook for alerts - API change planned here for next refactor
+  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
 
   window.chat.renderAlerts(oldMsgsWereAdded);
 }
