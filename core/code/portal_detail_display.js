@@ -70,8 +70,9 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
  * @function renderPortalDetails
  * @param {string|null} guid - The globally unique identifier of the portal to display details for.
  */
-window.renderPortalDetails = function (guid, dontSelect) {
-  if (!dontSelect) window.selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
+window.renderPortalDetails = function(guid, forceSelect) {
+  if (forceSelect || window.selectedPortal !== guid)
+    window.selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
