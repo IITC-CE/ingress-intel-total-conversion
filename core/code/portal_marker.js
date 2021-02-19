@@ -11,16 +11,16 @@ var portalBaseStyle = {
 // portal hooks
 function handler_portal_click (e) {
   window.selectPortal(e.target.options.guid, e.type);
-  window.renderPortalDetails(e.target.options.guid, true)
+  window.renderPortalDetails(e.target.options.guid)
 }
 function handler_portal_dblclick (e) {
   window.selectPortal(e.target.options.guid, e.type);
-  window.renderPortalDetails(e.target.options.guid, true)
+  window.renderPortalDetails(e.target.options.guid)
   window.map.setView(e.target.getLatLng(), DEFAULT_ZOOM);
 }
 function handler_portal_contextmenu (e) {
   window.selectPortal(e.target.options.guid, e.type);
-  window.renderPortalDetails(e.target.options.guid, true)
+  window.renderPortalDetails(e.target.options.guid)
   if (window.isSmartphone()) {
     window.show('info');
   } else if (!$('#scrollwrapper').is(':visible')) {
@@ -56,7 +56,7 @@ L.PortalMarker = L.CircleMarker.extend({
     if (this._details.timestamp < details.timestamp)
       return true;
     // current marker is a placeholder, and details is real data
-    if (this.isPlaceholder())
+    if (this.isPlaceholder() && this._details.team === details.team)
       return true;
     // even if we get history that was missing ? is it even possible ?
     if (this._details.timestamp > details.timestamp)
@@ -135,7 +135,7 @@ L.PortalMarker = L.CircleMarker.extend({
   renderDetails() {
     if (!this._rendering) {
       this._rendering = true;
-      renderPortalDetails(this._details.guid, true);
+      renderPortalDetails(this._details.guid);
       this._rendering = false;
     }
   },

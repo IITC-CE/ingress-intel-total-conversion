@@ -27,8 +27,9 @@ window.renderPortalUrl = function (lat, lng, title) {
   linkDetails.append($('<aside>').append(mapHtml));
 };
 
-window.renderPortalDetails = function(guid, dontSelect) {
-  if (!dontSelect) selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
+window.renderPortalDetails = function(guid, forceSelect) {
+  if (forceSelect || selectedPortal !== guid)
+    selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
@@ -138,7 +139,7 @@ window.renderPortalDetails = function(guid, dontSelect) {
     );
 
   window.renderPortalUrl(lat, lng, title, guid);
-  
+
   // compatibility
   var data = hasFullDetails ? getPortalSummaryData(details) : details;
 
