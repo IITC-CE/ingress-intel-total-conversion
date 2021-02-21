@@ -167,7 +167,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 		&& markup[3][0] == 'PORTAL'
 		&& markup[4][0] == 'TEXT'
 		&& markup[4][1].plain == ' has decayed') {
-				// search for "Your Lx Resonator on y has decayed"
+			// search for "Your Lx Resonator on y has decayed"
 			var portal = markup[3][1];
 			match = true;
 			plugin.uniques.setPortalAction(portal,'visited');
@@ -185,23 +185,23 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 			match = true;
 			plugin.uniques.setPortalAction(portal,'visited');
 		} else if (plext.plextType == 'SYSTEM_NARROWCAST'
-			&& markup.length==3
-			&& markup[0][0] == 'TEXT'
-			&& markup[0][1].plain == 'You claimed Scout Controller on '
-			&& markup[1][0] == 'PORTAL') {
+	  && markup.length==3
+		&& markup[0][0] == 'TEXT'
+		&& markup[0][1].plain == 'You claimed Scout Controller on '
+		&& markup[1][0] == 'PORTAL') {
 				// search for "You claimed Scout Controller on "
-				var portal = markup[1][1];
-				match = true;
-				plugin.uniques.setPortalAction(portal,'scoutControlled');
+			var portal = markup[1][1];
+			match = true;
+			plugin.uniques.setPortalAction(portal,'scoutControlled');
 		} else if (plext.plextType == 'SYSTEM_NARROWCAST'
-			&& markup.length==3
-			&& markup[0][0] == 'TEXT'
-			&& markup[0][1].plain == 'You were displaced as Scout Controller on '
-			&& markup[1][0] == 'PORTAL') {
-				// search for "You were displaced as Scout Controller on"
-				var portal = markup[1][1];
-				match = true;
-				plugin.uniques.setPortalAction(portal,'scoutControlled');
+		&& markup.length==3
+		&& markup[0][0] == 'TEXT'
+		&& markup[0][1].plain == 'You were displaced as Scout Controller on '
+		&& markup[1][0] == 'PORTAL') {
+        // search for "You were displaced as Scout Controller on"
+			var portal = markup[1][1];
+			match = true;
+			plugin.uniques.setPortalAction(portal,'scoutControlled');
 		}
 		}
 		if (match){
@@ -248,10 +248,12 @@ window.plugin.uniques.setPortalAction = function(portal, action) {
 			Object.assign(uniqueInfo,window.uniques.missedLatLngs[id].action);
 			delete window.plugin.uniques.missedLatLngs[id];
 			window.plugin.uniques.storeLocal('missedLatLngs');
-		}
+		};
 		uniqueInfo[action] = true;
 		// special handling for captured
-		if (action === 'captured') uniqueInfo.visited = true;
+		if (action === 'captured') {
+      uniqueInfo.visited = true;
+    };
 		window.plugin.uniques.uniques[guid] = uniqueInfo;
 		window.plugin.uniques.storeLocal('uniques');
 		// trigger highlighters
@@ -259,10 +261,13 @@ window.plugin.uniques.setPortalAction = function(portal, action) {
 		// triger sync
 		plugin.uniques.sync(guid);
 	} else { //guid not found, so add to missedLatLngs
-		if (!window.plugin.uniques.missedLatLngs[id])
+		if (!window.plugin.uniques.missedLatLngs[id]) {
 			window.plugin.uniques.missedLatLngs[id] = {portal:portal,action:{}};
+    };
 		window.plugin.uniques.missedLatLngs[id].action[action] = true;
-		if (action === 'captured') window.plugin.uniques.missedLatLngs[id].action.visited = true;
+		if (action === 'captured') {
+      window.plugin.uniques.missedLatLngs[id].action.visited = true;
+    };
 		window.plugin.uniques.storeLocal('missedLatLngs');
 	}
 }
@@ -845,7 +850,6 @@ window.plugin.uniques.onPortalAdded = function(data) {
 	//console.log("portal added: %s %s %o", guid, id, data);
 	// check if portal is in missedLatLngs
 	if (window.plugin.uniques.missedLatLngs[id]) {
-		console.log("found portal guid for previously missed portal: %s -> %s (%o)", id, guid, data);
 		window.plugin.uniques.uniques[guid] = Object.assign (
 			{},
 			window.plugin.uniques.uniques[guid],
@@ -876,7 +880,7 @@ window.plugin.uniques.genList = function (){
 	var list = '';
 	for (var item in mLL) {
 		var p = mLL[item].portal;
-		list = list + '<a onclick=\"map.setView(['+p.latE6/1E6+','+p.lngE6/1E6+'],15);\">'+p.name+'</a><br>';
+		list = list + '<a onclick="map.setView(['+p.latE6/1E6+','+p.lngE6/1E6+'],15);">'+p.name+'</a><br>';
 	}
 	return list
 }
@@ -897,8 +901,8 @@ window.plugin.uniques.options = function (){
 			+ '<div id="missedPL" style="height:150px;overflow:auto">'
 			+ window.plugin.uniques.genList()
 			+ '</div><hr>'
-			+ '<a onclick=\"window.plugin.uniques.optExport();return false\" title=\"Export portals\' unique info to IITC.\">Backup</a> / '
-			+ '<a onclick=\"window.plugin.uniques.optImport();return false\" title=\"Import portals\' unique info to IITC.\">Restore</a> Uniques'
+			+ '<a onclick="window.plugin.uniques.optExport();return false" title="Export portals\' unique info to IITC.">Backup</a> / '
+			+ '<a onclick="window.plugin.uniques.optImport();return false" title="Import portals\' unique info to IITC.">Restore</a> Uniques'
 	var dialog = window.dialog ({
 		title: "Uniques",
 		html: list,
