@@ -2,7 +2,7 @@
 // @name           Uniques
 // @category       Misc
 // @version        0.4.0
-// @description    Allow manual entry of portals visited/captured, scouted or droned. Highlighters for all three help to identify new portals. Uniques uses the 'sync'-plugin to share between multiple browsers or desktop/mobile. COMM and portal details are analyzed to fill the fields automatically (but this will not catch every case).
+// @description    Allow manual entry of portals visited/captured, scoutControlled or droneVisited. Highlighters for all three help to identify new portals. Uniques uses the 'sync'-plugin to share between multiple browsers or desktop/mobile. COMM and portal details are analyzed to fill the fields automatically (but this will not catch every case).
 
 //use own namespace for plugin
 window.plugin.uniques = function() {};
@@ -192,7 +192,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 				// search for "You claimed Scout Controller on "
 				var portal = markup[1][1];
 				match = true;
-				plugin.uniques.setPortalAction(portal,'scouted');
+				plugin.uniques.setPortalAction(portal,'scoutControlled');
 		} else if (plext.plextType == 'SYSTEM_NARROWCAST'
 			&& markup.length==3
 			&& markup[0][0] == 'TEXT'
@@ -201,7 +201,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function(data) {
 				// search for "You were displaced as Scout Controller on"
 				var portal = markup[1][1];
 				match = true;
-				plugin.uniques.setPortalAction(portal,'scouted');
+				plugin.uniques.setPortalAction(portal,'scoutControlled');
 		}
 		}
 		if (match){
@@ -219,12 +219,12 @@ window.plugin.uniques.updateCheckedAndHighlight = function(guid) {
 		var uniqueInfo = plugin.uniques.uniques[guid],
 			visited = (uniqueInfo && uniqueInfo.visited) || false,
 			captured = (uniqueInfo && uniqueInfo.captured) || false,
-			scouted = (uniqueInfo && uniqueInfo.scouted) || false,
-			droned = (uniqueInfo && uniqueInfo.droned) || false;
+			scoutControlled = (uniqueInfo && uniqueInfo.scoutControlled) || false,
+			droneVisited = (uniqueInfo && uniqueInfo.droneVisited) || false;
 		$('#visited').prop('checked', visited);
 		$('#captured').prop('checked', captured);
-		$('#scouted').prop('checked', scouted);
-		$('#droned').prop('checked', droned);
+		$('#scoutControlled').prop('checked', scoutControlled);
+		$('#droneVisited').prop('checked', droneVisited);
 	}
 
 	if (window.plugin.uniques.isHighlightActive) {
@@ -266,7 +266,7 @@ window.plugin.uniques.setPortalAction = function(portal, action) {
 		window.plugin.uniques.storeLocal('missedLatLngs');
 	}
 }
-// Visited
+
 window.plugin.uniques.updateVisited = function(visited, guid) {
 	if (guid == undefined) guid = window.selectedPortal;
 
@@ -290,7 +290,7 @@ window.plugin.uniques.updateVisited = function(visited, guid) {
 	plugin.uniques.updateCheckedAndHighlight(guid);
 	plugin.uniques.sync(guid);
 }
-// Captured
+
 window.plugin.uniques.updateCaptured = function(captured, guid) {
 	if (guid == undefined) guid = window.selectedPortal;
 
@@ -314,52 +314,52 @@ window.plugin.uniques.updateCaptured = function(captured, guid) {
 	plugin.uniques.updateCheckedAndHighlight(guid);
 	plugin.uniques.sync(guid);
 }
-// Scouted
-window.plugin.uniques.updateScouted = function(scouted, guid) {
+
+window.plugin.uniques.updateScoutControlled = function(scoutControlled, guid) {
 	if (guid == undefined) guid = window.selectedPortal;
 
 	var uniqueInfo = plugin.uniques.uniques[guid];
 	if (!uniqueInfo) {
 		plugin.uniques.uniques[guid] = uniqueInfo = {
-			scouted: false,
+			scoutControlled: false,
 		};
 	}
 
-	if (scouted == uniqueInfo.scouted) return;
+	if (scoutControlled == uniqueInfo.scoutControlled) return;
 
-	if (scouted) {
-		uniqueInfo.scouted = true;
+	if (scoutControlled) {
+		uniqueInfo.scoutControlled = true;
 	} else {
-		uniqueInfo.scouted = false;
-	}
-
-	plugin.uniques.updateCheckedAndHighlight(guid);
-	plugin.uniques.sync(guid);
-}
-// Droned
-window.plugin.uniques.updateDroned = function(droned, guid) {
-	if (guid == undefined) guid = window.selectedPortal;
-
-	var uniqueInfo = plugin.uniques.uniques[guid];
-	if (!uniqueInfo) {
-		plugin.uniques.uniques[guid] = uniqueInfo = {
-			droned: false
-		};
-	}
-
-	if (droned == uniqueInfo.droned) return;
-
-	if (droned) {
-		uniqueInfo.droned = true;
-	} else {
-		uniqueInfo.droned = false;
+		uniqueInfo.scoutControlled = false;
 	}
 
 	plugin.uniques.updateCheckedAndHighlight(guid);
 	plugin.uniques.sync(guid);
 }
 
-// stores the gived GUID for sync
+window.plugin.uniques.updateDroneVisited = function(droneVisited, guid) {
+	if (guid == undefined) guid = window.selectedPortal;
+
+	var uniqueInfo = plugin.uniques.uniques[guid];
+	if (!uniqueInfo) {
+		plugin.uniques.uniques[guid] = uniqueInfo = {
+			droneVisited: false
+		};
+	}
+
+	if (droneVisited == uniqueInfo.droneVisited) return;
+
+	if (droneVisited) {
+		uniqueInfo.droneVisited = true;
+	} else {
+		uniqueInfo.droneVisited = false;
+	}
+
+	plugin.uniques.updateCheckedAndHighlight(guid);
+	plugin.uniques.sync(guid);
+}
+
+// stores the given GUID for sync
 plugin.uniques.sync = function(guid) {
 	plugin.uniques.updateQueue[guid] = true;
 	plugin.uniques.storeLocal('uniques');
@@ -455,8 +455,41 @@ window.plugin.uniques.loadLocal = function(name) {
 
 	if(localStorage[key] !== undefined) {
 		plugin.uniques[name] = JSON.parse(localStorage[key]);
-	}
+  }
 }
+
+// transformData - function to transform storagedata still using "scouted and droned".
+window.plugin.uniques.transformData = function () {
+  var trans;
+  for (var guid in window.plugin.uniques.uniques) {
+    trans = window.plugin.uniques.uniques[guid];
+    if (trans.scouted) {
+      trans.scoutControlled = trans.scouted;
+      delete trans.scouted;
+    };
+    if (trans.droned) {
+      trans.droneVisited = trans.droned;
+      delete trans.droned;
+    };
+  };
+
+  for (var id in window.plugin.uniques.missedLatLngs) {
+    
+    trans = window.plugin.uniques.missedLatLngs[id].action
+    if (trans.scouted) {
+      trans.scoutControlled = trans.scouted;
+      delete trans.scouted;
+    };
+    if (trans.droned) {
+      trans.droneVisited = trans.droned;
+      delete trans.droned;
+    };
+  };
+
+  window.plugin.uniques.uniques['version.040']={};
+  window.plugin.uniques.storeLocal('missedLatLngs');
+  window.plugin.uniques.storeLocal('uniques');
+};
 
 /****************************************************************************************/
 /** HIGHLIGHTERS ************************************************************************/
@@ -496,16 +529,16 @@ window.plugin.uniques.highlighterCaptured = {
 	}
 }
 
-// highlighter scouted
-window.plugin.uniques.highlighterScouted = {
+// highlighter scoutControlled
+window.plugin.uniques.highlighterScoutControlled = {
 	highlight: function(data) {
 		var guid = data.portal.options.ent[0];
 		var uniqueInfo = window.plugin.uniques.uniques[guid];
 
 		var style = {};
 
-		if (uniqueInfo && uniqueInfo.scouted) { 
-      // scouted - no highlights
+		if (uniqueInfo && uniqueInfo.scoutControlled) { 
+      // scoutControlled - no highlights
 		} else {
 				style.fillColor = 'red';
 				style.fillOpacity = 0.7;
@@ -517,16 +550,16 @@ window.plugin.uniques.highlighterScouted = {
 		window.plugin.uniques.isHighlightActive = active;
 	}
 }
-// highlighter droned
-window.plugin.uniques.highlighterDroned = {
+// highlighter droneVisited
+window.plugin.uniques.highlighterDroneVisited = {
 	highlight: function(data) {
 		var guid = data.portal.options.ent[0];
 		var uniqueInfo = window.plugin.uniques.uniques[guid];
 
 		var style = {};
 
-		if (uniqueInfo && uniqueInfo.droned) { 
-      // droneded - no highlights
+		if (uniqueInfo && uniqueInfo.droneVisited) { 
+      // droneVisited - no highlights
 		} else {
 				style.fillColor = 'red';
 				style.fillOpacity = 0.7;
@@ -550,8 +583,8 @@ window.plugin.uniques.setupContent = function() {
 	plugin.uniques.contentHTML = '<div id="uniques-container">'
 		+ '<label><input type="checkbox" id="visited" onclick="window.plugin.uniques.updateVisited($(this).prop(\'checked\'))"> Visited</label>'
 		+ '<label><input type="checkbox" id="captured" onclick="window.plugin.uniques.updateCaptured($(this).prop(\'checked\'))"> Captured</label>'
-		+ '<label><input type="checkbox" id="scouted" onclick="window.plugin.uniques.updateScouted($(this).prop(\'checked\'))"> Scout controlled/label>'
-		+ '<label><input type="checkbox" id="droned" onclick="window.plugin.uniques.updateDroned($(this).prop(\'checked\'))"> Drone visited</label>'
+		+ '<label><input type="checkbox" id="scoutControlled" onclick="window.plugin.uniques.updateScoutControlled($(this).prop(\'checked\'))"> Scout controlled/label>'
+		+ '<label><input type="checkbox" id="droneVisited" onclick="window.plugin.uniques.updateDroneVisited($(this).prop(\'checked\'))"> Drone visited</label>'
 		+ '</div>';
 	plugin.uniques.disabledMessage = '<div id="uniques-container" class="help" title="Your browser does not support localStorage">Plugin Uniques disabled</div>';
 }
@@ -560,12 +593,12 @@ window.plugin.uniques.setupPortalsList = function() {
 
 	window.addHook('pluginUniquesUpdateUniques', function(data) {
 		var info = plugin.uniques.uniques[data.guid];
-		if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+		if (!info) info = { visited: false, captured: false, scoutControlled: false, droneVisited: false	};
 
 		$('[data-list-uniques="'+data.guid+'"].visited').prop('checked', !!info.visited);
 		$('[data-list-uniques="'+data.guid+'"].captured').prop('checked', !!info.captured);
-		$('[data-list-uniques="'+data.guid+'"].scouted').prop('checked', !!info.scouted);
-		$('[data-list-uniques="'+data.guid+'"].droned').prop('checked', !!info.droned);
+		$('[data-list-uniques="'+data.guid+'"].scoutControlled').prop('checked', !!info.scoutControlled);
+		$('[data-list-uniques="'+data.guid+'"].droneVisited').prop('checked', !!info.droneVisited);
 	});
 
 	window.addHook('pluginUniquesRefreshAll', function() {
@@ -573,13 +606,13 @@ window.plugin.uniques.setupPortalsList = function() {
 			var guid = element.getAttribute("data-list-uniques");
 
 			var info = plugin.uniques.uniques[guid];
-			if (!info) info = { visited: false, captured: false, scouted: false, droned: false };
+			if (!info) info = { visited: false, captured: false, scoutControlled: false, droneVisited: false };
 
 			var e = $(element);
 			if (e.hasClass('visited')) e.prop('checked', !!info.visited);
 			if (e.hasClass('captured')) e.prop('checked', !!info.captured);
-			if (e.hasClass('scouted')) e.prop('checked', !!info.scouted);
-			if (e.hasClass('droned')) e.prop('checked', !!info.droned);
+			if (e.hasClass('scoutControlled')) e.prop('checked', !!info.scoutControlled);
+			if (e.hasClass('droneVisited')) e.prop('checked', !!info.droneVisited);
 		});
 	});
 
@@ -592,18 +625,18 @@ window.plugin.uniques.setupPortalsList = function() {
 		if (info.visited) return 1;
 	}
 
-	function scoutedValue(guid) {
+	function scoutControlledValue(guid) {
 		var info = plugin.uniques.uniques[guid];
 		if (!info) return 0;
-		if (info.scouted === undefined ) return 0;
-		if (info.scouted === true) return 1;
+		if (info.scoutControlled === undefined ) return 0;
+		if (info.scoutControlled === true) return 1;
 	}
 
-	function dronedValue(guid) {
+	function droneVisitedValue(guid) {
 		var info = plugin.uniques.uniques[guid];
 		if (!info) return 0;
-		if (info.droned === undefined ) return 0;
-		if (info.droned === true) return 1;
+		if (info.droneVisited === undefined ) return 0;
+		if (info.droneVisited === true) return 1;
 	}
 
 	window.plugin.portalslist.fields.push({
@@ -614,7 +647,7 @@ window.plugin.uniques.setupPortalsList = function() {
 		},
 		format: function(cell, portal, guid) {
 			var info = plugin.uniques.uniques[guid];
-			if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+			if (!info) info = { visited: false, captured: false, scoutControlled: false, droneVisited: false	};
 
 			$(cell).addClass("portal-list-uniques");
 
@@ -654,11 +687,11 @@ window.plugin.uniques.setupPortalsList = function() {
       title: "S",
 			value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
 			sort:	function(guidA, guidB) {
-				return scoutedValue(guidA) - scoutedValue(guidB);
+				return scoutControlledValue(guidA) - scoutControlledValue(guidB);
 			},
 			format: function(cell, portal, guid) {
 			var info = plugin.uniques.uniques[guid];
-			if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+			if (!info) info = { visited: false, captured: false, scoutControlled: false, droneVisited: false	};
 
 			$(cell).addClass("portal-list-uniques");
 
@@ -666,14 +699,14 @@ window.plugin.uniques.setupPortalsList = function() {
 			$('<input>')
 				.prop({
 					type: "checkbox",
-					className: "scouted",
-					title: "Portal scouted?",
-					checked: !!info.scouted,
+					className: "scoutControlled",
+					title: "Portal scoutControlled?",
+					checked: !!info.scoutControlled,
 				})
 				.attr("data-list-uniques", guid)
 				.appendTo(cell)
 				[0].addEventListener("change", function(ev) {
-					window.plugin.uniques.updateScouted(this.checked, guid);
+					window.plugin.uniques.updateScoutControlled(this.checked, guid);
 					ev.preventDefault();
 					return false;
 				}, false);
@@ -684,11 +717,11 @@ window.plugin.uniques.setupPortalsList = function() {
       title: "D",
 			value: function(portal) { return portal.options.guid; }, // we store the guid, but implement a custom comparator so the list does sort properly without closing and reopening the dialog
 			sort:	function(guidA, guidB) {
-				return dronedValue(guidA) - dronedValue(guidB);
+				return droneVisitedValue(guidA) - droneVisitedValue(guidB);
 			},
 			format: function(cell, portal, guid) {
 			var info = plugin.uniques.uniques[guid];
-			if (!info) info = { visited: false, captured: false, scouted: false, droned: false	};
+			if (!info) info = { visited: false, captured: false, scoutControlled: false, droneVisited: false	};
 
 			$(cell).addClass("portal-list-uniques");
 
@@ -696,14 +729,14 @@ window.plugin.uniques.setupPortalsList = function() {
 			$('<input>')
 				.prop({
 					type: "checkbox",
-					className: "droned",
-					title: "Portal droned?",
-					checked: !!info.droned,
+					className: "droneVisited",
+					title: "Portal droneVisited?",
+					checked: !!info.droneVisited,
 				})
 				.attr("data-list-uniques", guid)
 				.appendTo(cell)
 				[0].addEventListener("change", function(ev) {
-					window.plugin.uniques.updateDroned(this.checked, guid);
+					window.plugin.uniques.updateDroneVisited(this.checked, guid);
 					ev.preventDefault();
 					return false;
 				}, false);
@@ -850,16 +883,16 @@ window.plugin.uniques.genList = function (){
 
 window.plugin.uniques.options = function (){
 	aoPortals=window.plugin.uniques.uniques;
-	visited=captured=scouted=droned=0;
+	visited=captured=scoutControlled=droneVisited=0;
 	$.each(aoPortals,function(PUID){
 		aPortal=window.plugin.uniques.uniques[PUID];
 		if (aPortal.visited) visited++;
 		if (aPortal.captured) captured++;
-		if (aPortal.scouted) scouted++;
-		if (aPortal.droned) droned++;
+		if (aPortal.scoutControlled) scoutControlled++;
+		if (aPortal.droneVisited) droneVisited++;
 	});
 
-	let list = 'Unique Portals Count:<br>visited: '+visited+' - captured: '+captured+'<br>scouted: '+scouted+' - droned: '+droned+'<br><hr>'
+	let list = 'Unique Portals Count:<br>visited: '+visited+' - captured: '+captured+'<br>scoutControlled: '+scoutControlled+' - droneVisited: '+droneVisited+'<br><hr>'
 			+ 'Missed Portals: <br>Click on portals to move the map to resolve the backlogged actions for this portal.<br><br>'
 			+ '<div id="missedPL" style="height:150px;overflow:auto">'
 			+ window.plugin.uniques.genList()
@@ -885,12 +918,17 @@ var setup = function() {
 	window.plugin.uniques.setupContent();
 	window.plugin.uniques.loadLocal('uniques');
 	window.plugin.uniques.loadLocal('missedLatLngs');
-	window.plugin.uniques.loadLocal('parsedMsgs');
+
+  if (!window.plugin.uniques.uniques["version.040"]) {
+    window.plugin.uniques.transformData();
+  };
+  
+  window.plugin.uniques.loadLocal('parsedMsgs');
 
 	window.plugin.uniques.removeOldParsedMsgs();
 
-	window.addPortalHighlighter('Uniques: drone visited', window.plugin.uniques.highlighterDroned);
-	window.addPortalHighlighter('Uniques: scout controlled', window.plugin.uniques.highlighterScouted);
+	window.addPortalHighlighter('Uniques: drone visited', window.plugin.uniques.highlighterDroneVisited);
+	window.addPortalHighlighter('Uniques: scout controlled', window.plugin.uniques.highlighterScoutControlled);
 	window.addPortalHighlighter('Uniques: visited/captured', window.plugin.uniques.highlighterCaptured);
 
 	window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
