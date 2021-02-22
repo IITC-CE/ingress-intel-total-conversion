@@ -14,9 +14,9 @@ window.plugin.portalslist.sortOrder = -1;
 window.plugin.portalslist.enlP = 0;
 window.plugin.portalslist.resP = 0;
 window.plugin.portalslist.neuP = 0;
-window.plugin.portalslist.visitedP =0;
-window.plugin.portalslist.capturedP =0;
-window.plugin.portalslist.scoutControlledP =0;
+window.plugin.portalslist.visitedP = 0;
+window.plugin.portalslist.capturedP = 0;
+window.plugin.portalslist.scoutControlledP = 0;
 
 window.plugin.portalslist.filter = 0;
 
@@ -306,9 +306,9 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
   if(filter !== 0) {
     portals = portals.filter(function(obj) {
       if (Math.abs(filter) <= 3) {
-      return filter < 0
-        ? obj.portal.options.team+1 != -filter
-        : obj.portal.options.team+1 == filter;
+        return filter < 0
+          ? obj.portal.options.team+1 != -filter
+          : obj.portal.options.team+1 == filter;
       }
       switch (filter) {
         case 4: {return (obj.portal.options.data.history.visited)};
