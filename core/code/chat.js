@@ -167,9 +167,13 @@ window.chat.handleChannel = function (channel, data, olderMsgs, ascendingTimesta
   chat.writeDataToHash(data, chat._channels[channel], false, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._channels[channel].oldestGUID;
 
-  runHooks(channel + 'ChatDataAvailable', {raw: data, result: data.result, processed: chat._channels[channel].data});
+  var hook = channel + 'ChatDataAvailable';
+  // backward compability
+  if (channel === 'all') hook = 'publicChatDataAvailable';
+  runHooks(hook, {raw: data, result: data.result, processed: chat._channels[channel].data});
 
-  // runHooks('chatDataAvailable', {channel: channel, raw: data, result: data.result, processed: chat._channels[channel].data});
+  // generic hook
+  runHooks('chatDataAvailable', {channel: channel, raw: data, result: data.result, processed: chat._channels[channel].data});
 
   window.chat.renderChannel(channel, oldMsgsWereAdded);
 };
