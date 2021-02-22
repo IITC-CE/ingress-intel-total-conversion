@@ -101,9 +101,21 @@ L.PortalMarker = L.CircleMarker.extend({
       } else if (this._details.timestamp == details.timestamp) {
         // we got more details
         var localThis = this;
-        ["mods", "resonators", "owner", "artifactDetail", "history"].forEach(function (prop) {
+        ["mods", "resonators", "owner", "artifactDetail"].forEach(function (prop) {
           if (details[prop]) localThis._details[prop] = details[prop];
         });
+        // smarter update for history (cause it's missing sometimes)
+        if (details.history) {
+          if (!this._details.history) this._details.history = details.history;
+          else {
+            if (this._details.history._raw & details.history._raw != this._details.history._raw)
+              log.warn("new portal data has lost some history");
+            this._details.history._raw |= details.history._raw;
+            ['visited', 'captured', 'scoutControlled'].forEach(function (prop) {
+              localThis._details.history[prop] ||= details.history[prop];
+            });
+          }
+        }
         // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
         this._details.ent = details.ent;
       } else {
