@@ -12,6 +12,7 @@
         "eqeqeq": "error",
         "indent": ["warn", 2],
         "brace-style": ["error","1tbs", { "allowSingleLine": true }],
+        "curly": ["error", "multi-line"],
         "keyword-spacing": "error",
         "spaced-comment": "error",
         "quotes": ["error", "single", { "avoidEscape": true }],
