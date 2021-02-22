@@ -311,12 +311,12 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
           : obj.portal.options.team+1 == filter;
       }
       switch (filter) {
-        case 4: {return (obj.portal.options.data.history.visited)};
-        case 5: {return (obj.portal.options.data.history.captured)};
-        case 6: {return (obj.portal.options.data.history.scoutControlled)};
-        case -4: {return (!obj.portal.options.data.history.visited)};
-        case -5: {return (!obj.portal.options.data.history.captured)};
-        case -6: {return (!obj.portal.options.data.history.scoutControlled)};
+        case 4: return obj.portal.options.data.history.visited;
+        case 5: return obj.portal.options.data.history.captured;
+        case 6: return obj.portal.options.data.history.scoutControlled;
+        case -4: return !obj.portal.options.data.history.visited;
+        case -5: return !obj.portal.options.data.history.captured;
+        case -6: return !obj.portal.options.data.history.scoutControlled;
       }; 
     });
   }
