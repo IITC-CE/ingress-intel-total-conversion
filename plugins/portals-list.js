@@ -332,7 +332,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 
   var length = window.plugin.portalslist.listPortals.length;
 
-  ["All", "Neutral", "Resistance", "Enlightened", "visited", "captured", "Sc. contr." ].forEach(function(label, i) {
+  ["All", "Neutral", "Resistance", "Enlightened", "visited", "captured", "Scout Ctrl" ].forEach(function(label, i) {
     cell = row.appendChild(document.createElement('th'));
     cell.className = 'filter' + label.substr(0, 3);
     cell.textContent = label+':';
