@@ -4,6 +4,9 @@
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
+// create IITC scope
+var IITC = {}
+window.IITC = IITC;
 
 window.script_info = plugin_info;
 window.script_info.changelog = [

@@ -164,26 +164,8 @@ window.Render.prototype.endRenderPass = function() {
 }
 
 window.Render.prototype.bringPortalsToFront = function() {
-  for (var lvl in portalsFactionLayers) {
-    // portals are stored in separate layers per faction
-    // to avoid giving weight to one faction or another, we'll push portals to front based on GUID order
-    var lvlPortals = {};
-    for (var fac in portalsFactionLayers[lvl]) {
-      var layer = portalsFactionLayers[lvl][fac];
-      if (layer._map) {
-        layer.eachLayer (function(p) {
-          lvlPortals[p.options.guid] = p;
-        });
-      }
-    }
-
-    var guids = Object.keys(lvlPortals);
-    guids.sort();
-
-    for (var j in guids) {
-      var guid = guids[j];
-      lvlPortals[guid].bringToFront();
-    }
+  for (var guid in window.portals) {
+    window.portals[guid].bringToFront();
   }
 
   // artifact portals are always brought to the front, above all others
@@ -192,7 +174,6 @@ window.Render.prototype.bringPortalsToFront = function() {
       portals[guid].bringToFront();
     }
   });
-
 }
 
 
@@ -215,7 +196,7 @@ window.Render.prototype.deletePortalEntity = function(guid) {
 window.Render.prototype.deleteLinkEntity = function(guid) {
   if (guid in window.links) {
     var l = window.links[guid];
-    linksFactionLayers[l.options.team].removeLayer(l);
+    l.remove();
     delete window.links[guid];
     window.runHooks('linkRemoved', {link: l, data: l.options.data });
   }
@@ -225,8 +206,7 @@ window.Render.prototype.deleteLinkEntity = function(guid) {
 window.Render.prototype.deleteFieldEntity = function(guid) {
   if (guid in window.fields) {
     var f = window.fields[guid];
-
-    fieldsFactionLayers[f.options.team].removeLayer(f);
+    f.remove();
     delete window.fields[guid];
     window.runHooks('fieldRemoved', {field: f, data: f.options.data });
   }
@@ -436,7 +416,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
   window.fields[ent[0]] = poly;
 
   // TODO? postpone adding to the layer??
-  fieldsFactionLayers[poly.options.team].addLayer(poly);
+  if (!IITC.filters.filterField(poly)) poly.addTo(window.map);
 }
 
 window.Render.prototype.createLinkEntity = function (ent) {
@@ -498,7 +478,7 @@ window.Render.prototype.createLinkEntity = function (ent) {
 
   window.links[ent[0]] = poly;
 
-  linksFactionLayers[poly.options.team].addLayer(poly);
+  if (!IITC.filters.filterLink(poly)) poly.addTo(window.map);
 }
 
 
@@ -519,10 +499,10 @@ window.Render.prototype.rescalePortalMarkers = function() {
 
 // add the portal to the visible map layer
 window.Render.prototype.addPortalToMapLayer = function(portal) {
-  portalsFactionLayers[parseInt(portal.options.level)||0][portal.options.team].addLayer(portal);
+  if (!IITC.filters.filterPortal(portal)) portal.addTo(window.map);
 }
 
 window.Render.prototype.removePortalFromMapLayer = function(portal) {
   //remove it from the portalsLevels layer
-  portalsFactionLayers[parseInt(portal.options.level)||0][portal.options.team].removeLayer(portal);
+  portal.remove();
 }

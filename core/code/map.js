@@ -117,59 +117,73 @@ function createDefaultBaseMapLayers () {
   return baseLayers;
 }
 
-function createFactionLayersArray() {
-  return window.TEAM_NAMES.map(() => L.layerGroup());
-}
-
-function createDefaultOverlays () {
-  /* global portalsFactionLayers: true, linksFactionLayers: true, fieldsFactionLayers: true -- eslint*/
+function createDefaultOverlays() {
   /* eslint-disable dot-notation  */
 
   var addLayers = {};
 
-  portalsFactionLayers = [];
-  var portalsLayers = [];
-  for (var i = 0; i <= 8; i++) {
-    portalsFactionLayers[i] = createFactionLayersArray();
-    portalsLayers[i] = L.layerGroup();
-    var t = (i === 0 ? 'Unclaimed/Placeholder' : 'Level ' + i) + ' Portals';
-    addLayers[t] = portalsLayers[i];
+  var l0Layer = new IITC.filters.FilterLayer({
+    name: 'Unclaimed/Placeholder Portals',
+    filter: [
+      { portal: true, data: { team: 'N' } },
+      { portal: true, data: { level: undefined } },
+    ],
+  });
+  addLayers[l0Layer.options.name] = l0Layer;
+  for (var i = 1; i <= 8; i++) {
+    var t = 'Level ' + i + ' Portals';
+    var portalsLayer = new IITC.filters.FilterLayer({
+      name: t,
+      filter: [
+        { portal: true, data: { level: i, team: 'R' } },
+        { portal: true, data: { level: i, team: 'E' } },
+      ],
+    });
+    addLayers[t] = portalsLayer;
   }
 
-  fieldsFactionLayers = createFactionLayersArray();
-  var fieldsLayer = L.layerGroup();
-  addLayers['Fields'] = fieldsLayer;
+  var fieldsLayer = new IITC.filters.FilterLayer({
+    name: 'Fields',
+    filter: { field: true },
+  });
+  addLayers[fieldsLayer.options.name] = fieldsLayer;
 
-  linksFactionLayers = createFactionLayersArray();
-  var linksLayer = L.layerGroup();
-  addLayers['Links'] = linksLayer;
+  var linksLayer = new IITC.filters.FilterLayer({
+    name: 'Links',
+    filter: { link: true },
+  });
+  addLayers[linksLayer.options.name] = linksLayer;
 
   // faction-specific layers
-  // these layers don't actually contain any data. instead, every time they're added/removed from the map,
-  // the matching sub-layers within the above portals/fields/links are added/removed from their parent with
-  // the below 'onoverlayadd/onoverlayremove' events
-  var factionLayers = createFactionLayersArray();
-  factionLayers.forEach(function (facLayer, facIdx) {
-    facLayer.on('add remove', function (e) {
-      var fn = e.type + 'Layer';
-      fieldsLayer[fn](fieldsFactionLayers[facIdx]);
-      linksLayer[fn](linksFactionLayers[facIdx]);
-      portalsLayers.forEach(function (portals, lvl) {
-        portals[fn](portalsFactionLayers[lvl][facIdx]);
-      });
-    });
-    addLayers[window.TEAM_NAMES[facIdx]] = facLayer;
+  var neutralLayer = new IITC.filters.FilterLayer({
+    name: window.TEAM_NAME_NONE,
+    filter: { portal: true, data: { team: 'N' } },
+  });
+  var resistanceLayer = new IITC.filters.FilterLayer({
+    name: window.TEAM_NAME_RES,
+    filter: { portal: true, link: true, field: true, data: { team: 'R' } },
+  });
+  var enlightenedLayer = new IITC.filters.FilterLayer({
+    name: window.TEAM_NAME_ENL,
+    filter: { portal: true, link: true, field: true, data: { team: 'E' } },
+  });
+  var machinaLayer = new IITC.filters.FilterLayer({
+    name: window.TEAM_NAME_MAC,
+    filter: { portal: true, link: true, field: true, data: { team: 'M' } },
   });
 
+  addLayers[neutralLayer.options.name] = neutralLayer;
   // to avoid any favouritism, we'll put the player's own faction layer first
-  if (window.PLAYER.team !== 'RESISTANCE') {
-    delete addLayers[window.TEAM_NAME_RES];
-    addLayers[window.TEAM_NAME_RES] = factionLayers[window.TEAM_RES];
+  if (PLAYER.team === 'RESISTANCE') {
+    addLayers[resistanceLayer.options.name] = resistanceLayer;
+    addLayers[enlightenedLayer.options.name] = enlightenedLayer;
+  } else {
+    addLayers[enlightenedLayer.options.name] = enlightenedLayer;
+    addLayers[resistanceLayer.options.name] = resistanceLayer;
   }
 
   // and just put __MACHINA__ faction last
-  delete addLayers[window.TEAM_NAME_MAC];
-  addLayers[window.TEAM_NAME_MAC] = factionLayers[window.TEAM_MAC];
+  addLayers[window.TEAM_NAME_MAC] = machinaLayer;
 
   return addLayers;
   /* eslint-enable dot-notation  */
