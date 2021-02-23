@@ -46,7 +46,9 @@ window.Render.prototype.clearPortalsOutsideBounds = function (bounds) {
     var p = window.portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
     if (!bounds.contains(p.getLatLng()) && guid !== window.selectedPortal && !window.artifact.isInterestingPortal(guid)) {
-      this.deletePortalEntity(guid);
+      // remove the marker as a layer first
+      // deletion will be done at endRenderPass
+      p.remove();
     }
   }
 };
@@ -364,6 +366,9 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
     if (!p.willUpdate(data)) {
       // this data doesn't bring new detail - abort processing
+      // re-add the portal to the relevant layer (does nothing if already in the correct layer)
+      // useful for portals outside the view
+      this.addPortalToMapLayer(p);
       return p;
     }
 
@@ -397,8 +402,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   if (oldPortal) {
     // update marker style/highlight and layer
     marker = window.portals[data.guid];
-    // remove portal from its faction/level specific layer
-    this.removePortalFromMapLayer(marker);
 
     marker.updateDetails(data);
 
