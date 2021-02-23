@@ -13,8 +13,6 @@ window.Render.prototype.startRenderPass = function(level,bounds) {
 
   this.deletedGuid = {};  // object - represents the set of all deleted game entity GUIDs seen in a render pass
 
-  this.visibleLinksFieldsAnchors = {};
-
   this.seenPortalsGuid = {};
   this.seenLinksGuid = {};
   this.seenFieldsGuid = {};
@@ -26,11 +24,11 @@ window.Render.prototype.startRenderPass = function(level,bounds) {
   // this will just avoid a few entity removals at start of render when they'll just be added again
   var paddedBounds = bounds.pad(0.1);
 
+  this.clearPortalsOutsideBounds(paddedBounds);
 
   this.clearLinksOutsideBounds(paddedBounds);
   this.clearFieldsOutsideBounds(paddedBounds);
 
-  this.clearPortalsOutsideBounds(paddedBounds);
 
   this.rescalePortalMarkers();
 }
@@ -40,7 +38,7 @@ window.Render.prototype.clearPortalsOutsideBounds = function(bounds) {
   for (var guid in window.portals) {
     var p = portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
-    if (!bounds.contains(p.getLatLng()) && guid !== selectedPortal && !this.visibleLinksFieldsAnchors[guid] && !artifact.isInterestingPortal(guid)) {
+    if (!bounds.contains(p.getLatLng()) && guid !== selectedPortal && !artifact.isInterestingPortal(guid)) {
       this.deletePortalEntity(guid);
       count++;
     }
@@ -60,9 +58,6 @@ window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
     if (!bounds.intersects(linkBounds)) {
       this.deleteLinkEntity(guid);
       count++;
-    } else {
-      this.visibleLinksFieldsAnchors[l.options.data.oGuid] = true;
-      this.visibleLinksFieldsAnchors[l.options.data.dGuid] = true;
     }
   }
 }
@@ -80,10 +75,6 @@ window.Render.prototype.clearFieldsOutsideBounds = function(bounds) {
     if (!bounds.intersects(fieldBounds)) {
       this.deleteFieldEntity(guid);
       count++;
-    } else {
-      this.visibleLinksFieldsAnchors[f.options.data.points[0].guid] = true;
-      this.visibleLinksFieldsAnchors[f.options.data.points[1].guid] = true;
-      this.visibleLinksFieldsAnchors[f.options.data.points[2].guid] = true;
     }
   }
 }
