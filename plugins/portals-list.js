@@ -423,7 +423,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
   container.append('<div class="disclaimer">Click on portals table headers to sort by that column. '
     + 'Click on <b>All, Neutral, Resistance, Enlightened</b> to only show portals owned '
     + 'by that faction or on the number behind the factions to show all but those portals. '
-    + 'Click on <b>visited, captured or Sc. contr.</b> to only show portals the user has a history for '
+    + 'Click on <b>Visited, Captured or Scout controlled</b> to only show portals the user has a history for '
     + 'or on the number to hide those. </div>');
 
   return container;

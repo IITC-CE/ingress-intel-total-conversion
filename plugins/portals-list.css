@@ -107,6 +107,6 @@
   width: 22%;
 }
 
-.ui-dialog.ui-dialog-portallist {
+.ui-dialog.ui-dialog-portalslist {
   max-width: calc(100vw - 2px);
 }
