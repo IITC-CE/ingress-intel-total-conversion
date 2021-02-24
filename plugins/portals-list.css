@@ -57,7 +57,7 @@
 }
 
 #portalslist table.filter {
-  table-layout: fixed;
+  table-layout: auto;
   cursor: pointer;
   border-collapse: separate;
   border-spacing: 1px;
