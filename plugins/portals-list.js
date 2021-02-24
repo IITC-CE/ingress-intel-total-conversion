@@ -341,41 +341,24 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
       $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i));
     });
 
-    if (i != 0) {
-      cell = row.insertCell(-1);
-      cell.className = 'filter' + label.substr(0, 3);
-      cell.title = 'Hide '+label+' portals ';
-      $(cell).click(function() {
-        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, -i));
-      });
+    // No 'Hide all portals'
+    if (i === 0) return;
 
-      switch(i-1) {
-        case -1:
-          cell.textContent = length;
-          break;
-        case 0:
-          cell.textContent = window.plugin.portalslist.neuP + ' (' + Math.round(window.plugin.portalslist.neuP/length*100) + '%)';
-          break;
-        case 1:
-          cell.textContent = window.plugin.portalslist.resP + ' (' + Math.round(window.plugin.portalslist.resP/length*100) + '%)';
-          break;
-        case 2:
-          cell.textContent = window.plugin.portalslist.enlP + ' (' + Math.round(window.plugin.portalslist.enlP/length*100) + '%)';
-          break;
-        case 3:
-          cell.textContent = window.plugin.portalslist.visitedP + ' (' + Math.round(window.plugin.portalslist.visitedP/length*100) + '%)';
-          break;
-        case 4:
-          cell.textContent = window.plugin.portalslist.capturedP + ' (' + Math.round(window.plugin.portalslist.capturedP/length*100) + '%)';
-          break;
-        case 5:
-          cell.textContent = window.plugin.portalslist.scoutControlledP + ' (' + Math.round(window.plugin.portalslist.scoutControlledP/length*100) + '%)';
-      }
-      if (i == 3) {
-        // create a new row with an empty first cell
-         row = table.insertRow(-1);
-         cell = row.insertCell(-1); cell.textContent = (" ");
-      }
+    cell = row.insertCell(-1);
+    cell.className = 'filter' + label.substr(0, 3);
+    cell.title = 'Hide '+label+' portals ';
+    $(cell).click(function() {
+      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, -i));
+    });
+
+    var name = ['neuP', 'resP', 'enlP', 'visitedP', 'capturedP', 'scoutControlledP'][i-1];
+    var count = window.plugin.portalslist[name];
+    cell.textContent = count + ' (' + Math.round(count/length*100) + '%)';
+
+    if (i == 3) {
+      // create a new row with an empty first cell
+       row = table.insertRow(-1);
+       cell = row.insertCell(-1); cell.textContent = (" ");
     }
   });
 
