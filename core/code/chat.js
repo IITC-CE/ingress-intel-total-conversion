@@ -837,6 +837,8 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
 //
 
 //WORK IN PROGRESS
+// 'all' 'faction' and 'alerts' channels are hard coded in several places (including mobile app)
+// dont change those channels
 window.chat.commTabs = [
   // channel: the COMM channel ('tab' parameter in server requests)
   // name: visible name
@@ -848,7 +850,6 @@ window.chat.commTabs = [
   //          second is true when trigger from scrolling to top
   // render: (optional) function to render channel content
   //          argument is `channel`
-  
   // localBounds: (optional) if true, reset on view change
   {
     channel: 'all', name:'All', localBounds: true,
@@ -1135,9 +1136,22 @@ function createCommTab (commTab) {
         commTab.request(commTab.channel, false);
     });
   }
+
+  // pane
+  if (useAndroidPanes()) {
+    // exlude hard coded panes
+    if (commTab.channel !== 'all' && commTab.channel !== 'faction' && commTab.channel !== 'alerts') {
+      android.addPane(commTab.channel, commTab.name, 'ic_action_view_as_list');
+    }
+  }
 }
 
 window.chat.addCommTab = function (commTab) {
+  // deny reserved name
+  if (commTab.channel == 'info' || commTab.channel == 'map') {
+    log.warn('could not add commtab "' + commTab.channel + '": reserved');
+    return false;
+  }
   if (chat.getCommTab(commTab.channel)) {
     log.warn('could not add commtab "' + commTab.channel + '": already exist');
     return false;
