@@ -666,12 +666,13 @@ window.chat.chooseTab = function(tab) {
 }
 
 window.chat.show = function(name) {
-    window.isSmartphone()
-        ? $('#updatestatus').hide()
-        : $('#updatestatus').show();
-    $('#chat, #chatinput').show();
+  window.isSmartphone()
+      ? $('#updatestatus').hide()
+      : $('#updatestatus').show();
+  $('#chat, #chatinput').show();
 
-    window.chat.chooseTab(name);
+  window.chat.chooseTab(name);
+  return $("<div>").append($('#chat, #chatinput'));
 }
 
 window.chat.chooser = function(event) {

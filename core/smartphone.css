@@ -69,7 +69,7 @@ body {
   height: 6px;
   width: 6px;
   left: 50%;
-  top: -3px; 
+  top: -3px;
   margin-left: -3px;
   position: absolute;
   z-index: -1;
@@ -232,3 +232,15 @@ body {
    https://github.com/IITC-CE/ingress-intel-total-conversion/issues/89
 */
 .leaflet-bottom { bottom: 5px; }
+
+.mobile-pane {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
