@@ -80,7 +80,7 @@ window.DataCache.prototype.startExpireInterval = function(period) {
 
 window.DataCache.prototype.stopExpireInterval = function() {
   if (this._interval !== undefined) {
-    stopInterval (this._interval);
+    clearInterval(this._interval);
     this._interval = undefined;
   }
 }
