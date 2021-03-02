@@ -8,6 +8,10 @@
     "extends": [
         "eslint:recommended"
     ],
+    "ignorePatterns": [
+        "/core/external/*.js", 
+        "/plugins/external/*.js"
+    ],
     "rules": {
         "eqeqeq": "error",
         "indent": ["warn", 2],
