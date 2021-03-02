@@ -27,7 +27,7 @@ window.plugin.cachePortalDetailsOnMap.entityInject = function(data) {
       ents.push(window.plugin.cachePortalDetailsOnMap.cache[guid].ent);
     }
   }
-  data.callback(ents);
+  data.callback(ents, 'detailed');
 };
 
 
