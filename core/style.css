@@ -64,7 +64,7 @@ i.large { font-size: 6rem; }
   top: 0;
   width: 340px;
   bottom: 45px;
-  z-index: 1001;
+  z-index: 3001;
   pointer-events: none;
 }
 
@@ -78,7 +78,6 @@ i.large { font-size: 6rem; }
   max-height: 100%;
   overflow-y:scroll;
   overflow-x:hidden;
-  z-index: 3000;
   pointer-events: auto;
 }
 
@@ -89,7 +88,7 @@ i.large { font-size: 6rem; }
   line-height: 10px;
   position: absolute;
   top: 108px;
-  z-index: 3001;
+  z-index: 3002;
   background-color: rgba(8, 48, 78, 0.9);
   color: #FFCE00;
   border: 1px solid #20A8B1;
