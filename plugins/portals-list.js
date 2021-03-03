@@ -171,7 +171,7 @@ window.plugin.portalslist.fields = [
       return window.plugin.portalslist.scoutControlledValue(portal.options.guid);
     },
     format: function(cell, portal, value) {
-      $(cell).addClass('portal-list-history allingC');
+      $(cell).addClass('portal-list-history alignC');
       cell.append(window.plugin.portalslist.historyCodePoints[value]);
     }
   }
