@@ -158,7 +158,7 @@ window.plugin.portalslist.fields = [
     defaultOrder: -1,
   },
   { 
-    title: "V/C",
+    title: 'V/C',
     value: function(portal) { return window.plugin.portalslist.visitedValue(portal.options.guid); },
     format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history alignC");
@@ -166,12 +166,12 @@ window.plugin.portalslist.fields = [
     }
   },
   {
-    title: "S",
+    title: 'S',
     value: function(portal) { 
       return window.plugin.portalslist.scoutControlledValue(portal.options.guid);
     },
     format: function(cell, portal, value) {
-      $(cell).addClass("portal-list-history allingC");
+      $(cell).addClass('portal-list-history allingC');
       cell.append(window.plugin.portalslist.historyCodePoints[value]);
     }
   }
@@ -284,7 +284,6 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 
   var portals = window.plugin.portalslist.listPortals;
   var sortField = window.plugin.portalslist.fields[sortBy];
-
 
   portals.sort(function(a, b) {
     var valueA = a.sortValues[sortBy];
