@@ -89,11 +89,11 @@ window.plugin.portalslist.fields = [
   {
     title: "Health",
     value: function(portal) { return portal.options.data.health; },
-    sortValue: function(value, portal) { return portal.options.team===TEAM_NONE ? -1 : value; },
+    sortValue: function(value, portal) { return portal.options.team === TEAM_NONE ? -1 : value; },
     format: function(cell, portal, value) {
       $(cell)
         .addClass("alignR")
-        .text(portal.options.team===TEAM_NONE ? '-' : value+'%');
+        .text(portal.options.team === TEAM_NONE ? '-' : value+'%');
     },
     defaultOrder: -1,
   },
@@ -140,7 +140,7 @@ window.plugin.portalslist.fields = [
     sortValue: function(value, portal) { return value.enemyAp; },
     format: function(cell, portal, value) {
       var title = '';
-      if (teamStringToId(PLAYER.team) == portal.options.team) {
+      if (teamStringToId(PLAYER.team) === portal.options.team) {
         title += 'Friendly AP:\t'+value.friendlyAp+'\n'
                + '- deploy '+(8-portal.options.data.resCount)+' resonator(s)\n'
                + '- upgrades/mods unknown\n';
@@ -269,7 +269,7 @@ window.plugin.portalslist.displayPL = function() {
     dialog({
       html: $('<div id="portalslist">').append(list),
       dialogClass: 'ui-dialog-portalslist',
-      title: 'Portal list: ' + window.plugin.portalslist.listPortals.length + ' ' + (window.plugin.portalslist.listPortals.length == 1 ? 'portal' : 'portals'),
+      title: 'Portal list: ' + window.plugin.portalslist.listPortals.length + ' ' + (window.plugin.portalslist.listPortals.length === 1 ? 'portal' : 'portals'),
       id: 'portal-list',
       width: 700
     });
@@ -306,8 +306,8 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
     portals = portals.filter(function(obj) {
       if (Math.abs(filter) <= 3) {
         return filter < 0
-          ? obj.portal.options.team+1 != -filter
-          : obj.portal.options.team+1 == filter;
+          ? obj.portal.options.team+1 !== -filter
+          : obj.portal.options.team+1 === filter;
       }
       switch (filter) {
         case 4: return obj.portal.options.data.history.visited;
@@ -331,7 +331,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 
   var length = window.plugin.portalslist.listPortals.length;
 
-  ["All", "Neutral", "Resistance", "Enlightened", "Visited", "Captured", "Scout Controlled" ].forEach(function(label, i) {
+  ['All', 'Neutral', 'Resistance', 'Enlightened', 'Visited', 'Captured', 'Scout Controlled' ].forEach(function(label, i) {
     cell = row.appendChild(document.createElement('th'));
     cell.className = 'filter' + label.substr(0, 3);
     cell.textContent = label+':';
@@ -354,7 +354,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
     var count = window.plugin.portalslist[name];
     cell.textContent = count + ' (' + Math.round(count/length*100) + '%)';
 
-    if (i == 3) {
+    if (i === 3) {
       // create a new row with an empty first cell
        row = table.insertRow(-1);
        cell = row.insertCell(-1); cell.textContent = (" ");
@@ -376,13 +376,13 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
     cell.textContent = field.title;
     if(field.sort !== null) {
       cell.classList.add("sortable");
-      if(i == window.plugin.portalslist.sortBy) {
+      if(i === window.plugin.portalslist.sortBy) {
         cell.classList.add("sorted");
       }
 
       $(cell).click(function() {
         var order;
-        if(i == sortBy) {
+        if(i === sortBy) {
           order = -sortOrder;
         } else {
           order = field.defaultOrder < 0 ? -1 : 1;
@@ -436,7 +436,7 @@ window.plugin.portalslist.getPortalLink = function(portal) {
 }
 
 window.plugin.portalslist.onPaneChanged = function(pane) {
-  if(pane == "plugin-portalslist")
+  if(pane === "plugin-portalslist")
     window.plugin.portalslist.displayPL();
   else
     $("#portalslist").remove()
