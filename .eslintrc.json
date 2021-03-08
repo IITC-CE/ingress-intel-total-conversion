@@ -1,0 +1,30 @@
+{
+    "env": {
+        "browser": true,
+        "es6": false,
+        "jquery": true,
+        "greasemonkey": true
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "ignorePatterns": [
+        "/core/external/*.js", 
+        "/plugins/external/*.js"
+    ],
+    "rules": {
+        "eqeqeq": "error",
+        "indent": ["warn", 2],
+        "brace-style": ["error","1tbs", { "allowSingleLine": true }],
+        "curly": ["error", "multi-line"],
+        "keyword-spacing": "error",
+        "spaced-comment": "error",
+        "quotes": ["error", "single", { "avoidEscape": true }],
+        "no-trailing-spaces": "error",
+        "max-len": ["warn", { "code": 160 }],
+        "semi": "error",
+        "eol-last": "error",
+        "quote-props": ["error","consistent-as-needed"],
+        "no-unused-expressions": "error"
+    }
+}
