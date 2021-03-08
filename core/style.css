@@ -317,6 +317,14 @@ em {
   padding-bottom: 3px;
 }
 
+#chat .divider {
+  color: #bbb;
+}
+
+#chat .divider td:nth-child(2) {
+  text-align: center;
+}
+
 /* time */
 #chat td:first-child, #chatinput td:first-child {
   width: 44px;

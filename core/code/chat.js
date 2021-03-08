@@ -577,8 +577,7 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
 }
 
 window.chat.renderDivider = function(text) {
-  var d = ' ──────────────────────────────────────────────────────────────────────────';
-  return '<tr><td colspan="3" style="padding-top:3px"><summary>─ ' + text + d + '</summary></td></tr>';
+  return '<tr class="divider"><td><hr></td><td>' + text + '</td><td><hr></td></tr>';
 };
 
 // renders data from the data-hash to the element defined by the given
