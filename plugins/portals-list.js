@@ -50,12 +50,12 @@ window.plugin.portalslist.historyCodePoints =[];
 
 window.plugin.portalslist.visitedValue = function (guid){
   var info = window.portals[guid].options.data.history;
-  return ((info) ? (info.visited + info.captured * 2) : 0);
+  return info ? info.visited + info.captured * 2 : 0;
 }
 
 window.plugin.portalslist.scoutControlledValue = function(guid) {
   var info = window.portals[guid].options.data.history
-  return ((info) ? (info.scoutControlled * 4) : 0);
+  return info ? info.scoutControlled * 4 : 0;
 }
 
 window.plugin.portalslist.fields = [
