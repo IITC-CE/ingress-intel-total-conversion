@@ -525,10 +525,10 @@ window.chat.toggle = function() {
     var div = $('#chat > div:visible');
     div.data('ignoreNextScroll', true);
     div.scrollTop(99999999); // scroll to bottom
-    $('.leaflet-control').css('margin-left', '13px');
+    $('.leaflet-control').removeClass('chat-expand');
   } else {
     c.addClass('expand');
-    $('.leaflet-control').css('margin-left', '720px');
+    $('.leaflet-control').addClass('chat-expand');
     chat.needMoreMessages();
   }
 };

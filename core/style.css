@@ -156,6 +156,10 @@ a:hover {
   margin-bottom: 0 !important;
 }
 
+/* shift controls when chat is expanded */
+.leaflet-left .leaflet-control.chat-expand {
+  margin-left: 720px;
+}
 
 .help {
   cursor: help;
@@ -1248,7 +1252,7 @@ table.artifact .portal {
 
 /* prevent nonfunctional horizontal scrollbar in Chrome (perhaps jQuery issue) */
 .cellscore .historychart > div {
-  overflow: auto; 
+  overflow: auto;
 }
 
 .cellscore .logscale {
