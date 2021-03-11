@@ -179,7 +179,10 @@ window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
     return log.warn('faction chat error. Waiting for next auto-refresh.');
   }
 
-  if(data.result.length === 0) return;
+  var needsClearing = $('#chatfaction').data('needsClearing');
+  if(!needsClearing && data.result.length === 0) return;
+
+  $('#chatfaction').data('needsClearing', null);
 
   var old = chat._faction.oldestGUID;
   chat.writeDataToHash(data, chat._faction, false, olderMsgs, ascendingTimestampOrder);
@@ -227,7 +230,10 @@ window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
     return log.warn('public chat error. Waiting for next auto-refresh.');
   }
 
-  if(data.result.length === 0) return;
+  var needsClearing = $('#chatall').data('needsClearing');
+  if(!needsClearing && data.result.length === 0) return;
+
+  $('#chatall').data('needsClearing', null);
 
   var old = chat._public.oldestGUID;
   chat.writeDataToHash(data, chat._public, undefined, olderMsgs, ascendingTimestampOrder);   //NOTE: isPublic passed as undefined - this is the 'all' channel, so not really public or private
