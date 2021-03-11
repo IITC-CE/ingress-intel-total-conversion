@@ -20,15 +20,17 @@ window.plugin.portalslist.scoutControlledP = 0;
 
 window.plugin.portalslist.filter = 0;
 
-window.plugin.portalslist.historyCodePoints =[];
-[0x026AA, // white dot
- 0x1F7E1, // yellow dot
- 0x02B55, // red empty dot (should never show)
- 0x1F534, // red dot
- 0x1F7E3  // violet dot
- ].forEach (function (value) {
-   window.plugin.portalslist.historyCodePoints.push(String.fromCodePoint(value))
+var historySymbols = {
+  unvisited:  0x026AA, // Medium White Circle
+  visited:    0x1F7E1, // Large Yellow Circle
+  captured:   0x1F534, // Large Red Circle
+  scoutControlled: 0x1F7E3  // Large Purple Circle
+};
+$.each(historySymbols, function (prop, code) {
+  historySymbols[prop] = String.fromCodePoint(code);
 });
+historySymbols.unknown = '';
+window.plugin.portalslist.historySymbols = historySymbols;
 
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
@@ -47,16 +49,6 @@ window.plugin.portalslist.historyCodePoints =[];
  * defaultOrder: -1|1
  *     Which order should by default be used for this column. -1 means descending. Default: 1
  */
-
-window.plugin.portalslist.visitedValue = function (guid){
-  var info = window.portals[guid].options.data.history;
-  return info ? info.visited + info.captured * 2 : 0;
-}
-
-window.plugin.portalslist.scoutControlledValue = function(guid) {
-  var info = window.portals[guid].options.data.history
-  return info ? info.scoutControlled * 4 : 0;
-}
 
 window.plugin.portalslist.fields = [
   {
@@ -159,20 +151,34 @@ window.plugin.portalslist.fields = [
   },
   { 
     title: 'V/C',
-    value: function(portal) { return window.plugin.portalslist.visitedValue(portal.options.guid); },
+    value: function(portal) {
+      var history = portal.options.data.history;
+      if (history) {
+        return history.captured ? 2
+             : history.visited ? 1
+             : 0;
+      }
+      return -1;
+    },
     format: function(cell, portal, value) {
       $(cell).addClass("portal-list-history alignC");
-      cell.append(window.plugin.portalslist.historyCodePoints[value]);
+      var s = window.plugin.portalslist.historySymbols;
+      cell.append([s.unknown, s.unvisited, s.visited, s.captured][value+1]);
     }
   },
   {
     title: 'S',
     value: function(portal) { 
-      return window.plugin.portalslist.scoutControlledValue(portal.options.guid);
+      var history = portal.options.data.history;
+      if (history) {
+        return history.scoutControlled ? 1 : 0;
+      }
+      return -1;
     },
     format: function(cell, portal, value) {
       $(cell).addClass('portal-list-history alignC');
-      cell.append(window.plugin.portalslist.historyCodePoints[value]);
+      var s = window.plugin.portalslist.historySymbols;
+      cell.append([s.unknown, s.unvisited, s.scoutControlled][value+1]);
     }
   }
 ];
