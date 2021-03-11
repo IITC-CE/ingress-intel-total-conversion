@@ -20,17 +20,7 @@ window.plugin.portalslist.scoutControlledP = 0;
 
 window.plugin.portalslist.filter = 0;
 
-var historySymbols = {
-  unvisited:  0x026AA, // Medium White Circle
-  visited:    0x1F7E1, // Large Yellow Circle
-  captured:   0x1F534, // Large Red Circle
-  scoutControlled: 0x1F7E3  // Large Purple Circle
-};
-$.each(historySymbols, function (prop, code) {
-  historySymbols[prop] = String.fromCodePoint(code);
-});
-historySymbols.unknown = '';
-window.plugin.portalslist.historySymbols = historySymbols;
+window.plugin.portalslist.historySymbol = String.fromCodePoint(0x25CF);
 
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
@@ -161,9 +151,12 @@ window.plugin.portalslist.fields = [
       return -1;
     },
     format: function(cell, portal, value) {
-      $(cell).addClass("portal-list-history alignC");
-      var s = window.plugin.portalslist.historySymbols;
-      cell.append([s.unknown, s.unvisited, s.visited, s.captured][value+1]);
+      if (value === -1) { return; }
+      $(cell).addClass([
+        'portal-list-history',
+        ['unvisited', 'visited', 'captured'][value]
+      ]);
+      cell.append(window.plugin.portalslist.historySymbol);
     }
   },
   {
@@ -176,9 +169,12 @@ window.plugin.portalslist.fields = [
       return -1;
     },
     format: function(cell, portal, value) {
-      $(cell).addClass('portal-list-history alignC');
-      var s = window.plugin.portalslist.historySymbols;
-      cell.append([s.unknown, s.unvisited, s.scoutControlled][value+1]);
+      if (value === -1) { return; }
+      $(cell).addClass([
+        'portal-list-history',
+        ['unvisited', 'scoutControlled'][value]
+      ]);
+      cell.append(window.plugin.portalslist.historySymbol);
     }
   }
 ];
