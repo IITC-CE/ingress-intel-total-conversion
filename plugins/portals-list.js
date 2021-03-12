@@ -139,7 +139,7 @@ window.plugin.portalslist.fields = [
     },
     defaultOrder: -1,
   },
-  { 
+  {
     title: 'V/C',
     value: function(portal) {
       var history = portal.options.data.history;
@@ -161,7 +161,7 @@ window.plugin.portalslist.fields = [
   },
   {
     title: 'S',
-    value: function(portal) { 
+    value: function(portal) {
       var history = portal.options.data.history;
       if (history) {
         return history.scoutControlled ? 1 : 0;
@@ -321,14 +321,14 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
   var container = $('<div>');
 
   filters = document.createElement('div');
-  filters.className = 'filter';
+  filters.className = 'filters';
   container.append(filters);
 
   var length = window.plugin.portalslist.listPortals.length;
 
   ['All', 'Neutral', 'Resistance', 'Enlightened', 'Visited', 'Captured', 'Scout Controlled' ].forEach(function(label, i) {
     cell = filters.appendChild(document.createElement('div'));
-    cell.className = 'filter' + label.substr(0, 3);
+    cell.className = 'name filter' + label.substr(0, 3);
     cell.textContent = label+':';
     cell.title = 'Show only '+label+' portals';
     $(cell).click(function() {
@@ -344,7 +344,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
     }
 
     cell = filters.appendChild(document.createElement('div'));
-    cell.className = 'filter' + label.substr(0, 3);
+    cell.className = 'count filter' + label.substr(0, 3);
 
     if (i == 0) {
       cell.textContent = length;

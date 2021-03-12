@@ -53,44 +53,77 @@
   color: #FFCE00;
 }
 
-#portalslist .filter {
+#portalslist .filters {
   display: grid;
   grid-template-columns: 1fr auto 1fr auto 1fr auto;
   grid-gap: 1px
 }
 
-#portalslist.mobile .filter {
+#portalslist.mobile .filters {
   grid-template-columns: 1fr auto 1fr auto;
 }
 
-#portalslist .filter > div {
-  text-align: left;
+#portalslist .filters div {
   padding: 0.2em 0.3em;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: #0005;
+  white-space: nowrap;
 }
 
-#portalslist .filter .active {
-  font-weight: bolder
+#portalslist .filters .count {
+  text-align: right;
 }
 
-#portalslist .filter .filterAll {
+#portalslist .filters .active {
+  font-weight: bolder;
+  color: #FFCE00;
+}
+
+#portalslist .filters .filterAll {
   display: none;
 }
 
-#portalslist.mobile .filter .filterAll {
+#portalslist.mobile .filters .filterAll {
   display: block;
 }
 
-#portalslist .filterNeu {
+#portalslist .filters .filterNeu {
   background-color: #666;
 }
 
-#portalslist table tr.res td, #portalslist .filterRes {
+#portalslist .filterVis.name:before,
+#portalslist .filterCap.name:before,
+#portalslist .filterSco.name:before {
+  content: '';
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 6px;
+  margin: auto;
+  margin-right: 0.2em;
+  vertical-align: -8%;
+}
+
+#portalslist .filterVis:before {
+  background-color: yellow;
+}
+
+#portalslist .filterCap:before {
+  background-color: red;
+}
+
+#portalslist .filterSco:before {
+  background-color: purple;
+}
+
+#portalslist table tr.res td,
+#portalslist .filters .filterRes {
   background-color: #005684;
 }
 
-#portalslist table tr.enl td, #portalslist .filterEnl {
+#portalslist table tr.enl td,
+#portalslist .filters .filterEnl {
   background-color: #017f01;
 }
 
