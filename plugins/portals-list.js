@@ -256,7 +256,7 @@ window.plugin.portalslist.displayPL = function() {
   window.plugin.portalslist.filter = 0;
 
   if (window.plugin.portalslist.getPortals()) {
-    list = window.plugin.portalslist.portalTable(window.plugin.portalslist.sortBy, window.plugin.portalslist.sortOrder,window.plugin.portalslist.filter);
+    list = window.plugin.portalslist.portalTable(window.plugin.portalslist.sortBy, window.plugin.portalslist.sortOrder,window.plugin.portalslist.filter, false);
   } else {
     list = $('<table class="noPortals"><tr><td>Nothing to show!</td></tr></table>');
   };
@@ -274,7 +274,7 @@ window.plugin.portalslist.displayPL = function() {
   }
 }
 
-window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
+window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reversed) {
   // save the sortBy/sortOrder/filter
   window.plugin.portalslist.sortBy = sortBy;
   window.plugin.portalslist.sortOrder = sortOrder;
@@ -302,9 +302,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 
   if(filter !== 0) {
     portals = portals.filter(function(obj) {
-      var type = Math.abs(filter)
-      var reversed = filter < 0;
-      switch (type) {
+      switch (filter) {
         case 1:
         case 2:
         case 3:
@@ -334,14 +332,14 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
     cell.textContent = label+':';
     cell.title = 'Show only '+label+' portals';
     $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1));
+      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, false));
     });
 
     cell = filters.appendChild(document.createElement('div'));
     cell.className = 'filter' + label.substr(0, 3);
     cell.title = 'Hide '+label+' portals ';
     $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, -i-1));
+      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, true));
     });
 
     var name = ['neuP', 'resP', 'enlP', 'visitedP', 'capturedP', 'scoutControlledP'][i];
@@ -376,7 +374,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
           order = field.defaultOrder < 0 ? -1 : 1;
         }
 
-        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(i, order, filter));
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(i, order, filter, reversed));
       });
     }
   });
