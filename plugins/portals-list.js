@@ -302,19 +302,20 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 
   if(filter !== 0) {
     portals = portals.filter(function(obj) {
-      if (Math.abs(filter) <= 3) {
-        return filter < 0
-          ? obj.portal.options.team+1 !== -filter
-          : obj.portal.options.team+1 === filter;
-      }
-      switch (filter) {
-        case 4: return obj.portal.options.data.history.visited;
-        case 5: return obj.portal.options.data.history.captured;
-        case 6: return obj.portal.options.data.history.scoutControlled;
-        case -4: return !obj.portal.options.data.history.visited;
-        case -5: return !obj.portal.options.data.history.captured;
-        case -6: return !obj.portal.options.data.history.scoutControlled;
-      }; 
+      var type = Math.abs(filter)
+      var reversed = filter < 0;
+      switch (type) {
+        case 1:
+        case 2:
+        case 3:
+          return reversed ^ (1+obj.portal.options.team === filter);
+        case 4:
+          return reversed ^ obj.portal.options.data.history.visited;
+        case 5:
+          return reversed ^ obj.portal.options.data.history.captured;
+        case 6:
+          return reversed ^ obj.portal.options.data.history.scoutControlled;
+      };
     });
   }
 
