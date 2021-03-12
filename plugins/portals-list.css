@@ -117,6 +117,10 @@
   background-color: purple;
 }
 
+#portalslist .table-container {
+  overflow-y: hidden;
+}
+
 #portalslist table tr.res td,
 #portalslist .filters .filterRes {
   background-color: #005684;

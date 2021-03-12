@@ -317,7 +317,6 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
     });
   }
 
-  var table, row, cell;
   var container = $('<div>');
 
   filters = document.createElement('div');
@@ -327,7 +326,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
   var length = window.plugin.portalslist.listPortals.length;
 
   ['All', 'Neutral', 'Resistance', 'Enlightened', 'Visited', 'Captured', 'Scout Controlled' ].forEach(function(label, i) {
-    cell = filters.appendChild(document.createElement('div'));
+    var cell = filters.appendChild(document.createElement('div'));
     cell.className = 'name filter' + label.substr(0, 3);
     cell.textContent = label+':';
     cell.title = 'Show only '+label+' portals';
@@ -368,14 +367,18 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
     }
   });
 
-  table = document.createElement('table');
+  var tableDiv = document.createElement('div');
+  tableDiv.className = 'table-container';
+  container.append(tableDiv);
+
+  var table = document.createElement('table');
   table.className = 'portals';
-  container.append(table);
+  tableDiv.appendChild(table);
 
   var thead = table.appendChild(document.createElement('thead'));
-  row = thead.insertRow(-1);
+  var row = thead.insertRow(-1);
 
-  cell = row.appendChild(document.createElement('th'));
+  var cell = row.appendChild(document.createElement('th'));
   cell.textContent = '#';
 
   window.plugin.portalslist.fields.forEach(function(field, i) {
