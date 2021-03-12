@@ -96,7 +96,8 @@
 
 #portalslist .history {
   text-align: center;
-  font-size: 20px;
+  font-size: 30px;
+  line-height: 15px;
 }
 
 #portalslist .history.unvisited {
