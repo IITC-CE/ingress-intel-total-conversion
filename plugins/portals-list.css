@@ -22,7 +22,6 @@
   border-bottom: 1px solid #0b314e;
   color: white;
   padding: 3px;
-  white-space: nowrap;
 }
 
 #portalslist table th {
@@ -54,7 +53,7 @@
 }
 
 #portalslist table.filter {
-  table-layout: auto;
+  table-layout: fixed;
   cursor: pointer;
   border-collapse: separate;
   border-spacing: 1px;
