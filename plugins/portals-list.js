@@ -20,8 +20,6 @@ window.plugin.portalslist.scoutControlledP = 0;
 
 window.plugin.portalslist.filter = 0;
 
-window.plugin.portalslist.historySymbol = String.fromCharCode(0x25CF);
-
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
  * title: String
@@ -156,7 +154,7 @@ window.plugin.portalslist.fields = [
         'history',
         ['unvisited', 'visited', 'captured'][value]
       ]);
-      cell.append(window.plugin.portalslist.historySymbol);
+      $(cell).append('<div class="icon"></div>');
     }
   },
   {
@@ -174,7 +172,7 @@ window.plugin.portalslist.fields = [
         'history',
         ['unvisited', 'scoutControlled'][value]
       ]);
-      cell.append(window.plugin.portalslist.historySymbol);
+      $(cell).append('<div class="icon"></div>');
     }
   }
 ];
