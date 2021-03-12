@@ -160,6 +160,9 @@ window.decodeArray.portal = function(a, details) {
 
   if (a.length >= EXTENDED_PORTAL_DATA_LENGTH || details === 'extended' || details === 'detailed') {
     $.extend(data, extendedPortalData(a));
+    if (data.history && data.history.captured && !data.history.visited) {
+      log.warn('Inconsistent history data found in portal "' + data.title + '"');
+    }
   }
 
   return data;
