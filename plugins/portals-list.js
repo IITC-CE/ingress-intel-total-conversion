@@ -332,7 +332,11 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
     cell.textContent = label+':';
     cell.title = 'Show only '+label+' portals';
     $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, false));
+      if (this.classList.contains('active')) {
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, 0, false));
+      } else {
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, false));
+      }
     });
 
     if (filter === i+1 && !reversed) {
@@ -343,7 +347,11 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
     cell.className = 'filter' + label.substr(0, 3);
     cell.title = 'Hide '+label+' portals ';
     $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, true));
+      if (this.classList.contains('active')) {
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, 0, false));
+      } else {
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, true));
+      }
     });
 
     if (filter === i+1 && reversed) {
