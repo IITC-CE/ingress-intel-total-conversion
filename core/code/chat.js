@@ -179,8 +179,10 @@ window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
     return log.warn('faction chat error. Waiting for next auto-refresh.');
   }
 
-  var needsClearing = $('#chatfaction').data('needsClearing');
-  if(!needsClearing && data.result.length === 0) return;
+  if (!data.result.length && !$('#chatfaction').data('needsClearing')) {
+    // no new data and current data in chat._faction.data is already rendered
+    return;
+  }
 
   $('#chatfaction').data('needsClearing', null);
 
@@ -230,8 +232,10 @@ window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
     return log.warn('public chat error. Waiting for next auto-refresh.');
   }
 
-  var needsClearing = $('#chatall').data('needsClearing');
-  if(!needsClearing && data.result.length === 0) return;
+  if (!data.result.length && !$('#chatall').data('needsClearing')) {
+    // no new data and current data in chat._public.data is already rendered
+    return;
+  }
 
   $('#chatall').data('needsClearing', null);
 
