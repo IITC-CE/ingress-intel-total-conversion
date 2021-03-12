@@ -54,9 +54,13 @@
 }
 
 #portalslist .filter {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1fr auto;
-    grid-gap: 1px
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto;
+  grid-gap: 1px
+}
+
+#portalslist.mobile .filter {
+  grid-template-columns: 1fr auto 1fr auto;
 }
 
 #portalslist .filter > div {
@@ -67,7 +71,15 @@
 }
 
 #portalslist .filter .active {
-    font-weight: bolder
+  font-weight: bolder
+}
+
+#portalslist .filter .filterAll {
+  display: none;
+}
+
+#portalslist.mobile .filter .filterAll {
+  display: block;
 }
 
 #portalslist .filterNeu {
