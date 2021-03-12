@@ -53,25 +53,21 @@
   color: #FFCE00;
 }
 
-#portalslist table.filter {
-  table-layout: auto;
-  cursor: pointer;
-  border-collapse: separate;
-  border-spacing: 1px;
+#portalslist .filter {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto;
+    grid-gap: 1px
 }
 
-#portalslist table.filter th {
+#portalslist .filter > div {
   text-align: left;
-  padding-left: 0.3em;
+  padding: 0.2em 0.3em;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-#portalslist table.filter td {
-  text-align: right;
-  padding-right: 0.3em;
-  overflow: hidden;
-  text-overflow: ellipsis;
+#portalslist .filter .active {
+    font-weight: bolder
 }
 
 #portalslist .filterNeu {
@@ -116,15 +112,6 @@
 
 #portalslist .history.scoutControlled {
   color: purple;
-}
-
-#portalslist.mobile table.filter tr {
-  display: block;
-  text-align: center;
-}
-#portalslist.mobile table.filter th, #portalslist.mobile table.filter td {
-  display: inline-block;
-  width: 22%;
 }
 
 .ui-dialog.ui-dialog-portalslist {

@@ -322,42 +322,31 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
   var table, row, cell;
   var container = $('<div>');
 
-  table = document.createElement('table');
-  table.className = 'filter';
-  container.append(table);
-
-  row = table.insertRow(-1);
+  filters = document.createElement('div');
+  filters.className = 'filter';
+  container.append(filters);
 
   var length = window.plugin.portalslist.listPortals.length;
 
-  ['All', 'Neutral', 'Resistance', 'Enlightened', 'Visited', 'Captured', 'Scout Controlled' ].forEach(function(label, i) {
-    cell = row.appendChild(document.createElement('th'));
+  ['Neutral', 'Resistance', 'Enlightened', 'Visited', 'Captured', 'Scout Controlled' ].forEach(function(label, i) {
+    cell = filters.appendChild(document.createElement('div'));
     cell.className = 'filter' + label.substr(0, 3);
     cell.textContent = label+':';
     cell.title = 'Show only '+label+' portals';
     $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i));
+      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1));
     });
 
-    // No 'Hide all portals'
-    if (i === 0) return;
-
-    cell = row.insertCell(-1);
+    cell = filters.appendChild(document.createElement('div'));
     cell.className = 'filter' + label.substr(0, 3);
     cell.title = 'Hide '+label+' portals ';
     $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, -i));
+      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, -i-1));
     });
 
-    var name = ['neuP', 'resP', 'enlP', 'visitedP', 'capturedP', 'scoutControlledP'][i-1];
+    var name = ['neuP', 'resP', 'enlP', 'visitedP', 'capturedP', 'scoutControlledP'][i];
     var count = window.plugin.portalslist[name];
     cell.textContent = count + ' (' + Math.round(count/length*100) + '%)';
-
-    if (i === 3) {
-      // create a new row with an empty first cell
-       row = table.insertRow(-1);
-       cell = row.insertCell(-1); cell.textContent = (" ");
-    }
   });
 
   table = document.createElement('table');
