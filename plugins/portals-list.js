@@ -153,7 +153,7 @@ window.plugin.portalslist.fields = [
     format: function(cell, portal, value) {
       if (value === -1) { return; }
       $(cell).addClass([
-        'portal-list-history',
+        'history',
         ['unvisited', 'visited', 'captured'][value]
       ]);
       cell.append(window.plugin.portalslist.historySymbol);
@@ -171,7 +171,7 @@ window.plugin.portalslist.fields = [
     format: function(cell, portal, value) {
       if (value === -1) { return; }
       $(cell).addClass([
-        'portal-list-history',
+        'history',
         ['unvisited', 'scoutControlled'][value]
       ]);
       cell.append(window.plugin.portalslist.historySymbol);
