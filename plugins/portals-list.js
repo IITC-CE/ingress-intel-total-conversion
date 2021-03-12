@@ -335,12 +335,20 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
       $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, false));
     });
 
+    if (filter === i+1 && !reversed) {
+      cell.classList.add('active');
+    }
+
     cell = filters.appendChild(document.createElement('div'));
     cell.className = 'filter' + label.substr(0, 3);
     cell.title = 'Hide '+label+' portals ';
     $(cell).click(function() {
       $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i+1, true));
     });
+
+    if (filter === i+1 && reversed) {
+      cell.classList.add('active');
+    }
 
     var name = ['neuP', 'resP', 'enlP', 'visitedP', 'capturedP', 'scoutControlledP'][i];
     var count = window.plugin.portalslist[name];
