@@ -1,10 +1,10 @@
 #portalslist.mobile {
   background: transparent;
-  border: 0 none !important;
-  height: 100% !important;
-  width: 100% !important;
-  left: 0 !important;
-  top: 0 !important;
+  border: 0 none;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
   position: absolute;
   overflow: auto;
 }
@@ -43,8 +43,8 @@
 }
 
 #portalslist table .portalTitle {
-  min-width: 120px !important;
-  max-width: 240px !important;
+  min-width: 120px;
+  max-width: 240px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
