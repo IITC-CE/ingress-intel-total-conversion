@@ -341,30 +341,27 @@ window.plugin.mpe.data.toggleManager = function(PJ){
   }
 }
 
-window.plugin.mpe.ui.toggleSidebar = function(PJ){
-  var s = '.mpeSidebar .mpe.'+PJ;
-  var elem = $(s);
-  var prep = ''
-  var fa = window.plugin.mpe.data.getFaClass(PJ);
-  fa = (fa.length !== 0)? fa : 'nofa';
-  var title = window.plugin.mpe.data.getTitle(PJ);
-  var short = (title) ? title.substr(0, 3): 'n/a'
+window.plugin.mpe.ui.toggleSidebar = function(PJ) {
+  var elem = $('.mpeSidebar .mpe.' + PJ);
 
-  if(window.plugin.faIcon){
-    prep = '<i class="left fa '+fa+'" title="'+title+'"></i>';
-  } else {
-    prep = '<i class="left fa" title="'+title+'">'+short+'</i>';
-  };
-
-  if(window.plugin.mpe.data.isInSidebar(PJ) >= 0){
-    if(!elem.length){
-      $('.mpeSidebar').append(window.plugin.mpe.getHTML.project(PJ));
-      $(s).prepend(prep);
-    }
-  }else{
+  if (window.plugin.mpe.data.isInSidebar(PJ) === -1) {
     elem.remove();
+  } else if (!elem.length) {
+    var title = window.plugin.mpe.data.getTitle(PJ);
+    var prep;
+    if (window.plugin.faIcon) {
+      var fa = window.plugin.mpe.data.getFaClass(PJ);
+      fa = fa.length ? fa : 'nofa';
+      prep = '<i class="left fa ' + fa + '" title="' + title + '"></i>';
+    } else {
+      var short = title ? title.substr(0, 3): 'n/a'
+      prep = '<i class="left fa" title="' + title + '">' + short + '</i>';
+    }
+    $('.mpeSidebar').append(window.plugin.mpe.getHTML.project(PJ));
+    elem.prepend(prep);
   }
-}
+};
+
 window.plugin.mpe.ui.toggleManager = function(PJ){
   var elem = $('.mpeManager .mpe.'+PJ+'');
 
