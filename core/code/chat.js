@@ -74,13 +74,14 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
   if (!(b.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(chat._oldBBox) && chat._oldBBox.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(b))) {
     log.log('Bounding Box changed, chat will be cleared (old: '+chat._oldBBox.toBBoxString()+'; new: '+b.toBBoxString()+')');
 
-    $('#chat > div').data('needsClearing', true);
-
     // need to reset these flags now because clearing will only occur
     // after the request is finished – i.e. there would be one almost
     // useless request.
     window.chat.commTabs.forEach(function (entry) {
-      if (entry.localBounds) chat.initChannelData(entry);
+      if (entry.localBounds) {
+        chat.initChannelData(entry);
+        $('#chat' + entry.channel).data('needsClearing', true);
+      }
     });
 
     chat._oldBBox = b;
