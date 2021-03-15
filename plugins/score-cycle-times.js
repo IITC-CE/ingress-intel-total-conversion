@@ -10,7 +10,7 @@ window.plugin.scoreCycleTimes = function() {};
 
 window.plugin.scoreCycleTimes.CHECKPOINT = 5*60*60; //5 hours per checkpoint
 window.plugin.scoreCycleTimes.CYCLE = 7*25*60*60; //7 25 hour 'days' per cycle
-
+window.plugin.scoreCycleTimes.localeTime = 'default';
 
 window.plugin.scoreCycleTimes.setup  = function() {
 
@@ -40,11 +40,13 @@ window.plugin.scoreCycleTimes.update = function() {
   var checkpointStart = Math.floor(now / (window.plugin.scoreCycleTimes.CHECKPOINT*1000)) * (window.plugin.scoreCycleTimes.CHECKPOINT*1000);
   var checkpointEnd = checkpointStart + window.plugin.scoreCycleTimes.CHECKPOINT*1000;
 
+  var o = new Intl.DateTimeFormat(window.plugin.scoreCycleTimes.localeTime, {
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric',
+  });
 
   var formatRow = function(label,time) {
-    var timeStr = unixTimeToString(time,true);
-    timeStr = timeStr.replace(/:00$/,''); //FIXME: doesn't remove seconds from AM/PM formatted dates
-
+    var timeStr = o.format(new Date(time));
     return '<tr><td>'+label+'</td><td>'+timeStr+'</td></tr>';
   };
 
