@@ -137,6 +137,9 @@ window.dialog = function(options) {
         collapse.click($.proxy(function() {
           var collapsed = ($(this).data('collapsed') === true);
 
+          // Toggle collapsed state
+          $(this).data('collapsed', !collapsed);
+
           // Run callbacks if we have them
           if($(this).data('collapseExpandCallback')) {
             $.proxy($(this).data('collapseExpandCallback'), this)(!collapsed);
@@ -164,9 +167,6 @@ window.dialog = function(options) {
             $(button).removeClass('ui-dialog-titlebar-button-collapse-expanded');
             $(button).addClass('ui-dialog-titlebar-button-collapse-collapsed');
           }
-
-          // Toggle collapsed state
-          $(this).data('collapsed', !collapsed);
         }, this));
 
         // Put it into the titlebar
