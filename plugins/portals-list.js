@@ -1,7 +1,7 @@
 // @author         teo96
 // @name           Portals list
 // @category       Info
-// @version        0.2.2
+// @version        0.3.0
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
 
@@ -14,7 +14,10 @@ window.plugin.portalslist.sortOrder = -1;
 window.plugin.portalslist.enlP = 0;
 window.plugin.portalslist.resP = 0;
 window.plugin.portalslist.neuP = 0;
+
 window.plugin.portalslist.filter = 0;
+
+window.plugin.portalslist.historySymbol = String.fromCodePoint(0x25CF);
 
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
@@ -33,7 +36,6 @@ window.plugin.portalslist.filter = 0;
  * defaultOrder: -1|1
  *     Which order should by default be used for this column. -1 means descending. Default: 1
  */
-
 
 window.plugin.portalslist.fields = [
   {
@@ -66,11 +68,11 @@ window.plugin.portalslist.fields = [
   {
     title: "Health",
     value: function(portal) { return portal.options.data.health; },
-    sortValue: function(value, portal) { return portal.options.team===TEAM_NONE ? -1 : value; },
+    sortValue: function(value, portal) { return portal.options.team === TEAM_NONE ? -1 : value; },
     format: function(cell, portal, value) {
       $(cell)
         .addClass("alignR")
-        .text(portal.options.team===TEAM_NONE ? '-' : value+'%');
+        .text(portal.options.team === TEAM_NONE ? '-' : value+'%');
     },
     defaultOrder: -1,
   },
@@ -117,7 +119,7 @@ window.plugin.portalslist.fields = [
     sortValue: function(value, portal) { return value.enemyAp; },
     format: function(cell, portal, value) {
       var title = '';
-      if (teamStringToId(PLAYER.team) == portal.options.team) {
+      if (teamStringToId(PLAYER.team) === portal.options.team) {
         title += 'Friendly AP:\t'+value.friendlyAp+'\n'
                + '- deploy '+(8-portal.options.data.resCount)+' resonator(s)\n'
                + '- upgrades/mods unknown\n';
@@ -134,6 +136,44 @@ window.plugin.portalslist.fields = [
     },
     defaultOrder: -1,
   },
+  { 
+    title: 'V/C',
+    value: function(portal) {
+      var history = portal.options.data.history;
+      if (history) {
+        return history.captured ? 2
+             : history.visited ? 1
+             : 0;
+      }
+      return -1;
+    },
+    format: function(cell, portal, value) {
+      if (value === -1) { return; }
+      $(cell).addClass([
+        'history',
+        ['unvisited', 'visited', 'captured'][value]
+      ]);
+      cell.append(window.plugin.portalslist.historySymbol);
+    }
+  },
+  {
+    title: 'S',
+    value: function(portal) { 
+      var history = portal.options.data.history;
+      if (history) {
+        return history.scoutControlled ? 1 : 0;
+      }
+      return -1;
+    },
+    format: function(cell, portal, value) {
+      if (value === -1) { return; }
+      $(cell).addClass([
+        'history',
+        ['unvisited', 'scoutControlled'][value]
+      ]);
+      cell.append(window.plugin.portalslist.historySymbol);
+    }
+  }
 ];
 
 //fill the listPortals array with portals avaliable on the map (level filtered portals will not appear in the table)
@@ -222,7 +262,7 @@ window.plugin.portalslist.displayPL = function() {
     dialog({
       html: $('<div id="portalslist">').append(list),
       dialogClass: 'ui-dialog-portalslist',
-      title: 'Portal list: ' + window.plugin.portalslist.listPortals.length + ' ' + (window.plugin.portalslist.listPortals.length == 1 ? 'portal' : 'portals'),
+      title: 'Portal list: ' + window.plugin.portalslist.listPortals.length + ' ' + (window.plugin.portalslist.listPortals.length === 1 ? 'portal' : 'portals'),
       id: 'portal-list',
       width: 700
     });
@@ -321,13 +361,13 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
     cell.textContent = field.title;
     if(field.sort !== null) {
       cell.classList.add("sortable");
-      if(i == window.plugin.portalslist.sortBy) {
+      if(i === window.plugin.portalslist.sortBy) {
         cell.classList.add("sorted");
       }
 
       $(cell).click(function() {
         var order;
-        if(i == sortBy) {
+        if(i === sortBy) {
           order = -sortOrder;
         } else {
           order = field.defaultOrder < 0 ? -1 : 1;
@@ -378,7 +418,7 @@ window.plugin.portalslist.getPortalLink = function(portal) {
 }
 
 window.plugin.portalslist.onPaneChanged = function(pane) {
-  if(pane == "plugin-portalslist")
+  if(pane === "plugin-portalslist")
     window.plugin.portalslist.displayPL();
   else
     $("#portalslist").remove()
