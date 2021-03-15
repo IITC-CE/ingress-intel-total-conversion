@@ -44,7 +44,7 @@ function clone (layer) {
     return L.tileLayer(layer._url, options);
   } else if (L.GridLayer.GoogleMutant && layer instanceof L.GridLayer.GoogleMutant) {
     var gm = L.gridLayer.googleMutant(options);
-    layer._GAPIPromise.then(function () {
+    layer.whenReady(function () {
       for (var name in layer._subLayers) { gm.addGoogleLayer(name); }
     });
     return gm;
@@ -132,8 +132,11 @@ function setup () {
 
   if (!miniMap.options.mapOptions.attributionControl) { // hide attribution
     $('<style>').html(
-      'div.gm-style .gmnoprint, div.gm-style img,'      // google
-    + 'ymaps[class$="-copyrights-pane"], ymaps iframe'  // yandex
+      'div.leaflet-control-minimap div.leaflet-bottom,'               // google
+    // + 'div.leaflet-control-minimap div.gm-style .gmnoprint,'       // google (old)
+    // + 'div.leaflet-control-minimap div.gm-style img,'
+    + 'div.leaflet-control-minimap ymaps[class$="-copyrights-pane"],' // yandex
+    + 'div.leaflet-control-minimap ymaps iframe'
     + '  { display: none }'
     ).appendTo('head');
   }

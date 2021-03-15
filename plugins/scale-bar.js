@@ -26,6 +26,7 @@ function moveToEdge (ctrl) {
     $corner.prepend($el);
   } else if (pos.indexOf('bottom') !== -1) {
     $corner.append($el);
+    $corner.find(".leaflet-control-attribution").appendTo($corner); // make sure that attribution control is on very bottom
   }
 }
 

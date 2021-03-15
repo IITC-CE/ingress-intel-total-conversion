@@ -102,13 +102,6 @@ body {
   margin-left: 5px !important;
 }
 
-.leaflet-control-container .leaflet-bottom {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: flex-end;
-  margin-bottom: 24px !important;
-}
-
 #searchwrapper {
   font-size: 1.2em;
 }
@@ -232,3 +225,10 @@ body {
   border: 1px outset #20A8B1;
   margin-top: 2px;
 }
+
+/* FIX ME
+   Quick and dirty hack to fix scale-bar position
+   Permanent solution should include fixes for attribution control too
+   https://github.com/IITC-CE/ingress-intel-total-conversion/issues/89
+*/
+.leaflet-bottom { bottom: 5px; }
