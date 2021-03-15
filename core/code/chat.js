@@ -57,7 +57,7 @@ window.chat._oldBBox = null;
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
  * @returns {Object} The generated post data.
  */
-window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
+window.chat.genPostData = function(channel, _storageHash, getOlderMsgs) {
   if (typeof channel !== 'string') {
     throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
   }
@@ -86,6 +86,8 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
 
     chat._oldBBox = b;
   }
+
+  var storageHash = chat._channels[channel];
 
   var ne = b.getNorthEast();
   var sw = b.getSouthWest();
