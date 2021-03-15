@@ -510,8 +510,6 @@ window.plugin.mpe.setupCSS = function(){
 
 
 var setup = function(){
-  window.pluginCreateHook('mpe');
-
   window.plugin.mpe.storage.checkStorage();
   window.plugin.mpe.setupCSS();
   window.plugin.mpe.ui.addControl();
