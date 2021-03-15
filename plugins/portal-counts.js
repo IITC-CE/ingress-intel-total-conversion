@@ -30,6 +30,28 @@ window.plugin.portalcounts = {
   CENTER_Y: 100,
 };
 
+// Determine if a point is inside of a polygon.
+// ray-casting algorithm based on
+// https://observablehq.com/@tmcw/understanding-point-in-polygon
+window.plugin.portalcounts.portalinpolygon = function(portal,LatLngsObjectsArray) {
+  var portalCoords = portal.getLatLng();
+
+  var x = portalCoords.lat, y = portalCoords.lng;
+
+  var inside = false;
+  for (var i = 0, j = LatLngsObjectsArray.length - 1; i < LatLngsObjectsArray.length; j = i++) {
+    var xi = LatLngsObjectsArray[i]['lat'], yi = LatLngsObjectsArray[i]['lng'];
+    var xj = LatLngsObjectsArray[j]['lat'], yj = LatLngsObjectsArray[j]['lng'];
+
+    var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) {
+      inside = !inside;
+    }
+  }
+
+  return inside;
+};
+
 //count portals for each level available on the map
 window.plugin.portalcounts.getPortals = function (){
   //console.log('** getPortals');
@@ -46,7 +68,27 @@ window.plugin.portalcounts.getPortals = function (){
     self.PortalsRes[level] = 0;
   }
 
+  self.upcP = 0;
+  self.upvP = 0;
+
+  if(localStorage['plugin-draw-tools-layer']) {
+    var drawLayer = JSON.parse(localStorage['plugin-draw-tools-layer']);
+  }
   $.each(window.portals, function(i, portal) {
+    if (drawLayer && drawLayer.length) {
+      var portalInPolygon = false;
+      for(var dl in drawLayer){
+        if(drawLayer[dl].type === 'polygon') {
+          if(window.plugin.portalcounts.portalinpolygon(portal, drawLayer[dl].latLngs)) {
+            portalInPolygon = true;
+            break;
+          }
+        }
+      }
+      if (!portalInPolygon) {
+        return;
+      }
+    }
     var level = portal.options.level;
     var team = portal.options.team;
     // just count portals in viewport
@@ -64,6 +106,23 @@ window.plugin.portalcounts.getPortals = function (){
         self.neuP++;
         break;
     }
+
+    if (window.plugin.uniques) {
+      var guid = portal.options.ent[0];
+      var uniqueInfo = window.plugin.uniques.uniques[guid];
+
+      if (uniqueInfo) {
+        if (!uniqueInfo.captured) {
+          self.upcP++;
+        }
+        if (!uniqueInfo.visited) {
+          self.upvP++;
+        }
+      } else {
+        self.upvP++;
+        self.upcP++;
+      }
+    }
   });
 
   //get portals informations from IITC
@@ -71,7 +130,7 @@ window.plugin.portalcounts.getPortals = function (){
 
   var counts = '';
   if(total > 0) {
-    counts += '<table><tr><th></th><th class="enl">Enlightened</th><th class="res">Resistance</th></tr>';  //'+self.enlP+' Portal(s)</th></tr>';
+    counts += '<table><tr><th></th><th class="enl">Enlightened</th><th class="res">Resistance</th></tr>';
     for(var level = window.MAX_PORTAL_LEVEL; level > 0; level--){
       counts += '<tr><td class="L'+level+'">Level '+level+'</td>';
       counts += '<td class="enl">'+self.PortalsEnl[level]+'</td><td class="res">'+self.PortalsRes[level]+'</td>';
@@ -82,7 +141,19 @@ window.plugin.portalcounts.getPortals = function (){
 
     counts += '<tr><td>Neutral:</td><td colspan="2">';
     counts += self.neuP;
-    counts += '</td></tr></table>';
+    counts += '</td></tr>';
+
+    if (window.plugin.uniques) {
+      counts += '<tr><td>Unvisited:</td><td colspan="2">';
+      counts += self.upvP;
+      counts += '</td></tr>';
+
+      counts += '<tr><td>Uncaptured:</td><td colspan="2">';
+      counts += self.upcP;
+      counts += '</td></tr>';
+    }
+
+    counts += '</table>';
 
     var svg = $('<svg width="300" height="200">').css('margin-top', 10);
 
@@ -168,6 +239,9 @@ window.plugin.portalcounts.getPortals = function (){
 
   var total = self.enlP + self.resP + self.neuP;
   var title = total + ' ' + (total == 1 ? 'portal' : 'portals');
+  if (drawLayer && drawLayer.length) {
+      title = title + ' in polygons';
+  }
 
   if(window.useAndroidPanes()) {
     $('<div id="portalcounts" class="mobile">'
