@@ -4,6 +4,7 @@
 :root {
   --html-background-color: #0e3d4e;
   --ui-border-color: #20a8b1;
+  --ui-background-color: rgba(8, 48, 78, 0.9);
   --highlight-text-color: #ffce00;
   --highlight-border-color: #ffce00;
   --arrow-toggle-color: #ffce00;
@@ -78,7 +79,7 @@ i.large { font-size: 6rem; }
 }
 
 #sidebar {
-  background-color: rgba(8, 48, 78, 0.9);
+  background-color: var(--ui-background-color);
   border-left: 1px solid var(--ui-border-color);
   color: #888;
   position: relative;
@@ -98,7 +99,7 @@ i.large { font-size: 6rem; }
   position: absolute;
   top: 108px;
   z-index: 3002;
-  background-color: rgba(8, 48, 78, 0.9);
+  background-color: var(--ui-background-color);
   color: var(--highlight-text-color);
   border: 1px solid var(--ui-border-color);
   border-right: none;
@@ -191,7 +192,7 @@ a:hover {
 
 #chatcontrols {
   color: var(--highlight-text-color);
-  background: rgba(8, 48, 78, 0.9);
+  background: var(--ui-background-color);
   position: absolute;
   left: 0;
   z-index: 3000;
@@ -277,7 +278,7 @@ a:hover {
   bottom: 23px;
   left: 0;
   z-index: 3000;
-  background: rgba(8, 48, 78, 0.9);
+  background: var(--ui-background-color);
   line-height: 15px;
   color: #eee;
   border: 1px solid var(--ui-border-color);
@@ -379,7 +380,7 @@ summary {
   bottom: 0;
   left: 0;
   padding: 0 2px;
-  background: rgba(8, 48, 78, 0.9);
+  background: var(--ui-background-color);
   width: 708px;
   height: 23px;
   border: 1px solid var(--ui-border-color);
@@ -862,7 +863,7 @@ h3.title {
 
 /* update status */
 #updatestatus {
-  background-color: rgba(8, 48, 78, 0.9);
+  background-color: var(--ui-background-color);
   border-bottom: 0;
   border-top: 1px solid var(--ui-border-color);
   border-left: 1px solid var(--ui-border-color);
@@ -898,7 +899,7 @@ h3.title {
 .ui-tooltip, .ui-dialog {
   position: absolute;
   z-index: 9500;
-  background-color: rgba(8, 48, 78, 0.9);
+  background-color: var(--ui-background-color);
   border: 1px solid var(--ui-border-color);
   color: #eee;
   font-size: 13px;
@@ -1069,7 +1070,7 @@ h3.title {
   min-width: 40px;
   color: var(--highlight-text-color);
   border: 1px solid var(--highlight-border-color);
-  background-color: rgba(8, 48, 78, 0.9);
+  background-color: var(--ui-background-color);
 }
 
 .ui-dialog-buttonset button:hover {
@@ -1187,7 +1188,7 @@ td + td {
 
 /** artifact dialog *****************/
 table.artifact tr > * {
-  background: rgba(8, 48, 78, 0.9);
+  background: var(--ui-background-color);
 }
 
 table.artifact td.info {
