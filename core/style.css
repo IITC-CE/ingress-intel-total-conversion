@@ -3,6 +3,7 @@
 /* color vars */
 :root {
   --html-background-color: #0e3d4e;
+  --ui-border-color: #20a8b1;
 }
 
 /* for printing directly from the browser, hide all UI components
@@ -75,7 +76,7 @@ i.large { font-size: 6rem; }
 
 #sidebar {
   background-color: rgba(8, 48, 78, 0.9);
-  border-left: 1px solid #20A8B1;
+  border-left: 1px solid var(--ui-border-color);
   color: #888;
   position: relative;
   left: 0;
@@ -96,7 +97,7 @@ i.large { font-size: 6rem; }
   z-index: 3002;
   background-color: rgba(8, 48, 78, 0.9);
   color: #FFCE00;
-  border: 1px solid #20A8B1;
+  border: 1px solid var(--ui-border-color);
   border-right: none;
   border-radius: 5px 0 0 5px;
   text-decoration: none;
@@ -207,7 +208,7 @@ a:hover {
   text-align: center;
   height: 24px;
   line-height: 24px;
-  border: 1px solid #20A8B1;
+  border: 1px solid var(--ui-border-color);
   vertical-align: top;
 }
 
@@ -276,7 +277,7 @@ a:hover {
   background: rgba(8, 48, 78, 0.9);
   line-height: 15px;
   color: #eee;
-  border: 1px solid #20A8B1;
+  border: 1px solid var(--ui-border-color);
   border-bottom: 0;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -378,7 +379,7 @@ summary {
   background: rgba(8, 48, 78, 0.9);
   width: 708px;
   height: 23px;
-  border: 1px solid #20A8B1;
+  border: 1px solid var(--ui-border-color);
   z-index: 3001;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -404,7 +405,7 @@ summary {
 /* sidebar ************************************************************/
 
 #sidebar > * {
-  border-bottom: 1px solid #20A8B1;
+  border-bottom: 1px solid var(--ui-border-color);
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -860,8 +861,8 @@ h3.title {
 #updatestatus {
   background-color: rgba(8, 48, 78, 0.9);
   border-bottom: 0;
-  border-top: 1px solid #20A8B1;
-  border-left: 1px solid #20A8B1;
+  border-top: 1px solid var(--ui-border-color);
+  border-left: 1px solid var(--ui-border-color);
   bottom: 0;
   color: #ffce00;
   font-size:13px;
@@ -883,7 +884,7 @@ h3.title {
   color: #000000;
   display: inline-block;
   min-width: 1.8em;
-  border: 1px solid #20A8B1;
+  border: 1px solid var(--ui-border-color);
   border-width: 0 1px;
   margin: -4px 0;
   padding: 4px 0.2em;
@@ -895,7 +896,7 @@ h3.title {
   position: absolute;
   z-index: 9500;
   background-color: rgba(8, 48, 78, 0.9);
-  border: 1px solid #20A8B1;
+  border: 1px solid var(--ui-border-color);
   color: #eee;
   font-size: 13px;
   line-height: 15px;
@@ -1052,7 +1053,7 @@ h3.title {
 
 .ui-dialog-buttonpane {
   padding: 6px;
-  border-top: 1px solid #20A8B1;
+  border-top: 1px solid var(--ui-border-color);
 }
 
 .ui-dialog-buttonset {
@@ -1203,7 +1204,7 @@ table.artifact .portal {
 #map .leaflet-popup-content-wrapper {
   border-radius: 0px;
   -webkit-border-radius: 0px;
-  border: 1px solid #20A8B1;
+  border: 1px solid var(--ui-border-color);
   background: var(--html-background-color);
   pointer-events: auto;
 }
@@ -1225,7 +1226,7 @@ table.artifact .portal {
 
 #map .leaflet-popup-tip {
   /* change the tip from an arrow to a simple line */
-  background: #20A8B1;
+  background: var(--ui-border-color);
   width: 1px;
   height: 20px;
   padding: 0;
@@ -1247,7 +1248,7 @@ table.artifact .portal {
 
 /* region scores */
 .cellscore .ui-accordion-header, .cellscore .ui-accordion-content {
-	border: 1px solid #20a8b1;
+	border: 1px solid var(--ui-border-color);
 	margin-top: -1px;
 	display: block;
 }
@@ -1334,7 +1335,7 @@ g.checkpoint:hover circle {
 /* tabs */
 .ui-tabs-nav {
 	display: block;
-	border-bottom: 1px solid #20a8b1;
+	border-bottom: 1px solid var(--ui-border-color);
 	border-top: 1px solid transparent;
 	margin: 3px 0 0;
 	padding: 0;
@@ -1351,7 +1352,7 @@ g.checkpoint:hover circle {
 	display: block;
 	float:left;
 	margin: 0 0 -1px;
-	border: 1px solid #20a8b1;
+	border: 1px solid var(--ui-border-color);
 }
 .ui-tabs-nav li.ui-tabs-active {
 	border-bottom-color: #0F2C3F;
