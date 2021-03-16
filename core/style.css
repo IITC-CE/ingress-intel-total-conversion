@@ -977,7 +977,7 @@ h3.title {
   height: 17px;
   top: 3px;
   cursor: pointer;
-  border: 1px solid rgb(32, 168, 177);
+  border: 1px solid var(--ui-border-color);
   background-color: rgba(0, 0, 0, 0);
   padding: 0;
 }
@@ -1012,7 +1012,7 @@ h3.title {
   width: 11px;
   margin-left: -6px;
   height: 0;
-  border-top: 2px solid rgb(32, 168, 177);
+  border-top: 2px solid var(--ui-border-color);
 }
 .ui-dialog-titlebar-button-close::after {
   transform: translateY(3.5px) rotate(45deg);
