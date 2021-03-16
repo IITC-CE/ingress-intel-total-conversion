@@ -23,7 +23,7 @@ function setup () {
   loadLeafletZoomslider();
 
   var map = window.map;
-  if (map.zoomControl._map) {
+  if (map.zoomControl && map.zoomControl._map) {
     map.zoomControl.remove();
   }
   zoomSlider.control = L.control.zoomslider(zoomSlider.options).addTo(map);
