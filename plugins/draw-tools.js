@@ -527,7 +527,7 @@ window.plugin.drawTools.optReset = function() {
 }
 
 window.plugin.drawTools.snapToPortals = function() {
-  var dataParams = window.getCurrentZoomTileParameters();
+  var dataParams = window.getDataZoomTileParameters();
   if (dataParams.level > 0) {
     if (!confirm('Not all portals are visible on the map. Snap to portals may move valid points to the wrong place. Continue?')) {
       return;

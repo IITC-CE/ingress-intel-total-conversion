@@ -275,12 +275,6 @@ window.androidCopy = function(text) {
   return false;
 }
 
-window.getCurrentZoomTileParameters = function() {
-  var zoom = getDataZoomForMapZoom( map.getZoom() );
-  var tileParams = getMapZoomTileParameters(zoom);
-  return tileParams;
-}
-
 // returns number of pixels left to scroll down before reaching the
 // bottom. Works similar to the native scrollTop function.
 window.scrollBottom = function(elm) {

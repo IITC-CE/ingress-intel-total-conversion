@@ -98,6 +98,12 @@ window.getMapZoomTileParameters = function(zoom) {
   };
 }
 
+window.getDataZoomTileParameters = function(zoom) {
+  zoom = arguments.length ? zoom : map.getZoom();
+  var dataZoom = getDataZoomForMapZoom(zoom);
+  return tileParams = getMapZoomTileParameters(dataZoom);
+}
+
 
 window.getDataZoomForMapZoom = function(zoom) {
   // we can fetch data at a zoom level different to the map zoom.
