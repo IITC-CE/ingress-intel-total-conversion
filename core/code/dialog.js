@@ -153,12 +153,21 @@ window.dialog = function(options) {
 
           // Find the button pane and content dialog in this ui-dialog, and add or remove the 'hidden' class.
           var dialog   = $(this).closest('.ui-dialog');
-          var selector = dialog.find('.ui-dialog-content,.ui-dialog-buttonpane');
+          var content = dialog.find('.ui-dialog-content');
+          var buttonpane = dialog.find('.ui-dialog-buttonpane');
           var button   = dialog.find('.ui-dialog-titlebar-button-collapse');
 
           // Slide toggle
           $(this).css('height', '');
-          $(selector).slideToggle({duration: window.DIALOG_SLIDE_DURATION, complete: sizeFix});
+          $(content).slideToggle({
+            duration: window.DIALOG_SLIDE_DURATION,
+            complete: function () {
+              $(buttonpane).slideToggle({
+                duration: window.DIALOG_SLIDE_DURATION,
+                complete: sizeFix
+              });
+            }
+          });
 
           if(collapsed) {
             $(button).removeClass('ui-dialog-titlebar-button-collapse-collapsed');
