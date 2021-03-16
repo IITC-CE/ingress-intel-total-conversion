@@ -292,14 +292,14 @@ window.getPortalHackDetails = function(d) {
   // first mod of type is fully effective, the others are only 50% effective
   var effectivenessReduction = [ 1, 0.5, 0.5, 0.5 ];
 
-  var cooldownTime = 300; // 5 mins - 300 seconds 
+  var cooldownTime = COOLDOWN_TIME;
 
   $.each(heatsinks, function(index,mod) {
     var hackSpeed = parseInt(mod.stats.HACK_SPEED)/1000000;
     cooldownTime = Math.round(cooldownTime * (1 - hackSpeed * effectivenessReduction[index]));
   });
 
-  var numHacks = 4; // default hacks
+  var numHacks = HACK_COUNT; // default hacks
 
   $.each(multihacks, function(index,mod) {
     var extraHacks = parseInt(mod.stats.BURNOUT_INSULATION);
