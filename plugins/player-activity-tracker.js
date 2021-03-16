@@ -86,7 +86,7 @@ window.plugin.playerTracker.closeIconTooltips = function() {
 window.plugin.playerTracker.zoomListener = function() {
   var ctrl = $('.leaflet-control-layers-selector + span:contains("Player Tracker")').parent();
   if(window.map.getZoom() < window.PLAYER_TRACKER_MIN_ZOOM) {
-    if (!window.isTouchDevice()) plugin.playerTracker.closeIconTooltips();
+    if (!L.Browser.touch) plugin.playerTracker.closeIconTooltips();
     plugin.playerTracker.drawnTracesEnl.clearLayers();
     plugin.playerTracker.drawnTracesRes.clearLayers();
     ctrl.addClass('disabled').attr('title', 'Zoom in to show those.');
@@ -258,8 +258,6 @@ window.plugin.playerTracker.ago = function(time, now) {
 }
 
 window.plugin.playerTracker.drawData = function() {
-  var isTouchDev = window.isTouchDevice();
-
   var gllfe = plugin.playerTracker.getLatLngFromEvent;
 
   var polyLineByAgeEnl = [[], [], [], []];
@@ -292,7 +290,7 @@ window.plugin.playerTracker.drawData = function() {
     var ago = plugin.playerTracker.ago;
 
     // tooltip for marker - no HTML - and not shown on touchscreen devices
-    var tooltip = isTouchDev ? '' : (playerData.nick+', '+ago(last.time, now)+' ago');
+    var tooltip = L.Browser.touch ? '' : (playerData.nick+', '+ago(last.time, now)+' ago');
 
     // popup for marker
     var popup = $('<div>')
@@ -397,7 +395,7 @@ window.plugin.playerTracker.drawData = function() {
     window.registerMarkerForOMS(m);
 
     // jQueryUI doesn’t automatically notice the new markers
-    if (!isTouchDev) {
+    if (!L.Browser.touch) {
       window.setupTooltips($(m._icon));
     }
   });
@@ -463,7 +461,7 @@ window.plugin.playerTracker.handleData = function(data) {
 
   plugin.playerTracker.discardOldData();
   plugin.playerTracker.processNewData(data);
-  if (!window.isTouchDevice()) plugin.playerTracker.closeIconTooltips();
+  if (!L.Browser.touch) plugin.playerTracker.closeIconTooltips();
 
   plugin.playerTracker.drawnTracesEnl.clearLayers();
   plugin.playerTracker.drawnTracesRes.clearLayers();
