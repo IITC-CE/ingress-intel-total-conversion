@@ -5,6 +5,7 @@
   --html-background-color: #0e3d4e;
   --ui-border-color: #20a8b1;
   --ui-background-color: rgba(8, 48, 78, 0.9);
+  --ui-background-color-no-alpha: rgb(8, 48, 78);
   --ui-title-background-color: rgba(8, 60, 78, 0.9);
   --ui-title-button-background-color: #20a8b1;
   --highlight-text-color: #ffce00;
@@ -227,7 +228,7 @@ a:hover {
   border-color: var(--highlight-border-color);
   border-bottom-width:0px;
   font-weight:bold;
-  background: rgb(8, 48, 78);
+  background: var(--ui-background-color-no-alpha);
 }
 
 #chatcontrols a.active + a {
@@ -474,7 +475,6 @@ h2 #stats {
   position: absolute;
   top: 0;
   right: 0;
-  background-color: rgba(8, 48, 78, 0.5);
   display: none; /* starts hidden */
 }
 #name:hover #signout {
