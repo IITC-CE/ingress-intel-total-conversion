@@ -1,5 +1,10 @@
 /* general rules ******************************************************/
 
+/* color vars */
+:root {
+  --html-background-color: #0e3d4e;
+}
+
 /* for printing directly from the browser, hide all UI components
  * NOTE: @media needs to be first?
  */
@@ -25,7 +30,7 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden; /* workaround for #373 */
-  background: #0e3d4e;
+  background: var(--html-background-color);
 }
 
 #map {
@@ -1199,7 +1204,7 @@ table.artifact .portal {
   border-radius: 0px;
   -webkit-border-radius: 0px;
   border: 1px solid #20A8B1;
-  background: #0e3d4e;
+  background: var(--html-background-color);
   pointer-events: auto;
 }
 
