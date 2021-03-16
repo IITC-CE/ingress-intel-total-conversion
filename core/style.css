@@ -5,6 +5,8 @@
   --html-background-color: #0e3d4e;
   --ui-border-color: #20a8b1;
   --ui-background-color: rgba(8, 48, 78, 0.9);
+  --ui-title-background-color: rgba(8, 60, 78, 0.9);
+  --ui-title-button-background-color: #20a8b1;
   --highlight-text-color: #ffce00;
   --highlight-border-color: #ffce00;
   --arrow-toggle-color: #ffce00;
@@ -948,7 +950,7 @@ h3.title {
   line-height: 15px;
   text-align: center;
   padding: 4px;
-  background-color: rgba(8, 60, 78, 0.9);
+  background-color: var(--ui-title-background-color);
 }
 
 .ui-dialog-title {
@@ -981,7 +983,7 @@ h3.title {
 }
 
 .ui-dialog-titlebar-button:active {
-  background-color: rgb(32, 168, 177);
+  background-color: var(--ui-title-button-background-color);
 }
 
 .ui-dialog-titlebar-button-close {
@@ -997,7 +999,7 @@ h3.title {
 }
 
 .ui-dialog-titlebar-button-collapse-collapsed {
-  background-color: rgb(32, 168, 177);
+  background-color: var(--ui-title-button-background-color);
 }
 
 .ui-dialog-titlebar-button-collapse::after,
@@ -1026,7 +1028,7 @@ h3.title {
 .ui-dialog-titlebar-button.ui-dialog-titlebar-button-collapse-collapsed::before,
 .ui-dialog-titlebar-button:active::after,
 .ui-dialog-titlebar-button:active::before {
-  border-top-color: rgba(8, 60, 78, 0.9);
+  border-top-color: var(--ui-title-background-color);
 }
 
 .ui-dialog-content {
