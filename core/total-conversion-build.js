@@ -59,7 +59,7 @@ document.body = document.createElement('body');
 document.body.innerHTML = ''
   + '<div id="map">Loading, please wait</div>'
   + '<div id="chatcontrols" style="display:none">'
-  + '<a accesskey="0" title="[0]"><span class="toggle expand"></span></a>'
+  + '<a accesskey="0" title="[0]"><span class="toggle"></span></a>'
   + '<a accesskey="1" title="[1]">all</a>'
   + '<a accesskey="2" title="[2]" class="active">faction</a>'
   + '<a accesskey="3" title="[3]">alerts</a>'
