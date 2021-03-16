@@ -61,19 +61,19 @@
 // geoSearch:
 // search:
 
-window._hooks = {}
+window._hooks = {};
 window.VALID_HOOKS = []; // stub for compatibility
 
 var isRunning = 0;
 window.runHooks = function(event, data) {
-  if(!_hooks[event]) return true;
+  if (!_hooks[event]) { return true; }
   var interrupted = false;
   isRunning++;
-  $.each(_hooks[event], function(ind, callback) {
+  $.each(_hooks[event], function (ind, callback) {
     try {
       if (callback(data) === false) {
         interrupted = true;
-        return false;  //break from $.each
+        return false; // break from $.each
       }
     } catch (e) {
       log.error('error running hook '+event+', error: '+e);
@@ -81,7 +81,7 @@ window.runHooks = function(event, data) {
   });
   isRunning--;
   return !interrupted;
-}
+};
 
 window.pluginCreateHook = function() {}; // stub for compatibility
 
@@ -90,11 +90,12 @@ window.addHook = function(event, callback) {
     throw new Error('Callback must be a function.');
   }
 
-  if(!_hooks[event])
+  if (!_hooks[event]) {
     _hooks[event] = [callback];
-  else
+  } else {
     _hooks[event].push(callback);
-}
+  }
+};
 
 // callback must the SAME function to be unregistered.
 window.removeHook = function(event, callback) {
@@ -105,13 +106,14 @@ window.removeHook = function(event, callback) {
   var listeners = _hooks[event];
   if (listeners) {
     var index = listeners.indexOf(callback);
-    if(index == -1)
-      log.warn('Callback wasn\'t registered for this event.');
-    else
+    if (index === -1) {
+      log.warn("Callback wasn't registered for this event.");
+    } else {
       if (isRunning) {
         listeners[index] = $.noop;
         _hooks[event] = listeners = listeners.slice();
       }
       listeners.splice(index, 1);
+    }
   }
-}
+};
