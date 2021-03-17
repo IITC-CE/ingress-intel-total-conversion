@@ -13,12 +13,7 @@ window.renderUpdateStatus = function() {
 
   if (tileParams.hasPortals) {
     // zoom level includes portals (and also all links/fields)
-    if(!window.isSmartphone()) // space is valuable
-      t += '<b>portals</b>: ';
-    if(tileParams.level === 0)
-      t += '<span id="loadlevel">all</span>';
-    else
-      t += '<span id="loadlevel" style="background:'+COLORS_LVL[tileParams.level]+'">L'+tileParams.level+(tileParams.level<8?'+':'') + '</span>';
+    t += '<span id="loadlevel">portals</span>';
   } else {
     if(!window.isSmartphone()) // space is valuable
       t += '<b>links</b>: ';
