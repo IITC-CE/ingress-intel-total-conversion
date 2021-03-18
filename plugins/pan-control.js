@@ -1,7 +1,7 @@
 // @author         fragger
 // @name           Pan control
 // @category       Controls
-// @version        0.2.0
+// @version        0.2.1
 // @description    Show a panning control on the map.
 
 
@@ -20,8 +20,11 @@ function setup () {
   var map = window.map;
   panControl.control = L.control.pan(panControl.options).addTo(map);
 
-  if (map.zoomControl._map) {
-    map.zoomControl.setPosition(panControl.options.position || 'topleft'); // Move above the zoom control
+  if (!panControl.options.position) { // default: 'topleft'
+    window.addHook('iitcLoaded', function () {
+      // to be above all controls
+      $('.leaflet-top.leaflet-left .leaflet-control').first().before(panControl.control.getContainer());
+    });
   }
 
   // L.Control.Pan.css tries to align zoom control with the pan control, but the result sucks
