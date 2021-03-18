@@ -1,7 +1,7 @@
 // @author         ZasoGD
 // @name           Multi Projects Extension
-// @category       Control
-// @version        0.0.7
+// @category       Controls
+// @version        0.1.0
 // @description    Create separated projects in some plugins.
 
 //
@@ -341,23 +341,27 @@ window.plugin.mpe.data.toggleManager = function(PJ){
   }
 }
 
-window.plugin.mpe.ui.toggleSidebar = function(PJ){
-  var s = '.mpeSidebar .mpe.'+PJ;
-  var elem = $(s);
-  var fa = window.plugin.mpe.data.getFaClass(PJ);
-  fa = (fa.length !== 0)? fa : 'nofa';
+window.plugin.mpe.ui.toggleSidebar = function(PJ) {
+  var elem = $('.mpeSidebar .mpe.' + PJ);
 
-  var title = window.plugin.mpe.data.getTitle(PJ);
-
-  if(window.plugin.mpe.data.isInSidebar(PJ) >= 0){
-    if(!elem.length){
-      $('.mpeSidebar').append(window.plugin.mpe.getHTML.project(PJ));
-      $(s).prepend('<i class="left fa '+fa+'" title="'+title+'"></i>');
-    }
-  }else{
+  if (window.plugin.mpe.data.isInSidebar(PJ) === -1) {
     elem.remove();
+  } else if (!elem.length) {
+    var title = window.plugin.mpe.data.getTitle(PJ);
+    var prep;
+    if (window.plugin.faIcon) {
+      var fa = window.plugin.mpe.data.getFaClass(PJ);
+      fa = fa.length ? fa : 'nofa';
+      prep = '<i class="left fa ' + fa + '" title="' + title + '"></i>';
+    } else {
+      var short = title ? title.substr(0, 3): 'n/a'
+      prep = '<i class="left fa" title="' + title + '">' + short + '</i>';
+    }
+    $('.mpeSidebar').append(window.plugin.mpe.getHTML.project(PJ));
+    elem.prepend(prep);
   }
-}
+};
+
 window.plugin.mpe.ui.toggleManager = function(PJ){
   var elem = $('.mpeManager .mpe.'+PJ+'');
 
@@ -506,8 +510,6 @@ window.plugin.mpe.setupCSS = function(){
 
 
 var setup = function(){
-  window.pluginCreateHook('mpe');
-
   window.plugin.mpe.storage.checkStorage();
   window.plugin.mpe.setupCSS();
   window.plugin.mpe.ui.addControl();

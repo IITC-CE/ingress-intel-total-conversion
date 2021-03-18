@@ -992,7 +992,8 @@ window.plugin.bookmarks.loadStorageBox = function() {
       if(fullUpdated) {
         window.plugin.bookmarks.refreshBkmrks();
         window.plugin.bookmarks.resetAllStars();
-        console.log('BOOKMARKS: synchronized all after offline');
+        window.runHooks('pluginBkmrksSyncEnd', {"target": "all", "action": "sync"});
+        console.log('BOOKMARKS: synchronized all from drive after offline');
         return;
       }
 
@@ -1000,6 +1001,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
       if(e.isLocal) {
         // Update pushed successfully, remove it from updatingQueue
         delete window.plugin.bookmarks.updatingQueue[e.property];
+        console.log('BOOKMARKS: synchronized to drive');
       } else {
         // Remote update
         delete window.plugin.bookmarks.updateQueue[e.property];
@@ -1135,10 +1137,6 @@ window.plugin.bookmarks.loadStorageBox = function() {
   }
 
 /***************************************************************************************************************************************************************/
-
-  window.plugin.bookmarks.setupCSS = function() {
-    $('<style>').prop('type', 'text/css').html('@include_css:bookmarks.css@').appendTo('head');
-  }
 
   window.plugin.bookmarks.setupPortalsList = function() {
     function onBookmarkChanged(data) {
@@ -1364,4 +1362,8 @@ window.plugin.bookmarks.initMPE = function(){
         window.plugin.bookmarks.initMPE();
     }
 
+  }
+// moved setupCSS to the end to improve readability of built script
+    window.plugin.bookmarks.setupCSS = function() {
+    $('<style>').prop('type', 'text/css').html('@include_css:bookmarks.css@').appendTo('head');
   }

@@ -689,15 +689,7 @@ window.plugin.drawTools.boot = function() {
 // ---------------------------------------------------------------------------------
 // MPE - MULTI PROJECTS EXTENSION
 // ---------------------------------------------------------------------------------
-window.plugin.drawTools.mpe = {};
-window.plugin.drawTools.mpe.ui = {};
-
-window.plugin.drawTools.mpe.boot = function(){
-  window.plugin.drawTools.mpe.initMPE();
-};
-
-
-window.plugin.drawTools.mpe.initMPE = function(){
+window.plugin.drawTools.initMPE = function(){
   // Not launch the code if the MPE plugin there isn't.
   if(!window.plugin.mpe){ return; }
 
@@ -738,9 +730,9 @@ window.plugin.drawTools.mpe.initMPE = function(){
 }
 
 function setup () {
-  loadExternals();                              // initialize leaflet
-  window.plugin.drawTools.boot();               // initialize drawtools
-  window.plugin.drawTools.mpe.boot();           // register to MPE if available
+  loadExternals();
+  window.plugin.drawTools.boot();
+  window.plugin.drawTools.initMPE();
 }
 
 function loadExternals () {
