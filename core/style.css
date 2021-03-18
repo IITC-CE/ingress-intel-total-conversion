@@ -11,6 +11,20 @@
   --highlight-text-color: #ffce00;
   --highlight-border-color: #ffce00;
   --arrow-toggle-color: #ffce00;
+
+  --faction-none-color: #ff6600;
+  --faction-res-color: #0088ff;
+  --faction-enl-color: #03dc03;
+
+  --level-0-color: #000;
+  --level-1-color: #fece5a;
+  --level-2-color: #ffa630;
+  --level-3-color: #ff7315;
+  --level-4-color: #e40000;
+  --level-5-color: #fd2992;
+  --level-6-color: #eb26cd;
+  --level-7-color: #c124e0;
+  --level-8-color: #9627f4;
 }
 
 /* for printing directly from the browser, hide all UI components
