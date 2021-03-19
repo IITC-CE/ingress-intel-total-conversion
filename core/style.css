@@ -215,16 +215,6 @@ a:hover {
   width: 0;
 }
 
-/* field mu count */
-.fieldmu {
-  color: var(--highlight-text-color);
-  font-size: 13px;
-  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; /*override leaflet-container */
-  text-align: center;
-  text-shadow: 0 0 0.2em black, 0 0 0.2em black, 0 0 0.2em black;
-  pointer-events: none;
-}
-
 
 /* chat ***************************************************************/
 
