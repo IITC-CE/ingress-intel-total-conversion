@@ -28,6 +28,15 @@
   --level-6-color: #eb26cd;
   --level-7-color: #c124e0;
   --level-8-color: #9627f4;
+
+  --rarity-common-color: #8cffbf;
+  --rarity-rare-color: #73a8ff;
+  --rarity-very-rare: #b08cff;
+
+  --ui-text-on-color: #03fe03;
+  --ui-text-off-color: #ff4a4a;
+
+  --ui-content-color: #eee;
 }
 
 /* for printing directly from the browser, hide all UI components
@@ -129,11 +138,11 @@ i.large { font-size: 6rem; }
 }
 
 .enl {
-  color: #03fe03 !important;
+  color: var(--faction-enl-color) !important;
 }
 
 .res {
-  color: #00c5ff !important;
+  color: var(--faction-res-color) !important;
 }
 
 .none {
@@ -300,7 +309,7 @@ a:hover {
   z-index: 3000;
   background: var(--ui-background-color);
   line-height: 15px;
-  color: #eee;
+  color: var(--ui-content-color);
   border: 1px solid var(--ui-border-color);
   border-bottom: 0;
   -webkit-box-sizing: border-box;
@@ -418,7 +427,7 @@ summary {
 
 #chatinput input {
   background: transparent;
-  color: #EEEEEE;
+  color: var(--ui-content-color);
   width: 100%;
   height: 100%;
   padding:3px 4px 1px 4px;
@@ -873,11 +882,11 @@ h3.title {
 }
 
 #historydetails span {
-  color: #ff4a4a;
+  color: var(--ui-text-off-color);
 }
 
 #historydetails span.completed {
-  color: #03fe03;
+  color: var(--ui-text-on-color);
 }
 
 /* update status */
@@ -920,7 +929,7 @@ h3.title {
   z-index: 9500;
   background-color: var(--ui-background-color);
   border: 1px solid var(--ui-border-color);
-  color: #eee;
+  color: var(--ui-content-color);
   font-size: 13px;
   line-height: 15px;
   padding: 2px 4px;
@@ -1166,11 +1175,11 @@ td + td {
 }
 
 .RESISTANCE {
-  color: #00c2ff;
+  color: var(--faction-res-color);
 }
 
 .ALIENS, .ENLIGHTENED {
-  color: #28f428;
+  color: var(--faction-enl-color);
 }
 
 #portal_highlight_select {
@@ -1179,9 +1188,8 @@ td + td {
   left:10px;
   z-index: 2500;
   font-size:11px;
-  background-color:#0E3C46;
-  color:var(--highlight-text-color);
-
+  background-color: inherit;
+  color: var(--highlight-text-color);
 }
 
 
