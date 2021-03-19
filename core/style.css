@@ -117,9 +117,7 @@ i.large { font-size: 6rem; }
 }
 
 #sidebar {
-  background-color: var(--ui-background-color);
-  border-left: 1px solid var(--ui-border-color);
-  color: var(--ui-content-color);
+  border-left: 1px solid;
   position: relative;
   left: 0;
   top: 0;
@@ -137,9 +135,7 @@ i.large { font-size: 6rem; }
   position: absolute;
   top: 108px;
   z-index: 3002;
-  background-color: var(--ui-background-color);
-  color: var(--highlight-text-color);
-  border: 1px solid var(--ui-border-color);
+  border: 1px solid;
   border-right: none;
   border-radius: 5px 0 0 5px;
   text-decoration: none;
@@ -163,7 +159,6 @@ i.large { font-size: 6rem; }
 }
 
 a {
-  color: var(--highlight-text-color);
   cursor: pointer;
   text-decoration: none;
 }
@@ -219,8 +214,6 @@ a:hover {
 /* chat ***************************************************************/
 
 #chatcontrols {
-  color: var(--highlight-text-color);
-  background: var(--ui-background-color);
   position: absolute;
   left: 0;
   z-index: 3000;
@@ -240,7 +233,7 @@ a:hover {
   text-align: center;
   height: 24px;
   line-height: 24px;
-  border: 1px solid var(--ui-border-color);
+  border: 1px solid;
   vertical-align: top;
 }
 
@@ -306,10 +299,8 @@ a:hover {
   bottom: 23px;
   left: 0;
   z-index: 3000;
-  background: var(--ui-background-color);
   line-height: 15px;
-  color: var(--ui-content-color);
-  border: 1px solid var(--ui-border-color);
+  border: 1px solid;
   border-bottom: 0;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -408,10 +399,9 @@ summary {
   bottom: 0;
   left: 0;
   padding: 0 2px;
-  background: var(--ui-background-color);
   width: 708px;
   height: 23px;
-  border: 1px solid var(--ui-border-color);
+  border: 1px solid;
   z-index: 3001;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -426,7 +416,6 @@ summary {
 
 #chatinput input {
   background: transparent;
-  color: var(--ui-content-color);
   width: 100%;
   height: 100%;
   padding:3px 4px 1px 4px;
@@ -437,13 +426,11 @@ summary {
 /* sidebar ************************************************************/
 
 #sidebar > * {
-  border-bottom: 1px solid var(--ui-border-color);
+  border-bottom: 1px solid;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-
-
 
 #sidebartoggle .toggle {
   border-bottom: 10px solid transparent;
@@ -464,7 +451,6 @@ summary {
 }
 
 h2 {
-  color: var(--highlight-text-color);
   font-size: 21px;
   padding: 0 4px;
   margin: 0;
@@ -543,7 +529,6 @@ input[type="text"], input[type="password"],
 input[type="number"], input[type="email"],
 input[type="search"], input[type="url"] {
   background-color: var(--input-background-color);
-  color: var(--highlight-text-color);
   height: 24px;
   padding:0px 4px 0px 4px;
   font-size: 12px;
@@ -867,14 +852,12 @@ h3.title {
   top: -2px;
   right: 2px;
   cursor: pointer;
-  color: var(--highlight-text-color);
   font-size: 16px;
 }
 
 /* history details */
 #historydetails {
   text-align: center;
-  color: var(--highlight-text-color);
 }
 
 #historydetails .missing {
@@ -890,12 +873,10 @@ h3.title {
 
 /* update status */
 #updatestatus {
-  background-color: var(--ui-background-color);
   border-bottom: 0;
-  border-top: 1px solid var(--ui-border-color);
-  border-left: 1px solid var(--ui-border-color);
+  border-top: 1px solid;
+  border-left: 1px solid;
   bottom: 0;
-  color: var(--highlight-text-color);
   font-size:13px;
   padding: 4px;
   position: fixed;
@@ -915,7 +896,7 @@ h3.title {
   color: #000000;
   display: inline-block;
   min-width: 1.8em;
-  border: 1px solid var(--ui-border-color);
+  border: 1px solid;
   border-width: 0 1px;
   margin: -4px 0;
   padding: 4px 0.2em;
@@ -926,9 +907,7 @@ h3.title {
 .ui-tooltip, .ui-dialog {
   position: absolute;
   z-index: 9500;
-  background-color: var(--ui-background-color);
-  border: 1px solid var(--ui-border-color);
-  color: var(--ui-content-color);
+  border: 1px solid;
   font-size: 13px;
   line-height: 15px;
   padding: 2px 4px;
@@ -955,10 +934,6 @@ h3.title {
 
 .ui-tooltip {
   z-index: 10002 !important;
-}
-
-.ui-tooltip, .ui-dialog a {
-  color: var(--highlight-text-color);
 }
 
 .ui-dialog {
@@ -1002,7 +977,7 @@ h3.title {
   height: 17px;
   top: 3px;
   cursor: pointer;
-  border: 1px solid var(--ui-border-color);
+  border: 1px solid;
   background-color: rgba(0, 0, 0, 0);
   padding: 0;
 }
@@ -1037,7 +1012,7 @@ h3.title {
   width: 11px;
   margin-left: -6px;
   height: 0;
-  border-top: 2px solid var(--ui-border-color);
+  border-top: 2px;
 }
 .ui-dialog-titlebar-button-close::after {
   transform: translateY(3.5px) rotate(45deg);
@@ -1084,7 +1059,7 @@ h3.title {
 
 .ui-dialog-buttonpane {
   padding: 6px;
-  border-top: 1px solid var(--ui-border-color);
+  border-top: 1px solid;
 }
 
 .ui-dialog-buttonset {
@@ -1095,9 +1070,7 @@ h3.title {
 .ui-dialog-content button {
   padding: 2px;
   min-width: 40px;
-  color: var(--highlight-text-color);
   border: 1px solid var(--highlight-border-color);
-  background-color: var(--ui-background-color);
 }
 
 .ui-dialog-buttonset button:hover {
@@ -1188,7 +1161,6 @@ td + td {
   z-index: 2500;
   font-size:11px;
   background-color: inherit;
-  color: var(--highlight-text-color);
 }
 
 
@@ -1213,10 +1185,6 @@ td + td {
 
 
 /** artifact dialog *****************/
-table.artifact tr > * {
-  background: var(--ui-background-color);
-}
-
 table.artifact td.info {
   min-width: 110px; /* min-width for info column, to ensure really long portal names don't crowd things out */
 }
@@ -1234,13 +1202,12 @@ table.artifact .portal {
 #map .leaflet-popup-content-wrapper {
   border-radius: 0px;
   -webkit-border-radius: 0px;
-  border: 1px solid var(--ui-border-color);
+  border: 1px solid;
   background: var(--html-background-color);
   pointer-events: auto;
 }
 
 #map .leaflet-popup-content {
-  color: var(--highlight-text-color);
   margin: 5px 8px;
 }
 
@@ -1271,19 +1238,17 @@ table.artifact .portal {
 
 /* misc */
 .layer_off_warning {
-  color: var(--highlight-text-color);
   margin: 8px;
   text-align: center;
 }
 
 /* region scores */
 .cellscore .ui-accordion-header, .cellscore .ui-accordion-content {
-	border: 1px solid var(--ui-border-color);
+	border: 1px solid;
 	margin-top: -1px;
 	display: block;
 }
 .cellscore .ui-accordion-header {
-	color: var(--highlight-text-color);
 	outline: none
 }
 .cellscore .ui-accordion-header:before {
@@ -1365,7 +1330,7 @@ g.checkpoint:hover circle {
 /* tabs */
 .ui-tabs-nav {
 	display: block;
-	border-bottom: 1px solid var(--ui-border-color);
+	border-bottom: 1px solid;
 	border-top: 1px solid transparent;
 	margin: 3px 0 0;
 	padding: 0;
@@ -1382,7 +1347,7 @@ g.checkpoint:hover circle {
 	display: block;
 	float:left;
 	margin: 0 0 -1px;
-	border: 1px solid var(--ui-border-color);
+	border: 1px solid;
 }
 .ui-tabs-nav li.ui-tabs-active {
 	border-bottom-color: #0F2C3F;
@@ -1423,4 +1388,66 @@ svg.icon-button {
 .leaflet-marker-icon > svg {
 	height: inherit;
 	width: inherit;
+}
+
+/* border ui */
+.ui-tooltip, .ui-dialog,
+.ui-dialog-titlebar-button,
+.ui-dialog-titlebar-button-collapse::after,
+.ui-dialog-titlebar-button-close::after,
+.ui-dialog-titlebar-button-close::before,
+.ui-dialog-buttonpane,
+.ui-tabs-nav, .ui-tabs-nav li,
+#map .leaflet-popup-content-wrapper,
+.cellscore .ui-accordion-header, .cellscore .ui-accordion-content,
+#sidebar, #sidebar > *,
+#sidebartoggle,
+#updatestatus,
+#loadlevel,
+#chat,
+#chatinput,
+#chatcontrols a {
+  border-color: var(--ui-border-color);
+}
+
+/* highilight */
+a, h2, input:not([type]), .input,
+input[type="text"], input[type="password"],
+input[type="number"], input[type="email"],
+input[type="search"], input[type="url"],
+#chatcontrols,
+#sidebartoggle,
+#portaldetails .close,
+#historydetails,
+#updatestatus,
+#portal_highlight_select,
+.ui-tooltip, .ui-dialog a,
+.ui-dialog-buttonset button,
+.ui-dialog-content button,
+#map .leaflet-popup-content,
+.layer_off_warning,
+.cellscore .ui-accordion-header {
+  color: var(--highlight-text-color);
+}
+
+/* ui background */
+#sidebar,
+#sidebartoggle,
+#chatcontrols,
+#chat,
+#chatinput,
+#updatestatus,
+.ui-tooltip, .ui-dialog,
+.ui-dialog-buttonset button,
+.ui-dialog-content button,
+table.artifact tr > * {
+  background-color: var(--ui-background-color);
+}
+
+/* ui content color */
+#sidebar,
+#chat,
+#chatinput input,
+.ui-tooltip, .ui-dialog {
+  color: var(--ui-content-color);
 }
