@@ -110,7 +110,7 @@ i.large { font-size: 6rem; }
 #sidebar {
   background-color: var(--ui-background-color);
   border-left: 1px solid var(--ui-border-color);
-  color: #888;
+  color: var(--ui-content-color);
   position: relative;
   left: 0;
   top: 0;
@@ -529,12 +529,12 @@ h2 sup, h2 sub {
 }
 
 #gamestat .res {
-  background: #005684;
+  background: linear-gradient(#0007,#0007) var(--faction-res-color);
   text-align: right;
 }
 
 #gamestat .enl {
-  background: #017f01;
+  background: linear-gradient(#0007,#0007) var(--faction-enl-color);
 }
 
 
