@@ -41,6 +41,10 @@
   --ui-text-off-color: #ff4a4a;
 
   --ui-content-color: #eee;
+
+  --input-background-color: rgba(0, 0, 0, 0.3);
+
+  --placeholder-background-color: rgba(0, 0, 0, 0.3);
 }
 
 /* for printing directly from the browser, hide all UI components
@@ -547,7 +551,7 @@ input:not([type]), .input,
 input[type="text"], input[type="password"],
 input[type="number"], input[type="email"],
 input[type="search"], input[type="url"] {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--input-background-color);
   color: var(--highlight-text-color);
   height: 24px;
   padding:0px 4px 0px 4px;
@@ -689,7 +693,7 @@ h3.title {
 }
 
 .mods span {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--placeholder-background-color);
   /* can’t use inline-block because Webkit's implementation is buggy and
    * introduces additional margins in random cases. No clear necessary,
    * as that’s solved by setting height on .mods. */
@@ -788,7 +792,7 @@ h3.title {
 }
 
 .meter {
-  background: #000;
+  background: var(--placeholder-background-color);
   cursor: help;
   display: inline-block;
   height: 18px;
