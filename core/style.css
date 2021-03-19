@@ -41,6 +41,7 @@
   --ui-text-off-color: #ff4a4a;
 
   --ui-content-color: #eee;
+  --ui-content-secondary-color: #bbb;
 
   --input-background-color: rgba(0, 0, 0, 0.3);
 
@@ -369,7 +370,7 @@ em {
   width: 44px;
   overflow: hidden;
   padding-left: 2px;
-  color: #bbb;
+  color: var(--ui-content-secondary-color);
   white-space: nowrap;
 }
 
@@ -403,7 +404,7 @@ mark {
 
 /* divider */
 summary {
-  color: #bbb;
+  color: var(--ui-content-secondary-color);
   display: inline-block;
   height: 16px;
   overflow: hidden;
@@ -626,7 +627,7 @@ input[type="search"], input[type="url"] {
   text-decoration: underline;
 }
 #searchwrapper li em {
-  color: #ccc;
+  color: var(--ui-content-secondary-color);
   font-size: 0.9em;
 }
 
