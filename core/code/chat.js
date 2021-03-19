@@ -333,8 +333,11 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
       guid: newData.result[newData.result.length-1][0],
       time: newData.result[newData.result.length-1][1]
     };
-    if (isAscendingOrder)
-      [first, last] = [last, first];
+    if (isAscendingOrder) {
+      var temp = first;
+      first = last;
+      last = temp;
+    }
     if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp >= last.time) {
       if (isOlderMsgs || storageHash.oldestTimestamp != last.time) {
         storageHash.oldestTimestamp = last.time;
