@@ -15,6 +15,10 @@
   --highlight-border-color: #ffce00;
   --arrow-toggle-color: #ffce00;
 
+  --faction-none-light-color: #ffffff;
+  --faction-res-light-color: #00c5ff;
+  --faction-enl-light-color: #03fe03;
+
   --faction-none-color: #ff6600;
   --faction-res-color: #0088ff;
   --faction-enl-color: #03dc03;
@@ -138,11 +142,11 @@ i.large { font-size: 6rem; }
 }
 
 .enl {
-  color: var(--faction-enl-color) !important;
+  color: var(--faction-enl-light-color) !important;
 }
 
 .res {
-  color: var(--faction-res-color) !important;
+  color: var(--faction-res-light-color) !important;
 }
 
 .none {
@@ -706,10 +710,10 @@ h3.title {
 }
 
 .res .mods span, .res .meter {
-  border: 1px solid #0076b6;
+  border: 1px solid var(--faction-res-color);
 }
 .enl .mods span, .enl .meter {
-  border: 1px solid #017f01;
+  border: 1px solid var(--faction-enl-color);
 }
 
 /* random details, resonator details */
@@ -1175,11 +1179,11 @@ td + td {
 }
 
 .RESISTANCE {
-  color: var(--faction-res-color);
+  color: var(--faction-res-light-color);
 }
 
 .ALIENS, .ENLIGHTENED {
-  color: var(--faction-enl-color);
+  color: var(--faction-enl-light-color);
 }
 
 #portal_highlight_select {
