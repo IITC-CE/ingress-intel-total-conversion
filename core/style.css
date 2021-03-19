@@ -8,6 +8,9 @@
   --ui-background-color-no-alpha: rgb(8, 48, 78);
   --ui-title-background-color: rgba(8, 60, 78, 0.9);
   --ui-title-button-background-color: #20a8b1;
+  --ui-title-color: #ffce00;
+  --ui-title-inactive-color: #ffffff;
+
   --highlight-text-color: #ffce00;
   --highlight-border-color: #ffce00;
   --arrow-toggle-color: #ffce00;
@@ -975,11 +978,11 @@ h3.title {
 }
 
 .ui-dialog-title-active {
-  color: var(--highlight-text-color);
+  color: var(--ui-title-color);
 }
 
 .ui-dialog-title-inactive {
-  color: #ffffff;
+  color: var(--ui-title-inactive-color);
 }
 
 .ui-dialog-titlebar-button {
