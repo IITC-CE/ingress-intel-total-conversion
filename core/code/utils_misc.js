@@ -330,6 +330,14 @@ if (typeof String.prototype.startsWith !== 'function') {
   };
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc#polyfill
+// (required for KitKat support)
+if (!Math.trunc) {
+  Math.trunc = function (v) {
+    return v < 0 ? Math.ceil(v) : Math.floor(v);
+  };
+}
+
 // escape a javascript string, so quotes and backslashes are escaped with a backslash
 // (for strings passed as parameters to html onclick="..." for example)
 window.escapeJavascriptString = function(str) {
@@ -483,7 +491,7 @@ window.makePermalink = function (latlng, options) {
   options = options || {};
 
   function round (l) { // ensures that lat,lng are with same precision as in stock intel permalinks
-    return Math.trunc(l*1e6)/1e6;
+    return Math.floor(l*1e6)/1e6;
   }
   var args = [];
   if (!latlng || options.includeMapView) {
