@@ -180,15 +180,6 @@ portalsHistory.toggleHistory = function(keepUIbutton) {
 
 // -----------------------------------------------------------------------------------------
 var setup = function () {
-  inherit('common', ['marked', 'semiMarked']);
-  inherit('semiMarked', ['visited', 'captureTarget']);
-  inherit('marked', ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget']);
-  inherit('commonOther', ['otherVC', 'otherNotVC', 'otherScout', 'otherNotScout']);
-
-  window.addPortalHighlighter('History: visited/captured', portalsHistory.visited);
-  window.addPortalHighlighter('History: not visited/captured', portalsHistory.notVisited);
-  window.addPortalHighlighter('History: scout controlled', portalsHistory.scoutControlled);
-  window.addPortalHighlighter('History: not scout controlled', portalsHistory.notScoutControlled);
 
   portalsHistory.setupLayers();
 
