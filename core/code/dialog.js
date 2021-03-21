@@ -137,6 +137,9 @@ window.dialog = function(options) {
         collapse.click($.proxy(function() {
           var collapsed = ($(this).data('collapsed') === true);
 
+          // Toggle collapsed state
+          $(this).data('collapsed', !collapsed);
+
           // Run callbacks if we have them
           if($(this).data('collapseExpandCallback')) {
             $.proxy($(this).data('collapseExpandCallback'), this)(!collapsed);
@@ -150,12 +153,21 @@ window.dialog = function(options) {
 
           // Find the button pane and content dialog in this ui-dialog, and add or remove the 'hidden' class.
           var dialog   = $(this).closest('.ui-dialog');
-          var selector = dialog.find('.ui-dialog-content,.ui-dialog-buttonpane');
+          var content = dialog.find('.ui-dialog-content');
+          var buttonpane = dialog.find('.ui-dialog-buttonpane');
           var button   = dialog.find('.ui-dialog-titlebar-button-collapse');
 
           // Slide toggle
           $(this).css('height', '');
-          $(selector).slideToggle({duration: window.DIALOG_SLIDE_DURATION, complete: sizeFix});
+          $(content).slideToggle({
+            duration: window.DIALOG_SLIDE_DURATION,
+            complete: function () {
+              $(buttonpane).slideToggle({
+                duration: window.DIALOG_SLIDE_DURATION,
+                complete: sizeFix
+              });
+            }
+          });
 
           if(collapsed) {
             $(button).removeClass('ui-dialog-titlebar-button-collapse-collapsed');
@@ -164,9 +176,6 @@ window.dialog = function(options) {
             $(button).removeClass('ui-dialog-titlebar-button-collapse-expanded');
             $(button).addClass('ui-dialog-titlebar-button-collapse-collapsed');
           }
-
-          // Toggle collapsed state
-          $(this).data('collapsed', !collapsed);
         }, this));
 
         // Put it into the titlebar
