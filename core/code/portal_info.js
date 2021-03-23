@@ -292,21 +292,21 @@ window.getPortalHackDetails = function(d) {
   // first mod of type is fully effective, the others are only 50% effective
   var effectivenessReduction = [ 1, 0.5, 0.5, 0.5 ];
 
-  var cooldownTime = COOLDOWN_TIME;
+  var cooldownTime = BASE_HACK_COOLDOWN;
 
   $.each(heatsinks, function(index,mod) {
     var hackSpeed = parseInt(mod.stats.HACK_SPEED)/1000000;
     cooldownTime = Math.round(cooldownTime * (1 - hackSpeed * effectivenessReduction[index]));
   });
 
-  var numHacks = HACK_COUNT; // default hacks
+  var hackCount = BASE_HACK_COUNT; // default hacks
 
   $.each(multihacks, function(index,mod) {
     var extraHacks = parseInt(mod.stats.BURNOUT_INSULATION);
-    numHacks = numHacks + (extraHacks * effectivenessReduction[index]);
+    hackCount = hackCount + (extraHacks * effectivenessReduction[index]);
   });
 
-  return {cooldown: cooldownTime, hacks: numHacks, burnout: cooldownTime*(numHacks-1)};
+  return {cooldown: cooldownTime, hacks: hackCount, burnout: cooldownTime*(hackCount-1)};
 }
 
 // given a detailed portal structure, return summary portal data, as seen in the map tile data
