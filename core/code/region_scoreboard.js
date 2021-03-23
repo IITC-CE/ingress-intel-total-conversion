@@ -12,6 +12,8 @@ window.RegionScoreboard = (function() {
 
     this.median=[-1,-1,-1];
     this.MAX_CYCLES = 35;
+    this.CP_TIME = 5*60*60*1000;
+    this.CYCLE_TIME = this.CP_TIME * this.MAX_CYCLES;
 
     this.checkpoints = [];
 
@@ -122,9 +124,7 @@ window.RegionScoreboard = (function() {
     };
 
     this.getCheckpointEnd = function(cp) {
-      var end = new Date(this.cycleStartTime.getTime());
-      end.setHours(end.getHours() + cp*5);
-      return end;
+      return new Date(this.cycleStartTime.getTime() + this.CP_TIME * cp);
     };
 
     for (var i=0; i<serverResult.scoreHistory.length; i++) {
@@ -132,9 +132,7 @@ window.RegionScoreboard = (function() {
       this.checkpoints[parseInt(h[0])] = [parseInt(h[1]), parseInt(h[2])];
     }
 
-    var now = new Date().getTime();
-    var CYCLE_TIME = 7*25*60*60*1000; //7 25 hour 'days' per cycle
-    this.cycleStartTime = new Date(Math.floor(now / CYCLE_TIME) * (CYCLE_TIME));
+    this.cycleStartTime = new Date(Math.floor(Date.now() / this.CYCLE_TIME) * this.CYCLE_TIME);
   }
 
 
