@@ -298,44 +298,36 @@ window.plugin.missions = {
 		$(openDialog).dialog({title: caption});
 
 		// When showing list for one portal, show button to switch back to general list, otherwise hide it
-		if(isPortalList)
-		{
+		if (isPortalList) {
 			$(plugin.missions.fromPortalListToNormalListButton).show();
-		}
-		else
-		{
+		} else {
 			$(plugin.missions.fromPortalListToNormalListButton).hide();
 		}
 
 		this.resizeMissionList();
 	},
 
-	onCollapseMissionList: function()
-	{
+	onCollapseMissionList: function() {
 		plugin.missions.isMissionListCollapsed = true;
 		plugin.missions.collapseFix();
 	},
 
-	onExpandMissionList: function()
-	{
+	onExpandMissionList: function() {
 		plugin.missions.isMissionListCollapsed = false;
 		plugin.missions.collapseFix();
 
 		// When showing missions in View and not portal mission list, refresh list now
-		if(!plugin.missions.isShowingPortalList)
-		{
+		if (!plugin.missions.isShowingPortalList) {
 			plugin.missions.openTopMissions();
 		}
 	},
 
-	resizeMissionList: function()
-	{
+	resizeMissionList: function() {
 		if(!plugin.missions.isMissionListCollapsed)
 		{
 			let openDialog = window.DIALOGS['dialog-missionsList'];
 
-			if(openDialog)
-			{
+			if (openDialog) {
 				// Make dialog choose height automatically based on content first
 				// A few lines down we will restrict height to fit the screen
 				$(openDialog).dialog({height: 'auto'});
@@ -1175,7 +1167,7 @@ window.plugin.missions = {
 
       var button = this.mobilePane.appendChild(document.createElement('button'));
       button.textContent = 'Missions in view';
-      button.addEventListener('click', function () { this.openTopMissions(); }.bind(this), false);
+      button.addEventListener('click', function() { this.openTopMissions(); }.bind(this), false);
 
       this.tabs = this.mobilePane.appendChild(document.createElement('div'));
       this.tabBar = this.tabs.appendChild(document.createElement('ul'));
@@ -1208,7 +1200,7 @@ window.plugin.missions = {
 
     window.addHook('search', this.onSearch.bind(this));
 
-		window.map.on('moveend', this.onMoveEnd.bind(this));
+		window.map.on('moveend', this.onMoveEnd, this);
 
 		var me = this;
 		window.addHook('portalAdded', function (data) {
