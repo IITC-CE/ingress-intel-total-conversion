@@ -11,13 +11,9 @@ window.plugin.portalHistoryOrnaments = portalsHistory;
 
 // Exposed functions
 
-portalsHistory.makeButton           = makeButton;
-portalsHistory.toggleHistory        = toggleHistory;
-portalsHistory.removePortalFromMap  = removePortalFromMap;
-portalsHistory.addToPortalMap       = addToPortalMap;
-portalsHistory.toggleDisplayMode    = toggleDisplayMode;
-portalsHistory.createIcons          = createIcons;
-portalsHistory.drawAllFlags         = drawAllFlags;
+portalsHistory.toggleHistory        = toggleHistory;        // Button
+portalsHistory.toggleDisplayMode    = toggleDisplayMode;    // dialog
+portalsHistory.drawAllFlags         = drawAllFlags;         // hooked to 'mapDataRefreshEnd'
 
 
 var KEY_SETTINGS = "plugin-portal-history-flags";
@@ -62,8 +58,6 @@ function toggleHistory(keepUIbutton) {
   }
 };
 
-// -----------------------------------------------------------------------------------------
-// New Style Ornaments (by @Eisfrei)
 function svgToIcon (str, s) {
   var url = ("data:image/svg+xml," + encodeURIComponent(str)).replace(/#/g, '%23');
   return new L.Icon({
@@ -72,22 +66,6 @@ function svgToIcon (str, s) {
     iconAnchor: [s / 2, s / 2],
     className: 'no-pointer-events', //allows users to click on portal under the unique marker
   })
-}
-
-function removePortalFromMap (data) {
-  if (!data.portal._historyLayer) {
-    return;
-  }
-  portalsHistory.layerGroup.removeLayer(data.portal._historyLayer);
-}
-
-function addToPortalMap (data) {
-  var tileParams = window.getCurrentZoomTileParameters ? window.getCurrentZoomTileParameters() : window.getMapZoomTileParameters();
-  if (tileParams.level === 0) {
-    drawPortalFlags(data.portal);
-  } else {
-    portalsHistory.removePortalFromMap(data);
-  }
 }
 
 function loadSettings() {
@@ -198,7 +176,7 @@ function drawPortalFlags (portal) {
 
 function drawAllFlags () {
   portalsHistory.layerGroup.clearLayers();
-  portalsHistory.createIcons();
+  createIcons();
   //IITC.me support: getCurrentZoomTileParameters is iitc.app only; iitc.me function is: getMapZoomTileParameters
   var tileParams = window.getCurrentZoomTileParameters ? window.getCurrentZoomTileParameters() : window.getMapZoomTileParameters();
   if (tileParams.level !== 0) {
@@ -222,7 +200,6 @@ function getSVGString (size, color, parts, offset) {
 }
 // -----------------------------------------------------------------------------------------
 var setup = function () {
-  loadSettings();
 
   var checkedCircle = '<svg class="tracker-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"/></svg>';
   var emptyCircle =  '<svg class="tracker-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"/></svg>';
@@ -244,16 +221,16 @@ var setup = function () {
 
   $('head').append(style);
 
-  makeButton ();
-  // New Style Ornaments (by @EisFrei)
-
+// Initialization
+  loadSettings();
   portalsHistory.layerGroup = new L.LayerGroup();
   window.addLayerGroup('Portal History', portalsHistory.layerGroup, false);
 
-//  window.addHook('portalAdded', portalsHistory.addToPortalMap);
-//  window.addHook('portalRemoved', portalsHistory.removePortalFromMap);
+// Hooks
   window.addHook('mapDataRefreshEnd', portalsHistory.drawAllFlags);
-//  window.map.on('zoom', portalsHistory.drawAllFlags);
+  
+// UI additions
+  makeButton ();
   $('#toolbox').append('<a onclick="window.plugin.portalHistoryOrnaments.toggleDisplayMode()">Portal History</a>');
 
 }
