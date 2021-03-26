@@ -24,10 +24,22 @@ var KEY_SETTINGS = "plugin-portal-history-flags";
 
 function makeButton () {
   var isClass = portalsHistory.settings.drawMissing?'revHistory':'normHistory';
-  $('.leaflet-top.leaflet-left')
+  
+  $('.leaflet-top.leaflet-left').append(
+    $('<div>', { id: "toggleHistoryButton", class: "leaflet-control leaflet-bar" }).append(
+      $("<a>", {
+        id: "toggleHistory",
+        title: "History toggle",
+        class: isClass,
+        click: function () { toggleHistory(true); return false; }
+      })
+    )
+  )
+/*  $('.leaflet-top.leaflet-left')
     .append('<div class="leaflet-control leaflet-bar" id="toggleHistoryButton"> '
       +'<a onclick="window.plugin.portalHistoryOrnaments.toggleHistory(true); return false;" '
       +'id="toggleHistory" class="'+isClass+'" title="History toggle"></a></div>');
+*/
 };
 
 function toggleHistory(keepUIbutton) {
@@ -211,7 +223,14 @@ var setup = function () {
 
 // Initialization
   loadSettings();
-  portalsHistory.layerGroup = new L.LayerGroup();
+  portalsHistory.layerGroup = new L.LayerGroup()
+    .on('add', function () {
+       $('#toggleHistoryButton').show();
+    })
+    .on('remove', function () {
+      $('#toggleHistoryButton').hide();
+    });
+
   window.addLayerGroup('Portal History', portalsHistory.layerGroup, false);
 
 // Hooks
