@@ -33,26 +33,14 @@ function makeButton () {
 function toggleHistory(keepUIbutton) {
   var button = $('#toggleHistory');
 
-  var buttonPos = $('#toggleHistoryButton').position();
-  var top = buttonPos.top;
-  var left = buttonPos.left;
-  var fixedStyle = {
-    position: 'fixed',
-    top: top,
-    left: left
-  };
-
-  $('#toggleHistoryButton').css(fixedStyle);
   portalsHistory.settings.drawMissing = !portalsHistory.settings.drawMissing
   localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
-  portalsHistory.drawAllFlags();
+  drawAllFlags();
 
   if (button.hasClass('normHistory')) {
-    $('#toggleHistoryButton').css({'position':'fixed'});
     button.removeClass('normHistory');
     button.addClass('revHistory');
   } else {
-    $('#toggleHistoryButton').css({'position':'static'});
     button.addClass('normHistory');
     button.removeClass('revHistory');
   }
