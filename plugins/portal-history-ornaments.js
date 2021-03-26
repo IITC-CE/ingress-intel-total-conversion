@@ -9,11 +9,18 @@
 var portalsHistory = {};
 window.plugin.portalHistoryOrnaments = portalsHistory;
 
-var KEY_SETTINGS = "plugin-portal-history-flags";
-// History Ornaments
-portalsHistory.layers = {};
+// Exposed functions
+/*
+portalsHistory.makeButton
 
-portalsHistory.createStatusMarker = function(latlng, data, statusColor, scaleRadius) {
+*/
+
+var KEY_SETTINGS = "plugin-portal-history-flags";
+
+// History Ornaments
+// portalsHistory.layers = {};
+
+/* portalsHistory.createStatusMarker = function(latlng, data, statusColor, scaleRadius) {
   var styleOptions = window.getMarkerStyleOptions(data.data);
 
   styleOptions.fill = false;
@@ -26,8 +33,8 @@ portalsHistory.createStatusMarker = function(latlng, data, statusColor, scaleRad
 
   return marker;
 };
-
-portalsHistory.onPortalAdded = function(data) {
+*/
+/* portalsHistory.onPortalAdded = function(data) {
   // data = {portal: marker, previousData: previousData}
   var portaloptionsdata = data.portal.options.data;
   if (!portaloptionsdata.history) return; // skip portal placeholders without titles
@@ -96,7 +103,7 @@ portalsHistory.onPortalAdded = function(data) {
     portalsHistory.layers.revScoutControlled.addLayer(marker);
   }
 };
-
+*/
 /* WIP 
 portalsHistory.onportalRemoved = function(data) {
   // data = {portal: p, data: p.options.data }
@@ -108,7 +115,7 @@ portalsHistory.onportalRemoved = function(data) {
 };
 */
 
-portalsHistory.setupLayers = function() {
+/* portalsHistory.setupLayers = function() {
   portalsHistory.layers.normVisited = new L.LayerGroup();
   portalsHistory.layers.revVisited = new L.LayerGroup();
   portalsHistory.layers.normScoutControlled = new L.LayerGroup();
@@ -123,15 +130,16 @@ portalsHistory.setupLayers = function() {
   window.addHook('portalAdded', portalsHistory.onPortalAdded);
 //  window.addHook('portalRemoved', portalsHistory.onportalRemoved);
 };
-
+*/
 //------------------------------------------------------------------------------------------
 // Toggle Switch
 
 portalsHistory.makeButton = function() {
+  var isClass = portalsHistory.settings.drawMissing?'normHistory':'revHistory';
   $('.leaflet-top.leaflet-left')
     .append('<div class="leaflet-control leaflet-bar" id="toggleHistoryButton"> '
       +'<a onclick="window.plugin.portalHistoryOrnaments.toggleHistory(true); return false;" '
-      +'id="toggleHistory" class="normHistory" title="History toggle"></a></div>');
+      +'id="toggleHistory" class="'+isClass+'" title="History toggle"></a></div>');
 };
 
 portalsHistory.toggleHistory = function(keepUIbutton) {
@@ -147,13 +155,14 @@ portalsHistory.toggleHistory = function(keepUIbutton) {
   };
 
   $('#toggleHistoryButton').css(fixedStyle);
-
+/* 
   // are the layers active?
   var visitedLayerActive = window.map.hasLayer (portalsHistory.layers.visited);
   var scoutControlledLayerActive = window.map.hasLayer(portalsHistory.layers.scoutControlled);
   // remove layers
   window.removeLayerGroup(portalsHistory.layers.visited);
   window.removeLayerGroup(portalsHistory.layers.scoutControlled);
+*/
   portalsHistory.settings.drawMissing = !portalsHistory.settings.drawMissing
 //  createIcons();
   portalsHistory.drawAllFlags();
@@ -162,24 +171,27 @@ portalsHistory.toggleHistory = function(keepUIbutton) {
     $('#toggleHistoryButton').css({'position':'fixed'});
     button.removeClass('normHistory');
     button.addClass('revHistory');
-    //switch layers
+/*    //switch layers
     portalsHistory.layers.visited =
       portalsHistory.layers.revVisited;
     portalsHistory.layers.scoutControlled =
       portalsHistory.layers.revScoutControlled;
+*/
   } else {
     $('#toggleHistoryButton').css({'position':'static'});
     button.addClass('normHistory');
     button.removeClass('revHistory');
-    //switch layers
+/*    //switch layers
     portalsHistory.layers.visited =
       portalsHistory.layers.normVisited;
     portalsHistory.layers.scoutControlled =
       portalsHistory.layers.normScoutControlled;
+*/
   }
-  // reactivate previous active layers
+/*  // reactivate previous active layers
   window.addLayerGroup('Visited/Captured', portalsHistory.layers.visited, visitedLayerActive);
   window.addLayerGroup('Scout Controlled', portalsHistory.layers.scoutControlled, scoutControlledLayerActive);
+*/
 };
 
 // -----------------------------------------------------------------------------------------
@@ -229,7 +241,6 @@ loadSettings = function() {
       showScouted: false,
     };
   }
-  
 }
 
 portalsHistory.toggleDisplayMode = function () {
@@ -373,8 +384,8 @@ getSVGString = function(size, color, parts, offset) {
 // -----------------------------------------------------------------------------------------
 var setup = function () {
   loadSettings();
-  
-  portalsHistory.setupLayers();
+
+  //portalsHistory.setupLayers();
 
   var checkedCircle = '<svg class="tracker-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"/></svg>';
   var emptyCircle =  '<svg class="tracker-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"/></svg>';
@@ -393,11 +404,11 @@ var setup = function () {
           background-image: url('data:image/svg+xml;charset=UTF8,`+emptyCircle+`');
         }
       </style>`;
-      
+
   $('head').append(style);
-  
+
   portalsHistory.makeButton();
-  
+
   // New Style Ornaments (by @EisFrei)
 
 //  portalsHistory.createIcons();
