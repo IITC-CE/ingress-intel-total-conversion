@@ -1,7 +1,7 @@
 // @author         Hollow011
 // @name           Available AP statistics
 // @category       Info
-// @version        0.4.1
+// @version        0.4.2
 // @description    Displays the per-team AP gains available in the current view.
 
 
@@ -41,7 +41,17 @@ window.plugin.compAPStats.requestFinished = function() {
   }
 }
 
-window.plugin.compAPStats.update = function(hasFinished) {
+window.plugin.compAPStats.updateNoPortals = function (hasFinished) {
+  $('#available_ap_display').html('Available AP in this area: '
+    + '<div style="color:red">Zoom closer to get all portals loaded.<div>');
+}
+
+window.plugin.compAPStats.update = function (hasFinished) {
+  if (!window.getCurrentZoomTileParameters().hasPortals) {
+    window.plugin.compAPStats.updateNoPortals(hasFinished);
+    return;
+  }
+  
   var result = window.plugin.compAPStats.compAPStats();
   var loading = hasFinished ? '' : 'Loading...';
 
@@ -86,26 +96,24 @@ window.plugin.compAPStats.compAPStats = function() {
 
     // AP to complete a portal - assuming it's already captured (so no CAPTURE_PORTAL)
     var completePortalAp = 0;
-    var isFullyDeployed = data.resCount == 8;
-    if (!isFullyDeployed) {
-      completePortalAp = data.resCount != 8 ? (8-data.resCount)*DEPLOY_RESONATOR + COMPLETION_BONUS : 0;
+    if ('resCount' in data && data.resCount < 8) {
+      completePortalAp = (8-data.resCount)*DEPLOY_RESONATOR + COMPLETION_BONUS;
     }
 
     // AP to destroy this portal
-    var destroyAp = data.resCount * DESTROY_RESONATOR;
+    var destroyAp = (data.resCount || 0) * DESTROY_RESONATOR;
 
-    if (portal.options.team == TEAM_ENL) {
+    if (portal.options.team === TEAM_ENL) {
       result.res.AP += destroyAp + PORTAL_FULL_DEPLOY_AP;
       result.res.destroyPortals++;
-      if (!isFullyDeployed) {
+      if (completePortalAp) {
         result.enl.AP += completePortalAp;
         result.enl.finishPortals++;
       }
-    }
-    else if (portal.options.team == TEAM_RES) {
+    } else if (portal.options.team === TEAM_RES) {
       result.enl.AP += destroyAp + PORTAL_FULL_DEPLOY_AP;
       result.enl.destroyPortals++;
-      if (!isFullyDeployed) {
+      if (completePortalAp) {
         result.res.AP += completePortalAp;
         result.res.finishPortals++;
       }
