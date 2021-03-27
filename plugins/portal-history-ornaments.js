@@ -10,14 +10,11 @@ var portalsHistory = {};
 window.plugin.portalHistoryOrnaments = portalsHistory;
 
 // Exposed functions
-
 portalsHistory.toggleHistory        = toggleHistory;        // Button
 portalsHistory.toggleDisplayMode    = toggleDisplayMode;    // dialog
 portalsHistory.drawAllFlags         = drawAllFlags;         // hooked to 'mapDataRefreshEnd'
 
-
 var KEY_SETTINGS = "plugin-portal-history-flags";
-
 
 //------------------------------------------------------------------------------------------
 // Toggle Switch
@@ -127,7 +124,7 @@ function createIcons () {
     var offset = 0;
     if (portalsHistory.settings.showScouted) {
       portalsHistory.iconScouted[idx] = svgToIcon(getSVGString(size, 'violet', parts, offset), size + 4);
-    offset++;
+      offset++;
       } else {
       portalsHistory.iconScouted[idx] = svgToIcon(getSVGString(size, 'transparent', parts, offset), size + 4);
     }
@@ -145,7 +142,7 @@ function createIcons () {
 
 function drawPortalFlags (portal) {
   var drawMissing = portalsHistory.settings.drawMissing;
-  portal._historyLayer = new L.LayerGroup();
+  portal._historyLayer = L.layerGroup();
 
   if (portal.options.data.history) {
     if (drawMissing && !portal.options.data.history.visited || !drawMissing && portal.options.data.history.captured) {
@@ -241,4 +238,3 @@ var setup = function () {
   $('#toolbox').append('<a onclick="window.plugin.portalHistoryOrnaments.toggleDisplayMode()">Portal History</a>');
 
 }
-
