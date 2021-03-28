@@ -9,35 +9,35 @@
 var portalsHistory = {};
 window.plugin.portalHistoryOrnaments = portalsHistory;
 
-// Exposed functions
+//Exposed functions
 portalsHistory.toggleHistory        = toggleHistory;        // needed for button
 portalsHistory.toggleDisplayMode    = toggleDisplayMode;    // used by dialog
 portalsHistory.drawAllFlags         = drawAllFlags;         // hooked to 'mapDataRefreshEnd'
 
-var KEY_SETTINGS = "plugin-portal-history-flags";
+var KEY_SETTINGS = 'plugin-portal-history-flags';
 
 //------------------------------------------------------------------------------------------
 // Toggle Switch
 
 function makeButton () {
-  var isClass = portalsHistory.settings.drawMissing ? 'revHistory' : 'normHistory';
-  
+  var newClass = portalsHistory.settings.drawMissing ? 'revHistory' : 'normHistory';
+
   $('.leaflet-top.leaflet-left').append(
     $('<div>', { id: 'toggleHistoryButton', class: 'leaflet-control leaflet-bar' }).append(
       $('<a>', {
         id: 'toggleHistory',
         title: 'History toggle',
-        class: isClass,
-        click: function () { toggleHistory(true); return false; }
+        class: newClass,
+        click: function () { toggleHistory(); return false; }
       })
     )
-  )
-};
+  );
+}
 
-function toggleHistory(keepUIbutton) {
+function toggleHistory() {
   var button = $('#toggleHistory');
 
-  portalsHistory.settings.drawMissing = !portalsHistory.settings.drawMissing
+  portalsHistory.settings.drawMissing = !portalsHistory.settings.drawMissing;
   localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
   drawAllFlags();
 
@@ -48,7 +48,7 @@ function toggleHistory(keepUIbutton) {
     button.addClass('normHistory');
     button.removeClass('revHistory');
   }
-};
+}
 
 function svgToIcon (str, s) {
   var url = ('data:image/svg+xml,' + encodeURIComponent(str)).replace(/#/g, '%23');
@@ -66,8 +66,7 @@ function loadSettings() {
   } catch (e) {
     portalsHistory.settings = {
       drawMissing: false,
-      showVisited: true,
-      showCaptured: true,
+      showVisitedCaptured: true,
       showScoutControlled: false,
     };
   }
@@ -82,9 +81,9 @@ function toggleDisplayMode () {
   <option value="missing" ${portalsHistory.settings.drawMissing?'selected':''}>Show missing uniques</option>
 </select>
 </div>
-<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited" 
+<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited"
   ${portalsHistory.settings.showVisitedCaptured?'checked':''}> Show visited/captured</label></div>
-<div><label style="color:violet;"><input type="checkbox" id="portal-history-settings--show-scouted" 
+<div><label style="color:violet;"><input type="checkbox" id="portal-history-settings--show-scouted"
   ${portalsHistory.settings.showScoutControlled?'checked':''}> Show Scout Controlled</label></div>
 </div>`,
 
@@ -105,7 +104,7 @@ function toggleDisplayMode () {
     }
   });
 }
-  
+
 function createIcons () {
 // portalMarkerRadiuses are [7, 7, 7, 7, 8, 8, 9, 10, 11];
   var LEVEL_TO_RADIUS =   [6, 6, 6, 6, 8, 8, 8, 10, 11];    // values differ as the weight is not included
@@ -120,7 +119,7 @@ function createIcons () {
     if (portalsHistory.settings.showScoutControlled) {
       portalsHistory.iconScoutControlled[idx] = svgToIcon(getSVGString(iconSize, 'violet', parts, offset), iconSize + 4);
       offset++;
-      } else {
+    } else {
       portalsHistory.iconScoutControlled[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + 4);
     }
 
@@ -139,7 +138,7 @@ function drawPortalFlags (portal) {
   var drawMissing = portalsHistory.settings.drawMissing;
   portal._historyLayer = L.layerGroup();
   var history = portal.options.data.history;
-  
+
   if (history) {
     if (drawMissing && !history.visited || !drawMissing && history.captured) {
       L.marker(portal._latlng, {
@@ -148,7 +147,7 @@ function drawPortalFlags (portal) {
         keyboard: false,
       }).addTo(portal._historyLayer);
     }
-    if (drawMissing && history.visited && !history.captured 
+    if (drawMissing && history.visited && !history.captured
         || !drawMissing && history.visited && !history.captured) {
       L.marker(portal._latlng, {
         icon: portalsHistory.iconSemiMarked[portal.options.level],
@@ -158,7 +157,7 @@ function drawPortalFlags (portal) {
     }
     if (drawMissing && !history.scoutControlled || !drawMissing && history.scoutControlled) {
       L.marker(portal._latlng, {
-        icon: portalsHistory.iconScouted[portal.options.level],
+        icon: portalsHistory.iconScoutControlled[portal.options.level],
         interactive: false,
         keyboard: false,
       }).addTo(portal._historyLayer);
@@ -170,7 +169,10 @@ function drawPortalFlags (portal) {
 function drawAllFlags () {
   portalsHistory.layerGroup.clearLayers();
   createIcons();
-  var tileParams = window.getCurrentZoomTileParameters();
+  /* As getDataZoomTileParameters is not available in all IITC versions
+     fallback to getMapZoomTileParameters
+  */ 
+  var tileParams = window.getDataZoomTileParameters ? window.getDataZoomTileParameters() : window.getMapZoomTileParameters();
   if (tileParams.level !== 0) {
     return;
   }
@@ -185,8 +187,8 @@ function getSVGString (size, color, parts, offset) {
   var arcOffset = circumference / parts * (parts - 1);
   var rotate = 360 / parts * offset;
   return `<svg width="${(size+4)}" height="${(size+4)}" xmlns="http://www.w3.org/2000/svg">
-          <circle stroke="${color}" stroke-width="4" fill="transparent" cx="${(size+4)/2}" cy="${(size+4)/2}" 
-          r="${(size/2)}" stroke-dasharray="${circumference}" stroke-dashoffset="${arcOffset}" 
+          <circle stroke="${color}" stroke-width="4" fill="transparent" cx="${(size+4)/2}" cy="${(size+4)/2}"
+          r="${(size/2)}" stroke-dasharray="${circumference}" stroke-dashoffset="${arcOffset}"
           transform="rotate(${rotate}, ${((size+4)/2)}, ${((size+4)/2)})" />
           </svg>`;
 }
@@ -209,13 +211,17 @@ var setup = function () {
         #toggleHistory.revHistory {
           background-image: url('data:image/svg+xml;charset=UTF8,`+emptyCircle+`');
         }
+        
+        .no-pointer-events {
+          pointer-events: none;
+        }
       </style>`;
 
   $('head').append(style);
 
 // Initialization
   loadSettings();
-  portalsHistory.layerGroup = L.LayerGroup()
+  portalsHistory.layerGroup = L.layerGroup()
     .on('add', function () {
        $('#toggleHistoryButton').show();
     })
@@ -230,5 +236,7 @@ var setup = function () {
 
 // UI additions
   makeButton ();
-  $('#toolbox').append('<a onclick="window.plugin.portalHistoryOrnaments.toggleDisplayMode()">Portal History</a>');
+  $('<a>Portal History</a>')
+    .click(toggleDisplayMode)
+    .appendTo('#toolbox');
 }
