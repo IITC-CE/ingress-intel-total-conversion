@@ -28,7 +28,8 @@ function makeButton () {
         id: 'toggleHistory',
         title: 'History toggle',
         class: newClass,
-        click: function () { toggleHistory(); return false; }
+        click: function () { toggleHistory(); return false; },
+        dblclick : function () { toggleDisplayMode(); return false;}
       })
     )
   );
@@ -73,20 +74,21 @@ function loadSettings() {
 }
 
 function toggleDisplayMode () {
-  dialog({
-    html: `<div id="portal-history-settings">
-<div>
-<select id="portal-history-settings--display-mode">
-  <option value="received" ${portalsHistory.settings.drawMissing?'':'selected'}>Show uniques received</option>
-  <option value="missing" ${portalsHistory.settings.drawMissing?'selected':''}>Show missing uniques</option>
-</select>
-</div>
-<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited"
-  ${portalsHistory.settings.showVisitedCaptured?'checked':''}> Show visited/captured</label></div>
-<div><label style="color:violet;"><input type="checkbox" id="portal-history-settings--show-scouted"
-  ${portalsHistory.settings.showScoutControlled?'checked':''}> Show Scout Controlled</label></div>
-</div>`,
+  var html = '<div id="portal-history-settings"> '+
+      '<div> '+
+      '<select id="portal-history-settings--display-mode"> '+
+      '  <option value="received" '+(portalsHistory.settings.drawMissing ? '' : 'selected')+'>Show uniques received</option> '+
+      '  <option value="missing" '+(portalsHistory.settings.drawMissing ? 'selected' : '')+'>Show missing uniques</option> '+
+      '</select> '+
+      '</div> '+
+      '<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited" '+
+      '  '+(portalsHistory.settings.showVisitedCaptured ? 'checked' : '')+'> Show visited/captured</label></div> '+
+      '<div><label style="color:violet;"><input type="checkbox" id="portal-history-settings--show-scouted" '+
+      '  '+(portalsHistory.settings.showScoutControlled ? 'checked' : '')+'> Show Scout Controlled</label></div> '+
+      '</div>';
 
+  dialog({
+    html: html,
     title: 'Portal History Settings',
     id: 'plugin-portal-history-flags',
     width: 'auto',
