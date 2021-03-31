@@ -188,12 +188,19 @@ function getSVGString (size, color, parts, offset) {
   var circumference = size * Math.PI;
   var arcOffset = circumference / parts * (parts - 1);
   var rotate = 360 / parts * offset;
-  return `<svg width="${(size+4)}" height="${(size+4)}" xmlns="http://www.w3.org/2000/svg">
-          <circle stroke="${color}" stroke-width="4" fill="transparent" cx="${(size+4)/2}" cy="${(size+4)/2}"
-          r="${(size/2)}" stroke-dasharray="${circumference}" stroke-dashoffset="${arcOffset}"
-          transform="rotate(${rotate}, ${((size+4)/2)}, ${((size+4)/2)})" />
-          </svg>`;
-}
+  return L.Util.template('<svg width="{size}" height="{size}" xmlns="http://www.w3.org/2000/svg">'+
+    '<circle stroke="{color}" stroke-width="4" fill="transparent" cx="{middle}" cy="{middle}" '+
+    'r="{radius}" stroke-dasharray="{dasharray}" stroke-dashoffset="{offset}"'+
+    ' transform="rotate({rotate}, {middle}, {middle})" /></svg>',
+    {
+      size: size+4,
+      radius: size/2,
+      middle: (size+4)/2,
+      rotate: rotate,
+      color: color,
+      dasharray: circumference,
+      offset: arcOffset
+    });}
 // -----------------------------------------------------------------------------------------
 var setup = function () {
 
