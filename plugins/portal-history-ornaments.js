@@ -210,6 +210,9 @@ var setup = function () {
 
   // Initialization
   loadSettings();
+  makeButton ();
+  $('#toggleHistoryButton').hide();
+  
   portalsHistory.layerGroup = L.layerGroup()
     .on('add', function () {
       $('#toggleHistoryButton').show();
@@ -223,8 +226,7 @@ var setup = function () {
   // Hooks
   window.addHook('mapDataRefreshEnd', portalsHistory.drawAllFlags);
 
-  // UI additions
-  makeButton ();
+  // toolbox additions
   $('<a>Portal History</a>')
     .click(toggleDisplayMode)
     .appendTo('#toolbox');
