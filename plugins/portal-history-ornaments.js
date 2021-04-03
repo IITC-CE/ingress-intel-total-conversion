@@ -18,19 +18,21 @@ var KEY_SETTINGS = 'plugin-portal-history-flags';
 
 //------------------------------------------------------------------------------------------
 // Toggle Switch
+function toggleIcon() {
+  return ('<svg width=26px height=26px color=white>'+
+             '  <use xlink:href="'+(portalsHistory.settings.drawMissing ? '#fa-emptyCircle' : '#fa-checkedCircle')+'">'+
+             '</svg>');
+}
 
 function makeButton () {
-  var newClass = portalsHistory.settings.drawMissing ? 'revHistory' : 'normHistory';
-
   $('.leaflet-top.leaflet-left').append(
     $('<div>', { id: 'toggleHistoryButton', class: 'leaflet-control leaflet-bar' }).append(
       $('<a>', {
         id: 'toggleHistory',
         title: 'History toggle',
-        class: newClass,
         click: function () { toggleHistory(); return false; },
         dblclick : function () { toggleDisplayMode(); return false;},
-        html:'X'
+        html: toggleIcon()
       })
     )
   );
@@ -41,15 +43,8 @@ function toggleHistory() {
 
   portalsHistory.settings.drawMissing = !portalsHistory.settings.drawMissing;
   localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
+  $("#toggleHistory").html(toggleIcon());
   drawAllFlags();
-
-  if (button.hasClass('normHistory')) {
-    button.removeClass('normHistory');
-    button.addClass('revHistory');
-  } else {
-    button.addClass('normHistory');
-    button.removeClass('revHistory');
-  }
 }
 
 function svgToIcon (str, s) {
@@ -103,6 +98,7 @@ function toggleDisplayMode () {
       portalsHistory.settings.showScoutControlled = elScouted.checked;
 
       localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
+      $("#toggleHistory").html(toggleIcon());
       portalsHistory.drawAllFlags();
     }
   });
@@ -204,10 +200,6 @@ function getSVGString (size, color, parts, offset) {
     });}
 // -----------------------------------------------------------------------------------------
 var setup = function () {
-
-  var checkedCircle = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"/></svg>';
-  var emptyCircle = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"/></svg>';
- 
   var faSymbols ='<svg xmlns="http://www.w3.org/2000/svg">'+
     '<symbol id="fa-emptyCircle" viewBox="0 0 512 512"> '+
     '  <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"/>'+
@@ -215,28 +207,6 @@ var setup = function () {
     '  <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"/>'+
     '</svg>';
   $('body').append(faSymbols);
-  
-
-  var style = `<style>
-        #toggleHistory {
-          background-size: 90% 90%;
-          background-position: center;
-        }
-
-        #toggleHistory.normHistory {
-          background-image: '<svg width = 26px height = 26px line-height=30px vertical-align="text-top"><use xlink:href = "#fa-checkedCircle"/>';
-        }
-
-        #toggleHistory.revHistory {
-          background-image: '<svg width = 26px height = 26px line-height=30px vertical-align="text-top"><use xlink:href = "#fa-emptyCircle"/>';
-        }
-
-        .no-pointer-events {
-          pointer-events: none;
-        }
-      </style>`;
-
-  $('head').append(style);
 
 // Initialization
   loadSettings();
