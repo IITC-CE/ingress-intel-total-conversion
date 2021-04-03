@@ -9,14 +9,14 @@
 var portalsHistory = {};
 window.plugin.portalHistoryOrnaments = portalsHistory;
 
-//Exposed functions
+// Exposed functions
 portalsHistory.toggleHistory        = toggleHistory;        // needed for button
 portalsHistory.toggleDisplayMode    = toggleDisplayMode;    // used by dialog
 portalsHistory.drawAllFlags         = drawAllFlags;         // hooked to 'mapDataRefreshEnd'
 
 var KEY_SETTINGS = 'plugin-portal-history-flags';
 
-//------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------
 // Toggle Switch
 function toggleIcon() {
   return ('<svg width=26px height=26px color=white>'+
@@ -39,11 +39,9 @@ function makeButton () {
 }
 
 function toggleHistory() {
-  var button = $('#toggleHistory');
-
   portalsHistory.settings.drawMissing = !portalsHistory.settings.drawMissing;
   localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
-  $("#toggleHistory").html(toggleIcon());
+  $('#toggleHistory').html(toggleIcon());
   drawAllFlags();
 }
 
@@ -54,7 +52,7 @@ function svgToIcon (str, s) {
     iconSize: [s, s],
     iconAnchor: [s / 2, s / 2],
     className: 'no-pointer-events', // allows users to click on portal under the unique marker
-  })
+  });
 }
 
 function loadSettings() {
@@ -98,7 +96,7 @@ function toggleDisplayMode () {
       portalsHistory.settings.showScoutControlled = elScouted.checked;
 
       localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
-      $("#toggleHistory").html(toggleIcon());
+      $('#toggleHistory').html(toggleIcon());
       portalsHistory.drawAllFlags();
     }
   });
@@ -112,7 +110,7 @@ function createIcons () {
   portalsHistory.iconMarked = {};
   portalsHistory.iconScoutControlled = {};
   var parts = (portalsHistory.settings.showVisitedCaptured + portalsHistory.settings.showScoutControlled);
-  LEVEL_TO_RADIUS.forEach((portalMarkerRadius, idx) => {
+  LEVEL_TO_RADIUS.forEach(function (portalMarkerRadius, idx) {
     var iconSize = (portalMarkerRadius * 2 + 8) * scale;    // 8 = 2 x weight of ornament (4px)
     var offset = 0;
     if (portalsHistory.settings.showScoutControlled) {
@@ -130,7 +128,7 @@ function createIcons () {
       portalsHistory.iconSemiMarked[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + 4);
       portalsHistory.iconMarked[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + 4);
     }
-  });
+  }) ;
 }
 
 function drawPortalFlags (portal) {
@@ -170,7 +168,7 @@ function drawAllFlags () {
   createIcons();
   /* As getDataZoomTileParameters is not available in all IITC versions
      fallback to getMapZoomTileParameters
-  */ 
+  */
   var tileParams = window.getDataZoomTileParameters ? window.getDataZoomTileParameters() : window.getMapZoomTileParameters();
   if (tileParams.level !== 0) {
     return;
@@ -197,7 +195,9 @@ function getSVGString (size, color, parts, offset) {
       color: color,
       dasharray: circumference,
       offset: arcOffset
-    });}
+    }
+  );
+}
 // -----------------------------------------------------------------------------------------
 var setup = function () {
   var faSymbols ='<svg xmlns="http://www.w3.org/2000/svg">'+
@@ -208,11 +208,11 @@ var setup = function () {
     '</svg>';
   $('body').append(faSymbols);
 
-// Initialization
+  // Initialization
   loadSettings();
   portalsHistory.layerGroup = L.layerGroup()
     .on('add', function () {
-       $('#toggleHistoryButton').show();
+      $('#toggleHistoryButton').show();
     })
     .on('remove', function () {
       $('#toggleHistoryButton').hide();
@@ -220,12 +220,12 @@ var setup = function () {
 
   window.addLayerGroup('Portal History', portalsHistory.layerGroup, false);
 
-// Hooks
+  // Hooks
   window.addHook('mapDataRefreshEnd', portalsHistory.drawAllFlags);
 
-// UI additions
+  // UI additions
   makeButton ();
   $('<a>Portal History</a>')
     .click(toggleDisplayMode)
     .appendTo('#toolbox');
-}
+};
