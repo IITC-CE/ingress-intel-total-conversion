@@ -9,10 +9,14 @@
 var portalsHistory = {};
 window.plugin.portalHistoryOrnaments = portalsHistory;
 
+// Global functions used
+var dialog = window.dialog;
+
 // Exposed functions
 portalsHistory.toggleHistory        = toggleHistory;        // needed for button
 portalsHistory.toggleDisplayMode    = toggleDisplayMode;    // used by dialog
 portalsHistory.drawAllFlags         = drawAllFlags;         // hooked to 'mapDataRefreshEnd'
+
 
 var KEY_SETTINGS = 'plugin-portal-history-flags';
 
@@ -50,8 +54,7 @@ function svgToIcon (str, s) {
   return new L.Icon({
     iconUrl: url,
     iconSize: [s, s],
-    iconAnchor: [s / 2, s / 2],
-    className: 'no-pointer-events', // allows users to click on portal under the unique marker
+    iconAnchor: [s / 2, s / 2]
   });
 }
 
@@ -62,7 +65,7 @@ function loadSettings() {
     portalsHistory.settings = {
       drawMissing: false,
       showVisitedCaptured: true,
-      showScoutControlled: false,
+      showScoutControlled: false
     };
   }
 }
@@ -141,7 +144,7 @@ function drawPortalFlags (portal) {
       L.marker(portal._latlng, {
         icon: portalsHistory.iconMarked[portal.options.level],
         interactive: false,
-        keyboard: false,
+        keyboard: false
       }).addTo(portal._historyLayer);
     }
     if (drawMissing && history.visited && !history.captured
@@ -149,14 +152,14 @@ function drawPortalFlags (portal) {
       L.marker(portal._latlng, {
         icon: portalsHistory.iconSemiMarked[portal.options.level],
         interactive: false,
-        keyboard: false,
+        keyboard: false
       }).addTo(portal._historyLayer);
     }
     if (drawMissing && !history.scoutControlled || !drawMissing && history.scoutControlled) {
       L.marker(portal._latlng, {
         icon: portalsHistory.iconScoutControlled[portal.options.level],
         interactive: false,
-        keyboard: false,
+        keyboard: false
       }).addTo(portal._historyLayer);
     }
   }
@@ -199,12 +202,19 @@ function getSVGString (size, color, parts, offset) {
   );
 }
 // -----------------------------------------------------------------------------------------
-var setup = function () {
+function setup () { // eslint-disable-line no-unused-vars
   var faSymbols ='<svg xmlns="http://www.w3.org/2000/svg">'+
     '<symbol id="fa-emptyCircle" viewBox="0 0 512 512"> '+
-    '  <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"/>'+
+    '  <path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 '+
+    '  448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"/>'+
     '<symbol id="fa-checkedCircle" viewBox="0 0 512 512">'+
-    '  <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"/>'+
+    '  <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 '+
+    '  248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 '+
+    '  200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 '+
+    '  130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 '+
+    '  303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 '+
+    '  4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 '+
+    '  16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"/>'+
     '</svg>';
   $('body').append(faSymbols);
 
@@ -212,7 +222,7 @@ var setup = function () {
   loadSettings();
   makeButton ();
   $('#toggleHistoryButton').hide();
-  
+
   portalsHistory.layerGroup = L.layerGroup()
     .on('add', function () {
       $('#toggleHistoryButton').show();
@@ -230,4 +240,4 @@ var setup = function () {
   $('<a>Portal History</a>')
     .click(toggleDisplayMode)
     .appendTo('#toolbox');
-};
+}
