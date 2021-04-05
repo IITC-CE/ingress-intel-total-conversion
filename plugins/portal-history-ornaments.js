@@ -13,9 +13,9 @@ window.plugin.portalHistoryOrnaments = portalsHistory;
 var dialog = window.dialog;
 
 // Exposed functions
-portalsHistory.toggleHistory        = toggleHistory;        // needed for button
-portalsHistory.toggleDisplayMode    = toggleDisplayMode;    // used by dialog
-portalsHistory.drawAllFlags         = drawAllFlags;         // hooked to 'mapDataRefreshEnd'
+portalsHistory.toggleHistoryMode       = toggleHistoryMode;       // needed for button
+portalsHistory.historyDialog           = historyDialog;           // used by dialog
+portalsHistory.drawAllHistoryOrnaments = drawAllHistoryOrnaments; // hooked to 'mapDataRefreshEnd'
 
 
 var KEY_SETTINGS = 'plugin-portal-history-flags';
@@ -24,7 +24,7 @@ var KEY_SETTINGS = 'plugin-portal-history-flags';
 // Toggle Switch
 function toggleIcon() {
   return ('<svg width=26px height=26px color=white>'+
-             '  <use xlink:href="'+(portalsHistory.settings.drawMissing ? '#fa-emptyCircle' : '#fa-checkedCircle')+'">'+
+             '  <use xlink:href="'+(portalsHistory.settings.historyModeInverted ? '#fa-emptyCircle' : '#fa-checkedCircle')+'">'+
              '</svg>');
 }
 
@@ -34,19 +34,19 @@ function makeButton () {
       $('<a>', {
         id: 'toggleHistory',
         title: 'History toggle',
-        click: function () { toggleHistory(); return false; },
-        dblclick : function () { toggleDisplayMode(); return false;},
+        click: function () { toggleHistoryMode(); return false; },
+        dblclick : function () { historyDialog(); return false;},
         html: toggleIcon()
       })
     )
   );
 }
 
-function toggleHistory() {
-  portalsHistory.settings.drawMissing = !portalsHistory.settings.drawMissing;
+function toggleHistoryMode() {
+  portalsHistory.settings.historyModeInverted = !portalsHistory.settings.historyModeInverted;
   localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
   $('#toggleHistory').html(toggleIcon());
-  drawAllFlags();
+  drawAllHistoryOrnaments();
 }
 
 function svgToIcon (str, s) {
@@ -70,12 +70,12 @@ function loadSettings() {
   }
 }
 
-function toggleDisplayMode () {
+function historyDialog () {
   var html = '<div id="portal-history-settings"> '+
       '<div> '+
       '<select id="portal-history-settings--display-mode"> '+
-      '  <option value="received" '+(portalsHistory.settings.drawMissing ? '' : 'selected')+'>Show uniques received</option> '+
-      '  <option value="missing" '+(portalsHistory.settings.drawMissing ? 'selected' : '')+'>Show missing uniques</option> '+
+      '  <option value="received" '+(portalsHistory.settings.historyModeInverted ? '' : 'selected')+'>Show uniques received</option> '+
+      '  <option value="missing" '+(portalsHistory.settings.historyModeInverted ? 'selected' : '')+'>Show missing uniques</option> '+
       '</select> '+
       '</div> '+
       '<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited" '+
@@ -94,48 +94,48 @@ function toggleDisplayMode () {
       var elVisitedCaptured = document.getElementById('portal-history-settings--show-visited');
       var elScouted = document.getElementById('portal-history-settings--show-scouted');
 
-      portalsHistory.settings.drawMissing = elMode.value === 'missing';
+      portalsHistory.settings.historyModeInverted = elMode.value === 'missing';
       portalsHistory.settings.showVisitedCaptured = elVisitedCaptured.checked;
       portalsHistory.settings.showScoutControlled = elScouted.checked;
 
       localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
       $('#toggleHistory').html(toggleIcon());
-      portalsHistory.drawAllFlags();
+      portalsHistory.drawAllHistoryOrnaments();
     }
   });
 }
 
 function createIcons () {
-// portalMarkerRadiuses are [7, 7, 7, 7, 8, 8, 9, 10, 11];
-  var LEVEL_TO_RADIUS =   [6, 6, 6, 6, 8, 8, 8, 10, 11];    // values differ as the weight is not included
+  var LEVEL_TO_RADIUS =   [6, 6, 6, 6, 8, 8, 8, 10, 11];
   var scale = window.portalMarkerScale();
   portalsHistory.iconSemiMarked = {};
   portalsHistory.iconMarked = {};
   portalsHistory.iconScoutControlled = {};
+  var ornamentWeight = 4;
   var parts = (portalsHistory.settings.showVisitedCaptured + portalsHistory.settings.showScoutControlled);
   LEVEL_TO_RADIUS.forEach(function (portalMarkerRadius, idx) {
-    var iconSize = (portalMarkerRadius * 2 + 8) * scale;    // 8 = 2 x weight of ornament (4px)
+    var iconSize = (portalMarkerRadius + ornamentWeight) * 2 * scale;
     var offset = 0;
     if (portalsHistory.settings.showScoutControlled) {
-      portalsHistory.iconScoutControlled[idx] = svgToIcon(getSVGString(iconSize, 'violet', parts, offset), iconSize + 4);
+      portalsHistory.iconScoutControlled[idx] = svgToIcon(getSVGString(iconSize, 'violet', parts, offset), iconSize + ornamentWeight);
       offset++;
     } else {
-      portalsHistory.iconScoutControlled[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + 4);
+      portalsHistory.iconScoutControlled[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + ornamentWeight);
     }
 
     if (portalsHistory.settings.showVisitedCaptured) {
-      portalsHistory.iconSemiMarked[idx] = svgToIcon(getSVGString(iconSize, 'yellow', parts, offset), iconSize + 4);
-      portalsHistory.iconMarked[idx] = svgToIcon(getSVGString(iconSize, 'red', parts, offset), iconSize + 4);
+      portalsHistory.iconSemiMarked[idx] = svgToIcon(getSVGString(iconSize, 'yellow', parts, offset), iconSize + ornamentWeight);
+      portalsHistory.iconMarked[idx] = svgToIcon(getSVGString(iconSize, 'red', parts, offset), iconSize + ornamentWeight);
       offset++;
     } else {
-      portalsHistory.iconSemiMarked[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + 4);
-      portalsHistory.iconMarked[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + 4);
+      portalsHistory.iconSemiMarked[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + ornamentWeight);
+      portalsHistory.iconMarked[idx] = svgToIcon(getSVGString(iconSize, 'transparent', parts, offset), iconSize + ornamentWeight);
     }
   }) ;
 }
 
-function drawPortalFlags (portal) {
-  var drawMissing = portalsHistory.settings.drawMissing;
+function drawHistoryOrnaments (portal) {
+  var drawMissing = portalsHistory.settings.historyModeInverted;
   portal._historyLayer = L.layerGroup();
   var history = portal.options.data.history;
 
@@ -166,7 +166,7 @@ function drawPortalFlags (portal) {
   portal._historyLayer.addTo(portalsHistory.layerGroup);
 }
 
-function drawAllFlags () {
+function drawAllHistoryOrnaments () {
   portalsHistory.layerGroup.clearLayers();
   createIcons();
   /* As getDataZoomTileParameters is not available in all IITC versions
@@ -178,7 +178,7 @@ function drawAllFlags () {
   }
 
   for (var id in window.portals) {
-    drawPortalFlags(window.portals[id]);
+    drawHistoryOrnaments(window.portals[id]);
   }
 }
 
@@ -221,7 +221,7 @@ function setup () { // eslint-disable-line no-unused-vars
   // Initialization
   loadSettings();
   makeButton ();
-  $('#toggleHistoryButton').hide();
+  $('#toggleHistoryButton').hide(); // hide the button on start, it will show on add
 
   portalsHistory.layerGroup = L.layerGroup()
     .on('add', function () {
@@ -234,10 +234,10 @@ function setup () { // eslint-disable-line no-unused-vars
   window.addLayerGroup('Portal History', portalsHistory.layerGroup, false);
 
   // Hooks
-  window.addHook('mapDataRefreshEnd', portalsHistory.drawAllFlags);
+  window.addHook('mapDataRefreshEnd', portalsHistory.drawAllHistoryOrnaments);
 
   // toolbox additions
   $('<a>Portal History</a>')
-    .click(toggleDisplayMode)
+    .click(historyDialog)
     .appendTo('#toolbox');
 }
