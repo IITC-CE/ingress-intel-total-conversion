@@ -1,22 +1,9 @@
 // @author         yenky
 // @name           Portal count
 // @category       Info
-// @version        0.1.2
+// @version        0.2.0
 // @description    Display a list of all localized portals by level and faction.
 
-
-/* whatsnew
-* 0.1.0  : display graphs
-* 0.0.10 : show in nav drawer on mobile devices
-* 0.0.9  : fix for new intel map
-* 0.0.8  : use dialog() instead of alert()
-* 0.0.6  : ignoring outside bounds portals (even if close to)
-* 0.0.5  : changed table layout, added some colors
-* 0.0.4  : reverse show order of portals, using MAX_PORTAL_LEVEL now for array, changed table layout to be more compact, cleaned up code
-* 0.0.3  : fixed incorrect rounded portal levels, adjusted viewport
-* 0.0.2  : fixed counts to be reset after scrolling
-* 0.0.1  : initial release, show count of portals
-*/
 
 // use own namespace for plugin
 window.plugin.portalcounts = {
@@ -28,6 +15,7 @@ window.plugin.portalcounts = {
   RADIUS_OUTER: 100,
   CENTER_X: 200,
   CENTER_Y: 100,
+  nozeroes: true
 };
 
 //count portals for each level available on the map
@@ -41,7 +29,7 @@ window.plugin.portalcounts.getPortals = function (){
 
   self.PortalsEnl = new Array();
   self.PortalsRes = new Array();
-  for(var level = window.MAX_PORTAL_LEVEL; level > 0; level--){
+  for(var level = window.MAX_PORTAL_LEVEL; level >= 0; level--){
     self.PortalsEnl[level] = 0;
     self.PortalsRes[level] = 0;
   }
@@ -72,8 +60,10 @@ window.plugin.portalcounts.getPortals = function (){
   var counts = '';
   if(total > 0) {
     counts += '<table><tr><th></th><th class="enl">Enlightened</th><th class="res">Resistance</th></tr>';  //'+self.enlP+' Portal(s)</th></tr>';
-    for(var level = window.MAX_PORTAL_LEVEL; level > 0; level--){
-      counts += '<tr><td class="L'+level+'">Level '+level+'</td>';
+    for(var level = window.MAX_PORTAL_LEVEL; level >= 0; level--) {
+      var title = level ? 'Level ' + level : 'Placeholders';
+      counts += (self.PortalsEnl[level] || self.PortalsRes[level]) ? '<tr>' : '<tr class="zeroes">';
+      counts += '<td class="L'+level+'">'+title+'</td>';
       counts += '<td class="enl">'+self.PortalsEnl[level]+'</td><td class="res">'+self.PortalsRes[level]+'</td>';
       counts += '</tr>';
     }
@@ -182,6 +172,12 @@ window.plugin.portalcounts.getPortals = function (){
       width: 'auto'
     });
   }
+  if (window.plugin.portalcounts.nozeroes) {
+    $('#portalcounts').addClass('nozeroes');
+  }
+  $('#portalcounts svg').click(function () {
+    $('#portalcounts').toggleClass('nozeroes');
+  });
 }
 
 window.plugin.portalcounts.makeBar = function(portals, text, color, shift) {
@@ -339,5 +335,7 @@ var setup =  function() {
     '#portalcounts table td.L8 { background-color: #9627F4 !important;}' +
     '#portalcounts table td:nth-child(1) { text-align: left;}' +
     '#portalcounts table th:nth-child(1) { text-align: left;}' +
+    '#portalcounts table th:nth-child(1) { text-align: left;}' +
+    '#portalcounts.nozeroes table tr.zeroes { display: none;}' +
     '</style>');
 }
