@@ -17,7 +17,6 @@ portalsHistory.toggleHistoryMode       = toggleHistoryMode;       // needed for 
 portalsHistory.historyDialog           = historyDialog;           // used by dialog
 portalsHistory.drawAllHistoryOrnaments = drawAllHistoryOrnaments; // hooked to 'mapDataRefreshEnd'
 
-
 var KEY_SETTINGS = 'plugin-portal-history-flags';
 
 // ------------------------------------------------------------------------------------------
@@ -186,7 +185,8 @@ function getSVGString (size, color, parts, offset) {
   var circumference = size * Math.PI;
   var arcOffset = circumference / parts * (parts - 1);
   var rotate = 360 / parts * offset;
-  return L.Util.template('<svg width="{size}" height="{size}" xmlns="http://www.w3.org/2000/svg">'+
+  return L.Util.template(
+    '<svg width="{size}" height="{size}" xmlns="http://www.w3.org/2000/svg">'+
     '<circle stroke="{color}" stroke-width="4" fill="transparent" cx="{middle}" cy="{middle}" '+
     'r="{radius}" stroke-dasharray="{dasharray}" stroke-dashoffset="{offset}"'+
     ' transform="rotate({rotate}, {middle}, {middle})" /></svg>',
