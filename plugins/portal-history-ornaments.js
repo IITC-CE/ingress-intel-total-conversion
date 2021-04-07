@@ -72,13 +72,13 @@ function loadSettings() {
 function historyDialog() {
   var html = '<div id="portal-history-settings"> ' +
     '<div> ' +
-    '<select id="portal-history-settings--display-mode"> ' +
+    '<select id="display-mode"> ' +
     '  <option value="received">Show uniques received</option> ' +
     '  <option value="missing">Show missing uniques</option> ' +
     '</select> ' +
     '</div> ' +
-    '<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited"> Show visited/captured</label></div> ' +
-    '<div><label style="color:violet;"><input type="checkbox" id="portal-history-settings--show-scouted"> Show Scout Controlled</label></div> ' +
+    '<div><label style="color:red;"><input type="checkbox" id="show-visited">Show visited/captured</label></div> ' +
+    '<div><label style="color:violet;"><input type="checkbox" id="show-scouted">Show Scout Controlled</label></div> ' +
     '</div>';
 
   dialog({
@@ -97,16 +97,16 @@ function historyDialog() {
 
 function updateDialogOption() {
   var displayMode = portalsHistory.settings.historyModeInverted ? 'missing' : 'received';
-  $('#portal-history-settings--display-mode').val(displayMode);
-  $('#portal-history-settings--show-visited').prop('checked', portalsHistory.settings.showVisitedCaptured);
-  $('#portal-history-settings--show-scouted').prop('checked', portalsHistory.settings.showScoutControlled);
+  $('#portal-history-settings #display-mode').val(displayMode);
+  $('#portal-history-settings #show-visited').prop('checked', portalsHistory.settings.showVisitedCaptured);
+  $('#portal-history-settings #show-scouted').prop('checked', portalsHistory.settings.showScoutControlled);
 }
 
 
 function saveDialogOption() {
-  portalsHistory.settings.historyModeInverted = $('#portal-history-settings--display-mode').val() === 'missing';
-  portalsHistory.settings.showVisitedCaptured = $('#portal-history-settings--show-visited').is(':checked');
-  portalsHistory.settings.showScoutControlled = $('#portal-history-settings--show-scouted').is(':checked');
+  portalsHistory.settings.historyModeInverted = $('#portal-history-settings #display-mode').val() === 'missing';
+  portalsHistory.settings.showVisitedCaptured = $('#portal-history-settings #show-visited').is(':checked');
+  portalsHistory.settings.showScoutControlled = $('#portal-history-settings #show-scouted').is(':checked');
 
   localStorage.setItem(KEY_SETTINGS, JSON.stringify(portalsHistory.settings));
   $('#toggleHistory').html(toggleIcon());
