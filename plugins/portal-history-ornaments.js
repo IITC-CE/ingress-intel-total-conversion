@@ -69,19 +69,17 @@ function loadSettings() {
   }
 }
 
-function historyDialog () {
-  var html = '<div id="portal-history-settings"> '+
-      '<div> '+
-      '<select id="portal-history-settings--display-mode"> '+
-      '  <option value="received" '+(portalsHistory.settings.historyModeInverted ? '' : 'selected')+'>Show uniques received</option> '+
-      '  <option value="missing" '+(portalsHistory.settings.historyModeInverted ? 'selected' : '')+'>Show missing uniques</option> '+
-      '</select> '+
-      '</div> '+
-      '<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited" '+
-      '  '+(portalsHistory.settings.showVisitedCaptured ? 'checked' : '')+'> Show visited/captured</label></div> '+
-      '<div><label style="color:violet;"><input type="checkbox" id="portal-history-settings--show-scouted" '+
-      '  '+(portalsHistory.settings.showScoutControlled ? 'checked' : '')+'> Show Scout Controlled</label></div> '+
-      '</div>';
+function historyDialog() {
+  var html = '<div id="portal-history-settings"> ' +
+    '<div> ' +
+    '<select id="portal-history-settings--display-mode"> ' +
+    '  <option value="received">Show uniques received</option> ' +
+    '  <option value="missing">Show missing uniques</option> ' +
+    '</select> ' +
+    '</div> ' +
+    '<div><label style="color:red;"><input type="checkbox" id="portal-history-settings--show-visited"> Show visited/captured</label></div> ' +
+    '<div><label style="color:violet;"><input type="checkbox" id="portal-history-settings--show-scouted"> Show Scout Controlled</label></div> ' +
+    '</div>';
 
   dialog({
     html: html,
@@ -102,6 +100,11 @@ function historyDialog () {
       portalsHistory.drawAllHistoryOrnaments();
     }
   });
+
+  var displayMode = portalsHistory.settings.historyModeInverted ? 'missing' : 'received';
+  $('#portal-history-settings--display-mode').val(displayMode);
+  $('#portal-history-settings--show-visited').prop('checked', portalsHistory.settings.showVisitedCaptured);
+  $('#portal-history-settings--show-scouted').prop('checked', portalsHistory.settings.showScoutControlled);
 }
 
 function createIcons () {
