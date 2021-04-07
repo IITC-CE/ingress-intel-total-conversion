@@ -87,25 +87,32 @@ function historyDialog() {
     id: 'plugin-portal-history-flags',
     width: 'auto',
     closeCallback: function () {
-      var elMode = document.getElementById('portal-history-settings--display-mode');
-      var elVisitedCaptured = document.getElementById('portal-history-settings--show-visited');
-      var elScouted = document.getElementById('portal-history-settings--show-scouted');
-
-      portalsHistory.settings.historyModeInverted = elMode.value === 'missing';
-      portalsHistory.settings.showVisitedCaptured = elVisitedCaptured.checked;
-      portalsHistory.settings.showScoutControlled = elScouted.checked;
-
-      localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
-      $('#toggleHistory').html(toggleIcon());
-      portalsHistory.drawAllHistoryOrnaments();
+      saveDialogOption();
     }
   });
 
+  updateDialogOption();
+}
+
+
+function updateDialogOption() {
   var displayMode = portalsHistory.settings.historyModeInverted ? 'missing' : 'received';
   $('#portal-history-settings--display-mode').val(displayMode);
   $('#portal-history-settings--show-visited').prop('checked', portalsHistory.settings.showVisitedCaptured);
   $('#portal-history-settings--show-scouted').prop('checked', portalsHistory.settings.showScoutControlled);
 }
+
+
+function saveDialogOption() {
+  portalsHistory.settings.historyModeInverted = $('#portal-history-settings--display-mode').val() === 'missing';
+  portalsHistory.settings.showVisitedCaptured = $('#portal-history-settings--show-visited').is(':checked');
+  portalsHistory.settings.showScoutControlled = $('#portal-history-settings--show-scouted').is(':checked');
+
+  localStorage.setItem(KEY_SETTINGS, JSON.stringify(portalsHistory.settings));
+  $('#toggleHistory').html(toggleIcon());
+  portalsHistory.drawAllHistoryOrnaments();
+}
+
 
 function createIcons () {
   var LEVEL_TO_RADIUS =   [6, 6, 6, 6, 8, 8, 8, 10, 11];
