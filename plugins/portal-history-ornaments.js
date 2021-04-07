@@ -70,16 +70,14 @@ function loadSettings() {
 }
 
 function historyDialog() {
-  var html = '<div id="portal-history-settings"> ' +
-    '<div> ' +
+  var html = '<div> ' +
     '<select id="display-mode"> ' +
     '  <option value="received">Show uniques received</option> ' +
     '  <option value="missing">Show missing uniques</option> ' +
     '</select> ' +
     '</div> ' +
     '<div><label style="color:red;"><input type="checkbox" id="show-visited">Show visited/captured</label></div> ' +
-    '<div><label style="color:violet;"><input type="checkbox" id="show-scouted">Show Scout Controlled</label></div> ' +
-    '</div>';
+    '<div><label style="color:violet;"><input type="checkbox" id="show-scouted">Show Scout Controlled</label></div>';
 
   dialog({
     html: html,
@@ -96,7 +94,7 @@ function historyDialog() {
 
 
 function updateDialogOption() {
-  var dialog = $('#portal-history-settings');
+  var dialog = $('#dialog-plugin-portal-history-flags');
 
   var displayMode = portalsHistory.settings.historyModeInverted ? 'missing' : 'received';
   $('#display-mode', dialog).val(displayMode);
@@ -106,7 +104,7 @@ function updateDialogOption() {
 
 
 function saveDialogOption() {
-  var dialog = $('#portal-history-settings');
+  var dialog = $('#dialog-plugin-portal-history-flags');
 
   portalsHistory.settings.historyModeInverted = $('#display-mode', dialog).val() === 'missing';
   portalsHistory.settings.showVisitedCaptured = $('#show-visited', dialog).is(':checked');
