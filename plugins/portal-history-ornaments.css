@@ -1,0 +1,20 @@
+.dot {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  display: inline-block;
+  border: solid black 0.1em;
+  vertical-align: text-bottom;
+}
+
+.dot.yellow {
+  background-color: yellow;
+}
+
+.dot.red {
+  background-color: red;
+}
+
+.dot.violet {
+  background-color: violet;
+}

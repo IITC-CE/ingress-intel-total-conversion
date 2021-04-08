@@ -46,6 +46,7 @@ function toggleHistoryMode() {
   localStorage[KEY_SETTINGS] = JSON.stringify(portalsHistory.settings);
   $('#toggleHistory').html(toggleIcon());
   drawAllHistoryOrnaments();
+  updateDialogOption();
 }
 
 function svgToIcon (str, s) {
@@ -76,8 +77,9 @@ function historyDialog() {
     '  <option value="missing">Show missing uniques</option> ' +
     '</select> ' +
     '</div> ' +
-    '<div><label style="color:red;"><input type="checkbox" id="show-visited">Show visited/captured</label></div> ' +
-    '<div><label style="color:violet;"><input type="checkbox" id="show-scouted">Show Scout Controlled</label></div>';
+    '<div><label><input type="checkbox" id="show-visited">Show <span class="dot yellow"></span>Visited/'+
+    '<span class="dot red"></span>Captured</label></div> ' +
+    '<div><label><input type="checkbox" id="show-scouted">Show <span class="dot violet"></span>Scout Controlled</label></div>';
 
   dialog({
     html: html,
@@ -252,4 +254,10 @@ function setup () { // eslint-disable-line no-unused-vars
   $('<a>Portal History</a>')
     .click(historyDialog)
     .appendTo('#toolbox');
+
+  $('<style>')
+    .prop('type', 'text/css')
+    .html('@include_string:portal-history-ornaments.css@')
+    .appendTo('head');
+
 }
