@@ -363,7 +363,7 @@ window.plugin.missions = {
 			}).map(function(waypoint) {
 				return L.latLng(waypoint.portal.latE6/1E6, waypoint.portal.lngE6/1E6);
 			}).map(function(latlng1, i, latlngs) {
-				if(i == 0) return 0;
+				if(i === 0) return 0;
 				var latlng2 = latlngs[i - 1];
 				return latlng1.distanceTo(latlng2);
 			}).reduce(function(a, b) {
@@ -450,7 +450,7 @@ window.plugin.missions = {
 
 		if(!distances.length) return;
 
-		if(mission.typeNum == 2) { // non-sequential
+		if(mission.typeNum === 2) { // non-sequential
 			distances.sort(function(a, b) { return a.distance - b.distance; });
 		}
 
@@ -553,7 +553,7 @@ window.plugin.missions = {
 	renderPortalCircle: function(portal) {
 		var team = TEAM_TO_CSS[getTeam(portal)];
 		var resCount = portal.resCount;
-		var level = resCount == 0 ? 0 : portal.level; // we want neutral portals to be level 0
+		var level = resCount ? portal.level : 0; // we want neutral portals to be level 0
 
 		var container = document.createElement('div');
 		container.className = 'plugin-mission-portal-indicator help ' + team;
@@ -759,7 +759,7 @@ window.plugin.missions = {
 			opacity: 1,
 			weight: 2,
 			interactive: false,
-			dashArray: (mission.typeNum == 2 /* non-sequential */ ? '1,5' : undefined),
+			dashArray: (mission.typeNum === 2 /* non-sequential */ ? '1,5' : undefined),
 		});
 		this.missionLayer.addLayer(line);
 		markers.push(line);
@@ -897,7 +897,7 @@ window.plugin.missions = {
 	},
 
 	onPaneChanged: function(pane) {
-		if(pane == 'plugin-missions') {
+		if(pane === 'plugin-missions') {
 			document.body.appendChild(this.mobilePane);
 		} else if(this.mobilePane.parentNode) {
 			this.mobilePane.parentNode.removeChild(this.mobilePane);
@@ -939,7 +939,7 @@ window.plugin.missions = {
 				return;
 			}
 
-			if(query.results.some(function(result) { return result.mission && (result.mission.guid == mission.guid); }))
+			if(query.results.some(function(result) { return result.mission && (result.mission.guid === mission.guid); }))
 				// mission already in list (a cached mission may be found again via missions in bounds)
 				return;
 
