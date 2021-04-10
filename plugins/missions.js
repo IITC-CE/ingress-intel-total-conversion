@@ -355,7 +355,7 @@ window.plugin.missions = {
 
 		if(cachedMission) {
 			var span = container.appendChild(document.createElement('span'));
-			span.className = 'nickname ' + (cachedMission.authorTeam === 'R' ? 'res' : 'enl')
+			span.className = 'nickname ' + (cachedMission.authorTeam === 'R' ? 'res' : 'enl');
 			span.textContent = cachedMission.authorNickname;
 
 			var len = cachedMission.waypoints.filter(function(waypoint) {
@@ -480,7 +480,7 @@ window.plugin.missions = {
 		desc.className = 'description';
 		desc.textContent = mission.description;
 
-		var list = container.appendChild(document.createElement('ol'))
+		var list = container.appendChild(document.createElement('ol'));
 		mission.waypoints.forEach(function(waypoint, index) {
 			list.appendChild(this.renderMissionWaypoint(waypoint, index, mission));
 		}, this);
@@ -877,7 +877,7 @@ window.plugin.missions = {
 			delete this[fieldName + 'UpdatingQueue'][e.property];
 		} else {
 			// Remote update
-			delete this[fieldName + 'UpdateQueue'][e.property]
+			delete this[fieldName + 'UpdateQueue'][e.property];
 			this.storeLocal(fieldName + 'UpdateQueue');
 
 			if(fieldName === 'checkedMissions') {
