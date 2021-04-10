@@ -10,7 +10,7 @@ var portalsHistory = {};
 window.plugin.portalHistoryOrnaments = portalsHistory;
 
 // Global functions used
-var dialog = window.dialog;
+// var dialog = window.dialog; //disabled, not working in IITCm 
 
 // Exposed functions
 portalsHistory.toggleHistoryMode       = toggleHistoryMode;       // needed for button
