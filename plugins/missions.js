@@ -164,8 +164,9 @@ window.plugin.missions = {
 			tabs.tabs('refresh');
 			tabs.find('.ui-tabs-nav').sortable('refresh');
 			tabs.tabs('option','active', -1);
-			if(window.isSmartphone())
+			if (window.isSmartphone()) {
 				show('plugin-missions');
+			}
 		} else {
 			dialog({
 				id: 'plugin-mission-details-' + id,
@@ -334,9 +335,9 @@ window.plugin.missions = {
 		var container = document.createElement('div');
 		container.className = 'plugin-mission-summary';
 		container.dataset['mission_mid'] = mission.guid;
-		if(checked)
+		if (checked) {
 			container.classList.add('checked');
-
+		}
 		var img = container.appendChild(document.createElement('img'));
 		img.src = mission.image;
 		img.addEventListener('click', function(ev) {
@@ -371,11 +372,11 @@ window.plugin.missions = {
 			}, 0);
 
 			if(len > 0) {
-				if(len > 1000)
+				if (len > 1000) {
 					len = Math.round(len / 100) / 10 + 'km';
-				else
+				} else {
 					len = Math.round(len * 10) / 10 + 'm';
-
+				}
 				var infoLength = container.appendChild(document.createElement('span'));
 				infoLength.className = 'plugin-mission-info length help';
 				infoLength.title = 'Length of this mission.\n\nNOTE: The actual distance required to cover may vary depending on several factors!';
@@ -503,15 +504,17 @@ window.plugin.missions = {
 
 			title.href = perma;
 			title.addEventListener('click', function(ev) {
-				if(window.isSmartphone())
+				if (window.isSmartphone()) {
 					show('map');
+				}
 				selectPortalByLatLng(lat, lng);
 				ev.preventDefault();
 				return false;
 			}, false);
 			title.addEventListener('dblclick', function(ev) {
-				if(window.isSmartphone())
+				if (window.isSmartphone()) {
 					show('map');
+				}
 				zoomToAndShowPortal(waypoint.portal.guid, [lat, lng]);
 				ev.preventDefault();
 				return false;
@@ -525,13 +528,13 @@ window.plugin.missions = {
 		}
 
 		title.className = 'title';
-		if(waypoint.title)
+		if (waypoint.title) {
 			title.textContent = waypoint.title;
-		else if(waypoint.portal && waypoint.portal.title)
+		} else if (waypoint.portal && waypoint.portal.title) {
 			title.textContent = waypoint.portal.title;
-		else
+		} else {
 			title.textContent = 'Unknown';
-
+		}
 		var mwpid = mission.guid + '-' + index + '-' + waypoint.guid;
 		var checked = this.checkedWaypoints[mwpid];
 
@@ -570,11 +573,11 @@ window.plugin.missions = {
 	},
 
 	toggleWaypoint: function(mid, mwpid, dontsave) {
-		if(this.checkedWaypoints[mwpid])
+		if (this.checkedWaypoints[mwpid]) {
 			delete this.checkedWaypoints[mwpid];
-		else
+		} else {
 			this.checkedWaypoints[mwpid] = true;
-
+		}
 		window.runHooks('plugin-missions-waypoint-changed', { mwpid: mwpid, local: true, });
 		if (!dontsave) {
 			this.checkedWaypointsUpdateQueue[mwpid] = true;
@@ -602,11 +605,11 @@ window.plugin.missions = {
 	},
 
 	toggleMission: function(mid) {
-		if(this.checkedMissions[mid])
+		if (this.checkedMissions[mid]) {
 			delete this.checkedMissions[mid];
-		else
+		} else {
 			this.checkedMissions[mid] = true;
-
+		}
 		window.runHooks('plugin-missions-mission-changed', { mid: mid, local: true, });
 		this.checkedMissionsUpdateQueue[mid] = true;
 		this.storeLocal('checkedMissions');
@@ -939,10 +942,10 @@ window.plugin.missions = {
 				return;
 			}
 
-			if(query.results.some(function(result) { return result.mission && result.mission.guid === mission.guid; }))
+			if (query.results.some(function(result) { return result.mission && result.mission.guid === mission.guid; })) {
 				// mission already in list (a cached mission may be found again via missions in bounds)
 				return;
-
+			}
 			var result = {
 				title: escapeHtmlSpecialChars(mission.title),
 				description: mission.description
