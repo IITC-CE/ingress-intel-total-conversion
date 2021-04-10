@@ -49,7 +49,7 @@ var decodeMissionSummary = function(data) {
 	};
 };
 var timeToRemaining = function(t) {
-	var data = parseInt(t / 86400) + 'd ' + (new Date(t % 86400 * 1000)).toUTCString().replace(/.*(\d{2}):(\d{2}):(\d{2}).*/, '$1h $2m $3s');
+	var data = parseInt(t / 86400) + 'd ' + new Date(t % 86400 * 1000).toUTCString().replace(/.*(\d{2}):(\d{2}):(\d{2}).*/, '$1h $2m $3s');
 	data = data.replace('0d', '');
 	data = data.replace('00h', '');
 	data = data.replace('00m', '');
@@ -83,7 +83,7 @@ window.plugin.missions = {
 			return;
 		}
 		var portal = window.portals[window.selectedPortal];
-		if (!portal || (!portal.options.data.mission && !portal.options.data.mission50plus)) {
+		if (!portal || !portal.options.data.mission && !portal.options.data.mission50plus) {
 			return;
 		}
 		// After select.
@@ -226,10 +226,10 @@ window.plugin.missions = {
 	loadMissionsInBounds: function(bounds, callback, errorcallback) {
 		var me = this;
 		window.postAjax('getTopMissionsInBounds', {
-			northE6: ((bounds.getNorth() * 1000000) | 0),
-			southE6: ((bounds.getSouth() * 1000000) | 0),
-			westE6: ((bounds.getWest() * 1000000) | 0),
-			eastE6: ((bounds.getEast() * 1000000) | 0)
+			northE6: bounds.getNorth() * 1000000 | 0,
+			southE6: bounds.getSouth() * 1000000 | 0,
+			westE6: bounds.getWest() * 1000000 | 0,
+			eastE6: bounds.getEast() * 1000000 | 0
 		}, function(data) {
 			var missions = data.result.map(decodeMissionSummary);
 			if (!missions) {
@@ -250,7 +250,7 @@ window.plugin.missions = {
 	loadPortalMissions: function(guid, callback, errorcallback) {
 		var me = this;
 		// Mission summary rarely goes stale.
-		if (me.cacheByPortalGuid[guid] && this.cacheByPortalGuid[guid].time > (Date.now() - this.portalMissionsCacheTime)) {
+		if (me.cacheByPortalGuid[guid] && this.cacheByPortalGuid[guid].time > Date.now() - this.portalMissionsCacheTime) {
 			callback(me.cacheByPortalGuid[guid].data);
 			return;
 		}
@@ -284,7 +284,7 @@ window.plugin.missions = {
 	loadMission: function(guid, callback, errorcallback) {
 		var me = this;
 		// TODO: we need to refresh data often enough, portal data can quickly go stale
-		if (this.cacheByMissionGuid[guid] && this.cacheByMissionGuid[guid].time > (Date.now() - this.missionCacheTime)) {
+		if (this.cacheByMissionGuid[guid] && this.cacheByMissionGuid[guid].time > Date.now() - this.missionCacheTime) {
 			callback(this.getMissionCache(guid, true));
 			return;
 		}
@@ -400,14 +400,14 @@ window.plugin.missions = {
 		var infoTime = container.appendChild(document.createElement('span'));
 		infoTime.className = 'plugin-mission-info time help';
 		infoTime.title = 'Typical duration';
-		infoTime.textContent = timeToRemaining((mission.medianCompletionTimeMs / 1000) | 0) + ' ';
+		infoTime.textContent = timeToRemaining(mission.medianCompletionTimeMs / 1000 | 0) + ' ';
 		img = infoTime.insertBefore(document.createElement('img'), infoTime.firstChild);
 		img.src = 'https://commondatastorage.googleapis.com/ingress.com/img/tm_icons/time.png';
 
 		var infoRating = container.appendChild(document.createElement('span'));
 		infoRating.className = 'plugin-mission-info rating help';
 		infoRating.title = 'Average rating';
-		infoRating.textContent = (((mission.ratingE6 / 100) | 0) / 100) + '%' + ' ';
+		infoRating.textContent = (mission.ratingE6 / 100 | 0) / 100 + '%' + ' ';
 		img = infoRating.insertBefore(document.createElement('img'), infoRating.firstChild);
 		img.src = 'https://commondatastorage.googleapis.com/ingress.com/img/tm_icons/like.png';
 
@@ -635,7 +635,7 @@ window.plugin.missions = {
 		if (this.cacheByMissionGuid[guid]) {
 			var cache = this.cacheByMissionGuid[guid];
 			// Update portal data from map if older then 2 minutes.
-			if (updatePortals && cache.time < (Date.now() - (2 * 60 * 1000))) {
+			if (updatePortals && cache.time < Date.now() - 2 * 60 * 1000) {
 				cache.data.waypoints.map(function(waypoint) {
 					if (!waypoint.portal) {
 						return;
@@ -708,7 +708,7 @@ window.plugin.missions = {
 		cache.sort(function(a, b) {
 			return me.cacheByPortalGuid[a].time - me.cacheByPortalGuid[b].time;
 		});
-		var toDelete = (cache.length / 2) | 0;
+		var toDelete = cache.length / 2 | 0;
 		cache.splice(0, toDelete + 1).forEach(function(el) {
 			delete me.cacheByPortalGuid[el];
 		});
@@ -721,7 +721,7 @@ window.plugin.missions = {
 		cache.sort(function(a, b) {
 			return me.cacheByMissionGuid[a].time - me.cacheByMissionGuid[b].time;
 		});
-		var toDelete = (cache.length / 2) | 0;
+		var toDelete = cache.length / 2 | 0;
 		cache.splice(0, toDelete + 1).forEach(function(el) {
 			delete me.cacheByMissionGuid[el];
 		});
@@ -759,7 +759,7 @@ window.plugin.missions = {
 			opacity: 1,
 			weight: 2,
 			interactive: false,
-			dashArray: (mission.typeNum === 2 /* non-sequential */ ? '1,5' : undefined),
+			dashArray: mission.typeNum === 2 /* non-sequential */ ? '1,5' : undefined,
 		});
 		this.missionLayer.addLayer(line);
 		markers.push(line);
@@ -777,7 +777,7 @@ window.plugin.missions = {
 		var bringToFront = map.hasLayer(plugin.missions.missionLayer);
 
 		this.missionLayer.eachLayer(function(layer) {
-			var active = (markers.indexOf(layer) !== -1);
+			var active = markers.indexOf(layer) !== -1;
 			layer.setStyle({
 				color: active ? this.MISSION_COLOR_ACTIVE : this.MISSION_COLOR,
 			});
@@ -935,11 +935,11 @@ window.plugin.missions = {
 
 		missions.forEach(function(mission) {
 			if(mission.title.toLowerCase().indexOf(term) === -1
-			&& ((!mission.description) || mission.description.toLowerCase().indexOf(term) === -1)) {
+			&& (!mission.description || mission.description.toLowerCase().indexOf(term) === -1)) {
 				return;
 			}
 
-			if(query.results.some(function(result) { return result.mission && (result.mission.guid === mission.guid); }))
+			if(query.results.some(function(result) { return result.mission && result.mission.guid === mission.guid; }))
 				// mission already in list (a cached mission may be found again via missions in bounds)
 				return;
 
