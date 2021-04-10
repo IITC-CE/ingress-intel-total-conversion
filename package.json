@@ -16,5 +16,9 @@
     "build:local": "./build.py local",
     "build:mobile": "./build.py mobile",
     "fileserver": "./web_server_local.py local"
+  },
+  "dependencies": {
+    "postcss": "^8.2.9",
+    "postcss-cli": "^8.3.1"
   }
 }
