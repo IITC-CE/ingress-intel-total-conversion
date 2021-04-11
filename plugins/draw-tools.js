@@ -373,8 +373,8 @@ window.plugin.drawTools.optCopy = function() {
       // for polygons, we also need a final link from last to first point
       if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
         stockLinks.push([latLngs[latLngs.length-1].lat,latLngs[latLngs.length-1].lng,latLngs[0].lat,latLngs[0].lng]);
-        }
-      });
+      }
+    });
     var stockUrl = window.makePermalink(null, {
       includeMapView: true,
       fullURL: true
@@ -710,7 +710,7 @@ window.plugin.drawTools.boot = function() {
 
   $('head').append('<style>' +
         '.drawtoolsSetbox > a { display:block; color:#ffce00; border:1px solid #ffce00; padding:3px 0; margin:10px auto; width:80%; text-align:center; background:rgba(8,48,78,.9); }'+
-        '.ui-dialog-drawtoolsSet-copy textarea { width:96%; height:100px; resize:vertical; }'+
+        '.ui-dialog-drawtoolsSet-copy textarea { width:96%; height:150px; resize:vertical; }'+
         '</style>');
 
 }
