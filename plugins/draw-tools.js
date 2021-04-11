@@ -584,8 +584,8 @@ window.plugin.drawTools.snapToPortals = function() {
       if (visibleBounds.contains(ll)) {
         testCount++;
         var newll = findClosestPortalLatLng(ll);
-        if (!newll.equals(ll)) {
-          layer.setLatLng(new L.LatLng(newll.lat,newll.lng));
+        if (newll.lat !== ll.lat || newll.lng !== ll.lng) {
+          layer.setLatLng(new L.LatLng(newll.lat, newll.lng));
           changedCount++;
         }
       }
@@ -596,8 +596,8 @@ window.plugin.drawTools.snapToPortals = function() {
         if (visibleBounds.contains(lls[i])) {
           testCount++;
           var newll = findClosestPortalLatLng(lls[i]);
-          if (!newll.equals(lls[i])) {
-            lls[i] = new L.LatLng(newll.lat,newll.lng);
+          if (newll.lat !== lls[i].lat || newll.lng !== lls[i].lng) {
+            lls[i] = new L.LatLng(newll.lat, newll.lng);
             changedCount++;
             layerChanged = true;
           }
