@@ -275,7 +275,7 @@ window.plugin.drawTools.manualOpt = function() {
   }
 
   var edfStatusCheck = '';
-  if(!window.plugin.drawTools.edf.obj.status){
+  if (!window.plugin.drawTools.edf.obj.status){
     edfStatusCheck = 'checked';
   }
 
@@ -385,14 +385,8 @@ window.plugin.drawTools.optCopy = function() {
     if (stockWarnings.noCircle) stockWarnTexts.push('Warning: Circles cannot be exported to stock intel');
     if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
     if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
-/*
-    var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-              +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'
-              +localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
-              +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
-              +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
-*/
-     // Export Normal draw
+
+    // Export Normal draw
     var html = ''
       +'<p style="margin:0 0 6px;">Normal export:</p>'
       +'<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">Select all</a> and press CTRL+C to copy it.</p>'
@@ -722,30 +716,29 @@ window.plugin.drawTools.getDrawAsLines = function(){
   var rawDraw = JSON.parse(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
   var draw = [];
 
-  for(i in rawDraw){
+  for (i in rawDraw){
     var elemDraw = rawDraw[i];
 
-    if(elemDraw.type === 'polygon'){
+    if (elemDraw.type === 'polygon'){
       var convElemDraw = {};
       convElemDraw.color = elemDraw.color;
       convElemDraw.type = 'polyline';
       convElemDraw.latLngs = [];
 
-      var v = elemDraw.latLngs.length;
-      for(j in elemDraw.latLngs){
+      for (j in elemDraw.latLngs){
         var ll = elemDraw.latLngs[j];
         convElemDraw.latLngs.push(ll);
       }
       convElemDraw.latLngs.push(elemDraw.latLngs[0]);
 
       draw.push(convElemDraw);
-    }else{
+    } else {
       draw.push(elemDraw);
     }
   }
 
   return JSON.stringify(draw);
-}
+};
 
 // ---------------------------------------------------------------------------------
 // EMPTY POLYGONS (EMPTY DRAWN FIELDS)
@@ -760,7 +753,7 @@ window.plugin.drawTools.edf.ui = {};
 window.plugin.drawTools.edf.boot = function(){
   window.addHook('pluginDrawTools', window.plugin.drawTools.edf.hookManagement);
   window.addHook('iitcLoaded', function(){
-    if(window.plugin.drawTools.edf.obj.status){
+    if (window.plugin.drawTools.edf.obj.status){
       window.plugin.drawTools.edf.draw.toggleOpacityOpt();
       window.plugin.drawTools.edf.draw.clearAndDraw();
     }
@@ -772,35 +765,36 @@ window.plugin.drawTools.edf.obj.toggle = function(){
   var status = window.plugin.drawTools.edf.obj.status;
   status = Boolean(!status);
   window.plugin.drawTools.edf.obj.status = status;
-}
+};
 window.plugin.drawTools.edf.draw.toggleOpacityOpt = function(){
   if(window.plugin.drawTools.edf.obj.status){
     window.plugin.drawTools.polygonOptions.fillOpacity = 0.0;
   }else{
     window.plugin.drawTools.polygonOptions.fillOpacity = 0.2;
   }
-}
+};
 window.plugin.drawTools.edf.draw.clearAndDraw = function(){
   window.plugin.drawTools.drawnItems.clearLayers();
   window.plugin.drawTools.load();
   console.log('DRAWTOOLS: reset all drawn items');
-}
+};
 
 window.plugin.drawTools.edf.action.toggle = function(){
   window.plugin.drawTools.edf.obj.toggle();
   window.plugin.drawTools.edf.draw.toggleOpacityOpt();
   window.plugin.drawTools.edf.draw.clearAndDraw();
-}
+};
 
 window.plugin.drawTools.edf.hookManagement = function(data){
-  if(data.event === 'openOpt'){
-  }else if(data.event == 'layerCreated'){
-    if(window.plugin.drawTools.edf.obj.status){
+  if (data.event === 'openOpt'){
+    return;
+  } else if (data.event === 'layerCreated'){
+    if (window.plugin.drawTools.edf.obj.status){
       //    window.plugin.drawTools.edf.draw.toggleOpacityOpt(); // disabled by Zaso
       window.plugin.drawTools.edf.draw.clearAndDraw();
     }
   }
-}
+};
 
 // ---------------------------------------------------------------------------------
 // MPE - MULTI PROJECTS EXTENSION
