@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.8.1
+// @version        0.8.3
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 
@@ -387,7 +387,8 @@ window.plugin.drawTools.optCopy = function() {
       if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
 /*
       var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
+                +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'
+                +localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
                 +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
                 +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
 */
@@ -395,13 +396,15 @@ window.plugin.drawTools.optCopy = function() {
         var html = ''
           +'<p style="margin:0 0 6px;">Normal export:</p>'
           +'<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-          +'<textarea id="copyNorm" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">'+localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>';
+          +'<textarea id="copyNorm" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">'
+          +localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>';
 
         // Export draw (polygons as lines)
         html += '<hr/>'
           +'<p style="margin:0 0 6px;">or export with polygons as lines (not filled):</p>'
           +'<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-          +'<textarea id="copyEDF" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">'+window.plugin.drawTools.getDrawAsLines()+'</textarea>';
+          +'<textarea id="copyEDF" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">'
+          +window.plugin.drawTools.getDrawAsLines()+'</textarea>';
 
         // Export for intel stock URL (only lines)
         html += '<hr/>'
@@ -412,35 +415,6 @@ window.plugin.drawTools.optCopy = function() {
       if (stockWarnTexts.length>0) {
         html += '<ul><li>'+stockWarnTexts.join('</li><li>')+'</li></ul>';
       }
-      // only polygons and polylines make it through to here
-      var latLngs = layer.getLatLngs();
-      // stock only handles one line segment at a time
-      for (var i=0; i<latLngs.length-1; i++) {
-        stockLinks.push([latLngs[i].lat,latLngs[i].lng,latLngs[i+1].lat,latLngs[i+1].lng]);
-      }
-      // for polygons, we also need a final link from last to first point
-      if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
-        stockLinks.push([latLngs[latLngs.length-1].lat,latLngs[latLngs.length-1].lng,latLngs[0].lat,latLngs[0].lng]);
-      }
-    });
-    var stockUrl = window.makePermalink(null, {
-      includeMapView: true,
-      fullURL: true
-    }) + '&pls='+stockLinks.map(function(link){return link.join(',');}).join('_');
-    var stockWarnTexts = [];
-    if (stockWarnings.polyAsLine) stockWarnTexts.push('Note: polygons are exported as lines');
-    if (stockLinks.length>40) stockWarnTexts.push('Warning: Stock intel may not work with more than 40 line segments - there are '+stockLinks.length);
-    if (stockWarnings.noCircle) stockWarnTexts.push('Warning: Circles cannot be exported to stock intel');
-    if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
-    if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
-
-    var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-              +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
-              +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
-              +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
-    if (stockWarnTexts.length>0) {
-      html += '<ul><li>'+stockWarnTexts.join('</li><li>')+'</li></ul>';
-    }
 
     dialog({
       html: html,
@@ -872,8 +846,8 @@ window.plugin.drawTools.initMPE = function(){
 }
 
 function setup () {
-  loadExternals();
-  window.plugin.drawTools.boot();
+  loadExternals();                              // initialize leaflet
+  window.plugin.drawTools.boot();               // initialize drawtools
   window.plugin.drawTools.initMPE();            // register to MPE if available
   window.plugin.drawTools.edf.boot();           // initialize empty drawn fields
 }
