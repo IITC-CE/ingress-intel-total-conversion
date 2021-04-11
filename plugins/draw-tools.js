@@ -275,7 +275,7 @@ window.plugin.drawTools.manualOpt = function() {
   }
 
   var edfStatusCheck = '';
-  if (!window.plugin.drawTools.edf.obj.status){
+  if (!window.plugin.drawTools.EDFstatus){
     edfStatusCheck = 'checked';
   }
 
@@ -294,7 +294,7 @@ window.plugin.drawTools.manualOpt = function() {
            +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
            + '<center><label id="edfToggle" style="color: #ffce00; cursor:pointer; display:block;">'
            +    '<input type="checkbox" '+edfStatusCheck+' name="edf"'
-           +    'onchange="window.plugin.drawTools.edf.action.toggle();return false;" />Fill the polygon(s)</label></center>'
+           +    'onchange="window.plugin.drawTools.edfStausToggle();return false;" />Fill the polygon(s)</label></center>'
            + '</div>';
 
   dialog({
@@ -687,6 +687,11 @@ window.plugin.drawTools.boot = function() {
       window.registerMarkerForOMS(layer);
     }
 
+    if (window.plugin.drawTools.EDFstatus){
+      //    window.plugin.drawTools.toggleOpacityOpt(); // disabled by Zaso
+      window.plugin.drawTools.clearAndDraw();
+    }
+
     runHooks('pluginDrawTools',{event:'layerCreated',layer:layer});
   });
 
@@ -699,6 +704,7 @@ window.plugin.drawTools.boot = function() {
     window.plugin.drawTools.save();
     runHooks('pluginDrawTools',{event:'layersEdited'});
   });
+
   //add options menu
   $('#toolbox').append('<a onclick="window.plugin.drawTools.manualOpt();return false;" accesskey="x" title="[x]">DrawTools Opt</a>');
 
@@ -743,57 +749,42 @@ window.plugin.drawTools.getDrawAsLines = function(){
 // ---------------------------------------------------------------------------------
 // EMPTY POLYGONS (EMPTY DRAWN FIELDS)
 // ---------------------------------------------------------------------------------
-window.plugin.drawTools.edf = {};
-window.plugin.drawTools.edf.storage = {};
-window.plugin.drawTools.edf.draw = {};
-window.plugin.drawTools.edf.obj = {};
-window.plugin.drawTools.edf.action = {};
-window.plugin.drawTools.edf.ui = {};
+window.plugin.drawTools.EDFstatus = false;
 
-window.plugin.drawTools.edf.boot = function(){
-  window.addHook('pluginDrawTools', window.plugin.drawTools.edf.hookManagement);
+window.plugin.drawTools.initEDF = function(){
+  // window.addHook('pluginDrawTools', window.plugin.drawTools.edf.hookManagement);
   window.addHook('iitcLoaded', function(){
-    if (window.plugin.drawTools.edf.obj.status){
-      window.plugin.drawTools.edf.draw.toggleOpacityOpt();
-      window.plugin.drawTools.edf.draw.clearAndDraw();
+    if (window.plugin.drawTools.EDFstatus){
+      window.plugin.drawTools.toggleOpacityOpt();
+      window.plugin.drawTools.clearAndDraw();
     }
   });
 };
 
-window.plugin.drawTools.edf.obj.status = false;
-window.plugin.drawTools.edf.obj.toggle = function(){
-  var status = window.plugin.drawTools.edf.obj.status;
+window.plugin.drawTools.toggleEDF = function(){
+  var status = window.plugin.drawTools.EDFstatus;
   status = Boolean(!status);
-  window.plugin.drawTools.edf.obj.status = status;
+  window.plugin.drawTools.EDFstatus = status;
 };
-window.plugin.drawTools.edf.draw.toggleOpacityOpt = function(){
-  if(window.plugin.drawTools.edf.obj.status){
+
+window.plugin.drawTools.toggleOpacityOpt = function(){
+  if (window.plugin.drawTools.EDFstatus){
     window.plugin.drawTools.polygonOptions.fillOpacity = 0.0;
-  }else{
+  } else {
     window.plugin.drawTools.polygonOptions.fillOpacity = 0.2;
   }
 };
-window.plugin.drawTools.edf.draw.clearAndDraw = function(){
+
+window.plugin.drawTools.clearAndDraw = function(){
   window.plugin.drawTools.drawnItems.clearLayers();
   window.plugin.drawTools.load();
   console.log('DRAWTOOLS: reset all drawn items');
 };
 
-window.plugin.drawTools.edf.action.toggle = function(){
-  window.plugin.drawTools.edf.obj.toggle();
-  window.plugin.drawTools.edf.draw.toggleOpacityOpt();
-  window.plugin.drawTools.edf.draw.clearAndDraw();
-};
-
-window.plugin.drawTools.edf.hookManagement = function(data){
-  if (data.event === 'openOpt'){
-    return;
-  } else if (data.event === 'layerCreated'){
-    if (window.plugin.drawTools.edf.obj.status){
-      //    window.plugin.drawTools.edf.draw.toggleOpacityOpt(); // disabled by Zaso
-      window.plugin.drawTools.edf.draw.clearAndDraw();
-    }
-  }
+window.plugin.drawTools.edfStausToggle = function(){
+  window.plugin.drawTools.toggleEDF();
+  window.plugin.drawTools.toggleOpacityOpt();
+  window.plugin.drawTools.clearAndDraw();
 };
 
 // ---------------------------------------------------------------------------------
@@ -843,7 +834,7 @@ function setup () {
   loadExternals();                              // initialize leaflet
   window.plugin.drawTools.boot();               // initialize drawtools
   window.plugin.drawTools.initMPE();            // register to MPE if available
-  window.plugin.drawTools.edf.boot();           // initialize empty drawn fields
+  window.plugin.drawTools.initEDF();            // initialize empty drawn fields
 }
 
 function loadExternals () {
