@@ -533,7 +533,7 @@ window.plugin.drawTools.snapToPortals = function() {
     }
   }
 
-  if (mapDataRequest.status.short != 'done') {
+  if (window.mapDataRequest.status.short !== 'done') {
     if (!confirm('Map data has not completely loaded, so some portals may be missing. Do you want to continue?')) {
       return;
     }
@@ -551,71 +551,75 @@ window.plugin.drawTools.snapToPortals = function() {
     }
   });
 
-  if (Object.keys(visiblePortals).length == 0) {
+  if (!Object.keys(visiblePortals).length) {
     alert('Error: No portals visible in this view - nothing to snap points to!');
     return;
   }
 
-  var findClosestPortalLatLng = function(latlng) {
+  var findClosestPortalLatLng = function(latlng) { // except when latlng is already on portal
     var testpoint = map.project(latlng);
 
-    var minDistSquared = undefined;
-    var minGuid = undefined;
+    var minDistSquared = Infinity;
+    var minGuid;
     for (var guid in visiblePortals) {
-      var p = visiblePortals[guid];
-      var distSquared = (testpoint.x-p.x)*(testpoint.x-p.x) + (testpoint.y-p.y)*(testpoint.y-p.y);
-      if (minDistSquared == undefined || minDistSquared > distSquared) {
+      var diff = visiblePortals[guid].subtract(testpoint);
+      var distSquared = diff.x*diff.x + diff.y*diff.y;
+      if (minDistSquared > distSquared) {
         minDistSquared = distSquared;
         minGuid = guid;
       }
     }
-    return minGuid ? portals[minGuid].getLatLng() : undefined; //should never hit 'undefined' case - as we abort when the list is empty
+    if (minGuid) {
+      var pll = portals[minGuid].getLatLng();
+      if (pll.lat !== latlng.lat || pll.lng !== latlng.lng) {
+        return L.latLng(pll);
+      }
+    }
   };
-
 
   var changedCount = 0;
   var testCount = 0;
-
   window.plugin.drawTools.drawnItems.eachLayer(function(layer) {
+    var newll;
     if (layer.getLatLng) {
-      //circles and markers - a single point to snap
+      // circles and markers - a single point to snap
       var ll = layer.getLatLng();
       if (visibleBounds.contains(ll)) {
         testCount++;
-        var newll = findClosestPortalLatLng(ll);
-        if (newll.lat !== ll.lat || newll.lng !== ll.lng) { // must be strict
-          layer.setLatLng(new L.LatLng(newll.lat, newll.lng));
+        newll = findClosestPortalLatLng(ll);
+        if (newll) {
+          layer.setLatLng(newll);
           changedCount++;
         }
       }
     } else if (layer.getLatLngs) {
       var lls = layer.getLatLngs();
-      var layerChanged = false;
-      for (var i=0; i<lls.length; i++) {
-        if (visibleBounds.contains(lls[i])) {
+      var layerChanged;
+      layer.getLatLngs().forEach(function(ll, i) { // eslint-disable-line no-shadow -- allow ll
+        if (visibleBounds.contains(ll)) {
           testCount++;
-          var newll = findClosestPortalLatLng(lls[i]);
-          if (newll.lat !== lls[i].lat || newll.lng !== lls[i].lng) {
-            lls[i] = new L.LatLng(newll.lat, newll.lng);
+          newll = findClosestPortalLatLng(ll);
+          if (newll) {
+            lls[i] = newll;
             changedCount++;
             layerChanged = true;
           }
         }
-      }
+      });
       if (layerChanged) {
         layer.setLatLngs(lls);
       }
     }
   });
-
-  if(changedCount > 0) {
-    runHooks('pluginDrawTools',{event:'layersSnappedToPortals'}); //or should we send 'layersEdited'? as that's effectively what's happened...
+  if (changedCount) {
+    window.runHooks('pluginDrawTools', {
+      // or should we send 'layersEdited'? as that's effectively what's happened...
+      event:'layersSnappedToPortals'
+    });
   }
-
   alert('Tested '+testCount+' points, and moved '+changedCount+' onto portal coordinates');
-
   window.plugin.drawTools.save();
-}
+};
 
 window.plugin.drawTools.boot = function() {
 
