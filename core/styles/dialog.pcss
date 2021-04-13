@@ -1,5 +1,3 @@
-/* Dialogs
- */
 .ui-tooltip,
 .ui-dialog {
   position: absolute;
@@ -12,8 +10,26 @@
   padding: 2px 4px;
 }
 
+.ui-dialog {
+  padding: 0;
+  border-radius: 2px;
+  max-width: calc(100vw - 2px);
+}
+
+@media (min-width: 700px) {
+  .ui-dialog {
+    max-width: 600px;
+  }
+}
+
+.ui-tooltip,
+.ui-dialog a {
+  color: #ffce00;
+}
+
 .ui-tooltip {
   max-width: 300px;
+  z-index: 10002 !important;
 }
 
 .ui-widget-overlay {
@@ -29,20 +45,6 @@
 
 .ui-modal {
   z-index: 10001 !important;
-}
-
-.ui-tooltip {
-  z-index: 10002 !important;
-}
-
-.ui-tooltip,
-.ui-dialog a {
-  color: #ffce00;
-}
-
-.ui-dialog {
-  padding: 0;
-  border-radius: 2px;
 }
 
 .ui-dialog-modal .ui-dialog-titlebar-close {
@@ -84,10 +86,10 @@
   border: 1px solid rgb(32, 168, 177);
   background-color: rgba(0, 0, 0, 0);
   padding: 0;
-}
 
-.ui-dialog-titlebar-button:active {
-  background-color: rgb(32, 168, 177);
+  &:active {
+    background-color: rgb(32, 168, 177);
+  }
 }
 
 .ui-dialog-titlebar-button-close {
@@ -96,10 +98,6 @@
 
 .ui-dialog-titlebar-button-collapse {
   right: 25px;
-}
-
-.ui-dialog-titlebar-button-collapse-expanded {
-  /* For future changes */
 }
 
 .ui-dialog-titlebar-button-collapse-collapsed {
@@ -118,14 +116,17 @@
   height: 0;
   border-top: 2px solid rgb(32, 168, 177);
 }
+
 .ui-dialog-titlebar-button-close::after {
   transform: translateY(3.5px) rotate(45deg);
   -webkit-transform: translateY(3.5px) rotate(45deg);
 }
+
 .ui-dialog-titlebar-button-close::before {
   transform: translateY(3.5px) rotate(-45deg);
   -webkit-transform: translateY(3.5px) rotate(-45deg);
 }
+
 .ui-dialog-titlebar-button.ui-state-active::after,
 .ui-dialog-titlebar-button.ui-state-active::before,
 .ui-dialog-titlebar-button.ui-dialog-titlebar-button-collapse-collapsed::after,
@@ -145,16 +146,6 @@
   /* 24px – padding 12px * 2 */
   /*  2px – border 1px * 2 */
   max-height: calc(100vh - 57px - 24px - 2px) !important;
-}
-
-.ui-dialog {
-  max-width: calc(100vw - 2px);
-}
-
-@media (min-width: 700px) {
-  .ui-dialog {
-    max-width: 600px;
-  }
 }
 
 .ui-dialog-content-hidden {
