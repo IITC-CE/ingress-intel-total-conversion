@@ -97,7 +97,7 @@ function setup () {
     });
   tidyLinks.layer.getCenter = function () { return map.getCenter(); }; // for tooltip position
 
-  window.addLayerGroup('Tidy Links', tidyLinks.layer, false);
+  window.layerChooser.addOverlay(tidyLinks.layer, 'Tidy Links', {default: false});
 
   $('<style>').html('\
     .tidy-links-error {\

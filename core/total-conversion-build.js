@@ -85,10 +85,7 @@ document.body.innerHTML = ''
   + '    </div>'
   + '    <div id="portaldetails"></div>'
   + '    <input id="redeem" placeholder="Redeem code…" type="text"/>'
-  + '    <div id="toolbox">'
-  + '      <a onmouseover="setPermaLink(this)" onclick="setPermaLink(this);return androidPermalink()" title="URL link to this map view">Permalink</a>'
-  + '      <a onclick="window.aboutIITC()" style="cursor: help">About IITC</a>'
-  + '    </div>'
+  + '    <div id="toolbox"></div>'
   + '  </div>'
   + '</div>'
   + '<div id="updatestatus"><div id="innerstatus"></div></div>'
@@ -175,7 +172,8 @@ window.selectedPortal = null;
 window.portalRangeIndicator = null;
 window.portalAccessIndicator = null;
 window.mapRunsUserAction = false;
-//var portalsLayers, linksLayer, fieldsLayer;
+
+// var portalsLayers, linksLayer, fieldsLayer;
 var portalsFactionLayers, linksFactionLayers, fieldsFactionLayers;
 
 // contain references to all entities loaded from the server. If render limits are hit,
@@ -183,10 +181,6 @@ var portalsFactionLayers, linksFactionLayers, fieldsFactionLayers;
 window.portals = {};
 window.links = {};
 window.fields = {};
-
-// contain current status(on/off) of overlay layerGroups.
-// But you should use isLayerGroupDisplayed(name) to check the status
-window.overlayStatus = {};
 
 // plugin framework. Plugins may load earlier than iitc, so don’t
 // overwrite data
@@ -199,5 +193,4 @@ var ulog = (function (module) {
 
 '@bundle_code@';
 
-  // fixed Addons
-  RegionScoreboard.setup();
+/* exported ulog, portalsFactionLayers, linksFactionLayers, fieldsFactionLayers -- eslint */

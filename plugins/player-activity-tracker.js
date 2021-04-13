@@ -35,11 +35,11 @@ window.plugin.playerTracker.setup = function() {
   plugin.playerTracker.drawnTracesRes = new L.LayerGroup();
   // to avoid any favouritism, we'll put the player's own faction layer first
   if (PLAYER.team == 'RESISTANCE') {
-    window.addLayerGroup('Player Tracker Resistance', plugin.playerTracker.drawnTracesRes, true);
-    window.addLayerGroup('Player Tracker Enlightened', plugin.playerTracker.drawnTracesEnl, true);
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesRes, 'Player Tracker Resistance');
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesEnl, 'Player Tracker Enlightened');
   } else {
-    window.addLayerGroup('Player Tracker Enlightened', plugin.playerTracker.drawnTracesEnl, true);
-    window.addLayerGroup('Player Tracker Resistance', plugin.playerTracker.drawnTracesRes, true);
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesEnl, 'Player Tracker Enlightened');
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesRes, 'Player Tracker Resistance');
   }
   map.on('layeradd',function(obj) {
     if(obj.layer === plugin.playerTracker.drawnTracesEnl || obj.layer === plugin.playerTracker.drawnTracesRes) {

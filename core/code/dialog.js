@@ -57,11 +57,6 @@ window.dialog = function(options) {
   var jqID = '#' + id;
   var html = '';
 
-  // hint for iitc mobile that a dialog was opened
-  if (typeof android !== 'undefined' && android && android.dialogOpened) {
-    android.dialogOpened(id, true);
-  }
-
   // Convert text to HTML if necessary
   if(options.text) {
     html = window.convertTextToTableMagic(options.text);
@@ -204,10 +199,6 @@ window.dialog = function(options) {
 
       window.DIALOG_COUNT--;
       log.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') closed. ' + window.DIALOG_COUNT + ' remain.');
-      // hint for iitc mobile that a dialog was closed
-      if (typeof android !== 'undefined' && android && android.dialogOpened) {
-        android.dialogOpened(id, false);
-      }
 
       // remove from DOM and destroy
       $(this).dialog('destroy').remove();
@@ -230,10 +221,6 @@ window.dialog = function(options) {
 
       // This dialog is now in focus
       window.DIALOG_FOCUS = this;
-      // hint for iitc mobile that a dialog was focused
-      if (typeof android !== 'undefined' && android && android.dialogFocused) {
-        android.dialogFocused($(window.DIALOG_FOCUS).data('id'));
-      }
       $(this).closest('.ui-dialog').find('.ui-dialog-title').removeClass('ui-dialog-title-inactive').addClass('ui-dialog-title-active');
     }
   }, options));

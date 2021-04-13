@@ -1037,8 +1037,8 @@ window.plugin.missions = {
 		this.missionStartLayer = new L.LayerGroup();
 		this.missionLayer = new L.LayerGroup();
 
-		window.addLayerGroup('Mission start portals', this.missionStartLayer, false);
-		window.addLayerGroup('Mission portals', this.missionLayer, true);
+		window.layerChooser.addOverlay(this.missionStartLayer, 'Mission start portals', {default: false});
+		window.layerChooser.addOverlay(this.missionLayer, 'Mission portals');
 
 		// HOOKS:
 		// - plugin-missions-loaded-mission

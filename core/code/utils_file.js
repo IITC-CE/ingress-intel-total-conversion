@@ -20,13 +20,10 @@ function saveAs (data,filename,dataType) {
 } // alternative: https://github.com/eligrey/FileSaver.js/blob/master/src/FileSaver.js
 
 // @function saveFile(data: String, filename?: String, dataType? String)
-// Save data to file with given filename, using IITCm file chooser, or generic browser routine.
+// Save data to file with given filename, using generic browser routine,
+// or  IITCm file chooser (overwritten in android.js).
 // `dataType` can be set to filter IITCm file chooser filetypes.
-window.saveFile = typeof android === 'undefined' || !android.saveFile
-  ? saveAs
-  : function (data,filename,dataType) {
-      android.saveFile(filename || '', dataType || '*/*', data);
-    };
+window.saveFile = saveAs;
 
 /*
  * @class L.FileReader

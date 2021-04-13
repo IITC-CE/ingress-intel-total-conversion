@@ -327,5 +327,5 @@ var setup =  function() {
 	$('body').append('<select onchange="window.plugin.farmFind.changeLevel()" id="farm_level_select"><option value=1>Farm level 1</option><option value=2>Farm level 2</option><option value=3>Farm level 3</option><option value=4>Farm level 4</option><option value=5>Farm level 5</option><option value=6>Farm level 6</option><option value=7>Farm level 7</option><option value=8>Farm level 8</option></select>');
     var myselect = document.getElementById("farm_level_select");
     myselect.options.selectedIndex = 6;
-    window.addLayerGroup('Farms', window.plugin.farmFind.levelLayerGroup, true);
+    window.layerChooser.addOverlay(window.plugin.farmFind.levelLayerGroup, 'Farms');
 };

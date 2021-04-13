@@ -167,7 +167,7 @@ var setup = function() {
   window.plugin.portalNames.setupCSS();
 
   window.plugin.portalNames.labelLayerGroup = new L.LayerGroup();
-  window.addLayerGroup('Portal Names', window.plugin.portalNames.labelLayerGroup, true);
+  window.layerChooser.addOverlay(window.plugin.portalNames.labelLayerGroup, 'Portal Names');
 
   window.addHook('requestFinished', function() { setTimeout(function(){window.plugin.portalNames.delayedUpdatePortalLabels(3.0);},1); });
   window.addHook('mapDataRefreshEnd', function() { window.plugin.portalNames.delayedUpdatePortalLabels(0.5); });

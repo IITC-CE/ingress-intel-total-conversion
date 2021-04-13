@@ -160,19 +160,12 @@ public class IITC_MapSettings implements OnItemSelectedListener, OnItemClickList
 
     @Override
     public boolean onItemLongClick(final AdapterView<?> parent, final View view, int position, final long id) {
-        if (mDisableListeners) return false;
+        if (mDisableListeners || position == 0) return false;
         position--; // The ListView header counts as an item as well.
-        final boolean active = !mOverlayLayers.getItem(position).active;
-
-        for (int i = 0; i < mOverlayLayers.getCount(); i++) {
-            final Layer item = mOverlayLayers.getItem(i);
-            if (item.name.contains("DEBUG")) continue;
-            if (active == item.active) continue; // no need to set same value again
-            item.active = active;
-            setLayer(item);
-        }
-
-        mOverlayLayers.notifyDataSetChanged();
+        mIitc.getWebView().loadUrl(
+                "javascript: " +
+                "var data = window.layerChooser._layers[" + mOverlayLayers.getItem(position).id + "];" +
+                "window.layerChooser._onLongClick(data);");
 
         return true;
     }
