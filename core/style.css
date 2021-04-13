@@ -16,8 +16,8 @@
   width: 100%;
 }
 
-
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow: hidden; /* workaround for #373 */
@@ -29,7 +29,6 @@ html, body {
   height: 100%;
   width: 100%;
 }
-
 
 body {
   font-size: 14px;
@@ -47,10 +46,18 @@ body {
   cursor: pointer;
 }
 
-i.tiny { font-size: 1rem; }
-i.small { font-size: 2rem; }
-i.medium { font-size: 4rem; }
-i.large { font-size: 6rem; }
+i.tiny {
+  font-size: 1rem;
+}
+i.small {
+  font-size: 2rem;
+}
+i.medium {
+  font-size: 4rem;
+}
+i.large {
+  font-size: 6rem;
+}
 
 #scrollwrapper {
   overflow-x: hidden;
@@ -102,7 +109,7 @@ a:hover {
 
 /* field mu count */
 .fieldmu {
-  color: #FFCE00;
+  color: #ffce00;
   font-size: 13px;
   font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; /*override leaflet-container */
   text-align: center;
@@ -166,11 +173,11 @@ a:hover {
 #updatestatus {
   background-color: rgba(8, 48, 78, 0.9);
   border-bottom: 0;
-  border-top: 1px solid #20A8B1;
-  border-left: 1px solid #20A8B1;
+  border-top: 1px solid #20a8b1;
+  border-left: 1px solid #20a8b1;
   bottom: 0;
   color: #ffce00;
-  font-size:13px;
+  font-size: 13px;
   padding: 4px;
   position: fixed;
   right: 0;
@@ -185,11 +192,11 @@ a:hover {
 }
 
 #loadlevel {
-  background: #FFF;
+  background: #fff;
   color: #000000;
   display: inline-block;
   min-width: 1.8em;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   border-width: 0 1px;
   margin: -4px 0;
   padding: 4px 0.2em;
@@ -209,21 +216,23 @@ a:hover {
   color: #00c2ff;
 }
 
-.ALIENS, .ENLIGHTENED {
+.ALIENS,
+.ENLIGHTENED {
   color: #28f428;
 }
 
 #portal_highlight_select {
   position: absolute;
-  top:5px;
-  left:10px;
+  top: 5px;
+  left: 10px;
   z-index: 2500;
-  font-size:11px;
-  background-color:#0E3C46;
-  color:#ffce00;
+  font-size: 11px;
+  background-color: #0e3c46;
+  color: #ffce00;
 }
 
-.portal_details th, .portal_details td {
+.portal_details th,
+.portal_details td {
   vertical-align: top;
   text-align: left;
 }
@@ -233,7 +242,8 @@ a:hover {
   padding-right: 1em;
 }
 
-.portal_details tr.padding-top th, .portal_details tr.padding-top td {
+.portal_details tr.padding-top th,
+.portal_details tr.padding-top td {
   padding-top: 0.7em;
 }
 
@@ -249,7 +259,7 @@ a:hover {
 #map .leaflet-popup-content-wrapper {
   border-radius: 0px;
   -webkit-border-radius: 0px;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   background: #0e3d4e;
   pointer-events: auto;
 }
@@ -268,10 +278,9 @@ a:hover {
   pointer-events: auto;
 }
 
-
 #map .leaflet-popup-tip {
   /* change the tip from an arrow to a simple line */
-  background: #20A8B1;
+  background: #20a8b1;
   width: 1px;
   height: 20px;
   padding: 0;
@@ -283,75 +292,74 @@ a:hover {
   transform: none;
 }
 
-
 /* misc */
 .layer_off_warning {
-  color: #FFCE00;
+  color: #ffce00;
   margin: 8px;
   text-align: center;
 }
 
 /* tabs */
 .ui-tabs-nav {
-	display: block;
-	border-bottom: 1px solid #20a8b1;
-	border-top: 1px solid transparent;
-	margin: 3px 0 0;
-	padding: 0;
+  display: block;
+  border-bottom: 1px solid #20a8b1;
+  border-top: 1px solid transparent;
+  margin: 3px 0 0;
+  padding: 0;
 }
 .ui-tabs-nav::after {
-	content: '';
-	clear: left;
-	display: block;
-	height: 0;
-	width: 0;
+  content: "";
+  clear: left;
+  display: block;
+  height: 0;
+  width: 0;
 }
 .ui-tabs-nav li {
-	list-style: none;
-	display: block;
-	float:left;
-	margin: 0 0 -1px;
-	border: 1px solid #20a8b1;
+  list-style: none;
+  display: block;
+  float: left;
+  margin: 0 0 -1px;
+  border: 1px solid #20a8b1;
 }
 .ui-tabs-nav li.ui-tabs-active {
-	border-bottom-color: #0F2C3F;
-	background: #0F2C3F;
-	border-width: 2px 2px 1px;
-	font-weight: bold;
-	margin: -1px 1px;
+  border-bottom-color: #0f2c3f;
+  background: #0f2c3f;
+  border-width: 2px 2px 1px;
+  font-weight: bold;
+  margin: -1px 1px;
 }
 .ui-tabs-nav a {
-	display: inline-block;
-	padding: 0.2em 0.7em;
+  display: inline-block;
+  padding: 0.2em 0.7em;
 }
 .ui-tabs-nav .ui-icon {
-	display: inline-block;
-	font-size: 0;
-	height: 22px;
-	overflow: hidden;
-	position: relative;
-	vertical-align: top;
-	width: 16px;
+  display: inline-block;
+  font-size: 0;
+  height: 22px;
+  overflow: hidden;
+  position: relative;
+  vertical-align: top;
+  width: 16px;
 }
 .ui-tabs-nav .ui-icon-close::before {
-	content: "×";
-	font-size: 16px;
-	height: 16px;
-	position: absolute;
-	text-align: center;
-	top: 2px;
-	vertical-align: baseline;
-	width: 16px;
-	cursor: pointer;
+  content: "×";
+  font-size: 16px;
+  height: 16px;
+  position: absolute;
+  text-align: center;
+  top: 2px;
+  vertical-align: baseline;
+  width: 16px;
+  cursor: pointer;
 }
 
 svg.icon-button {
-	fill: currentColor;
+  fill: currentColor;
 }
 
 .leaflet-marker-icon > svg {
-	height: inherit;
-	width: inherit;
+  height: inherit;
+  width: inherit;
 }
 
 /* Warning text */

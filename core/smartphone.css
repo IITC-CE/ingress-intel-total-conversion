@@ -29,7 +29,7 @@ body {
 #loadlevel {
   border-width: 0;
   background: transparent;
-  color: #FFF;
+  color: #fff;
 }
 
 #mobileinfo {
@@ -38,7 +38,7 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  position:relative;
+  position: relative;
   padding: 4px 0;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -47,7 +47,7 @@ body {
 
 #mobileinfo .portallevel {
   padding: 0 0.25em;
-  color: #FFF;
+  color: #fff;
 }
 
 #mobileinfo .resonator {
@@ -69,7 +69,7 @@ body {
   height: 6px;
   width: 6px;
   left: 50%;
-  top: -3px; 
+  top: -3px;
   margin-left: -3px;
   position: absolute;
   z-index: -1;
@@ -89,11 +89,15 @@ body {
   background-color: #00c5ff !important;
 }
 
-#name #signout { /* no hover, always show signout button */
+/* no hover, always show signout button */
+#name #signout {
   display: block;
 }
 
-#sidebar, #chatcontrols, #chat, #chatinput {
+#sidebar,
+#chatcontrols,
+#chat,
+#chatinput {
   background: transparent !important;
 }
 
@@ -125,7 +129,7 @@ body {
 
 #chatcontrols a {
   width: 50px;
-  height:36px;
+  height: 36px;
   overflow: hidden;
   vertical-align: middle;
   line-height: 36px;
@@ -136,10 +140,10 @@ body {
 }
 
 #chat {
-  left:0;
-  right:0;
+  left: 0;
+  right: 0;
   top: 1px !important;
-  bottom:30px;
+  bottom: 30px;
   width: auto;
 }
 
@@ -148,18 +152,19 @@ body {
   height: 30px;
 }
 
-#chat td:nth-child(2), #chatinput td:nth-child(2) {
+#chat td:nth-child(2),
+#chatinput td:nth-child(2) {
   width: 77px;
 }
 
 #chatcontrols a.active {
-  border-color: #FFCE00;
-  border-bottom-width:0px;
-  font-weight:bold
+  border-color: #ffce00;
+  border-bottom-width: 0px;
+  font-weight: bold;
 }
 
 #chatcontrols a.active + a {
-  border-left-color: #FFCE00
+  border-left-color: #ffce00;
 }
 
 #sidebartoggle {
@@ -171,13 +176,13 @@ body {
   max-height: none !important;
   width: 100% !important;
   right: 0;
-  left:0;
+  left: 0;
 }
 
 #sidebar {
   width: 100% !important;
   min-height: 100%;
-  border:0;
+  border: 0;
 }
 
 #sidebar > * {
@@ -200,29 +205,28 @@ body {
  * for some reason leaflet popups on mobile are colored white on white
  * so force the popup msg color to black
  */
-.leaflet-popup-content{
-    color:black;
+.leaflet-popup-content {
+  color: black;
 }
 
-
 /* add extra padding, and a button effect, to sidebar link areas */
-.linkdetails aside  {
+.linkdetails aside {
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
-  border: 2px outset #20A8B1;
+  border: 2px outset #20a8b1;
 }
 
 #toolbox > a {
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
-  border: 2px outset #20A8B1;
+  border: 2px outset #20a8b1;
 }
 
 #portaldetails .close {
   padding: 4px;
-  border: 1px outset #20A8B1;
+  border: 1px outset #20a8b1;
   margin-top: 2px;
 }
 
@@ -231,4 +235,6 @@ body {
    Permanent solution should include fixes for attribution control too
    https://github.com/IITC-CE/ingress-intel-total-conversion/issues/89
 */
-.leaflet-bottom { bottom: 5px; }
+.leaflet-bottom {
+  bottom: 5px;
+}

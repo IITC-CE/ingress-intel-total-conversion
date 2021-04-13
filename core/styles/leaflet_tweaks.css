@@ -14,7 +14,7 @@
 .leaflet-control-layers-overlays {
   float: left;
   margin-left: 8px;
-  border-left: 1px solid #DDDDDD;
+  border-left: 1px solid #dddddd;
   padding-left: 8px;
   overflow-y: auto;
   max-height: 600px;
@@ -24,7 +24,6 @@
 .leaflet-control-layers-separator {
   display: none;
 }
-
 
 /* shift controls when chat is expanded */
 .leaflet-left .leaflet-control.chat-expand {
