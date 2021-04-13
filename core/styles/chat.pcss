@@ -1,220 +1,236 @@
 /* chat ***************************************************************/
 
 #chatcontrols {
-    color: #FFCE00;
-    background: rgba(8, 48, 78, 0.9);
-    position: absolute;
-    left: 0;
-    z-index: 3000;
-    height: 26px;
-    padding-left:1px;
+  color: #ffce00;
+  background: rgba(8, 48, 78, 0.9);
+  position: absolute;
+  left: 0;
+  z-index: 3000;
+  height: 26px;
+  padding-left: 1px;
+}
+
+#chatcontrols.expand {
+  top: 0;
+  bottom: auto;
+}
+
+#chatcontrols a {
+  margin-left: -1px;
+  display: inline-block;
+  width: 94px;
+  text-align: center;
+  height: 24px;
+  line-height: 24px;
+  border: 1px solid #20a8b1;
+  vertical-align: top;
+}
+
+#chatcontrols a:first-child {
+  letter-spacing: -1px;
+  text-decoration: none !important;
+}
+
+#chatcontrols a.active {
+  border-color: #ffce00;
+  border-bottom-width: 0px;
+  font-weight: bold;
+  background: rgb(8, 48, 78);
+}
+
+#chatcontrols a.active + a {
+  border-left-color: #ffce00;
+}
+
+#chatcontrols .toggle {
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #ffce00;
+  margin: 6px auto auto;
+}
+
+#chatcontrols.expand .toggle {
+  border-top: 10px solid #ffce00;
+  border-bottom: none;
+}
+
+#chatcontrols .loading {
+  background-color: rgba(255, 0, 0, 0.3);
+  -webkit-animation: chatloading 1.2s infinite linear;
+  -moz-animation: chatloading 1.2s infinite linear;
+  animation: chatloading 1.2s infinite linear;
+}
+
+@-webkit-keyframes chatloading {
+  0% {
+    background-color: rgba(255, 0, 0, 0.4);
   }
-  
-  #chatcontrols.expand {
-    top: 0;
-    bottom: auto;
+  50% {
+    background-color: rgba(255, 0, 0, 0.1);
   }
-  
-  #chatcontrols a {
-    margin-left: -1px;
-    display: inline-block;
-    width: 94px;
-    text-align: center;
-    height: 24px;
-    line-height: 24px;
-    border: 1px solid #20A8B1;
-    vertical-align: top;
+  100% {
+    background-color: rgba(255, 0, 0, 0.4);
   }
-  
-  #chatcontrols a:first-child {
-    letter-spacing:-1px;
-    text-decoration: none !important;
+}
+
+@-moz-keyframes chatloading {
+  0% {
+    background-color: rgba(255, 0, 0, 0.4);
   }
-  
-  #chatcontrols a.active {
-    border-color: #FFCE00;
-    border-bottom-width:0px;
-    font-weight:bold;
-    background: rgb(8, 48, 78);
+  50% {
+    background-color: rgba(255, 0, 0, 0.1);
   }
-  
-  #chatcontrols a.active + a {
-    border-left-color: #FFCE00
+  100% {
+    background-color: rgba(255, 0, 0, 0.4);
   }
-  
-  
-  #chatcontrols .toggle {
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #FFCE00;
-    margin: 6px auto auto;
+}
+
+@keyframes chatloading {
+  0% {
+    background-color: rgba(255, 0, 0, 0.4);
   }
-  
-  #chatcontrols.expand .toggle {
-    border-top: 10px solid #FFCE00;
-    border-bottom: none;
+  50% {
+    background-color: rgba(255, 0, 0, 0.1);
   }
-  
-  #chatcontrols .loading {
-    background-color: rgba(255,0,0,0.3);
-    -webkit-animation: chatloading 1.2s infinite linear;
-    -moz-animation: chatloading 1.2s infinite linear;
-    animation: chatloading 1.2s infinite linear;
+  100% {
+    background-color: rgba(255, 0, 0, 0.4);
   }
-  
-  @-webkit-keyframes chatloading {
-      0% { background-color: rgba(255,0,0,0.4) }
-     50% { background-color: rgba(255,0,0,0.1) }
-    100% { background-color: rgba(255,0,0,0.4) }
-  }
-  
-  @-moz-keyframes chatloading {
-      0% { background-color: rgba(255,0,0,0.4) }
-     50% { background-color: rgba(255,0,0,0.1) }
-    100% { background-color: rgba(255,0,0,0.4) }
-  }
-  
-  @keyframes chatloading {
-      0% { background-color: rgba(255,0,0,0.4) }
-     50% { background-color: rgba(255,0,0,0.1) }
-    100% { background-color: rgba(255,0,0,0.4) }
-  }
-  
-  
-  
-  #chat {
-    position: absolute;
-    width: 708px;
-    bottom: 23px;
-    left: 0;
-    z-index: 3000;
-    background: rgba(8, 48, 78, 0.9);
-    line-height: 15px;
-    color: #eee;
-    border: 1px solid #20A8B1;
-    border-bottom: 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  
-  em {
-    color: red;
-    font-style: normal;
-  }
-  
-  #chat.expand {
-    height:auto;
-    top: 25px;
-  }
-  
-  
-  #chat > div {
-    overflow-x:hidden;
-    overflow-y:scroll;
-    height: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 2px;
-    position:relative;
-  }
-  
-  #chat table, #chatinput table {
-    width: 100%;
-    table-layout: fixed;
-    border-spacing: 0;
-    border-collapse: collapse;
-  }
-  
-  #chatinput table {
-    height: 100%;
-  }
-  
-  #chat td, #chatinput td {
-    font-size: 13px;
-    vertical-align: top;
-    padding-bottom: 3px;
-  }
-  
-  /* time */
-  #chat td:first-child, #chatinput td:first-child {
-    width: 44px;
-    overflow: hidden;
-    padding-left: 2px;
-    color: #bbb;
-    white-space: nowrap;
-  }
-  
-  #chat time {
-    cursor: help;
-  }
-  
-  /* nick */
-  #chat td:nth-child(2), #chatinput td:nth-child(2) {
-    width: 91px;
-    overflow: hidden;
-    padding-left: 2px;
-    white-space: nowrap;
-  }
-  
-  #chat td .system_narrowcast {
-    color: #f66 !important;
-  }
-  
-  mark {
-    background: transparent;
-  }
-  
-  .invisep {
-    display: inline-block;
-    width: 1px;
-    height: 1px;
-    overflow:hidden;
-    color: transparent;
-  }
-  
-  /* divider */
-  summary {
-    color: #bbb;
-    display: inline-block;
-    height: 16px;
-    overflow: hidden;
-    padding: 0 2px;
-    white-space: nowrap;
-    width: 100%;
-  }
-  
-  #chatinput {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 0 2px;
-    background: rgba(8, 48, 78, 0.9);
-    width: 708px;
-    height: 23px;
-    border: 1px solid #20A8B1;
-    z-index: 3001;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  
-  #chatinput td {
-    padding-bottom: 1px;
-    vertical-align: middle;
-  }
-  
-  
-  #chatinput input {
-    background: transparent;
-    color: #EEEEEE;
-    width: 100%;
-    height: 100%;
-    padding:3px 4px 1px 4px;
-  }
-  
-  
+}
+
+#chat {
+  position: absolute;
+  width: 708px;
+  bottom: 23px;
+  left: 0;
+  z-index: 3000;
+  background: rgba(8, 48, 78, 0.9);
+  line-height: 15px;
+  color: #eee;
+  border: 1px solid #20a8b1;
+  border-bottom: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+em {
+  color: red;
+  font-style: normal;
+}
+
+#chat.expand {
+  height: auto;
+  top: 25px;
+}
+
+#chat > div {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 2px;
+  position: relative;
+}
+
+#chat table,
+#chatinput table {
+  width: 100%;
+  table-layout: fixed;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+#chatinput table {
+  height: 100%;
+}
+
+#chat td,
+#chatinput td {
+  font-size: 13px;
+  vertical-align: top;
+  padding-bottom: 3px;
+}
+
+/* time */
+#chat td:first-child,
+#chatinput td:first-child {
+  width: 44px;
+  overflow: hidden;
+  padding-left: 2px;
+  color: #bbb;
+  white-space: nowrap;
+}
+
+#chat time {
+  cursor: help;
+}
+
+/* nick */
+#chat td:nth-child(2),
+#chatinput td:nth-child(2) {
+  width: 91px;
+  overflow: hidden;
+  padding-left: 2px;
+  white-space: nowrap;
+}
+
+#chat td .system_narrowcast {
+  color: #f66 !important;
+}
+
+mark {
+  background: transparent;
+}
+
+.invisep {
+  display: inline-block;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  color: transparent;
+}
+
+/* divider */
+summary {
+  color: #bbb;
+  display: inline-block;
+  height: 16px;
+  overflow: hidden;
+  padding: 0 2px;
+  white-space: nowrap;
+  width: 100%;
+}
+
+#chatinput {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 0 2px;
+  background: rgba(8, 48, 78, 0.9);
+  width: 708px;
+  height: 23px;
+  border: 1px solid #20a8b1;
+  z-index: 3001;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#chatinput td {
+  padding-bottom: 1px;
+  vertical-align: middle;
+}
+
+#chatinput input {
+  background: transparent;
+  color: #eeeeee;
+  width: 100%;
+  height: 100%;
+  padding: 3px 4px 1px 4px;
+}
+
 .pl_nudge_date {
   background-color: #724510;
   border-left: 1px solid #ffd652;
@@ -228,7 +244,8 @@
 }
 
 .pl_nudge_pointy_spacer {
-  background: no-repeat url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
+  background: no-repeat
+    url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
   display: inline-block;
   float: left;
   height: 20px;

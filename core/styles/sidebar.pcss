@@ -1,467 +1,475 @@
 /* sidebar ************************************************************/
 
 #sidebar {
-    background-color: rgba(8, 48, 78, 0.9);
-    border-left: 1px solid #20A8B1;
-    color: #888;
-    position: relative;
-    left: 0;
-    top: 0;
-    max-height: 100%;
-    overflow-y:scroll;
-    overflow-x:hidden;
-    pointer-events: auto;
-}
-  
-  #sidebartoggle {
-    display: block;
-    padding: 20px 5px;
-    margin-top: -31px; /* -(toggle height / 2) */
-    line-height: 10px;
-    position: absolute;
-    top: 108px;
-    z-index: 3002;
-    background-color: rgba(8, 48, 78, 0.9);
-    color: #FFCE00;
-    border: 1px solid #20A8B1;
-    border-right: none;
-    border-radius: 5px 0 0 5px;
-    text-decoration: none;
-    right: -50px; /* overwritten later by the script with SIDEBAR_WIDTH */
+  background-color: rgba(8, 48, 78, 0.9);
+  border-left: 1px solid #20a8b1;
+  color: #888;
+  position: relative;
+  left: 0;
+  top: 0;
+  max-height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  pointer-events: auto;
 }
 
-  
+#sidebartoggle {
+  display: block;
+  padding: 20px 5px;
+  margin-top: -31px; /* -(toggle height / 2) */
+  line-height: 10px;
+  position: absolute;
+  top: 108px;
+  z-index: 3002;
+  background-color: rgba(8, 48, 78, 0.9);
+  color: #ffce00;
+  border: 1px solid #20a8b1;
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+  text-decoration: none;
+  right: -50px; /* overwritten later by the script with SIDEBAR_WIDTH */
+}
+
 #sidebar > * {
-    border-bottom: 1px solid #20A8B1;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  
-    
-  #sidebartoggle .toggle {
-    border-bottom: 10px solid transparent;
-    border-top: 10px solid transparent;
-  }
-  
-  #sidebartoggle .open {
-    border-right: 10px solid #FFCE00;
-  }
-  
-  #sidebartoggle .close {
-    border-left: 10px solid #FFCE00;
-  }
-  
-  /* player stats */
-  #playerstat {
-    height: 30px;
-  }
-  
-  h2 {
-    color: #ffce00;
-    font-size: 21px;
-    padding: 0 4px;
-    margin: 0;
-    cursor:help;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    width: 100%;
-  }
-  
-  h2 #name {
-    font-weight: 300;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: top;
-    white-space: nowrap;
-    width: 205px;
-    position: relative;
-  }
-  
-  h2 #stats {
-    float: right;
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  #signout {
-    font-size: 12px;
-    font-weight: normal;
-    line-height: 29px;
-    padding: 0 4px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    background-color: rgba(8, 48, 78, 0.5);
-    display: none; /* starts hidden */
-  }
-  #name:hover #signout {
-    display: block;
-  }
-  
-  h2 sup, h2 sub {
-    display: block;
-    font-size: 11px;
-    margin-bottom: -2px;
-  }
-  
-  
-  /* gamestats */
-  #gamestat {
-    height: 22px;
-  }
-  
-  #gamestat span {
-    display: block;
-    float: left;
-    font-weight: bold;
-    cursor:help;
-    height: 21px;
-    line-height: 22px;
-  }
-  
-  #gamestat .res {
-    background: #005684;
-    text-align: right;
-  }
-  
-  #gamestat .enl {
-    background: #017f01;
-  }
-  
-  
-  /* search input, and others */
-  input:not([type]), .input,
-  input[type="text"], input[type="password"],
-  input[type="number"], input[type="email"],
-  input[type="search"], input[type="url"] {
-    background-color: rgba(0, 0, 0, 0.3);
-    color: #ffce00;
-    height: 24px;
-    padding:0px 4px 0px 4px;
-    font-size: 12px;
-    border:0;
-    font-family:inherit;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  
-  #searchwrapper {
-    position: relative;
-  }
-  #search {
-    width: 100%;
-    padding-right: 24px;
-  }
-  #buttongeolocation {
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin: 0;
-    border: 0 none transparent;
-    padding: 0 2px 0 0;
-    height: 24px;
-    background-color: transparent;
-  }
-  #buttongeolocation:focus {
-    outline: 1px dotted #ffce00;
-  }
-  #buttongeolocation img {
-    display: block;
-  }
-  #searchwrapper h3 {
-    font-size: 1em;
-    height: auto;
-    cursor: pointer;
-  }
-  .searchquery {
-    max-height: 25em;
-    overflow-y: auto;
-  }
-  #searchwrapper .ui-accordion-header::before {
-    font-size: 18px;
-    margin-right: 2px;
-    font-weight: normal;
-    line-height: 1em;
-    content: "⊞";
-  }
-  #searchwrapper .ui-accordion-header-active::before {
-    content: "⊟";
-  }
-  #searchwrapper .ui-accordion-content {
-    margin: 0;
-    overflow: hidden;
-  }
-  #searchwrapper ul {
-    padding-left: 14px;
-  }
-  #searchwrapper li {
-    cursor: pointer;
-  }
-  #searchwrapper li a {
-    margin-left: -14px;
-    padding-left: 14px;
-    background-position: 1px center;
-    background-repeat: no-repeat;
-    background-size: 12px 12px;
-  }
-  #searchwrapper li:focus a, #searchwrapper li:hover a {
-    text-decoration: underline;
-  }
-  #searchwrapper li em {
-    color: #ccc;
-    font-size: 0.9em;
-  }
-  
-  ::-webkit-input-placeholder {
-    font-style: italic;
-  }
-  
-  :-moz-placeholder {
-    font-style: italic;
-  }
-  
-  ::-moz-placeholder {
-    font-style: italic;
-  }
-  
-  .leaflet-control-layers input {
-    height: auto;
-    padding: 0;
-  }
-  
-  
-  /* portal title and image */
-  h3.title {
-    padding-right: 17px; /* to not overlap with close button */
-    margin: 2px 0;
-    line-height: 24px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .imgpreview {
-    height: 190px;
-    background: no-repeat center center;
-    background-size: contain;
-    cursor: help;
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .imgpreview img.hide {
-    display: none;
-  }
-  
-  .imgpreview .portalDetails {
-    display: none;
-  }
-  
-  #level {
-    font-size: 40px;
-    text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000, 0 0 5px #fff;
-    display: block;
-    margin-right: 15px;
-    text-align:right;
-    float: right;
-  }
-  
-  /* portal mods */
-  .mods {
-    margin: 3px auto 1px auto;
-    width: 296px;
-    height: 67px;
-    text-align: center;
-  }
-  
-  .mods span {
-    background-color: rgba(0, 0, 0, 0.3);
-    /* can’t use inline-block because Webkit's implementation is buggy and
+  border-bottom: 1px solid #20a8b1;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#sidebartoggle .toggle {
+  border-bottom: 10px solid transparent;
+  border-top: 10px solid transparent;
+}
+
+#sidebartoggle .open {
+  border-right: 10px solid #ffce00;
+}
+
+#sidebartoggle .close {
+  border-left: 10px solid #ffce00;
+}
+
+/* player stats */
+#playerstat {
+  height: 30px;
+}
+
+h2 {
+  color: #ffce00;
+  font-size: 21px;
+  padding: 0 4px;
+  margin: 0;
+  cursor: help;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+h2 #name {
+  font-weight: 300;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+  width: 205px;
+  position: relative;
+}
+
+h2 #stats {
+  float: right;
+  height: 100%;
+  overflow: hidden;
+}
+
+#signout {
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 29px;
+  padding: 0 4px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(8, 48, 78, 0.5);
+  display: none; /* starts hidden */
+}
+#name:hover #signout {
+  display: block;
+}
+
+h2 sup,
+h2 sub {
+  display: block;
+  font-size: 11px;
+  margin-bottom: -2px;
+}
+
+/* gamestats */
+#gamestat {
+  height: 22px;
+}
+
+#gamestat span {
+  display: block;
+  float: left;
+  font-weight: bold;
+  cursor: help;
+  height: 21px;
+  line-height: 22px;
+}
+
+#gamestat .res {
+  background: #005684;
+  text-align: right;
+}
+
+#gamestat .enl {
+  background: #017f01;
+}
+
+/* search input, and others */
+input:not([type]),
+.input,
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="email"],
+input[type="search"],
+input[type="url"] {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #ffce00;
+  height: 24px;
+  padding: 0px 4px 0px 4px;
+  font-size: 12px;
+  border: 0;
+  font-family: inherit;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#searchwrapper {
+  position: relative;
+}
+#search {
+  width: 100%;
+  padding-right: 24px;
+}
+#buttongeolocation {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+  border: 0 none transparent;
+  padding: 0 2px 0 0;
+  height: 24px;
+  background-color: transparent;
+}
+#buttongeolocation:focus {
+  outline: 1px dotted #ffce00;
+}
+#buttongeolocation img {
+  display: block;
+}
+#searchwrapper h3 {
+  font-size: 1em;
+  height: auto;
+  cursor: pointer;
+}
+.searchquery {
+  max-height: 25em;
+  overflow-y: auto;
+}
+#searchwrapper .ui-accordion-header::before {
+  font-size: 18px;
+  margin-right: 2px;
+  font-weight: normal;
+  line-height: 1em;
+  content: "⊞";
+}
+#searchwrapper .ui-accordion-header-active::before {
+  content: "⊟";
+}
+#searchwrapper .ui-accordion-content {
+  margin: 0;
+  overflow: hidden;
+}
+#searchwrapper ul {
+  padding-left: 14px;
+}
+#searchwrapper li {
+  cursor: pointer;
+}
+#searchwrapper li a {
+  margin-left: -14px;
+  padding-left: 14px;
+  background-position: 1px center;
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+}
+#searchwrapper li:focus a,
+#searchwrapper li:hover a {
+  text-decoration: underline;
+}
+#searchwrapper li em {
+  color: #ccc;
+  font-size: 0.9em;
+}
+
+::-webkit-input-placeholder {
+  font-style: italic;
+}
+
+:-moz-placeholder {
+  font-style: italic;
+}
+
+::-moz-placeholder {
+  font-style: italic;
+}
+
+.leaflet-control-layers input {
+  height: auto;
+  padding: 0;
+}
+
+/* portal title and image */
+h3.title {
+  padding-right: 17px; /* to not overlap with close button */
+  margin: 2px 0;
+  line-height: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imgpreview {
+  height: 190px;
+  background: no-repeat center center;
+  background-size: contain;
+  cursor: help;
+  overflow: hidden;
+  position: relative;
+}
+
+.imgpreview img.hide {
+  display: none;
+}
+
+.imgpreview .portalDetails {
+  display: none;
+}
+
+#level {
+  font-size: 40px;
+  text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000,
+    0 0 5px #fff;
+  display: block;
+  margin-right: 15px;
+  text-align: right;
+  float: right;
+}
+
+/* portal mods */
+.mods {
+  margin: 3px auto 1px auto;
+  width: 296px;
+  height: 67px;
+  text-align: center;
+}
+
+.mods span {
+  background-color: rgba(0, 0, 0, 0.3);
+  /* can’t use inline-block because Webkit's implementation is buggy and
      * introduces additional margins in random cases. No clear necessary,
      * as that’s solved by setting height on .mods. */
-    display: block;
-    float:left;
-    height: 63px;
-    margin: 0 2px;
-    overflow: hidden;
-    padding: 2px;
-    text-align: center;
-    width: 63px;
-    cursor:help;
-    border: 1px solid #666;
-  }
-  
-  .mods span:not([title]) {
-    cursor: auto;
-  }
-  
-  .res .mods span, .res .meter {
-    border: 1px solid #0076b6;
-  }
-  .enl .mods span, .enl .meter {
-    border: 1px solid #017f01;
-  }
-  
-  /* random details, resonator details */
-  #randdetails, #resodetails {
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 0 4px;
-    table-layout: fixed;
-    border-spacing: 0m;
-    border-collapse: collapse;
-  }
-  
-  #randdetails td, #resodetails td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: top;
-    white-space: nowrap;
-    width: 50%;
-  }
-  
-  #randdetails th, #resodetails th {
-    font-weight: normal;
-    text-align: right;
-    width: 62px;
-    padding:0px;
-    padding-right:4px;
-    padding-left:4px;
-  }
-  
-  #randdetails th + th, #resodetails th + th {
-    text-align: left;
-    padding-right: 4px;
-    padding-left: 4px;
-  }
-  
-  #randdetails td:first-child, #resodetails td:first-child {
-    text-align: right;
-    padding-left: 2px;
-  }
-  
-  #randdetails td:last-child, #resodetails td:last-child {
-    text-align: left;
-    padding-right: 2px;
-  }
-  
-  
-  #randdetails {
-    margin-top: 4px;
-    margin-bottom: 5px;
-  }
-  
-  
-  #randdetails tt {
-    font-family: inherit;
-    cursor: help;
-  }
-  
-  #artifact_target, #artifact_fragments {
-    margin-top: 4px;
-    margin-bottom: 4px;
-  
-    margin-left: 8px;
-    margin-right: 8px;
-  }
-  
-  
-  /* resonators */
-  #resodetails {
-    margin-bottom: 0px;
-  }
-  
-  .meter {
-    background: #000;
-    cursor: help;
-    display: inline-block;
-    height: 18px;
-    padding: 1px;
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    position: relative;
-    left: 0;
-    top: 0;
-  }
-  
-  .meter.north {
-    overflow: hidden;
-  }
-  .meter.north:before {
-    content: "";
-    background-color: red;
-    border: 1px solid #000000;
-    border-radius: 100%;
-    display: block;
-    height: 6px;
-    width: 6px;
-    left: 50%;
-    top: -3px;
-    margin-left: -4px;
-    position: absolute;
-  }
-  
-  .meter span {
-    display: block;
-    height: 14px;
-  }
-  
-  .meter-level {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: -2px;
-    text-shadow: 0.0em 0.0em 0.3em #808080;
-    text-align: center;
-    word-spacing: 4px; /* to leave some space for the north indicator */
-  }
-  
-  /* links below resos */
-  
-  .linkdetails {
-    margin-bottom: 0px;
-    text-align: center;
-  }
-  
-  .linkdetails aside {
-    display: inline-block;
-    white-space: nowrap;
-    margin-left: 5px;
-    margin-right: 5px;
-  }
-  
-  #toolbox {
-    text-align: left;    /* centre didn't look as nice here as it did above in .linkdetails */
-  }
-  
-  #toolbox > a {
-    margin-left: 5px;
-    margin-right: 5px;
-    white-space: nowrap;
-    display: inline-block;
-  }
-  
-  /* a common portal display takes this much space (prevents moving
+  display: block;
+  float: left;
+  height: 63px;
+  margin: 0 2px;
+  overflow: hidden;
+  padding: 2px;
+  text-align: center;
+  width: 63px;
+  cursor: help;
+  border: 1px solid #666;
+}
+
+.mods span:not([title]) {
+  cursor: auto;
+}
+
+.res .mods span,
+.res .meter {
+  border: 1px solid #0076b6;
+}
+.enl .mods span,
+.enl .meter {
+  border: 1px solid #017f01;
+}
+
+/* random details, resonator details */
+#randdetails,
+#resodetails {
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0 4px;
+  table-layout: fixed;
+  border-spacing: 0m;
+  border-collapse: collapse;
+}
+
+#randdetails td,
+#resodetails td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+  width: 50%;
+}
+
+#randdetails th,
+#resodetails th {
+  font-weight: normal;
+  text-align: right;
+  width: 62px;
+  padding: 0px;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+#randdetails th + th,
+#resodetails th + th {
+  text-align: left;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+#randdetails td:first-child,
+#resodetails td:first-child {
+  text-align: right;
+  padding-left: 2px;
+}
+
+#randdetails td:last-child,
+#resodetails td:last-child {
+  text-align: left;
+  padding-right: 2px;
+}
+
+#randdetails {
+  margin-top: 4px;
+  margin-bottom: 5px;
+}
+
+#randdetails tt {
+  font-family: inherit;
+  cursor: help;
+}
+
+#artifact_target,
+#artifact_fragments {
+  margin-top: 4px;
+  margin-bottom: 4px;
+
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* resonators */
+#resodetails {
+  margin-bottom: 0px;
+}
+
+.meter {
+  background: #000;
+  cursor: help;
+  display: inline-block;
+  height: 18px;
+  padding: 1px;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+.meter.north {
+  overflow: hidden;
+}
+.meter.north:before {
+  content: "";
+  background-color: red;
+  border: 1px solid #000000;
+  border-radius: 100%;
+  display: block;
+  height: 6px;
+  width: 6px;
+  left: 50%;
+  top: -3px;
+  margin-left: -4px;
+  position: absolute;
+}
+
+.meter span {
+  display: block;
+  height: 14px;
+}
+
+.meter-level {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  text-shadow: 0em 0em 0.3em #808080;
+  text-align: center;
+  word-spacing: 4px; /* to leave some space for the north indicator */
+}
+
+/* links below resos */
+
+.linkdetails {
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.linkdetails aside {
+  display: inline-block;
+  white-space: nowrap;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#toolbox {
+  text-align: left; /* centre didn't look as nice here as it did above in .linkdetails */
+}
+
+#toolbox > a {
+  margin-left: 5px;
+  margin-right: 5px;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+/* a common portal display takes this much space (prevents moving
    * content when first selecting a portal) */
-  
-  #portaldetails {
-    min-height: 63px;
-    position: relative; /* so the below '#portaldetails .close' is relative to this */
-  }
-  
-  #portaldetails .close {
-    position: absolute;
-    top: -2px;
-    right: 2px;
-    cursor: pointer;
-    color: #FFCE00;
-    font-size: 16px;
-  }
+
+#portaldetails {
+  min-height: 63px;
+  position: relative; /* so the below '#portaldetails .close' is relative to this */
+}
+
+#portaldetails .close {
+  position: absolute;
+  top: -2px;
+  right: 2px;
+  cursor: pointer;
+  color: #ffce00;
+  font-size: 16px;
+}

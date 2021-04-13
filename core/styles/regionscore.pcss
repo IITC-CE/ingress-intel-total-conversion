@@ -1,24 +1,25 @@
 /* region scores */
-.cellscore .ui-accordion-header, .cellscore .ui-accordion-content {
-	border: 1px solid #20a8b1;
-	margin-top: -1px;
-	display: block;
+.cellscore .ui-accordion-header,
+.cellscore .ui-accordion-content {
+  border: 1px solid #20a8b1;
+  margin-top: -1px;
+  display: block;
 }
 .cellscore .ui-accordion-header {
-	color: #ffce00;
-	outline: none
+  color: #ffce00;
+  outline: none;
 }
 .cellscore .ui-accordion-header:before {
-	font-size: 18px;
-	margin-right: 2px;
-	content: "⊞";
+  font-size: 18px;
+  margin-right: 2px;
+  content: "⊞";
 }
 .cellscore .ui-accordion-header-active:before {
-	content: "⊟";
+  content: "⊟";
 }
 .cellscore table {
-	width: 90%;
-	max-width: 360px; /* prevent width change on scrollbar appearance (after animation) */
+  width: 90%;
+  max-width: 360px; /* prevent width change on scrollbar appearance (after animation) */
 }
 
 /* prevent nonfunctional horizontal scrollbar in Chrome (perhaps jQuery issue) */
@@ -32,7 +33,7 @@
 }
 
 @-moz-document url-prefix() {
- .cellscore .logscale {
+  .cellscore .logscale {
     transform: scale(0.8);
   }
 
@@ -47,15 +48,17 @@ g.checkpoint:hover circle {
   stroke-width: 2px;
 }
 
-.cellscore th, .cellscore td {
-	text-align: left;
-	padding-left: 5px;
+.cellscore th,
+.cellscore td {
+  text-align: left;
+  padding-left: 5px;
 }
 .checkpoint_table {
-	border-collapse: collapse;
+  border-collapse: collapse;
 }
-.checkpoint_table th, .checkpoint_table td {
-	text-align: right;
+.checkpoint_table th,
+.checkpoint_table td {
+  text-align: right;
 }
 
 .cellscore #overview {
