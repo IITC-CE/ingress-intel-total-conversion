@@ -1,12 +1,11 @@
-@import 'styles/leaflet_tweaks';
-@import 'styles/print';
-@import 'styles/chat';
-@import 'styles/dialog';
-@import 'styles/sidebar';
-@import 'styles/artifact';
-@import 'styles/redeem';
-@import 'styles/regionscore';
-
+@import "styles/leaflet_tweaks";
+@import "styles/print";
+@import "styles/chat.pcss";
+@import "styles/dialog.pcss";
+@import "styles/sidebar.pcss";
+@import "styles/artifact.pcss";
+@import "styles/redeem.pcss";
+@import "styles/regionscore.pcss";
 
 .text-overflow-ellipsis {
   display: inline-block;
