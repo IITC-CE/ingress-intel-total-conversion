@@ -695,6 +695,21 @@ window.plugin.drawTools.boot = function() {
     runHooks('pluginDrawTools',{event:'layerCreated',layer:layer});
   });
 
+  window.plugin.drawTools.oldEDFstatus = false;
+  map.on('draw:deletestart', function(e) {
+    console.log('draw:deletestart');
+    window.plugin.drawTools.oldEDFstatus = window.plugin.drawTools.EDFstatus;
+    window.plugin.drawTools.EDFstatus = false;
+    window.plugin.drawTools.toggleOpacityOpt();
+    window.plugin.drawTools.clearAndDraw();
+  });
+  map.on('draw:deletestop', function(e) {
+    console.log('draw:deletestop');
+    window.plugin.drawTools.EDFstatus = window.plugin.drawTools.oldEDFstatus;
+    window.plugin.drawTools.toggleOpacityOpt();
+    window.plugin.drawTools.clearAndDraw();
+  });
+
   map.on('draw:deleted', function(e) {
     window.plugin.drawTools.save();
     runHooks('pluginDrawTools',{event:'layersDeleted'});
