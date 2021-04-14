@@ -770,8 +770,10 @@ window.plugin.drawTools.toggleEDF = function(){
 window.plugin.drawTools.toggleOpacityOpt = function(){
   if (window.plugin.drawTools.EDFstatus){
     window.plugin.drawTools.polygonOptions.fillOpacity = 0.0;
+    window.plugin.drawTools.polygonOptions.interactive = false;
   } else {
     window.plugin.drawTools.polygonOptions.fillOpacity = 0.2;
+    window.plugin.drawTools.polygonOptions.interactive = true;
   }
 };
 
