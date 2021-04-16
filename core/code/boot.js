@@ -855,4 +855,8 @@ try {
   throw e;
 }
 
-$(boot);
+if (document.readyState === 'complete') { // IITCm
+  setTimeout(boot);
+} else {
+  window.addEventListener('load', boot);
+}
