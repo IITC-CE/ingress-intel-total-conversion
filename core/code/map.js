@@ -31,49 +31,41 @@ function setupCRS () {
   });
 }
 
-// either retrieves the last shown position from a cookie, from the
-// URL or if neither is present, via Geolocation. If that fails, it
-// returns a map that shows the whole world.
+function normLL (lat, lng, zoom) {
+  return {
+    center: [
+      parseFloat(lat) || 0,
+      parseFloat(lng) || 0
+    ],
+    zoom: parseInt(zoom) || window.DEFAULT_ZOOM
+  };
+}
+
+// retrieves the last shown position from URL or from a cookie
 function getPosition () {
-  if(getURLParam('latE6') && getURLParam('lngE6')) {
-    log.log("mappos: reading email URL params");
-    var lat = parseInt(getURLParam('latE6'))/1E6 || 0.0;
-    var lng = parseInt(getURLParam('lngE6'))/1E6 || 0.0;
-    var z = parseInt(getURLParam('z')) || DEFAULT_ZOOM;
-    return {center: new L.LatLng(lat, lng), zoom: z};
+  var url = window.getURLParam;
+
+  var zoom = url('z');
+  var latE6 = url('latE6');
+  var lngE6 = url('lngE6');
+  if (latE6 && lngE6) {
+    log.log('mappos: reading email URL params');
+    return normLL(parseInt(latE6)/1E6, parseInt(lngE6)/1E6, zoom);
   }
 
-  if(getURLParam('ll')) {
-    log.log("mappos: reading stock Intel URL params");
-    var lat = parseFloat(getURLParam('ll').split(",")[0]) || 0.0;
-    var lng = parseFloat(getURLParam('ll').split(",")[1]) || 0.0;
-    var z = parseInt(getURLParam('z')) || DEFAULT_ZOOM;
-    return {center: new L.LatLng(lat, lng), zoom: z};
+  var ll = url('ll') || url('pll');
+  if (ll) {
+    log.log('mappos: reading stock Intel URL params');
+    ll = ll.split(',');
+    return normLL(ll[0], ll[1], zoom);
   }
 
-  if(getURLParam('pll')) {
-    log.log("mappos: reading stock Intel URL portal params");
-    var lat = parseFloat(getURLParam('pll').split(",")[0]) || 0.0;
-    var lng = parseFloat(getURLParam('pll').split(",")[1]) || 0.0;
-    var z = parseInt(getURLParam('z')) || DEFAULT_ZOOM;
-    return {center: new L.LatLng(lat, lng), zoom: z};
+  var lat = window.readCookie('ingress.intelmap.lat');
+  var lng = window.readCookie('ingress.intelmap.lng');
+  if (lat && lng) {
+    log.log('mappos: reading cookies');
+    return normLL(lat, lng, window.readCookie('ingress.intelmap.zoom'));
   }
-
-  if(readCookie('ingress.intelmap.lat') && readCookie('ingress.intelmap.lng')) {
-    log.log("mappos: reading cookies");
-    var lat = parseFloat(readCookie('ingress.intelmap.lat')) || 0.0;
-    var lng = parseFloat(readCookie('ingress.intelmap.lng')) || 0.0;
-    var z = parseInt(readCookie('ingress.intelmap.zoom')) || DEFAULT_ZOOM;
-
-    if(lat < -90  || lat > 90) lat = 0.0;
-    if(lng < -180 || lng > 180) lng = 0.0;
-
-    return {center: new L.LatLng(lat, lng), zoom: z};
-  }
-
-  setTimeout("window.map.locate({setView : true});", 50);
-
-  return {center: new L.LatLng(0.0, 0.0), zoom: 1};
 }
 
 function createDefaultBaseMapLayers() {
@@ -317,10 +309,13 @@ window.setupMap = function() {
     var baseLayer = nameToLayer[localStorage['iitc-base-map']] || firstLayer;
     map.addLayer(baseLayer);
 
-    // now we have a base layer we can set the map position
-    // (setting an initial position, before a base layer is added, causes issues with leaflet)
+    // (setting an initial position, before a base layer is added, causes issues with leaflet) // todo check
     var pos = getPosition();
-    map.setView (pos.center, pos.zoom, {reset:true});
+    if (!pos) {
+      pos = {center: [0, 0], zoom: 1};
+      map.locate({setView: true});
+    }
+    map.setView(pos.center, pos.zoom, {reset: true});
 
 
     //event to track layer changes and store the name
