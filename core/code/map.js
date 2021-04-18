@@ -31,27 +31,10 @@ function setupCRS () {
   });
 }
 
-// LOCATION HANDLING /////////////////////////////////////////////////
-// i.e. setting initial position and storing new position after moving
-
-// retrieves current position from map and stores it cookies
-window.storeMapPosition = function() {
-  var m = window.map.getCenter();
-
-  if(m['lat'] >= -90  && m['lat'] <= 90)
-    writeCookie('ingress.intelmap.lat', m['lat']);
-
-  if(m['lng'] >= -180 && m['lng'] <= 180)
-    writeCookie('ingress.intelmap.lng', m['lng']);
-
-  writeCookie('ingress.intelmap.zoom', window.map.getZoom());
-}
-
-
 // either retrieves the last shown position from a cookie, from the
 // URL or if neither is present, via Geolocation. If that fails, it
 // returns a map that shows the whole world.
-window.getPosition = function() {
+function getPosition () {
   if(getURLParam('latE6') && getURLParam('lngE6')) {
     log.log("mappos: reading email URL params");
     var lat = parseInt(getURLParam('latE6'))/1E6 || 0.0;
@@ -288,7 +271,18 @@ window.setupMap = function() {
 
   map.attributionControl.setPrefix('');
   // listen for changes and store them in cookies
-  map.on('moveend', window.storeMapPosition);
+  map.on('moveend', function () {
+    var m = window.map.getCenter();
+
+    if(m['lat'] >= -90  && m['lat'] <= 90)
+      writeCookie('ingress.intelmap.lat', m['lat']);
+
+    if(m['lng'] >= -180 && m['lng'] <= 180)
+      writeCookie('ingress.intelmap.lng', m['lng']);
+
+    writeCookie('ingress.intelmap.zoom', window.map.getZoom());
+  });
+
 
   // map update status handling & update map hooks
   // ensures order of calls
