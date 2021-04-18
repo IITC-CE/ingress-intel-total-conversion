@@ -1,3 +1,36 @@
+function setupCRS () {
+  // use the earth radius value from s2 geometry library
+  // https://github.com/google/s2-geometry-library-java/blob/c28f287b996c0cedc5516a0426fbd49f6c9611ec/src/com/google/common/geometry/S2LatLng.java#L31
+  var EARTH_RADIUS_METERS = 6367000.0;
+  // distance calculations with that constant are a little closer to values observable in Ingress client.
+  // difference is:
+  // - ~0.06% when using LatLng.distanceTo() (R is 6371 vs 6367)
+  // - ~0.17% when using Map.distance() / CRS.destance() (R is 6378.137 vs 6367)
+  // (Yes, Leaflet is not consistent here, e.g. see https://github.com/Leaflet/Leaflet/pull/6928)
+
+  // this affects LatLng.distanceTo(), which is currently used in most iitc plugins
+  L.CRS.Earth.R = EARTH_RADIUS_METERS;
+
+  // this affects Map.distance(), which is known to be used in draw-tools
+  var SphericalMercator = L.Projection.SphericalMercator;
+  SphericalMercator.S2 = L.extend({}, SphericalMercator, {
+    R: EARTH_RADIUS_METERS,
+    bounds: (function () {
+      var d = EARTH_RADIUS_METERS * Math.PI;
+      return L.bounds([-d, -d], [d, d]);
+    })()
+  });
+
+  L.CRS.S2 = L.extend({}, L.CRS.Earth, {
+    code: 'Ingress',
+    projection: SphericalMercator.S2,
+    transformation: (function () {
+      var scale = 0.5 / (Math.PI * SphericalMercator.S2.R);
+      return L.transformation(scale, 0.5, -scale, 0.5);
+    }())
+  });
+}
+
 function createDefaultBaseMapLayers() {
   var baseLayers = {};
 
@@ -47,6 +80,7 @@ function createDefaultBaseMapLayers() {
 
 
 window.setupMap = function() {
+  setupCRS();
   $('#map').text('');
 
 
@@ -213,6 +247,32 @@ window.setupMap = function() {
   // (the code originally called the request function directly, and triggered a normal delay for the next refresh.
   //  however, the moveend/zoomend gets triggered on map load, causing a duplicate refresh. this helps prevent that
   window.startRefreshTimeout(ON_MOVE_REFRESH*1000);
+
+
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
+  // on zoomend, check to see the zoom level is an int, and reset the view if not
+  // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
+  map.on('zoomend', function() {
+    var z = map.getZoom();
+    if (z != parseInt(z))
+    {
+      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
+      map.setZoom(parseInt(z), {animate:false});
+    }
+  });
+  */
+
+  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
+  // Fix Leaflet: handle touchcancel events in Draggable
+  L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
+  L.Draggable.prototype._onDown = function(e) {
+    L.Draggable.prototype._onDownOrig.apply(this, arguments);
+
+    if(e.type === "touchstart") {
+      L.DomEvent.on(document, "touchcancel", this._onUp, this);
+    }
+  };
+  */
 };
 
 //adds a base layer to the map. done separately from the above, so that plugins that add base layers can be the default
