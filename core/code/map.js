@@ -270,17 +270,12 @@ window.setupMap = function() {
   map.addControl(window.layerChooser);
 
   map.attributionControl.setPrefix('');
-  // listen for changes and store them in cookies
+
   map.on('moveend', function () {
-    var m = window.map.getCenter();
-
-    if(m['lat'] >= -90  && m['lat'] <= 90)
-      writeCookie('ingress.intelmap.lat', m['lat']);
-
-    if(m['lng'] >= -180 && m['lng'] <= 180)
-      writeCookie('ingress.intelmap.lng', m['lng']);
-
-    writeCookie('ingress.intelmap.zoom', window.map.getZoom());
+    var center = this.getCenter().wrap();
+    window.writeCookie('ingress.intelmap.lat', center.lat);
+    window.writeCookie('ingress.intelmap.lng', center.lng);
+    window.writeCookie('ingress.intelmap.zoom', this.getZoom());
   });
 
 
