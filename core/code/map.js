@@ -155,108 +155,83 @@ window.setupMap = function() {
   }
 
   var addLayers = {};
-  var hiddenLayer = [];
 
   portalsFactionLayers = [];
   var portalsLayers = [];
-  for(var i = 0; i <= 8; i++) {
+  for (var i = 0; i <= 8; i++) {
     portalsFactionLayers[i] = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
-    portalsLayers[i] = L.layerGroup(portalsFactionLayers[i]);
-    map.addLayer(portalsLayers[i]);
+    portalsLayers[i] = L.layerGroup();
     var t = (i === 0 ? 'Unclaimed/Placeholder' : 'Level ' + i) + ' Portals';
+    if (isLayerGroupDisplayed(t, true)) {
+      map.addLayer(portalsLayers[i]);
+    }
     addLayers[t] = portalsLayers[i];
-    // Store it in hiddenLayer to remove later
-    if(!isLayerGroupDisplayed(t, true)) hiddenLayer.push(portalsLayers[i]);
   }
 
   fieldsFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
-  var fieldsLayer = L.layerGroup(fieldsFactionLayers);
-  map.addLayer(fieldsLayer, true);
+  var fieldsLayer = L.layerGroup();
+  if (isLayerGroupDisplayed('Fields', true)) {
+    map.addLayer(fieldsLayer, true);
+  }
   addLayers['Fields'] = fieldsLayer;
-  // Store it in hiddenLayer to remove later
-  if(!isLayerGroupDisplayed('Fields', true)) hiddenLayer.push(fieldsLayer);
 
   linksFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
-  var linksLayer = L.layerGroup(linksFactionLayers);
-  map.addLayer(linksLayer, true);
+  var linksLayer = L.layerGroup();
+  if (isLayerGroupDisplayed('Links', true)) {
+    map.addLayer(linksLayer, true);
+  }
   addLayers['Links'] = linksLayer;
-  // Store it in hiddenLayer to remove later
-  if(!isLayerGroupDisplayed('Links', true)) hiddenLayer.push(linksLayer);
 
   // faction-specific layers
   // these layers don't actually contain any data. instead, every time they're added/removed from the map,
   // the matching sub-layers within the above portals/fields/links are added/removed from their parent with
   // the below 'onoverlayadd/onoverlayremove' events
   var factionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
-  for (var fac in factionLayers) {
-    map.addLayer (factionLayers[fac]);
-  }
-
-  var setFactionLayersState = function(fac,enabled) {
-    if (enabled) {
-      if (!fieldsLayer.hasLayer(fieldsFactionLayers[fac])) fieldsLayer.addLayer (fieldsFactionLayers[fac]);
-      if (!linksLayer.hasLayer(linksFactionLayers[fac])) linksLayer.addLayer (linksFactionLayers[fac]);
-      for (var lvl in portalsLayers) {
-        if (!portalsLayers[lvl].hasLayer(portalsFactionLayers[lvl][fac])) portalsLayers[lvl].addLayer (portalsFactionLayers[lvl][fac]);
-      }
-    } else {
-      if (fieldsLayer.hasLayer(fieldsFactionLayers[fac])) fieldsLayer.removeLayer (fieldsFactionLayers[fac]);
-      if (linksLayer.hasLayer(linksFactionLayers[fac])) linksLayer.removeLayer (linksFactionLayers[fac]);
-      for (var lvl in portalsLayers) {
-        if (portalsLayers[lvl].hasLayer(portalsFactionLayers[lvl][fac])) portalsLayers[lvl].removeLayer (portalsFactionLayers[lvl][fac]);
-      }
-    }
-  }
-
-  // to avoid any favouritism, we'll put the player's own faction layer first
-  if (PLAYER.team == 'RESISTANCE') {
-    addLayers['Resistance'] = factionLayers[TEAM_RES];
-    addLayers['Enlightened'] = factionLayers[TEAM_ENL];
-  } else {
-    addLayers['Enlightened'] = factionLayers[TEAM_ENL];
-    addLayers['Resistance'] = factionLayers[TEAM_RES];
-  }
-  if (!isLayerGroupDisplayed('Resistance', true)) hiddenLayer.push (factionLayers[TEAM_RES]);
-  if (!isLayerGroupDisplayed('Enlightened', true)) hiddenLayer.push (factionLayers[TEAM_ENL]);
-
-  setFactionLayersState (TEAM_NONE, true);
-  setFactionLayersState (TEAM_RES, isLayerGroupDisplayed('Resistance', true));
-  setFactionLayersState (TEAM_ENL, isLayerGroupDisplayed('Enlightened', true));
-
-  // NOTE: these events are fired by the layer chooser, so won't happen until that's created and added to the map
-  window.map.on('overlayadd overlayremove', function(e) {
-    var displayed = (e.type == 'overlayadd');
-    switch (e.name) {
-      case 'Resistance':
-        setFactionLayersState (TEAM_RES, displayed);
-        break;
-      case 'Enlightened':
-        setFactionLayersState (TEAM_ENL, displayed);
-        break;
+  factionLayers.forEach(function (facLayer, facIdx) {
+    facLayer.on('add remove', function (e) {
+      var fn = e.type + 'Layer';
+      fieldsLayer[fn](fieldsFactionLayers[facIdx]);
+      linksLayer[fn](linksFactionLayers[facIdx]);
+      portalsLayers.forEach(function (portals, lvl) {
+        portals[fn](portalsFactionLayers[lvl][facIdx]);
+      });
+    });
+    var teamName = window.TEAM_NAMES[facIdx];
+    addLayers[teamName] = facLayer;
+    if (isLayerGroupDisplayed(teamName, true)) {
+      map.addLayer(facLayer);
     }
   });
+
+  // to avoid any favouritism, we'll put the player's own faction layer first
+  if (PLAYER.team !== 'RESISTANCE') {
+    delete addLayers['Resistance'];
+    addLayers['Resistance'] = factionLayers[TEAM_RES];
+  }
+  delete addLayers['Neutral'];
 
   var baseLayers = createDefaultBaseMapLayers();
 
   window.layerChooser = new L.Control.Layers(baseLayers, addLayers);
 
-  // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers 
-  $.each(hiddenLayer, function(ind, layer){
-    map.removeLayer(layer);
+  $.each(addLayers, function (_, layer) {
+    if (map.hasLayer(layer)) { return true; } // continue
 
     // as users often become confused if they accidentally switch a standard layer off, display a warning in this case
-    $('#portaldetails').html('<div class="layer_off_warning">'
-                            +'<p><b>Warning</b>: some of the standard layers are turned off. Some portals/links/fields will not be visible.</p>'
-                            +'<a id="enable_standard_layers">Enable standard layers</a>'
-                            +'</div>');
-
-    $('#enable_standard_layers').on('click', function() {
-      $.each(addLayers, function(ind, layer) {
-        if (!map.hasLayer(layer)) map.addLayer(layer);
+    $('#portaldetails')
+      .html('<div class="layer_off_warning">'
+         + '<p><b>Warning</b>: some of the standard layers are turned off. Some portals/links/fields will not be visible.</p>'
+         + '<a id="enable_standard_layers">Enable standard layers</a>'
+         + '</div>');
+    $('#enable_standard_layers').on('click', function () {
+      $.each(addLayers, function (ind, overlay) {
+        if (!map.hasLayer(overlay)) {
+          map.addLayer(overlay);
+        }
       });
       $('#portaldetails').html('');
     });
-
+    return false; // break
   });
 
   map.addControl(window.layerChooser);
