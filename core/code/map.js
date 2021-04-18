@@ -115,45 +115,7 @@ function createDefaultBaseMapLayers() {
   return baseLayers;
 }
 
-
-window.setupMap = function() {
-  setupCRS();
-  $('#map').text('');
-
-
-
-
-  // proper initial position is now delayed until all plugins are loaded and the base layer is set
-  window.map = new L.Map('map', {
-    center: [0,0],
-    zoom: 1,
-    crs: L.CRS.S2,
-    zoomControl: (typeof android !== 'undefined' && android && android.showZoom) ? android.showZoom() : true,
-    minZoom: MIN_ZOOM,
-//    zoomAnimation: false,
-    markerZoomAnimation: false,
-    bounceAtZoomLimits: false,
-    maxBoundsViscosity: 0.7,
-    worldCopyJump: true, // wrap longitude to not find ourselves looking beyond +-180 degrees
-    preferCanvas: 'PREFER_CANVAS' in window
-      ? window.PREFER_CANVAS
-      : true // default
-  });
-  var max_lat = map.options.crs.projection.MAX_LATITUDE;
-  map.setMaxBounds([[max_lat,360],[-max_lat,-360]]);
-
-  L.Renderer.mergeOptions({
-    padding: window.RENDERER_PADDING || 0.5
-  });
-
-  // add empty div to leaflet control areas - to force other leaflet controls to move around IITC UI elements
-  // TODO? move the actual IITC DOM into the leaflet control areas, so dummy <div>s aren't needed
-  if(!isSmartphone()) {
-    // chat window area
-    $(window.map._controlCorners['bottomleft']).append(
-      $('<div>').width(708).height(108).addClass('leaflet-control').css({'pointer-events': 'none', 'margin': '0'}));
-  }
-
+function createDefaultOverlays (map) {
   var addLayers = {};
 
   portalsFactionLayers = [];
@@ -208,13 +170,56 @@ window.setupMap = function() {
     delete addLayers['Resistance'];
     addLayers['Resistance'] = factionLayers[TEAM_RES];
   }
-  delete addLayers['Neutral'];
+
+  return addLayers;
+}
+
+window.setupMap = function() {
+  setupCRS();
+  $('#map').text('');
+
+
+
+
+  // proper initial position is now delayed until all plugins are loaded and the base layer is set
+  window.map = new L.Map('map', {
+    center: [0,0],
+    zoom: 1,
+    crs: L.CRS.S2,
+    zoomControl: (typeof android !== 'undefined' && android && android.showZoom) ? android.showZoom() : true,
+    minZoom: MIN_ZOOM,
+//    zoomAnimation: false,
+    markerZoomAnimation: false,
+    bounceAtZoomLimits: false,
+    maxBoundsViscosity: 0.7,
+    worldCopyJump: true, // wrap longitude to not find ourselves looking beyond +-180 degrees
+    preferCanvas: 'PREFER_CANVAS' in window
+      ? window.PREFER_CANVAS
+      : true // default
+  });
+  var max_lat = map.options.crs.projection.MAX_LATITUDE;
+  map.setMaxBounds([[max_lat,360],[-max_lat,-360]]);
+
+  L.Renderer.mergeOptions({
+    padding: window.RENDERER_PADDING || 0.5
+  });
+
+  // add empty div to leaflet control areas - to force other leaflet controls to move around IITC UI elements
+  // TODO? move the actual IITC DOM into the leaflet control areas, so dummy <div>s aren't needed
+  if(!isSmartphone()) {
+    // chat window area
+    $(window.map._controlCorners['bottomleft']).append(
+      $('<div>').width(708).height(108).addClass('leaflet-control').css({'pointer-events': 'none', 'margin': '0'}));
+  }
 
   var baseLayers = createDefaultBaseMapLayers();
+  var overlays = createDefaultOverlays(map);
+  delete overlays['Neutral'];
 
-  window.layerChooser = new L.Control.Layers(baseLayers, addLayers);
+  window.layerChooser = new L.Control.Layers(baseLayers, overlays)
+    .addTo(map);
 
-  $.each(addLayers, function (_, layer) {
+  $.each(overlays, function (_, layer) {
     if (map.hasLayer(layer)) { return true; } // continue
 
     // as users often become confused if they accidentally switch a standard layer off, display a warning in this case
@@ -224,7 +229,7 @@ window.setupMap = function() {
          + '<a id="enable_standard_layers">Enable standard layers</a>'
          + '</div>');
     $('#enable_standard_layers').on('click', function () {
-      $.each(addLayers, function (ind, overlay) {
+      $.each(overlays, function (ind, overlay) {
         if (!map.hasLayer(overlay)) {
           map.addLayer(overlay);
         }
@@ -233,8 +238,6 @@ window.setupMap = function() {
     });
     return false; // break
   });
-
-  map.addControl(window.layerChooser);
 
   map.attributionControl.setPrefix('');
 
