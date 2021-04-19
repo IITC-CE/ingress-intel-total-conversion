@@ -184,13 +184,10 @@ window.addLayerGroup = function(name, layerGroup, defaultDisplay) {
   layerChooser.addOverlay(layerGroup, name);
 }
 
-window.removeLayerGroup = function(layerGroup) {
-  function find (arr, callback) { // ES5 doesn't include Array.prototype.find()
-    for (var i=0; i<arr.length; i++) {
-      if (callback(arr[i], i, arr)) { return arr[i]; }
-    }
-  }
-  var element = find(layerChooser._layers, function (el) { return el.layer === layerGroup; });
+window.removeLayerGroup = function (layerGroup) {
+  var element = layerChooser._layers.find(function (el) {
+    return el.layer === layerGroup;
+  });
   if (!element) {
     throw new Error('Layer was not found');
   }
