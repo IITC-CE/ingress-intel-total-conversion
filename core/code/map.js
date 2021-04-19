@@ -218,6 +218,10 @@ window.setupMap = function() {
 
   window.layerChooser = new window.LayerChooser(baseLayers, overlays)
     .addTo(map);
+  // hide layer chooser if booted with the iitcm android app
+  if (typeof android !== 'undefined' && android && android.setLayers) {
+    $('.leaflet-control-layers').hide();
+  }
 
   $.each(overlays, function (_, layer) {
     if (map.hasLayer(layer)) { return true; } // continue

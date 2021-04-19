@@ -294,7 +294,6 @@ function boot() {
   window.setupTooltips();
   window.chat.setup();
   window.portalDetail.setup();
-  window.setupLayerChooserApi();
 
   $('#sidebar').show();
 

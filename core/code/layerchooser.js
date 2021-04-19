@@ -1,5 +1,26 @@
 var LayerChooser = L.Control.Layers.extend({
 
+  _addLayer: function (layer, name, overlay) {
+    L.Control.Layers.prototype._addLayer.apply(this, arguments);
+    if (overlay) {
+      if (layer._map) {
+        window.updateDisplayedLayerGroup(name, true);
+      }
+      layer._statusTracking = function (e) {
+        window.updateDisplayedLayerGroup(name, e.type === 'add');
+      };
+      layer.on('add remove', layer._statusTracking, this);
+    }
+  },
+
+  removeLayer: function (layer) {
+    if (layer && layer._statusTracking) {
+      layer.off('add remove', layer._statusTracking, this);
+      delete layer._statusTracking;
+    }
+    return L.Control.Layers.prototype.removeLayer.apply(this, arguments);
+  },
+
   // layer: either Layer or it's name in the control
   _layerInfo: function (layer) {
     var prop = layer instanceof L.Layer ? 'layer' : 'name';
@@ -143,31 +164,6 @@ if (typeof android !== 'undefined' && android && android.setLayers) {
   });
 }
 
-// Setup the function to record the on/off status of overlay layerGroups
-function setupLayerChooserStatusRecorder () {
-  // Record already added layerGroups
-  $.each(window.layerChooser._layers, function(ind, chooserEntry) {
-    if(!chooserEntry.overlay) return true;
-    var display = window.map.hasLayer(chooserEntry.layer);
-    window.updateDisplayedLayerGroup(chooserEntry.name, display);
-  });
-
-  // Record layerGroups change
-  window.map.on('overlayadd overlayremove', function(e) {
-    var display = (e.type === 'overlayadd');
-    window.updateDisplayedLayerGroup(e.name, display);
-  });
-}
-
-window.setupLayerChooserApi = function() {
-  setupLayerChooserStatusRecorder();
-
-  // hide layer chooser if booted with the iitcm android app
-  if (typeof android !== 'undefined' && android && android.setLayers) {
-    $('.leaflet-control-layers').hide();
-  }
-}
-
 // contain current status(on/off) of overlay layerGroups.
 // But you should use isLayerGroupDisplayed(name) to check the status
 window.overlayStatus = {};
@@ -209,9 +205,6 @@ window.removeLayerGroup = function (layerGroup) {
   if (!element) {
     throw new Error('Layer was not found');
   }
-  // removing the layer will set it's default visibility to false (store if layer gets added again)
-  var enabled = isLayerGroupDisplayed(element.name);
-  map.removeLayer(layerGroup);
   layerChooser.removeLayer(layerGroup);
-  updateDisplayedLayerGroup(element.name, enabled);
+  map.removeLayer(layerGroup);
 };
