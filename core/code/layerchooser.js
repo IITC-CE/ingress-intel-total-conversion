@@ -1,4 +1,13 @@
 var LayerChooser = L.Control.Layers.extend({
+
+  // layer: either Layer or it's name in the control
+  _layerInfo: function (layer) {
+    var prop = layer instanceof L.Layer ? 'layer' : 'name';
+    return this._layers.find(function (el) {
+      return el[prop] === layer;
+    });
+  },
+
   showLayer: function(id,show) {
     if (show === undefined) show = true;
     obj = this._layers[id];
@@ -34,6 +43,62 @@ var LayerChooser = L.Control.Layers.extend({
     }
     */
     return true;
+  },
+
+  // adds listeners to the overlays list to make inputs toggleable.
+  _initLayout: function () {
+    L.Control.Layers.prototype._initLayout.call(this);
+    $(this._overlaysList).on('click taphold', 'label', function (e) {
+      if (!(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.type === 'taphold')) {
+        return;
+      }
+      // e.preventDefault(); // seems no effect
+      var input = e.target.closest('label').querySelector('input');
+      var idx = this._layerControlInputs.indexOf(input);
+      this._toggleOverlay(idx);
+    }.bind(this));
+  },
+
+  _filterOverlays: function (el) {
+    return el.overlay &&
+      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(el.name) === -1;
+  },
+
+  // Hides all the control's overlays except given one,
+  // or restores all, if it was the only one displayed (or none was displayed).
+  _toggleOverlay: function (idx) {
+    var info = this._layers[idx];
+    if (!info || !info.overlay) {
+      log.warn('Overlay not found: ', info);
+      return;
+    }
+    var map = this._map;
+
+    var isChecked = map.hasLayer(info.layer);
+    var checked = 0;
+    var overlays = this._layers.filter(this._filterOverlays);
+    overlays.forEach(function (el) {
+      if (map.hasLayer(el.layer)) { checked++; }
+    });
+
+    if (checked === 0 || isChecked && checked === 1) {
+      // if nothing is selected, or specified overlay is exclusive,
+      // assume all boxes should be checked again
+      overlays.forEach(function (el) {
+        if (!el.layer.options.defaultDisabled) {
+          map.addLayer(el.layer);
+        }
+      });
+    } else {
+      // uncheck all, check specified
+      overlays.forEach(function (el) {
+        if (el.layer === info.layer) {
+          map.addLayer(el.layer);
+        } else {
+          map.removeLayer(el.layer);
+        }
+      });
+    }
   },
 
   // !!deprecated
@@ -87,43 +152,6 @@ if (typeof android !== 'undefined' && android && android.setLayers) {
   });
 }
 
-// adds listeners to the layer chooser such that a long press hides
-// all custom layers except the long pressed one.
-function setupLayerChooserSelectOne () {
-  $('.leaflet-control-layers-overlays').on('click taphold', 'label', function(e) {
-    if(!e) return;
-    if(!(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.type === 'taphold')) return;
-    var m = window.map;
-
-    var add = function(layer) {
-      if(!m.hasLayer(layer.layer)) m.addLayer(layer.layer);
-    };
-    var rem = function(layer) {
-      if(m.hasLayer(layer.layer)) m.removeLayer(layer.layer);
-    };
-
-    var isChecked = $(e.target).find('input').is(':checked');
-    var checkSize = $('.leaflet-control-layers-overlays input:checked').length;
-    if((isChecked && checkSize === 1) || checkSize === 0) {
-      // if nothing is selected or the users long-clicks the only
-      // selected element, assume all boxes should be checked again
-      $.each(window.layerChooser._layers, function(ind, layer) {
-        if(!layer.overlay) return true;
-        add(layer);
-      });
-    } else {
-      // uncheck all
-      var keep = $.trim($(e.target).text());
-      $.each(window.layerChooser._layers, function(ind, layer) {
-        if(layer.overlay !== true) return true;
-        if(layer.name === keep) { add(layer);  return true; }
-        rem(layer);
-      });
-    }
-    e.preventDefault();
-  });
-}
-
 // Setup the function to record the on/off status of overlay layerGroups
 function setupLayerChooserStatusRecorder () {
   // Record already added layerGroups
@@ -141,7 +169,6 @@ function setupLayerChooserStatusRecorder () {
 }
 
 window.setupLayerChooserApi = function() {
-  setupLayerChooserSelectOne();
   setupLayerChooserStatusRecorder();
 
   // hide layer chooser if booted with the iitcm android app
