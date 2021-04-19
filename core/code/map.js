@@ -216,7 +216,7 @@ window.setupMap = function() {
   var overlays = createDefaultOverlays(map);
   delete overlays['Neutral'];
 
-  window.layerChooser = new L.Control.Layers(baseLayers, overlays)
+  window.layerChooser = new window.LayerChooser(baseLayers, overlays)
     .addTo(map);
 
   $.each(overlays, function (_, layer) {
