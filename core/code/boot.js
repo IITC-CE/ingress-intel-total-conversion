@@ -463,7 +463,6 @@ function boot() {
 
   loadPlugins();
 
-  window.setMapBaseLayer();
   window.setupLayerChooserApi();
 
   window.runOnSmartphonesAfterBoot();

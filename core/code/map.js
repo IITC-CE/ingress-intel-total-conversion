@@ -304,6 +304,44 @@ window.setupMap = function() {
   //  however, the moveend/zoomend gets triggered on map load, causing a duplicate refresh. this helps prevent that
   window.startRefreshTimeout(ON_MOVE_REFRESH*1000);
 
+  // adds a base layer to the map. done separately from the above,
+  // so that plugins that add base layers can be the default
+  window.addHook('iitcLoaded', function () {
+    //create a map name -> layer mapping - depends on internals of L.Control.Layers
+    var nameToLayer = {};
+    var firstLayer = null;
+
+    for (i in window.layerChooser._layers) {
+      var obj = window.layerChooser._layers[i];
+      if (!obj.overlay) {
+        nameToLayer[obj.name] = obj.layer;
+        if (!firstLayer) firstLayer = obj.layer;
+      }
+    }
+
+    var baseLayer = nameToLayer[localStorage['iitc-base-map']] || firstLayer;
+    map.addLayer(baseLayer);
+
+    // now we have a base layer we can set the map position
+    // (setting an initial position, before a base layer is added, causes issues with leaflet)
+    var pos = getPosition();
+    map.setView (pos.center, pos.zoom, {reset:true});
+
+
+    //event to track layer changes and store the name
+    map.on('baselayerchange', function(info) {
+      for(i in window.layerChooser._layers) {
+        var obj = window.layerChooser._layers[i];
+        if (info.layer === obj.layer) {
+          localStorage['iitc-base-map'] = obj.name;
+          break;
+        }
+      }
+
+      //also, leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here
+      map.setZoom(map.getZoom());
+    });
+  });
 
   /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
   // on zoomend, check to see the zoom level is an int, and reset the view if not
@@ -330,45 +368,3 @@ window.setupMap = function() {
   };
   */
 };
-
-//adds a base layer to the map. done separately from the above, so that plugins that add base layers can be the default
-window.setMapBaseLayer = function() {
-  //create a map name -> layer mapping - depends on internals of L.Control.Layers
-  var nameToLayer = {};
-  var firstLayer = null;
-
-  for (i in window.layerChooser._layers) {
-    var obj = window.layerChooser._layers[i];
-    if (!obj.overlay) {
-      nameToLayer[obj.name] = obj.layer;
-      if (!firstLayer) firstLayer = obj.layer;
-    }
-  }
-
-  var baseLayer = nameToLayer[localStorage['iitc-base-map']] || firstLayer;
-  map.addLayer(baseLayer);
-
-  // now we have a base layer we can set the map position
-  // (setting an initial position, before a base layer is added, causes issues with leaflet)
-  var pos = getPosition();
-  map.setView (pos.center, pos.zoom, {reset:true});
-
-
-  //event to track layer changes and store the name
-  map.on('baselayerchange', function(info) {
-    for(i in window.layerChooser._layers) {
-      var obj = window.layerChooser._layers[i];
-      if (info.layer === obj.layer) {
-        localStorage['iitc-base-map'] = obj.name;
-        break;
-      }
-    }
-
-    //also, leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here
-    map.setZoom(map.getZoom());
-
-
-  });
-
-
-}
