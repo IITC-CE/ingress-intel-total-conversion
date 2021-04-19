@@ -25,7 +25,7 @@ window.artifact.setup = function() {
   setTimeout (artifact.requestData, 1);
 
   artifact._layer = new L.LayerGroup();
-  addLayerGroup ('Artifacts', artifact._layer, true);
+  window.layerChooser.addOverlay(artifact._layer, 'Artifacts');
 
   $('<a>')
     .html('Artifacts')

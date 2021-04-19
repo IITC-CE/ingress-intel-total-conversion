@@ -125,7 +125,7 @@ window.plugin.doneLinks.testForDeletedLinks = function () {
 window.plugin.doneLinks.createLayer = function() {
     window.plugin.doneLinks.linkLayer = new L.FeatureGroup();
     window.plugin.doneLinks.linkLayerGuids={};
-    window.addLayerGroup('Done Links', window.plugin.doneLinks.linkLayer, true);
+    window.layerChooser.addOverlay(window.plugin.doneLinks.linkLayer, 'Done Links');
 
     map.on('layeradd', function(obj) {
       if(obj.layer === window.plugin.doneLinks.linkLayer) {

@@ -26,7 +26,7 @@ window.plugin.regions.setup  = function() {
           }")
   .appendTo("head");
 
-  addLayerGroup('Score Regions', window.plugin.regions.regionLayer, true);
+  window.layerChooser.addOverlay(window.plugin.regions.regionLayer, 'Score Regions');
 
   map.on('moveend', window.plugin.regions.update);
 

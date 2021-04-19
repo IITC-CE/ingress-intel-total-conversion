@@ -1348,8 +1348,8 @@ window.plugin.bookmarks.initMPE = function(){
     window.addPortalHighlighter('Bookmarked Portals', window.plugin.bookmarks.highlight);
 
     // Layer - Bookmarked portals
-    window.plugin.bookmarks.starLayerGroup = new L.LayerGroup();
-    window.addLayerGroup('Bookmarked Portals', window.plugin.bookmarks.starLayerGroup, false);
+    window.plugin.bookmarks.starLayerGroup = L.layerGroup(null, {defaultDisabled: true});
+    window.layerChooser.addOverlay(window.plugin.bookmarks.starLayerGroup, 'Bookmarked Portals');
     window.plugin.bookmarks.addAllStars();
     window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.editStar);
     window.addHook('pluginBkmrksSyncEnd', window.plugin.bookmarks.resetAllStars);

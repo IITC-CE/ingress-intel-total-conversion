@@ -244,12 +244,15 @@ LayerChooser.addInitHook(function () {
   window.isLayerGroupDisplayed = this._isOverlayDisplayed.bind(this);
 });
 
+// !!deprecated: use `layerChooser.addOverlay` directly (https://leafletjs.com/reference.html#control-layers-addoverlay)
+// persistent status is now handled automatically by layerChooser.
+// `defaultDisabled` state should be set as `layerGroup` option.
 window.addLayerGroup = function (name, layerGroup, defaultDisplay) {
   if (defaultDisplay === false) {
     layerGroup.options.defaultDisabled = true;
   }
-  layerChooser.addOverlay(layerGroup, name);
-}
+  window.layerChooser.addOverlay(layerGroup, name);
+};
 
 window.removeLayerGroup = function (layerGroup) {
   var element = layerChooser._layers.find(function (el) {
