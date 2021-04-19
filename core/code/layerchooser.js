@@ -43,7 +43,13 @@ var LayerChooser = L.Control.Layers.extend({
     }
   },
 
+  // @method removeLayer(layer: Layer|String): this
+  // Removes the given layer from the control.
+  // Either layer object or it's name in the control must be specified.
   removeLayer: function (layer) {
+    if (!(layer instanceof L.Layer)) {
+      layer = this.getLayerByName(layer);
+    }
     if (layer && layer._statusTracking) {
       layer.off('add remove', layer._statusTracking, this);
       delete layer._statusTracking;
@@ -69,6 +75,13 @@ var LayerChooser = L.Control.Layers.extend({
     return this._layers.find(function (el) {
       return el[prop] === layer;
     });
+  },
+
+  // @method getLayerByName(name: String): Layer
+  // Returns layer by it's name in the control.
+  getLayerByName: function (name) {
+    var info = this._layerInfo(name);
+    return info && info.layer;
   },
 
   // @method showLayer(layer: Layer|String|Number, display?: Boolean): this
