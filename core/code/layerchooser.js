@@ -1,6 +1,6 @@
 // adds listeners to the layer chooser such that a long press hides
 // all custom layers except the long pressed one.
-window.setupLayerChooserSelectOne = function() {
+function setupLayerChooserSelectOne () {
   $('.leaflet-control-layers-overlays').on('click taphold', 'label', function(e) {
     if(!e) return;
     if(!(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.type === 'taphold')) return;
@@ -36,7 +36,7 @@ window.setupLayerChooserSelectOne = function() {
 }
 
 // Setup the function to record the on/off status of overlay layerGroups
-window.setupLayerChooserStatusRecorder = function() {
+function setupLayerChooserStatusRecorder () {
   // Record already added layerGroups
   $.each(window.layerChooser._layers, function(ind, chooserEntry) {
     if(!chooserEntry.overlay) return true;
@@ -52,6 +52,9 @@ window.setupLayerChooserStatusRecorder = function() {
 }
 
 window.setupLayerChooserApi = function() {
+  setupLayerChooserSelectOne();
+  setupLayerChooserStatusRecorder();
+
   // hide layer chooser if booted with the iitcm android app
   if (typeof android !== 'undefined' && android && android.setLayers) {
     $('.leaflet-control-layers').hide();
