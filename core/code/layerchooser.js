@@ -12,6 +12,7 @@
 
 var LayerChooser = L.Control.Layers.extend({
   initialize: function (baseLayers, overlays, options) {
+    this._overlayStatus = {};
     this._mapToAdd = options && options.map;
     L.Control.Layers.prototype.initialize.apply(this, arguments);
   },
@@ -20,7 +21,7 @@ var LayerChooser = L.Control.Layers.extend({
     L.Control.Layers.prototype._addLayer.apply(this, arguments);
     if (overlay) {
       if (layer._map) {
-        window.updateDisplayedLayerGroup(name, true);
+        this._storeOverlayState(name, true);
       } else {
         var defaultState = !layer.options.defaultDisabled;
         if (window.isLayerGroupDisplayed(name, defaultState)) {
@@ -28,7 +29,7 @@ var LayerChooser = L.Control.Layers.extend({
         }
       }
       layer._statusTracking = function (e) {
-        window.updateDisplayedLayerGroup(name, e.type === 'add');
+        this._storeOverlayState(name, e.type === 'add');
       };
       layer.on('add remove', layer._statusTracking, this);
     }
@@ -40,6 +41,11 @@ var LayerChooser = L.Control.Layers.extend({
       delete layer._statusTracking;
     }
     return L.Control.Layers.prototype.removeLayer.apply(this, arguments);
+  },
+
+  _storeOverlayState: function (name, isDisplayed) {
+    this._overlayStatus[name] = isDisplayed;
+    localStorage['ingress.intelmap.layergroupdisplayed'] = JSON.stringify(this._overlayStatus);
   },
 
   // layer: either Layer or it's name in the control
@@ -185,15 +191,9 @@ if (typeof android !== 'undefined' && android && android.setLayers) {
   });
 }
 
-// contain current status(on/off) of overlay layerGroups.
-// But you should use isLayerGroupDisplayed(name) to check the status
-window.overlayStatus = {};
-
-// Update layerGroups display status to window.overlayStatus and localStorage 'ingress.intelmap.layergroupdisplayed'
-window.updateDisplayedLayerGroup = function(name, display) {
-  overlayStatus[name] = display;
-  localStorage['ingress.intelmap.layergroupdisplayed'] = JSON.stringify(overlayStatus);
-}
+// contains current status(on/off) of overlay layerGroups.
+// !!deprecated: use `map.hasLayer` instead (https://leafletjs.com/reference.html#map-haslayer)
+// window.overlayStatus = window.layerChooser._overlayStatus;
 
 // Read layerGroup status from window.overlayStatus if it was added to map,
 // read from cookie if it has not added to map yet.
