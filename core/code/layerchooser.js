@@ -22,6 +22,7 @@ var LayerChooser = L.Control.Layers.extend({
       }
     }
     this._mapToAdd = options && options.map;
+    this.lastBaseLayerName = localStorage['iitc-base-map'];
     L.Control.Layers.prototype.initialize.apply(this, arguments);
   },
 
@@ -40,6 +41,11 @@ var LayerChooser = L.Control.Layers.extend({
         this._storeOverlayState(name, e.type === 'add');
       };
       layer.on('add remove', layer._statusTracking, this);
+    } else {
+      layer._statusTracking = function () {
+        localStorage['iitc-base-map'] = name;
+      };
+      layer.on('add', layer._statusTracking);
     }
   },
 
@@ -53,6 +59,9 @@ var LayerChooser = L.Control.Layers.extend({
     if (layer && layer._statusTracking) {
       layer.off('add remove', layer._statusTracking, this);
       delete layer._statusTracking;
+    } else {
+      log.warn('Layer not found');
+      return this;
     }
     return L.Control.Layers.prototype.removeLayer.apply(this, arguments);
   },

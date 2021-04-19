@@ -256,20 +256,8 @@ window.setupMap = function() {
   // adds a base layer to the map. done separately from the above,
   // so that plugins that add base layers can be the default
   window.addHook('iitcLoaded', function () {
-    //create a map name -> layer mapping - depends on internals of L.Control.Layers
-    var nameToLayer = {};
-    var firstLayer = null;
-
-    for (i in window.layerChooser._layers) {
-      var obj = window.layerChooser._layers[i];
-      if (!obj.overlay) {
-        nameToLayer[obj.name] = obj.layer;
-        if (!firstLayer) firstLayer = obj.layer;
-      }
-    }
-
-    var baseLayer = nameToLayer[localStorage['iitc-base-map']] || firstLayer;
-    map.addLayer(baseLayer);
+    var stored = layerChooser.getLayerByName(layerChooser.lastBaseLayerName);
+    map.addLayer(stored || baseLayers['CartoDB Dark Matter']);
 
     // (setting an initial position, before a base layer is added, causes issues with leaflet) // todo check
     var pos = getPosition();
@@ -295,17 +283,9 @@ window.setupMap = function() {
       window.writeCookie('ingress.intelmap.zoom', this.getZoom());
     });
 
-    //event to track layer changes and store the name
-    map.on('baselayerchange', function(info) {
-      for(i in window.layerChooser._layers) {
-        var obj = window.layerChooser._layers[i];
-        if (info.layer === obj.layer) {
-          localStorage['iitc-base-map'] = obj.name;
-          break;
-        }
-      }
-
-      //also, leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here
+    // todo check
+    // leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here
+    map.on('baselayerchange', function () {
       map.setZoom(map.getZoom());
     });
   });
