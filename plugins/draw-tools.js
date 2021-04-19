@@ -292,9 +292,8 @@ window.plugin.drawTools.manualOpt = function() {
            + '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>'
            + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
            +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
-           + '<center><label id="edfToggle" style="color: #ffce00; cursor:pointer; display:block;">'
-           +    '<input type="checkbox" '+edfStatusCheck+' name="edf"'
-           +    'onchange="window.plugin.drawTools.edfStausToggle();return false;" />Fill the polygon(s)</label></center>'
+           + '<center><label id="edfToggle"><input type="checkbox" '+edfStatusCheck+' name="edf"'
+           +   'onchange="window.plugin.drawTools.edfStausToggle();return false;" />Fill the polygon(s)</label></center>'
            + '</div>';
 
   dialog({
