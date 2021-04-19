@@ -174,29 +174,29 @@ function createDefaultOverlays (map) {
   return addLayers;
 }
 
+// extendable by plugins: `setup.priority = 'boot';`
+window.mapOptions = {
+  preferCanvas: 'PREFER_CANVAS' in window
+    ? window.PREFER_CANVAS
+    : true // default
+};
+
 window.setupMap = function() {
   setupCRS();
-  $('#map').text('');
+  $('#map').text(''); // clear 'Loading, please wait'
 
-
-
-
-  // proper initial position is now delayed until all plugins are loaded and the base layer is set
-  window.map = new L.Map('map', {
-    center: [0,0],
+  window.map = L.map('map', L.extend({
+    // proper initial position is now delayed until all plugins are loaded and the base layer is set
+    center: [0, 0],
     zoom: 1,
     crs: L.CRS.S2,
-    zoomControl: (typeof android !== 'undefined' && android && android.showZoom) ? android.showZoom() : true,
-    minZoom: MIN_ZOOM,
-//    zoomAnimation: false,
+    minZoom: window.MIN_ZOOM,
+    // zoomAnimation: false,
     markerZoomAnimation: false,
     bounceAtZoomLimits: false,
     maxBoundsViscosity: 0.7,
-    worldCopyJump: true, // wrap longitude to not find ourselves looking beyond +-180 degrees
-    preferCanvas: 'PREFER_CANVAS' in window
-      ? window.PREFER_CANVAS
-      : true // default
-  });
+    worldCopyJump: true,
+  }, window.mapOptions));
   var max_lat = map.options.crs.projection.MAX_LATITUDE;
   map.setMaxBounds([[max_lat,360],[-max_lat,-360]]);
 
