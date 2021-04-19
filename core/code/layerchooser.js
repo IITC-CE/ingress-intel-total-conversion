@@ -24,7 +24,7 @@ var LayerChooser = L.Control.Layers.extend({
         this._storeOverlayState(name, true);
       } else {
         var defaultState = !layer.options.defaultDisabled;
-        if (window.isLayerGroupDisplayed(name, defaultState)) {
+        if (this._isOverlayDisplayed(name, defaultState)) {
           layer.addTo(this._map || this._mapToAdd);
         }
       }
@@ -46,6 +46,19 @@ var LayerChooser = L.Control.Layers.extend({
   _storeOverlayState: function (name, isDisplayed) {
     this._overlayStatus[name] = isDisplayed;
     localStorage['ingress.intelmap.layergroupdisplayed'] = JSON.stringify(this._overlayStatus);
+  },
+
+  _isOverlayDisplayed: function (name, defaultState) {
+    if (name in this._overlayStatus) {
+      return this._overlayStatus[name];
+    }
+    var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
+    var layers;
+    if (layersJSON) {
+      layers = JSON.parse(layersJSON);
+      this._overlayStatus = L.extend({}, layers, this._overlayStatus);
+    }
+    return layers && name in layers ? layers[name] : defaultState;
   },
 
   // layer: either Layer or it's name in the control
@@ -195,22 +208,14 @@ if (typeof android !== 'undefined' && android && android.setLayers) {
 // !!deprecated: use `map.hasLayer` instead (https://leafletjs.com/reference.html#map-haslayer)
 // window.overlayStatus = window.layerChooser._overlayStatus;
 
-// Read layerGroup status from window.overlayStatus if it was added to map,
-// read from cookie if it has not added to map yet.
-// return 'defaultDisplay' if both overlayStatus and cookie didn't have the record
-window.isLayerGroupDisplayed = function(name, defaultDisplay) {
-  if(typeof(overlayStatus[name]) !== 'undefined') return overlayStatus[name];
-
-  convertCookieToLocalStorage('ingress.intelmap.layergroupdisplayed');
-  var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
-  if(!layersJSON) return defaultDisplay;
-
-  var layers = JSON.parse(layersJSON);
-  // keep latest overlayStatus
-  overlayStatus = $.extend(layers, overlayStatus);
-  if(typeof(overlayStatus[name]) === 'undefined') return defaultDisplay;
-  return overlayStatus[name];
-}
+// Reads recorded layerGroup status (as it may not be added to map yet),
+// return `defaultDisplay` if no record found.
+// !!deprecated: persistent status is now handled automatically by layerChooser,
+// for most use cases prefer `map.hasLayer` (https://leafletjs.com/reference.html#map-haslayer)
+window.isLayerGroupDisplayed = function (name, defaultDisplay) {
+  if (!window.layerChooser) { return; } // to be safe
+  return window.layerChooser._isOverlayDisplayed(name, defaultDisplay);
+};
 
 window.addLayerGroup = function (name, layerGroup, defaultDisplay) {
   if (defaultDisplay === false) {
