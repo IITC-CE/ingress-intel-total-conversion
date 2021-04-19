@@ -1,40 +1,4 @@
 var LayerChooser = L.Control.Layers.extend({
-  //hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
-  //WARNING: does depend on internals of the L.Control.Layers code
-  getLayers: function() {
-    var baseLayers = [];
-    var overlayLayers = [];
-    this._layers.forEach(function (obj,idx) {
-      var layerActive = window.map.hasLayer(obj.layer);
-      var info = {
-        layerId: idx,
-        name: obj.name,
-        active: layerActive
-      }
-      if (obj.overlay) {
-        overlayLayers.push(info);
-      } else {
-        baseLayers.push(info);
-      }
-    });
-
-    var overlayLayersJSON = JSON.stringify(overlayLayers);
-    var baseLayersJSON = JSON.stringify(baseLayers);
-
-    if (typeof android !== 'undefined' && android && android.setLayers) {
-        if(this.androidTimer) clearTimeout(this.androidTimer);
-        this.androidTimer = setTimeout(function() {
-            this.androidTimer = null;
-            android.setLayers(baseLayersJSON, overlayLayersJSON);
-        }, 1000);
-    }
-
-    return {
-      baseLayers: baseLayers,
-      overlayLayers: overlayLayers
-    }
-  },
-
   showLayer: function(id,show) {
     if (show === undefined) show = true;
     obj = this._layers[id];
@@ -72,20 +36,56 @@ var LayerChooser = L.Control.Layers.extend({
     return true;
   },
 
-  _update: function() {
-    // update layer menu in IITCm
-    try {
-      if (typeof android !== 'undefined')
-        window.layerChooser.getLayers();
-    } catch (e) {
-      log.error(e);
-    }
-    // call through
-    return L.Control.Layers.prototype._update.apply(this, arguments);
+  // !!deprecated
+  getLayers: function () {
+    var baseLayers = [];
+    var overlayLayers = [];
+    this._layers.forEach(function (info, idx) {
+      (info.overlay ? overlayLayers : baseLayers).push({
+        layerId: idx,
+        name: info.name,
+        active: this._map.hasLayer(info.layer)
+      });
+    }, this);
+
+    return {
+      baseLayers: baseLayers,
+      overlayLayers: overlayLayers
+    };
   }
 });
 
 window.LayerChooser = LayerChooser;
+
+function debounce (callback, time) { // https://gist.github.com/nmsdvid/8807205#gistcomment-2641356
+  var timeout;
+  return function () {
+    var context = this;
+    var args = arguments;
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(function () {
+      timeout = null;
+      callback.apply(context, args);
+    }, time);
+  };
+}
+
+if (typeof android !== 'undefined' && android && android.setLayers) {
+  // hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
+  LayerChooser.include({
+    _setAndroidLayers: debounce(function () { // update layer menu in IITCm
+      var l = this.getLayers();
+      android.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
+    }, 1000),
+
+    _update: function () {
+      this._setAndroidLayers();
+      return L.Control.Layers.prototype._update.apply(this, arguments);
+    }
+  });
+}
 
 // adds listeners to the layer chooser such that a long press hides
 // all custom layers except the long pressed one.
