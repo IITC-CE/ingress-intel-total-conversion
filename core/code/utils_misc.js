@@ -106,15 +106,6 @@ window.aboutIITC = function () {
   });
 }
 
-
-window.layerGroupLength = function(layerGroup) {
-  var layersCount = 0;
-  var layers = layerGroup._layers;
-  if (layers)
-    layersCount = Object.keys(layers).length;
-  return layersCount;
-}
-
 // retrieves parameter from the URL?query=string.
 window.getURLParam = function(param) {
   var items = window.location.search.substr(1).split('&');
@@ -407,53 +398,6 @@ window.convertTextToTableMagic = function(text) {
 window.calcTriArea = function(p) {
   return Math.abs((p[0].lat*(p[1].lng-p[2].lng)+p[1].lat*(p[2].lng-p[0].lng)+p[2].lat*(p[0].lng-p[1].lng))/2);
 }
-
-// Update layerGroups display status to window.overlayStatus and localStorage 'ingress.intelmap.layergroupdisplayed'
-window.updateDisplayedLayerGroup = function(name, display) {
-  overlayStatus[name] = display;
-  localStorage['ingress.intelmap.layergroupdisplayed'] = JSON.stringify(overlayStatus);
-}
-
-// Read layerGroup status from window.overlayStatus if it was added to map,
-// read from cookie if it has not added to map yet.
-// return 'defaultDisplay' if both overlayStatus and cookie didn't have the record
-window.isLayerGroupDisplayed = function(name, defaultDisplay) {
-  if(typeof(overlayStatus[name]) !== 'undefined') return overlayStatus[name];
-
-  convertCookieToLocalStorage('ingress.intelmap.layergroupdisplayed');
-  var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
-  if(!layersJSON) return defaultDisplay;
-
-  var layers = JSON.parse(layersJSON);
-  // keep latest overlayStatus
-  overlayStatus = $.extend(layers, overlayStatus);
-  if(typeof(overlayStatus[name]) === 'undefined') return defaultDisplay;
-  return overlayStatus[name];
-}
-
-window.addLayerGroup = function(name, layerGroup, defaultDisplay) {
-  if (defaultDisplay === undefined) defaultDisplay = true;
-
-  if(isLayerGroupDisplayed(name, defaultDisplay)) map.addLayer(layerGroup);
-  layerChooser.addOverlay(layerGroup, name);
-}
-
-window.removeLayerGroup = function(layerGroup) {
-  function find (arr, callback) { // ES5 doesn't include Array.prototype.find()
-    for (var i=0; i<arr.length; i++) {
-      if (callback(arr[i], i, arr)) { return arr[i]; }
-    }
-  }
-  var element = find(layerChooser._layers, function (el) { return el.layer === layerGroup; });
-  if (!element) {
-    throw new Error('Layer was not found');
-  }
-  // removing the layer will set it's default visibility to false (store if layer gets added again)
-  var enabled = isLayerGroupDisplayed(element.name);
-  map.removeLayer(layerGroup);
-  layerChooser.removeLayer(layerGroup);
-  updateDisplayedLayerGroup(element.name, enabled);
-};
 
 function clamp (n,max,min) {
   if (n===0) { return 0; }

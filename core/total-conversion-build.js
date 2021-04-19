@@ -186,10 +186,6 @@ window.portals = {};
 window.links = {};
 window.fields = {};
 
-// contain current status(on/off) of overlay layerGroups.
-// But you should use isLayerGroupDisplayed(name) to check the status
-window.overlayStatus = {};
-
 // plugin framework. Plugins may load earlier than iitc, so don’t
 // overwrite data
 if(typeof window.plugin !== 'function') window.plugin = function() {};
