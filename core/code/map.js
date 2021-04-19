@@ -115,7 +115,7 @@ function createDefaultBaseMapLayers() {
   return baseLayers;
 }
 
-function createDefaultOverlays (map) {
+function createDefaultOverlays () {
   var addLayers = {};
 
   portalsFactionLayers = [];
@@ -124,24 +124,15 @@ function createDefaultOverlays (map) {
     portalsFactionLayers[i] = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
     portalsLayers[i] = L.layerGroup();
     var t = (i === 0 ? 'Unclaimed/Placeholder' : 'Level ' + i) + ' Portals';
-    if (isLayerGroupDisplayed(t, true)) {
-      map.addLayer(portalsLayers[i]);
-    }
     addLayers[t] = portalsLayers[i];
   }
 
   fieldsFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
   var fieldsLayer = L.layerGroup();
-  if (isLayerGroupDisplayed('Fields', true)) {
-    map.addLayer(fieldsLayer, true);
-  }
   addLayers['Fields'] = fieldsLayer;
 
   linksFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
   var linksLayer = L.layerGroup();
-  if (isLayerGroupDisplayed('Links', true)) {
-    map.addLayer(linksLayer, true);
-  }
   addLayers['Links'] = linksLayer;
 
   // faction-specific layers
@@ -158,11 +149,7 @@ function createDefaultOverlays (map) {
         portals[fn](portalsFactionLayers[lvl][facIdx]);
       });
     });
-    var teamName = window.TEAM_NAMES[facIdx];
-    addLayers[teamName] = facLayer;
-    if (isLayerGroupDisplayed(teamName, true)) {
-      map.addLayer(facLayer);
-    }
+    addLayers[window.TEAM_NAMES[facIdx]] = facLayer;
   });
 
   // to avoid any favouritism, we'll put the player's own faction layer first
@@ -213,10 +200,11 @@ window.setupMap = function() {
   }
 
   var baseLayers = createDefaultBaseMapLayers();
-  var overlays = createDefaultOverlays(map);
+  var overlays = createDefaultOverlays();
+  map.addLayer(overlays['Neutral']);
   delete overlays['Neutral'];
 
-  window.layerChooser = new window.LayerChooser(baseLayers, overlays)
+  window.layerChooser = new window.LayerChooser(baseLayers, overlays, {map: map})
     .addTo(map);
   // hide layer chooser if booted with the iitcm android app
   if (typeof android !== 'undefined' && android && android.setLayers) {

@@ -1,10 +1,31 @@
+/*
+ * @class LayerChooser
+ * @aka window.LayerChooser
+ * @inherits L.Controls.Layers
+ *
+ * Provides 'persistence' of layers display state between sessions, saving it to localStorage.
+ * Every overlay is added to map automatically if it's last state was active.
+ * When no record exists - active is assumed, except when layer has option `defaultDisabled`.
+ *
+ * Also some additional methods provided, see below.
+ */
+
 var LayerChooser = L.Control.Layers.extend({
+  initialize: function (baseLayers, overlays, options) {
+    this._mapToAdd = options && options.map;
+    L.Control.Layers.prototype.initialize.apply(this, arguments);
+  },
 
   _addLayer: function (layer, name, overlay) {
     L.Control.Layers.prototype._addLayer.apply(this, arguments);
     if (overlay) {
       if (layer._map) {
         window.updateDisplayedLayerGroup(name, true);
+      } else {
+        var defaultState = !layer.options.defaultDisabled;
+        if (window.isLayerGroupDisplayed(name, defaultState)) {
+          layer.addTo(this._map || this._mapToAdd);
+        }
       }
       layer._statusTracking = function (e) {
         window.updateDisplayedLayerGroup(name, e.type === 'add');
@@ -191,10 +212,10 @@ window.isLayerGroupDisplayed = function(name, defaultDisplay) {
   return overlayStatus[name];
 }
 
-window.addLayerGroup = function(name, layerGroup, defaultDisplay) {
-  if (defaultDisplay === undefined) defaultDisplay = true;
-
-  if(isLayerGroupDisplayed(name, defaultDisplay)) map.addLayer(layerGroup);
+window.addLayerGroup = function (name, layerGroup, defaultDisplay) {
+  if (defaultDisplay === false) {
+    layerGroup.options.defaultDisabled = true;
+  }
   layerChooser.addOverlay(layerGroup, name);
 }
 
