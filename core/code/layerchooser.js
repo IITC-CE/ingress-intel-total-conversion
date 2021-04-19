@@ -8,41 +8,32 @@ var LayerChooser = L.Control.Layers.extend({
     });
   },
 
-  showLayer: function(id,show) {
-    if (show === undefined) show = true;
-    obj = this._layers[id];
-    if (!obj) return false;
-
-    if(show) {
-      if (!this._map.hasLayer(obj.layer)) {
-        //the layer to show is not currently active
-        this._map.addLayer(obj.layer);
-
-        //if it's a base layer, remove any others
-        if (!obj.overlay) {
-          for(i in this._layers) {
-            if (i != id) {
-              var other = this._layers[i];
-              if (!other.overlay && this._map.hasLayer(other.layer)) this._map.removeLayer(other.layer);
+  // @method showLayer(layer: Layer|String|Number, display?: Boolean): this
+  // Switches layer's display state to given value (true by default).
+  // Layer can be specified also by it's name in the control.
+  showLayer: function (layer, display) {
+    var info = this._layers[layer] || this._layerInfo(layer);
+    if (!info) {
+      log.warn('Layer not found');
+      return this;
+    }
+    var map = this._map;
+    if (display || arguments.length === 1) {
+      if (!map.hasLayer(info.layer)) {
+        if (!info.overlay) {
+          // if it's a base layer, remove any others
+          this._layers.forEach(function (el) {
+            if (!el.overlay && el.layer !== info.layer) {
+              map.removeLayer(el.layer);
             }
-          }
+          });
         }
+        map.addLayer(info.layer);
       }
     } else {
-      if (this._map.hasLayer(obj.layer)) {
-        this._map.removeLayer(obj.layer);
-      }
+      map.removeLayer(info.layer);
     }
-
-    /* this code seems obsolete.
-
-    //below logic based on code in L.Control.Layers _onInputClick
-    if(!obj.overlay) {
-      this._map.setZoom(this._map.getZoom());
-      this._map.fire('baselayerchange', {layer: obj.layer});
-    }
-    */
-    return true;
+    return this;
   },
 
   // adds listeners to the overlays list to make inputs toggleable.
