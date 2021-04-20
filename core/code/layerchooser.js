@@ -6,6 +6,7 @@
  * Provides 'persistence' of layers display state between sessions, saving it to localStorage.
  * Every overlay is added to map automatically if it's last state was active.
  * When no record exists - active is assumed, except when layer has option `defaultDisabled`.
+ * And with `notPersistent` layer option it is possible to suppress it's status tracking.
  *
  * Also some additional methods provided, see below.
  */
@@ -28,6 +29,13 @@ var LayerChooser = L.Control.Layers.extend({
 
   _addLayer: function (layer, name, overlay) {
     L.Control.Layers.prototype._addLayer.apply(this, arguments);
+    if (layer.options.notPersistent) {
+      layer._statusTracking = L.Util.falseFn; // dummy
+      if (overlay && !layer.options.defaultDisabled) {
+        layer.addTo(this._map || this._mapToAdd);
+      }
+      return;
+    }
     if (overlay) {
       if (layer._map) {
         this._storeOverlayState(name, true);
