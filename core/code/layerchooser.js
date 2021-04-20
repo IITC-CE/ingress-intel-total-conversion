@@ -49,21 +49,25 @@ var LayerChooser = L.Control.Layers.extend({
     }
   },
 
-  // @method removeLayer(layer: Layer|String): this
+  // @method removeLayer(layer: Layer|String, keepOnMap?: Boolean): this
   // Removes the given layer from the control.
   // Either layer object or it's name in the control must be specified.
-  removeLayer: function (layer) {
+  // Layer is removed from the map as well, except `keepOnMap` argument is true.
+  removeLayer: function (layer, keepOnMap) {
     if (!(layer instanceof L.Layer)) {
       layer = this.getLayerByName(layer);
     }
     if (layer && layer._statusTracking) {
       layer.off('add remove', layer._statusTracking, this);
       delete layer._statusTracking;
+      L.Control.Layers.prototype.removeLayer.apply(this, arguments);
+      if (this._map && !keepOnMap) {
+        map.removeLayer(layer);
+      }
     } else {
       log.warn('Layer not found');
-      return this;
     }
-    return L.Control.Layers.prototype.removeLayer.apply(this, arguments);
+    return this;
   },
 
   _storeOverlayState: function (name, isDisplayed) {
@@ -254,13 +258,9 @@ window.addLayerGroup = function (name, layerGroup, defaultDisplay) {
   window.layerChooser.addOverlay(layerGroup, name);
 };
 
+// !!deprecated: use `layerChooser.removeLayer` directly
+// our method differs from inherited (https://leafletjs.com/reference.html#control-layers-removelayer),
+// as (by default) layer is removed from the map as well, see description for more details.
 window.removeLayerGroup = function (layerGroup) {
-  var element = layerChooser._layers.find(function (el) {
-    return el.layer === layerGroup;
-  });
-  if (!element) {
-    throw new Error('Layer was not found');
-  }
-  layerChooser.removeLayer(layerGroup);
-  map.removeLayer(layerGroup);
+  window.layerChooser.removeLayer(layerGroup);
 };
