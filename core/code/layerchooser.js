@@ -12,6 +12,22 @@
  */
 
 var LayerChooser = L.Control.Layers.extend({
+  options: {
+    // @option sortLayers: Boolean = true
+    // Ensures stable sort order (based on initial), while still providing ability
+    // to enforce specific order with layer's `sortPriority` option,
+    // which lower value means layer's upper position.
+    //
+    // If `sortPriority` is not specified - it will be assigned implicitly in increasing manner.
+    sortLayers: true,
+
+    sortFunction: function (layerA, layerB) {
+      var a = layerA.options.sortPriority;
+      var b = layerB.options.sortPriority;
+      return a < b ? -1 : (b < a ? 1 : 0);
+    }
+  },
+
   initialize: function (baseLayers, overlays, options) {
     this._overlayStatus = {};
     var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
@@ -24,11 +40,18 @@ var LayerChooser = L.Control.Layers.extend({
     }
     this._mapToAdd = options && options.map;
     this.lastBaseLayerName = localStorage['iitc-base-map'];
+    this._lastPriority = -1000; // initial layers get priority <0
     L.Control.Layers.prototype.initialize.apply(this, arguments);
+    this._lastPriority = 0; // any following gets >0
   },
 
   _addLayer: function (layer, name, overlay) {
     L.Control.Layers.prototype._addLayer.apply(this, arguments);
+    // provide stable sort order
+    if (!('sortPriority' in layer.options)) {
+      this._lastPriority = this._lastPriority + 10;
+      layer.options.sortPriority = this._lastPriority;
+    }
     if (layer.options.notPersistent) {
       layer._statusTracking = L.Util.falseFn; // dummy
       if (overlay && !layer.options.defaultDisabled) {

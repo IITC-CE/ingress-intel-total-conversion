@@ -290,6 +290,7 @@ function boot() {
   window.updateGameScore();
   window.artifact.setup();
   window.ornaments.setup();
+  layerChooser._lastPriority = 1000; // plugins overlays have priority >1000
   window.setupPlayerStat();
   window.setupTooltips();
   window.chat.setup();
