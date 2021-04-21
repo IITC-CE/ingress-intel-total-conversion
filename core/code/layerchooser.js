@@ -288,6 +288,47 @@ var LayerChooser = L.Control.Layers.extend({
     return this;
   },
 
+  _onLongClick: function (idx, originalEvent) {
+    var el = this._layers[idx];
+    var defaultPrevented;
+
+    // @miniclass LayersControlInteractionEvent (LayerChooser)
+    // @inherits Event
+    // @property layer: L.Layer
+    // The layer that was interacted in LayerChooser control.
+    // @property control: LayerChooser
+    // LayerChooser control instance (just handy shortcut for window.layerChooser).
+    // @property idx: Number
+    // Internal index of layer, can be used to address layer in private arrays
+    // (`_layers`, `_layerControlInputs`).
+    // @property originalEvent: DOMEvent
+    // The original mouse/jQuery event that triggered this Leaflet event.
+    // @method preventDefault: Function
+    // Method to prevent default action of event (like overlays toggling), otherwise handled by layerChooser.
+    var obj = {
+      control: this,
+      idx: idx,
+      originalEvent: originalEvent || {type: 'taphold'},
+      preventDefault: function () {
+        defaultPrevented = true;
+        this.defaultPrevented = true;
+      }
+    };
+
+    // @namespace Layer
+    // @section Layers control interaction events
+    // Fired when the overlay's label is long-clicked in the layers control.
+
+    // @section Layers control interaction events
+    // @event longclick: LayersControlInteractionEvent
+    // Fired on layer
+    el.layer.fire('longclick', obj);
+    if (!defaultPrevented) {
+      this._toggleOverlay(idx);
+    }
+    // @namespace LayerChooser
+  },
+
   // adds listeners to the overlays list to make inputs toggleable.
   _initLayout: function () {
     L.Control.Layers.prototype._initLayout.call(this);
@@ -298,7 +339,7 @@ var LayerChooser = L.Control.Layers.extend({
       // e.preventDefault(); // seems no effect
       var input = e.target.closest('label').querySelector('input');
       var idx = this._layerControlInputs.indexOf(input);
-      this._toggleOverlay(idx);
+      this._onLongClick(idx, e);
     }.bind(this));
   },
 
