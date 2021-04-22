@@ -293,7 +293,7 @@ window.plugin.drawTools.manualOpt = function() {
            + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
            +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
            + '<center><label id="edfToggle"><input type="checkbox" '+edfStatusCheck+' name="edf"'
-           +   'onchange="window.plugin.drawTools.edfStausToggle();return false;" />Fill the polygon(s)</label></center>'
+           +   'onchange="window.plugin.drawTools.edfStatusToggle();return false;" />Fill the polygon(s)</label></center>'
            + '</div>';
 
   dialog({
@@ -797,7 +797,7 @@ window.plugin.drawTools.clearAndDraw = function(){
   console.log('DRAWTOOLS: reset all drawn items');
 };
 
-window.plugin.drawTools.edfStausToggle = function(){
+window.plugin.drawTools.edfStatusToggle = function(){
   window.plugin.drawTools.toggleEDF();
   window.plugin.drawTools.toggleOpacityOpt();
   window.plugin.drawTools.clearAndDraw();
