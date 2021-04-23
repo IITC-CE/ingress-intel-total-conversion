@@ -1,7 +1,7 @@
 ﻿// @author         modos189
 // @name           Fix maps offsets in China
 // @category       Tweaks
-// @version        0.2.2
+// @version        0.3.0
 // @description    Show correct maps for China user by applying offset tweaks.
 
 
@@ -278,14 +278,22 @@ var fixChinaOffset = {
 };
 
 // redefine L.GridLayer.GoogleMutant methods
-function fixGoogleMutant (_update) {
+function fixGoogleMutant (_update, style) {
   return function () {
     _update.call(this);
-    if (this._mutant && this.options.needFixChinaOffset) {
+    var o = this.options;
+    if (this._mutant && o.type !== 'satellite') {
       var wgs = this._map.getCenter();
       if (fixChinaMapOffset.isInChina(wgs.lat, wgs.lng)) {
         var gcj = fixChinaMapOffset.wgs_gcj(wgs);
-        this._mutant.setCenter(gcj);
+        if (o.type === 'hybrid') {
+          var zoom = this._map.getZoom();
+          var offset = this._map.project(wgs, zoom)
+            .subtract(this._map.project(gcj, zoom));
+          style.transform = L.Util.template('translate3d({x}px, {y}px, 0px)', offset);
+        } else {
+          this._mutant.setCenter(gcj);
+        }
       }
     }
   };
@@ -296,10 +304,15 @@ function setup () {
   L.TileLayer.include(fixChinaOffset);
 
   // GoogleMutant needs additional support
+  var styleEl = document.createElement('style');
+  var css = document.body.appendChild(styleEl).sheet;
+  var cssrule = css.cssRules[css.insertRule('.google-mutant .leaflet-tile img:nth-child(2) {}')];
+
   L.GridLayer.GoogleMutant
+    .mergeOptions({className: 'google-mutant'})
     .include(fixChinaOffset)
     .include({
-      _update: fixGoogleMutant(L.GridLayer.GoogleMutant.prototype._update)
+      _update: fixGoogleMutant(L.GridLayer.GoogleMutant.prototype._update, cssrule.style)
     })
     .addInitHook(function () {
       var o = this.options;
