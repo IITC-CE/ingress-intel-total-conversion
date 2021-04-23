@@ -314,12 +314,12 @@ function setup () {
   L.TileLayer.include(fixChinaOffset);
 
   // GoogleMutant needs additional support
-  L.GridLayer.GoogleMutant.include(fixChinaOffset);
-  L.GridLayer.GoogleMutant.include(fixGoogleMutant);
-  layerChooser._layers.forEach(function (item) {
-    if (item.layer instanceof L.GridLayer.GoogleMutant) {
-      var o = item.layer.options;
-      o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybride';
-    }
-  });
+  L.GridLayer.GoogleMutant
+    .include(fixChinaOffset)
+    .include(fixGoogleMutant)
+    .addInitHook(function () {
+      var o = this.options;
+      o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybrid';
+    });
 }
+setup.priority = 'boot';
