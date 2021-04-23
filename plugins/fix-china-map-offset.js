@@ -1,7 +1,7 @@
 ﻿// @author         modos189
 // @name           Fix maps offsets in China
 // @category       Tweaks
-// @version        0.2.1
+// @version        0.2.2
 // @description    Show correct maps for China user by applying offset tweaks.
 
 
@@ -317,7 +317,7 @@ function setup () {
   L.GridLayer.GoogleMutant.include(fixChinaOffset);
   L.GridLayer.GoogleMutant.include(fixGoogleMutant);
   layerChooser._layers.forEach(function (item) {
-    if (item.layer._GAPIPromise) { // Google layer
+    if (item.layer instanceof L.GridLayer.GoogleMutant) {
       var o = item.layer.options;
       o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybride';
     }
