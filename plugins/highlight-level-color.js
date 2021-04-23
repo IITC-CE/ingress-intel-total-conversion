@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalHighlighterPortalsLevelColor = function() {};
+var highlightLevelColor = {};
+window.plugin.highlightLevelColor = highlightLevelColor;
 
-window.plugin.portalHighlighterPortalsLevelColor.colorLevel = function(data) {
+highlightLevelColor.highlight = function(data) {
   var portal_level = data.portal.options.data.level;
   if (portal_level !== undefined) {
     var opacity = .6;
@@ -17,5 +18,5 @@ window.plugin.portalHighlighterPortalsLevelColor.colorLevel = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Level Color', window.plugin.portalHighlighterPortalsLevelColor.colorLevel);
+  window.addPortalHighlighter('Level Color', highlightLevelColor.highlight);
 }

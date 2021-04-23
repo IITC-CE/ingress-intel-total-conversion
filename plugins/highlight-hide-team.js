@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalHighlighterHideOwnership = function() {};
+var highlightHideOwnership ={};
+window.plugin.highlightHideOwnership = highlightHideOwnership;
 
-window.plugin.portalHighlighterHideOwnership.highlight = function(data) {
+highlightHideOwnership.highlight = function(data) {
   var scale = window.portalMarkerScale();
 
   var params = getMarkerStyleOptions({team: TEAM_NONE, level: 0});
@@ -16,5 +17,5 @@ window.plugin.portalHighlighterHideOwnership.highlight = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Hide portal ownership', window.plugin.portalHighlighterHideOwnership.highlight);
+  window.addPortalHighlighter('Hide portal ownership', highlightHideOwnership.highlight);
 }

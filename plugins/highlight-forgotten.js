@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalHighlighterInactive = function() {};
+var highlightInactive = {};
+window.plugin.highlightInactive = highlightInactive;
 
-window.plugin.portalHighlighterInactive.highlight = function(data) {
+highlightInactive.highlight = function(data) {
 
   if (data.portal.options.timestamp > 0) {
 
@@ -31,5 +32,5 @@ window.plugin.portalHighlighterInactive.highlight = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Inactive Portals', window.plugin.portalHighlighterInactive.highlight);
+  window.addPortalHighlighter('Inactive Portals', highlightInactive.highlight);
 }

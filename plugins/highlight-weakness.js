@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalWeakness = function() {};
+var highlightWeakness = {};
+window.plugin.highlightWeakness = highlightWeakness;
 
-window.plugin.portalWeakness.highlightWeakness = function(data) {
+highlightWeakness.highlight = function(data) {
 
   if(data.portal.options.data.resCount !== undefined && data.portal.options.data.health !== undefined && data.portal.options.team != TEAM_NONE) {
     var res_count = data.portal.options.data.resCount;
@@ -34,5 +35,5 @@ window.plugin.portalWeakness.highlightWeakness = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Portal Weakness', window.plugin.portalWeakness.highlightWeakness);
+  window.addPortalHighlighter('Portal Weakness', highlightWeakness.highlight);
 }

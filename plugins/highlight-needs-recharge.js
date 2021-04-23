@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalHighlighterNeedsRecharge = function() {};
+var highlightNeedsRecharge = {};
+window.plugin.highlightNeedsRecharge = highlightNeedsRecharge;
 
-window.plugin.portalHighlighterNeedsRecharge.highlight = function(data) {
+highlightNeedsRecharge.highlight = function(data) {
   var d = data.portal.options.data;
   var health = d.health;
 
@@ -34,5 +35,5 @@ window.plugin.portalHighlighterNeedsRecharge.highlight = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Needs Recharge (Health)', window.plugin.portalHighlighterNeedsRecharge.highlight);
+  window.addPortalHighlighter('Needs Recharge (Health)', highlightNeedsRecharge.highlight);
 }

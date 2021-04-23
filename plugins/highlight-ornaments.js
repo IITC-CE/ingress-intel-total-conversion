@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalHighlightOrnaments = function() {};
+var highlightOrnaments = {};
+window.plugin.highlightOrnaments = highlightOrnaments;
 
-window.plugin.portalHighlightOrnaments.highlight = function(data) {
+highlightOrnaments.highlight = function(data) {
   var d = data.portal.options.data;
   if(d.ornaments && d.ornaments.length > 0) {
     var fill_opacity = 0.75;
@@ -22,5 +23,5 @@ window.plugin.portalHighlightOrnaments.highlight = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Ornaments (anomaly portals)', window.plugin.portalHighlightOrnaments.highlight);
+  window.addPortalHighlighter('Ornaments (anomaly portals)', highlightOrnaments.highlight);
 }

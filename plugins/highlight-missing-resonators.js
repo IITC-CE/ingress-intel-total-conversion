@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalsMissingResonators = function() {};
+var highlightMissingResonators = {};
+window.plugin.highlightMissingResonators = highlightMissingResonators;
 
-window.plugin.portalsMissingResonators.highlight = function(data) {
+highlightMissingResonators.highlight = function(data) {
 
   if(data.portal.options.team != TEAM_NONE) {
     var res_count = data.portal.options.data.resCount;
@@ -28,5 +29,5 @@ window.plugin.portalsMissingResonators.highlight = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Portals Missing Resonators', window.plugin.portalsMissingResonators.highlight);
+  window.addPortalHighlighter('Portals Missing Resonators', highlightMissingResonators.highlight);
 }

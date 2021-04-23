@@ -6,18 +6,19 @@
 
 
 // use own namespace for plugin
-window.plugin.portalHighlighterPortalsMyLevel = function() {};
+var highlightMyLevel = {};
+window.plugin.highlightMyLevel = highlightMyLevel;
 
 
-window.plugin.portalHighlighterPortalsMyLevel.belowLevel = function(data) {
-  window.plugin.portalHighlighterPortalsMyLevel.colorLevel(true,data);
+highlightMyLevel.belowLevel = function(data) {
+  highlightMyLevel.colorLevel(true,data);
 }
 
-window.plugin.portalHighlighterPortalsMyLevel.aboveLevel = function(data) {
-  window.plugin.portalHighlighterPortalsMyLevel.colorLevel(false,data);
+highlightMyLevel.aboveLevel = function(data) {
+  highlightMyLevel.colorLevel(false,data);
 }
 
-window.plugin.portalHighlighterPortalsMyLevel.colorLevel = function(below,data) {
+highlightMyLevel.colorLevel = function(below,data) {
   var portal_level = data.portal.options.level;
 
   // as portal levels can never be higher than L8, clamp the player level to this for highlight purposes
@@ -31,6 +32,6 @@ window.plugin.portalHighlighterPortalsMyLevel.colorLevel = function(below,data) 
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Below My Level', window.plugin.portalHighlighterPortalsMyLevel.belowLevel);
-  window.addPortalHighlighter('Above My Level', window.plugin.portalHighlighterPortalsMyLevel.aboveLevel);
+  window.addPortalHighlighter('Below My Level', highlightMyLevel.belowLevel);
+  window.addPortalHighlighter('Above My Level', highlightMyLevel.aboveLevel);
 }
