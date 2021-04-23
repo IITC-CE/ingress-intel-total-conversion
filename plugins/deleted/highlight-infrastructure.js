@@ -6,9 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.portalInfrastructure = function() {};
+var portalInfrastructure = {};
+window.plugin.portalInfrastructure = portalInfrastructure;
 
-window.plugin.portalInfrastructure.badTitles = ['^statue$',
+portalInfrastructure.badTitles = ['^statue$',
                                                 '^fountain$',
                                                 '^sculpture$',
                                                 '^post office$',
@@ -17,7 +18,7 @@ window.plugin.portalInfrastructure.badTitles = ['^statue$',
                                                 'untitled',
                                                 'no title'];
 
-window.plugin.portalInfrastructure.highlight = function(data) {
+portalInfrastructure.highlight = function(data) {
   var d = data.portal.options.data;
   var color = '';
   var opa = .75;
@@ -26,7 +27,7 @@ window.plugin.portalInfrastructure.highlight = function(data) {
     color = 'red';
   }
 
-  if((new RegExp(window.plugin.portalInfrastructure.badTitles.join("|"),'i')).test(d.title)) {
+  if((new RegExp(portalInfrastructure.badTitles.join("|"),'i')).test(d.title)) {
     color = color == 'red' ? 'orange' : 'yellow';
     opa = .9;
   }
@@ -39,5 +40,5 @@ window.plugin.portalInfrastructure.highlight = function(data) {
 }
 
 var setup =  function() {
-  window.addPortalHighlighter('Infrastructure', window.plugin.portalInfrastructure.highlight);
+  window.addPortalHighlighter('Infrastructure', portalInfrastructure.highlight);
 }
