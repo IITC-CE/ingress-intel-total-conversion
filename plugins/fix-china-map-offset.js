@@ -278,36 +278,18 @@ var fixChinaOffset = {
 };
 
 // redefine L.GridLayer.GoogleMutant methods
-var fixGoogleMutant = {
-/* eslint-disable */
-	_update: function () {
-		// zoom level check needs to happen before super's implementation (tile addition/creation)
-		// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
-		if (this._mutant) {
-			var center = this._map.getCenter();
-			var _center = new google.maps.LatLng(center.lat, center.lng);
-			/// modified here ///
-			center = fixChinaMapOffset.transform(center, this.options);
-			/////////////////////
-
-			this._mutant.setCenter(_center);
-			var zoom = this._map.getZoom();
-			var fractionalLevel = zoom !== Math.round(zoom);
-			var mutantZoom = this._mutant.getZoom();
-
-			//ignore fractional zoom levels
-			if (!fractionalLevel && (zoom != mutantZoom)) {
-				this._mutant.setZoom(zoom);
-
-				if (this._mutantIsReady) this._checkZoomLevels();
-				//else zoom level check will be done later by 'idle' handler
-			}
-		}
-
-		L.GridLayer.prototype._update.call(this);
-	},
-/* eslint-enable */
-};
+function fixGoogleMutant (_update) {
+  return function () {
+    _update.call(this);
+    if (this._mutant && this.options.needFixChinaOffset) {
+      var wgs = this._map.getCenter();
+      if (fixChinaMapOffset.isInChina(wgs.lat, wgs.lng)) {
+        var gcj = fixChinaMapOffset.wgs_gcj(wgs);
+        this._mutant.setCenter(gcj);
+      }
+    }
+  };
+}
 
 function setup () {
   // add support of `needFixChinaOffset` property to any TileLayer
@@ -316,7 +298,9 @@ function setup () {
   // GoogleMutant needs additional support
   L.GridLayer.GoogleMutant
     .include(fixChinaOffset)
-    .include(fixGoogleMutant)
+    .include({
+      _update: fixGoogleMutant(L.GridLayer.GoogleMutant.prototype._update)
+    })
     .addInitHook(function () {
       var o = this.options;
       o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybrid';
