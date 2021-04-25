@@ -258,41 +258,62 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
 
 fixChinaMapOffset.wgs_gcj = PRCoords.wgs_gcj;
 
-fixChinaMapOffset.transform = function (wgs, options) {
-  if (options.needFixChinaOffset && fixChinaMapOffset.isInChina(wgs.lat, wgs.lng)) {
-    return fixChinaMapOffset.wgs_gcj(wgs);
-  }
-  return wgs;
-};
-
 // redefine L.TileLayer methods
 var fixChinaOffset = {
+  _inChina: false,
+
+  _inChinaLastChecked: [0,0],
+
+  _inChinaValidRadius: 100000,
+
+  _isInChina: function (latlng) {
+    if (latlng._notChina) { return false; } // do not check twice same latlng
+
+    if (latlng.distanceTo(this._inChinaLastChecked) > this._inChinaValidRadius) {
+      // recheck only when beyond of specified radius, otherwise keep last known value
+      this._inChina = fixChinaMapOffset.isInChina(latlng.lat, latlng.lng);
+      this._inChinaLastChecked = latlng;
+    }
+    latlng._notChina = !this._inChina;
+    return this._inChina;
+  },
+
+  _fixChinaOffset: function (latlng) {
+    if (!this.options.needFixChinaOffset) { return latlng; }
+    if (!latlng._gcj) { // do not calculate twice same latlng
+      latlng._gcj = this._isInChina(latlng) &&
+        fixChinaMapOffset.wgs_gcj(latlng);
+    }
+    return latlng._gcj || latlng;
+  },
+
   _getTiledPixelBounds: function (center) {
-    center = fixChinaMapOffset.transform(center, this.options);
+    center = this._fixChinaOffset(center);
     return L.GridLayer.prototype._getTiledPixelBounds.call(this, center);
   },
+
   _setZoomTransform: function (level, center, zoom) {
-    center = fixChinaMapOffset.transform(center, this.options);
+    center = this._fixChinaOffset(center);
     return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
   }
 };
 
 // redefine L.GridLayer.GoogleMutant methods
 function fixGoogleMutant (_update, style) {
-  return function () {
-    _update.call(this);
+  return function (wgs) {
+    wgs = wgs || this._map.getCenter();
+    _update.call(this, wgs);
     var o = this.options;
     if (this._mutant && o.type !== 'satellite') {
-      var wgs = this._map.getCenter();
-      if (fixChinaMapOffset.isInChina(wgs.lat, wgs.lng)) {
-        var gcj = fixChinaMapOffset.wgs_gcj(wgs);
+      if (this._isInChina(wgs)) {
+        wgs._gcj = wgs._gcj || fixChinaMapOffset.wgs_gcj(wgs);
         if (o.type === 'hybrid') {
           var zoom = this._map.getZoom();
           var offset = this._map.project(wgs, zoom)
-            .subtract(this._map.project(gcj, zoom));
+            .subtract(this._map.project(wgs._gcj, zoom));
           style.transform = L.Util.template('translate3d({x}px, {y}px, 0px)', offset);
         } else {
-          this._mutant.setCenter(gcj);
+          this._mutant.setCenter(wgs._gcj);
         }
       }
     }
