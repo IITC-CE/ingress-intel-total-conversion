@@ -371,6 +371,7 @@
 			++checkCounter;
 		}, 500);
 	}
+
 	// 🍂class GridLayer.GoogleMutant
 	// 🍂extends GridLayer
 	L.GridLayer.GoogleMutant = L.GridLayer.extend({
@@ -419,17 +420,11 @@
 			}
 
 			waitForAPI(function () {
-				this$1._initMutant();
-
-				map = this$1._map;
-				if (!map) {
+				if (!this$1._map) {
 					return;
 				}
-				var moveevent = this$1.options.updateWhenIdle ? "moveend" : "move";
-				map.on(moveevent, this$1._update, this$1);
-				this$1.once("remove", function () {
-					this._map.off(moveevent, this._update, this);
-				});
+				this$1._initMutant();
+
 				//handle layer being added to a map for which there are no Google tiles at the given zoom
 				google.maps.event.addListenerOnce(this$1._mutant, "idle", function () {
 					if (!this$1._map) {
@@ -438,9 +433,7 @@
 					this$1._checkZoomLevels();
 					this$1._mutantIsReady = true;
 				});
-
-				this$1._update();
-			}, this);
+			});
 		},
 
 		onRemove: function (map) {
@@ -507,10 +500,10 @@
 
 			this.setOpacity(this.options.opacity);
 			var style = this._mutantContainer.style;
-			if (this.options.zoomSnap < 1) {
+			if (this._map.options.zoomSnap < 1) {
 				// Fractional zoom needs a bigger mutant container in order to load more (smaller) tiles
-				style.width = "150%";
-				style.height = "150%";
+				style.width = "180%";
+				style.height = "180%";
 			} else {
 				style.width = "100%";
 				style.height = "100%";
@@ -550,6 +543,8 @@
 					nodes[i].style.pointerEvents = "auto";
 				}
 			});
+
+			this._update();
 
 			// 🍂event spawned
 			// Fired when the mutant has been created.
@@ -756,12 +751,12 @@
 			}
 		},
 
-		_update: function () {
+		_update: function (center) {
 			// zoom level check needs to happen before super's implementation (tile addition/creation)
 			// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
 			if (this._mutant) {
-				var center = this._map.getCenter(),
-					_center = new google.maps.LatLng(center.lat, center.lng),
+				center = center || this._map.getCenter();
+				var _center = new google.maps.LatLng(center.lat, center.lng),
 					zoom = Math.round(this._map.getZoom()),
 					mutantZoom = this._mutant.getZoom();
 
@@ -776,7 +771,7 @@
 				}
 			}
 
-			L.GridLayer.prototype._update.call(this);
+			L.GridLayer.prototype._update.call(this, center);
 		},
 
 		// @method whenReady(fn: Function, context?: Object): this
@@ -784,7 +779,7 @@
 		// if it's already initialized, optionally passing a function context.
 		whenReady: function (callback, context) {
 			if (this._mutant) {
-				callback.call(context || this, {target: this});
+				callback.call(context || this, { target: this });
 			} else {
 				this.on("spawned", callback, context);
 			}
