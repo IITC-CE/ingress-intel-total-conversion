@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.2.0
+// @version        0.2.1
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 
@@ -308,7 +308,7 @@ window.plugin.missions = {
 			me.storeCache();
 
 			callback(mission);
-		}, function() {
+		}, function(error) {
 			console.error('Error loading mission data: ' + guid + ', ' + Array.prototype.slice.call(arguments));
 			
 			if (errorcallback) {
