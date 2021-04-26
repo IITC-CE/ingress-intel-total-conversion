@@ -9,27 +9,53 @@
 var highlightNeedsRecharge = {};
 window.plugin.highlightNeedsRecharge = highlightNeedsRecharge;
 
+highlightNeedsRecharge.conditions = [85,70,60,45,30,15,0];
+
+highlightNeedsRecharge.styles = {
+  common: {
+  },
+  cond85: {
+    fillColor: 'yellow',
+    fillOpacity: 0.5
+  },
+  cond70: {
+    fillColor: 'orange',
+    fillOpacity: 0.5
+  },
+  cond60: {
+    fillColor: 'darkorange',
+    fillOpacity: 0.5
+  },
+  cond45: {
+    fillColor: 'red',
+    fillOpacity: 0.4
+  },
+  cond30: {
+    fillColor: 'red',
+    fillOpacity: 0.6
+  },
+  cond15: {
+    fillColor: 'red',
+    fillOpacity: 0.8
+  },
+  cond0: {
+    fillColor: 'magenta',
+    fillOpacity: 1.0
+  }
+};
+
 highlightNeedsRecharge.highlight = function(data) {
   var d = data.portal.options.data;
   var health = d.health;
 
-  if(health !== undefined && data.portal.options.team != TEAM_NONE && health < 100) {
-    var color,fill_opacity;
-    if (health > 95) {
-      color = 'yellow';
-      fill_opacity = (1-health/100)*.50 + .50;
-    } else if (health > 75) {
-      color = 'DarkOrange';
-      fill_opacity = (1-health/100)*.50 + .50;
-    } else if (health > 15) {
-      color = 'red';
-      fill_opacity = (1-health/100)*.75 + .25;
-    } else {
-      color = 'magenta';
-      fill_opacity = (1-health/100)*.75 + .25;
-    }
+  if (health !== undefined && data.portal.options.team != TEAM_NONE && health < 100) {
+    var params = L.extend ({},
+      highlightNeedsRecharge.styles.common,
+      highlightNeedsRecharge.styles[
+        'cond'+ highlightNeedsRecharge.conditions.find(function (cond) {return cond < health;})
+      ]
+    );
 
-    var params = {fillColor: color, fillOpacity: fill_opacity};
     data.portal.setStyle(params);
   }
 }

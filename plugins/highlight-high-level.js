@@ -6,25 +6,38 @@
 
 
 // use own namespace for plugin
-var highlightHighLevel = {};
-window.plugin.highlightHighLevel = highlightHighLevel;
 
-highlightHighLevel.highlight = function(data) {
+var highLevel = {};
+window.plugin.highlightHighLevel = highLevel;
+
+highLevel.styles = {
+  common: {
+    fillOpacity: 0.7
+  },
+  level6: {
+    fillColor: 'orange'
+  },
+  level7: {
+    fillColor: 'red'
+  },
+  level8: {
+    fillColor: 'magenta'
+  },
+};
+
+highLevel.highlight = function (data) {
   var portal_level = data.portal.options.data.level;
-  var opacity = 0.7;
-  var color = undefined;
+  if (portal_level === undefined) return;           // continue on 0..8
+  var newStyle= L.extend ( {},
+    highLevel.styles.common,
+    highLevel.styles['level'+portal_level]
+  );
 
-  switch (portal_level) {
-    case 6: color='orange'; break;
-    case 7: color='red'; break;
-    case 8: color='magenta'; break;
+  if (newStyle.fillColor) {
+    data.portal.setStyle(newStyle);
   }
+};
 
-  if (color) {
-    data.portal.setStyle({fillColor: color, fillOpacity: opacity});
-  }
-}
-
-var setup =  function() {
-  window.addPortalHighlighter('Higher Level Portals', highlightHighLevel.highlight);
+function setup () {
+  window.addPortalHighlighter('Higher Level Portals', highLevel.highlight);
 }

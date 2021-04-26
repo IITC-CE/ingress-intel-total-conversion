@@ -9,6 +9,12 @@
 var highlightMissingResonators = {};
 window.plugin.highlightMissingResonators = highlightMissingResonators;
 
+highlightMissingResonators.styles = {
+  common: {
+    fillcolor: red,
+  }
+
+
 highlightMissingResonators.highlight = function(data) {
 
   if(data.portal.options.team != TEAM_NONE) {
@@ -16,12 +22,13 @@ highlightMissingResonators.highlight = function(data) {
 
     if(res_count !== undefined && res_count < 8) {
       var fill_opacity = ((8-res_count)/8)*.85 + .15;
-      var color = 'red';
-      var params = {fillColor: color, fillOpacity: fill_opacity};
-
       // Hole per missing resonator
       var dash = new Array((8 - res_count) + 1).join("1,4,") + "100,0"
-      params.dashArray = dash;
+
+      var params = L.extend({},
+        highlightMissingResonators.styles.common,
+        {fillOpacity: fill_opacity, dashArray: dash}
+      );
 
       data.portal.setStyle(params);
     } 
