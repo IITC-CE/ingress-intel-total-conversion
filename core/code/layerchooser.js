@@ -13,6 +13,14 @@
 var LayerChooser = L.Control.Layers.extend({
   initialize: function (baseLayers, overlays, options) {
     this._overlayStatus = {};
+    var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
+    if (layersJSON) {
+      try {
+        this._overlayStatus = JSON.parse(layersJSON);
+      } catch (e) {
+        log.error(e);
+      }
+    }
     this._mapToAdd = options && options.map;
     L.Control.Layers.prototype.initialize.apply(this, arguments);
   },
@@ -52,13 +60,7 @@ var LayerChooser = L.Control.Layers.extend({
     if (name in this._overlayStatus) {
       return this._overlayStatus[name];
     }
-    var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
-    var layers;
-    if (layersJSON) {
-      layers = JSON.parse(layersJSON);
-      this._overlayStatus = L.extend({}, layers, this._overlayStatus);
-    }
-    return layers && name in layers ? layers[name] : defaultState;
+    return defaultState;
   },
 
   // layer: either Layer or it's name in the control
