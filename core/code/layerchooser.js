@@ -208,16 +208,19 @@ if (typeof android !== 'undefined' && android && android.setLayers) {
 
 // contains current status(on/off) of overlay layerGroups.
 // !!deprecated: use `map.hasLayer` instead (https://leafletjs.com/reference.html#map-haslayer)
-// window.overlayStatus = window.layerChooser._overlayStatus;
+window.overlayStatus = {}; // to be set in constructor
 
 // Reads recorded layerGroup status (as it may not be added to map yet),
 // return `defaultDisplay` if no record found.
-// !!deprecated: persistent status is now handled automatically by layerChooser,
-// for most use cases prefer `map.hasLayer` (https://leafletjs.com/reference.html#map-haslayer)
-window.isLayerGroupDisplayed = function (name, defaultDisplay) {
-  if (!window.layerChooser) { return; } // to be safe
-  return window.layerChooser._isOverlayDisplayed(name, defaultDisplay);
-};
+// !!deprecated: for most use cases prefer `getLayer()` method
+// or `map.hasLayer` (https://leafletjs.com/reference.html#map-haslayer)
+// window.isLayerGroupDisplayed = function (name, defaultDisplay) { // ...
+window.isLayerGroupDisplayed = L.Util.falseFn; // to be set in constructor
+
+LayerChooser.addInitHook(function () {
+  window.overlayStatus = this._overlayStatus;
+  window.isLayerGroupDisplayed = this._isOverlayDisplayed.bind(this);
+});
 
 window.addLayerGroup = function (name, layerGroup, defaultDisplay) {
   if (defaultDisplay === false) {
