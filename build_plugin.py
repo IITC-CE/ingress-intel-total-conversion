@@ -24,6 +24,9 @@ def fill_meta(source, plugin_name, dist_path):
     meta = ['// ==UserScript==']
     keys = set()
 
+    # concatenate subsequent simple comment lines to the previous line (multi-line-headers)
+    source = re.sub(r'\n\/\/\s+([^@].+)$', r' \1', source, flags=re.MULTILINE)
+    
     def append_line(key, value):
         if key not in keys:
             meta.append(f'// @{key:<14} {value}')
