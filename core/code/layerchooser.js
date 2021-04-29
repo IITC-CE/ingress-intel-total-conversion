@@ -11,6 +11,8 @@
  * Also some additional methods provided, see below.
  */
 
+'use strict';
+
 var LayerChooser = L.Control.Layers.extend({
   options: {
     // @option sortLayers: Boolean = true
@@ -45,8 +47,16 @@ var LayerChooser = L.Control.Layers.extend({
     this._lastPriority = 0; // any following gets >0
   },
 
-  _addLayer: function (layer, name, overlay) {
-    L.Control.Layers.prototype._addLayer.apply(this, arguments);
+  _addLayer: function (layer, label, overlay) {
+    if (!layer._name) {
+      // name is stored on first add (with .addBaseLayer/.addOverlay)
+      // should be unique, otherwise behavior of other methods is undefined (typically: first found will be taken)
+      layer._name = label;
+      layer._overlay = overlay;
+    } else {
+      label = label || layer._label || layer._name;
+    }
+    L.Control.Layers.prototype._addLayer.call(this, layer, label, overlay);
     // provide stable sort order
     if (!('sortPriority' in layer.options)) {
       this._lastPriority = this._lastPriority + 10;
@@ -61,20 +71,20 @@ var LayerChooser = L.Control.Layers.extend({
     }
     if (overlay) {
       if (layer._map) {
-        this._storeOverlayState(name, true);
+        this._storeOverlayState(layer._name, true);
       } else {
         var defaultState = !layer.options.defaultDisabled;
-        if (this._isOverlayDisplayed(name, defaultState)) {
+        if (this._isOverlayDisplayed(layer._name, defaultState)) {
           layer.addTo(this._map || this._mapToAdd);
         }
       }
       layer._statusTracking = function (e) {
-        this._storeOverlayState(name, e.type === 'add');
+        this._storeOverlayState(layer._name, e.type === 'add');
       };
       layer.on('add remove', layer._statusTracking, this);
     } else {
       layer._statusTracking = function () {
-        localStorage['iitc-base-map'] = name;
+        localStorage['iitc-base-map'] = layer._name;
       };
       layer.on('add', layer._statusTracking);
     }
@@ -85,9 +95,7 @@ var LayerChooser = L.Control.Layers.extend({
   // Either layer object or it's name in the control must be specified.
   // Layer is removed from the map as well, except `keepOnMap` argument is true.
   removeLayer: function (layer, keepOnMap) {
-    if (!(layer instanceof L.Layer)) {
-      layer = this.getLayerByName(layer);
-    }
+    layer = this.getLayer(layer);
     if (layer && layer._statusTracking) {
       layer.off('add remove', layer._statusTracking, this);
       delete layer._statusTracking;
@@ -113,18 +121,29 @@ var LayerChooser = L.Control.Layers.extend({
     return defaultState;
   },
 
-  // layer: either Layer or it's name in the control
-  _layerInfo: function (layer) {
-    var prop = layer instanceof L.Layer ? 'layer' : 'name';
-    return this._layers.find(function (el) {
-      return el[prop] === layer;
-    });
+  __byName: function (el) {
+    var name = this.toString();
+    return el.layer._name === name ||
+      el.name === name;
   },
 
-  // @method getLayerByName(name: String): Layer
-  // Returns layer by it's name in the control.
-  getLayerByName: function (name) {
-    var info = this._layerInfo(name);
+  __byLayer: function (el) {
+    return el.layer === this;
+  },
+
+  // layer: either Layer or it's name in the control
+  _layerInfo: function (layer) {
+    var fn = layer instanceof L.Layer
+      ? this.__byLayer
+      : this.__byName;
+    return this._layers.find(fn, layer);
+  },
+
+  // @method getLayer(name: String|Layer): Layer
+  // Returns layer by it's name in the control, or by layer object itself.
+  // The latter can be used to ensure the layer is in layerChooser.
+  getLayer: function (layer) {
+    var info = this._layerInfo(layer);
     return info && info.layer;
   },
 
@@ -132,27 +151,52 @@ var LayerChooser = L.Control.Layers.extend({
   // Switches layer's display state to given value (true by default).
   // Layer can be specified also by it's name in the control.
   showLayer: function (layer, display) {
-    var info = this._layers[layer] || this._layerInfo(layer);
-    if (!info) {
-      log.warn('Layer not found');
-      return this;
+    var info = this._layers[layer]; // layer is index, private use only
+    if (info) {
+      layer = info.layer;
+    } else {
+      layer = this.getLayer(layer);
+      if (!layer) {
+        log.warn('Layer not found');
+        return this;
+      }
     }
     var map = this._map;
     if (display || arguments.length === 1) {
-      if (!map.hasLayer(info.layer)) {
-        if (!info.overlay) {
+      if (!map.hasLayer(layer)) {
+        if (!layer._overlay) {
           // if it's a base layer, remove any others
           this._layers.forEach(function (el) {
-            if (!el.overlay && el.layer !== info.layer) {
+            if (!el.overlay && el.layer !== layer) {
               map.removeLayer(el.layer);
             }
           });
         }
-        map.addLayer(info.layer);
+        map.addLayer(layer);
       }
     } else {
-      map.removeLayer(info.layer);
+      map.removeLayer(layer);
     }
+    return this;
+  },
+
+  // @method setLabel(layer: String|Layer, label?: String): this
+  // Sets layers label to specified label text (html),
+  // or resets it to original name when label is not specified.
+  setLabel: function (layer, label) {
+    var fn = layer instanceof L.Layer
+      ? this.__byLayer
+      : this.__byName;
+    var idx = this._layers.findIndex(fn, layer);
+    if (idx === -1) {
+      log.warn('Layer not found');
+      return this;
+    }
+    var info = this._layers[idx];
+    label = label || info.layer._name;
+    info.name = label;
+    var nameEl = this._layerControlInputs[idx].closest('label').querySelector('span');
+    nameEl.innerHTML = ' ' + label;
     return this;
   },
 
@@ -172,7 +216,7 @@ var LayerChooser = L.Control.Layers.extend({
 
   _filterOverlays: function (el) {
     return el.overlay &&
-      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(el.name) === -1;
+      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(el.layer._name) === -1;
   },
 
   // Hides all the control's overlays except given one,
@@ -212,6 +256,10 @@ var LayerChooser = L.Control.Layers.extend({
     }
   },
 
+  _stripHtmlTags: function (str) {
+    return str.replace(/(<([^>]+)>)/gi, ''); // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
+  },
+
   // !!deprecated
   getLayers: function () {
     var baseLayers = [];
@@ -219,7 +267,7 @@ var LayerChooser = L.Control.Layers.extend({
     this._layers.forEach(function (info, idx) {
       (info.overlay ? overlayLayers : baseLayers).push({
         layerId: idx,
-        name: info.name,
+        name: this._stripHtmlTags(info.name), // IITCm does not support html in layers labels
         active: this._map.hasLayer(info.layer)
       });
     }, this);
@@ -255,6 +303,13 @@ if (typeof android !== 'undefined' && android && android.setLayers) {
       var l = this.getLayers();
       android.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
     }, 1000),
+
+    setLabel: (function (setLabel) {
+      return function () {
+        this._setAndroidLayers();
+        return setLabel.apply(this, arguments);
+      };
+    })(LayerChooser.prototype.setLabel),
 
     _update: function () {
       this._setAndroidLayers();

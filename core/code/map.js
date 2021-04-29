@@ -256,7 +256,7 @@ window.setupMap = function() {
   // adds a base layer to the map. done separately from the above,
   // so that plugins that add base layers can be the default
   window.addHook('iitcLoaded', function () {
-    var stored = layerChooser.getLayerByName(layerChooser.lastBaseLayerName);
+    var stored = layerChooser.getLayer(layerChooser.lastBaseLayerName);
     map.addLayer(stored || baseLayers['CartoDB Dark Matter']);
 
     // (setting an initial position, before a base layer is added, causes issues with leaflet) // todo check
