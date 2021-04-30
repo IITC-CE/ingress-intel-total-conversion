@@ -47,7 +47,8 @@ var LayerChooser = L.Control.Layers.extend({
     this._lastPriority = 0; // any following gets >0
   },
 
-  _addLayer: function (layer, label, overlay) {
+  _addLayer: function (layer, label, overlay, options) { // todo process .sortPriority/.defaultDisabled ??
+    options = options || {};
     if (!layer._name) {
       // name is stored on first add (with .addBaseLayer/.addOverlay)
       // should be unique, otherwise behavior of other methods is undefined (typically: first found will be taken)
@@ -70,24 +71,34 @@ var LayerChooser = L.Control.Layers.extend({
       return;
     }
     if (overlay) {
-      if (layer._map) {
-        this._storeOverlayState(layer._name, true);
-      } else {
-        var defaultState = !layer.options.defaultDisabled;
-        if (this._isOverlayDisplayed(layer._name, defaultState)) {
-          layer.addTo(this._map || this._mapToAdd);
-        }
-      }
       layer._statusTracking = function (e) {
         this._storeOverlayState(layer._name, e.type === 'add');
       };
       layer.on('add remove', layer._statusTracking, this);
+      var map = this._map || this._mapToAdd;
+      if ('enable' in options) { // do as explicitly specified
+        map[options.enable ? 'addLayer' : 'removeLayer'](layer);
+      } else if (layer._map) { // already on map, only store state
+        this._storeOverlayState(layer._name, true);
+      } else { // restore at recorded state
+        var defaultState = !layer.options.defaultDisabled;
+        if (this._isOverlayDisplayed(layer._name, defaultState)) {
+          layer.addTo(map);
+        }
+      }
     } else {
       layer._statusTracking = function () {
         localStorage['iitc-base-map'] = layer._name;
       };
       layer.on('add', layer._statusTracking);
     }
+  },
+
+  // @method addOverlay(layer: Layer, name: String, options: Object): this //todo
+  // Adds an overlay (checkbox entry) with the given name to the control.
+  addOverlay: function (layer, name, options) {
+    this._addLayer(layer, name, true, options);
+    return (this._map) ? this._update() : this;
   },
 
   // @method removeLayer(layer: Layer|String, keepOnMap?: Boolean): this
