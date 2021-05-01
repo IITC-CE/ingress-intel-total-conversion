@@ -4,7 +4,8 @@
 // @version        0.2.0
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
-
+/* exported setup --eslint */
+/* globals L */
 // use own namespace for plugin
 var portalsHistory = {};
 window.plugin.portalHighlighterPortalsHistory = portalsHistory;
@@ -93,7 +94,7 @@ function inherit (parentName, childNames) {
   });
 }
 
-var setup = function () {
+function setup () {
   inherit('common', ['marked', 'semiMarked']);
   inherit('semiMarked', ['visited', 'captureTarget']);
   inherit('marked', ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget']);
@@ -103,4 +104,4 @@ var setup = function () {
   window.addPortalHighlighter('History: not visited/captured', portalsHistory.notVisited);
   window.addPortalHighlighter('History: scout controlled', portalsHistory.scoutControlled);
   window.addPortalHighlighter('History: not scout controlled', portalsHistory.notScoutControlled);
-};
+}

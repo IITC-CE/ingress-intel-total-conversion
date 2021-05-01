@@ -4,7 +4,8 @@
 // @version        0.1.0
 // @description    Use the portal fill color to denote high level portals: Purple L8, Red L7, Orange L6
 
-
+/* exported setup --eslint */
+/* globals L */
 // use own namespace for plugin
 
 var highLevel = {};

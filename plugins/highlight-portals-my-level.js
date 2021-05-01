@@ -4,7 +4,8 @@
 // @version        0.1.2
 // @description    Use the portal fill color to denote if the portal is either at and above, or at and below your level.
 
-
+/* exported setup --eslint */
+/* globals PLAYER */
 // use own namespace for plugin
 var highlightMyLevel = {};
 window.plugin.highlightMyLevel = highlightMyLevel;
@@ -12,11 +13,11 @@ window.plugin.highlightMyLevel = highlightMyLevel;
 
 highlightMyLevel.belowLevel = function(data) {
   highlightMyLevel.colorLevel(true,data);
-}
+};
 
 highlightMyLevel.aboveLevel = function(data) {
   highlightMyLevel.colorLevel(false,data);
-}
+};
 
 highlightMyLevel.colorLevel = function(below,data) {
   var portal_level = data.portal.options.level;
@@ -25,13 +26,13 @@ highlightMyLevel.colorLevel = function(below,data) {
   var player_level = Math.min(PLAYER.level,8);
 
   var opacity = .6;
-  if((below && portal_level <= player_level) ||
+  if ((below && portal_level <= player_level) ||
      (!below && portal_level >= player_level)) {
     data.portal.setStyle({fillColor: 'red', fillOpacity: opacity});
-  } 
-}
+  }
+};
 
-var setup =  function() {
+function setup () {
   window.addPortalHighlighter('Below My Level', highlightMyLevel.belowLevel);
   window.addPortalHighlighter('Above My Level', highlightMyLevel.aboveLevel);
 }
