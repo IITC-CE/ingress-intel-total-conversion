@@ -99,8 +99,8 @@ window.plugin.keysOnMap.setupCSS = function() {
 }
 
 window.plugin.keysOnMap.setupLayer = function() {
-  window.plugin.keysOnMap.keyLayerGroup = L.layerGroup(null, {defaultDisabled: true});
-  window.layerChooser.addOverlay(window.plugin.keysOnMap.keyLayerGroup, 'Keys');
+  window.plugin.keysOnMap.keyLayerGroup = new L.LayerGroup();
+  window.layerChooser.addOverlay(window.plugin.keysOnMap.keyLayerGroup, 'Keys', {default: false});
 }
 
 var setup =  function() {

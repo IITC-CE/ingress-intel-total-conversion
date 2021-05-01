@@ -1034,10 +1034,10 @@ window.plugin.missions = {
 			me.onPortalChanged('delete', data.portal.options.guid, data.portal);
 		});
 
-		this.missionStartLayer = L.layerGroup(null, {defaultDisabled: true});
-		this.missionLayer = L.layerGroup();
+		this.missionStartLayer = new L.LayerGroup();
+		this.missionLayer = new L.LayerGroup();
 
-		window.layerChooser.addOverlay(this.missionStartLayer, 'Mission start portals');
+		window.layerChooser.addOverlay(this.missionStartLayer, 'Mission start portals', {default: false});
 		window.layerChooser.addOverlay(this.missionLayer, 'Mission portals');
 
 		// HOOKS:

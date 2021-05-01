@@ -3,10 +3,7 @@
  * @aka window.LayerChooser
  * @inherits L.Controls.Layers
  *
- * Provides 'persistence' of layers display state between sessions, saving it to localStorage.
- * Every overlay is added to map automatically if it's last state was active.
- * When no record exists - active is assumed, except when layer has option `defaultDisabled`.
- * And with `notPersistent` layer option it is possible to suppress it's status tracking.
+ * Provides 'persistence' of layers display state between sessions.
  *
  * Also some additional methods provided, see below.
  */
@@ -17,15 +14,13 @@ var LayerChooser = L.Control.Layers.extend({
   options: {
     // @option sortLayers: Boolean = true
     // Ensures stable sort order (based on initial), while still providing ability
-    // to enforce specific order with layer's `sortPriority` option,
-    // which lower value means layer's upper position.
-    //
-    // If `sortPriority` is not specified - it will be assigned implicitly in increasing manner.
+    // to enforce specific order with `addBaseLayer`/`addOverlay`
+    // `sortPriority` option.
     sortLayers: true,
 
     sortFunction: function (layerA, layerB) {
-      var a = layerA.options.sortPriority;
-      var b = layerB.options.sortPriority;
+      var a = layerA._sortPriority;
+      var b = layerB._sortPriority;
       return a < b ? -1 : (b < a ? 1 : 0);
     }
   },
@@ -47,26 +42,32 @@ var LayerChooser = L.Control.Layers.extend({
     this._lastPriority = 0; // any following gets >0
   },
 
-  _addLayer: function (layer, label, overlay, options) { // todo process .sortPriority/.defaultDisabled ??
+  _addLayer: function (layer, label, overlay, options) {
     options = options || {};
+    // stored on first add (with .addBaseLayer/.addOverlay)
     if (!layer._name) {
-      // name is stored on first add (with .addBaseLayer/.addOverlay)
-      // should be unique, otherwise behavior of other methods is undefined (typically: first found will be taken)
+      // name should be unique, otherwise behavior of other methods is undefined (typically: first found will be taken)
       layer._name = label;
       layer._overlay = overlay;
+      layer._persistent = 'persistent' in options ? options.persistent : true;
     } else {
       label = label || layer._label || layer._name;
     }
     L.Control.Layers.prototype._addLayer.call(this, layer, label, overlay);
     // provide stable sort order
-    if (!('sortPriority' in layer.options)) {
+    if ('sortPriority' in options) {
+      layer._sortPriority = options.sortPriority;
+    } else if (!('_sortPriority' in layer)) {
       this._lastPriority = this._lastPriority + 10;
-      layer.options.sortPriority = this._lastPriority;
+      layer._sortPriority = this._lastPriority;
     }
-    if (layer.options.notPersistent) {
-      layer._statusTracking = L.Util.falseFn; // dummy
-      if (overlay && !layer.options.defaultDisabled) {
-        layer.addTo(this._map || this._mapToAdd);
+    if (layer._overlay) {
+      layer._default = 'default' in options ? options.default : true;
+    }
+    var map = this._map || this._mapToAdd;
+    if (!layer._persistent) {
+      if ('enable' in options ? options.enable : layer._default) {
+        layer.addTo(map);
       }
       return;
     }
@@ -75,14 +76,12 @@ var LayerChooser = L.Control.Layers.extend({
         this._storeOverlayState(layer._name, e.type === 'add');
       };
       layer.on('add remove', layer._statusTracking, this);
-      var map = this._map || this._mapToAdd;
       if ('enable' in options) { // do as explicitly specified
         map[options.enable ? 'addLayer' : 'removeLayer'](layer);
       } else if (layer._map) { // already on map, only store state
         this._storeOverlayState(layer._name, true);
       } else { // restore at recorded state
-        var defaultState = !layer.options.defaultDisabled;
-        if (this._isOverlayDisplayed(layer._name, defaultState)) {
+        if (this._isOverlayDisplayed(layer._name, layer._default)) {
           layer.addTo(map);
         }
       }
@@ -94,7 +93,40 @@ var LayerChooser = L.Control.Layers.extend({
     }
   },
 
-  // @method addOverlay(layer: Layer, name: String, options: Object): this //todo
+  // @miniclass LayersEntry options (LayerChooser)
+  // @aka layersEntry options
+
+  // @option persistent: Boolean = true
+  // * When `false` - baselayer's status is not tracked.
+
+  // @option sortPriority: Number = *
+  // Enforces specific order in control, lower value means layer's upper position.
+  // If not specified - the value will be assigned implicitly in increasing manner.
+
+  // @method addBaseLayer(layer: Layer, name: String, options?: LayersEntry options): this
+  // Adds a base layer (radio button entry) with the given name to the control.
+  addBaseLayer: function (layer, name, options) {
+    this._addLayer(layer, name, false, options);
+    return (this._map) ? this._update() : this;
+  },
+
+  // @miniclass AddOverlay options (LayerChooser)
+  // @aka addOverlay options
+  // @inherits LayersEntry options
+
+  // @option persistent: Boolean = true
+  // * When `true` (or not specified) - adds overlay to the map as well,
+  //   if it's last state was active.
+  //   If no record exists then value specified in `default` option is used.
+  // * When `false` - overlay status is not tracked, `default` option is honored too.
+
+  // @option default: Boolean = true
+  // Default state of overlay (used only when no record about previous state found).
+
+  // @option enable: Boolean
+  // Enforce specified state ignoring previously saved.
+
+  // @method addOverlay(layer: L.Layer, name: String, options?: AddOverlay options): this
   // Adds an overlay (checkbox entry) with the given name to the control.
   addOverlay: function (layer, name, options) {
     this._addLayer(layer, name, true, options);
@@ -104,12 +136,14 @@ var LayerChooser = L.Control.Layers.extend({
   // @method removeLayer(layer: Layer|String, keepOnMap?: Boolean): this
   // Removes the given layer from the control.
   // Either layer object or it's name in the control must be specified.
-  // Layer is removed from the map as well, except `keepOnMap` argument is true.
+  // Layer is removed from the map as well, except `keepOnMap` argument is true. // todo?? {keepOnMap: true}
   removeLayer: function (layer, keepOnMap) {
     layer = this.getLayer(layer);
-    if (layer && layer._statusTracking) {
-      layer.off('add remove', layer._statusTracking, this);
-      delete layer._statusTracking;
+    if (layer) {
+      if (layer._statusTracking) {
+        layer.off('add remove', layer._statusTracking, this);
+        delete layer._statusTracking;
+      }
       L.Control.Layers.prototype.removeLayer.apply(this, arguments);
       if (this._map && !keepOnMap) {
         map.removeLayer(layer);
@@ -251,7 +285,7 @@ var LayerChooser = L.Control.Layers.extend({
       // if nothing is selected, or specified overlay is exclusive,
       // assume all boxes should be checked again
       overlays.forEach(function (el) {
-        if (!el.layer.options.defaultDisabled) {
+        if (el.layer._default) {
           map.addLayer(el.layer);
         }
       });
@@ -345,14 +379,11 @@ LayerChooser.addInitHook(function () {
   window.isLayerGroupDisplayed = this._isOverlayDisplayed.bind(this);
 });
 
-// !!deprecated: use `layerChooser.addOverlay` directly (https://leafletjs.com/reference.html#control-layers-addoverlay)
-// persistent status is now handled automatically by layerChooser.
-// `defaultDisabled` state should be set as `layerGroup` option.
+// !!deprecated: use `layerChooser.addOverlay` directly
 window.addLayerGroup = function (name, layerGroup, defaultDisplay) {
-  if (defaultDisplay === false) {
-    layerGroup.options.defaultDisabled = true;
-  }
-  window.layerChooser.addOverlay(layerGroup, name);
+  var options = {default: defaultDisplay};
+  if (arguments.length < 3) { options = undefined; }
+  window.layerChooser.addOverlay(layerGroup, name, options);
 };
 
 // !!deprecated: use `layerChooser.removeLayer` directly

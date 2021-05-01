@@ -350,8 +350,8 @@ flyLinks.Triangle = function(a, b, c, depth) {
 };
 
 function setup () {
-  flyLinks.linksLayerGroup = L.layerGroup(null, {defaultDisabled: true});
-  flyLinks.fieldsLayerGroup = L.layerGroup(null, {defaultDisabled: true});
+  flyLinks.linksLayerGroup = L.layerGroup();
+  flyLinks.fieldsLayerGroup = L.layerGroup();
 
   function update () {
     if (!map.hasLayer(flyLinks.linksLayerGroup) ||
@@ -375,6 +375,6 @@ function setup () {
     drawTools.filterEvents.on('changed', flyLinks.updateLayer);
   }
 
-  window.layerChooser.addOverlay(flyLinks.linksLayerGroup, 'Fly links');
-  window.layerChooser.addOverlay(flyLinks.fieldsLayerGroup, 'Fly fields');
+  window.layerChooser.addOverlay(flyLinks.linksLayerGroup, 'Fly links', {default: false});
+  window.layerChooser.addOverlay(flyLinks.fieldsLayerGroup, 'Fly fields', {default: false});
 }
