@@ -144,10 +144,24 @@ window.readCookie = function(name){
   return cookies[name];
 }
 
-window.writeCookie = function(name, val) {
-  var d = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
-  document.cookie = name + "=" + val + '; expires='+d+'; path=/';
-}
+/**
+ * Store a cookie
+ * @param {number} forcedExpireTime days till cookie expires
+ */
+window.writeCookie = function (name, val, forcedExpireTime) {
+
+  var DEFAULT_COOKIE_EXPIRE_DAYS = 365;
+
+  var expires = '';
+  var acceptCookies = window.readCookie('_ncc') === '1';
+
+  if (acceptCookies || forcedExpireTime) {
+    var time = (forcedExpireTime ? forcedExpireTime : DEFAULT_COOKIE_EXPIRE_DAYS) * 24 * 60 * 60 * 1000;
+    expires = '; expires=' + new Date(Date.now() + time).toUTCString();
+  }
+
+  document.cookie = name + '=' + val + expires + '; path=/';
+};
 
 window.eraseCookie = function(name) {
   document.cookie = name + '=; expires=Thu, 1 Jan 1970 00:00:00 GMT; path=/';

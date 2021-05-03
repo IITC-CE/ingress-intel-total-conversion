@@ -739,6 +739,7 @@ function boot() {
   var loadPlugins = prepPluginsToLoad();
   loadPlugins('boot');
 
+  window.checkCookieLaw();
   window.extendLeaflet();
   window.extractFromStock();
   window.setupIdle();
