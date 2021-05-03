@@ -45,6 +45,7 @@ window.writeCookie = function (name, val, forcedExpireTime) {
     expires = '; expires=' + new Date(Date.now() + time).toUTCString();
   }
 
+  
   document.cookie = name + '=' + val + expires + '; path=/;SameSite=Strict';
 };
 

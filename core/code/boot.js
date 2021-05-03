@@ -196,6 +196,7 @@ function boot() {
   loadPlugins('boot');
 
   setupIngressMarkers();
+  window.checkCookieLaw();
   window.extractFromStock();
   window.setupIdle();
   window.setupDialogs();
