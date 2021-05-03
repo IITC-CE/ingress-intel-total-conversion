@@ -19,8 +19,8 @@ var LayerChooser = L.Control.Layers.extend({
     sortLayers: true,
 
     sortFunction: function (layerA, layerB) {
-      var a = layerA._sortPriority;
-      var b = layerB._sortPriority;
+      var a = layerA._chooser.sortPriority;
+      var b = layerB._chooser.sortPriority;
       return a < b ? -1 : (b < a ? 1 : 0);
     }
   },
@@ -45,51 +45,57 @@ var LayerChooser = L.Control.Layers.extend({
   _addLayer: function (layer, label, overlay, options) {
     options = options || {};
     // stored on first add (with .addBaseLayer/.addOverlay)
-    if (!layer._name) {
-      // name should be unique, otherwise behavior of other methods is undefined (typically: first found will be taken)
-      layer._name = label;
-      layer._overlay = overlay;
-      layer._persistent = 'persistent' in options ? options.persistent : true;
+    var data = layer._chooser;
+    if (!data) {
+      data = {
+        // name should be unique, otherwise behavior of other methods is undefined
+        // (typically: first found will be taken)
+        name: label,
+        overlay: overlay,
+        persistent: 'persistent' in options ? options.persistent : true
+      };
+      layer._chooser = data;
     } else {
-      label = label || layer._label || layer._name;
+      label = label || data.label || data.name;
     }
-    L.Control.Layers.prototype._addLayer.call(this, layer, label, overlay);
     // provide stable sort order
     if ('sortPriority' in options) {
-      layer._sortPriority = options.sortPriority;
-    } else if (!('_sortPriority' in layer)) {
+      data.sortPriority = options.sortPriority;
+    } else if (!('sortPriority' in data)) {
       this._lastPriority = this._lastPriority + 10;
-      layer._sortPriority = this._lastPriority;
+      data.sortPriority = this._lastPriority;
     }
-    if (layer._overlay) {
-      layer._default = 'default' in options ? options.default : true;
+    L.Control.Layers.prototype._addLayer.call(this, layer, label, overlay);
+    if (data.overlay) {
+      data.default = 'default' in options ? options.default : true;
     }
     var map = this._map || this._mapToAdd;
-    if (!layer._persistent) {
-      if ('enable' in options ? options.enable : layer._default) {
+    if (!data.persistent) {
+      if (!data.overlay) { return; }
+      if ('enable' in options ? options.enable : data.default) {
         layer.addTo(map);
       }
       return;
     }
     if (overlay) {
-      layer._statusTracking = function (e) {
-        this._storeOverlayState(layer._name, e.type === 'add');
+      data.statusTracking = function (e) {
+        this._storeOverlayState(data.name, e.type === 'add');
       };
-      layer.on('add remove', layer._statusTracking, this);
+      layer.on('add remove', data.statusTracking, this);
       if ('enable' in options) { // do as explicitly specified
         map[options.enable ? 'addLayer' : 'removeLayer'](layer);
       } else if (layer._map) { // already on map, only store state
-        this._storeOverlayState(layer._name, true);
+        this._storeOverlayState(data.name, true);
       } else { // restore at recorded state
-        if (this._isOverlayDisplayed(layer._name, layer._default)) {
+        if (this._isOverlayDisplayed(data.name, data.default)) {
           layer.addTo(map);
         }
       }
     } else {
-      layer._statusTracking = function () {
-        localStorage['iitc-base-map'] = layer._name;
+      data.statusTracking = function () {
+        localStorage['iitc-base-map'] = data.name;
       };
-      layer.on('add', layer._statusTracking);
+      layer.on('add', data.statusTracking);
     }
   },
 
@@ -140,9 +146,10 @@ var LayerChooser = L.Control.Layers.extend({
   removeLayer: function (layer, keepOnMap) {
     layer = this.getLayer(layer);
     if (layer) {
-      if (layer._statusTracking) {
-        layer.off('add remove', layer._statusTracking, this);
-        delete layer._statusTracking;
+      var data = layer._chooser;
+      if (data.statusTracking) {
+        layer.off('add remove', data.statusTracking, this);
+        delete data.statusTracking;
       }
       L.Control.Layers.prototype.removeLayer.apply(this, arguments);
       if (this._map && !keepOnMap) {
@@ -168,7 +175,7 @@ var LayerChooser = L.Control.Layers.extend({
 
   __byName: function (el) {
     var name = this.toString();
-    return el.layer._name === name ||
+    return el.layer._chooser.name === name ||
       el.name === name;
   },
 
@@ -209,7 +216,7 @@ var LayerChooser = L.Control.Layers.extend({
     var map = this._map;
     if (display || arguments.length === 1) {
       if (!map.hasLayer(layer)) {
-        if (!layer._overlay) {
+        if (!layer._chooser.overlay) {
           // if it's a base layer, remove any others
           this._layers.forEach(function (el) {
             if (!el.overlay && el.layer !== layer) {
@@ -238,7 +245,7 @@ var LayerChooser = L.Control.Layers.extend({
       return this;
     }
     var info = this._layers[idx];
-    label = label || info.layer._name;
+    label = label || info.layer._chooser.name;
     info.name = label;
     var nameEl = this._layerControlInputs[idx].closest('label').querySelector('span');
     nameEl.innerHTML = ' ' + label;
@@ -261,7 +268,7 @@ var LayerChooser = L.Control.Layers.extend({
 
   _filterOverlays: function (el) {
     return el.overlay &&
-      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(el.layer._name) === -1;
+      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(el.layer._chooser.name) === -1;
   },
 
   // Hides all the control's overlays except given one,
@@ -285,7 +292,7 @@ var LayerChooser = L.Control.Layers.extend({
       // if nothing is selected, or specified overlay is exclusive,
       // assume all boxes should be checked again
       overlays.forEach(function (el) {
-        if (el.layer._default) {
+        if (el.layer._chooser.default) {
           map.addLayer(el.layer);
         }
       });
