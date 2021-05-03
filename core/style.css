@@ -71,6 +71,14 @@ i.large {
   pointer-events: none;
 }
 
+.RESISTANCE {
+  color: #00c2ff;
+}
+
+.ENLIGHTENED {
+  color: #28f428;
+}
+
 .enl {
   color: #03fe03;
 }
@@ -158,9 +166,6 @@ a:hover {
   color: #ffce00;
 }
 
-#historydetails .missing {
-}
-
 #historydetails span {
   color: #ff4a4a;
 }
@@ -201,7 +206,6 @@ a:hover {
   margin: -4px 0;
   padding: 4px 0.2em;
 }
-
 .pl_nudge_date:after {
   background: no-repeat url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
   position:absolute;
@@ -212,14 +216,6 @@ a:hover {
   top:-1px
 }
 
-.RESISTANCE {
-  color: #00c2ff;
-}
-
-.ALIENS,
-.ENLIGHTENED {
-  color: #28f428;
-}
 
 #portal_highlight_select {
   position: absolute;
