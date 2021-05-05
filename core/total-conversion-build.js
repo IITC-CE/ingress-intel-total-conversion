@@ -44,6 +44,9 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // player information is now available in a hash like this:
 // window.PLAYER = {"ap": "123", "energy": 123, "available_invites": 123, "nickname": "somenick", "team": "ENLIGHTENED||RESISTANCE"};
 
+function main () {
+var main = undefined;
+
 // remove complete page. We only wanted the user-data and the page’s
 // security context so we can access the API easily. Setup as much as
 // possible without requiring scripts.
@@ -201,3 +204,39 @@ var ulog = (function (module) {
 
   // fixed Addons
   RegionScoreboard.setup();
+}
+
+if (document.cookie.search('_ncc=') === -1) {
+  var counter = 20;
+  var timerId = setInterval(function () {
+    // wait cookiebar to load
+    var cookiebar = document.body.querySelector('ark-cookiebar');
+    if (counter && !cookiebar || !cookiebar.childElementCount) {
+      counter--;
+      return;
+    }
+    clearInterval(timerId);
+
+    var cookiebar_style;
+    if (counter) {
+      var styles = document.head.querySelectorAll('style');
+      // find cookiebar style
+      Array.prototype.forEach.call(styles, function (style) {
+        if (style.sheet.cssRules[0].selectorText === 'ark-cookiebar') {
+          cookiebar_style = style;
+        }
+      });
+    }
+
+    main();
+
+    if (cookiebar_style) {
+      document.head.appendChild(cookiebar_style);
+      document.body.appendChild(cookiebar);
+    } else {
+      throw new Error('Niantic cookiebar not found');
+    }
+  }, 100);
+} else {
+  main();
+}
