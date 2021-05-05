@@ -145,7 +145,7 @@ window.readCookie = function(name){
 }
 
 window.writeCookie = function(name, val) {
-  var d = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
+  var d = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toUTCString();
   document.cookie = name + "=" + val + '; expires='+d+'; path=/';
 }
 
