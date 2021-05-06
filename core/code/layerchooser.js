@@ -18,9 +18,13 @@ var LayerChooser = L.Control.Layers.extend({
     // `sortPriority` option.
     sortLayers: true,
 
-    sortFunction: function (layerA, layerB) {
-      var a = layerA._chooser.sortPriority;
-      var b = layerB._chooser.sortPriority;
+    // @option sortFunction: Function = *
+    // A [compare function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+    // that will be used for sorting the layers, when `sortLayers` is `true`.
+    // The function receives objects with the layers's data.
+    sortFunction: function (A, B) {
+      var a = A.sortPriority;
+      var b = B.sortPriority;
       return a < b ? -1 : (b < a ? 1 : 0);
     }
   },
@@ -42,21 +46,23 @@ var LayerChooser = L.Control.Layers.extend({
     this._lastPriority = 0; // any following gets >0
   },
 
-  _addLayer: function (layer, label, overlay, options) {
+  _addLayer: function (layer, name, overlay, options) {
     options = options || {};
-    // stored on first add (with .addBaseLayer/.addOverlay)
+    // _chooser property stores layerChooser data after layer removal
+    // (in case if it's meant to be re-added)
     var data = layer._chooser;
     if (!data) {
       data = {
+        layer: layer,
         // name should be unique, otherwise behavior of other methods is undefined
         // (typically: first found will be taken)
-        name: label,
+        name: name,
+        // label: name,
         overlay: overlay,
         persistent: 'persistent' in options ? options.persistent : true
       };
-      layer._chooser = data;
     } else {
-      label = label || data.label || data.name;
+      delete layer._chooser;
     }
     // provide stable sort order
     if ('sortPriority' in options) {
@@ -65,7 +71,25 @@ var LayerChooser = L.Control.Layers.extend({
       this._lastPriority = this._lastPriority + 10;
       data.sortPriority = this._lastPriority;
     }
-    L.Control.Layers.prototype._addLayer.call(this, layer, label, overlay);
+    // *** adapted from L.Control.Layers.prototype._addLayer.call(this, layer, name, overlay);
+    if (this._map) {
+      layer.on('add remove', this._onLayerChange, this);
+    }
+
+    this._layers.push(data);
+
+    if (this.options.sortLayers) {
+      this._layers.sort(this.options.sortFunction);
+    }
+
+    if (this.options.autoZIndex && layer.setZIndex) {
+       this._lastZIndex++;
+       layer.setZIndex(this._lastZIndex);
+    }
+
+    this._expandIfNotCollapsed();
+    // ***
+
     if (data.overlay) {
       data.default = 'default' in options ? options.default : true;
     }
@@ -97,6 +121,17 @@ var LayerChooser = L.Control.Layers.extend({
       };
       layer.on('add', data.statusTracking);
     }
+  },
+
+  _addItem: function (obj) {
+    var labelEl = L.Control.Layers.prototype._addItem.call(this, {
+      layer: obj.layer,
+      overlay: obj.overlay,
+      name: obj.label || obj.name
+    });
+    obj.labelEl = labelEl;
+    // obj.inputEl = this._layerControlInputs[this._layerControlInputs.length-1];
+    return labelEl;
   },
 
   // @miniclass LayersEntry options (LayerChooser)
@@ -145,20 +180,22 @@ var LayerChooser = L.Control.Layers.extend({
   // Layer is removed from the map as well, except `.keepOnMap` option is true.
   removeLayer: function (layer, options) {
     layer = this.getLayer(layer);
-    if (layer) {
+    var data = this.layerInfo(layer);
+    if (data) {
       options = options || {};
-      var data = layer._chooser;
       if (data.statusTracking) {
-        layer.off('add remove', data.statusTracking, this);
+        data.layer.off('add remove', data.statusTracking, this);
         delete data.statusTracking;
       }
       L.Control.Layers.prototype.removeLayer.apply(this, arguments);
       if (this._map && !options.keepOnMap) {
-        map.removeLayer(layer);
+        map.removeLayer(data.layer);
       }
-      // ?? optionally delete layer._chooser
+      delete data.labelEl;
+      // delete data.inputEl;
+      layer._chooser = data;
     } else {
-      log.warn('Layer not found');
+      log.warn('Layer not found: ', layer);
     }
     return this;
   },
@@ -175,18 +212,22 @@ var LayerChooser = L.Control.Layers.extend({
     return defaultState;
   },
 
-  __byName: function (el) {
+  __byName: function (data) {
     var name = this.toString();
-    return el.layer._chooser.name === name ||
-      el.name === name;
+    return data.name === name ||
+      data.label === name;
   },
 
-  __byLayer: function (el) {
-    return el.layer === this;
+  __byLayer: function (data) {
+    return data.layer === this;
   },
 
-  // layer: either Layer or it's name in the control
-  _layerInfo: function (layer) {
+  // @method layerInfo(name: String|Layer): Layer
+  // Returns layer info by it's name in the control, or by layer object itself.
+  // Info is internal data object with following properties:
+  // `layer`, `name`, `label`, `overlay`, `sortPriority`, `persistent`, `default`,
+  // `labelEl`, `inputEl`, `statusTracking`.
+  layerInfo: function (layer) {
     var fn = layer instanceof L.Layer
       ? this.__byLayer
       : this.__byName;
@@ -197,39 +238,37 @@ var LayerChooser = L.Control.Layers.extend({
   // Returns layer by it's name in the control, or by layer object itself.
   // The latter can be used to ensure the layer is in layerChooser.
   getLayer: function (layer) {
-    var info = this._layerInfo(layer);
-    return info && info.layer;
+    var data = this.layerInfo(layer);
+    return data && data.layer;
   },
 
   // @method showLayer(layer: Layer|String|Number, display?: Boolean): this
   // Switches layer's display state to given value (true by default).
   // Layer can be specified also by it's name in the control.
   showLayer: function (layer, display) {
-    var info = this._layers[layer]; // layer is index, private use only
-    if (info) {
-      layer = info.layer;
-    } else {
-      layer = this.getLayer(layer);
-      if (!layer) {
-        log.warn('Layer not found');
+    var data = this._layers[layer]; // layer is index, private use only
+    if (!data) {
+      data = this.layerInfo(layer);
+      if (!data) {
+        log.warn('Layer not found: ', layer);
         return this;
       }
     }
     var map = this._map;
     if (display || arguments.length === 1) {
-      if (!map.hasLayer(layer)) {
-        if (!layer._chooser.overlay) {
+      if (!map.hasLayer(data.layer)) {
+        if (!data.overlay) {
           // if it's a base layer, remove any others
           this._layers.forEach(function (el) {
-            if (!el.overlay && el.layer !== layer) {
+            if (!el.overlay && el.layer !== data.layer) {
               map.removeLayer(el.layer);
             }
           });
         }
-        map.addLayer(layer);
+        map.addLayer(data.layer);
       }
     } else {
-      map.removeLayer(layer);
+      map.removeLayer(data.layer);
     }
     return this;
   },
@@ -238,18 +277,13 @@ var LayerChooser = L.Control.Layers.extend({
   // Sets layers label to specified label text (html),
   // or resets it to original name when label is not specified.
   setLabel: function (layer, label) {
-    var fn = layer instanceof L.Layer
-      ? this.__byLayer
-      : this.__byName;
-    var idx = this._layers.findIndex(fn, layer);
-    if (idx === -1) {
-      log.warn('Layer not found');
+    var data = this.layerInfo(layer);
+    if (!data) {
+      log.warn('Layer not found: ', layer);
       return this;
     }
-    var info = this._layers[idx];
-    label = label || info.layer._chooser.name;
-    info.name = label;
-    var nameEl = this._layerControlInputs[idx].closest('label').querySelector('span');
+    data.label = label;
+    var nameEl = data.labelEl.querySelector('span');
     nameEl.innerHTML = ' ' + label;
     return this;
   },
@@ -268,22 +302,22 @@ var LayerChooser = L.Control.Layers.extend({
     }.bind(this));
   },
 
-  _filterOverlays: function (el) {
-    return el.overlay &&
-      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(el.layer._chooser.name) === -1;
+  _filterOverlays: function (data) {
+    return data.overlay &&
+      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(data.name) === -1;
   },
 
   // Hides all the control's overlays except given one,
   // or restores all, if it was the only one displayed (or none was displayed).
   _toggleOverlay: function (idx) {
-    var info = this._layers[idx];
-    if (!info || !info.overlay) {
-      log.warn('Overlay not found: ', info);
+    var data = this._layers[idx];
+    if (!data || !data.overlay) {
+      log.warn('Overlay not found: ', data);
       return;
     }
     var map = this._map;
 
-    var isChecked = map.hasLayer(info.layer);
+    var isChecked = map.hasLayer(data.layer);
     var checked = 0;
     var overlays = this._layers.filter(this._filterOverlays);
     overlays.forEach(function (el) {
@@ -294,14 +328,14 @@ var LayerChooser = L.Control.Layers.extend({
       // if nothing is selected, or specified overlay is exclusive,
       // assume all boxes should be checked again
       overlays.forEach(function (el) {
-        if (el.layer._chooser.default) {
+        if (el.default) {
           map.addLayer(el.layer);
         }
       });
     } else {
       // uncheck all, check specified
       overlays.forEach(function (el) {
-        if (el.layer === info.layer) {
+        if (el.layer === data.layer) {
           map.addLayer(el.layer);
         } else {
           map.removeLayer(el.layer);
@@ -318,11 +352,11 @@ var LayerChooser = L.Control.Layers.extend({
   getLayers: function () {
     var baseLayers = [];
     var overlayLayers = [];
-    this._layers.forEach(function (info, idx) {
-      (info.overlay ? overlayLayers : baseLayers).push({
+    this._layers.forEach(function (data, idx) {
+      (data.overlay ? overlayLayers : baseLayers).push({
         layerId: idx,
-        name: this._stripHtmlTags(info.name), // IITCm does not support html in layers labels
-        active: this._map.hasLayer(info.layer)
+        name: this._stripHtmlTags(data.label || data.name), // IITCm does not support html in layers labels
+        active: this._map.hasLayer(data.layer)
       });
     }, this);
 

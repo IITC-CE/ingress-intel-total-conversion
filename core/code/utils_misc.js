@@ -546,32 +546,6 @@ if (!Array.prototype.find) {
   });
 }
 
-// adapted from https://github.com/jsPolyfill/Array.prototype.findIndex/blob/master/findIndex.js
-// https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array.prototype.findindex
-if (!Array.prototype.findIndex) {
-  Object.defineProperty(Array.prototype, 'findIndex', {
-    value: function(callback) {
-      if (this === null) {
-        throw new TypeError('Array.prototype.findIndex called on null or undefined');
-      } else if (typeof callback !== 'function') {
-        throw new TypeError('callback must be a function');
-      }
-      var list = Object(this);
-      // Makes sures is always has an positive integer as length.
-      var length = list.length >>> 0;
-      var thisArg = arguments[1];
-      for (var i = 0; i < length; i++) {
-        if ( callback.call(thisArg, list[i], i, list) ) {
-          return i;
-        }
-      }
-      return -1;
-    },
-    configurable: true,
-    writable: true
-  });
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#polyfill
 if (!Element.prototype.matches) {
   Element.prototype.matches =
