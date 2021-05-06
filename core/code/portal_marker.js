@@ -94,9 +94,9 @@ L.PortalMarker = L.CircleMarker.extend({
           this._details = details;
         }
       } else if (this._details.timestamp == details.timestamp) {
-        // we got more details
+        // we got more details (core/summary -> summary/detailed/extended)
         var localThis = this;
-        ["mods", "resonators", "owner", "artifactDetail"].forEach(function (prop) {
+        ["level", "health", "resCount", "image", "title", "ornaments", "mission", "mission50plus", "artifactBrief", "mods", "resonators", "owner", "artifactDetail"].forEach(function (prop) {
           if (details[prop]) localThis._details[prop] = details[prop];
         });
         // smarter update for history (cause it's missing sometimes)
