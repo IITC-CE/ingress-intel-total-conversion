@@ -163,7 +163,9 @@ public class IITC_MapSettings implements OnItemSelectedListener, OnItemClickList
         if (mDisableListeners || position == 0) return false;
         position--; // The ListView header counts as an item as well.
         mIitc.getWebView().loadUrl(
-                "javascript: window.layerChooser._onLongClick(" + mOverlayLayers.getItem(position).id + ");");
+                "javascript: " +
+                "var data = window.layerChooser._layers[" + mOverlayLayers.getItem(position).id + "];" +
+                "window.layerChooser._onLongClick(data);");
 
         return true;
     }

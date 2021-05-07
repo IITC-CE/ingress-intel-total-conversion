@@ -222,20 +222,26 @@ var LayerChooser = L.Control.Layers.extend({
     return data.layer === this;
   },
 
+  __byLabelEl: function (data) {
+    return data.labelEl === this;
+  },
+
   // @method layerInfo(name: String|Layer): Layer
-  // Returns layer info by it's name in the control, or by layer object itself.
+  // Returns layer info by it's name in the control, or by layer object itself,
+  // or label html element.
   // Info is internal data object with following properties:
   // `layer`, `name`, `label`, `overlay`, `sortPriority`, `persistent`, `default`,
   // `labelEl`, `inputEl`, `statusTracking`.
   layerInfo: function (layer) {
-    var fn = layer instanceof L.Layer
-      ? this.__byLayer
-      : this.__byName;
+    var fn = layer instanceof L.Layer ? this.__byLayer
+      : layer instanceof HTMLElement ? this.__byLabelEl
+        : this.__byName;
     return this._layers.find(fn, layer);
   },
 
   // @method getLayer(name: String|Layer): Layer
-  // Returns layer by it's name in the control, or by layer object itself.
+  // Returns layer by it's name in the control, or by layer object itself,
+  // or label html element.
   // The latter can be used to ensure the layer is in layerChooser.
   getLayer: function (layer) {
     var data = this.layerInfo(layer);
@@ -288,8 +294,7 @@ var LayerChooser = L.Control.Layers.extend({
     return this;
   },
 
-  _onLongClick: function (idx, originalEvent) {
-    var el = this._layers[idx];
+  _onLongClick: function (data, originalEvent) {
     var defaultPrevented;
 
     // @miniclass LayersControlInteractionEvent (LayerChooser)
@@ -298,16 +303,15 @@ var LayerChooser = L.Control.Layers.extend({
     // The layer that was interacted in LayerChooser control.
     // @property control: LayerChooser
     // LayerChooser control instance (just handy shortcut for window.layerChooser).
-    // @property idx: Number
-    // Internal index of layer, can be used to address layer in private arrays
-    // (`_layers`, `_layerControlInputs`).
+    // @property data: Object
+    // Internal data object TODO
     // @property originalEvent: DOMEvent
     // The original mouse/jQuery event that triggered this Leaflet event.
     // @method preventDefault: Function
     // Method to prevent default action of event (like overlays toggling), otherwise handled by layerChooser.
     var obj = {
       control: this,
-      idx: idx,
+      data: data,
       originalEvent: originalEvent || {type: 'taphold'},
       preventDefault: function () {
         defaultPrevented = true;
@@ -322,9 +326,9 @@ var LayerChooser = L.Control.Layers.extend({
     // @section Layers control interaction events
     // @event longclick: LayersControlInteractionEvent
     // Fired on layer
-    el.layer.fire('longclick', obj);
+    data.layer.fire('longclick', obj);
     if (!defaultPrevented) {
-      this._toggleOverlay(idx);
+      this._toggleOverlay(data);
     }
     // @namespace LayerChooser
   },
@@ -337,9 +341,8 @@ var LayerChooser = L.Control.Layers.extend({
         return;
       }
       // e.preventDefault(); // seems no effect
-      var input = e.target.closest('label').querySelector('input');
-      var idx = this._layerControlInputs.indexOf(input);
-      this._onLongClick(idx, e);
+      var labelEl = e.target.closest('label');
+      this._onLongClick(this.layerInfo(labelEl), e);
     }.bind(this));
   },
 
@@ -350,8 +353,7 @@ var LayerChooser = L.Control.Layers.extend({
 
   // Hides all the control's overlays except given one,
   // or restores all, if it was the only one displayed (or none was displayed).
-  _toggleOverlay: function (idx) {
-    var data = this._layers[idx];
+  _toggleOverlay: function (data) {
     if (!data || !data.overlay) {
       log.warn('Overlay not found: ', data);
       return;
