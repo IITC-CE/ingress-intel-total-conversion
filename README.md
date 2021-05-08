@@ -2,8 +2,8 @@ Ingress Intel Total Conversion (IITC)
 =====================================
 
 <!-- [START badges] -->
-[![Build Status](http://img.shields.io/travis/IITC-CE/ingress-intel-total-conversion/master.svg?label=beta)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
-[![Build Status](http://img.shields.io/travis/IITC-CE/ingress-intel-total-conversion/test-builds.svg?label=test-builds)](https://travis-ci.org/IITC-CE/ingress-intel-total-conversion)
+[![Build Status](https://img.shields.io/travis/com/iitc-ce/ingress-intel-total-conversion/master?label=beta)](https://travis-ci.com/IITC-CE/ingress-intel-total-conversion)
+[![Build Status](https://img.shields.io/travis/com/iitc-ce/ingress-intel-total-conversion/test-builds?label=test-builds)](https://travis-ci.com/IITC-CE/ingress-intel-total-conversion)
 [![Docs Status](https://readthedocs.org/projects/iitc-ce/badge/?version=latest)](https://readthedocs.org/projects/iitc-ce/)
 [![LICENSE](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
 <!-- [END badges] -->
@@ -14,7 +14,7 @@ It is available for desktop browsers, such as Firefox and Chrome, and as a mobil
 
 **IITC "Community Edition"** (**_IITC-CE_**) started by [modos189](https://github.com/modos189) to continue development of stalled [iitc-project](https://github.com/iitc-project/ingress-intel-total-conversion).
 
-**[Website](https://iitc.app/) | [Documentation](http://iitc-ce.rtfd.io/) | [Telegram channel](https://t.me/iitc_news)**
+**[Website](https://iitc.app/) | [Documentation](https://iitc-ce.rtfd.io/) | [Telegram channel](https://t.me/iitc_news)**
 
 
 ## Users
