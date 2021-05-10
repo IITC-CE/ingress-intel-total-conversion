@@ -47,7 +47,7 @@ window.plugin.compAPStats.updateNoPortals = function (hasFinished) {
 }
 
 window.plugin.compAPStats.update = function (hasFinished) {
-  if (!window.getCurrentZoomTileParameters().hasPortals) {
+  if (!window.getDataZoomTileParameters().hasPortals) {
     window.plugin.compAPStats.updateNoPortals(hasFinished);
     return;
   }

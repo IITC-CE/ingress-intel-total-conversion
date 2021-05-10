@@ -152,7 +152,7 @@ window.plugin.portalcounts.getPortals = function (){
     counts += '<p>No Portals in range!</p>';
   }
 
-  if (!window.getCurrentZoomTileParameters().hasPortals) {
+  if (!window.getDataZoomTileParameters().hasPortals) {
     counts += '<p class="help"><b>Warning</b>: Portal counts is inaccurate when zoomed to link-level</p>';
   }
 

@@ -54,7 +54,7 @@ window.setupDataTileParams = function() {
   // 2015-07-01: niantic added code to the stock site that overrides the min zoom level for unclaimed portals to 15 and above
   // instead of updating the zoom-to-level array. makes no sense really....
   // we'll just chop off the array at that point, so the code defaults to level 0 (unclaimed) everywhere...
-  window.TILE_PARAMS.ZOOM_TO_LEVEL = window.TILE_PARAMS.ZOOM_TO_LEVEL.slice(0,15);
+  window.TILE_PARAMS.ZOOM_TO_LEVEL = window.TILE_PARAMS.ZOOM_TO_LEVEL.slice(0,15); // deprecated
 
 }
 
@@ -90,12 +90,18 @@ window.getMapZoomTileParameters = function(zoom) {
   var maxTilesPerEdge = window.TILE_PARAMS.TILES_PER_EDGE[window.TILE_PARAMS.TILES_PER_EDGE.length-1];
 
   return {
-    level: window.TILE_PARAMS.ZOOM_TO_LEVEL[zoom] || 0,
+    level: window.TILE_PARAMS.ZOOM_TO_LEVEL[zoom] || 0, // deprecated
     tilesPerEdge: window.TILE_PARAMS.TILES_PER_EDGE[zoom] || maxTilesPerEdge,
     minLinkLength: window.TILE_PARAMS.ZOOM_TO_LINK_LENGTH[zoom] || 0,
     hasPortals: zoom >= window.TILE_PARAMS.ZOOM_TO_LINK_LENGTH.length,  // no portals returned at all when link length limits things
     zoom: zoom  // include the zoom level, for reference
   };
+}
+
+window.getDataZoomTileParameters = function(zoom) {
+  zoom = arguments.length ? zoom : map.getZoom();
+  var dataZoom = getDataZoomForMapZoom(zoom);
+  return tileParams = getMapZoomTileParameters(dataZoom);
 }
 
 

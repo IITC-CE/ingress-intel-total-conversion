@@ -7,18 +7,13 @@ window.renderUpdateStatusTimer_ = undefined;
 window.renderUpdateStatus = function() {
   var progress = 1;
 
-  var tileParams = window.getCurrentZoomTileParameters();
+  var tileParams = window.getDataZoomTileParameters();
 
   var t = '<span class="help portallevel" title="Indicates portal levels/link lengths displayed.  Zoom in to display more.">';
 
   if (tileParams.hasPortals) {
     // zoom level includes portals (and also all links/fields)
-    if(!window.isSmartphone()) // space is valuable
-      t += '<b>portals</b>: ';
-    if(tileParams.level === 0)
-      t += '<span id="loadlevel">all</span>';
-    else
-      t += '<span id="loadlevel" style="background:'+COLORS_LVL[tileParams.level]+'">L'+tileParams.level+(tileParams.level<8?'+':'') + '</span>';
+    t += '<span id="loadlevel">portals</span>';
   } else {
     if(!window.isSmartphone()) // space is valuable
       t += '<b>links</b>: ';
