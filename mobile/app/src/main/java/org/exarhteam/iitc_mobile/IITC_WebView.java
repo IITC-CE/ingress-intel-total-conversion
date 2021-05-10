@@ -75,15 +75,14 @@ public class IITC_WebView extends WebView {
         addJavascriptInterface(mJsInterface, "android");
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
 
-        // Hack to work Google login page in old browser
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP &&
-                !mSharedPrefs.getBoolean("pref_fake_user_agent", false))
-            mSharedPrefs.edit().putBoolean("pref_fake_user_agent", true).apply();
-
-        final String original_ua = mSettings.getUserAgentString();
-        // remove ";wv " marker as Google blocks WebViews from using OAuth
         // https://developer.chrome.com/multidevice/user-agent#webview_user_agent
-        mMobileUserAgent = original_ua.replace("; wv", "");
+        final String original_ua = mSettings.getUserAgentString();
+        if (original_ua.contains("; wv")) {
+            // remove ";wv " marker as Google blocks WebViews from using OAuth
+            mMobileUserAgent = original_ua.replace("; wv", "");
+        } else { // KitKat and older
+            mMobileUserAgent = original_ua.replaceFirst("Version\\/\\d\\.\\d+ ", "");
+        }
         setUserAgent();
 
         mNavHider = new Runnable() {
