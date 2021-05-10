@@ -1,7 +1,7 @@
 ﻿// @author         modos189
 // @name           Fix maps offsets in China
 // @category       Tweaks
-// @version        0.2.1
+// @version        0.3.0
 // @description    Show correct maps for China user by applying offset tweaks.
 
 
@@ -258,68 +258,86 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
 
 fixChinaMapOffset.wgs_gcj = PRCoords.wgs_gcj;
 
-fixChinaMapOffset.transform = function (wgs, options) {
-  if (options.needFixChinaOffset && fixChinaMapOffset.isInChina(wgs.lat, wgs.lng)) {
-    return fixChinaMapOffset.wgs_gcj(wgs);
-  }
-  return wgs;
-};
-
 // redefine L.TileLayer methods
 var fixChinaOffset = {
+  _inChina: false,
+
+  _inChinaLastChecked: [0,0],
+
+  _inChinaValidRadius: 100000,
+
+  _isInChina: function (latlng) {
+    if (latlng._notChina) { return false; } // do not check twice same latlng
+
+    if (latlng.distanceTo(this._inChinaLastChecked) > this._inChinaValidRadius) {
+      // recheck only when beyond of specified radius, otherwise keep last known value
+      this._inChina = fixChinaMapOffset.isInChina(latlng.lat, latlng.lng);
+      this._inChinaLastChecked = latlng;
+    }
+    latlng._notChina = !this._inChina;
+    return this._inChina;
+  },
+
+  _fixChinaOffset: function (latlng) {
+    if (!this.options.needFixChinaOffset) { return latlng; }
+    if (!latlng._gcj) { // do not calculate twice same latlng
+      latlng._gcj = this._isInChina(latlng) &&
+        fixChinaMapOffset.wgs_gcj(latlng);
+    }
+    return latlng._gcj || latlng;
+  },
+
   _getTiledPixelBounds: function (center) {
-    center = fixChinaMapOffset.transform(center, this.options);
+    center = this._fixChinaOffset(center);
     return L.GridLayer.prototype._getTiledPixelBounds.call(this, center);
   },
+
   _setZoomTransform: function (level, center, zoom) {
-    center = fixChinaMapOffset.transform(center, this.options);
+    center = this._fixChinaOffset(center);
     return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
   }
 };
 
 // redefine L.GridLayer.GoogleMutant methods
-var fixGoogleMutant = {
-/* eslint-disable */
-	_update: function () {
-		// zoom level check needs to happen before super's implementation (tile addition/creation)
-		// otherwise tiles may be missed if maxNativeZoom is not yet correctly determined
-		if (this._mutant) {
-			var center = this._map.getCenter();
-			var _center = new google.maps.LatLng(center.lat, center.lng);
-			/// modified here ///
-			center = fixChinaMapOffset.transform(center, this.options);
-			/////////////////////
-
-			this._mutant.setCenter(_center);
-			var zoom = this._map.getZoom();
-			var fractionalLevel = zoom !== Math.round(zoom);
-			var mutantZoom = this._mutant.getZoom();
-
-			//ignore fractional zoom levels
-			if (!fractionalLevel && (zoom != mutantZoom)) {
-				this._mutant.setZoom(zoom);
-
-				if (this._mutantIsReady) this._checkZoomLevels();
-				//else zoom level check will be done later by 'idle' handler
-			}
-		}
-
-		L.GridLayer.prototype._update.call(this);
-	},
-/* eslint-enable */
-};
+function fixGoogleMutant (_update, style) {
+  return function (wgs) {
+    wgs = wgs || this._map.getCenter();
+    _update.call(this, wgs);
+    var o = this.options;
+    if (this._mutant && o.type !== 'satellite') {
+      if (this._isInChina(wgs)) {
+        wgs._gcj = wgs._gcj || fixChinaMapOffset.wgs_gcj(wgs);
+        if (o.type === 'hybrid') {
+          var zoom = this._map.getZoom();
+          var offset = this._map.project(wgs, zoom)
+            .subtract(this._map.project(wgs._gcj, zoom));
+          style.transform = L.Util.template('translate3d({x}px, {y}px, 0px)', offset);
+        } else {
+          this._mutant.setCenter(wgs._gcj);
+        }
+      }
+    }
+  };
+}
 
 function setup () {
   // add support of `needFixChinaOffset` property to any TileLayer
   L.TileLayer.include(fixChinaOffset);
 
   // GoogleMutant needs additional support
-  L.GridLayer.GoogleMutant.include(fixChinaOffset);
-  L.GridLayer.GoogleMutant.include(fixGoogleMutant);
-  layerChooser._layers.forEach(function (item) {
-    if (item.layer._GAPIPromise) { // Google layer
-      var o = item.layer.options;
-      o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybride';
-    }
-  });
+  var styleEl = document.createElement('style');
+  var css = document.body.appendChild(styleEl).sheet;
+  var cssrule = css.cssRules[css.insertRule('.google-mutant .leaflet-tile img:nth-child(2) {}')];
+
+  L.GridLayer.GoogleMutant
+    .mergeOptions({className: 'google-mutant'})
+    .include(fixChinaOffset)
+    .include({
+      _update: fixGoogleMutant(L.GridLayer.GoogleMutant.prototype._update, cssrule.style)
+    })
+    .addInitHook(function () {
+      var o = this.options;
+      o.needFixChinaOffset = o.type !== 'satellite' && o.type !== 'hybrid';
+    });
 }
+setup.priority = 'boot';

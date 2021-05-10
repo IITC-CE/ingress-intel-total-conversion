@@ -24,7 +24,7 @@
   leaflet-src.js, leaflet.css, images/*
 
 * https://gitlab.com/IvanSanchez/Leaflet.GridLayer.GoogleMutant
-  v0.11.3 + MR!53
+  v0.13.4
 
 * https://github.com/IITC-CE/Leaflet.Geodesic
   L.Geodesic.js: c9f84ab763e89fa172ed410037a67151ef56d06c
