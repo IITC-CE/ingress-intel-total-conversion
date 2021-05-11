@@ -85,6 +85,11 @@
   display: block;
 }
 
+/* kitkat fallback */
+#portalslist.mobile .filters .name {
+  float: left;
+}
+
 #portalslist .filters .filterNeu,
 #portalslist .filters .filterRes,
 #portalslist .filters .filterEnl {
