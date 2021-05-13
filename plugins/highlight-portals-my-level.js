@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote if the portal is either at and above, or at and below your level.
 
 /* exported setup --eslint */
-/* globals PLAYER */
+/* global PLAYER */
 // use own namespace for plugin
 var highlightMyLevel = {};
 window.plugin.highlightMyLevel = highlightMyLevel;

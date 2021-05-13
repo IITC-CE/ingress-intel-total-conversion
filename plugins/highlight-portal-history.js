@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 /* exported setup --eslint */
-/* globals L */
+/* global L */
 // use own namespace for plugin
 var portalsHistory = {};
 window.plugin.portalHighlighterPortalsHistory = portalsHistory;

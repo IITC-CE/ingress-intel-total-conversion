@@ -6,7 +6,7 @@
 //                 Yellow: above 85%. Orange: above 70%. Red: above 15%. Magenta: below 15%.
 
 /* exported setup --eslint */
-/* globals L, TEAM_NONE*/
+/* global L, TEAM_NONE*/
 // use own namespace for plugin
 var highlightNeedsRecharge = {};
 window.plugin.highlightNeedsRecharge = highlightNeedsRecharge;

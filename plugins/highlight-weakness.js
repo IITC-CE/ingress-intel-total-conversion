@@ -5,7 +5,7 @@
 // @description    Use the fill color of the portals to denote if the portal is weak. Stronger red indicates recharge required, missing resonators, or both.
 
 /* exported setup --eslint */
-/* globals TEAM_NONE */
+/* global TEAM_NONE */
 // use own namespace for plugin
 var highlightWeakness = {};
 window.plugin.highlightWeakness = highlightWeakness;

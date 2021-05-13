@@ -5,7 +5,7 @@
 // @description    Show all portals as neutral, as if uncaptured. Great for creating plans.
 
 /* exported setup --eslint */
-/* globals TEAM_NONE, getMarkerStyleOptions*/
+/* global TEAM_NONE, getMarkerStyleOptions*/
 // use own namespace for plugin
 var highlightHideOwnership = {};
 window.plugin.highlightHideOwnership = highlightHideOwnership;

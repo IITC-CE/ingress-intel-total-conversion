@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote the portal level by using the game level colors.
 
 /* exported setup --eslint */
-/* globals COLORS_LVL*/
+/* global COLORS_LVL*/
 // use own namespace for plugin
 var highlightLevelColor = {};
 window.plugin.highlightLevelColor = highlightLevelColor;

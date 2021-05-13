@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote high level portals: Purple L8, Red L7, Orange L6
 
 /* exported setup --eslint */
-/* globals L */
+/* global L */
 // use own namespace for plugin
 
 var highLevel = {};
@@ -23,7 +23,7 @@ highLevel.styles = {
   },
   level8: {
     fillColor: 'magenta'
-  },
+  }
 };
 
 highLevel.highlight = function (data) {

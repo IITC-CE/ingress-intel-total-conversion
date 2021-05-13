@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote if the portal is missing resonators.
 
 /* exported setup --eslint */
-/* globals L, TEAM_NONE */
+/* global L, TEAM_NONE */
 // use own namespace for plugin
 var highlightMissingResonators = {};
 window.plugin.highlightMissingResonators = highlightMissingResonators;
