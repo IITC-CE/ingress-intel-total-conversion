@@ -4,21 +4,20 @@
 // @version        0.1.0
 // @description    For use for unattended display screens only, this plugin causes idle mode to be left once per hour.
 
+// use own namespace for plugin
+var periodicRefresh = {};
+window.plugin.periodicRefresh = periodicRefresh;
 
-window.plugin.periodicRefresh = function() {};
-
-window.plugin.periodicRefresh.wakeup = function() {
+var wakeup = function() {
   console.log('periodicRefresh: timer fired - leaving idle mode');
   idleReset();
 }
 
 
-window.plugin.periodicRefresh.setup = function() {
+var setup = function() {
 
   var refreshMinutes = 60;
 
-  setInterval ( window.plugin.periodicRefresh.wakeup, refreshMinutes*60*1000 );
+  setInterval (wakeup, refreshMinutes*60*1000 );
 
 };
-
-var setup = window.plugin.periodicRefresh.setup;

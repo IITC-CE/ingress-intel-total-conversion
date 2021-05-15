@@ -6,12 +6,12 @@
 
 
 // use own namespace for plugin
-window.plugin.scrollWheelZoomDisable = function() {};
+// var scrollWheelZoomDisable = {};
+// window.plugin.scrollWheelZoomDisable = scrollWheelZoomDisable;
 
-window.plugin.scrollWheelZoomDisable.setup = function() {
+var setup = function() {
 
   window.map.scrollWheelZoom.disable();
 
 };
 
-var setup =  window.plugin.scrollWheelZoomDisable.setup;
