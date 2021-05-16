@@ -1,7 +1,7 @@
 // @author         vita10gy
 // @name           Highlight portals by my level
 // @category       Highlighter
-// @version        0.1.2
+// @version        0.1.3
 // @description    Use the portal fill color to denote if the portal is either at and above, or at and below your level.
 
 /* exported setup --eslint */

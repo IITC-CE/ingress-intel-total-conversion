@@ -1,7 +1,7 @@
 // @author         vita10gy
 // @name           Highlight portals missing resonators
 // @category       Highlighter
-// @version        0.1.2
+// @version        0.1.3
 // @description    Use the portal fill color to denote if the portal is missing resonators.
 
 /* exported setup --eslint */

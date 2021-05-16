@@ -1,7 +1,7 @@
 // @author         vita10gy
 // @name           Highlight portals that need recharging
 // @category       Highlighter
-// @version        0.1.2
+// @version        0.1.3
 // @description    Use the portal fill color to denote if the portal needs recharging and how much.
 //                 Yellow: above 85%. Orange: above 70%. Red: above 15%. Magenta: below 15%.
 

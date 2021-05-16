@@ -1,7 +1,7 @@
 // @author         vita10gy
 // @name           Highlight portals by level color
 // @category       Highlighter
-// @version        0.1.2
+// @version        0.1.3
 // @description    Use the portal fill color to denote the portal level by using the game level colors.
 
 /* exported setup --eslint */

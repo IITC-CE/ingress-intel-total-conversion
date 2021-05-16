@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Highlight high level portals
 // @category       Highlighter
-// @version        0.1.0
+// @version        0.1.1
 // @description    Use the portal fill color to denote high level portals: Purple L8, Red L7, Orange L6
 
 /* exported setup --eslint */

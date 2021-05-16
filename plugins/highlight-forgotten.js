@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Highlight inactive portals
 // @category       Highlighter
-// @version        0.1.0
+// @version        0.1.1
 // @description    Use the portal fill color to denote if the portal is unclaimed with no recent activity.
 //                 Shades of red from one week to one month, then tinted to purple for longer.
 //                 May also highlight captured portals that are stuck and fail to decay every 24 hours.
