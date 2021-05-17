@@ -584,7 +584,7 @@ window.plugin.drawTools.snapToPortals = function() {
       if (visibleBounds.contains(ll)) {
         testCount++;
         var newll = findClosestPortalLatLng(ll);
-        if (newll.lat !== ll.lat || newll.lng !== ll.lng) {
+        if (newll.lat !== ll.lat || newll.lng !== ll.lng) { // must be strict
           layer.setLatLng(new L.LatLng(newll.lat, newll.lng));
           changedCount++;
         }
