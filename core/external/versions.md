@@ -1,8 +1,8 @@
 ### jQuery-related components:
 
 * https://jquery.com/
-  3.5.1
-  https://code.jquery.com/jquery-3.5.1.min.js
+  3.6.0
+  https://code.jquery.com/jquery-3.6.0.min.js
 
 * https://jqueryui.com/
   1.12.1
