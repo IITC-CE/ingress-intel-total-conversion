@@ -1,7 +1,7 @@
 // @author         Johtaja
 // @name           Highlight portals based on history
 // @category       Highlighter
-// @version        0.2.0
+// @version        0.3.0
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 /* exported setup --eslint */

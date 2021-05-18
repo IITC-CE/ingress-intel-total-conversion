@@ -1,7 +1,7 @@
 // @author         vita10gy
 // @name           Hide portal ownership
 // @category       Highlighter
-// @version        0.1.2
+// @version        0.2.0
 // @description    Show all portals as neutral, as if uncaptured. Great for creating plans.
 
 /* exported setup --eslint */

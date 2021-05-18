@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Highlight portals with ornaments
 // @category       Highlighter
-// @version        0.0.1
+// @version        0.2.0
 // @description    Use the portal fill color to denote portals with additional 'ornament' markers.
 //                 e.g. Anomaly portals
 
