@@ -6,15 +6,12 @@
 
 /* exported setup --eslint */
 /* global TEAM_NONE, getMarkerStyleOptions*/
-// use own namespace for plugin
-var highlightHideOwnership = {};
-window.plugin.highlightHideOwnership = highlightHideOwnership;
 
-highlightHideOwnership.highlight = function(data) {
+function hideOwnership (data) {
   var params = getMarkerStyleOptions({team: TEAM_NONE, level: 0});
   data.portal.setStyle(params);
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Hide portal ownership', highlightHideOwnership.highlight);
+  window.addPortalHighlighter('Hide portal ownership', hideOwnership);
 }

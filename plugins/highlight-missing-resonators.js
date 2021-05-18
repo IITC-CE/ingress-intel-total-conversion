@@ -16,7 +16,7 @@ highlightMissingResonators.styles = {
   }
 };
 
-highlightMissingResonators.highlight = function(data) {
+function missingResonators (data) {
 
   if (data.portal.options.team !== TEAM_NONE) {
     var res_count = data.portal.options.data.resCount;
@@ -34,8 +34,8 @@ highlightMissingResonators.highlight = function(data) {
       data.portal.setStyle(params);
     }
   }
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Portals Missing Resonators', highlightMissingResonators.highlight);
+  window.addPortalHighlighter('Portals Missing Resonators', missingResonators);
 }

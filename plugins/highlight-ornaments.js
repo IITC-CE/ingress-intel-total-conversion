@@ -17,7 +17,7 @@ highlightOrnaments.styles = {
   }
 };
 
-highlightOrnaments.highlight = function(data) {
+function ornamentshighlight (data) {
   var d = data.portal.options.data;
   if (d.ornaments && d.ornaments.length > 0) {
 
@@ -26,8 +26,8 @@ highlightOrnaments.highlight = function(data) {
     var params = highlightOrnaments.styles.common;
     data.portal.setStyle(params);
   }
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Ornaments (anomaly portals)', highlightOrnaments.highlight);
+  window.addPortalHighlighter('Ornaments (anomaly portals)', ornamentshighlight);
 }

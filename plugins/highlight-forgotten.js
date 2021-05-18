@@ -7,11 +7,8 @@
 //                 May also highlight captured portals that are stuck and fail to decay every 24 hours.
 
 /* exported setup --eslint */
-// use own namespace for plugin
-var highlightInactive = {};
-window.plugin.highlightInactive = highlightInactive;
 
-highlightInactive.highlight = function(data) {
+function highlightInactivePortals (data) {
 
   if (data.portal.options.timestamp > 0) {
     var daysUnmodified = (new Date().getTime() - data.portal.options.timestamp) / (24*60*60*1000);
@@ -24,9 +21,9 @@ highlightInactive.highlight = function(data) {
     }
   }
 
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Inactive Portals', highlightInactive.highlight);
+  window.addPortalHighlighter('Inactive Portals', highlightInactivePortals);
 }
 

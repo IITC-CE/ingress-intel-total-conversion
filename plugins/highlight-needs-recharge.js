@@ -46,7 +46,7 @@ highlightNeedsRecharge.styles = {
   }
 };
 
-highlightNeedsRecharge.highlight = function(data) {
+function needsRecharge(data) {
   var d = data.portal.options.data;
   var health = d.health;
 
@@ -60,8 +60,8 @@ highlightNeedsRecharge.highlight = function(data) {
 
     data.portal.setStyle(params);
   }
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Needs Recharge (Health)', highlightNeedsRecharge.highlight);
+  window.addPortalHighlighter('Needs Recharge (Health)', needsRecharge);
 }

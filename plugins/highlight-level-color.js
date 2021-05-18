@@ -6,18 +6,15 @@
 
 /* exported setup --eslint */
 /* global COLORS_LVL*/
-// use own namespace for plugin
-var highlightLevelColor = {};
-window.plugin.highlightLevelColor = highlightLevelColor;
 
-highlightLevelColor.highlight = function(data) {
+function highlightLevelColor (data) {
   var portal_level = data.portal.options.data.level;
   if (portal_level !== undefined) {
     var opacity = .6;
     data.portal.setStyle({fillColor: COLORS_LVL[portal_level], fillOpacity: opacity});
   }
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Level Color', highlightLevelColor.highlight);
+  window.addPortalHighlighter('Level Color', highlightLevelColor);
 }

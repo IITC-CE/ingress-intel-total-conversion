@@ -7,7 +7,6 @@
 /* exported setup --eslint */
 /* global L */
 // use own namespace for plugin
-
 var highLevel = {};
 window.plugin.highlightHighLevel = highLevel;
 
@@ -26,7 +25,7 @@ highLevel.styles = {
   }
 };
 
-highLevel.highlight = function (data) {
+function highlightHighLevel (data) {
   var portal_level = data.portal.options.data.level;
   if (portal_level === undefined) return;           // continue on 0..8
   var newStyle= L.extend ( {},
@@ -37,8 +36,8 @@ highLevel.highlight = function (data) {
   if (newStyle.fillColor) {
     data.portal.setStyle(newStyle);
   }
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Higher Level Portals', highLevel.highlight);
+  window.addPortalHighlighter('Higher Level Portals', highlightHighLevel);
 }

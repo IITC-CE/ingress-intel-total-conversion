@@ -6,20 +6,16 @@
 
 /* exported setup --eslint */
 /* global PLAYER */
-// use own namespace for plugin
-var highlightMyLevel = {};
-window.plugin.highlightMyLevel = highlightMyLevel;
 
+function belowMyLevel (data) {
+  colorLevel(true,data);
+}
 
-highlightMyLevel.belowLevel = function(data) {
-  highlightMyLevel.colorLevel(true,data);
-};
+function aboveMyLevel (data) {
+  colorLevel(false,data);
+}
 
-highlightMyLevel.aboveLevel = function(data) {
-  highlightMyLevel.colorLevel(false,data);
-};
-
-highlightMyLevel.colorLevel = function(below,data) {
+function colorLevel (below,data) {
   var portal_level = data.portal.options.level;
 
   // as portal levels can never be higher than L8, clamp the player level to this for highlight purposes
@@ -30,9 +26,9 @@ highlightMyLevel.colorLevel = function(below,data) {
      (!below && portal_level >= player_level)) {
     data.portal.setStyle({fillColor: 'red', fillOpacity: opacity});
   }
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Below My Level', highlightMyLevel.belowLevel);
-  window.addPortalHighlighter('Above My Level', highlightMyLevel.aboveLevel);
+  window.addPortalHighlighter('Below My Level', belowMyLevel);
+  window.addPortalHighlighter('Above My Level', aboveMyLevel);
 }

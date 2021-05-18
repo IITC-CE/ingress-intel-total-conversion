@@ -6,11 +6,8 @@
 
 /* exported setup --eslint */
 /* global TEAM_NONE */
-// use own namespace for plugin
-var highlightWeakness = {};
-window.plugin.highlightWeakness = highlightWeakness;
 
-highlightWeakness.highlight = function(data) {
+function weaknessHighlight (data) {
 
   if (data.portal.options.data.resCount !== undefined
       && data.portal.options.data.health !== undefined
@@ -34,8 +31,8 @@ highlightWeakness.highlight = function(data) {
     }
   }
 
-};
+}
 
 function setup () {
-  window.addPortalHighlighter('Portal Weakness', highlightWeakness.highlight);
+  window.addPortalHighlighter('Portal Weakness', weaknessHighlight);
 }
