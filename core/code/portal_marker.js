@@ -74,7 +74,6 @@ L.PortalMarker = L.CircleMarker.extend({
     if (!this._details.mods && details.mods)
       return true;
 
-    // does portal picture/name/location modfication update the timestamp ?
     return false;
   },
   updateDetails: function(details) {
