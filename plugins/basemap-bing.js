@@ -4,9 +4,9 @@
 // @version        0.3.0
 // @description    Add the bing.com map layers.
 
-
+// use own namespace for plugin
 var mapBing = {};
-window.plugin.mapBing = mapBing;
+// window.plugin.mapBing = mapBing;
 
 mapBing.sets = {
   Road: {

@@ -7,7 +7,7 @@
 
 // use own namespace for plugin
 var mapYandex = {};
-window.plugin.mapYandex = mapYandex;
+// window.plugin.mapYandex = mapYandex;
 
 mapYandex.types = {
   map: {

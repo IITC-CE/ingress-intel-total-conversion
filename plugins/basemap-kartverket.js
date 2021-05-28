@@ -4,8 +4,11 @@
 // @version        0.2.1
 // @description    Add Kartverket.no map layers.
 
+// use own namespace for plugin
+var mapKartverket = {};
+// window.plugin.mapKartverket = mapKartverket;
 
-function setup () {
+mapKartverket.setup = function () {
 
   L.TileLayer.Kartverket = L.TileLayer.extend({
 
@@ -72,4 +75,8 @@ function setup () {
     l = L.tileLayer.kartverket(layer);
     layerChooser.addBaseLayer(l, l._name);
   }
+}
+
+function setup () {
+  mapKartverket.setup();
 }

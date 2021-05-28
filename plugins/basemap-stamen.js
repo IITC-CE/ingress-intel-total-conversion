@@ -4,11 +4,14 @@
 // @version        0.2.1
 // @description    Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
 
+// use own namespace for plugin
+var mapStamen = {};
+// window.plugin.mapStamen = mapStamen;
 
 // see API here http://maps.stamen.com/
 // https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js (overcomplicated)
 
-function setup () {
+mapStamen.setup = function () {
   var baseUrl = 'https://stamen-tiles-{s}.a.ssl.fastly.net/{layer}/{z}/{x}/{y}.{type}';
   var L_StamenTileLayer = L.TileLayer.extend({
     options: {
@@ -61,4 +64,7 @@ function setup () {
     ].join('')
   };
   addLayer('Watercolor',options);
+}
+function setup () {
+  mapStamen.setup();
 }

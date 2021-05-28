@@ -4,10 +4,11 @@
 // @version        0.1.3
 // @description    Add a simplified gray Version of Google map tiles as an optional layer.
 
-
 // use own namespace for plugin
-window.plugin.grayGMaps = function() {};
-window.plugin.grayGMaps.addLayer = function() {
+var grayGMaps = {};
+// window.plugin.grayGMaps = grayGMaps;
+
+grayGMaps.addLayer = function() {
   var grayGMapsOptions = {
     maxZoom: 21,
     styles: [
@@ -29,4 +30,6 @@ window.plugin.grayGMaps.addLayer = function() {
   layerChooser.addBaseLayer(grayGMaps, "Google Gray");
 };
 
-var setup =  window.plugin.grayGMaps.addLayer;
+function setup () {
+  grayGMaps.addLayer();
+}

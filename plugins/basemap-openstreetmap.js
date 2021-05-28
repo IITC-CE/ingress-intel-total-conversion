@@ -4,10 +4,11 @@
 // @version        0.1.1
 // @description    Add the native OpenStreetMap.org map tiles as an optional layer.
 
-
 // use own namespace for plugin
-window.plugin.mapTileOpenStreetMap = {
-  addLayer: function() {
+var mapOpenStreetMap = {};
+// window.plugin.mapOpenStreetMap = mapOpenStreetMap;
+
+mapOpenStreetMap.addLayer = function () {
     // OpenStreetMap tiles - we shouldn't use these by default - https://wiki.openstreetmap.org/wiki/Tile_usage_policy
     // "Heavy use (e.g. distributing an app that uses tiles from openstreetmap.org) is forbidden without prior permission from the System Administrators"
 
@@ -26,7 +27,9 @@ window.plugin.mapTileOpenStreetMap = {
       var layer = new L.TileLayer(url, osmOpt);
       layerChooser.addBaseLayer(layer, layers[url]);
     }
-  },
-};
+  }
 
-var setup =  window.plugin.mapTileOpenStreetMap.addLayer;
+
+function setup () {
+  mapOpenStreetMap.addLayer();
+}
