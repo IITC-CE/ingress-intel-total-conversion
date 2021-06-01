@@ -125,26 +125,37 @@ def imgrepl(match, path=None):
     return load_image(fullname)
 
 
+def expand_variables(match):
+    quote = "'%s'"
+    kw = match.groups()[0]
+    return quote % getattr(settings, kw)
+
+
 def expand_template(match, path=None):
     quote = "'%s'"
     kw, filename = match.groups()
-    if not filename:
-        return quote % getattr(settings, kw)
-
     fullname = path / filename
-    if kw == 'include_raw':
+
+    if kw == 'import':
         return """// *** included: {filename} ***
 {content}
 
 """.format(filename=filename, content=readtext(fullname))
-    elif kw == 'include_string':
+    elif kw == 'importString':
         return quote % multi_line(readtext(fullname))
-    elif kw == 'include_img':
+    elif kw == 'importImage':
         return quote % load_image(fullname)
-    elif kw == 'include_css':
+    elif kw == 'importCSS':
         pattern = r'(?<=url\()["\']?(?P<filename>[^)#]+?)["\']?(?=\))'
         css = re.sub(pattern, partial(imgrepl, path=fullname.parent), readtext(fullname))
         return quote % multi_line(css)
+    else:
+        raise Exception(f'Error: function {kw} unknown')
+
+
+def errorOut(match):
+    kw = match.groups()[0]
+    print(f"Error: file still contains @{kw}@")
 
 
 def process_file(source, out_dir, dist_path=None, deps_list=None):
@@ -165,20 +176,28 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
     settings.plugin_id = plugin_name
 
     path = source.parent  # used as root for all (relative) paths
-    script = re.sub(r"'@bundle_code@';", partial(bundle_code, path=path), script)
+    script = re.sub(r"IITCTool.importCode\s*\(\s*\)\s*;?", partial(bundle_code, path=path), script)
     try:
         script_before_wrapper, script = script.split('\n/*wrapped-from-here*/\n', 1)
     except ValueError:
         script_before_wrapper = ''
 
     wrapper = get_module(settings.plugin_wrapper)
-    template = r"'@(\w+)(?::([\w./-]+))?@'"  # to find '@keyword[:path]@' patterns
-    repl = partial(expand_template, path=path)
+    templateVariables = r"'@(\w+)@'"  # to find '@keyword[:path]@' patterns
+    replaceVariables = partial(expand_variables)
+    templateFunctions = r"IITCTool.(\w+)\s*\(\s*['\"](.*?)['\"]\s*\)\s*;?"  # to find "IITCTool.function()" patterns
+    replaceFunctions = partial(expand_template, path=path)
+
+    head = re.sub(templateVariables, replaceVariables, wrapper.start)
+    code = re.sub(templateFunctions, replaceFunctions, script)
+    code = re.sub(templateVariables, replaceVariables, code)
+    re.sub(r"'@(.*)@'", errorOut, code)
+
     data = [
         meta,
         script_before_wrapper,
-        re.sub(template, repl, wrapper.start),
-        re.sub(template, repl, script),
+        head,
+        code,
         wrapper.setup if not is_main else '',  # it's for plugins only
         wrapper.end,
     ]

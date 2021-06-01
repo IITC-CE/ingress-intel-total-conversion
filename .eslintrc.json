@@ -26,5 +26,8 @@
         "eol-last": "error",
         "quote-props": ["error","consistent-as-needed"],
         "no-unused-expressions": "error"
-    }
+    },
+    "globals": {
+        "IITCTool": "readonly"
+    }    
 }
