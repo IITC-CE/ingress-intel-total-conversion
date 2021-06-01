@@ -148,7 +148,12 @@ def expand_template(match, path=None):
     elif kw == 'importCSS':
         pattern = r'(?<=url\()["\']?(?P<filename>[^)#]+?)["\']?(?=\))'
         css = re.sub(pattern, partial(imgrepl, path=fullname.parent), readtext(fullname))
-        return quote % multi_line(css)
+        return """// *** included: {filename} ***
+;(function() {{ var style = document.createElement('style');
+style.appendChild(document.createTextNode('{content}'));
+document.head.appendChild(style);
+}})();
+""".format(filename=filename, content=multi_line(css))
     else:
         raise Exception(f'Error: function {kw} unknown')
 

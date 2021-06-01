@@ -1358,5 +1358,5 @@ window.plugin.bookmarks.initMPE = function(){
 
 // moved setupCSS to the end to improve readability of built script
 window.plugin.bookmarks.setupCSS = function () {
-  $('<style>').prop('type', 'text/css').html(IITCTool.importCSS('bookmarks.css')).appendTo('head');
+  IITCTool.importCSS('bookmarks.css');
 };

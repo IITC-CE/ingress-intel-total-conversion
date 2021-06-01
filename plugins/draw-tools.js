@@ -738,8 +738,8 @@ function loadExternals () {
   try {
     // https://github.com/Leaflet/Leaflet.draw
     IITCTool.import('external/leaflet.draw-src.js');
-    $('<style>').html(IITCTool.importCSS('external/leaflet.draw-src.css')).appendTo('head');
-    $('<style>').html(IITCTool.importCSS('external/leaflet.draw-fix.css')).appendTo('head');
+    IITCTool.importCSS('external/leaflet.draw-src.css');
+    IITCTool.importCSS('external/leaflet.draw-fix.css');
 
     IITCTool.import('external/leaflet.draw-snap.js');
     IITCTool.import('external/leaflet.draw-geodesic.js');

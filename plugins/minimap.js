@@ -146,7 +146,7 @@ function loadLeafletMiniMap() {
   try {
     // https://github.com/Norkart/Leaflet-MiniMap
     IITCTool.import('external/Control.MiniMap.js');
-    $('<style>').html(IITCTool.importCSS('external/Control.MiniMap.css')).appendTo('head');
+    IITCTool.importCSS('external/Control.MiniMap.css');
 
   } catch (e) {
     console.error('Control.MiniMap.js loading failed');

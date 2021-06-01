@@ -983,7 +983,7 @@ window.plugin.missions = {
 
 		this.loadData();
 
-		$('<style>').prop('type', 'text/css').html(IITCTool.importCSS('missions.css')).appendTo('head');
+		IITCTool.importCSS('missions.css');
 		$('#toolbox').append('<a tabindex="0" onclick="plugin.missions.openTopMissions();">Missions in view</a>');
 
 		if(window.useAndroidPanes()) {

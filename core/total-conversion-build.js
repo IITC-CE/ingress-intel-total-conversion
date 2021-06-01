@@ -50,7 +50,7 @@ if (!window.PLAYER || !PLAYER.nickname) {
 document.head.innerHTML = ''
   + '<title>Ingress Intel Map</title>'
   + '<style>' + IITCTool.importString('style.css') + '</style>'
-  + '<style>' + IITCTool.importCSS('external/leaflet.css') + '</style>'
+  + '<style>' + IITCTool.importString('external/leaflet.css') + '</style>'
   // note: smartphone.css injection moved into code/smartphone.js
   + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 

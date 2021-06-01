@@ -169,5 +169,5 @@ plugin.showLinkedPortal.removePreview = function() {
 
 var setup = function () {
   window.addHook('portalDetailsUpdated', window.plugin.showLinkedPortal.portalDetail);
-  $('<style>').prop('type', 'text/css').html(IITCTool.importCSS('linked-portals-show.css')).appendTo('head');
+  IITCTool.importCSS('linked-portals-show.css');
 }
