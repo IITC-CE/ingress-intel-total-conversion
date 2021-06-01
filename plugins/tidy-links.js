@@ -113,10 +113,10 @@ function setup () {
   ').appendTo('head');
 }
 
-function loadDelaunay () {
+function loadDelaunay() {
   try {
     // https://github.com/ironwallaby/delaunay
-    '@include_raw:external/delaunay.js@';
+    IITCTool.import('external/delaunay.js');
 
     return Delaunay;
   } catch (e) {

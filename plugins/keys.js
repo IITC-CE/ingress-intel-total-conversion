@@ -153,10 +153,10 @@ window.plugin.keys.loadKeys = function() {
   if(keysObject.keys) plugin.keys.storeLocal(plugin.keys.KEY);
 }
 
-window.plugin.keys.setupCSS = function() {
+window.plugin.keys.setupCSS = function () {
   $("<style>")
     .prop("type", "text/css")
-    .html('@include_string:keys.css@')
+    .html(IITCTool.importString('keys.css'))
     .appendTo("head");
 }
 

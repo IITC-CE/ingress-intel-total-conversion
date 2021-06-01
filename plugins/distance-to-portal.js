@@ -106,19 +106,19 @@ window.plugin.distanceToPortal.setupPortalsList = function() {
 }
 
 
-window.plugin.distanceToPortal.setup  = function() {
+window.plugin.distanceToPortal.setup = function () {
   // https://github.com/gregallensworth/Leaflet/
-  '@include_raw:external/LatLng_Bearings.js@';
+  IITCTool.import('external/LatLng_Bearings.js');
 
   try {
     window.plugin.distanceToPortal.currentLoc = L.latLng(JSON.parse(localStorage['plugin-distance-to-portal']));
-  } catch(e) {
+  } catch (e) {
     window.plugin.distanceToPortal.currentLoc = null;
   }
 
   window.plugin.distanceToPortal.currentLocMarker = null;
 
-  $('<style>').prop('type', 'text/css').html('@include_string:distance-to-portal.css@').appendTo('head');
+  $('<style>').prop('type', 'text/css').html(IITCTool.importString('distance-to-portal.css')).appendTo('head');
 
   addHook('portalDetailsUpdated', window.plugin.distanceToPortal.addDistance);
 

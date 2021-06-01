@@ -37,16 +37,16 @@ function setup () {
   }
 };
 
-function setupBingLeaflet () {
+function setupBingLeaflet() {
   try {
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.js
-    '@include_raw:external/Bing.js@';
+    IITCTool.import('external/Bing.js');
 
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.addon.applyMaxNativeZoom.js
-    '@include_raw:external/Bing.addon.applyMaxNativeZoom.js@';
+    IITCTool.import('external/Bing.addon.applyMaxNativeZoom.js');
 
-    } catch (e) {
-      console.error('Bing.js loading failed');
-      throw e;
-    }
+  } catch (e) {
+    console.error('Bing.js loading failed');
+    throw e;
+  }
 }

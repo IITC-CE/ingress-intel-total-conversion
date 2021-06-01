@@ -107,8 +107,8 @@ plugin.layerCount.calculate = function(ev) {
 	return false;
 };
 
-var setup = function() {
-	$('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
+var setup = function () {
+  $('<style>').prop('type', 'text/css').html(IITCTool.importString('layer-count.css')).appendTo('head');
 
 	var parent = $(".leaflet-top.leaflet-left", window.map.getContainer());
 

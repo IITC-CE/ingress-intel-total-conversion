@@ -8,8 +8,8 @@
 // use own namespace for plugin
 window.plugin.regions = function() {};
 
-window.plugin.regions.setup  = function() {
-  '@include_raw:external/s2geometry.js@';
+window.plugin.regions.setup = function () {
+  IITCTool.import('external/s2geometry.js');
 
   window.plugin.regions.regionLayer = L.layerGroup();
 
@@ -149,13 +149,13 @@ window.plugin.regions.getSearchResult = function(match) {
 
   var result = {}, level;
 
-  if(id2 === undefined) {
+  if (id2 === undefined) {
     result.description = 'Regional score cells (cluster of 16 cells)';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
+    result.icon = 'data:image/svg+xml;base64,' + btoa(IITCTool.importString('images/icon-cell.svg').replace(/orange/, 'gold'));
     level = 4;
   } else {
     result.description = 'Regional score cell';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@');
+    result.icon = 'data:image/svg+xml;base64,' + btoa(IITCTool.importString('images/icon-cell.svg'));
     level = 6;
 
     var xy = window.plugin.regions.d2xy(4, id2);

@@ -68,12 +68,12 @@ window.plugin.missions = {
 	SYNC_DELAY: 5000,
 	enableSync: false,
 
-	missionTypeImages: [
-		'@include_img:images/mission-type-unknown.png@',
-		'@include_img:images/mission-type-sequential.png@',
-		'@include_img:images/mission-type-random.png@',
-		'@include_img:images/mission-type-hidden.png@',
-	],
+  missionTypeImages: [
+    IITCTool.importImage('images/mission-type-unknown.png'),
+    IITCTool.importImage('images/mission-type-sequential.png'),
+    IITCTool.importImage('images/mission-type-random.png'),
+    IITCTool.importImage('images/mission-type-hidden.png'),
+  ],
 
 	onPortalSelected: function(event) {
 		/*if(event.selectedPortalGuid === event.unselectedPortalGuid) {
@@ -381,9 +381,8 @@ window.plugin.missions = {
 				infoLength.title = 'Length of this mission.\n\nNOTE: The actual distance required to cover may vary depending on several factors!';
 				infoLength.textContent = len;
 				img = infoLength.insertBefore(document.createElement('img'), infoLength.firstChild);
-				img.src = '@include_img:images/mission-length.png@';
-			}
-			
+                img.src = IITCTool.importImage('images/mission-length.png');
+            }
 			if(window.plugin.distanceToPortal && window.plugin.distanceToPortal.currentLoc) {
 				var infoDistance = container.appendChild(document.createElement('span'));
 				infoDistance.className = 'plugin-mission-info distance help';
@@ -984,7 +983,7 @@ window.plugin.missions = {
 
 		this.loadData();
 
-		$('<style>').prop('type', 'text/css').html('@include_string:missions.css@').appendTo('head');
+		$('<style>').prop('type', 'text/css').html(IITCTool.importCSS('missions.css')).appendTo('head');
 		$('#toolbox').append('<a tabindex="0" onclick="plugin.missions.openTopMissions();">Missions in view</a>');
 
 		if(window.useAndroidPanes()) {

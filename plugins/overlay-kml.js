@@ -242,10 +242,10 @@ function setup () {
   */
 }
 
-function loadLeafletFileLayer () {
+function loadLeafletFileLayer() {
   try {
     // https://github.com/mapbox/togeojson/
-    '@include_raw:external/togeojson.js@';
+    IITCTool.import('external/togeojson.js');
 
   } catch (e) {
     console.error('togeojson.js loading failed');
@@ -256,7 +256,7 @@ function loadLeafletFileLayer () {
 
   try {
     // https://github.com/makinacorpus/Leaflet.FileLayer/
-    '@include_raw:external/leaflet.filelayer.js@';
+    IITCTool.import('external/leaflet.filelayer.js');
 
   } catch (e) {
     console.error('leaflet.filelayer.js loading failed');

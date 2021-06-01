@@ -10,9 +10,9 @@ window.plugin.mapTileBlank = function() {};
 
 window.plugin.mapTileBlank.addLayer = function() {
 
-  var blankOpt = {attribution: '', maxNativeZoom: 18, maxZoom: 21};
-  var blankWhite = new L.TileLayer('@include_img:images/basemap-blank-tile-white.png@', blankOpt);
-  var blankBlack = new L.TileLayer('@include_img:images/basemap-blank-tile-black.png@', blankOpt);
+  var blankOpt = { attribution: '', maxNativeZoom: 18, maxZoom: 21 };
+  var blankWhite = new L.TileLayer(IITCTool.importImage('images/basemap-blank-tile-white.png'), blankOpt);
+  var blankBlack = new L.TileLayer(IITCTool.importImage('images/basemap-blank-tile-black.png'), blankOpt);
 
   layerChooser.addBaseLayer(blankWhite, "Blank Map (White)");
   layerChooser.addBaseLayer(blankBlack, "Blank Map (Black)");

@@ -39,12 +39,11 @@ function setupYandexLeaflet () {
 
   try {
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Yandex.js
-    '@include_raw:external/Yandex.js@';
+    IITCTool.import('external/Yandex.js');
+    IITCTool.import('external/Yandex.addon.LoadApi.js');
 
-    '@include_raw:external/Yandex.addon.LoadApi.js@';
-    
-    } catch (e) {
-      console.error('Yandex.js loading failed');
-      throw e;
-    }
+  } catch (e) {
+    console.error('Yandex.js loading failed');
+    throw e;
+  }
 }

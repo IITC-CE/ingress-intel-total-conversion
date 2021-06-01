@@ -44,11 +44,11 @@ function setup () {
   ').appendTo('head');
 }
 
-function loadLeafletPancontrol () {
+function loadLeafletPancontrol() {
   try {
     // https://github.com/kartena/Leaflet.Pancontrol
-    '@include_raw:external/L.Control.Pan.js@';
-    $('<style>').html('@include_css:external/L.Control.Pan.css@').appendTo('head');
+    IITCTool.import('external/L.Control.Pan.js');
+    $('<style>').html(IITCTool.importCSS('external/L.Control.Pan.css')).appendTo('head');
 
   } catch (e) {
     console.error('L.Control.Pan.js loading failed');

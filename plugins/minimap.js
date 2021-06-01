@@ -142,11 +142,11 @@ function setup () {
   }
 }
 
-function loadLeafletMiniMap () {
+function loadLeafletMiniMap() {
   try {
     // https://github.com/Norkart/Leaflet-MiniMap
-    '@include_raw:external/Control.MiniMap.js@';
-    $('<style>').html('@include_css:external/Control.MiniMap.css@').appendTo('head');
+    IITCTool.import('external/Control.MiniMap.js');
+    $('<style>').html(IITCTool.importCSS('external/Control.MiniMap.css')).appendTo('head');
 
   } catch (e) {
     console.error('Control.MiniMap.js loading failed');

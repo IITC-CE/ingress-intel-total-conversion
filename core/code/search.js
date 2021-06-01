@@ -276,9 +276,9 @@ addHook('search', function(query) {
         title: data.title,
         description: teams[team] + ', L' + data.level + ', ' + data.health + '%, ' + data.resCount + ' Resonators',
         position: portal.getLatLng(),
-        icon: 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-portal.svg@'.replace(/%COLOR%/g, color)),
-        onSelected: function(result, event) {
-          if(event.type == 'dblclick') {
+        icon: 'data:image/svg+xml;base64,' + btoa(IITCTool.importString('images/icon-portal.svg').replace(/%COLOR%/g, color)),
+        onSelected: function (result, event) {
+          if (event.type == 'dblclick') {
             zoomToAndShowPortal(guid, portal.getLatLng());
           } else if(window.portals[guid]) {
             if(!map.getBounds().contains(result.position)) map.setView(result.position);

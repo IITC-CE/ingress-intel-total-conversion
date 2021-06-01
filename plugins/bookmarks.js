@@ -501,32 +501,23 @@ window.plugin.bookmarks.loadStorageBox = function() {
       $.each(folder.bkmrk, function(id, bookmark) {
         if(bookmark.label.toLowerCase().indexOf(term) === -1) return;
 
-        query.addResult({
-          title: escapeHtmlSpecialChars(bookmark.label),
-          description: 'Map in folder "' + escapeHtmlSpecialChars(folder.label) + '"',
-          icon: '@include_img:images/icon-bookmark-map.png@',
-          position: L.latLng(bookmark.latlng.split(",")),
-          zoom: bookmark.z,
-          onSelected: window.plugin.bookmarks.onSearchResultSelected,
-        });
+      query.addResult({
+        title: escapeHtmlSpecialChars(bookmark.label),
+        description: 'Map in folder "' + escapeHtmlSpecialChars(folder.label) + '"',
+        icon: IITCTool.importImage('images/icon-bookmark-map.png'),
+        position: L.latLng(bookmark.latlng.split(",")),
+        zoom: bookmark.z,
+        onSelected: window.plugin.bookmarks.onSearchResultSelected,
       });
     });
+  });
 
-    $.each(plugin.bookmarks.bkmrksObj.portals, function(id, folder) {
-      $.each(folder.bkmrk, function(id, bookmark) {
-        if(bookmark.label.toLowerCase().indexOf(term) === -1) return;
+    $.each(plugin.bookmarks.bkmrksObj.portals, function (id, folder) {
+      $.each(folder.bkmrk, function (id, bookmark) {
+        if (bookmark.label.toLowerCase().indexOf(term) === -1) return;
 
-        query.addResult({
-          title: escapeHtmlSpecialChars(bookmark.label),
-          description: 'Bookmark in folder "' + escapeHtmlSpecialChars(folder.label) + '"',
-          icon: '@include_img:images/icon-bookmark.png@',
-          position: L.latLng(bookmark.latlng.split(",")),
-          guid: bookmark.guid,
-          onSelected: window.plugin.bookmarks.onSearchResultSelected,
-        });
-      });
-    });
-  };
+  });
+};
 
   window.plugin.bookmarks.onSearchResultSelected = function(result, event) {
     if(result.guid) { // portal
@@ -1100,17 +1091,18 @@ window.plugin.bookmarks.loadStorageBox = function() {
     console.log("resetAllStars done");
   }
 
-  window.plugin.bookmarks.addStar = function(guid, latlng, lbl) {
-    var star = L.marker(latlng, {
-      title: lbl,
-      icon: L.icon({
-        iconUrl: '@include_img:images/marker-star.png@',
-        iconAnchor: [15,40],
-        iconSize: [30,40]
-      })
-    });
-    window.registerMarkerForOMS(star);
-    star.on('spiderfiedclick', function() { renderPortalDetails(guid); });
+    window.plugin.bookmarks.addStar = function (guid, latlng, lbl) {
+      var star = L.marker(latlng, {
+        title: lbl,
+        icon: L.icon({
+          iconUrl: IITCTool.importImage('images/marker-star.png'),
+          iconAnchor: [15, 40],
+          iconSize: [30, 40]
+        })
+      });
+
+      window.registerMarkerForOMS(star);
+      star.on('spiderfiedclick', function () { renderPortalDetails(guid); });
 
     window.plugin.bookmarks.starLayers[guid] = star;
     star.addTo(window.plugin.bookmarks.starLayerGroup);
@@ -1363,7 +1355,8 @@ window.plugin.bookmarks.initMPE = function(){
     }
 
   }
+
 // moved setupCSS to the end to improve readability of built script
-    window.plugin.bookmarks.setupCSS = function() {
-    $('<style>').prop('type', 'text/css').html('@include_css:bookmarks.css@').appendTo('head');
-  }
+window.plugin.bookmarks.setupCSS = function () {
+  $('<style>').prop('type', 'text/css').html(IITCTool.importCSS('bookmarks.css')).appendTo('head');
+};

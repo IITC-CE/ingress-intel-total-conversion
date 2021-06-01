@@ -400,12 +400,12 @@ window.plugin.uniques.highlighter = {
 }
 
 
-window.plugin.uniques.setupCSS = function() {
-	$("<style>")
-	.prop("type", "text/css")
-	.html('@include_string:uniques.css@')
-	.appendTo("head");
-}
+window.plugin.uniques.setupCSS = function () {
+  $('<style>')
+    .prop('type', 'text/css')
+    .html(IITCTool.importString('uniques.css'))
+    .appendTo('head');
+};
 
 window.plugin.uniques.setupContent = function() {
 	plugin.uniques.contentHTML = '<div id="uniques-container">'

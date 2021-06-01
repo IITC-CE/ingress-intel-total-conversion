@@ -556,11 +556,11 @@ window.setupLayerChooserApi = function() {
   }
 }
 
-window.extendLeaflet = function() {
+window.extendLeaflet = function () {
   L.Icon.Default.mergeOptions({
-    iconUrl: '@include_img:images/marker-ingress.png@',
-    iconRetinaUrl: '@include_img:images/marker-ingress-2x.png@',
-    shadowUrl: '@include_img:external/images/marker-shadow.png@'
+    iconUrl: IITCTool.importImage('images/marker-ingress.png'),
+    iconRetinaUrl: IITCTool.importImage('images/marker-ingress-2x.png'),
+    shadowUrl: IITCTool.importImage('external/images/marker-shadow.png')
   });
   L.Icon.Default.imagePath = ' '; // in order to suppress _detectIconPath (it fails with data-urls)
 
@@ -832,23 +832,23 @@ window.registerMarkerForOMS = function(marker) {
 }
 
 try {
-  '@include_raw:external/autolink-min.js@';
+  IITCTool.import('external/autolink-min.js');
 
-  window.L_NO_TOUCH = navigator.maxTouchPoints===0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
-  '@include_raw:external/leaflet-src.js@';
-  '@include_raw:external/L.Geodesic.js@';
-  '@include_raw:external/Leaflet.GoogleMutant.js@';
-  '@include_raw:external/oms.min.js@';
+  window.L_NO_TOUCH = navigator.maxTouchPoints === 0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
+  IITCTool.import('external/leaflet-src.js');
+  IITCTool.import('external/L.Geodesic.js');
+  IITCTool.import('external/Leaflet.GoogleMutant.js');
+  IITCTool.import('external/oms.min.js');
   L.CanvasIconLayer = (function (module) {
-    '@include_raw:external/rbush.min.js@';
-    '@include_raw:external/leaflet.canvas-markers.js@';
+    IITCTool.import('external/rbush.min.js');
+    IITCTool.import('external/leaflet.canvas-markers.js');
     return module;
   }({})).exports(L);
 
-  '@include_raw:external/jquery-3.5.1.min.js@';
-  '@include_raw:external/jquery-ui-1.12.1.min.js@';
-  '@include_raw:external/taphold.js@';
-  '@include_raw:external/jquery.qrcode.min.js@';
+  IITCTool.import('external/jquery-3.5.1.min.js');
+  IITCTool.import('external/jquery-ui-1.12.1.min.js');
+  IITCTool.import('external/taphold.js');
+  IITCTool.import('external/jquery.qrcode.min.js');
 
 } catch (e) {
   log.error("External's js loading failed");

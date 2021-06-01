@@ -737,14 +737,12 @@ function setup () {
 function loadExternals () {
   try {
     // https://github.com/Leaflet/Leaflet.draw
-    '@include_raw:external/leaflet.draw-src.js@';
-    $('<style>').html('@include_css:external/leaflet.draw-src.css@').appendTo('head');
+    IITCTool.import('external/leaflet.draw-src.js');
+    $('<style>').html(IITCTool.importCSS('external/leaflet.draw-src.css')).appendTo('head');
+    $('<style>').html(IITCTool.importCSS('external/leaflet.draw-fix.css')).appendTo('head');
 
-    $('<style>').html('@include_css:external/leaflet.draw-fix.css@').appendTo('head');
-
-    '@include_raw:external/leaflet.draw-snap.js@';
-
-    '@include_raw:external/leaflet.draw-geodesic.js@';
+    IITCTool.import('external/leaflet.draw-snap.js');
+    IITCTool.import('external/leaflet.draw-geodesic.js');
 
     // support Leaflet >= 1
     // https://github.com/Leaflet/Leaflet.draw/pull/911
@@ -774,8 +772,8 @@ function loadExternals () {
 
   try {
     // https://github.com/bgrins/spectrum
-    '@include_raw:external/spectrum.js@';
-    $('<style>').html('@include_string:external/spectrum.css@').appendTo('head');
+    IITCTool.import('external/spectrum.js');
+    $('<style>').html(IITCTool.importString("external/spectrum.css")).appendTo('head');
 
   } catch (e) {
     console.error('spectrum.js loading failed');

@@ -14,13 +14,13 @@ window.PLAYER_TRACKER_LINE_COLOUR = '#FF00FD';
 // use own namespace for plugin
 window.plugin.playerTracker = function() {};
 
-window.plugin.playerTracker.setup = function() {
-  $('<style>').prop('type', 'text/css').html('@include_string:player-tracker.css@').appendTo('head');
+window.plugin.playerTracker.setup = function () {
+  $('<style>').prop('type', 'text/css').html(IITCTool.importString('player-tracker.css')).appendTo('head');
 
-  var iconEnlImage = '@include_img:images/marker-green.png@';
-  var iconEnlRetImage = '@include_img:images/marker-green-2x.png@';
-  var iconResImage = '@include_img:images/marker-blue.png@';
-  var iconResRetImage = '@include_img:images/marker-blue-2x.png@';
+  var iconEnlImage = IITCTool.importImage('images/marker-green.png');
+  var iconEnlRetImage = IITCTool.importImage('images/marker-green-2x.png');
+  var iconResImage = IITCTool.importImage('images/marker-blue.png');
+  var iconResRetImage = IITCTool.importImage('images/marker-blue-2x.png');
 
   plugin.playerTracker.iconEnl = L.Icon.Default.extend({options: {
     iconUrl: iconEnlImage,

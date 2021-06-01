@@ -428,9 +428,8 @@ var setup =  function() {
     $('#toolbox').append('<a onclick="window.plugin.portalslist.displayPL()" title="Display a list of portals in the current view [t]" accesskey="t">Portals list</a>');
   }
 
-  $("<style>")
-    .prop("type", "text/css")
-    .html('@include_string:portals-list.css@')
-    .appendTo("head");
-
-}
+  $('<style>')
+    .prop('type', 'text/css')
+    .html(IITCTool.importString('portals-list.css'))
+    .appendTo('head');
+};
