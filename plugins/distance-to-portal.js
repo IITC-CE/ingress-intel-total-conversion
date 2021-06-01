@@ -118,7 +118,7 @@ window.plugin.distanceToPortal.setup = function () {
 
   window.plugin.distanceToPortal.currentLocMarker = null;
 
-  $('<style>').prop('type', 'text/css').html(IITCTool.importString('distance-to-portal.css')).appendTo('head');
+  IITCTool.importCSS('distance-to-portal.css');
 
   addHook('portalDetailsUpdated', window.plugin.distanceToPortal.addDistance);
 

@@ -13,7 +13,7 @@ window.plugin.userLocation.user = { latlng:null, direction:null };
 window.plugin.userLocation.setup = function() {
   window.pluginCreateHook('pluginUserLocation');
 
-  $('<style>').prop('type', 'text/css').html('@include_string:user-location.css@').appendTo('head');
+  IITCTool.importCSS('user-location.css');
 
   var cssClass = PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
 
