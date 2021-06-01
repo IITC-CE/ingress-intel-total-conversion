@@ -153,12 +153,6 @@ window.plugin.keys.loadKeys = function() {
   if(keysObject.keys) plugin.keys.storeLocal(plugin.keys.KEY);
 }
 
-window.plugin.keys.setupCSS = function () {
-  $("<style>")
-    .prop("type", "text/css")
-    .html(IITCTool.importString('keys.css'))
-    .appendTo("head");
-}
 
 window.plugin.keys.setupContent = function() {
   plugin.keys.contentHTML = '<div id="keys-content-outer">'
@@ -229,7 +223,8 @@ var setup =  function() {
   // - pluginKeysUpdateKey
   // - pluginKeysRefreshAll
 
-  window.plugin.keys.setupCSS();
+  IITCTool.importCSS('keys.css');
+
   window.plugin.keys.setupContent();
   window.plugin.keys.loadLocal(plugin.keys.UPDATE_QUEUE);
   window.plugin.keys.loadKeys();

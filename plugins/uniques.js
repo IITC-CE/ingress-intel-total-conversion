@@ -400,14 +400,7 @@ window.plugin.uniques.highlighter = {
 }
 
 
-window.plugin.uniques.setupCSS = function () {
-  $('<style>')
-    .prop('type', 'text/css')
-    .html(IITCTool.importString('uniques.css'))
-    .appendTo('head');
-};
-
-window.plugin.uniques.setupContent = function() {
+window.plugin.uniques.setupContent = function () {
 	plugin.uniques.contentHTML = '<div id="uniques-container">'
 		+ '<label><input type="checkbox" id="visited" onclick="window.plugin.uniques.updateVisited($(this).prop(\'checked\'))"> Visited</label>'
 		+ '<label><input type="checkbox" id="captured" onclick="window.plugin.uniques.updateCaptured($(this).prop(\'checked\'))"> Captured</label>'
@@ -549,23 +542,23 @@ window.plugin.uniques.checkMissionWaypoints = function(mission) {
 };
 
 
-var setup = function() {
+var setup = function () {
 	// HOOKS:
 	// - pluginUniquesUpdateUniques
 	// - pluginUniquesRefreshAll
 
-	window.plugin.uniques.setupCSS();
+	IITCTool.importCSS('uniques.css');
 	window.plugin.uniques.setupContent();
 	window.plugin.uniques.loadLocal('uniques');
 	window.addPortalHighlighter('Uniques', window.plugin.uniques.highlighter);
 	window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
 	window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
 	window.plugin.uniques.registerFieldForSyncing();
-	
+
 	// to mark mission portals as visited
 	window.addHook('plugin-missions-mission-changed', window.plugin.uniques.onMissionChanged);
 	window.addHook('plugin-missions-loaded-mission', window.plugin.uniques.onMissionLoaded);
-	
+
 	if (window.plugin.portalslist) {
 		window.plugin.uniques.setupPortalsList();
 	}

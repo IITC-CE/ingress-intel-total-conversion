@@ -15,7 +15,7 @@ window.PLAYER_TRACKER_LINE_COLOUR = '#FF00FD';
 window.plugin.playerTracker = function() {};
 
 window.plugin.playerTracker.setup = function () {
-  $('<style>').prop('type', 'text/css').html(IITCTool.importString('player-tracker.css')).appendTo('head');
+  IITCTool.importCSS('player-tracker.css');
 
   var iconEnlImage = IITCTool.importImage('images/marker-green.png');
   var iconEnlRetImage = IITCTool.importImage('images/marker-green-2x.png');

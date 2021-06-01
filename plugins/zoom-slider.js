@@ -41,7 +41,7 @@ function loadLeafletZoomslider() {
   try {
     // https://github.com/kartena/Leaflet.zoomslider
     IITCTool.import('external/L.Control.Zoomslider.js');
-    $('<style>').html(IITCTool.importString('external/L.Control.Zoomslider.css')).appendTo('head');
+    IITCTool.importCSS('external/L.Control.Zoomslider.css');
 
   } catch (e) {
     console.error('L.Control.Zoomslider.js loading failed');

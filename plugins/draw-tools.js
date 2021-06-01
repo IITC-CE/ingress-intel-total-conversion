@@ -773,7 +773,7 @@ function loadExternals () {
   try {
     // https://github.com/bgrins/spectrum
     IITCTool.import('external/spectrum.js');
-    $('<style>').html(IITCTool.importString("external/spectrum.css")).appendTo('head');
+    IITCTool.importCSS('external/spectrum.css');
 
   } catch (e) {
     console.error('spectrum.js loading failed');
