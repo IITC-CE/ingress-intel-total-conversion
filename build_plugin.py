@@ -121,7 +121,11 @@ def bundle_code(_, path=None):
 
 
 def imgrepl(match, path=None):
-    fullname = path / match.group('filename')
+    filename = match.group('filename')
+    if filename.startswith("data:"):
+        return filename
+
+    fullname = path / filename
     return load_image(fullname)
 
 
