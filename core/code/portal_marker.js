@@ -67,7 +67,7 @@ L.PortalMarker = L.CircleMarker.extend({
   willUpdate: function (details) {
     // details are from a placeholder
     if (details.level === undefined) {
-      // if team differs and corresponding link/field is more recent
+      // if team differs and corresponding link is more recent (ignore field)
       if (this._details.timestamp < details.timestamp && this._details.team !== details.team)
         return true;
       // in any other case
