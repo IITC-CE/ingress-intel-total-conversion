@@ -61,7 +61,11 @@ L.PortalMarker = L.CircleMarker.extend({
       // in any other case
       return false;
     }
-    // new data
+    // more recent timestamp, this occurs when the data has changed because of:
+    //  - resonator deploy/upgrade
+    //  - mod deploy
+    //  - recharge/damage/decay
+    //  - portal edit (title, location, portal main picture)
     if (this._details.timestamp < details.timestamp)
       return true;
     // current marker is a placeholder, and details is real data
@@ -70,6 +74,8 @@ L.PortalMarker = L.CircleMarker.extend({
     // even if we get history that was missing ? is it even possible ?
     if (this._details.timestamp > details.timestamp)
       return false;
+
+    // this._details.timestamp === details.timestamp
 
     // get new history
     if (details.history) {
