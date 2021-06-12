@@ -41,7 +41,12 @@ def fill_meta(source, plugin_name, dist_path):
             if text == '==UserScript==':
                 raise UserWarning(f'{plugin_name}: wrong metablock detected')
         else:
-            key = key[1:]
+            if key[0] == '@':
+                key = key[1:]
+            else:  # continue previous line
+                meta[-1] += ' ' + text
+                continue
+
             keys.add(key)
             if key == 'version':
                 if not re.match(r'^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$', value):
