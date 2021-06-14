@@ -1,117 +1,82 @@
-// @author Rich Adams <rich@richadams.me>
+(function ($) {
+  function namespaced (name, ns) {
+    return name.replace(/\w+/g, '$&'+ns);
+  }
 
-// Implements a tap and hold functionality. If you click/tap and release, it will trigger a normal
-// click event. But if you click/tap and hold for 1s (default), it will trigger a taphold event instead.
+  var startevent = namespaced(window.PointerEvent ? 'pointerdown' : 'touchstart mousedown', '.taphold');
 
-;(function($)
-{
-    // Default options
-    var defaults = {
-        duration: 1000, // ms
-        clickHandler: null
+  var preventClick = {
+    isActive: false,
+
+    handler: function (event) {
+      preventClick.off();
+      event.stopPropagation();
+      event.preventDefault();
+    },
+
+    off: function () {
+      document.removeEventListener('click', preventClick.handler, {capture: true});
+      $(document).off('.enableclick');
+      preventClick.isActive = false;
+    },
+
+    on: function () {
+      if (!preventClick.isActive) {
+        preventClick.isActive = true;
+        $(document).on(namespaced(startevent,'.enableclick'), preventClick.off);
+        // https://stackoverflow.com/a/20290312/2520247
+        // Note: listeners directly attached to element may skip capture phase
+        //       that's why we add add our click-preventing handler to `document`
+        document.addEventListener('click', preventClick.handler, {capture: true});
+        // https://github.com/jquery/jquery/issues/1735
+      }
     }
+  };
 
-    // When start of a taphold event is triggered.
-    function startHandler(event)
-    {
-        var $elem = jQuery(this);
+  var _cancel = '.taphold.cancel';
+  var cancelevent = {
+    pointerdown: namespaced('pointerup pointercancel pointerout', _cancel),
+    touchstart: namespaced('touchend touchmove touchcancel', _cancel),
+    mousedown: namespaced('mouseup mouseout dragstart', _cancel)
+  };
 
-        // Merge the defaults and any user defined settings.
-        settings = jQuery.extend({}, defaults, event.data);
-
-        // If object also has click handler, store it and unbind (.off). Taphold will trigger the
-        // click itself, rather than normal propagation.
-        var events = jQuery._data(this, "events");
-        if (events && events.click)
-        {
-            // Find the one without a namespace defined.
-            for (var c in events.click)
-            {
-                if (events.click[c].namespace == "")
-                {
-                    var handler = events.click[c].handler
-                    $elem.data("taphold_click_handler", handler);
-                    $elem.off("click", handler);
-                    break;
-                }
-            }
-        }
-        // Otherwise, if a custom click handler was explicitly defined, then store it instead.
-        else if (typeof settings.clickHandler == "function")
-        {
-            $elem.data("taphold_click_handler", settings.clickHandler);
-        }
-
-        // Reset the flags
-        $elem.data("taphold_triggered", false); // If a hold was triggered
-        $elem.data("taphold_clicked",   false); // If a click was triggered
-        $elem.data("taphold_cancelled", false); // If event has been cancelled.
-
-        // Set the timer for the hold event.
-        $elem.data("taphold_timer",
-            setTimeout(function()
-            {
-                // If event hasn't been cancelled/clicked already, then go ahead and trigger the hold.
-                if (!$elem.data("taphold_cancelled")
-                    && !$elem.data("taphold_clicked"))
-                {
-                    // Trigger the hold event, and set the flag to say it's been triggered.
-                    $elem.trigger(jQuery.extend(event, jQuery.Event("taphold")));
-                    $elem.data("taphold_triggered", true);
-                }
-            }, settings.duration));
+  function startHandler (event) {
+    var data = event.data;
+    if (event.originalEvent.isPrimary === false) { return; }
+    if (typeof event.button === 'number') {
+      if (event.button !== 0) { return; }
+    } else if (event.touches) {
+      if (event.touches.length !== 1) { return; }
     }
+    var $elem = $(this);
+    var _timer = setTimeout(function () {
+      $elem.off(_cancel);
+      $elem.triggerHandler($.Event('taphold', {target: event.target}), data);
+      if (event.type === 'touchstart' || event.pointerType === 'touch') {
+        // prevent simulated mouse events https://w3c.github.io/touch-events/#mouse-events
+        $elem.one('touchend', data, function (e) { e.preventDefault(); });
+      } else {
+        preventClick.on();
+      }
+    }, data.delay);
+    $elem.on(cancelevent[event.type], data, function () {
+      $elem.off(_cancel);
+      clearTimeout(_timer); // cancel taphold
+    });
+  }
 
-    // When user ends a tap or click, decide what we should do.
-    function stopHandler(event)
-    {
-        var $elem = jQuery(this);
+  $.event.special.taphold = {
+    defaults: {
+      delay: 500
+    },
 
-        // If taphold has been cancelled, then we're done.
-        if ($elem.data("taphold_cancelled")) { return; }
+    setup: function (data) {
+      data = $.extend({}, $.event.special.taphold.defaults, data);
+      $(this).on(startevent, data, startHandler);
+    },
 
-        // Clear the hold timer. If it hasn't already triggered, then it's too late anyway.
-        clearTimeout($elem.data("taphold_timer"));
-
-        // If hold wasn't triggered and not already clicked, then was a click event.
-        if (!$elem.data("taphold_triggered")
-            && !$elem.data("taphold_clicked"))
-        {
-            // If click handler, trigger it.
-            if (typeof $elem.data("taphold_click_handler") == "function")
-            {
-                $elem.data("taphold_click_handler")(jQuery.extend(event, jQuery.Event("click")));
-            }
-
-            // Set flag to say we've triggered the click event.
-            $elem.data("taphold_clicked", true);
-        }
+    teardown: function () {
+      $(this).off('.taphold');
     }
-
-    // If a user prematurely leaves the boundary of the object we're working on.
-    function leaveHandler(event)
-    {
-        // Cancel the event.
-        $(this).data("taphold_cancelled", true);
-    }
-
-    // Determine if touch events are supported.
-    var touchSupported = ("ontouchstart" in window) // Most browsers
-                         || ("onmsgesturechange" in window); // Microsoft
-
-    var taphold = $.event.special.taphold =
-    {
-        setup: function(data)
-        {
-            $(this).on((touchSupported ? "touchstart"            : "mousedown"),  data, startHandler)
-                   .on((touchSupported ? "touchend"              : "mouseup"),    stopHandler)
-                   .on((touchSupported ? "touchmove touchcancel" : "mouseleave"), leaveHandler);
-        },
-        teardown: function(namespaces)
-        {
-            $(this).off((touchSupported ? "touchstart"            : "mousedown"),  startHandler)
-                   .off((touchSupported ? "touchend"              : "mouseup"),    stopHandler)
-                   .off((touchSupported ? "touchmove touchcancel" : "mouseleave"), leaveHandler);
-        }
-    };
+  };
 })(jQuery);

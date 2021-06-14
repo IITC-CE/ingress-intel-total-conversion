@@ -13,8 +13,7 @@
   used in: utils_misc.js (showPortalPosLinks)
 
 * https://github.com/IITC-CE/jquery-taphold
-  (originally forked from https://github.com/richadams/jquery-taphold, which is archived now)
-  taphold.js: 392d42e59b6494d6ec6a9fe3cc4ac3e43bf207dd
+  taphold.js: 5f069454d28c49a9b18228e75d5f18ec43e9a7e9
 
 
 ### Leaflet-related components:
