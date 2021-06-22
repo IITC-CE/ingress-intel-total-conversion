@@ -2,13 +2,10 @@
 
 window.aboutIITC = function () {
 
-  var iitc = script_info;
-  var iitcVersion = (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
-
-  var html = createDialogContent(iitc, iitcVersion);
+  var html = createDialogContent();
 
   window.dialog({
-    title: 'IITC ' + iitcVersion,
+    title: 'IITC ' + getIITCVersion(),
     id: 'iitc-about',
     html: html,
     width: 'auto',
@@ -17,7 +14,7 @@ window.aboutIITC = function () {
 };
 
 
-function createDialogContent(iitc, iitcVersion) {
+function createDialogContent() {
   var html = ''
     + '<div><b>About IITC</b></div> '
     + '<div>Ingress Intel Total Conversion</div> '
@@ -34,13 +31,13 @@ function createDialogContent(iitc, iitcVersion) {
     + '   </ul>'
     + '</div>'
     + '<hr>'
-    + '<div>Version: ' + iitcVersion + '</div>';
+    + '<div>Version: ' + getIITCVersion() + '</div>';
 
   if (typeof android !== 'undefined' && android.getVersionName) {
     html += '<div>IITC Mobile ' + android.getVersionName() + '</div>';
   }
 
-  var plugins = getPlugins(iitc);
+  var plugins = getPlugins();
   if (plugins) {
     html += '<div><p>Plugins:</p><ul>' + plugins + '</ul></div>';
   }
@@ -49,7 +46,7 @@ function createDialogContent(iitc, iitcVersion) {
 }
 
 
-function getPlugins(iitc) {
+function getPlugins() {
 
   // Plugins metadata come from 2 sources:
   // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
@@ -57,6 +54,7 @@ function getPlugins(iitc) {
   // - script.name/version/description: from GM_info object, passed to wrapper
   //   `script` may be not available if userscript manager does not provede GM_info
   //   (atm: IITC-Mobile for iOS)
+  var iitc = script_info;
   var pluginsInfo = window.bootPlugins.info;
 
   function prepData(info, idx) { // try to gather plugin metadata from both sources
@@ -109,7 +107,13 @@ function getPlugins(iitc) {
 
 
 function isStandardPlugin(plugin) {
-  return (plugin.build === script_info.buildName && plugin.date === script_info.dateTimeVersion)
+  return (plugin.build === script_info.buildName && plugin.date === script_info.dateTimeVersion);
+}
+
+
+function getIITCVersion() {
+  var iitc = script_info;
+  return (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
 }
 
 
