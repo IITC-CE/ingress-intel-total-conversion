@@ -1,4 +1,4 @@
-/* global script_info, app */
+/* global script_info, app, L */
 
 window.aboutIITC = function() {
   var html = createDialogContent();
