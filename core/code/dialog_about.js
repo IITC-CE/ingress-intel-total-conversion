@@ -1,4 +1,5 @@
-/* global script_info, android */
+// FIXME: global variable definition
+/* global script_info, android, L */
 
 window.aboutIITC = function () {
 
