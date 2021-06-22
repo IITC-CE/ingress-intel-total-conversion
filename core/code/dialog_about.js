@@ -47,62 +47,73 @@ function createDialogContent() {
 
 
 function getPlugins() {
+  var pluginsInfo = window.bootPlugins.info;
 
+  var extra = getIITCVersionAddition();
+
+  var plugins = pluginsInfo.map(convertPluginInfo)
+    .sort(function (a, b) { return a.name > b.name ? 1 : -1; })
+    .map(function (p) { return pluginInfoToString(p, extra); })
+    .join('\n');
+
+  return plugins;
+}
+
+function convertPluginInfo(info, index) {
   // Plugins metadata come from 2 sources:
   // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
   //   (only standard plugins)
   // - script.name/version/description: from GM_info object, passed to wrapper
   //   `script` may be not available if userscript manager does not provede GM_info
   //   (atm: IITC-Mobile for iOS)
-  var iitc = script_info;
-  var pluginsInfo = window.bootPlugins.info;
-
-  function prepData(info, idx) { // try to gather plugin metadata from both sources
-    var data = {
+  var result = {
       build: info.buildName,
       name: info.pluginId,
       date: info.dateTimeVersion,
-      error: info.error
+    error: info.error,
+    version: undefined,
+    description: undefined
     };
+
     var script = info.script;
     if (script) {
-      if (typeof script.name === 'string') { // cut non-informative name part
-        data.name = script.name.replace(/^IITC plugin: /, '');
+    if (typeof script.name === 'string') {
+      result.name = script.name.replace(/^IITC[\s-]+plugin:\s+/i, ''); // cut non-informative name part
       }
-      data.version = script.version;
-      data.description = script.description;
+    result.version = script.version;
+    result.description = script.description;
     }
-    if (!data.name) {
-      if (iitc.script) { // check if GM_info is available
-        data.name = '[unknown plugin: index ' + idx + ']';
-        data.description = "this plugin does not have proper wrapper; report to it's author";
+
+  if (!result.name) {
+    if (script_info.script) { // check if GM_info is available
+      result.name = '[unknown plugin: index ' + index + ']';
+      result.description = "this plugin does not have proper wrapper; report to it's author";
       } else { // userscript manager fault
-        data.name = '[3rd-party plugin: index ' + idx + ']';
+      result.name = '[3rd-party plugin: index ' + index + ']';
       }
     }
-    return data;
+
+  return result;
   }
 
-  var extra = iitc.script && iitc.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
-  extra = extra && extra[1];
+function pluginInfoToString(p, extra) {
+  var info = {
+    style: '',
+    description: p.description || '',
+    name: p.name,
+    verinfo: formatVerInfo(p, extra)
+  };
 
-  var plugins = pluginsInfo.map(prepData)
-    .sort(function (a, b) { return a.name > b.name ? 1 : -1; })
-    .map(function (p) {
-      p.style = '';
-      p.description = p.description || '';
+  if (isStandardPlugin(p)) {
+    info.style += 'color:darkgray;';
+  }
+
       if (p.error) {
-        p.style += 'text-decoration:line-through;';
-        p.description = p.error;
-      } else if (isStandardPlugin(p)) { // is standard plugin
-        p.style += 'color:darkgray;';
+    info.style += 'text-decoration:line-through;';
+    info.description = p.error;
       }
-      p.verinfo = formatVerInfo(p, extra) || '';
-      return L.Util.template('<li style="{style}" title="{description}">{name}{verinfo}</li>', p);
-    })
-    .join('\n');
 
-  return plugins;
+  return L.Util.template('<li style="{style}" title="{description}">{name}{verinfo}</li>', info);
 }
 
 
@@ -114,6 +125,12 @@ function isStandardPlugin(plugin) {
 function getIITCVersion() {
   var iitc = script_info;
   return (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
+}
+
+
+function getIITCVersionAddition() {
+  var extra = script_info.script && script_info.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
+  return extra && extra[1];
 }
 
 
@@ -136,4 +153,6 @@ function formatVerInfo(p, extra) {
       version: p.version
     });
   }
+
+  return '';
 }
