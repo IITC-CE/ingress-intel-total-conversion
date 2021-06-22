@@ -65,34 +65,34 @@ function convertPluginInfo(info, index) {
   //   `script` may be not available if userscript manager does not provede GM_info
   //   (atm: IITC-Mobile for iOS)
   var result = {
-      build: info.buildName,
-      name: info.pluginId,
-      date: info.dateTimeVersion,
+    build: info.buildName,
+    name: info.pluginId,
+    date: info.dateTimeVersion,
     error: info.error,
     version: undefined,
     description: undefined
-    };
+  };
 
-    var script = info.script;
-    if (script) {
+  var script = info.script;
+  if (script) {
     if (typeof script.name === 'string') {
       result.name = script.name.replace(/^IITC[\s-]+plugin:\s+/i, ''); // cut non-informative name part
-      }
+    }
     result.version = script.version;
     result.description = script.description;
-    }
+  }
 
   if (!result.name) {
     if (script_info.script) { // check if GM_info is available
       result.name = '[unknown plugin: index ' + index + ']';
       result.description = "this plugin does not have proper wrapper; report to it's author";
-      } else { // userscript manager fault
+    } else { // userscript manager fault
       result.name = '[3rd-party plugin: index ' + index + ']';
-      }
     }
+  }
 
   return result;
-  }
+}
 
 function pluginInfoToString(p, extra) {
   var info = {
@@ -106,10 +106,10 @@ function pluginInfoToString(p, extra) {
     info.style += 'color:darkgray;';
   }
 
-      if (p.error) {
+  if (p.error) {
     info.style += 'text-decoration:line-through;';
     info.description = p.error;
-      }
+  }
 
   return L.Util.template('<li style="{style}" title="{description}">{name}{verinfo}</li>', info);
 }
