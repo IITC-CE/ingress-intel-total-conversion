@@ -34,6 +34,10 @@ function createDialogContent() {
     + '<hr>'
     + '<div>Version: ' + getIITCVersion() + '</div>';
 
+  if (isShortOnLocalStorage()) {
+    html += '<div class="warning">You are running low on LocalStorage memory.<br/>Please free some space to prevent data loss.</div>';
+  }
+
   if (typeof android !== 'undefined' && android.getVersionName) {
     html += '<div>IITC Mobile ' + android.getVersionName() + '</div>';
   }
@@ -156,4 +160,18 @@ function formatVerInfo(p, extra) {
   }
 
   return '';
+}
+
+
+function isShortOnLocalStorage() {
+  var MINIMUM_FREE_SPACE = 100000;
+  try {
+    localStorage.setItem('_MEM_CHECK_', '#'.repeat(MINIMUM_FREE_SPACE));
+  } catch (e) {
+    console.error('out of localstorage space', e);
+    return true;
+  }
+
+  localStorage.removeItem('_MEM_CHECK_');
+  return false;
 }
