@@ -51,6 +51,11 @@ function createDialogContent() {
 function getPlugins() {
   var pluginsInfo = window.bootPlugins.info;
 
+  while (window.bootPlugins[0]) {
+    var plugin = window.bootPlugins.shift();
+    pluginsInfo.push(plugin.info || {});
+  }
+
   var extra = getIITCVersionAddition();
 
   var plugins = pluginsInfo.map(convertPluginInfo)
