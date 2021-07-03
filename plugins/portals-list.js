@@ -17,7 +17,7 @@ window.plugin.portalslist.neuP = 0;
 
 window.plugin.portalslist.filter = 0;
 
-window.plugin.portalslist.historySymbol = String.fromCodePoint(0x25CF);
+window.plugin.portalslist.historySymbol = String.fromCharCode(0x25CF);
 
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
