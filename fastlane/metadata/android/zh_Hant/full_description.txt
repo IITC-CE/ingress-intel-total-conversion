@@ -1,0 +1,8 @@
+重要提醒：此 app 是依據 Ingress 的官方資料運作，若您對本服務不滿意，在留下負評之前請先造訪 https://intel.ingress.com/ 比較其載入速度，並將其列入您撰寫評價的考量，感謝您。
+
+Ingress Intel Total Conversion - Community Edition (IITC-CE) 是擴充實境遊戲 Ingress 的一個網頁附加元件，它具有比標準 Ingress 地圖更快的速度，並提供許多額外功能。
+
+您可以在電腦瀏覽器（例如 Firefox 和 Chrome）上使用，也有適用於行動裝置的 app。
+
+網頁：https://iitc.app
+GitHub 版控庫：https://github.com/IITC-CE/ingress-intel-total-conversion/

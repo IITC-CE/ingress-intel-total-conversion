@@ -13,7 +13,7 @@
     <string name="download_description">最新のIntelパッケージを取得中…</string>
     <string name="pref_about_title">IITC Mobileについて</string>
     <string name="pref_misc_cat">その他</string>
-    <string name="activity_share">以下の方法で共有…</string>
+    <string name="activity_share">共有…</string>
     <string name="drawer_close">ナビゲーションメニューを閉じる</string>
     <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; 
 \n&lt;p&gt;&lt;b&gt;ビルドバージョン：${build_version}&lt;/b&gt;&lt;br&gt;&lt;b&gt;IITCバージョン：${build_version}&lt;/b&gt; 
@@ -122,4 +122,23 @@
     <string name="pref_update_plugins_interval_2_weeks">2週</string>
     <string name="bugtracker">バグトラッカー</string>
     <string name="iitc_website">IITC ウェブサイト</string>
+    <string name="appintro_navigation_description"> 画面の左端からスワイプ（またはメニューアイコンをクリック）すると、<i>ナビゲーションドロワー</i>が表示されます。
+\n 戻るアイコンをクリックするとマップに戻ります。
+\n
+\n いくつかのプラグイン（<i>portal list</i>や<i>bookmark</i>など）が<i>ナビゲーションドロワー</i>に表示され、素早くアクセスできるようになりました。
+\nこれらのプラグインはもう情報ペインには表示されません。 </string>
+    <string name="pref_hide_fullscreen_notification_bar">システム通知バー</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC アクションバー</string>
+    <string name="pref_hide_fullscreen_navigation_bar">システムナビゲーションバー</string>
+    <string name="pref_update_plugins_interval_disable">無効</string>
+    <string name="appintro_navigation_title">ナビゲーション</string>
+    <string name="plugins_official_plugins">公式プラグイン</string>
+    <string name="plugins_user_plugins">ユーザープラグイン</string>
+    <string name="appintro_nfc_description">両デバイスでNFCがサポートされていれば簡単にポータルリンクを送ることができます。
+\n
+\n両デバイスの後ろと後ろを合わせてスクリーンをタップするとマップを相手デバイスに送信できます。</string>
+    <string name="appintro_nfc_title">NFC権限</string>
+    <string name="pref_user_location_show_position_and_orientation">マップに位置と向きを表示</string>
+    <string name="pref_user_location_show_position">マップに位置を表示</string>
+    <string name="pref_user_location_dont_show">位置を表示しない</string>
 </resources>

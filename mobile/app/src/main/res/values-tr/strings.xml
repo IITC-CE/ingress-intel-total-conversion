@@ -22,4 +22,11 @@
     <string name="pref_ui_cat">Arayüz</string>
     <string name="iitc_website">IITC web sayfası</string>
     <string name="pref_about_title">IITC Mobil hakkında</string>
+    <string name="pref_disable_splash">Giriş Ekranını iptal et</string>
+    <string name="pref_enable_dev_mode_sum">Eğer aktif edilirse, bütün IITC kaynakları Android cihazının harici depolama alanından yüklenecek. Lütfen $IITC_folder/build/mobile/ konumundaki bütün kaynakları /sdcard/IITC_Mobile/dev/ konumuna kopyalayın.</string>
+    <string name="pref_enable_dev_mode">Geliştirici modunu aç</string>
+    <string name="pref_advanced_options_sum">Geliştirici seçenekleri ve gelişmiş ince ayarlar</string>
+    <string name="pref_advanced_options">Gelişmiş Ayarlar</string>
+    <string name="pref_persistent_zoom">şuanki yakınlaşma seviyesi</string>
+    <string name="bugtracker">Hata takipçisi</string>
 </resources>

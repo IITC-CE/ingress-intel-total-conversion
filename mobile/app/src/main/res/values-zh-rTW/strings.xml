@@ -4,17 +4,146 @@
     <string name="debug_run">運行</string>
     <string name="activity_settings">IITC 設置</string>
     <string name="activity_plugins">IITC 插件</string>
-    <string name="activity_share_to_clipboard">複製到剪貼板</string>
+    <string name="activity_share_to_clipboard">複製到剪貼簿</string>
     <string name="activity_save_to_file">保存至文件</string>
     <string name="action_settings">設置</string>
     <string name="drawer_open">顯示導航清單</string>
     <string name="drawer_close">隱藏導航清單</string>
     <string name="version">列印版本</string>
     <string name="close">關閉</string>
-    <string name="download_description">正在下載最新Intel進程…</string>
-    <string name="bugtracker">問題追蹤</string>
+    <string name="download_description">正在下載最新 Intel 封包…</string>
+    <string name="bugtracker">追蹤錯誤</string>
     <string name="iitc_website">IITC 網址</string>
     <string name="pref_about_title">有關 IITC Mobile</string>
     <string name="pref_ui_cat">界面</string>
     <string name="pref_misc_cat">其餘</string>
+    <string name="activity_share">使用…分享</string>
+    <string name="pref_user_zoom_sum">在支援多點觸控的裝置上仍顯示 +/- 按鈕。</string>
+    <string name="pref_dex_desktop_sum">在 DeX mode 啟用時強制使用電腦版介面</string>
+    <string name="pref_external_storage_sum">需要重啟 app！將快取資料寫入 SD 卡，需要掛載外部儲存裝置。</string>
+    <string name="pref_enable_dev_mode_sum">一旦啟用，將改由裝置的外部儲存空間載入所需檔案。請將所有資源由 $IITC_folder/build/mobile/ 複製至 /sdcard/IITC_Mobile/dev/。</string>
+    <string name="pref_secure_updates_sum">若是啟用，只有透過 https 的更新才會被處理</string>
+    <string name="pref_user_location_show_position_and_orientation">在地圖上顯示使用者位置及指向</string>
+    <string name="choose_account_to_login">選擇一個帳號登入</string>
+    <string name="password">密碼</string>
+    <string name="install_dialog_top">是否安裝外部插件？</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITC 行動版要求安裝以下 javascript 檔案： &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;請注意：&lt;/b&gt;來自外部的 Javascript 檔案可能含有有害的程序（例如間諜軟體等等）&lt;p&gt;您確定要繼續嗎？</string>
+    <string name="appintro_welcome_description">這是 Ingress 玩家不可或缺的輔助工具行動版。
+\n
+\n Ingress Intel Total Conversion (IITC) 是一個擴充程式，它在 Ingress 官方情報地圖上添加更多有用資訊。
+\n
+\n IITC 將完全改變您使用地圖的方式，它能夠透過硬體加速提高效率，並由各式插件擴充地圖的功能。</string>
+    <string name="appintro_navigation_description"> 拖曳自螢幕左邊（或是按下選單按鈕）以開啟<i>導覽列</i>。
+\n 點擊圖示即可回到地圖。
+\n
+\n 部份插件（例如 <i>portals list</i> 及 <i>bookmarks</i>）會直接出現在<i>導覽列</i>以供快速存取。
+\n 而這些插件將不會列於 info pane內。 </string>
+    <string name="toggle_map">切換顯示地圖</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;版本：${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC 版本：${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;作者：${cradle_link}, ${fkloft_link} 及其他貢獻者&lt;/b&gt; &lt;p&gt;&lt;b&gt;圖標設計：${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC 行動版&lt;/b&gt; 是 &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; 使用者腳本 針對行動裝置優化的使用介面。 &lt;h3&gt;社群資訊：&lt;/h3&gt; • 請造訪 ${website_link} 以取得更新以及電腦版。&lt;br&gt; • 加入 Telegram 頻道 ${tg_iitc_news_link} 以接收更多資訊，您也可以加入聊天室：${tg_iitc_group_link}。&lt;br&gt; • 加入 Reddit 社群 ${reddit_iitc_link} ——您可以盡情發問並與其他使用者討論。&lt;br&gt; • 請在此回報問題或是提出建議：${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Developers:&lt;/h3&gt; ${github_iitc_link} on Github. &lt;h3&gt;IITC Licence:&lt;/h3&gt; ${ISC_license_text}</string>
+    <string name="notice_info">&lt;p&gt;小提示：開啟資訊欄的更多方式： &lt;p&gt; • 長按 portal 一秒&lt;br&gt; • 點擊狀態列的左半部&lt;br&gt;</string>
+    <string name="notice_extplugins">&lt;p&gt;小提示：&lt;p&gt;IITC 行動版也可以載入外部插件！&lt;p&gt;欲添加外部插件，請點選右上角的 (+) 圖示，插件檔案之檔名應以 \'.user.js\' 為結尾，並被複製至&lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="pref_tweaks_cat">調整</string>
+    <string name="pref_plugins">IITC 插件</string>
+    <string name="pref_plugins_sum">插件可以擴充或調整 IITC 的使用體驗。以下列出大部分適用於電腦版的插件。</string>
+    <string name="pref_plugins_title">可用的插件</string>
+    <string name="pref_user_location">在地圖上顯示你的位置</string>
+    <string name="pref_persistent_zoom">固定縮放比例</string>
+    <string name="pref_persistent_zoom_sum">按下定位按鈕後不改變縮放比例</string>
+    <string name="pref_user_zoom">顯示縮放控制器</string>
+    <string name="pref_fullscreen">設定全螢幕模式</string>
+    <string name="pref_fullscreen_sum">在全螢幕模式下隱藏哪些物件（備註：你仍然可以使用導覽列控制此 app）</string>
+    <string name="pref_force_desktop">強制使用電腦模式</string>
+    <string name="pref_force_desktop_sum">在平板電腦上不錯，但在手機上看起來很糟</string>
+    <string name="pref_dex_desktop">支援 Samsung DeX Mode</string>
+    <string name="pref_language">語言(Language)</string>
+    <string name="pref_external_storage">利用外部儲存空間儲存圖磚快取</string>
+    <string name="pref_press_twice_to_exit">按兩次返回鍵離開</string>
+    <string name="pref_press_twice_to_exit_sum">避免誤觸導致退出</string>
+    <string name="pref_advanced_options">進階設定</string>
+    <string name="pref_advanced_options_sum">開發者選項及進階調整</string>
+    <string name="pref_enable_dev_mode">啟用開發者模式</string>
+    <string name="pref_disable_splash">關閉 app 載入畫面</string>
+    <string name="pref_fake_user_agent">偽裝為使用者特工</string>
+    <string name="pref_fake_user_agent_sum">讓 IITC 行動版呈現官方的電腦版的外觀。備註：如果想要使用電腦版 IITC 介面，請使用「強制使用電腦模式」</string>
+    <string name="pref_android_menu">調整 app 選單</string>
+    <string name="pref_android_menu_sum">調整 app 選單的可見度</string>
+    <string name="pref_update_plugins_cat">使用者插件更新</string>
+    <string name="pref_update_plugins_interval">設定插件更新間隔</string>
+    <string name="pref_update_plugins_interval_sum">多久檢查插件是否有新的版本</string>
+    <string name="pref_force_plugin_update">強制更新插件</string>
+    <string name="pref_force_plugin_update_sum">更新所有啟用的使用者插件</string>
+    <string name="pref_secure_updates">需要安全的更新方式</string>
+    <string name="pref_hide_fullscreen_notification_bar">系統通知列</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC 動作列</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC 狀態列</string>
+    <string name="pref_hide_fullscreen_navigation_bar">系統導覽列</string>
+    <string name="pref_user_location_dont_show">不顯示使用者位置</string>
+    <string name="pref_user_location_show_position">在地圖上顯示使用者位置</string>
+    <string name="pref_update_plugins_interval_disable">停用</string>
+    <string name="pref_update_plugins_interval_1_day">1 天</string>
+    <string name="pref_update_plugins_interval_2_days">2 天</string>
+    <string name="pref_update_plugins_interval_1_week">1 週</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 週</string>
+    <string name="menu_reload">重新載入 IITC</string>
+    <string name="menu_toggle_fullscreen">全螢幕</string>
+    <string name="menu_layer_chooser">圖層選擇器</string>
+    <string name="menu_locate">取得位置</string>
+    <string name="menu_clear_cookies">清除 cookies</string>
+    <string name="menu_search">搜尋</string>
+    <string name="menu_open_plugins">插件</string>
+    <string name="menu_debug">除錯</string>
+    <string name="menu_send_screenshot">傳送螢幕截圖</string>
+    <string name="menu_plugins_add">增加外部插件</string>
+    <string name="menu_copy">複製</string>
+    <string name="menu_delete">刪除</string>
+    <string name="login_failed">登入失敗。</string>
+    <string name="search_hint">搜尋位置</string>
+    <string name="intent_error">無法開啟連結</string>
+    <string name="msg_copied">已複製至剪貼簿…</string>
+    <string name="msg_prepare_screenshot">正在準備…</string>
+    <string name="msg_take_screenshot">正在截取螢幕…</string>
+    <string name="notice_do_not_show_again">不再顯示</string>
+    <string name="sign_in_to">登入至 %1$s %2$s</string>
+    <string name="sign_in_action">登入</string>
+    <string name="username">用戶名稱</string>
+    <string name="tab_map">定位</string>
+    <string name="tab_share">分享</string>
+    <string name="label_highlighter">標記工具</string>
+    <string name="label_base_layer">底圖</string>
+    <string name="label_overlay_layers">上層圖層</string>
+    <string name="appintro_location_title">位置存取權限</string>
+    <string name="appintro_location_description">本程式需要取得權限以標示您的準確位置。
+\n
+\n 請放心：我們不會外傳您的位置紀錄。</string>
+    <string name="appintro_nfc_title">NFC 使用權限</string>
+    <string name="appintro_nfc_description">您能夠將 portal 的連結快速傳送到另一個裝置上（雙方皆必須支援 NFC 功能）。
+\n
+\n 將兩台裝置背對背靠近，然後點擊螢幕，便可將地圖資訊傳送另一台裝置。</string>
+    <string name="appintro_navigation_title">導航</string>
+    <string name="appintro_layers_title">圖層/標記</string>
+    <string name="appintro_layers_description"> 自螢幕右邊緣滑出（或是按下動作列的圖層選擇器圖示）以開啟<i>圖層繪製器</i>。
+\n
+\n 您可以藉此更換底層地圖或是顯示/影藏地圖上的物件。 </string>
+    <string name="appintro_plugins_title">插件</string>
+    <string name="appintro_plugins_description">您現在可以開始使用 IITC-CE 了。
+\n
+\n 但是相對於官方 Intel 地圖，IITC 的主要優勢是能夠擴充功能的插件。
+\n
+\n 您可以在設定中添加官方或是外部的插件。</string>
+    <string name="show_appintro_screen_title">顯示介紹畫面</string>
+    <string name="plugins_permission_denied">存取遭拒。您無法添加插件。</string>
+    <string name="plugins_permission_granted">存取成功。請重複該動作。</string>
+    <string name="file_browser_choose_file">選擇檔案</string>
+    <string name="plugins_user_plugins">使用者插件</string>
+    <string name="plugins_official_plugins">官方插件</string>
+    <string name="toast_press_twice_to_exit">按兩次以離開</string>
+    <string name="plugin_updated">已更新插件</string>
+    <string name="pane_all">全部</string>
+    <string name="pane_faction">陣營</string>
+    <string name="pane_alerts">警報</string>
+    <string name="pane_info">資訊</string>
+    <string name="pane_map">地圖</string>
+    <string name="notice_sharing">&lt;p&gt;透過 &lt;em&gt;分享 portal&lt;/em&gt; 功能，您可以：&lt;p&gt; • 向其他人傳送 portal 連結&lt;br&gt; • 在其他 app 內查看 portal 的位置&lt;br&gt; • 在瀏覽器中開啟 portal 連結&lt;br&gt; &lt;p&gt;小提示：選取 Google 地圖（或其他導航軟體）即可快速導航至選取的 portal。&lt;p&gt;以上小提示同樣適用於 &lt;em&gt;永久連結&lt;/em&gt;。</string>
+    <string name="tab_browser">Intel</string>
+    <string name="file_browser_is_required">未能選取任何檔案。請安裝檔案瀏覽器！</string>
 </resources>

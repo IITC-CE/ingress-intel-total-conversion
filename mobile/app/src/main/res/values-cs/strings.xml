@@ -72,7 +72,7 @@
     <string name="debug_run">Spustit</string>
     <string name="activity_settings">Nastavení IITC Mobile</string>
     <string name="activity_plugins">IITC Pluginy</string>
-    <string name="activity_share">Sdílet přes…</string>
+    <string name="activity_share">Sdílení aktivity…</string>
     <string name="activity_save_to_file">Uložit do souboru</string>
     <string name="action_settings">Nastavení</string>
     <string name="drawer_open">Zobrazit ovládací menu</string>
@@ -107,4 +107,5 @@
 \nIngress Intel Total Conversion (IITC) je doplněk, který funguje jako překrytí oficiální Intel Ingress mapy.
 \n
 \nIITC úplně změní způsob, jakým používáte mapu, podstatně zvyšuje efektivitu použitím hardwarové akcelerace a rozšiřuje možnosti využití přes různé přídavné moduly.</string>
+    <string name="pref_user_location_show_position_and_orientation">Zobrazit polohu a orientaci na mapě</string>
 </resources>

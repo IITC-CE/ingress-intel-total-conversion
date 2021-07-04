@@ -33,12 +33,12 @@
     <string name="pref_fullscreen">Configurar o modo de tela cheia</string>
     <string name="pref_force_desktop">Forçar modo de área de trabalho</string>
     <string name="pref_force_desktop_sum">Bom para tablets, parece horrível em smartphones</string>
-    <string name="pref_dex_desktop">Suporte Samsung DeX Mode</string>
+    <string name="pref_dex_desktop">Suporte ao Samsung DeX Mode</string>
     <string name="pref_dex_desktop_sum">Força o modo área de trabalho quando o modo DeX estiver ativo</string>
     <string name="pref_external_storage">Mover o cache para o armazenamento externo</string>
     <string name="pref_press_twice_to_exit">Pressione o botão voltar duas vezes para sair</string>
     <string name="pref_press_twice_to_exit_sum">Evita saídas acidentais</string>
-    <string name="pref_advanced_options">Configurações Avançadas</string>
+    <string name="pref_advanced_options">Configurações avançadas</string>
     <string name="pref_advanced_options_sum">Opções de desenvolvedor e ajustes avançados</string>
     <string name="pref_enable_dev_mode">Ativar modo de desenvolvedor</string>
     <string name="pref_disable_splash">Desativar tela inicial</string>
@@ -84,7 +84,7 @@
     <string name="tab_browser">Intel</string>
     <string name="install_dialog_msg">&lt;p&gt;O IITCm foi solicitado a instalar o seguinte arquivo javascript:&lt;p&gt;%1$s&lt;p&gt;&lt;b&gt;Cuidado:&lt;/b&gt;Javascript de fontes externas pode conter código malicioso (spyware etc.)!&lt;p&gt;Tem certeza de que deseja continuar\?</string>
     <string name="drawer_close">Ocultar menu de navegação</string>
-    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Versão da Build: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;Versão do IITC: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;por ${cradle_link}, ${fkloft_link} e colaboradores&lt;/b&gt; &lt;p&gt;&lt;b&gt;Icone por ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; é um navegador móvel otimizado para o &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; userscript. &lt;h3&gt;Comunidade:&lt;/h3&gt; • Visite ${website_link} para novos lançamentos e a versão para desktop.&lt;br&gt; • Acompanhe o ${tg_iitc_news_link} canal de Telegram para anúncios e participe ${tg_iitc_group_link} do chat.&lt;br&gt; • Participe da ${reddit_iitc_link} Comunidade no Reddit - um lugar para pedir ajuda e discutir com outros usuários.&lt;br&gt; • Relatar problemas e propor melhorias em ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Desenvolvedores:&lt;/h3&gt; ${github_iitc_link} no Github. &lt;h3&gt;Licença do IITC:&lt;/h3&gt; ${ISC_license_text}</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Versão da Build: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;Versão do IITC: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;por ${cradle_link}, ${fkloft_link} e colaboradores&lt;/b&gt; &lt;p&gt;&lt;b&gt;Icone por ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; é um navegador móvel otimizado para o &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; userscript. &lt;h3&gt;Comunidade:&lt;/h3&gt; • Visite o ${website_link} para novos lançamentos e a versão para desktop.&lt;br&gt; • Acompanhe o ${tg_iitc_news_link} canal de Telegram para anúncios e participe ${tg_iitc_group_link} do chat.&lt;br&gt; • Participe da ${reddit_iitc_link} Comunidade no Reddit - um lugar para pedir ajuda e discutir com outros usuários.&lt;br&gt; • Relatar problemas e propor melhorias em ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Desenvolvedores:&lt;/h3&gt; ${github_iitc_link} no Github. &lt;h3&gt;Licença do IITC:&lt;/h3&gt; ${ISC_license_text}</string>
     <string name="notice_sharing">&lt;p&gt;Com o &lt;em&gt;Compartilhar portal /em&gt;, você pode:&lt;p&gt; • enviar o link do portal para outras pessoas &lt;br&gt; • exibir a posição do portal selecionado em outro aplicativo&lt;br&gt; • abrir o link do portal em um navegador da web &lt;br&gt;&lt;p&gt;Dica: Ao selecionar o Google Maps (ou qualquer outro software de navegação instalado), você pode navegar rapidamente para o portal selecionado.&lt;p&gt; Essas dicas também se aplicam ao &lt;em&gt;link permanente&lt;/em&gt;.</string>
     <string name="activity_settings">Configurações do IITC Mobile</string>
     <string name="pref_persistent_zoom_sum">Não altere o nível de zoom quando o botão localizar estiver pressionado</string>
@@ -98,7 +98,7 @@
 \n
 \n Mas a principal vantagem sobre o mapa oficial Intel do Ingress é a abundância de plugins que expandem os recursos.
 \n
-\n Você pode adicionar plug-ins oficiais ou externos nas configurações.</string>
+\n Você pode adicionar plugins oficiais ou externos nas configurações.</string>
     <string name="appintro_navigation_description"> Deslize a partir da borda esquerda da tela (ou clique no ícone de menu) para abrir a <i>gaveta de navegação</i>.
 \n Clique no ícone voltar para retornar ao mapa.
 \n
@@ -113,7 +113,7 @@
     <string name="pane_info">Informações</string>
     <string name="pane_alerts">Alertas</string>
     <string name="pane_faction">Facção</string>
-    <string name="pane_all">Todos</string>
+    <string name="pane_all">Atividades</string>
     <string name="plugin_updated">Plugin atualizado</string>
     <string name="toast_press_twice_to_exit">Pressione duas vezes para sair</string>
     <string name="plugins_user_plugins">Plugins do usuário</string>

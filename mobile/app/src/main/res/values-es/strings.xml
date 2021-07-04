@@ -34,7 +34,7 @@
     <string name="sign_in_action">Registrarse</string>
     <string name="password">Contraseña</string>
     <string name="username">Usuario</string>
-    <string name="sign_in_to">Registrarse en %1$s %2$s</string>
+    <string name="sign_in_to">Inicia sesión en %1$s %2$s</string>
     <string name="msg_take_screenshot">Realizando captura de pantalla…</string>
     <string name="msg_prepare_screenshot">Preparando...</string>
     <string name="msg_copied">Copiado al portapapeles…</string>
@@ -102,11 +102,11 @@
     <string name="pref_update_plugins_interval_1_week">1 semana</string>
     <string name="pref_update_plugins_interval_2_weeks">2 semanas</string>
     <string name="iitc_website">Sitio web de IITC</string>
-    <string name="appintro_welcome_description">"Esta es una versión para móvil del complemento indispensable para el jugador de Ingress.
+    <string name="appintro_welcome_description">Esta es una versión para móvil del complemento indispensable para el jugador de Ingress.
 \n
-\n  Ingress Intel Total Conversion (IITC) es un complemento que trabaja en superposición con el Intel map oficial de Ingress.
+\n Ingress Intel Total Conversion (IITC) es un complemento que trabaja en superposición con el Intel map oficial de Ingress.
 \n
-\n  IITC cambia por completo la forma en que trabajas con el mapa, aumenta significativamente su eficiencia al aplicar aceleración por hardware y expande sus capacidades mediante el uso de varios plugins."</string>
+\n IITC cambia por completo la forma en que trabajas con el mapa, aumenta significativamente su eficiencia al aplicar aceleración por hardware y expande sus capacidades mediante el uso de varios plugins.</string>
     <string name="appintro_location_title">Permisos de locación</string>
     <string name="appintro_location_description">IITC-CE Mobile requiere permiso para acceder a su ubicación para facilitar la navegación.
 \n
@@ -123,4 +123,14 @@
 \nHaz click en el icono atrás para regresar al mapa.
 \nAlgunos plugins (por ej. <i>portals list</i> y <i>bookmarks</i>) ahora aparecen en el <i>Cajón de navegación</i> para un acceso rápido.
 \n Ya no aparecerán en el panel de Info. </string>
+    <string name="plugins_user_plugins">Plugins de usuario</string>
+    <string name="file_browser_choose_file">Elegir archivo</string>
+    <string name="plugins_permission_granted">Permiso concedido. Por favor repita la acción.</string>
+    <string name="plugins_permission_denied">Permiso denegado, no puedes añadir plugins.</string>
+    <string name="show_appintro_screen_title">Mostrar pantalla de introducción</string>
+    <string name="appintro_plugins_description">Puedes comenzar a utilizar IITC-CE right ahora.
+\n
+\n La principal ventaja sobre el mapa oficial de intel es la abundancia de plugins que expanden las capacidades.
+\n
+\n Puedes añadir plugins oficiales o externos en los ajustes.</string>
 </resources>

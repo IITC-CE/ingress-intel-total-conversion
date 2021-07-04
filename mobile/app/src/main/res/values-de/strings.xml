@@ -11,7 +11,7 @@
     <string name="drawer_close">Navigationsmenü ausblenden</string>
     <string name="version">Version drucken</string>
     <string name="close">Schließen</string>
-    <string name="download_description">Lade das neueste intel Paket herunter…</string>
+    <string name="download_description">Lade das aktuellste Intelpaket herunter…</string>
     <string name="pref_about_title">Über IITC Mobile</string>
     <string name="activity_share">Teilen…</string>
     <string name="activity_plugins">IITC Plugins</string>
@@ -65,7 +65,7 @@
     <string name="msg_copied">In die Zwischenablage kopiert…</string>
     <string name="msg_prepare_screenshot">Bereite vor…</string>
     <string name="msg_take_screenshot">Screenshot wird erstellt…</string>
-    <string name="notice_do_not_show_again">Nicht nocheinmal anzeigen</string>
+    <string name="notice_do_not_show_again">Nicht mehr anzeigen</string>
     <string name="sign_in_to">Einloggen in %1$s %2$s</string>
     <string name="username">Benutzername</string>
     <string name="password">Passwort</string>
