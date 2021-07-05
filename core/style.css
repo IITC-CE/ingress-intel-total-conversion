@@ -305,6 +305,14 @@ em {
   table-layout: fixed;
   border-spacing: 0;
   border-collapse: collapse;
+  /* make the table always scrollable */
+  min-height: 100%;
+  margin-bottom: 1px;
+}
+
+/* expand last row if needed */
+#chat table tr:last-child {
+    height: 100%;
 }
 
 #chatinput table {
