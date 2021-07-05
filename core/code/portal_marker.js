@@ -189,7 +189,7 @@ L.PortalMarker = L.CircleMarker.extend({
   _style: function () {
     var dashArray = null;
     // dashed outline for placeholder portals
-    if (this._team != TEAM_NONE && this._level==0) dashArray = '1,2';
+    if (this.isPlaceholder()) dashArray = '1,2';
 
     return L.extend(this._scale(), portalBaseStyle, {
       color: COLORS[this._team],
@@ -210,7 +210,7 @@ L.PortalMarker = L.CircleMarker.extend({
     var lvlRadius = LEVEL_TO_RADIUS[level] * scale;
 
     // thinner outline for placeholder portals
-    if (this._team != TEAM_NONE && level==0) {
+    if (this.isPlaceholder()) {
       lvlWeight = 1;
     }
 
