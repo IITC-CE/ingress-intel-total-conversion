@@ -1,0 +1,8 @@
+ÖNEMLİ NOT: Bu uygulama Ingress tarafından barındırılan veriler üzerinde çalışır. Kötü bir puan bırakmadan önce lütfen https://intel.ingress.com/ adresini ziyaret edin ve yükleme süresini not edin ve lütfen yorumunuzu bırakırken bunu göz önünde bulundurun teşekkür ederiz.
+
+Ingress Intel Total Conversion - Community Edition (IITC-CE), Ingress artırılmış gerçeklik oyunu için bir tarayıcı eklentisidir. Standart Giriş haritasından daha hızlıdır ve daha birçok özellik sunar.
+
+Firefox ve Chrome gibi masaüstü tarayıcılarda ve mobil uygulama olarak kullanılabilir.
+
+Web sitesi: https://iitc.app
+GitHub Deposu: https://github.com/IITC-CE/ingress-intel-total-conversion/

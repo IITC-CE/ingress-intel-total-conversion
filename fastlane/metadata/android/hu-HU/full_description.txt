@@ -1,0 +1,8 @@
+FONTOS MEGJEGYZÉS: ez az alkalmazás az Ingress által tárolt adatokon fut. Mielőtt rossz értékelést hagyna, kérjük, próbálja meg a https://intel.ingress.com/ oldalt, és vegye figyelembe a betöltési időt, és kérjük, vegye figyelembe ezt, amikor elhagyja a véleményét köszönöm.
+
+Az Ingress Intel Total Conversion - Közösségi kiadás (IITC-CE) egy böngésző kiegészítő az Ingress kibővített valóság játékhoz. Gyorsabb, mint a szokásos Ingress térkép, és sokkal több funkciót kínál.
+
+Elérhető asztali böngészőkben, mint például a Firefox és a Chrome, valamint mobilalkalmazásként.
+
+Weboldal: https://iitc.app
+GitHub-tár: https://github.com/IITC-CE/ingress-intel-total-conversion/

@@ -1,0 +1,8 @@
+중요 참고 :이 앱은 Ingress에서 호스팅하는 데이터에서 실행됩니다. 나쁜 등급을 남기기 전에 https://intel.ingress.com/을 시도하고로드 시간을 기록하고 리뷰를 떠날 때이를 고려해 주셔서 감사합니다.
+
+Ingress Intel Total Conversion-Community Edition (IITC-CE)은 Ingress 증강 현실 게임용 브라우저 애드온입니다. 표준 Ingress지도보다 빠르며 더 많은 기능을 제공합니다.
+
+Firefox 및 Chrome과 같은 데스크톱 브라우저 및 모바일 애플리케이션에서 사용할 수 있습니다.
+
+웹 사이트 : https://iitc.app
+GitHub 리포지토리 : https://github.com/IITC-CE/ingress-intel-total-conversion/
