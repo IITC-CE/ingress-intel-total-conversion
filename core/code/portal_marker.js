@@ -36,6 +36,25 @@ function handler_portal_contextmenu (e) {
 L.PortalMarker = L.CircleMarker.extend({
   options: {},
 
+  statics: {
+    // base style
+    portalBaseStyle: {
+      stroke: true,
+      opacity: 1,
+      fill: true,
+      fillOpacity: 0.5,
+      interactive: true,
+    },
+    // placeholder style
+    placeholderStyle: {
+      dashArray: '1,2',
+      weight: 1,
+    },
+    // portal level   0  1  2  3  4  5  6  7  8
+    LEVEL_TO_WEIGHT: [2, 2, 2, 2, 2, 3, 3, 4, 4],
+    LEVEL_TO_RADIUS: [7, 7, 7, 7, 8, 8, 9, 10, 11],
+  },
+
   initialize: function(latlng, data) {
     L.CircleMarker.prototype.initialize.call(this, latlng);
     this._selected = data.guid === selectedPortal;
@@ -194,9 +213,9 @@ L.PortalMarker = L.CircleMarker.extend({
   _style: function () {
     var dashArray = null;
     // dashed outline for placeholder portals
-    if (this.isPlaceholder()) dashArray = '1,2';
+    if (this.isPlaceholder()) dashArray = L.PortalMarker.placeholderStyle.dashArray;
 
-    return L.extend(this._scale(), portalBaseStyle, {
+    return L.extend(this._scale(), L.PortalMarker.portalBaseStyle, {
       color: COLORS[this._team],
       fillColor: COLORS[this._team],
       dashArray: dashArray
@@ -205,18 +224,14 @@ L.PortalMarker = L.CircleMarker.extend({
   _scale: function () {
     var scale = window.portalMarkerScale();
 
-    //   portal level      0  1  2  3  4  5  6  7  8
-    var LEVEL_TO_WEIGHT = [2, 2, 2, 2, 2, 3, 3, 4, 4];
-    var LEVEL_TO_RADIUS = [7, 7, 7, 7, 8, 8, 9,10,11];
-
     var level = Math.floor(this._level || 0);
 
-    var lvlWeight = LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
-    var lvlRadius = LEVEL_TO_RADIUS[level] * scale;
+    var lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
+    var lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
 
     // thinner outline for placeholder portals
     if (this.isPlaceholder()) {
-      lvlWeight = 1;
+      lvlWeight = L.PortalMarker.placeholderStyle.weight;
     }
 
     return {
@@ -271,33 +286,30 @@ window.setMarkerStyle = function(marker, selected) {
 window.getMarkerStyleOptions = function (details) {
   var scale = window.portalMarkerScale();
 
-  //   portal level      0  1  2  3  4  5  6  7  8
-  var LEVEL_TO_WEIGHT = [2, 2, 2, 2, 2, 3, 3, 4, 4];
-  var LEVEL_TO_RADIUS = [7, 7, 7, 7, 8, 8, 9, 10, 11];
-
   var level = Math.floor(details.level || 0);
 
-  var lvlWeight = LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
-  var lvlRadius = LEVEL_TO_RADIUS[level] * scale;
+  var lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
+  var lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
 
   var dashArray = null;
   // thinner and dashed outline for placeholder portals
   if (details.team !== window.TEAM_NONE && level === 0) {
-    lvlWeight = 1;
-    dashArray = '1,2';
+    lvlWeight = L.PortalMarker.placeholderStyle.weight;
+    dashArray = L.PortalMarker.placeholderStyle.dashArray;
   }
 
-  var options = {
-    radius: lvlRadius,
-    stroke: true,
-    color: window.COLORS[details.team],
-    weight: lvlWeight,
-    opacity: 1,
-    fill: true,
-    fillColor: window.COLORS[details.team],
-    fillOpacity: 0.5,
-    dashArray: dashArray,
-  };
+  var options = L.extend(
+    {
+      radius: lvlRadius,
+      weight: lvlWeight,
+    },
+    L.PortalMarker.portalBaseStyle,
+    {
+      color: window.COLORS[details.team],
+      fillColor: window.COLORS[details.team],
+      dashArray: dashArray,
+    }
+  );
 
   return options;
 };
