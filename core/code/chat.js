@@ -1181,6 +1181,10 @@ window.chat.setupTabs = function () {
     chat.initChannelData(entry);
     createCommTab(entry);
   });
+  // legacy compatibility
+  window.chat._public = window.chat._channels.all;
+  window.chat._faction = window.chat._channels.faction;
+  window.chat._alerts = window.chat._channels.alert;
 };
 
 /**
