@@ -1,7 +1,7 @@
 // @author         cradle
 // @name           User Location
 // @category       Tweaks
-// @version        0.2.1
+// @version        0.2.2
 // @description    Show user location marker on map
 
 

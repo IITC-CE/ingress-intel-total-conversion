@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.8.0
+// @version        0.8.1
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 

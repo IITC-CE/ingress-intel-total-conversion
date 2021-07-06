@@ -1,7 +1,7 @@
 // @author         fragger
 // @name           Zoom slider
 // @category       Controls
-// @version        0.2.0
+// @version        0.2.1
 // @description    Show a zoom slider on the map instead of the zoom buttons.
 
 
