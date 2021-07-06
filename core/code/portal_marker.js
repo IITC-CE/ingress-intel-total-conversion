@@ -53,10 +53,7 @@ L.PortalMarker = L.CircleMarker.extend({
     this.on('contextmenu', handler_portal_contextmenu);
   },
   willUpdate: function (details) {
-    // portal location edit
-    if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6)
-      return true;
-    // placeholder
+    // details are from a placeholder
     if (details.level === undefined) {
       // if team differs and corresponding link/field is more recent
       if (this._details.timestamp < details.timestamp && this._details.team !== details.team)
