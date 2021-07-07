@@ -58,7 +58,7 @@ deploy:
   # deploy to google play
   - provider: script
     skip_cleanup: true
-    script: if [[ "$TRAVIS_COMMIT_MESSAGE" != *"[Release]"* || $BUILD_TYPE == "release" ]]; then bundle exec fastlane deploy_$BUILD_TYPE; fi
+    script: if [[ "$TRAVIS_COMMIT_MESSAGE" != *"[Release]"* || "$BUILD_TYPE" == "release" ]]; then bundle exec fastlane deploy_$BUILD_TYPE; fi
     on:
       branch: master
       tags: true
