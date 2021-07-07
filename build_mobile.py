@@ -20,7 +20,7 @@ defaults = {
     ],
 }
 iitc_script = 'total-conversion-build.user.js'
-buildtypes = {'debug', 'beta', 'release'}
+buildtypes = {'debug', 'beta', 'release', 'copyonly'}
 distributiontypes = {'apk', 'aab'}
 
 
@@ -82,6 +82,9 @@ def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
     )
     user_location_plug = source / 'plugins' / 'user-location.js'
     build_plugin.process_file(user_location_plug, assets_dir)
+
+    if settings.gradle_buildtype == 'copyonly':
+        return
 
     for dist_ext in settings.gradle_distributiontypes:
         if dist_ext not in distributiontypes:
