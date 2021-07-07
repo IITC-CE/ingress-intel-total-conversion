@@ -58,9 +58,10 @@ deploy:
   # deploy to google play
   - provider: script
     skip_cleanup: true
-    script: bundle exec fastlane deploy_$BUILD_TYPE
+    script: if [[ "$TRAVIS_COMMIT_MESSAGE" != *"[Release]"* or BUILD_TYPE = "release" ]]; then bundle exec fastlane deploy_$BUILD_TYPE; fi
     on:
       branch: master
+      tags: true
 
   # deploy to github releases
   - provider: releases
