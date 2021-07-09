@@ -4,6 +4,17 @@
 // @version        0.2.2
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
+var MissionOrder = {
+  Sequential: 1,
+  NonSequential: 2,
+  Hidden: 3
+};
+
+var WaypointTarget = {
+  Portal: 1,
+  FieldTrip: 2
+};
+
 
 var decodeWaypoint = function (data) {
   var result = {
@@ -23,17 +34,23 @@ var decodeWaypoint = function (data) {
       'View this Field Trip Waypoint',
       'Enter the Passphrase'][data[4]],
   };
-  if (result.typeNum === 1 && data[5]) {
-    result.portal = window.decodeArray.portal(data[5], 'summary');
-    // Portal waypoints have the same guid as the respective portal.
-    result.portal.guid = result.guid;
-  } else if (result.typeNum === 2 && data[5]) { // field trip!
-    result.portal = {
-      // data[5] = [ "f", <latE6>, <lngE6> ]
-      latE6: data[5][1],
-      lngE6: data[5][2],
-      title: result.title
-    };
+
+  if (data[5]) {
+    switch (result.typeNum) {
+      case WaypointTarget.Portal:
+        result.portal = window.decodeArray.portal(data[5], 'summary');
+        // Portal waypoints have the same guid as the respective portal.
+        result.portal.guid = result.guid;
+        break;
+      case WaypointTarget.FieldTrip:
+        // data[5] = [ "f", <latE6>, <lngE6> ]
+        result.portal = {
+          latE6: data[5][1],
+          lngE6: data[5][2],
+          title: result.title
+        };
+        break;
+    }
   }
   return result;
 };
@@ -471,7 +488,7 @@ window.plugin.missions = {
 
     if (!distances.length) return;
 
-    if (mission.typeNum === 2) { // non-sequential
+    if (mission.typeNum === MissionOrder.NonSequential) {
       distances.sort(function (a, b) { return a.distance - b.distance; });
     }
 
@@ -539,8 +556,8 @@ window.plugin.missions = {
         ev.preventDefault();
         return false;
       }, false);
-    } else if (waypoint.typeNum === 1) {
-      // if typeNum === 1 but portal is undefined, this waypoint is a deleted portal.
+    } else if (waypoint.typeNum === WaypointTarget.Portal) {
+      // if portal is undefined, this waypoint is a deleted portal.
       var title = container.appendChild(document.createElement('span'));
       container.classList.add('unavailable');
     } else {
@@ -776,7 +793,7 @@ window.plugin.missions = {
       opacity: 1,
       weight: 2,
       interactive: false,
-      dashArray: (mission.typeNum == 2 /* non-sequential */ ? '1,5' : undefined),
+      dashArray: (mission.typeNum === MissionOrder.NonSequential ? '1,5' : undefined),
     });
     this.missionLayer.addLayer(line);
     markers.push(line);
