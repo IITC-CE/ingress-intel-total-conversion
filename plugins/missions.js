@@ -13,7 +13,15 @@ var decodeWaypoint = function (data) {
     typeNum: data[3],
     type: [null, 'Portal', 'Field Trip'][data[3]],
     objectiveNum: data[4],
-    objective: [null, 'Hack this Portal', 'Capture or Upgrade Portal', 'Create Link from Portal', 'Create Field from Portal', 'Install a Mod on this Portal', 'Take a Photo', 'View this Field Trip Waypoint', 'Enter the Passphrase'][data[4]],
+    objective: [null,
+      'Hack this Portal',
+      'Capture or Upgrade Portal',
+      'Create Link from Portal',
+      'Create Field from Portal',
+      'Install a Mod on this Portal',
+      'Take a Photo',
+      'View this Field Trip Waypoint',
+      'Enter the Passphrase'][data[4]],
   };
   if (result.typeNum === 1 && data[5]) {
     result.portal = window.decodeArray.portal(data[5], 'summary');
@@ -22,6 +30,7 @@ var decodeWaypoint = function (data) {
   }
   return result;
 };
+
 var decodeMission = function (data) {
 
   if (typeof (data) !== 'object' || data.length === 0) return;
@@ -42,6 +51,7 @@ var decodeMission = function (data) {
     image: data[10]
   };
 };
+
 var decodeMissionSummary = function (data) {
   return {
     guid: data[0],
@@ -51,6 +61,7 @@ var decodeMissionSummary = function (data) {
     medianCompletionTimeMs: data[4]
   };
 };
+
 var timeToRemaining = function (t) {
   var data = parseInt(t / 86400) + 'd ' + (new Date(t % 86400 * 1000)).toUTCString().replace(/.*(\d{2}):(\d{2}):(\d{2}).*/, '$1h $2m $3s');
   data = data.replace('0d', '');
@@ -58,6 +69,8 @@ var timeToRemaining = function (t) {
   data = data.replace('00m', '');
   return data.trim();
 };
+
+
 window.plugin.missions = {
   // 3 days.
   missionCacheTime: 3 * 24 * 3600 * 1E3,
@@ -78,10 +91,7 @@ window.plugin.missions = {
     '@include_img:images/mission-type-hidden.png@',
   ],
 
-  onPortalSelected: function (event) {
-    /*if(event.selectedPortalGuid === event.unselectedPortalGuid) {
-        return;
-    }*/
+  onPortalSelected: function () {
     if (window.selectedPortal === null) {
       return;
     }
@@ -136,7 +146,7 @@ window.plugin.missions = {
       button.textContent = 'Zoom to mission';
       button.addEventListener('click', function () {
         me.zoomToMission(mission);
-        show('map');
+        window.show('map');
       }, false);
 
       var li = this.tabBar.appendChild(document.createElement('li'));
@@ -167,10 +177,11 @@ window.plugin.missions = {
       tabs.tabs('refresh');
       tabs.find('.ui-tabs-nav').sortable('refresh');
       tabs.tabs('option', 'active', -1);
-      if (window.isSmartphone())
-        show('plugin-missions');
+      if (window.isSmartphone()) {
+        window.show('plugin-missions');
+      }
     } else {
-      dialog({
+      window.dialog({
         id: 'plugin-mission-details-' + id,
         title: mission.title,
         height: 'auto',
@@ -194,7 +205,7 @@ window.plugin.missions = {
   },
 
   showMissionListDialog: function (missions) {
-    dialog({
+    window.dialog({
       html: this.renderMissionList(missions),
       height: 'auto',
       width: '400px',
@@ -213,7 +224,7 @@ window.plugin.missions = {
   },
 
   zoomToMission: function (mission) {
-    map.fitBounds(this.getMissionBounds(mission), { maxZoom: DEFAULT_ZOOM });
+    window.map.fitBounds(this.getMissionBounds(mission), { maxZoom: DEFAULT_ZOOM });
   },
 
   getMissionBounds: function (mission) {
@@ -227,7 +238,6 @@ window.plugin.missions = {
   },
 
   loadMissionsInBounds: function (bounds, callback, errorcallback) {
-    var me = this;
     window.postAjax('getTopMissionsInBounds', {
       northE6: ((bounds.getNorth() * 1000000) | 0),
       southE6: ((bounds.getSouth() * 1000000) | 0),
@@ -281,9 +291,10 @@ window.plugin.missions = {
       if (errorcallback) {
         errorcallback(error);
       }
-      // awww   
+      // awww
     });
   },
+
   loadMission: function (guid, callback, errorcallback) {
     var me = this;
     // TODO: we need to refresh data often enough, portal data can quickly go stale
@@ -337,13 +348,12 @@ window.plugin.missions = {
     var container = document.createElement('div');
     container.className = 'plugin-mission-summary';
     container.dataset['mission_mid'] = mission.guid;
-    if (checked)
-      container.classList.add('checked');
+    if (checked) { container.classList.add('checked'); }
 
     var img = container.appendChild(document.createElement('img'));
     img.src = mission.image;
-    img.addEventListener('click', function (ev) {
-      plugin.missions.toggleMission(mission.guid);
+    img.addEventListener('click', function () {
+      window.plugin.missions.toggleMission(mission.guid);
     }, false);
 
     var title = container.appendChild(document.createElement('a'));
@@ -358,7 +368,7 @@ window.plugin.missions = {
 
     if (cachedMission) {
       var span = container.appendChild(document.createElement('span'));
-      span.className = 'nickname ' + (cachedMission.authorTeam === 'R' ? 'res' : 'enl')
+      span.className = 'nickname ' + (cachedMission.authorTeam === 'R' ? 'res' : 'enl');
       span.textContent = cachedMission.authorNickname;
 
       var len = cachedMission.waypoints.filter(function (waypoint) {
@@ -366,7 +376,7 @@ window.plugin.missions = {
       }).map(function (waypoint) {
         return L.latLng(waypoint.portal.latE6 / 1E6, waypoint.portal.lngE6 / 1E6);
       }).map(function (latlng1, i, latlngs) {
-        if (i == 0) return 0;
+        if (i === 0) return 0;
         var latlng2 = latlngs[i - 1];
         return latlng1.distanceTo(latlng2);
       }).reduce(function (a, b) {
@@ -374,10 +384,11 @@ window.plugin.missions = {
       }, 0);
 
       if (len > 0) {
-        if (len > 1000)
+        if (len > 1000) {
           len = Math.round(len / 100) / 10 + 'km';
-        else
+        } else {
           len = Math.round(len * 10) / 10 + 'm';
+        }
 
         var infoLength = container.appendChild(document.createElement('span'));
         infoLength.className = 'plugin-mission-info length help';
@@ -392,7 +403,7 @@ window.plugin.missions = {
         infoDistance.className = 'plugin-mission-info distance help';
         infoDistance.title = 'Distance to this mission. Click to update.';
         infoDistance.addEventListener('click', function () {
-          plugin.missions.renderMissionDistance(cachedMission, infoDistance);
+          window.plugin.missions.renderMissionDistance(cachedMission, infoDistance);
         }, false);
         this.renderMissionDistance(cachedMission, infoDistance);
       }
@@ -434,8 +445,8 @@ window.plugin.missions = {
     return container;
   },
 
-  renderMissionDistance: function (mission /* cached mission, full details*/, container) {
-    if (!(plugin.distanceToPortal && plugin.distanceToPortal.currentLoc)) return;
+  renderMissionDistance: function (mission, container) {
+    if (!(window.plugin.distanceToPortal && window.plugin.distanceToPortal.currentLoc)) return;
 
     var distances = mission.waypoints
       .filter(function (waypoint) {
@@ -443,7 +454,7 @@ window.plugin.missions = {
       })
       .map(function (waypoint) {
         var position = L.latLng(waypoint.portal.latE6 / 1E6, waypoint.portal.lngE6 / 1E6);
-        var distance = position.distanceTo(plugin.distanceToPortal.currentLoc);
+        var distance = position.distanceTo(window.plugin.distanceToPortal.currentLoc);
         return {
           waypoint: waypoint,
           distance: distance,
@@ -453,7 +464,7 @@ window.plugin.missions = {
 
     if (!distances.length) return;
 
-    if (mission.typeNum == 2) { // non-sequential
+    if (mission.typeNum === 2) { // non-sequential
       distances.sort(function (a, b) { return a.distance - b.distance; });
     }
 
@@ -483,7 +494,7 @@ window.plugin.missions = {
     desc.className = 'description';
     desc.textContent = mission.description;
 
-    var list = container.appendChild(document.createElement('ol'))
+    var list = container.appendChild(document.createElement('ol'));
     mission.waypoints.forEach(function (waypoint, index) {
       list.appendChild(this.renderMissionWaypoint(waypoint, index, mission));
     }, this);
@@ -506,16 +517,18 @@ window.plugin.missions = {
 
       title.href = perma;
       title.addEventListener('click', function (ev) {
-        if (window.isSmartphone())
-          show('map');
-        selectPortalByLatLng(lat, lng);
+        if (window.isSmartphone()) {
+          window.show('map');
+        }
+        window.selectPortalByLatLng(lat, lng);
         ev.preventDefault();
         return false;
       }, false);
       title.addEventListener('dblclick', function (ev) {
-        if (window.isSmartphone())
-          show('map');
-        zoomToAndShowPortal(waypoint.portal.guid, [lat, lng]);
+        if (window.isSmartphone()) {
+          window.show('map');
+        }
+        window.zoomToAndShowPortal(waypoint.portal.guid, [lat, lng]);
         ev.preventDefault();
         return false;
       }, false);
@@ -528,22 +541,22 @@ window.plugin.missions = {
     }
 
     title.className = 'title';
-    if (waypoint.title)
+    if (waypoint.title) {
       title.textContent = waypoint.title;
-    else if (waypoint.portal && waypoint.portal.title)
+    } else if (waypoint.portal && waypoint.portal.title) {
       title.textContent = waypoint.portal.title;
-    else
+    } else {
       title.textContent = 'Unknown';
+    }
 
     var mwpid = mission.guid + '-' + index + '-' + waypoint.guid;
-    var checked = this.checkedWaypoints[mwpid];
 
     var label = container.appendChild(document.createElement('label'));
 
     var checkbox = label.appendChild(document.createElement('input'));
     checkbox.type = 'checkbox';
     checkbox.addEventListener('change', function () {
-      plugin.missions.toggleWaypoint(mission.guid, mwpid);
+      window.plugin.missions.toggleWaypoint(mission.guid, mwpid);
     }, false);
     checkbox.dataset['mission_mwpid'] = mwpid;
 
@@ -556,7 +569,7 @@ window.plugin.missions = {
   renderPortalCircle: function (portal) {
     var team = TEAM_TO_CSS[getTeam(portal)];
     var resCount = portal.resCount;
-    var level = resCount == 0 ? 0 : portal.level; // we want neutral portals to be level 0
+    var level = resCount === 0 ? 0 : portal.level; // we want neutral portals to be level 0
 
     var container = document.createElement('div');
     container.className = 'plugin-mission-portal-indicator help ' + team;
@@ -573,10 +586,7 @@ window.plugin.missions = {
   },
 
   toggleWaypoint: function (mid, mwpid, dontsave) {
-    if (this.checkedWaypoints[mwpid])
-      delete this.checkedWaypoints[mwpid];
-    else
-      this.checkedWaypoints[mwpid] = true;
+    if (this.checkedWaypoints[mwpid]) { delete this.checkedWaypoints[mwpid]; } else { this.checkedWaypoints[mwpid] = true; }
 
     window.runHooks('plugin-missions-waypoint-changed', { mwpid: mwpid, local: true, });
     if (!dontsave) {
@@ -605,10 +615,7 @@ window.plugin.missions = {
   },
 
   toggleMission: function (mid) {
-    if (this.checkedMissions[mid])
-      delete this.checkedMissions[mid];
-    else
-      this.checkedMissions[mid] = true;
+    if (this.checkedMissions[mid]) { delete this.checkedMissions[mid]; } else { this.checkedMissions[mid] = true; }
 
     window.runHooks('plugin-missions-mission-changed', { mid: mid, local: true, });
     this.checkedMissionsUpdateQueue[mid] = true;
@@ -777,7 +784,7 @@ window.plugin.missions = {
 
   highlightMissionLayers: function (markers) {
     // layer.bringToFront() will break if the layer is not visible
-    var bringToFront = map.hasLayer(plugin.missions.missionLayer);
+    var bringToFront = window.map.hasLayer(window.plugin.missions.missionLayer);
 
     this.missionLayer.eachLayer(function (layer) {
       var active = (markers.indexOf(layer) !== -1);
@@ -801,15 +808,16 @@ window.plugin.missions = {
       }
 
       this.markedStarterPortals[guid] = L.circleMarker(
-        L.latLng(portal.options.data.latE6 / 1E6, portal.options.data.lngE6 / 1E6), {
-        radius: portal.options.radius + Math.ceil(portal.options.radius / 2),
-        weight: 3,
-        opacity: 1,
-        color: this.MISSION_COLOR_START,
-        fill: false,
-        dashArray: null,
-        interactive: false
-      }
+        L.latLng(portal.options.data.latE6 / 1E6, portal.options.data.lngE6 / 1E6),
+        {
+          radius: portal.options.radius + Math.ceil(portal.options.radius / 2),
+          weight: 3,
+          opacity: 1,
+          color: this.MISSION_COLOR_START,
+          fill: false,
+          dashArray: null,
+          interactive: false
+        }
       );
       this.missionStartLayer.addLayer(this.markedStarterPortals[guid]);
     } else if (type === 'delete') {
@@ -880,7 +888,7 @@ window.plugin.missions = {
       delete this[fieldName + 'UpdatingQueue'][e.property];
     } else {
       // Remote update
-      delete this[fieldName + 'UpdateQueue'][e.property]
+      delete this[fieldName + 'UpdateQueue'][e.property];
       this.storeLocal(fieldName + 'UpdateQueue');
 
       if (fieldName === 'checkedMissions') {
@@ -942,14 +950,15 @@ window.plugin.missions = {
         return;
       }
 
-      if (query.results.some(function (result) { return result.mission && (result.mission.guid == mission.guid); }))
+      if (query.results.some(function (result) { return result.mission && (result.mission.guid === mission.guid); })) {
         // mission already in list (a cached mission may be found again via missions in bounds)
         return;
+      }
 
       var result = {
-        title: escapeHtmlSpecialChars(mission.title),
+        title: window.escapeHtmlSpecialChars(mission.title),
         description: mission.description
-          ? 'Recently viewed mission: <small class="plugin-mission-search-result-desc">' + escapeHtmlSpecialChars(mission.description) + '</small>'
+          ? 'Recently viewed mission: <small class="plugin-mission-search-result-desc">' + window.escapeHtmlSpecialChars(mission.description) + '</small>'
           : 'Mission in view',
         icon: 'https://commondatastorage.googleapis.com/ingress.com/img/tm_icons/tm_cyan.png',
         onSelected: this.onSearchResultSelected.bind(this),
@@ -971,7 +980,7 @@ window.plugin.missions = {
 
   onSearchResultSelected: function (result, event) {
     if (result.bounds) {
-      map.fitBounds(result.bounds, { maxZoom: DEFAULT_ZOOM });
+      window.map.fitBounds(result.bounds, { maxZoom: DEFAULT_ZOOM });
     }
 
     this.openMission(result.mission.guid);
@@ -1021,7 +1030,7 @@ window.plugin.missions = {
         });
 
 			app.addPane('plugin-missions', 'Missions', 'ic_missions');
-      addHook('paneChanged', this.onPaneChanged.bind(this));
+      window.addHook('paneChanged', this.onPaneChanged.bind(this));
     }
 
     // window.addPortalHighlighter('Mission start point', this.highlight.bind(this));
@@ -1065,5 +1074,6 @@ window.plugin.missions = {
   }
 };
 
+/* exported setup */
 var setup = window.plugin.missions.setup.bind(window.plugin.missions);
 setup.priority = 'low';
