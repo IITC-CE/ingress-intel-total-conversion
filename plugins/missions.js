@@ -27,6 +27,13 @@ var decodeWaypoint = function (data) {
     result.portal = window.decodeArray.portal(data[5], 'summary');
     // Portal waypoints have the same guid as the respective portal.
     result.portal.guid = result.guid;
+  } else if (result.typeNum === 2 && data[5]) { // field trip!
+    result.portal = {
+      // data[5] = [ "f", <latE6>, <lngE6> ]
+      latE6: data[5][1],
+      lngE6: data[5][2],
+      title: result.title
+    };
   }
   return result;
 };
