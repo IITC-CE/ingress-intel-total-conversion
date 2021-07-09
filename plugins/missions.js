@@ -23,6 +23,9 @@ var decodeWaypoint = function (data) {
   return result;
 };
 var decodeMission = function (data) {
+
+  if (typeof (data) !== 'object' || data.length === 0) return;
+
   return {
     guid: data[0],
     title: data[1],
