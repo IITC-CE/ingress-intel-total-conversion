@@ -858,5 +858,7 @@ try {
 if (document.readyState === 'complete') { // IITCm
   setTimeout(boot);
 } else {
-  window.addEventListener('load', boot);
+  window.addEventListener('load', function () {
+    setTimeout(boot);
+  });
 }
