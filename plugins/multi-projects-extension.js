@@ -341,29 +341,34 @@ window.plugin.mpe.data.toggleManager = function(PJ){
   }
 }
 
-window.plugin.mpe.ui.toggleSidebar = function(PJ) {
-  var elem = $('.mpeSidebar .mpe.' + PJ);
+window.plugin.mpe.ui.toggleSidebar = function (PJ) {
+  var entry = $('.mpeSidebar .mpe.' + PJ);
 
   if (window.plugin.mpe.data.isInSidebar(PJ) === -1) {
-    elem.remove();
-  } else if (!elem.length) {
-    var title = window.plugin.mpe.data.getTitle(PJ);
-    var prep;
-    if (window.plugin.faIcon) {
-      var fa = window.plugin.mpe.data.getFaClass(PJ);
-      fa = fa.length ? fa : 'nofa';
-      prep = '<i class="left fa ' + fa + '" title="' + title + '"></i>';
-    } else {
-      var short = title ? title.substr(0, 3): 'n/a'
-      prep = '<i class="left fa" title="' + title + '">' + short + '</i>';
-    }
-    $('.mpeSidebar').append(window.plugin.mpe.getHTML.project(PJ));
-    elem.prepend(prep);
+    entry.remove();
+  } else if (entry.length === 0) {
+    var icon = getProjectIcon(PJ);
+    var newEntry = $(window.plugin.mpe.getHTML.project(PJ));
+    newEntry.prepend(icon);
+    $('.mpeSidebar').append(newEntry);
   }
 };
 
-window.plugin.mpe.ui.toggleManager = function(PJ){
-  var elem = $('.mpeManager .mpe.'+PJ+'');
+function getProjectIcon(PJ) {
+  var title = window.plugin.mpe.data.getTitle(PJ);
+
+  if (window.plugin.faIcon) {
+    var fa = window.plugin.mpe.data.getFaClass(PJ);
+    fa = fa.length !== 0 ? fa : 'nofa';
+    return '<i class="left fa ' + fa + '" title="' + title + '"></i>';
+  } else {
+    var short = title ? title.substr(0, 3) : 'n/a';
+    return '<i class="left fa" title="' + title + '">' + short + '</i>';
+  }
+}
+
+window.plugin.mpe.ui.toggleManager = function (PJ) {
+  var elem = $('.mpeManager .mpe.' + PJ + '');
 
   var isHidden = window.plugin.mpe.data.isInManager(PJ);
   if(isHidden >= 0){
