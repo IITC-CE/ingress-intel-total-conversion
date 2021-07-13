@@ -228,7 +228,7 @@ function setup () {
   */
 
   /* more customization samples:
-  window.addHook('iitcLoaded',function () {
+  function setup () {
 
     // add new handler
     overlayKML.control.on('data:loaded', function (e) { // single layer in chooser
@@ -238,7 +238,8 @@ function setup () {
     // remove some predefined handlers
     overlayKML.control.off('data:loaded', overlayKML.events['data:loaded'].singleLayer);
 
-  })
+  }
+  setup.priority = 'low';
   */
 }
 
