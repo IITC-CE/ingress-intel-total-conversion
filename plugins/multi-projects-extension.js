@@ -57,16 +57,12 @@ mpe.storage.removeStorage = function (storage) {
 // DATA
 // ------------------------------------------------------
 // Format the string
-mpe.data.validateName = function (name) {
-  var name = name.toString();
-  var pattern = new RegExp(/^[a-zA-Z0-9_\-\ \(\)\[\]]/);
-  for (var i = 0; i < name.length; i++) {
-    if (!pattern.test(name[i])) {
-      return false;
-    }
-  }
-  return true;
+mpe.data.isValidName = function (name) {
+  name = name.toString();
+  var pattern = new RegExp(/^[a-zA-Z0-9_\- ()[\]]*$/);
+  return pattern.test(name);
 };
+
 mpe.data.nameToField = function (PJ, name) {
   var preKey = 'MPE_' + mpe.data.getPreKeyPj(PJ);
   var field = name;
@@ -421,7 +417,7 @@ mpe.action.createNewProject = function (PJ, label) {
   var name = (label !== undefined) ? label : mpe.dialog.insertNameNewProject();
   if (name === false || name === '') { return false; }
 
-  var isValid = mpe.data.validateName(name);
+  var isValid = mpe.data.isValidName(name);
   if (isValid === true) {
     var storageName = mpe.data.nameToField(PJ, name);
     mpe.data.addStorageToPJ(PJ, storageName);
