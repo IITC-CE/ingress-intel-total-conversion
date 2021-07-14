@@ -71,6 +71,7 @@ mpe.data.nameToField = function (PJ, name) {
   field = preKey + field;
   return field;
 };
+
 mpe.data.fieldToName = function (PJ, field) {
   var preKey = 'MPE_' + mpe.data.getPreKeyPj(PJ);
   var name = field;
@@ -83,28 +84,32 @@ mpe.data.fieldToName = function (PJ, field) {
 mpe.data.getCurrKeyPj = function (PJ) {
   return mpe.obj.projects[PJ].currKey;
 };
+
 mpe.data.getPreKeyPj = function (PJ) {
   return mpe.obj.projects[PJ].defaultKey;
 };
+
 mpe.data.getProjects = function (PJ) {
   return mpe.obj.projects[PJ].pj;
 };
 
-mpe.data.isInSidebar = function (PJ) {
+mpe.data.getProjectIndex = function (PJ) {
   var arrSidebar = mpe.obj.opt['settings']['sidebar'];
-  var index = arrSidebar.indexOf(PJ);
-  if (index >= 0) {
-    return index;
-  }
-  return -1;
+  return arrSidebar.indexOf(PJ);
 };
-mpe.data.isInManager = function (PJ) {
+
+mpe.data.isInSidebar = function (PJ) {
+  return mpe.data.getProjectIndex(PJ) >= 0;
+};
+
+
+mpe.data.getManagerIndex = function (PJ) {
   var arrSidebar = mpe.obj.opt['settings']['manager'];
-  var index = arrSidebar.indexOf(PJ);
-  if (index >= 0) {
-    return index;
-  }
-  return -1;
+  return arrSidebar.indexOf(PJ);
+};
+
+mpe.data.isInManager = function (PJ) {
+  return mpe.data.getManagerIndex(PJ) >= 0;
 };
 
 mpe.data.getFaClass = function (PJ) {
@@ -207,8 +212,8 @@ mpe.getHTML.prjSett = function (PJ) {
   var txtNew = '+';
   var txtDel = 'X';
 
-  var inManager = (mpe.data.isInManager(PJ) < 0) ? 'checked' : '';
-  var inSidebar = (mpe.data.isInSidebar(PJ) >= 0) ? 'checked' : '';
+  var inManager = mpe.data.isInManager(PJ) ? 'checked' : '';
+  var inSidebar = mpe.data.isInSidebar(PJ) ? 'checked' : '';
 
   if (window.plugin.faIcon) {
     txtNew = '<i class="fa fa-plus"></i>';
@@ -320,7 +325,7 @@ mpe.action.toggleManager = function (PJ) {
 mpe.data.toggleSidebar = function (PJ) {
   var arrSidebar = mpe.obj.opt['settings']['sidebar'];
 
-  var index = mpe.data.isInSidebar(PJ);
+  var index = mpe.data.getProjectIndex(PJ);
   if (index >= 0) {
     arrSidebar.splice(index, 1);
     return false;
@@ -332,7 +337,7 @@ mpe.data.toggleSidebar = function (PJ) {
 mpe.data.toggleManager = function (PJ) {
   var arrSidebar = mpe.obj.opt['settings']['manager'];
 
-  var index = mpe.data.isInManager(PJ);
+  var index = mpe.data.getManagerIndex(PJ);
   if (index >= 0) {
     arrSidebar.splice(index, 1);
     return false;
@@ -345,7 +350,7 @@ mpe.data.toggleManager = function (PJ) {
 mpe.ui.toggleSidebar = function (PJ) {
   var entry = $('.mpeSidebar .mpe.' + PJ);
 
-  if (mpe.data.isInSidebar(PJ) === -1) {
+  if (!mpe.data.isInSidebar(PJ)) {
     entry.remove();
   } else if (entry.length === 0) {
     var icon = getProjectIcon(PJ);
@@ -371,8 +376,7 @@ function getProjectIcon(PJ) {
 mpe.ui.toggleManager = function (PJ) {
   var elem = $('.mpeManager .mpe.' + PJ + '');
 
-  var isHidden = mpe.data.isInManager(PJ);
-  if (isHidden >= 0) {
+  if (mpe.data.isInManager(PJ)) {
     elem.hide();
   } else {
     elem.show();
