@@ -29,25 +29,28 @@ mpe.obj.opt = { settings: { manager: [], sidebar: [] } };
 // STORAGE
 // ------------------------------------------------------
 mpe.storage.NAME = 'plugin-mpe';
-mpe.storage.saveStorage = function () {
-  window.localStorage[mpe.storage.NAME] = JSON.stringify(mpe.obj.opt);
+mpe.storage.save = function () {
+  window.localStorage.setItem(mpe.storage.NAME, JSON.stringify(mpe.obj.opt));
 };
-mpe.storage.loadStorage = function () {
-  mpe.obj.opt = JSON.parse(window.localStorage[mpe.storage.NAME]);
+
+mpe.storage.load = function () {
+  mpe.obj.opt = JSON.parse(window.localStorage.getItem(mpe.storage.NAME));
 };
-mpe.storage.checkStorage = function () {
-  if (window.localStorage[mpe.storage.NAME] === undefined) {
+
+mpe.storage.check = function () {
+  if (window.localStorage.getItem(mpe.storage.NAME) === undefined) {
     mpe.obj.opt = { settings: { manager: [], sidebar: [] } };
-    mpe.storage.saveStorage();
+    mpe.storage.save();
   }
-  mpe.storage.loadStorage();
+  mpe.storage.load();
 };
 
 mpe.storage.addStorage = function (storage) {
-  window.localStorage[storage] = '';
+  window.localStorage.setItem(storage, '');
 };
+
 mpe.storage.removeStorage = function (storage) {
-  delete window.localStorage[storage];
+  window.localStorage.removeItem(storage);
 };
 
 // ------------------------------------------------------
@@ -309,12 +312,12 @@ mpe.dialog.insertNameNewProject = function () {
 // ------------------------------------------------------
 mpe.action.toggleSidebar = function (PJ) {
   mpe.data.toggleSidebar(PJ);
-  mpe.storage.saveStorage();
+  mpe.storage.save();
   mpe.ui.toggleSidebar(PJ);
 };
 mpe.action.toggleManager = function (PJ) {
   mpe.data.toggleManager(PJ);
-  mpe.storage.saveStorage();
+  mpe.storage.save();
   mpe.ui.toggleManager(PJ);
 };
 
@@ -455,7 +458,7 @@ mpe.action.deleteProject = function (PJ, storage) {
 // ------------------------------------------------------
 
 mpe.setMultiProjects = function (settings) {
-  mpe.storage.loadStorage();
+  mpe.storage.load();
   mpe.ui.appendContainerInSidebar();
 
   if (
@@ -517,7 +520,7 @@ mpe.setupCSS = function () {
 
 
 var setup = function () {
-  mpe.storage.checkStorage();
+  mpe.storage.check();
   mpe.setupCSS();
   mpe.ui.addControl();
   mpe.ui.appendContainerInSidebar();
