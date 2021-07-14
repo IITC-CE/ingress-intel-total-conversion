@@ -159,20 +159,19 @@ mpe.data.scanStorageForOne = function (name) {
 mpe.getHTML.projectOptions = function (PJ) {
   var PROJ = mpe.obj.projects[PJ];
   var html = '';
-  var active = '';
-  if (PROJ.currKey === PROJ.defaultKey) { active = 'selected'; }
+  var active = PROJ.currKey === PROJ.defaultKey ? 'selected' : '';
   html += '<option ' + active + ' value="' + PROJ.defaultKey + '">Default Project</option>';
 
   for (var index in PROJ.pj) {
     var nameMultiStorage = PROJ.pj[index];
     var label = nameMultiStorage.replace('MPE_' + PROJ.defaultKey, '');
 
-    var active = '';
-    if (PROJ.currKey === nameMultiStorage) { active = 'selected'; }
+    active = PROJ.currKey === nameMultiStorage ? 'selected' : '';
     html += '<option ' + active + ' value="' + nameMultiStorage + '">' + mpe.data.fieldToName(PJ, label) + '</option>';
   }
   return html;
 };
+
 mpe.getHTML.project = function (PJ) {
   var PROJ = mpe.obj.projects[PJ];
   var listElem = '';
@@ -209,23 +208,15 @@ mpe.getHTML.projectsAll = function () {
 mpe.getHTML.prjSett = function (PJ) {
   var PROJ = mpe.obj.projects[PJ];
   var listElem = '';
-  var txtNew = '+';
-  var txtDel = 'X';
 
   var inManager = mpe.data.isInManager(PJ) ? 'checked' : '';
   var inSidebar = mpe.data.isInSidebar(PJ) ? 'checked' : '';
-
-  if (window.plugin.faIcon) {
-    txtNew = '<i class="fa fa-plus"></i>';
-    txtDel = '<i class="fa fa-trash"></i>';
-  }
 
   listElem += '<div class="mpe settings ' + PJ + '" data-mpe="' + PJ + '">';
   listElem += '<h4>' + PROJ.title + '</h4>';
   listElem += '<div>';
   listElem += '<label><input type="checkbox" ' + inManager + ' onclick="window.plugin.mpe.action.toggleManager(\'' + PJ + '\');" />in Manager</label>';
   listElem += '<label><input type="checkbox" ' + inSidebar + ' onclick="window.plugin.mpe.action.toggleSidebar(\'' + PJ + '\');" />in Sidebar</label>';
-  //                listElem += '<div class="clear"></div>';
   listElem += '</div>';
   listElem += '</div>';
 
@@ -253,7 +244,6 @@ mpe.ui.appendOption = function (PJ, storageName) {
   $('.mpe[data-mpe="' + PJ + '"] select').append(opt);
 };
 mpe.ui.redrawHTMLOptions = function (PJ) {
-  var PROJ = mpe.obj.projects[PJ];
   var html = mpe.getHTML.projectOptions(PJ);
   $('.mpe[data-mpe="' + PJ + '"] select').html(html);
 };
@@ -274,7 +264,7 @@ mpe.dialog.openMain = function () {
   //        mpe.data.scanStorageForAll();
   var html = mpe.getHTML.projectsAll();
 
-  dialog({
+  window.dialog({
     title: 'Multi Projects Manager',
     html: '<div class="mpeManager">' + html + '</div>',
     dialogClass: 'ui-dialog-mpe',
@@ -292,7 +282,7 @@ mpe.dialog.openMain = function () {
   }
 };
 mpe.dialog.openSettings = function () {
-  dialog({
+  window.dialog({
     title: 'Multi Projects Settings',
     html: '<div class="mpeSettings">' + mpe.getHTML.prjSettAll() + '</div>',
     dialogClass: 'ui-dialog-mpe',
@@ -403,7 +393,7 @@ mpe.action.switchProject = function (PJ, storageKey) {
 
   mpe.ui.redrawHTMLOptions(PJ);
 
-  data = {
+  var data = {
     event: 'switch',
     data: {
       namespace: pj.namespace,
@@ -433,7 +423,7 @@ mpe.action.createNewProject = function (PJ, label) {
 };
 mpe.action.deleteProject = function (PJ, storage) {
   if (storage === undefined) {
-    var storage = mpe.data.getCurrKeyPj(PJ);
+    storage = mpe.data.getCurrKeyPj(PJ);
   }
 
   var PROJ = mpe.obj.projects[PJ];
