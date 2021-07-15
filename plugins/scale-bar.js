@@ -26,14 +26,14 @@ function moveToEdge (ctrl) {
     $corner.prepend($el);
   } else if (pos.indexOf('bottom') !== -1) {
     $corner.append($el);
-    $corner.find(".leaflet-control-attribution").appendTo($corner); // make sure that attribution control is on very bottom
+    $corner.find('.leaflet-control-attribution').appendTo($corner); // make sure that attribution control is on very bottom
   }
 }
 
 function setup () {
-  window.addHook('iitcLoaded', function () { // wait other controls to initialize (should be initialized last)
-    var options = L.extend({}, window.isSmartphone() ? scaleBar.mobileOptions : scaleBar.desktopOptions, scaleBar.options);
-    scaleBar.control = L.control.scale(options).addTo(window.map);
-    setTimeout(function () { moveToEdge(scaleBar.control); });
-  });
+  var options = L.extend({}, window.isSmartphone() ? scaleBar.mobileOptions : scaleBar.desktopOptions, scaleBar.options);
+  scaleBar.control = L.control.scale(options).addTo(window.map);
+  // wait other controls to initialize (should be initialized last)
+  setTimeout(function () { moveToEdge(scaleBar.control); });
 }
+setup.priority = 'low';
