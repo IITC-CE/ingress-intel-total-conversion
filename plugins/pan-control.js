@@ -21,10 +21,8 @@ function setup () {
   panControl.control = L.control.pan(panControl.options).addTo(map);
 
   if (!panControl.options.position) { // default: 'topleft'
-    window.addHook('iitcLoaded', function () {
-      // to be above all controls
-      $('.leaflet-top.leaflet-left .leaflet-control').first().before(panControl.control.getContainer());
-    });
+    // to be above all controls
+    $('.leaflet-top.leaflet-left .leaflet-control').first().before(panControl.control.getContainer());
   }
 
   // L.Control.Pan.css tries to align zoom control with the pan control, but the result sucks
@@ -43,6 +41,7 @@ function setup () {
     .leaflet-touch .leaflet-left .leaflet-control-pan { margin-left: 10px; }\
   ').appendTo('head');
 }
+setup.priority = 'low';
 
 function loadLeafletPancontrol () {
   try {
