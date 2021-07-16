@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Scale bar
 // @category       Controls
-// @version        0.1.0
+// @version        0.1.1
 // @description    Show scale bar on the map.
 
 
