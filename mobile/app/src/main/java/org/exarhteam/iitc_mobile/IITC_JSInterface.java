@@ -218,4 +218,9 @@ public class IITC_JSInterface {
             mIitc.reloadIITC();
         });
     }
+
+    @JavascriptInterface
+    public void addInternalHostname(String hostname) {
+        mIitc.addInternalHostname(hostname);
+    }
 }
