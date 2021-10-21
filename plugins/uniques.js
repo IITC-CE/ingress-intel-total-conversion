@@ -29,6 +29,18 @@ window.plugin.uniques.contentHTML = null;
 
 window.plugin.uniques.isHighlightActive = false;
 
+window.plugin.uniques.onPortalAdded = function(data) {
+    var opt = data.portal.options,
+        history = opt.data.history;
+    if(history) {
+        if(history.captured) {
+            plugin.uniques.setPortalCaptured(opt.guid);
+        } else if(history.visited){
+            plugin.uniques.setPortalVisited(opt.guid);
+        }
+    }
+}
+
 window.plugin.uniques.onPortalDetailsUpdated = function() {
 	if(typeof(Storage) === "undefined") {
 		$('#portaldetails > .imgpreview').after(plugin.uniques.disabledMessage);
@@ -39,7 +51,14 @@ window.plugin.uniques.onPortalDetailsUpdated = function() {
 		details = portalDetail.get(guid),
 		nickname = window.PLAYER.nickname;
 	if(details) {
-		if(details.owner == nickname) {
+		var history = details.history;
+		if(history) {
+			if(history.captured) {
+				plugin.uniques.updateCaptured(true);
+			} else if(history.visited) {
+				plugin.uniques.updateVisited(true);
+			}	
+		} else if(details.owner == nickname) {
 			//FIXME: a virus flip will set the owner of the portal, but doesn't count as a unique capture
 			plugin.uniques.updateCaptured(true);
 			// no further logic required
@@ -558,6 +577,7 @@ var setup = function() {
 	window.plugin.uniques.setupContent();
 	window.plugin.uniques.loadLocal('uniques');
 	window.addPortalHighlighter('Uniques', window.plugin.uniques.highlighter);
+	window.addHook('portalAdded', window.plugin.uniques.onPortalAdded);
 	window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
 	window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
 	window.plugin.uniques.registerFieldForSyncing();
