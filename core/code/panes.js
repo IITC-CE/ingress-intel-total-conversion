@@ -16,9 +16,6 @@ window.show = function(id) {
     case 'alerts':
       window.chat.show(id);
       break;
-    case 'debug':
-      window.debug.console.show();
-      break;
     case 'map':
       window.smartphone.mapButton.click();
       $('#portal_highlight_select').show();

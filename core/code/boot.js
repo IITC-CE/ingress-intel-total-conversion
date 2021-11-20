@@ -184,10 +184,7 @@ function prepPluginsToLoad () {
   };
 }
 
-function boot () {
-  if (!isSmartphone()) { // TODO remove completely?
-    window.debug.console.overwriteNativeIfRequired();
-  }
+function boot() {
   log.log('loading done, booting. Built: '+'@build_date@');
   if (window.deviceID) {
     log.log('Your device ID: ' + window.deviceID);
