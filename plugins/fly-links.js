@@ -1,7 +1,7 @@
 // @author         Fly33
 // @name           Fly Links
 // @category       Draw
-// @version        0.4.0
+// @version        0.4.1
 // @description    Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 
 
@@ -252,20 +252,22 @@ window.plugin.flyLinks.updateLayer = function() {
 
   var markers = [];
   var lines = [];
-  for (var i in plugin.drawTools.drawnItems._layers) {
-    var layer = plugin.drawTools.drawnItems._layers[i];
-    if (layer instanceof L.Marker) {
-      var ll = layer.getLatLng();
-      var p = map.project(ll, window.plugin.flyLinks.PROJECT_ZOOM);
-      markers.push(p);
-    } else if (layer instanceof L.GeodesicPolyline) {
-      var p = []
-      var ll = layer.getLatLngs();
-      for (var j = 0; j < ll.length; ++j) {
-        p.push(map.project(ll[j], window.plugin.flyLinks.PROJECT_ZOOM))
-      }
-      for (var j = 1; j < p.length; ++j) {
-        lines.push([p[j-1], p[j]])
+  if (plugin.drawTools) {
+    for (var i in plugin.drawTools.drawnItems._layers) {
+      var layer = plugin.drawTools.drawnItems._layers[i];
+      if (layer instanceof L.Marker) {
+        var ll = layer.getLatLng();
+        var p = map.project(ll, window.plugin.flyLinks.PROJECT_ZOOM);
+        markers.push(p);
+      } else if (layer instanceof L.GeodesicPolyline) {
+        var p = []
+        var ll = layer.getLatLngs();
+        for (var j = 0; j < ll.length; ++j) {
+          p.push(map.project(ll[j], window.plugin.flyLinks.PROJECT_ZOOM))
+        }
+        for (var j = 1; j < p.length; ++j) {
+          lines.push([p[j-1], p[j]])
+        }
       }
     }
   }
@@ -341,26 +343,45 @@ window.plugin.flyLinks.updateLayer = function() {
 
   locations = filterMarkers(locations, markers);
 
-  for (var i in plugin.drawTools.drawnItems._layers) {
-    var layer = plugin.drawTools.drawnItems._layers[i];
-    if (layer instanceof L.GeodesicPolygon) {
-      var ll = layer.getLatLngs();
-      var polygon = [];
-      for (var i = 0; i < ll.length; ++i) {
-        var p = map.project(ll[i], window.plugin.flyLinks.PROJECT_ZOOM);
-        polygon.push(p);
+  var polygons = [];
+
+  if (plugin.drawTools) {
+    for (var i in plugin.drawTools.drawnItems._layers) {
+      var layer = plugin.drawTools.drawnItems._layers[i];
+      if (layer instanceof L.GeodesicPolygon) {
+        var ll = layer.getLatLngs();
+        var polygon = [];
+        for (var i = 0; i < ll.length; ++i) {
+          var p = map.project(ll[i], window.plugin.flyLinks.PROJECT_ZOOM);
+          polygon.push(p);
+        }
+        polygons.push(polygon);
       }
-      var points = filterPolygon(locations, polygon);
-      if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
-        //alert("Some polygon contains more than 100 portals.");
-        continue;
-      }
-      var triangulation = triangulate(points, lines);
-      edges = edges.concat(triangulation.edges);
-      triangles = triangles.concat(triangulation.triangles);
     }
   }
-  
+
+  // fallback to map bounds if no drawn polygon (or no drawtools)
+  if (!polygons.length) {
+    var mapBounds = map.getBounds();
+    var polygon = [];
+    polygon.push(map.project(mapBounds.getNorthWest(), window.plugin.flyLinks.PROJECT_ZOOM));
+    polygon.push(map.project(mapBounds.getSouthWest(), window.plugin.flyLinks.PROJECT_ZOOM));
+    polygon.push(map.project(mapBounds.getSouthEast(), window.plugin.flyLinks.PROJECT_ZOOM));
+    polygon.push(map.project(mapBounds.getNorthEast(), window.plugin.flyLinks.PROJECT_ZOOM));
+    polygons.push(polygon);
+  }
+
+  $.each(polygons, function (idx, polygon) {
+    var points = filterPolygon(locations, polygon);
+    if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
+      //alert("Some polygon contains more than 100 portals.");
+      return;
+    }
+    var triangulation = triangulate(points, lines);
+    edges = edges.concat(triangulation.edges);
+    triangles = triangles.concat(triangulation.triangles);
+  });
+
   $.each(edges, function(idx, edge) {
     drawLink(edge.a, edge.b, {
       color: '#FF0000',
