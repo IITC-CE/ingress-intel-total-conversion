@@ -19,7 +19,7 @@
 ### Leaflet-related components:
 
 * https://leafletjs.com/download.html
-  1.7.1+master.7db94fd
+  1.7.1+master.7dcc3de
   leaflet-src.js, leaflet.css, images/*
 
 * https://gitlab.com/IvanSanchez/Leaflet.GridLayer.GoogleMutant

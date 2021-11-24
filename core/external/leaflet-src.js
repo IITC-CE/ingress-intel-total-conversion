@@ -1,15 +1,15 @@
 /* @preserve
- * Leaflet 1.7.1+master.7db94fd, a JS library for interactive maps. http://leafletjs.com
- * (c) 2010-2019 Vladimir Agafonkin, (c) 2010-2011 CloudMade
+ * Leaflet 1.7.1+master.7dcc3de, a JS library for interactive maps. http://leafletjs.com
+ * (c) 2010-2021 Vladimir Agafonkin, (c) 2010-2011 CloudMade
  */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.L = {})));
-}(this, (function (exports) { 'use strict';
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.L = {}));
+})(this, (function (exports) { 'use strict';
 
-  var version = "1.7.1+master.d8dd2f0a";
+  var version = "1.7.1+master.7dcc3de7";
 
   /*
    * @namespace Util
@@ -33,7 +33,7 @@
 
   // @function create(proto: Object, properties?: Object): Object
   // Compatibility polyfill for [Object.create](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
-  var create = Object.create || (function () {
+  var create$2 = Object.create || (function () {
   	function F() {}
   	return function (proto) {
   		F.prototype = proto;
@@ -65,10 +65,10 @@
   // @function stamp(obj: Object): Number
   // Returns the unique ID of an object, assigning it one if it doesn't have it.
   function stamp(obj) {
-  	/*eslint-disable */
-  	obj._leaflet_id = obj._leaflet_id || ++lastId;
+  	if (!('_leaflet_id' in obj)) {
+  		obj['_leaflet_id'] = ++lastId;
+  	}
   	return obj._leaflet_id;
-  	/* eslint-enable */
   }
 
   // @function throttle(fn: Function, time: Number, context: Object): Function
@@ -121,10 +121,13 @@
   // Returns a function which always returns `false`.
   function falseFn() { return false; }
 
-  // @function formatNum(num: Number, digits?: Number): Number
-  // Returns the number `num` rounded to `digits` decimals, or to 6 decimals by default.
-  function formatNum(num, digits) {
-  	var pow = Math.pow(10, (digits === undefined ? 6 : digits));
+  // @function formatNum(num: Number, precision?: Number|false): Number
+  // Returns the number `num` rounded with specified `precision`.
+  // The default `precision` value is 6 decimal places.
+  // `false` can be passed to skip any processing (can be useful to avoid round-off errors).
+  function formatNum(num, precision) {
+  	if (precision === false) { return num; }
+  	var pow = Math.pow(10, precision === undefined ? 6 : precision);
   	return Math.round(num * pow) / pow;
   }
 
@@ -144,7 +147,7 @@
   // Merges the given properties to the `options` of the `obj` object, returning the resulting options. See `Class options`. Has an `L.setOptions` shortcut.
   function setOptions(obj, options) {
   	if (!Object.prototype.hasOwnProperty.call(obj, 'options')) {
-  		obj.options = obj.options ? create(obj.options) : {};
+  		obj.options = obj.options ? create$2(obj.options) : {};
   	}
   	for (var i in options) {
   		obj.options[i] = options[i];
@@ -250,11 +253,12 @@
   	}
   }
 
-  var Util = ({
+  var Util = {
+    __proto__: null,
     extend: extend,
-    create: create,
+    create: create$2,
     bind: bind,
-    lastId: lastId,
+    get lastId () { return lastId; },
     stamp: stamp,
     throttle: throttle,
     wrapNum: wrapNum,
@@ -272,7 +276,7 @@
     cancelFn: cancelFn,
     requestAnimFrame: requestAnimFrame,
     cancelAnimFrame: cancelAnimFrame
-  });
+  };
 
   // @class Class
   // @aka L.Class
@@ -291,6 +295,8 @@
   	// Returns a Javascript function that is a class constructor (to be called with `new`).
   	var NewClass = function () {
 
+  		setOptions(this);
+
   		// call the constructor
   		if (this.initialize) {
   			this.initialize.apply(this, arguments);
@@ -302,7 +308,7 @@
 
   	var parentProto = NewClass.__super__ = this.prototype;
 
-  	var proto = create(parentProto);
+  	var proto = create$2(parentProto);
   	proto.constructor = NewClass;
 
   	NewClass.prototype = proto;
@@ -317,23 +323,24 @@
   	// mix static properties into the class
   	if (props.statics) {
   		extend(NewClass, props.statics);
-  		delete props.statics;
   	}
 
   	// mix includes into the prototype
   	if (props.includes) {
   		checkDeprecatedMixinEvents(props.includes);
   		extend.apply(null, [proto].concat(props.includes));
-  		delete props.includes;
-  	}
-
-  	// merge options
-  	if (proto.options) {
-  		props.options = extend(create(proto.options), props.options);
   	}
 
   	// mix given properties into the prototype
   	extend(proto, props);
+  	delete proto.statics;
+  	delete proto.includes;
+
+  	// merge options
+  	if (proto.options) {
+  		proto.options = parentProto.options ? create$2(parentProto.options) : {};
+  		extend(proto.options, props.options);
+  	}
 
   	proto._initHooks = [];
 
@@ -360,7 +367,12 @@
   // @function include(properties: Object): this
   // [Includes a mixin](#class-includes) into the current class.
   Class.include = function (props) {
+  	var parentOptions = this.prototype.options;
   	extend(this.prototype, props);
+  	if (props.options) {
+  		this.prototype.options = parentOptions;
+  		this.mergeOptions(props.options);
+  	}
   	return this;
   };
 
@@ -467,7 +479,7 @@
   	 */
   	off: function (types, fn, context) {
 
-  		if (!types) {
+  		if (!arguments.length) {
   			// clear all listeners if called without arguments
   			delete this._events;
 
@@ -479,8 +491,13 @@
   		} else {
   			types = splitWords(types);
 
+  			var removeAll = arguments.length === 1;
   			for (var i = 0, len = types.length; i < len; i++) {
-  				this._off(types[i], fn, context);
+  				if (removeAll) {
+  					this._off(types[i]);
+  				} else {
+  					this._off(types[i], fn, context);
+  				}
   			}
   		}
 
@@ -489,6 +506,10 @@
 
   	// attach listener (without syntactic sugar now)
   	_on: function (type, fn, context) {
+  		if (typeof fn !== 'function') {
+  			console.warn('wrong listener type: ' + typeof fn);
+  			return;
+  		}
   		this._events = this._events || {};
 
   		/* get/init listeners for type */
@@ -528,10 +549,13 @@
   			return;
   		}
 
-  		if (!fn) {
-  			// Set all removed listeners to noop so they are not called if remove happens in fire
-  			for (i = 0, len = listeners.length; i < len; i++) {
-  				listeners[i].fn = falseFn;
+  		if (arguments.length === 1) { // remove all
+  			if (this._firingCount) {
+  				// Set all removed listeners to noop
+  				// so they are not called if remove happens in fire
+  				for (i = 0, len = listeners.length; i < len; i++) {
+  					listeners[i].fn = falseFn;
+  				}
   			}
   			// clear all listeners for a type if function isn't specified
   			delete this._events[type];
@@ -542,27 +566,28 @@
   			context = undefined;
   		}
 
-  		if (listeners) {
-
-  			// find fn and remove it
-  			for (i = 0, len = listeners.length; i < len; i++) {
-  				var l = listeners[i];
-  				if (l.ctx !== context) { continue; }
-  				if (l.fn === fn) {
-
+  		if (typeof fn !== 'function') {
+  			console.warn('wrong listener type: ' + typeof fn);
+  			return;
+  		}
+  		// find fn and remove it
+  		for (i = 0, len = listeners.length; i < len; i++) {
+  			var l = listeners[i];
+  			if (l.ctx !== context) { continue; }
+  			if (l.fn === fn) {
+  				if (this._firingCount) {
   					// set the removed listener to noop so that's not called if remove happens in fire
   					l.fn = falseFn;
 
-  					if (this._firingCount) {
-  						/* copy array in case events are being fired */
-  						this._events[type] = listeners = listeners.slice();
-  					}
-  					listeners.splice(i, 1);
-
-  					return;
+  					/* copy array in case events are being fired */
+  					this._events[type] = listeners = listeners.slice();
   				}
+  				listeners.splice(i, 1);
+
+  				return;
   			}
   		}
+  		console.warn('listener not found');
   	},
 
   	// @method fire(type: String, data?: Object, propagate?: Boolean): this
@@ -600,9 +625,13 @@
   		return this;
   	},
 
-  	// @method listens(type: String): Boolean
+  	// @method listens(type: String, propagate?: Boolean): Boolean
   	// Returns `true` if a particular event type has any listeners attached to it.
+  	// The verification can optionally be propagated, it will return `true` if parents have the listener attached to it.
   	listens: function (type, propagate) {
+  		if (typeof type !== 'string') {
+  			console.warn('"string" type argument expected');
+  		}
   		var listeners = this._events && this._events[type];
   		if (listeners && listeners.length) { return true; }
 
@@ -1802,7 +1831,7 @@
   		}
 
   		// closes the ring for polygons; "x" is VML syntax
-  		str += closed ? (svg ? 'z' : 'x') : '';
+  		str += closed ? (Browser.svg ? 'z' : 'x') : '';
   	}
 
   	// SVG complains about empty path strings
@@ -1824,7 +1853,7 @@
    * ```
    */
 
-  var style$1 = document.documentElement.style;
+  var style = document.documentElement.style;
 
   // @property ie: Boolean; `true` for all Internet Explorer versions (not Edge).
   var ie = 'ActiveXObject' in window;
@@ -1840,15 +1869,15 @@
   var webkit = userAgentContains('webkit');
 
   // @property android: Boolean
-  // `true` for any browser running on an Android platform.
+  // **Deprecated.** `true` for any browser running on an Android platform.
   var android = userAgentContains('android');
 
-  // @property android23: Boolean; `true` for browsers running on Android 2 or Android 3.
+  // @property android23: Boolean; **Deprecated.** `true` for browsers running on Android 2 or Android 3.
   var android23 = userAgentContains('android 2') || userAgentContains('android 3');
 
   /* See https://stackoverflow.com/a/17961266 for details on detecting stock Android */
   var webkitVer = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10); // also matches AppleWebKit
-  // @property androidStock: Boolean; `true` for the Android stock browser (i.e. not Chrome)
+  // @property androidStock: Boolean; **Deprecated.** `true` for the Android stock browser (i.e. not Chrome)
   var androidStock = android && userAgentContains('Google') && webkitVer < 537 && !('AudioNode' in window);
 
   // @property opera: Boolean; `true` for the Opera browser
@@ -1867,19 +1896,19 @@
 
   // @property opera12: Boolean
   // `true` for the Opera browser supporting CSS transforms (version 12 or later).
-  var opera12 = 'OTransition' in style$1;
+  var opera12 = 'OTransition' in style;
 
   // @property win: Boolean; `true` when the browser is running in a Windows platform
   var win = navigator.platform.indexOf('Win') === 0;
 
   // @property ie3d: Boolean; `true` for all Internet Explorer versions supporting CSS transforms.
-  var ie3d = ie && ('transition' in style$1);
+  var ie3d = ie && ('transition' in style);
 
   // @property webkit3d: Boolean; `true` for webkit-based browsers supporting CSS transforms.
   var webkit3d = ('WebKitCSSMatrix' in window) && ('m11' in new window.WebKitCSSMatrix()) && !android23;
 
   // @property gecko3d: Boolean; `true` for gecko-based browsers supporting CSS transforms.
-  var gecko3d = 'MozPerspective' in style$1;
+  var gecko3d = 'MozPerspective' in style;
 
   // @property any3d: Boolean
   // `true` for all browsers supporting CSS transforms.
@@ -1903,13 +1932,17 @@
   // `true` for all browsers supporting [pointer events](https://msdn.microsoft.com/en-us/library/dn433244%28v=vs.85%29.aspx).
   var pointer = !!(window.PointerEvent || msPointer);
 
-  // @property touch: Boolean
+  // @property touchNative: Boolean
   // `true` for all browsers supporting [touch events](https://developer.mozilla.org/docs/Web/API/Touch_events).
-  // This does not necessarily mean that the browser is running in a computer with
+  // **This does not necessarily mean** that the browser is running in a computer with
   // a touchscreen, it only means that the browser is capable of understanding
   // touch events.
-  var touch = !window.L_NO_TOUCH && (pointer || 'ontouchstart' in window ||
-  		(window.DocumentTouch && document instanceof window.DocumentTouch));
+  var touchNative = 'ontouchstart' in window || !!window.TouchEvent;
+
+  // @property touch: Boolean
+  // `true` for all browsers supporting either [touch](#browser-touch) or [pointer](#browser-pointer) events.
+  // Note: pointer events will be preferred (if available), and processed for all `touch*` listeners.
+  var touch = !window.L_NO_TOUCH && (touchNative || pointer);
 
   // @property mobileOpera: Boolean; `true` for the Opera browser in a mobile device.
   var mobileOpera = mobile && opera;
@@ -1942,17 +1975,17 @@
 
   // @property canvas: Boolean
   // `true` when the browser supports [`<canvas>`](https://developer.mozilla.org/docs/Web/API/Canvas_API).
-  var canvas = (function () {
+  var canvas$1 = (function () {
   	return !!document.createElement('canvas').getContext;
   }());
 
   // @property svg: Boolean
   // `true` when the browser supports [SVG](https://developer.mozilla.org/docs/Web/SVG).
-  var svg = !!(document.createElementNS && svgCreate('svg').createSVGRect);
+  var svg$1 = !!(document.createElementNS && svgCreate('svg').createSVGRect);
 
   // @property vml: Boolean
   // `true` if the browser supports [VML](https://en.wikipedia.org/wiki/Vector_Markup_Language).
-  var vml = !svg && (function () {
+  var vml = !svg$1 && (function () {
   	try {
   		var div = document.createElement('div');
   		div.innerHTML = '<v:shape adj="1"/>';
@@ -1972,110 +2005,87 @@
   	return navigator.userAgent.toLowerCase().indexOf(str) >= 0;
   }
 
-  var Browser = ({
-    ie: ie,
-    ielt9: ielt9,
-    edge: edge,
-    webkit: webkit,
-    android: android,
-    android23: android23,
-    androidStock: androidStock,
-    opera: opera,
-    chrome: chrome,
-    gecko: gecko,
-    safari: safari,
-    phantom: phantom,
-    opera12: opera12,
-    win: win,
-    ie3d: ie3d,
-    webkit3d: webkit3d,
-    gecko3d: gecko3d,
-    any3d: any3d,
-    mobile: mobile,
-    mobileWebkit: mobileWebkit,
-    mobileWebkit3d: mobileWebkit3d,
-    msPointer: msPointer,
-    pointer: pointer,
-    touch: touch,
-    mobileOpera: mobileOpera,
-    mobileGecko: mobileGecko,
-    retina: retina,
-    passiveEvents: passiveEvents,
-    canvas: canvas,
-    svg: svg,
-    vml: vml
-  });
+
+  var Browser = {
+  	ie: ie,
+  	ielt9: ielt9,
+  	edge: edge,
+  	webkit: webkit,
+  	android: android,
+  	android23: android23,
+  	androidStock: androidStock,
+  	opera: opera,
+  	chrome: chrome,
+  	gecko: gecko,
+  	safari: safari,
+  	phantom: phantom,
+  	opera12: opera12,
+  	win: win,
+  	ie3d: ie3d,
+  	webkit3d: webkit3d,
+  	gecko3d: gecko3d,
+  	any3d: any3d,
+  	mobile: mobile,
+  	mobileWebkit: mobileWebkit,
+  	mobileWebkit3d: mobileWebkit3d,
+  	msPointer: msPointer,
+  	pointer: pointer,
+  	touch: touch,
+  	touchNative: touchNative,
+  	mobileOpera: mobileOpera,
+  	mobileGecko: mobileGecko,
+  	retina: retina,
+  	passiveEvents: passiveEvents,
+  	canvas: canvas$1,
+  	svg: svg$1,
+  	vml: vml,
+  };
 
   /*
    * Extends L.DomEvent to provide touch support for Internet Explorer and Windows-based devices.
    */
 
-
-  var POINTER_DOWN =   msPointer ? 'MSPointerDown'   : 'pointerdown';
-  var POINTER_MOVE =   msPointer ? 'MSPointerMove'   : 'pointermove';
-  var POINTER_UP =     msPointer ? 'MSPointerUp'     : 'pointerup';
-  var POINTER_CANCEL = msPointer ? 'MSPointerCancel' : 'pointercancel';
-
+  var POINTER_DOWN =   Browser.msPointer ? 'MSPointerDown'   : 'pointerdown';
+  var POINTER_MOVE =   Browser.msPointer ? 'MSPointerMove'   : 'pointermove';
+  var POINTER_UP =     Browser.msPointer ? 'MSPointerUp'     : 'pointerup';
+  var POINTER_CANCEL = Browser.msPointer ? 'MSPointerCancel' : 'pointercancel';
+  var pEvent = {
+  	touchstart  : POINTER_DOWN,
+  	touchmove   : POINTER_MOVE,
+  	touchend    : POINTER_UP,
+  	touchcancel : POINTER_CANCEL
+  };
+  var handle = {
+  	touchstart  : _onPointerStart,
+  	touchmove   : _handlePointer,
+  	touchend    : _handlePointer,
+  	touchcancel : _handlePointer
+  };
   var _pointers = {};
   var _pointerDocListener = false;
 
   // Provides a touch events wrapper for (ms)pointer events.
   // ref http://www.w3.org/TR/pointerevents/ https://www.w3.org/Bugs/Public/show_bug.cgi?id=22890
 
-  function addPointerListener(obj, type, handler, id) {
+  function addPointerListener(obj, type, handler) {
   	if (type === 'touchstart') {
-  		_addPointerStart(obj, handler, id);
-
-  	} else if (type === 'touchmove') {
-  		_addPointerMove(obj, handler, id);
-
-  	} else if (type === 'touchend') {
-  		_addPointerEnd(obj, handler, id);
+  		_addPointerDocListener();
   	}
-
-  	return this;
+  	if (!handle[type]) {
+  		console.warn('wrong event specified:', type);
+  		return L.Util.falseFn;
+  	}
+  	handler = handle[type].bind(this, handler);
+  	obj.addEventListener(pEvent[type], handler, false);
+  	return handler;
   }
 
-  function removePointerListener(obj, type, id) {
-  	var handler = obj['_leaflet_' + type + id];
-
-  	if (type === 'touchstart') {
-  		obj.removeEventListener(POINTER_DOWN, handler, false);
-
-  	} else if (type === 'touchmove') {
-  		obj.removeEventListener(POINTER_MOVE, handler, false);
-
-  	} else if (type === 'touchend') {
-  		obj.removeEventListener(POINTER_UP, handler, false);
-  		obj.removeEventListener(POINTER_CANCEL, handler, false);
+  function removePointerListener(obj, type, handler) {
+  	if (!pEvent[type]) {
+  		console.warn('wrong event specified:', type);
+  		return;
   	}
-
-  	return this;
-  }
-
-  function _addPointerStart(obj, handler, id) {
-  	var onDown = bind(function (e) {
-  		// IE10 specific: MsTouch needs preventDefault. See #2000
-  		if (e.MSPOINTER_TYPE_TOUCH && e.pointerType === e.MSPOINTER_TYPE_TOUCH) {
-  			preventDefault(e);
-  		}
-
-  		_handlePointer(e, handler);
-  	});
-
-  	obj['_leaflet_touchstart' + id] = onDown;
-  	obj.addEventListener(POINTER_DOWN, onDown, false);
-
-  	// need to keep track of what pointers and how many are active to provide e.touches emulation
-  	if (!_pointerDocListener) {
-  		// we listen document as any drags that end by moving the touch off the screen get fired there
-  		document.addEventListener(POINTER_DOWN, _globalPointerDown, true);
-  		document.addEventListener(POINTER_MOVE, _globalPointerMove, true);
-  		document.addEventListener(POINTER_UP, _globalPointerUp, true);
-  		document.addEventListener(POINTER_CANCEL, _globalPointerUp, true);
-
-  		_pointerDocListener = true;
-  	}
+  	obj.removeEventListener(pEvent[type], handler, false);
   }
 
   function _globalPointerDown(e) {
@@ -2092,7 +2102,22 @@
   	delete _pointers[e.pointerId];
   }
 
-  function _handlePointer(e, handler) {
+  function _addPointerDocListener() {
+  	// need to keep track of what pointers and how many are active to provide e.touches emulation
+  	if (!_pointerDocListener) {
+  		// we listen document as any drags that end by moving the touch off the screen get fired there
+  		document.addEventListener(POINTER_DOWN, _globalPointerDown, true);
+  		document.addEventListener(POINTER_MOVE, _globalPointerMove, true);
+  		document.addEventListener(POINTER_UP, _globalPointerUp, true);
+  		document.addEventListener(POINTER_CANCEL, _globalPointerUp, true);
+
+  		_pointerDocListener = true;
+  	}
+  }
+
+  function _handlePointer(handler, e) {
+  	if (e.pointerType === (e.MSPOINTER_TYPE_MOUSE || 'mouse')) { return; }
+
   	e.touches = [];
   	for (var i in _pointers) {
   		e.touches.push(_pointers[i]);
@@ -2102,108 +2127,83 @@
   	handler(e);
   }
 
-  function _addPointerMove(obj, handler, id) {
-  	var onMove = function (e) {
-  		// don't fire touch moves when mouse isn't down
-  		if ((e.pointerType === (e.MSPOINTER_TYPE_MOUSE || 'mouse')) && e.buttons === 0) {
-  			return;
-  		}
-
-  		_handlePointer(e, handler);
-  	};
-
-  	obj['_leaflet_touchmove' + id] = onMove;
-  	obj.addEventListener(POINTER_MOVE, onMove, false);
-  }
-
-  function _addPointerEnd(obj, handler, id) {
-  	var onUp = function (e) {
-  		_handlePointer(e, handler);
-  	};
-
-  	obj['_leaflet_touchend' + id] = onUp;
-  	obj.addEventListener(POINTER_UP, onUp, false);
-  	obj.addEventListener(POINTER_CANCEL, onUp, false);
+  function _onPointerStart(handler, e) {
+  	// IE10 specific: MsTouch needs preventDefault. See #2000
+  	if (e.MSPOINTER_TYPE_TOUCH && e.pointerType === e.MSPOINTER_TYPE_TOUCH) {
+  		preventDefault(e);
+  	}
+  	_handlePointer(handler, e);
   }
 
   /*
    * Extends the event handling code with double tap support for mobile browsers.
+   *
+   * Note: currently most browsers fire native dblclick, with only a few exceptions
+   * (see https://github.com/Leaflet/Leaflet/issues/7012#issuecomment-595087386)
    */
 
-  var _touchstart = msPointer ? 'MSPointerDown' : pointer ? 'pointerdown' : 'touchstart';
-  var _touchend = msPointer ? 'MSPointerUp' : pointer ? 'pointerup' : 'touchend';
-  var _pre = '_leaflet_';
+  function makeDblclick(event) {
+  	// in modern browsers `type` cannot be just overridden:
+  	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Getter_only
+  	var newEvent = {},
+  	    prop, i;
+  	for (i in event) {
+  		prop = event[i];
+  		newEvent[i] = prop && prop.bind ? prop.bind(event) : prop;
+  	}
+  	event = newEvent;
+  	newEvent.type = 'dblclick';
+  	newEvent.detail = 2;
+  	newEvent.isTrusted = false;
+  	newEvent._simulated = true; // for debug purposes
+  	return newEvent;
+  }
 
-  // inspired by Zepto touch code by Thomas Fuchs
-  function addDoubleTapListener(obj, handler, id) {
-  	var last, touch$$1,
-  	    doubleTap = false,
-  	    delay = 250;
+  var delay = 200;
+  function addDoubleTapListener(obj, handler) {
+  	// Most browsers handle double tap natively
+  	obj.addEventListener('dblclick', handler);
 
-  	function onTouchStart(e) {
-
-  		if (pointer) {
-  			if (!e.isPrimary) { return; }
-  			if (e.pointerType === 'mouse') { return; } // mouse fires native dblclick
-  		} else if (e.touches.length > 1) {
+  	// On some platforms the browser doesn't fire native dblclicks for touch events.
+  	// It seems that in all such cases `detail` property of `click` event is always `1`.
+  	// So here we rely on that fact to avoid excessive 'dblclick' simulation when not needed.
+  	var last = 0,
+  	    detail;
+  	function simDblclick(e) {
+  		if (e.detail !== 1) {
+  			detail = e.detail; // keep in sync to avoid false dblclick in some cases
   			return;
   		}
 
-  		var now = Date.now(),
-  		    delta = now - (last || now);
+  		if (e.pointerType === 'mouse' ||
+  			(e.sourceCapabilities && !e.sourceCapabilities.firesTouchEvents)) {
 
-  		touch$$1 = e.touches ? e.touches[0] : e;
-  		doubleTap = (delta > 0 && delta <= delay);
+  			return;
+  		}
+
+  		var now = Date.now();
+  		if (now - last <= delay) {
+  			detail++;
+  			if (detail === 2) {
+  				handler(makeDblclick(e));
+  			}
+  		} else {
+  			detail = 1;
+  		}
   		last = now;
   	}
 
-  	function onTouchEnd(e) {
-  		if (doubleTap && !touch$$1.cancelBubble) {
-  			if (pointer) {
-  				if (e.pointerType === 'mouse') { return; }
-  				// work around .type being readonly with MSPointer* events
-  				var newTouch = {},
-  				    prop, i;
+  	obj.addEventListener('click', simDblclick);
 
-  				for (i in touch$$1) {
-  					prop = touch$$1[i];
-  					newTouch[i] = prop && prop.bind ? prop.bind(touch$$1) : prop;
-  				}
-  				touch$$1 = newTouch;
-  			}
-  			touch$$1.type = 'dblclick';
-  			touch$$1.button = 0;
-  			handler(touch$$1);
-  			last = null;
-  		}
-  	}
-
-  	obj[_pre + _touchstart + id] = onTouchStart;
-  	obj[_pre + _touchend + id] = onTouchEnd;
-  	obj[_pre + 'dblclick' + id] = handler;
-
-  	obj.addEventListener(_touchstart, onTouchStart, passiveEvents ? {passive: false} : false);
-  	obj.addEventListener(_touchend, onTouchEnd, passiveEvents ? {passive: false} : false);
-
-  	// On some platforms (notably, chrome<55 on win10 + touchscreen + mouse),
-  	// the browser doesn't fire touchend/pointerup events but does fire
-  	// native dblclicks. See #4127.
-  	// Edge 14 also fires native dblclicks, but only for pointerType mouse, see #5180.
-  	obj.addEventListener('dblclick', handler, false);
-
-  	return this;
+  	return {
+  		dblclick: handler,
+  		simDblclick: simDblclick
+  	};
   }
 
-  function removeDoubleTapListener(obj, id) {
-  	var touchstart = obj[_pre + _touchstart + id],
-  	    touchend = obj[_pre + _touchend + id],
-  	    dblclick = obj[_pre + 'dblclick' + id];
-
-  	obj.removeEventListener(_touchstart, touchstart, passiveEvents ? {passive: false} : false);
-  	obj.removeEventListener(_touchend, touchend, passiveEvents ? {passive: false} : false);
-  	obj.removeEventListener('dblclick', dblclick, false);
-
-  	return this;
+  function removeDoubleTapListener(obj, handlers) {
+  	obj.removeEventListener('dblclick', handlers.dblclick);
+  	obj.removeEventListener('click', handlers.simDblclick);
   }
 
   /*
@@ -2417,7 +2417,7 @@
   	var pos = offset || new Point(0, 0);
 
   	el.style[TRANSFORM] =
-  		(ie3d ?
+  		(Browser.ie3d ?
   			'translate(' + pos.x + 'px,' + pos.y + 'px)' :
   			'translate3d(' + pos.x + 'px,' + pos.y + 'px,0)') +
   		(scale ? ' scale(' + scale + ')' : '');
@@ -2433,7 +2433,7 @@
   	el._leaflet_pos = point;
   	/* eslint-enable */
 
-  	if (any3d) {
+  	if (Browser.any3d) {
   		setTransform(el, point);
   	} else {
   		el.style.left = point.x + 'px';
@@ -2551,7 +2551,8 @@
   	};
   }
 
-  var DomUtil = ({
+  var DomUtil = {
+    __proto__: null,
     TRANSFORM: TRANSFORM,
     TRANSITION: TRANSITION,
     TRANSITION_END: TRANSITION_END,
@@ -2572,15 +2573,15 @@
     setTransform: setTransform,
     setPosition: setPosition,
     getPosition: getPosition,
-    disableTextSelection: disableTextSelection,
-    enableTextSelection: enableTextSelection,
+    get disableTextSelection () { return disableTextSelection; },
+    get enableTextSelection () { return enableTextSelection; },
     disableImageDrag: disableImageDrag,
     enableImageDrag: enableImageDrag,
     preventOutline: preventOutline,
     restoreOutline: restoreOutline,
     getSizedParentNode: getSizedParentNode,
     getScale: getScale
-  });
+  };
 
   /*
    * @namespace DomEvent
@@ -2600,7 +2601,7 @@
   // Adds a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
   function on(obj, types, fn, context) {
 
-  	if (typeof types === 'object') {
+  	if (types && typeof types === 'object') {
   		for (var type in types) {
   			addOne(obj, type, types[type], fn);
   		}
@@ -2625,32 +2626,48 @@
   // @alternative
   // @function off(el: HTMLElement, eventMap: Object, context?: Object): this
   // Removes a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
+
+  // @alternative
+  // @function off(el: HTMLElement, types: String): this
+  // Removes all previously added listeners of given types.
+
+  // @alternative
+  // @function off(el: HTMLElement): this
+  // Removes all previously added listeners from given HTMLElement
   function off(obj, types, fn, context) {
 
-  	if (typeof types === 'object') {
+  	if (arguments.length === 1) {
+  		batchRemove(obj);
+  		delete obj[eventsKey];
+
+  	} else if (types && typeof types === 'object') {
   		for (var type in types) {
   			removeOne(obj, type, types[type], fn);
   		}
-  	} else if (types) {
+
+  	} else {
   		types = splitWords(types);
 
-  		for (var i = 0, len = types.length; i < len; i++) {
-  			removeOne(obj, types[i], fn, context);
+  		if (arguments.length === 2) {
+  			batchRemove(obj, function (type) {
+  				return indexOf(types, type) !== -1;
+  			});
+  		} else {
+  			for (var i = 0, len = types.length; i < len; i++) {
+  				removeOne(obj, types[i], fn, context);
+  			}
   		}
-  	} else {
-  		for (var j in obj[eventsKey]) {
-  			removeOne(obj, j, obj[eventsKey][j]);
-  		}
-  		delete obj[eventsKey];
   	}
 
   	return this;
   }
 
-  function browserFiresNativeDblClick() {
-  	// See https://github.com/w3c/pointerevents/issues/171
-  	if (pointer) {
-  		return !(edge || safari);
+  function batchRemove(obj, filterFn) {
+  	for (var id in obj[eventsKey]) {
+  		var type = id.split(/\d/)[0];
+  		if (!filterFn || filterFn(type)) {
+  			removeOne(obj, type, null, null, id);
+  		}
   	}
   }
 
@@ -2671,17 +2688,17 @@
 
   	var originalHandler = handler;
 
-  	if (pointer && type.indexOf('touch') === 0) {
+  	if (!Browser.touchNative && Browser.pointer && type.indexOf('touch') === 0) {
   		// Needs DomEvent.Pointer.js
-  		addPointerListener(obj, type, handler, id);
+  		handler = addPointerListener(obj, type, handler);
 
-  	} else if (touch && (type === 'dblclick') && !browserFiresNativeDblClick()) {
-  		addDoubleTapListener(obj, handler, id);
+  	} else if (Browser.touch && (type === 'dblclick')) {
+  		handler = addDoubleTapListener(obj, handler);
 
   	} else if ('addEventListener' in obj) {
 
   		if (type === 'touchstart' || type === 'touchmove' || type === 'wheel' ||  type === 'mousewheel') {
-  			obj.addEventListener(mouseSubst[type] || type, handler, passiveEvents ? {passive: false} : false);
+  			obj.addEventListener(mouseSubst[type] || type, handler, Browser.passiveEvents ? {passive: false} : false);
 
   		} else if (type === 'mouseenter' || type === 'mouseleave') {
   			handler = function (e) {
@@ -2696,7 +2713,7 @@
   			obj.addEventListener(type, originalHandler, false);
   		}
 
-  	} else if ('attachEvent' in obj) {
+  	} else {
   		obj.attachEvent('on' + type, handler);
   	}
 
@@ -2704,24 +2721,23 @@
   	obj[eventsKey][id] = handler;
   }
 
-  function removeOne(obj, type, fn, context) {
-
-  	var id = type + stamp(fn) + (context ? '_' + stamp(context) : ''),
-  	    handler = obj[eventsKey] && obj[eventsKey][id];
+  function removeOne(obj, type, fn, context, id) {
+  	id = id || type + stamp(fn) + (context ? '_' + stamp(context) : '');
+  	var handler = obj[eventsKey] && obj[eventsKey][id];
 
   	if (!handler) { return this; }
 
-  	if (pointer && type.indexOf('touch') === 0) {
-  		removePointerListener(obj, type, id);
+  	if (!Browser.touchNative && Browser.pointer && type.indexOf('touch') === 0) {
+  		removePointerListener(obj, type, handler);
 
-  	} else if (touch && (type === 'dblclick') && !browserFiresNativeDblClick()) {
-  		removeDoubleTapListener(obj, id);
+  	} else if (Browser.touch && (type === 'dblclick')) {
+  		removeDoubleTapListener(obj, handler);
 
   	} else if ('removeEventListener' in obj) {
 
   		obj.removeEventListener(mouseSubst[type] || type, handler, false);
 
-  	} else if ('detachEvent' in obj) {
+  	} else {
   		obj.detachEvent('on' + type, handler);
   	}
 
@@ -2744,7 +2760,6 @@
   	} else {
   		e.cancelBubble = true;
   	}
-  	skipped(e);
 
   	return this;
   }
@@ -2757,11 +2772,11 @@
   }
 
   // @function disableClickPropagation(el: HTMLElement): this
-  // Adds `stopPropagation` to the element's `'click'`, `'doubleclick'`,
+  // Adds `stopPropagation` to the element's `'click'`, `'dblclick'`, `'contextmenu'`,
   // `'mousedown'` and `'touchstart'` events (plus browser variants).
   function disableClickPropagation(el) {
-  	on(el, 'mousedown touchstart dblclick', stopPropagation);
-  	addOne(el, 'click', fakeStop);
+  	on(el, 'mousedown touchstart dblclick contextmenu', stopPropagation);
+  	el['_leaflet_disable_click'] = true;
   	return this;
   }
 
@@ -2809,8 +2824,8 @@
   // Chrome on Win scrolls double the pixels as in other platforms (see #4538),
   // and Firefox scrolls device pixels, not CSS pixels
   var wheelPxFactor =
-  	(win && chrome) ? 2 * window.devicePixelRatio :
-  	gecko ? window.devicePixelRatio : 1;
+  	(Browser.win && Browser.chrome) ? 2 * window.devicePixelRatio :
+  	Browser.gecko ? window.devicePixelRatio : 1;
 
   // @function getWheelDelta(ev: DOMEvent): Number
   // Gets normalized wheel delta from a wheel DOM event, in vertical
@@ -2818,7 +2833,7 @@
   // Events from pointing devices without precise scrolling are mapped to
   // a best guess of 60 pixels.
   function getWheelDelta(e) {
-  	return (edge) ? e.wheelDeltaY / 2 : // Don't trust window-geometry-based delta
+  	return (Browser.edge) ? e.wheelDeltaY / 2 : // Don't trust window-geometry-based delta
   	       (e.deltaY && e.deltaMode === 0) ? -e.deltaY / wheelPxFactor : // Pixels
   	       (e.deltaY && e.deltaMode === 1) ? -e.deltaY * 20 : // Lines
   	       (e.deltaY && e.deltaMode === 2) ? -e.deltaY * 60 : // Pages
@@ -2827,20 +2842,6 @@
   	       (e.detail && Math.abs(e.detail) < 32765) ? -e.detail * 20 : // Legacy Moz lines
   	       e.detail ? e.detail / -32765 * 60 : // Legacy Moz pages
   	       0;
-  }
-
-  var skipEvents = {};
-
-  function fakeStop(e) {
-  	// fakes stopPropagation by setting a special event flag, checked/reset with skipped(e)
-  	skipEvents[e.type] = true;
-  }
-
-  function skipped(e) {
-  	var events = skipEvents[e.type];
-  	// reset when checking, as it's only used in map container and propagates outside of the map
-  	skipEvents[e.type] = false;
-  	return events;
   }
 
   // check if element really left/entered the event target (for mouseenter/mouseleave)
@@ -2860,7 +2861,8 @@
   	return (related !== el);
   }
 
-  var DomEvent = ({
+  var DomEvent = {
+    __proto__: null,
     on: on,
     off: off,
     stopPropagation: stopPropagation,
@@ -2870,12 +2872,10 @@
     stop: stop,
     getMousePosition: getMousePosition,
     getWheelDelta: getWheelDelta,
-    fakeStop: fakeStop,
-    skipped: skipped,
     isExternalTarget: isExternalTarget,
     addListener: on,
     removeListener: off
-  });
+  };
 
   /*
    * @class PosAnimation
@@ -3119,7 +3119,7 @@
   		this.callInitHooks();
 
   		// don't animate on browsers without hardware-accelerated transitions or old Android/Opera
-  		this._zoomAnimated = TRANSITION && any3d && !mobileOpera &&
+  		this._zoomAnimated = TRANSITION && Browser.any3d && !Browser.mobileOpera &&
   				this.options.zoomAnimation;
 
   		// zoom transitions run with the same duration for all layers, so if one of transitionend events
@@ -3184,14 +3184,14 @@
   	// @method zoomIn(delta?: Number, options?: Zoom options): this
   	// Increases the zoom of the map by `delta` ([`zoomDelta`](#map-zoomdelta) by default).
   	zoomIn: function (delta, options) {
-  		delta = delta || (any3d ? this.options.zoomDelta : 1);
+  		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1);
   		return this.setZoom(this._zoom + delta, options);
   	},
 
   	// @method zoomOut(delta?: Number, options?: Zoom options): this
   	// Decreases the zoom of the map by `delta` ([`zoomDelta`](#map-zoomdelta) by default).
   	zoomOut: function (delta, options) {
-  		delta = delta || (any3d ? this.options.zoomDelta : 1);
+  		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1);
   		return this.setZoom(this._zoom - delta, options);
   	},
 
@@ -3321,7 +3321,7 @@
   	flyTo: function (targetCenter, targetZoom, options) {
 
   		options = options || {};
-  		if (options.animate === false || !any3d) {
+  		if (options.animate === false || !Browser.any3d) {
   			return this.setView(targetCenter, targetZoom, options);
   		}
 
@@ -3474,10 +3474,9 @@
   		return this;
   	},
 
-  	// @method panInside(latlng: LatLng, options?: options): this
+  	// @method panInside(latlng: LatLng, options?: padding options): this
   	// Pans the map the minimum amount to make the `latlng` visible. Use
-  	// `padding`, `paddingTopLeft` and `paddingTopRight` options to fit
-  	// the display to more restricted bounds, like [`fitBounds`](#map-fitbounds).
+  	// padding options to fit the display to more restricted bounds.
   	// If `latlng` is already within the (optionally padded) display bounds,
   	// the map will not be panned.
   	panInside: function (latlng, options) {
@@ -3485,35 +3484,19 @@
 
   		var paddingTL = toPoint(options.paddingTopLeft || options.padding || [0, 0]),
   		    paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]),
-  		    center = this.getCenter(),
-  		    pixelCenter = this.project(center),
+  		    pixelCenter = this.project(this.getCenter()),
   		    pixelPoint = this.project(latlng),
   		    pixelBounds = this.getPixelBounds(),
-  		    halfPixelBounds = pixelBounds.getSize().divideBy(2),
-  		    paddedBounds = toBounds([pixelBounds.min.add(paddingTL), pixelBounds.max.subtract(paddingBR)]);
+  		    paddedBounds = toBounds([pixelBounds.min.add(paddingTL), pixelBounds.max.subtract(paddingBR)]),
+  		    paddedSize = paddedBounds.getSize();
 
   		if (!paddedBounds.contains(pixelPoint)) {
   			this._enforcingBounds = true;
-  			var diff = pixelCenter.subtract(pixelPoint),
-  			    newCenter = toPoint(pixelPoint.x + diff.x, pixelPoint.y + diff.y);
-
-  			if (pixelPoint.x < paddedBounds.min.x || pixelPoint.x > paddedBounds.max.x) {
-  				newCenter.x = pixelCenter.x - diff.x;
-  				if (diff.x > 0) {
-  					newCenter.x += halfPixelBounds.x - paddingTL.x;
-  				} else {
-  					newCenter.x -= halfPixelBounds.x - paddingBR.x;
-  				}
-  			}
-  			if (pixelPoint.y < paddedBounds.min.y || pixelPoint.y > paddedBounds.max.y) {
-  				newCenter.y = pixelCenter.y - diff.y;
-  				if (diff.y > 0) {
-  					newCenter.y += halfPixelBounds.y - paddingTL.y;
-  				} else {
-  					newCenter.y -= halfPixelBounds.y - paddingBR.y;
-  				}
-  			}
-  			this.panTo(this.unproject(newCenter), options);
+  			var centerOffset = pixelPoint.subtract(paddedBounds.getCenter());
+  			var offset = paddedBounds.extend(pixelPoint).getSize().subtract(paddedSize);
+  			pixelCenter.x += centerOffset.x < 0 ? -offset.x : offset.x;
+  			pixelCenter.y += centerOffset.y < 0 ? -offset.y : offset.y;
+  			this.panTo(this.unproject(pixelCenter), options);
   			this._enforcingBounds = false;
   		}
   		return this;
@@ -3644,6 +3627,8 @@
   	},
 
   	_handleGeolocationError: function (error) {
+  		if (!this._container._leaflet_id) { return; }
+
   		var c = error.code,
   		    message = error.message ||
   		            (c === 1 ? 'permission denied' :
@@ -3663,6 +3648,8 @@
   	},
 
   	_handleGeolocationResponse: function (pos) {
+  		if (!this._container._leaflet_id) { return; }
+
   		var lat = pos.coords.latitude,
   		    lng = pos.coords.longitude,
   		    latlng = new LatLng(lat, lng),
@@ -3715,7 +3702,7 @@
   	remove: function () {
 
   		this._initEvents(true);
-  		this.off('moveend', this._panInsideMaxBounds);
+  		if (this.options.maxBounds) { this.off('moveend', this._panInsideMaxBounds); }
 
   		if (this._containerId !== this._container._leaflet_id) {
   			throw new Error('Map container is being reused by another instance');
@@ -3847,7 +3834,7 @@
   		    se = bounds.getSouthEast(),
   		    size = this.getSize().subtract(padding),
   		    boundsSize = toBounds(this.project(se, zoom), this.project(nw, zoom)).getSize(),
-  		    snap = any3d ? this.options.zoomSnap : 1,
+  		    snap = Browser.any3d ? this.options.zoomSnap : 1,
   		    scalex = size.x / boundsSize.x,
   		    scaley = size.y / boundsSize.y,
   		    scale = inside ? Math.max(scalex, scaley) : Math.min(scalex, scaley);
@@ -4075,13 +4062,13 @@
   	_initLayout: function () {
   		var container = this._container;
 
-  		this._fadeAnimated = this.options.fadeAnimation && any3d;
+  		this._fadeAnimated = this.options.fadeAnimation && Browser.any3d;
 
   		addClass(container, 'leaflet-container' +
-  			(touch ? ' leaflet-touch' : '') +
-  			(retina ? ' leaflet-retina' : '') +
-  			(ielt9 ? ' leaflet-oldie' : '') +
-  			(safari ? ' leaflet-safari' : '') +
+  			(Browser.touch ? ' leaflet-touch' : '') +
+  			(Browser.retina ? ' leaflet-retina' : '') +
+  			(Browser.ielt9 ? ' leaflet-oldie' : '') +
+  			(Browser.safari ? ' leaflet-safari' : '') +
   			(this._fadeAnimated ? ' leaflet-fade-anim' : ''));
 
   		var position = getStyle(container, 'position');
@@ -4198,28 +4185,28 @@
   		this._pixelOrigin = this._getNewPixelOrigin(center);
 
   		// @event zoom: Event
-  		// Fired repeatedly during any change in zoom level, including zoom
-  		// and fly animations.
+  		// Fired repeatedly during any change in zoom level,
+  		// including zoom and fly animations.
   		if (zoomChanged || (data && data.pinch)) {	// Always fire 'zoom' if pinching because #3530
   			this.fire('zoom', data);
   		}
 
   		// @event move: Event
-  		// Fired repeatedly during any movement of the map, including pan and
-  		// fly animations.
+  		// Fired repeatedly during any movement of the map,
+  		// including pan and fly animations.
   		return this.fire('move', data);
   	},
 
   	_moveEnd: function (zoomChanged) {
   		// @event zoomend: Event
-  		// Fired when the map has changed, after any animations.
+  		// Fired when the map zoom changed, after any animations.
   		if (zoomChanged) {
   			this.fire('zoomend');
   		}
 
   		// @event moveend: Event
-  		// Fired when the center of the map stops changing (e.g. user stopped
-  		// dragging the map).
+  		// Fired when the center of the map stops changing
+  		// (e.g. user stopped dragging the map or after non-centered zoom).
   		return this.fire('moveend');
   	},
 
@@ -4254,11 +4241,11 @@
   	// DOM event handling
 
   	// @section Interaction events
-  	_initEvents: function (remove$$1) {
+  	_initEvents: function (remove) {
   		this._targets = {};
   		this._targets[stamp(this._container)] = this;
 
-  		var onOff = remove$$1 ? off : on;
+  		var onOff = remove ? off : on;
 
   		// @event click: MouseEvent
   		// Fired when the user clicks (or taps) the map.
@@ -4294,8 +4281,8 @@
   			onOff(window, 'resize', this._onResize, this);
   		}
 
-  		if (any3d && this.options.transform3DLimit) {
-  			(remove$$1 ? this.off : this.on).call(this, 'moveend', this._onMoveEnd);
+  		if (Browser.any3d && this.options.transform3DLimit) {
+  			(remove ? this.off : this.on).call(this, 'moveend', this._onMoveEnd);
   		}
   	},
 
@@ -4328,7 +4315,7 @@
 
   		while (src) {
   			target = this._targets[stamp(src)];
-  			if (target && (type === 'click' || type === 'preclick') && !e._simulated && this._draggableMoved(target)) {
+  			if (target && (type === 'click' || type === 'preclick') && this._draggableMoved(target)) {
   				// Prevent firing click after you just dragged an object.
   				dragging = true;
   				break;
@@ -4347,14 +4334,24 @@
   		return targets;
   	},
 
+  	_isClickDisabled: function (el) {
+  		while (el !== this._container) {
+  			if (el['_leaflet_disable_click']) { return true; }
+  			el = el.parentNode;
+  		}
+  	},
+
   	_handleDOMEvent: function (e) {
-  		if (!this._loaded || skipped(e)) { return; }
+  		var el = (e.target || e.srcElement);
+  		if (!this._loaded || el['_leaflet_disable_events'] || e.type === 'click' && this._isClickDisabled(el)) {
+  			return;
+  		}
 
   		var type = e.type;
 
   		if (type === 'mousedown') {
   			// prevents outline when clicking on keyboard-focusable element
-  			preventOutline(e.target || e.srcElement);
+  			preventOutline(el);
   		}
 
   		this._fireDOMEvent(e, type);
@@ -4362,7 +4359,7 @@
 
   	_mouseEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu'],
 
-  	_fireDOMEvent: function (e, type, targets) {
+  	_fireDOMEvent: function (e, type, canvasTargets) {
 
   		if (e.type === 'click') {
   			// Fire a synthetic 'preclick' event which propagates up (mainly for closing popups).
@@ -4372,21 +4369,29 @@
   			// handlers start running).
   			var synth = extend({}, e);
   			synth.type = 'preclick';
-  			this._fireDOMEvent(synth, synth.type, targets);
+  			this._fireDOMEvent(synth, synth.type, canvasTargets);
   		}
 
-  		if (e._stopped) { return; }
-
   		// Find the layer the event is propagating from and its parents.
-  		targets = (targets || []).concat(this._findEventTargets(e, type));
+  		var targets = this._findEventTargets(e, type);
+
+  		if (canvasTargets) {
+  			var filtered = []; // pick only targets with listeners
+  			for (var i = 0; i < canvasTargets.length; i++) {
+  				if (canvasTargets[i].listens(type, true)) {
+  					filtered.push(canvasTargets[i]);
+  				}
+  			}
+  			targets = filtered.concat(targets);
+  		}
 
   		if (!targets.length) { return; }
 
-  		var target = targets[0];
-  		if (type === 'contextmenu' && target.listens(type, true)) {
+  		if (type === 'contextmenu') {
   			preventDefault(e);
   		}
 
+  		var target = targets[0];
   		var data = {
   			originalEvent: e
   		};
@@ -4399,7 +4404,7 @@
   			data.latlng = isMarker ? target.getLatLng() : this.layerPointToLatLng(data.layerPoint);
   		}
 
-  		for (var i = 0; i < targets.length; i++) {
+  		for (i = 0; i < targets.length; i++) {
   			targets[i].fire(type, data, true);
   			if (data.originalEvent._stopped ||
   				(targets[i].options.bubblingMouseEvents === false && indexOf(this._mouseEvents, type) !== -1)) { return; }
@@ -4535,7 +4540,7 @@
   	_limitZoom: function (zoom) {
   		var min = this.getMinZoom(),
   		    max = this.getMaxZoom(),
-  		    snap = any3d ? this.options.zoomSnap : 1;
+  		    snap = Browser.any3d ? this.options.zoomSnap : 1;
   		if (snap) {
   			zoom = Math.round(zoom / snap) * snap;
   		}
@@ -4702,7 +4707,7 @@
 
   var Control = Class.extend({
   	// @section
-  	// @aka Control options
+  	// @aka Control Options
   	options: {
   		// @option position: String = 'topright'
   		// The position of the control (one of the map corners). Possible values are `'topleft'`,
@@ -5042,24 +5047,24 @@
   		if (collapsed) {
   			this._map.on('click', this.collapse, this);
 
-  			if (!android) {
-  				on(container, {
-  					mouseenter: this.expand,
-  					mouseleave: this.collapse
-  				}, this);
-  			}
+  			on(container, {
+  				mouseenter: function () {
+  					on(section, 'click', preventDefault);
+  					this.expand();
+  					setTimeout(function () {
+  						off(section, 'click', preventDefault);
+  					});
+  				},
+  				mouseleave: this.collapse
+  			}, this);
   		}
 
   		var link = this._layersLink = create$1('a', className + '-toggle', container);
   		link.href = '#';
   		link.title = 'Layers';
 
-  		if (touch) {
-  			on(link, 'click', stop);
-  			on(link, 'click', this.expand, this);
-  		} else {
-  			on(link, 'focus', this.expand, this);
-  		}
+  		on(link, 'click', preventDefault); // prevent link function
+  		on(link, 'focus', this.expand, this);
 
   		if (!collapsed) {
   			this.expand();
@@ -5264,16 +5269,6 @@
   			this.expand();
   		}
   		return this;
-  	},
-
-  	_expand: function () {
-  		// Backward compatibility, remove me in 1.1.
-  		return this.expand();
-  	},
-
-  	_collapse: function () {
-  		// Backward compatibility, remove me in 1.1.
-  		return this.collapse();
   	}
 
   });
@@ -5299,17 +5294,17 @@
   	options: {
   		position: 'topleft',
 
-  		// @option zoomInText: String = '+'
+  		// @option zoomInText: String = '<span aria-hidden="true">+</span>'
   		// The text set on the 'zoom in' button.
-  		zoomInText: '+',
+  		zoomInText: '<span aria-hidden="true">+</span>',
 
   		// @option zoomInTitle: String = 'Zoom in'
   		// The title set on the 'zoom in' button.
   		zoomInTitle: 'Zoom in',
 
-  		// @option zoomOutText: String = '&#x2212;'
+  		// @option zoomOutText: String = '<span aria-hidden="true">&#x2212;</span>'
   		// The text set on the 'zoom out' button.
-  		zoomOutText: '&#x2212;',
+  		zoomOutText: '<span aria-hidden="true">&#x2212;</span>',
 
   		// @option zoomOutTitle: String = 'Zoom out'
   		// The title set on the 'zoom out' button.
@@ -5571,7 +5566,8 @@
 
   		// @option prefix: String = 'Leaflet'
   		// The HTML text shown before the attributions. Pass `false` to disable.
-  		prefix: '<a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a>'
+  		prefix: '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">Leaflet</a>'
+
   	},
 
   	initialize: function (options) {
@@ -5594,7 +5590,22 @@
 
   		this._update();
 
+  		map.on('layeradd', this._addAttribution, this);
+
   		return this._container;
+  	},
+
+  	onRemove: function (map) {
+  		map.off('layeradd', this._addAttribution, this);
+  	},
+
+  	_addAttribution: function (ev) {
+  		if (ev.layer.getAttribution) {
+  			this.addAttribution(ev.layer.getAttribution());
+  			ev.layer.once('remove', function () {
+  				this.removeAttribution(ev.layer.getAttribution());
+  			}, this);
+  		}
   	},
 
   	// @method setPrefix(prefix: String): this
@@ -5762,20 +5773,7 @@
    * ```
    */
 
-  var START = touch ? 'touchstart mousedown' : 'mousedown';
-  var END = {
-  	mousedown: 'mouseup',
-  	touchstart: 'touchend',
-  	pointerdown: 'touchend',
-  	MSPointerDown: 'touchend'
-  };
-  var MOVE = {
-  	mousedown: 'mousemove',
-  	touchstart: 'touchmove',
-  	pointerdown: 'touchmove',
-  	MSPointerDown: 'touchmove'
-  };
-
+  var START = Browser.touch ? 'touchstart mousedown' : 'mousedown';
 
   var Draggable = Evented.extend({
 
@@ -5790,12 +5788,12 @@
 
   	// @constructor L.Draggable(el: HTMLElement, dragHandle?: HTMLElement, preventOutline?: Boolean, options?: Draggable options)
   	// Creates a `Draggable` object for moving `el` when you start dragging the `dragHandle` element (equals `el` itself by default).
-  	initialize: function (element, dragStartTarget, preventOutline$$1, options) {
+  	initialize: function (element, dragStartTarget, preventOutline, options) {
   		setOptions(this, options);
 
   		this._element = element;
   		this._dragStartTarget = dragStartTarget || element;
-  		this._preventOutline = preventOutline$$1;
+  		this._preventOutline = preventOutline;
   	},
 
   	// @method enable()
@@ -5826,12 +5824,9 @@
   	},
 
   	_onDown: function (e) {
-  		// Ignore simulated events, since we handle both touch and
-  		// mouse explicitly; otherwise we risk getting duplicates of
-  		// touch events, see #4315.
-  		// Also ignore the event if disabled; this happens in IE11
+  		// Ignore the event if disabled; this happens in IE11
   		// under some circumstances, see #3666.
-  		if (e._simulated || !this._enabled) { return; }
+  		if (!this._enabled) { return; }
 
   		this._moved = false;
 
@@ -5861,17 +5856,15 @@
   		// Cache the scale, so that we can continuously compensate for it during drag (_onMove).
   		this._parentScale = getScale(sizedParent);
 
-  		on(document, MOVE[e.type], this._onMove, this);
-  		on(document, END[e.type], this._onUp, this);
+  		var mouseevent = e.type === 'mousedown';
+  		on(document, mouseevent ? 'mousemove' : 'touchmove', this._onMove, this);
+  		on(document, mouseevent ? 'mouseup' : 'touchend touchcancel', this._onUp, this);
   	},
 
   	_onMove: function (e) {
-  		// Ignore simulated events, since we handle both touch and
-  		// mouse explicitly; otherwise we risk getting duplicates of
-  		// touch events, see #4315.
-  		// Also ignore the event if disabled; this happens in IE11
+  		// Ignore the event if disabled; this happens in IE11
   		// under some circumstances, see #3666.
-  		if (e._simulated || !this._enabled) { return; }
+  		if (!this._enabled) { return; }
 
   		if (e.touches && e.touches.length > 1) {
   			this._moved = true;
@@ -5933,13 +5926,10 @@
   		this.fire('drag', e);
   	},
 
-  	_onUp: function (e) {
-  		// Ignore simulated events, since we handle both touch and
-  		// mouse explicitly; otherwise we risk getting duplicates of
-  		// touch events, see #4315.
-  		// Also ignore the event if disabled; this happens in IE11
+  	_onUp: function () {
+  		// Ignore the event if disabled; this happens in IE11
   		// under some circumstances, see #3666.
-  		if (e._simulated || !this._enabled) { return; }
+  		if (!this._enabled) { return; }
   		this.finishDrag();
   	},
 
@@ -5951,10 +5941,8 @@
   			this._lastTarget = null;
   		}
 
-  		for (var i in MOVE) {
-  			off(document, MOVE[i], this._onMove, this);
-  			off(document, END[i], this._onUp, this);
-  		}
+  		off(document, 'mousemove touchmove', this._onMove, this);
+  		off(document, 'mouseup touchend touchcancel', this._onUp, this);
 
   		enableImageDrag();
   		enableTextSelection();
@@ -6215,7 +6203,8 @@
   	return isFlat(latlngs);
   }
 
-  var LineUtil = ({
+  var LineUtil = {
+    __proto__: null,
     simplify: simplify,
     pointToSegmentDistance: pointToSegmentDistance,
     closestPointOnSegment: closestPointOnSegment,
@@ -6225,7 +6214,7 @@
     _sqClosestPointOnSegment: _sqClosestPointOnSegment,
     isFlat: isFlat,
     _flat: _flat
-  });
+  };
 
   /*
    * @namespace PolyUtil
@@ -6281,9 +6270,10 @@
   	return points;
   }
 
-  var PolyUtil = ({
+  var PolyUtil = {
+    __proto__: null,
     clipPolygon: clipPolygon
-  });
+  };
 
   /*
    * @namespace Projection
@@ -6379,11 +6369,12 @@
 
    */
 
-  var index = ({
+  var index = {
+    __proto__: null,
     LonLat: LonLat,
     Mercator: Mercator,
     SphericalMercator: SphericalMercator
-  });
+  };
 
   /*
    * @namespace CRS
@@ -6570,10 +6561,6 @@
 
   		this.onAdd(map);
 
-  		if (this.getAttribution && map.attributionControl) {
-  			map.attributionControl.addAttribution(this.getAttribution());
-  		}
-
   		this.fire('add');
   		map.fire('layeradd', {layer: this});
   	}
@@ -6646,10 +6633,6 @@
   			layer.onRemove(this);
   		}
 
-  		if (layer.getAttribution && this.attributionControl) {
-  			this.attributionControl.removeAttribution(layer.getAttribution());
-  		}
-
   		delete this._layers[id];
 
   		if (this._loaded) {
@@ -6665,7 +6648,7 @@
   	// @method hasLayer(layer: Layer): Boolean
   	// Returns `true` if the given layer is currently added to the map
   	hasLayer: function (layer) {
-  		return !!layer && (stamp(layer) in this._layers);
+  		return stamp(layer) in this._layers;
   	},
 
   	/* @method eachLayer(fn: Function, context?: Object): this
@@ -6692,7 +6675,7 @@
   	},
 
   	_addZoomLimit: function (layer) {
-  		if (isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
+  		if (!isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
   			this._zoomBoundLayers[stamp(layer)] = layer;
   			this._updateZoomLevels();
   		}
@@ -6810,7 +6793,6 @@
   	// @method hasLayer(id: Number): Boolean
   	// Returns `true` if the given internal ID is currently added to the group.
   	hasLayer: function (layer) {
-  		if (!layer) { return false; }
   		var layerId = typeof layer === 'number' ? layer : this.getLayerId(layer);
   		return layerId in this._layers;
   	},
@@ -7138,7 +7120,7 @@
   	},
 
   	_getIconUrl: function (name) {
-  		return retina && this.options[name + 'RetinaUrl'] || this.options[name + 'Url'];
+  		return Browser.retina && this.options[name + 'RetinaUrl'] || this.options[name + 'Url'];
   	}
   });
 
@@ -7179,7 +7161,7 @@
   	},
 
   	_getIconUrl: function (name) {
-  		if (!IconDefault.imagePath) {	// Deprecated, backwards-compatibility only
+  		if (typeof IconDefault.imagePath !== 'string') {	// Deprecated, backwards-compatibility only
   			IconDefault.imagePath = this._detectIconPath();
   		}
 
@@ -7190,20 +7172,26 @@
   		return (this.options.imagePath || IconDefault.imagePath) + Icon.prototype._getIconUrl.call(this, name);
   	},
 
+  	_stripUrl: function (path) {	// separate function to use in tests
+  		var strip = function (str, re, idx) {
+  			var match = re.exec(str);
+  			return match && match[idx];
+  		};
+  		path = strip(path, /^url\((['"])?(.+)\1\)$/, 2);
+  		return path && strip(path, /^(.*)marker-icon\.png$/, 1);
+  	},
+
   	_detectIconPath: function () {
   		var el = create$1('div',  'leaflet-default-icon-path', document.body);
   		var path = getStyle(el, 'background-image') ||
   		           getStyle(el, 'backgroundImage');	// IE8
 
   		document.body.removeChild(el);
-
-  		if (path === null || path.indexOf('url') !== 0) {
-  			path = '';
-  		} else {
-  			path = path.replace(/^url\(["']?/, '').replace(/marker-icon\.png["']?\)$/, '');
-  		}
-
-  		return path;
+  		path = this._stripUrl(path);
+  		if (path) { return path; }
+  		var link = document.querySelector('link[href$="leaflet.css"]');
+  		if (!link) { return ''; }
+  		return link.href.substring(0, link.href.length - 'leaflet.css'.length - 1);
   	}
   });
 
@@ -7883,7 +7871,8 @@
 
   	_clickTolerance: function () {
   		// used when doing hit detection for Canvas layers
-  		return (this.options.stroke ? this.options.weight / 2 : 0) + this._renderer.options.tolerance;
+  		return (this.options.stroke ? this.options.weight / 2 : 0) +
+  		  (this._renderer.options.tolerance || 0);
   	}
   });
 
@@ -8303,6 +8292,11 @@
   	_updateBounds: function () {
   		var w = this._clickTolerance(),
   		    p = new Point(w, w);
+
+  		if (!this._rawPxBounds) {
+  			return;
+  		}
+
   		this._pxBounds = new Bounds([
   			this._rawPxBounds.min.subtract(p),
   			this._rawPxBounds.max.add(p)
@@ -8844,18 +8838,19 @@
   	return latlngs;
   }
 
-  // @function latLngToCoords(latlng: LatLng, precision?: Number): Array
+  // @function latLngToCoords(latlng: LatLng, precision?: Number|false): Array
   // Reverse of [`coordsToLatLng`](#geojson-coordstolatlng)
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function.
   function latLngToCoords(latlng, precision) {
-  	precision = typeof precision === 'number' ? precision : 6;
   	return latlng.alt !== undefined ?
   		[formatNum(latlng.lng, precision), formatNum(latlng.lat, precision), formatNum(latlng.alt, precision)] :
   		[formatNum(latlng.lng, precision), formatNum(latlng.lat, precision)];
   }
 
-  // @function latLngsToCoords(latlngs: Array, levelsDeep?: Number, closed?: Boolean): Array
+  // @function latLngsToCoords(latlngs: Array, levelsDeep?: Number, closed?: Boolean, precision?: Number|false): Array
   // Reverse of [`coordsToLatLngs`](#geojson-coordstolatlngs)
   // `closed` determines whether the first point should be appended to the end of the array to close the feature, only used when `levelsDeep` is 0. False by default.
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function.
   function latLngsToCoords(latlngs, levelsDeep, closed, precision) {
   	var coords = [];
 
@@ -8903,25 +8898,22 @@
 
   // @namespace Marker
   // @section Other methods
-  // @method toGeoJSON(precision?: Number): Object
-  // `precision` is the number of decimal places for coordinates.
-  // The default value is 6 places.
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
   // Returns a [`GeoJSON`](http://en.wikipedia.org/wiki/GeoJSON) representation of the marker (as a GeoJSON `Point` Feature).
   Marker.include(PointToGeoJSON);
 
   // @namespace CircleMarker
-  // @method toGeoJSON(precision?: Number): Object
-  // `precision` is the number of decimal places for coordinates.
-  // The default value is 6 places.
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
   // Returns a [`GeoJSON`](http://en.wikipedia.org/wiki/GeoJSON) representation of the circle marker (as a GeoJSON `Point` Feature).
   Circle.include(PointToGeoJSON);
   CircleMarker.include(PointToGeoJSON);
 
 
   // @namespace Polyline
-  // @method toGeoJSON(precision?: Number): Object
-  // `precision` is the number of decimal places for coordinates.
-  // The default value is 6 places.
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
   // Returns a [`GeoJSON`](http://en.wikipedia.org/wiki/GeoJSON) representation of the polyline (as a GeoJSON `LineString` or `MultiLineString` Feature).
   Polyline.include({
   	toGeoJSON: function (precision) {
@@ -8937,9 +8929,8 @@
   });
 
   // @namespace Polygon
-  // @method toGeoJSON(precision?: Number): Object
-  // `precision` is the number of decimal places for coordinates.
-  // The default value is 6 places.
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
   // Returns a [`GeoJSON`](http://en.wikipedia.org/wiki/GeoJSON) representation of the polygon (as a GeoJSON `Polygon` or `MultiPolygon` Feature).
   Polygon.include({
   	toGeoJSON: function (precision) {
@@ -8975,9 +8966,8 @@
   		});
   	},
 
-  	// @method toGeoJSON(precision?: Number): Object
-  	// `precision` is the number of decimal places for coordinates.
-  	// The default value is 6 places.
+  	// @method toGeoJSON(precision?: Number|false): Object
+  	// Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
   	// Returns a [`GeoJSON`](http://en.wikipedia.org/wiki/GeoJSON) representation of the layer group (as a GeoJSON `FeatureCollection`, `GeometryCollection`, or `MultiPoint`).
   	toGeoJSON: function (precision) {
 
@@ -9590,38 +9580,45 @@
   		return this;
   	},
 
-  	_prepareOpen: function (parent, layer, latlng) {
-  		if (!(layer instanceof Layer)) {
-  			latlng = layer;
-  			layer = parent;
-  		}
+  	// prepare bound overlay to open: update latlng pos / content source (for FeatureGroup)
+  	_prepareOpen: function (latlng) {
+  		var source = this._source;
+  		if (!source._map) { return false; }
 
-  		if (layer instanceof FeatureGroup) {
-  			for (var id in parent._layers) {
-  				layer = parent._layers[id];
-  				break;
+  		if (source instanceof FeatureGroup) {
+  			source = null;
+  			var layers = this._source._layers;
+  			for (var id in layers) {
+  				if (layers[id]._map) {
+  					source = layers[id];
+  					break;
+  				}
   			}
+  			if (!source) { return false; } // Unable to get source layer.
+
+  			// set overlay source to this layer
+  			this._source = source;
   		}
 
   		if (!latlng) {
-  			if (layer.getCenter) {
-  				latlng = layer.getCenter();
-  			} else if (layer.getLatLng) {
-  				latlng = layer.getLatLng();
-  			} else if (layer.getBounds) {
-  				latlng = layer.getBounds().getCenter();
+  			if (source.getCenter) {
+  				latlng = source.getCenter();
+  			} else if (source.getLatLng) {
+  				latlng = source.getLatLng();
+  			} else if (source.getBounds) {
+  				latlng = source.getBounds().getCenter();
   			} else {
   				throw new Error('Unable to get source layer LatLng.');
   			}
   		}
+  		this.setLatLng(latlng);
 
-  		// set overlay source to this layer
-  		this._source = layer;
+  		if (this._map) {
+  			// update the overlay (content, layout, etc...)
+  			this.update();
+  		}
 
-  		// update the overlay (content, layout, ect...)
-  		this.update();
-
-  		return latlng;
+  		return true;
   	},
 
   	_updateContent: function () {
@@ -9851,10 +9848,12 @@
 
   		if (this.options.closeButton) {
   			var closeButton = this._closeButton = create$1('a', prefix + '-close-button', container);
+  			closeButton.setAttribute('role', 'button'); // overrides the implicit role=link of <a> elements #7399
+  			closeButton.setAttribute('aria-label', 'Close popup');
   			closeButton.href = '#close';
-  			closeButton.innerHTML = '&#215;';
+  			closeButton.innerHTML = '<span aria-hidden="true">&#215;</span>';
 
-  			on(closeButton, 'click', this._onCloseButtonClick, this);
+  			on(closeButton, 'click', this._close, this);
   		}
   	},
 
@@ -9894,7 +9893,7 @@
   		setPosition(this._container, pos.add(anchor));
   	},
 
-  	_adjustPan: function () {
+  	_adjustPan: function (e) {
   		if (!this.options.autoPan) { return; }
   		if (this._map._panAnim) { this._map._panAnim.stop(); }
 
@@ -9934,13 +9933,8 @@
   		if (dx || dy) {
   			map
   			    .fire('autopanstart')
-  			    .panBy([dx, dy]);
+  			    .panBy([dx, dy], {animate: e && e.type === 'moveend'});
   		}
-  	},
-
-  	_onCloseButtonClick: function (e) {
-  		this._close();
-  		stop(e);
   	},
 
   	_getAnchor: function () {
@@ -10077,10 +10071,8 @@
 
   	// @method openPopup(latlng?: LatLng): this
   	// Opens the bound popup at the specified `latlng` or at the default popup anchor if no `latlng` is passed.
-  	openPopup: function (layer, latlng) {
-  		if (this._popup && this._map) {
-  			latlng = this._popup._prepareOpen(this, layer, latlng);
-
+  	openPopup: function (latlng) {
+  		if (this._popup && this._popup._prepareOpen(latlng)) {
   			// open the popup on the map
   			this._map.openPopup(this._popup, latlng);
   		}
@@ -10099,12 +10091,12 @@
 
   	// @method togglePopup(): this
   	// Opens or closes the popup bound to this layer depending on its current state.
-  	togglePopup: function (target) {
+  	togglePopup: function () {
   		if (this._popup) {
   			if (this._popup._map) {
   				this.closePopup();
   			} else {
-  				this.openPopup(target);
+  				this.openPopup();
   			}
   		}
   		return this;
@@ -10132,33 +10124,25 @@
   	},
 
   	_openPopup: function (e) {
-  		var layer = e.layer || e.target;
-
-  		if (!this._popup) {
+  		if (!this._popup || !this._map) {
   			return;
   		}
-
-  		if (!this._map) {
-  			return;
-  		}
-
   		// prevent map click
   		stop(e);
 
-  		// if this inherits from Path its a vector and we can just
-  		// open the popup at the new location
-  		if (layer instanceof Path) {
-  			this.openPopup(e.layer || e.target, e.latlng);
+  		var target = e.layer || e.target;
+  		if (this._popup._source === target && !(target instanceof Path)) {
+  			// treat it like a marker and figure out
+  			// if we should toggle it open/closed
+  			if (this._map.hasLayer(this._popup)) {
+  				this.closePopup();
+  			} else {
+  				this.openPopup(e.latlng);
+  			}
   			return;
   		}
-
-  		// otherwise treat it like a marker and figure out
-  		// if we should toggle it open/closed
-  		if (this._map.hasLayer(this._popup) && this._popup._source === layer) {
-  			this.closePopup();
-  		} else {
-  			this.openPopup(layer, e.latlng);
-  		}
+  		this._popup._source = target;
+  		this.openPopup(e.latlng);
   	},
 
   	_movePopup: function (e) {
@@ -10235,6 +10219,13 @@
   		DivOverlay.prototype.onAdd.call(this, map);
   		this.setOpacity(this.options.opacity);
 
+  		if (this.options.interactive) {
+  			addClass(this._container, 'leaflet-interactive');
+  			if (this._source) {
+  				this._source.addInteractiveTarget(this._container);
+  			}
+  		}
+
   		// @namespace Map
   		// @section Tooltip events
   		// @event tooltipopen: TooltipEvent
@@ -10252,6 +10243,13 @@
 
   	onRemove: function (map) {
   		DivOverlay.prototype.onRemove.call(this, map);
+
+  		if (this.options.interactive) {
+  			removeClass(this._container, 'leaflet-interactive');
+  			if (this._source) {
+  				this._source.removeInteractiveTarget(this._container);
+  			}
+  		}
 
   		// @namespace Map
   		// @section Tooltip events
@@ -10271,7 +10269,7 @@
   	getEvents: function () {
   		var events = DivOverlay.prototype.getEvents.call(this);
 
-  		if (touch && !this.options.permanent) {
+  		if (!this.options.permanent) {
   			events.preclick = this._close;
   		}
 
@@ -10399,13 +10397,10 @@
   		return this.addLayer(tooltip);
   	},
 
-  	// @method closeTooltip(tooltip?: Tooltip): this
+  	// @method closeTooltip(tooltip: Tooltip): this
   	// Closes the tooltip given as parameter.
   	closeTooltip: function (tooltip) {
-  		if (tooltip) {
-  			this.removeLayer(tooltip);
-  		}
-  		return this;
+  		return this.removeLayer(tooltip);
   	}
 
   });
@@ -10431,6 +10426,10 @@
   	// necessary event listeners. If a `Function` is passed it will receive
   	// the layer as the first argument and should return a `String` or `HTMLElement`.
   	bindTooltip: function (content, options) {
+
+  		if (this._tooltip && this.isTooltipOpen()) {
+  			this.unbindTooltip();
+  		}
 
   		if (content instanceof Tooltip) {
   			setOptions(content, options);
@@ -10464,9 +10463,9 @@
   		return this;
   	},
 
-  	_initTooltipInteractions: function (remove$$1) {
-  		if (!remove$$1 && this._tooltipHandlersAdded) { return; }
-  		var onOff = remove$$1 ? 'off' : 'on',
+  	_initTooltipInteractions: function (remove) {
+  		if (!remove && this._tooltipHandlersAdded) { return; }
+  		var onOff = remove ? 'off' : 'on',
   		    events = {
   			remove: this.closeTooltip,
   			move: this._moveTooltip
@@ -10474,34 +10473,23 @@
   		if (!this._tooltip.options.permanent) {
   			events.mouseover = this._openTooltip;
   			events.mouseout = this.closeTooltip;
-  			if (this._tooltip.options.sticky) {
-  				events.mousemove = this._moveTooltip;
-  			}
-  			if (touch) {
-  				events.click = this._openTooltip;
-  			}
+  			events.click = this._openTooltip;
   		} else {
   			events.add = this._openTooltip;
   		}
+  		if (this._tooltip.options.sticky) {
+  			events.mousemove = this._moveTooltip;
+  		}
   		this[onOff](events);
-  		this._tooltipHandlersAdded = !remove$$1;
+  		this._tooltipHandlersAdded = !remove;
   	},
 
   	// @method openTooltip(latlng?: LatLng): this
   	// Opens the bound tooltip at the specified `latlng` or at the default tooltip anchor if no `latlng` is passed.
-  	openTooltip: function (layer, latlng) {
-  		if (this._tooltip && this._map) {
-  			latlng = this._tooltip._prepareOpen(this, layer, latlng);
-
+  	openTooltip: function (latlng) {
+  		if (this._tooltip && this._tooltip._prepareOpen(latlng)) {
   			// open the tooltip on the map
   			this._map.openTooltip(this._tooltip, latlng);
-
-  			// Tooltip container may not be defined if not permanent and never
-  			// opened.
-  			if (this._tooltip.options.interactive && this._tooltip._container) {
-  				addClass(this._tooltip._container, 'leaflet-clickable');
-  				this.addInteractiveTarget(this._tooltip._container);
-  			}
   		}
 
   		return this;
@@ -10512,22 +10500,18 @@
   	closeTooltip: function () {
   		if (this._tooltip) {
   			this._tooltip._close();
-  			if (this._tooltip.options.interactive && this._tooltip._container) {
-  				removeClass(this._tooltip._container, 'leaflet-clickable');
-  				this.removeInteractiveTarget(this._tooltip._container);
-  			}
   		}
   		return this;
   	},
 
   	// @method toggleTooltip(): this
   	// Opens or closes the tooltip bound to this layer depending on its current state.
-  	toggleTooltip: function (target) {
+  	toggleTooltip: function () {
   		if (this._tooltip) {
   			if (this._tooltip._map) {
   				this.closeTooltip();
   			} else {
-  				this.openTooltip(target);
+  				this.openTooltip();
   			}
   		}
   		return this;
@@ -10555,12 +10539,12 @@
   	},
 
   	_openTooltip: function (e) {
-  		var layer = e.layer || e.target;
-
   		if (!this._tooltip || !this._map) {
   			return;
   		}
-  		this.openTooltip(layer, this._tooltip.options.sticky ? e.latlng : undefined);
+  		this._tooltip._source = e.layer || e.target;
+
+  		this.openTooltip(this._tooltip.options.sticky ? e.latlng : undefined);
   	},
 
   	_moveTooltip: function (e) {
@@ -10731,7 +10715,7 @@
   		// `true` by default on mobile browsers, in order to avoid too many requests and keep smooth navigation.
   		// `false` otherwise in order to display new tiles _during_ panning, since it is easy to pan outside the
   		// [`keepBuffer`](#gridlayer-keepbuffer) option in desktop browsers.
-  		updateWhenIdle: mobile,
+  		updateWhenIdle: Browser.mobile,
 
   		// @option updateWhenZooming: Boolean = true
   		// By default, a smooth zoom animation (during a [touch zoom](#map-touchzoom) or a [`flyTo()`](#map-flyto)) will update grid layers every integer zoom level. Setting this option to `false` will update the grid layer only when the smooth animation ends.
@@ -10800,8 +10784,7 @@
   		this._levels = {};
   		this._tiles = {};
 
-  		this._resetView();
-  		this._update();
+  		this._resetView(); // implicit _update() call
   	},
 
   	beforeAdd: function (map) {
@@ -10870,6 +10853,11 @@
   	redraw: function () {
   		if (this._map) {
   			this._removeAllTiles();
+  			var tileZoom = this._clampZoom(this._map.getZoom());
+  			if (tileZoom !== this._tileZoom) {
+  				this._tileZoom = tileZoom;
+  				this._updateLevels();
+  			}
   			this._update();
   		}
   		return this;
@@ -10948,7 +10936,7 @@
   		if (!this._map) { return; }
 
   		// IE doesn't inherit filter opacity properly, so we're forced to set it on tiles
-  		if (ielt9) { return; }
+  		if (Browser.ielt9) { return; }
 
   		setOpacity(this._container, this.options.opacity);
 
@@ -11234,7 +11222,7 @@
   		    translate = level.origin.multiplyBy(scale)
   		        .subtract(this._map._getNewPixelOrigin(center, zoom)).round();
 
-  		if (any3d) {
+  		if (Browser.any3d) {
   			setTransform(level.el, translate, scale);
   		} else {
   			setPosition(level.el, translate);
@@ -11435,14 +11423,8 @@
   		tile.onmousemove = falseFn;
 
   		// update opacity on tiles in IE7-8 because of filter inheritance problems
-  		if (ielt9 && this.options.opacity < 1) {
+  		if (Browser.ielt9 && this.options.opacity < 1) {
   			setOpacity(tile, this.options.opacity);
-  		}
-
-  		// without this hack, tiles disappear after zoom on Chrome for Android
-  		// https://github.com/Leaflet/Leaflet/issues/2078
-  		if (android && !android23) {
-  			tile.style.WebkitBackfaceVisibility = 'hidden';
   		}
   	},
 
@@ -11522,7 +11504,7 @@
   			// Fired when the grid layer loaded all visible tiles.
   			this.fire('load');
 
-  			if (ielt9 || !this._map._fadeAnimated) {
+  			if (Browser.ielt9 || !this._map._fadeAnimated) {
   				requestAnimFrame(this._pruneTiles, this);
   			} else {
   				// Wait a bit more than 0.2 secs (the duration of the tile fade-in)
@@ -11647,7 +11629,7 @@
   		options = setOptions(this, options);
 
   		// detecting retina displays, adjusting tileSize and zoom levels
-  		if (options.detectRetina && retina && options.maxZoom > 0) {
+  		if (options.detectRetina && Browser.retina && options.maxZoom > 0) {
 
   			options.tileSize = Math.floor(options.tileSize / 2);
 
@@ -11666,10 +11648,7 @@
   			options.subdomains = options.subdomains.split('');
   		}
 
-  		// for https://github.com/Leaflet/Leaflet/issues/137
-  		if (!android) {
-  			this.on('tileunload', this._onTileRemove);
-  		}
+  		this.on('tileunload', this._onTileRemove);
   	},
 
   	// @method setUrl(url: String, noRedraw?: Boolean): this
@@ -11728,7 +11707,7 @@
   	// Classes extending `TileLayer` can override this function to provide custom tile URL naming schemes.
   	getTileUrl: function (coords) {
   		var data = {
-  			r: retina ? '@2x' : '',
+  			r: Browser.retina ? '@2x' : '',
   			s: this._getSubdomain(coords),
   			x: coords.x,
   			y: coords.y,
@@ -11747,7 +11726,7 @@
 
   	_tileOnLoad: function (done, tile) {
   		// For https://github.com/Leaflet/Leaflet/issues/3332
-  		if (ielt9) {
+  		if (Browser.ielt9) {
   			setTimeout(bind(done, this, null, tile), 0);
   		} else {
   			done(null, tile);
@@ -11796,8 +11775,15 @@
 
   				if (!tile.complete) {
   					tile.src = emptyImageUrl;
+  					var coords = this._tiles[i].coords;
   					remove(tile);
   					delete this._tiles[i];
+  					// @event tileabort: TileEvent
+  					// Fired when a tile was loading but is now not wanted.
+  					this.fire('tileabort', {
+  						tile: tile,
+  						coords: coords
+  					});
   				}
   			}
   		}
@@ -11808,11 +11794,7 @@
   		if (!tile) { return; }
 
   		// Cancels any pending http requests associated with the tile
-  		// unless we're on Android's stock browser,
-  		// see https://github.com/Leaflet/Leaflet/issues/137
-  		if (!androidStock) {
-  			tile.el.setAttribute('src', emptyImageUrl);
-  		}
+  		tile.el.setAttribute('src', emptyImageUrl);
 
   		return GridLayer.prototype._removeTile.call(this, key);
   	},
@@ -11910,7 +11892,7 @@
 
   		options = setOptions(this, options);
 
-  		var realRetina = options.detectRetina && retina ? 2 : 1;
+  		var realRetina = options.detectRetina && Browser.retina ? 2 : 1;
   		var tileSize = this.getTileSize();
   		wmsParams.width = tileSize.x * realRetina;
   		wmsParams.height = tileSize.y * realRetina;
@@ -11997,11 +11979,7 @@
   		// @option padding: Number = 0.1
   		// How much to extend the clip area around the map view (relative to its size)
   		// e.g. 0.1 would be 10% of map view in each direction
-  		padding: 0.1,
-
-  		// @option tolerance: Number = 0
-  		// How much to extend click tolerance round a path/object on the map
-  		tolerance : 0
+  		padding: 0.1
   	},
 
   	initialize: function (options) {
@@ -12060,7 +12038,7 @@
 
   		    topLeftOffset = viewHalf.multiplyBy(-scale).add(position).add(viewHalf).subtract(centerOffset);
 
-  		if (any3d) {
+  		if (Browser.any3d) {
   			setTransform(this._container, topLeftOffset, scale);
   		} else {
   			setPosition(this._container, topLeftOffset);
@@ -12135,6 +12113,15 @@
    */
 
   var Canvas = Renderer.extend({
+
+  	// @section
+  	// @aka Canvas options
+  	options: {
+  		// @option tolerance: Number = 0
+  		// How much to extend the click tolerance around a path/object on the map.
+  		tolerance: 0
+  	},
+
   	getEvents: function () {
   		var events = Renderer.prototype.getEvents.call(this);
   		events.viewprereset = this._onViewPreReset;
@@ -12160,6 +12147,7 @@
   		on(container, 'mousemove', this._onMouseMove, this);
   		on(container, 'click dblclick mousedown mouseup contextmenu', this._onClick, this);
   		on(container, 'mouseout', this._handleMouseOut, this);
+  		container['_leaflet_disable_events'] = true;
 
   		this._ctx = container.getContext('2d');
   	},
@@ -12192,7 +12180,7 @@
   		var b = this._bounds,
   		    container = this._container,
   		    size = b.getSize(),
-  		    m = retina ? 2 : 1;
+  		    m = Browser.retina ? 2 : 1;
 
   		setPosition(container, b.min);
 
@@ -12202,7 +12190,7 @@
   		container.style.width = size.x + 'px';
   		container.style.height = size.y + 'px';
 
-  		if (retina) {
+  		if (Browser.retina) {
   			this._ctx.scale(2, 2);
   		}
 
@@ -12446,15 +12434,12 @@
   		for (var order = this._drawFirst; order; order = order.next) {
   			layer = order.layer;
   			if (layer.options.interactive && layer._containsPoint(point)) {
-  				if (!(e.type === 'click' || e.type !== 'preclick') || !this._map._draggableMoved(layer)) {
+  				if (!(e.type === 'click' || e.type === 'preclick') || !this._map._draggableMoved(layer)) {
   					clickedLayer = layer;
   				}
   			}
   		}
-  		if (clickedLayer)  {
-  			fakeStop(e);
-  			this._fireEvent([clickedLayer], e);
-  		}
+  		this._fireEvent(clickedLayer ? [clickedLayer] : false, e);
   	},
 
   	_onMouseMove: function (e) {
@@ -12500,9 +12485,7 @@
   			}
   		}
 
-  		if (this._hoveredLayer) {
-  			this._fireEvent([this._hoveredLayer], e);
-  		}
+  		this._fireEvent(this._hoveredLayer ? [this._hoveredLayer] : false, e);
 
   		this._mouseHoverThrottled = true;
   		setTimeout(bind(function () {
@@ -12579,8 +12562,8 @@
 
   // @factory L.canvas(options?: Renderer options)
   // Creates a Canvas renderer with the given options.
-  function canvas$1(options) {
-  	return canvas ? new Canvas(options) : null;
+  function canvas(options) {
+  	return Browser.canvas ? new Canvas(options) : null;
   }
 
   /*
@@ -12724,7 +12707,7 @@
   	}
   };
 
-  var create$2 = vml ? vmlCreate : svgCreate;
+  var create = Browser.vml ? vmlCreate : svgCreate;
 
   /*
    * @class SVG
@@ -12771,12 +12754,12 @@
   	},
 
   	_initContainer: function () {
-  		this._container = create$2('svg');
+  		this._container = create('svg');
 
   		// makes it possible to click through svg root; we'll reset it back in individual paths
   		this._container.setAttribute('pointer-events', 'none');
 
-  		this._rootGroup = create$2('g');
+  		this._rootGroup = create('g');
   		this._container.appendChild(this._rootGroup);
   	},
 
@@ -12821,7 +12804,7 @@
   	// methods below are called by vector layers implementations
 
   	_initPath: function (layer) {
-  		var path = layer._path = create$2('path');
+  		var path = layer._path = create('path');
 
   		// @namespace Path
   		// @option className: String = null
@@ -12925,15 +12908,15 @@
   	}
   });
 
-  if (vml) {
+  if (Browser.vml) {
   	SVG.include(vmlMixin);
   }
 
   // @namespace SVG
   // @factory L.svg(options?: Renderer options)
   // Creates a SVG renderer with the given options.
-  function svg$1(options) {
-  	return svg || vml ? new SVG(options) : null;
+  function svg(options) {
+  	return Browser.svg || Browser.vml ? new SVG(options) : null;
   }
 
   Map.include({
@@ -12974,7 +12957,7 @@
   		// @namespace Map; @option preferCanvas: Boolean = false
   		// Whether `Path`s should be rendered on a `Canvas` renderer.
   		// By default, all `Path`s are rendered in a `SVG` renderer.
-  		return (this.options.preferCanvas && canvas$1(options)) || svg$1(options);
+  		return (this.options.preferCanvas && canvas(options)) || svg(options);
   	}
   });
 
@@ -13033,7 +13016,7 @@
   	return new Rectangle(latLngBounds, options);
   }
 
-  SVG.create = create$2;
+  SVG.create = create;
   SVG.pointsToPath = pointsToPath;
 
   GeoJSON.geometryToLayer = geometryToLayer;
@@ -13178,6 +13161,8 @@
   	_onKeyDown: function (e) {
   		if (e.keyCode === 27) {
   			this._finish();
+  			this._clearDeferredResetState();
+  			this._resetState();
   		}
   	}
   });
@@ -13256,8 +13241,8 @@
   	// If enabled, panning of the map will have an inertia effect where
   	// the map builds momentum while dragging and continues moving in
   	// the same direction for some time. Feels especially nice on touch
-  	// devices. Enabled by default unless running on old Android devices.
-  	inertia: !android23,
+  	// devices. Enabled by default.
+  	inertia: true,
 
   	// @option inertiaDeceleration: Number = 3000
   	// The rate with which the inertial movement slows down, in pixels/second².
@@ -13729,19 +13714,19 @@
   Map.addInitHook('addHandler', 'scrollWheelZoom', ScrollWheelZoom);
 
   /*
-   * L.Map.Tap is used to enable mobile hacks like quick taps and long hold.
+   * L.Map.TapHold is used to simulate `contextmenu` event on long hold,
+   * which otherwise is not fired by mobile Safari.
    */
+
+  var tapHoldDelay = 600;
 
   // @namespace Map
   // @section Interaction Options
   Map.mergeOptions({
   	// @section Touch interaction options
-  	// @option tap: Boolean
-  	// Enables mobile hacks for supporting instant taps (fixing 200ms click
-  	// delay on iOS/Android) and touch holds (fired as `contextmenu` events).
-  	// This is legacy option, by default enabled in mobile Safari only
-  	// (because we still need `contextmenu` simulation for iOS).
-  	tap: safari && mobile,
+  	// @option tapHold: Boolean
+  	// Enables simulation of `contextmenu` event, default is `true` for mobile Safari.
+  	tapHold: Browser.touchNative && Browser.safari && Browser.mobile,
 
   	// @option tapTolerance: Number = 15
   	// The max number of pixels a user can shift his finger during touch
@@ -13749,7 +13734,7 @@
   	tapTolerance: 15
   });
 
-  var Tap = Handler.extend({
+  var TapHold = Handler.extend({
   	addHooks: function () {
   		on(this._map._container, 'touchstart', this._onDown, this);
   	},
@@ -13759,102 +13744,70 @@
   	},
 
   	_onDown: function (e) {
-  		if (!e.touches) { return; }
+  		clearTimeout(this._holdTimeout);
+  		if (e.touches.length !== 1) { return; }
 
-  		preventDefault(e);
-
-  		this._fireClick = true;
-
-  		// don't simulate click or track longpress if more than 1 touch
-  		if (e.touches.length > 1) {
-  			this._fireClick = false;
-  			clearTimeout(this._holdTimeout);
-  			return;
-  		}
-
-  		var first = e.touches[0],
-  		    el = first.target;
-
+  		var first = e.touches[0];
   		this._startPos = this._newPos = new Point(first.clientX, first.clientY);
 
-  		// if touching a link, highlight it
-  		if (el.tagName && el.tagName.toLowerCase() === 'a') {
-  			addClass(el, 'leaflet-active');
-  		}
-
-  		// simulate long hold but setting a timeout
   		this._holdTimeout = setTimeout(bind(function () {
-  			if (this._isTapValid()) {
-  				this._fireClick = false;
-  				this._onUp();
-  				this._simulateEvent('contextmenu', first);
-  			}
-  		}, this), 1000);
+  			this._cancel();
+  			if (!this._isTapValid()) { return; }
 
-  		this._simulateEvent('mousedown', first);
+  			// prevent simulated mouse events https://w3c.github.io/touch-events/#mouse-events
+  			on(document, 'touchend', preventDefault);
+  			on(document, 'touchend touchcancel', this._cancelClickPrevent);
+  			this._simulateEvent('contextmenu', first);
+  		}, this), tapHoldDelay);
 
-  		on(document, {
-  			touchmove: this._onMove,
-  			touchend: this._onUp
-  		}, this);
+  		on(document, 'touchend touchcancel contextmenu', this._cancel, this);
+  		on(document, 'touchmove', this._onMove, this);
   	},
 
-  	_onUp: function (e) {
+  	_cancelClickPrevent: function cancelClickPrevent() {
+  		off(document, 'touchend', preventDefault);
+  		off(document, 'touchend touchcancel', cancelClickPrevent);
+  	},
+
+  	_cancel: function () {
   		clearTimeout(this._holdTimeout);
+  		off(document, 'touchend touchcancel contextmenu', this._cancel, this);
+  		off(document, 'touchmove', this._onMove, this);
+  	},
 
-  		off(document, {
-  			touchmove: this._onMove,
-  			touchend: this._onUp
-  		}, this);
-
-  		if (this._fireClick && e && e.changedTouches) {
-
-  			var first = e.changedTouches[0],
-  			    el = first.target;
-
-  			if (el && el.tagName && el.tagName.toLowerCase() === 'a') {
-  				removeClass(el, 'leaflet-active');
-  			}
-
-  			this._simulateEvent('mouseup', first);
-
-  			// simulate click if the touch didn't move too much
-  			if (this._isTapValid()) {
-  				this._simulateEvent('click', first);
-  			}
-  		}
+  	_onMove: function (e) {
+  		var first = e.touches[0];
+  		this._newPos = new Point(first.clientX, first.clientY);
   	},
 
   	_isTapValid: function () {
   		return this._newPos.distanceTo(this._startPos) <= this._map.options.tapTolerance;
   	},
 
-  	_onMove: function (e) {
-  		var first = e.touches[0];
-  		this._newPos = new Point(first.clientX, first.clientY);
-  		this._simulateEvent('mousemove', first);
-  	},
-
   	_simulateEvent: function (type, e) {
-  		var simulatedEvent = document.createEvent('MouseEvents');
+  		var simulatedEvent = new MouseEvent(type, {
+  			bubbles: true,
+  			cancelable: true,
+  			view: window,
+  			// detail: 1,
+  			screenX: e.screenX,
+  			screenY: e.screenY,
+  			clientX: e.clientX,
+  			clientY: e.clientY,
+  			// button: 2,
+  			// buttons: 2
+  		});
 
   		simulatedEvent._simulated = true;
-  		e.target._simulatedClick = true;
-
-  		simulatedEvent.initMouseEvent(
-  		        type, true, true, window, 1,
-  		        e.screenX, e.screenY,
-  		        e.clientX, e.clientY,
-  		        false, false, false, false, 0, null);
 
   		e.target.dispatchEvent(simulatedEvent);
   	}
   });
 
   // @section Handlers
-  // @property tap: Handler
-  // Mobile touch hacks (quick tap and touch hold) handler.
-  Map.addInitHook('addHandler', 'tap', Tap);
+  // @property tapHold: Handler
+  // Long tap handler to simulate `contextmenu` event (useful in mobile Safari).
+  Map.addInitHook('addHandler', 'tapHold', TapHold);
 
   /*
    * L.Handler.TouchZoom is used by L.Map to add pinch zoom on supported mobile browsers.
@@ -13868,8 +13821,8 @@
   	// Whether the map can be zoomed by touch-dragging with two fingers. If
   	// passed `'center'`, it will zoom to the center of the view regardless of
   	// where the touch events (fingers) were. Enabled for touch-capable web
-  	// browsers except for old Androids.
-  	touchZoom: touch && !android23,
+  	// browsers.
+  	touchZoom: Browser.touch,
 
   	// @option bounceAtZoomLimits: Boolean = true
   	// Set it to false if you don't want the map to zoom beyond min/max zoom
@@ -13910,7 +13863,7 @@
   		map._stop();
 
   		on(document, 'touchmove', this._onTouchMove, this);
-  		on(document, 'touchend', this._onTouchEnd, this);
+  		on(document, 'touchend touchcancel', this._onTouchEnd, this);
 
   		preventDefault(e);
   	},
@@ -13964,7 +13917,7 @@
   		cancelAnimFrame(this._animRequest);
 
   		off(document, 'touchmove', this._onTouchMove, this);
-  		off(document, 'touchend', this._onTouchEnd, this);
+  		off(document, 'touchend touchcancel', this._onTouchEnd, this);
 
   		// Pinch updates GridLayers' levels only when zoomSnap is off, so zoomSnap becomes noUpdate.
   		if (this._map.options.zoomAnimation) {
@@ -13985,87 +13938,87 @@
   Map.Drag = Drag;
   Map.Keyboard = Keyboard;
   Map.ScrollWheelZoom = ScrollWheelZoom;
-  Map.Tap = Tap;
+  Map.TapHold = TapHold;
   Map.TouchZoom = TouchZoom;
 
-  exports.version = version;
-  exports.Control = Control;
-  exports.control = control;
+  exports.Bounds = Bounds;
   exports.Browser = Browser;
-  exports.Evented = Evented;
-  exports.Mixin = Mixin;
-  exports.Util = Util;
+  exports.CRS = CRS;
+  exports.Canvas = Canvas;
+  exports.Circle = Circle;
+  exports.CircleMarker = CircleMarker;
   exports.Class = Class;
-  exports.Handler = Handler;
-  exports.extend = extend;
-  exports.bind = bind;
-  exports.stamp = stamp;
-  exports.setOptions = setOptions;
+  exports.Control = Control;
+  exports.DivIcon = DivIcon;
+  exports.DivOverlay = DivOverlay;
   exports.DomEvent = DomEvent;
   exports.DomUtil = DomUtil;
-  exports.PosAnimation = PosAnimation;
   exports.Draggable = Draggable;
-  exports.LineUtil = LineUtil;
-  exports.PolyUtil = PolyUtil;
-  exports.Point = Point;
-  exports.point = toPoint;
-  exports.Bounds = Bounds;
-  exports.bounds = toBounds;
-  exports.Transformation = Transformation;
-  exports.transformation = toTransformation;
-  exports.Projection = index;
-  exports.LatLng = LatLng;
-  exports.latLng = toLatLng;
-  exports.LatLngBounds = LatLngBounds;
-  exports.latLngBounds = toLatLngBounds;
-  exports.CRS = CRS;
+  exports.Evented = Evented;
+  exports.FeatureGroup = FeatureGroup;
   exports.GeoJSON = GeoJSON;
-  exports.geoJSON = geoJSON;
-  exports.geoJson = geoJson;
+  exports.GridLayer = GridLayer;
+  exports.Handler = Handler;
+  exports.Icon = Icon;
+  exports.ImageOverlay = ImageOverlay;
+  exports.LatLng = LatLng;
+  exports.LatLngBounds = LatLngBounds;
   exports.Layer = Layer;
   exports.LayerGroup = LayerGroup;
-  exports.layerGroup = layerGroup;
-  exports.FeatureGroup = FeatureGroup;
-  exports.featureGroup = featureGroup;
-  exports.ImageOverlay = ImageOverlay;
-  exports.imageOverlay = imageOverlay;
-  exports.VideoOverlay = VideoOverlay;
-  exports.videoOverlay = videoOverlay;
-  exports.SVGOverlay = SVGOverlay;
-  exports.svgOverlay = svgOverlay;
-  exports.DivOverlay = DivOverlay;
-  exports.Popup = Popup;
-  exports.popup = popup;
-  exports.Tooltip = Tooltip;
-  exports.tooltip = tooltip;
-  exports.Icon = Icon;
-  exports.icon = icon;
-  exports.DivIcon = DivIcon;
-  exports.divIcon = divIcon;
-  exports.Marker = Marker;
-  exports.marker = marker;
-  exports.TileLayer = TileLayer;
-  exports.tileLayer = tileLayer;
-  exports.GridLayer = GridLayer;
-  exports.gridLayer = gridLayer;
-  exports.SVG = SVG;
-  exports.svg = svg$1;
-  exports.Renderer = Renderer;
-  exports.Canvas = Canvas;
-  exports.canvas = canvas$1;
-  exports.Path = Path;
-  exports.CircleMarker = CircleMarker;
-  exports.circleMarker = circleMarker;
-  exports.Circle = Circle;
-  exports.circle = circle;
-  exports.Polyline = Polyline;
-  exports.polyline = polyline;
-  exports.Polygon = Polygon;
-  exports.polygon = polygon;
-  exports.Rectangle = Rectangle;
-  exports.rectangle = rectangle;
+  exports.LineUtil = LineUtil;
   exports.Map = Map;
+  exports.Marker = Marker;
+  exports.Mixin = Mixin;
+  exports.Path = Path;
+  exports.Point = Point;
+  exports.PolyUtil = PolyUtil;
+  exports.Polygon = Polygon;
+  exports.Polyline = Polyline;
+  exports.Popup = Popup;
+  exports.PosAnimation = PosAnimation;
+  exports.Projection = index;
+  exports.Rectangle = Rectangle;
+  exports.Renderer = Renderer;
+  exports.SVG = SVG;
+  exports.SVGOverlay = SVGOverlay;
+  exports.TileLayer = TileLayer;
+  exports.Tooltip = Tooltip;
+  exports.Transformation = Transformation;
+  exports.Util = Util;
+  exports.VideoOverlay = VideoOverlay;
+  exports.bind = bind;
+  exports.bounds = toBounds;
+  exports.canvas = canvas;
+  exports.circle = circle;
+  exports.circleMarker = circleMarker;
+  exports.control = control;
+  exports.divIcon = divIcon;
+  exports.extend = extend;
+  exports.featureGroup = featureGroup;
+  exports.geoJSON = geoJSON;
+  exports.geoJson = geoJson;
+  exports.gridLayer = gridLayer;
+  exports.icon = icon;
+  exports.imageOverlay = imageOverlay;
+  exports.latLng = toLatLng;
+  exports.latLngBounds = toLatLngBounds;
+  exports.layerGroup = layerGroup;
   exports.map = createMap;
+  exports.marker = marker;
+  exports.point = toPoint;
+  exports.polygon = polygon;
+  exports.polyline = polyline;
+  exports.popup = popup;
+  exports.rectangle = rectangle;
+  exports.setOptions = setOptions;
+  exports.stamp = stamp;
+  exports.svg = svg;
+  exports.svgOverlay = svgOverlay;
+  exports.tileLayer = tileLayer;
+  exports.tooltip = tooltip;
+  exports.transformation = toTransformation;
+  exports.version = version;
+  exports.videoOverlay = videoOverlay;
 
   var oldL = window.L;
   exports.noConflict = function() {
@@ -14076,5 +14029,5 @@
   // Always export us to window global (see #2364)
   window.L = exports;
 
-})));
+}));
 //# sourceMappingURL=leaflet-src.js.map
