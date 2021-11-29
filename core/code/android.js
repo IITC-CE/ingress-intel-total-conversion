@@ -20,6 +20,10 @@ if (isAndroid) {
 window.runOnAndroidBeforeBoot = function () {
   if (!isAndroid) { return; }
 
+  if (android.showZoom) {
+    window.mapOptions.zoomControl = android.showZoom();
+  }
+  
   // add jquery listeners ******************************************************
   if (android.dialogOpened && android.dialogFocused) {
     $(document.body).on({

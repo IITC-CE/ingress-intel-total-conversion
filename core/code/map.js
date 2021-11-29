@@ -161,7 +161,7 @@ function createDefaultOverlays () {
   return addLayers;
 }
 
-// extendable by plugins: `setup.priority = 'boot';`
+// to be extended in android.js (or by plugins: `setup.priority = 'boot';`)
 window.mapOptions = {
   preferCanvas: 'PREFER_CANVAS' in window
     ? window.PREFER_CANVAS
@@ -206,10 +206,6 @@ window.setupMap = function() {
 
   window.layerChooser = new window.LayerChooser(baseLayers, overlays, {map: map})
     .addTo(map);
-  // hide layer chooser if booted with the iitcm android app
-  if (window.isAndroid && android.setLayers) {
-    $('.leaflet-control-layers').hide();
-  }
 
   $.each(overlays, function (_, layer) {
     if (map.hasLayer(layer)) { return true; } // continue
