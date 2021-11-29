@@ -112,6 +112,18 @@ window.runOnAndroidBeforeBoot = function () {
       android.saveFile(filename || '', dataType || '*/*', data);
     };
   }
+
+  if (android.intentPosLink) {
+    window.renderPortalUrl = function (lat, lng, title) {
+      // one share link option - and the android app provides an interface to share the URL,
+      // share as a geo: intent (navigation via google maps), etc
+
+      var shareLink = $('<a>').text('Share portal').click(function () {
+        android.intentPosLink(lat, lng, window.map.getZoom(), title, true);
+      });
+      $('.linkdetails').append($('<aside>').append(shareLink));
+    };
+  }
 };
 
 window.runOnAndroidAfterBoot = function () {
