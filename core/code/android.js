@@ -98,6 +98,14 @@ window.runOnAndroidBeforeBoot = function () {
       android.switchToPane(name);
     });
   }
+
+  // overwrite some functions **************************************************
+  if (android.copy) {
+    window.androidCopy = function (text) {
+      android.copy(text);
+      return false;
+    };
+  }
 };
 
 window.runOnAndroidAfterBoot = function () {

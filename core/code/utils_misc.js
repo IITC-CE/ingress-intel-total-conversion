@@ -258,12 +258,10 @@ window.isTouchDevice = function() {
       || 'onmsgesturechange' in window; // works on ie10
 };
 
+// !!deprecated
+// to be ovewritten in android.js
 window.androidCopy = function(text) {
-  if(!window.isAndroid || !android.copy)
-    return true; // i.e. execute other actions
-  else
-    android.copy(text);
-  return false;
+  return true; // i.e. execute other actions
 }
 
 // returns number of pixels left to scroll down before reaching the
