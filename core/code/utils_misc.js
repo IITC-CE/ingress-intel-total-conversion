@@ -260,26 +260,18 @@ window.rangeLinkClick = function() {
 }
 
 window.showPortalPosLinks = function(lat, lng, name) {
-  var encoded_name = 'undefined';
-  if(name !== undefined) {
-    encoded_name = encodeURIComponent(name);
-  }
-
-  if (window.isAndroid && android.intentPosLink) {
-    android.intentPosLink(lat, lng, map.getZoom(), name, true);
-  } else {
-    var qrcode = '<div id="qrcode"></div>';
-    var script = '<script>$(\'#qrcode\').qrcode({text:\'GEO:'+lat+','+lng+'\'});</script>';
-    var gmaps = '<a href="https://maps.google.com/maps?ll='+lat+','+lng+'&q='+lat+','+lng+'%20('+encoded_name+')">Google Maps</a>';
-    var bingmaps = '<a href="https://www.bing.com/maps/?v=2&cp='+lat+'~'+lng+'&lvl=16&sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps</a>';
-    var osm = '<a href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lng+'&zoom=16">OpenStreetMap</a>';
-    var latLng = '<span>' + lat + ',' + lng +'</span>';
-    dialog({
-      html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
-      title: name,
-      id: 'poslinks'
-    });
-  }
+  var encoded_name = encodeURIComponent(name);
+  var qrcode = '<div id="qrcode"></div>';
+  var script = '<script>$(\'#qrcode\').qrcode({text:\'GEO:'+lat+','+lng+'\'});</script>';
+  var gmaps = '<a href="https://maps.google.com/maps?ll='+lat+','+lng+'&q='+lat+','+lng+'%20('+encoded_name+')">Google Maps</a>';
+  var bingmaps = '<a href="https://www.bing.com/maps/?v=2&cp='+lat+'~'+lng+'&lvl=16&sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps</a>';
+  var osm = '<a href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lng+'&zoom=16">OpenStreetMap</a>';
+  var latLng = '<span>' + lat + ',' + lng +'</span>';
+  dialog({
+    html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
+    title: name,
+    id: 'poslinks'
+  });
 }
 
 window.isTouchDevice = function() {
