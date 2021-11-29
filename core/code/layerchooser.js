@@ -412,43 +412,6 @@ var LayerChooser = L.Control.Layers.extend({
 
 window.LayerChooser = LayerChooser;
 
-function debounce (callback, time) { // https://gist.github.com/nmsdvid/8807205#gistcomment-2641356
-  var timeout;
-  return function () {
-    var context = this;
-    var args = arguments;
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(function () {
-      timeout = null;
-      callback.apply(context, args);
-    }, time);
-  };
-}
-
-if (window.isAndroid && android.setLayers) {
-  // hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
-  LayerChooser.include({
-    _setAndroidLayers: debounce(function () { // update layer menu in IITCm
-      var l = this.getLayers();
-      android.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
-    }, 1000),
-
-    setLabel: (function (setLabel) {
-      return function () {
-        this._setAndroidLayers();
-        return setLabel.apply(this, arguments);
-      };
-    })(LayerChooser.prototype.setLabel),
-
-    _update: function () {
-      this._setAndroidLayers();
-      return L.Control.Layers.prototype._update.apply(this, arguments);
-    }
-  });
-}
-
 // contains current status(on/off) of overlay layerGroups.
 // !!deprecated: use `map.hasLayer` instead (https://leafletjs.com/reference.html#map-haslayer)
 window.overlayStatus = {}; // to be set in constructor

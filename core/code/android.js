@@ -17,13 +17,54 @@ if (isAndroid) {
   };
 }
 
+function debounce (callback, time) { // https://gist.github.com/nmsdvid/8807205#gistcomment-2641356
+  var timeout;
+  return function () {
+    var context = this;
+    var args = arguments;
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(function () {
+      timeout = null;
+      callback.apply(context, args);
+    }, time);
+  };
+}
+
+function extendLayerChooser () {
+  if (android.setLayers) {
+    // hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
+    window.LayerChooser.include({
+      _setAndroidLayers: debounce(function () {
+        var l = this.getLayers();
+        android.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
+      }, 1000),
+
+      setLabel: (function (setLabel) {
+        return function () {
+          this._setAndroidLayers();
+          return setLabel.apply(this, arguments);
+        };
+      })(window.LayerChooser.prototype.setLabel),
+
+      _update: function () {
+        this._setAndroidLayers();
+        return L.Control.Layers.prototype._update.apply(this, arguments);
+      }
+    });
+  }
+}
+
 window.runOnAndroidBeforeBoot = function () {
   if (!isAndroid) { return; }
 
   if (android.showZoom) {
     window.mapOptions.zoomControl = android.showZoom();
   }
-  
+
+  extendLayerChooser();
+
   // add jquery listeners ******************************************************
   if (android.dialogOpened && android.dialogFocused) {
     $(document.body).on({
