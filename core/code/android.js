@@ -106,6 +106,12 @@ window.runOnAndroidBeforeBoot = function () {
       return false;
     };
   }
+
+  if (android.saveFile) {
+    window.saveFile = function (data, filename, dataType) {
+      android.saveFile(filename || '', dataType || '*/*', data);
+    };
+  }
 };
 
 window.runOnAndroidAfterBoot = function () {
