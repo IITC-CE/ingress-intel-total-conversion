@@ -20,6 +20,24 @@ if (isAndroid) {
 window.runOnAndroidBeforeBoot = function () {
   if (!isAndroid) { return; }
 
+  // add jquery listeners ******************************************************
+  if (android.dialogOpened && android.dialogFocused) {
+    $(document.body).on({
+      // hints for iitc mobile
+      dialogopen: function (e) {
+        var id = $(e.target).data('id');
+        android.dialogOpened(id, true);
+      },
+      dialogclose: function (e) {
+        var id = $(e.target).data('id');
+        android.dialogOpened(id, false);
+      },
+      dialogfocus: function (e) {
+        var id = $(e.target).data('id');
+        android.dialogFocused(id);
+      }
+    });
+  }
   // notify android that a select spinner is enabled.
   // this disables javascript injection on android side.
   // if android is not notified, the spinner closes on the next JS call
