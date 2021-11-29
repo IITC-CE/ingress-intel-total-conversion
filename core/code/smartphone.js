@@ -157,46 +157,4 @@ window.runOnSmartphonesAfterBoot = function() {
   // make buttons in action bar flexible
   var l = $('#chatcontrols a:visible');
   l.css('width', 100/l.length + '%');
-
-  // notify android that a select spinner is enabled.
-  // this disables javascript injection on android side.
-  // if android is not notified, the spinner closes on the next JS call
-  if (window.isAndroid && android.spinnerEnabled) {
-    $("body").on("click", "select", function() {
-      android.spinnerEnabled(true);
-    });
-  }
-
-  if (window.isAndroid && android.setPermalink) {
-    window.map.on('moveend', window.setAndroidPermalink);
-    addHook('portalSelected', window.setAndroidPermalink);
-  }
-
-
-  // for some reason, leaflet misses the WebView size being set at startup on IITC Mobile
-  // create a short timer that checks for this issue
-  setTimeout (function() { map.invalidateSize(); }, 0.2*1000);
-
-}
-
-window.setAndroidPermalink = function() {
-  var p = window.selectedPortal && window.portals[window.selectedPortal];
-  var href = $('<a>')
-    .prop('href',  window.makePermalink(p && p.getLatLng(), {includeMapView: true}))
-    .prop('href'); // to get absolute URI
-  android.setPermalink(href);
-}
-
-window.useAndroidPanes = function() {
-  // isSmartphone is important to disable panes in desktop mode
-  return (window.isAndroid && android.addPane && window.isSmartphone());
-}
-
-if (window.isAndroid) {
-  window.requestFile = function (callback) { // deprecated
-    L.FileListLoader.loadFiles()
-      .on('load',function (e) {
-        callback(e.file.name, e.reader.result);
-      });
-  };
 }
