@@ -12,7 +12,6 @@ android:
   - platform-tools
   - tools
   - build-tools-30.0.0
-  - android-30
   - extra-android-m2repository
 
 addons:
@@ -39,6 +38,7 @@ jobs:
       env: BUILD_TYPE=release
 
 before_install:
+  - yes | sdkmanager "platforms;android-30"
   - sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
   - bundle install --path vendor/bundle
 
