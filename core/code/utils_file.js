@@ -22,7 +22,7 @@ function saveAs (data,filename,dataType) {
 // @function saveFile(data: String, filename?: String, dataType? String)
 // Save data to file with given filename, using IITCm file chooser, or generic browser routine.
 // `dataType` can be set to filter IITCm file chooser filetypes.
-window.saveFile = typeof android === 'undefined' || !android.saveFile
+window.saveFile = !window.isAndroid || !android.saveFile
   ? saveAs
   : function (data,filename,dataType) {
       android.saveFile(filename || '', dataType || '*/*', data);

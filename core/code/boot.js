@@ -270,6 +270,7 @@ function boot() {
     log.log('Your device ID: ' + window.deviceID);
   }
   window.runOnSmartphonesBeforeBoot();
+  window.runOnAndroidBeforeBoot();
 
   var loadPlugins = prepPluginsToLoad();
   loadPlugins('boot');
@@ -301,17 +302,13 @@ function boot() {
   loadPlugins();
 
   window.runOnSmartphonesAfterBoot();
+  window.runOnAndroidAfterBoot();
 
   // workaround for #129. Not sure why this is required.
   // setTimeout('window.map.invalidateSize(false);', 500);
 
   window.iitcLoaded = true;
   window.runHooks('iitcLoaded');
-
-  if (typeof android !== 'undefined' && android.bootFinished) {
-    android.bootFinished();
-  }
-
 }
 
 /*

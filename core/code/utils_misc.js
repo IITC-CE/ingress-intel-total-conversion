@@ -90,7 +90,7 @@ window.aboutIITC = function () {
   + '<hr>'
   + '<div>Version: ' + iitcVersion + '</div>';
 
-  if (typeof android !== 'undefined' && android.getVersionName) {
+  if (window.isAndroid && android.getVersionName) {
     html += '<div>IITC Mobile ' + android.getVersionName() + '</div>';
   }
   if (plugins) {
@@ -236,7 +236,7 @@ window.showPortalPosLinks = function(lat, lng, name) {
     encoded_name = encodeURIComponent(name);
   }
 
-  if (typeof android !== 'undefined' && android && android.intentPosLink) {
+  if (window.isAndroid && android.intentPosLink) {
     android.intentPosLink(lat, lng, map.getZoom(), name, true);
   } else {
     var qrcode = '<div id="qrcode"></div>';
@@ -259,7 +259,7 @@ window.isTouchDevice = function() {
 };
 
 window.androidCopy = function(text) {
-  if(typeof android === 'undefined' || !android || !android.copy)
+  if(!window.isAndroid || !android.copy)
     return true; // i.e. execute other actions
   else
     android.copy(text);
@@ -464,7 +464,7 @@ window.setPermaLink = function(elm) { // deprecated
 }
 
 window.androidPermalink = function() { // deprecated
-  if(typeof android === 'undefined' || !android || !android.intentPosLink)
+  if(!window.isAndroid || !android.intentPosLink)
     return true; // i.e. execute other actions
 
   var center = map.getCenter();

@@ -207,7 +207,7 @@ window.setupMap = function() {
   window.layerChooser = new window.LayerChooser(baseLayers, overlays, {map: map})
     .addTo(map);
   // hide layer chooser if booted with the iitcm android app
-  if (typeof android !== 'undefined' && android && android.setLayers) {
+  if (window.isAndroid && android.setLayers) {
     $('.leaflet-control-layers').hide();
   }
 

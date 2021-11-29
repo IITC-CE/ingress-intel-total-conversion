@@ -335,7 +335,7 @@ window.plugin.drawTools.isEmpty = function() {
 window.plugin.drawTools.optCopy = function() {
   if (window.plugin.drawTools.isEmpty()) { return; }
 
-  if (typeof android !== 'undefined' && android.shareString) {
+  if (window.isAndroid && android.shareString) {
     android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
   } else {
     var stockWarnings = {};

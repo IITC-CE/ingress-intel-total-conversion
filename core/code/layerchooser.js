@@ -427,7 +427,7 @@ function debounce (callback, time) { // https://gist.github.com/nmsdvid/8807205#
   };
 }
 
-if (typeof android !== 'undefined' && android && android.setLayers) {
+if (window.isAndroid && android.setLayers) {
   // hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
   LayerChooser.include({
     _setAndroidLayers: debounce(function () { // update layer menu in IITCm

@@ -29,7 +29,7 @@ window.show = function(id) {
       break;
   }
 
-  if (typeof android !== 'undefined' && android && android.switchToPane) {
+  if (window.isAndroid && android.switchToPane) {
     android.switchToPane(id);
   }
 }

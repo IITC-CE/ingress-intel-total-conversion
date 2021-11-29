@@ -161,13 +161,13 @@ window.runOnSmartphonesAfterBoot = function() {
   // notify android that a select spinner is enabled.
   // this disables javascript injection on android side.
   // if android is not notified, the spinner closes on the next JS call
-  if (typeof android !== 'undefined' && android && android.spinnerEnabled) {
+  if (window.isAndroid && android.spinnerEnabled) {
     $("body").on("click", "select", function() {
       android.spinnerEnabled(true);
     });
   }
 
-  if(typeof android !== 'undefined' && android && android.setPermalink) {
+  if (window.isAndroid && android.setPermalink) {
     window.map.on('moveend', window.setAndroidPermalink);
     addHook('portalSelected', window.setAndroidPermalink);
   }
@@ -189,10 +189,10 @@ window.setAndroidPermalink = function() {
 
 window.useAndroidPanes = function() {
   // isSmartphone is important to disable panes in desktop mode
-  return (typeof android !== 'undefined' && android && android.addPane && window.isSmartphone());
+  return (window.isAndroid && android.addPane && window.isSmartphone());
 }
 
-if (typeof android !== 'undefined') {
+if (window.isAndroid) {
   window.requestFile = function (callback) { // deprecated
     L.FileListLoader.loadFiles()
       .on('load',function (e) {

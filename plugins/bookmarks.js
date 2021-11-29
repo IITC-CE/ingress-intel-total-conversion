@@ -40,12 +40,6 @@
   window.plugin.bookmarks.starLayerGroup = null;
 
   window.plugin.bookmarks.isSmart = undefined;
-  window.plugin.bookmarks.isAndroid = function() {
-    if(typeof android !== 'undefined' && android) {
-      return true;
-    }
-    return false;
-  }
 
 /*********************************************************************************************************************/
 
@@ -707,7 +701,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
   }
 
   window.plugin.bookmarks.optBox = function(command) {
-    if(!window.plugin.bookmarks.isAndroid()) {
+    if (!window.isAndroid) {
       switch(command) {
         case 'save':
           var boxX = parseInt($('#bookmarksBox').css('top'));
@@ -1236,7 +1230,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
     actions += '<a onclick="window.plugin.bookmarks.optExport();return false;">Export bookmarks</a>';
 
     actions += '<a onclick="window.plugin.bookmarks.optRenameF();return false;">Rename Folder</a>'
-    if(!plugin.bookmarks.isAndroid()) {
+    if (!window.isAndroid) {
       actions += '<a onclick="window.plugin.bookmarks.optBox(\'save\');return false;">Save box position</a>';
       actions += '<a onclick="window.plugin.bookmarks.optBox(\'reset\');return false;">Reset box position</a>';
     }

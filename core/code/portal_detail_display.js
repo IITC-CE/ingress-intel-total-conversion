@@ -82,7 +82,7 @@ window.renderPortalDetails = function(guid) {
 
   var posOnClick = window.showPortalPosLinks.bind(this,lat,lng,title);
 
-  if (typeof android !== 'undefined' && android && android.intentPosLink) {
+  if (window.isAndroid && android.intentPosLink) {
     // android devices. one share link option - and the android app provides an interface to share the URL,
     // share as a geo: intent (navigation via google maps), etc
 
