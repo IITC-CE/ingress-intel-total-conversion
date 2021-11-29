@@ -50,6 +50,13 @@ window.runOnAndroidBeforeBoot = function () {
       android.spinnerEnabled(true);
     });
   }
+
+  // add iitc hooks ************************************************************
+  if (android.switchToPane) {
+    window.addHook('paneChanged', function (name) { // https://stackoverflow.com/a/59158952/2520247
+      android.switchToPane(name);
+    });
+  }
 };
 
 window.runOnAndroidAfterBoot = function () {
