@@ -106,6 +106,35 @@ window.aboutIITC = function () {
   });
 }
 
+function setPermaLink () {
+  this.href = window.makePermalink(null, true);
+}
+
+window.setupAddons = function () {
+  $('<a>')
+    .html('Permalink')
+    .attr({
+      id: 'permalink',
+      title: 'URL link to this map view'
+    })
+    .on({
+      mouseover: setPermaLink,
+      click: setPermaLink
+    })
+    .appendTo('#toolbox');
+
+  $('<a>')
+    .html('About IITC')
+    .attr('id', 'about-iitc')
+    .css('cursor', 'help')
+    .click(aboutIITC)
+    .appendTo('#toolbox');
+
+  window.artifact.setup();
+
+  window.RegionScoreboard.setup();
+};
+
 // retrieves parameter from the URL?query=string.
 window.getURLParam = function(param) {
   var items = window.location.search.substr(1).split('&');
@@ -456,21 +485,6 @@ window.makePermalink = function (latlng, options) {
   var url = options.fullURL ? '@url_intel_base@' : '/';
   return url + '?' + args.join('&');
 };
-
-window.setPermaLink = function(elm) { // deprecated
-  $(elm).attr('href', window.makePermalink(null,true));
-}
-
-window.androidPermalink = function() { // deprecated
-  if(!window.isAndroid || !android.intentPosLink)
-    return true; // i.e. execute other actions
-
-  var center = map.getCenter();
-  android.intentPosLink(center.lat, center.lng, map.getZoom(), "Selected map view", false);
-  return false;
-}
-
-// todo refactor main.js to get rid of setPermaLink and androidPermalink
 
 Object.defineProperty(String.prototype, 'capitalize', {
   value: function() {

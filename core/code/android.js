@@ -117,6 +117,14 @@ window.runOnAndroidBeforeBoot = function () {
 window.runOnAndroidAfterBoot = function () {
   if (!isAndroid) { return; }
 
+  if (android.intentPosLink) {
+    $('#permalink').click(function (e) {
+      e.preventDefault();
+      var center = window.map.getCenter();
+      android.intentPosLink(center.lat, center.lng, window.map.getZoom(), 'Selected map view', false);
+    });
+  }
+
   // add leaflet listeners *****************************************************
   if (android.setPermalink) {
     var setAndroidPermalink = function () {
