@@ -83,8 +83,8 @@ var LayerChooser = L.Control.Layers.extend({
     }
 
     if (this.options.autoZIndex && layer.setZIndex) {
-       this._lastZIndex++;
-       layer.setZIndex(this._lastZIndex);
+      this._lastZIndex++;
+      layer.setZIndex(this._lastZIndex);
     }
 
     this._expandIfNotCollapsed();

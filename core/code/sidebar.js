@@ -21,7 +21,7 @@ window.setupStyles = function () {
       '#sidebar { width:'+(SIDEBAR_WIDTH + HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1 /*border*/)+'px;  } ',
       '#sidebartoggle { right:'+(SIDEBAR_WIDTH+1)+'px;  } ',
       '#scrollwrapper  { width:'+(SIDEBAR_WIDTH + 2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH)+'px; right:-'+(2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH-2)+'px } ',
-      '#sidebar > * { width:'+(SIDEBAR_WIDTH+1)+'px;  }'].join("\n")
+      '#sidebar > * { width:'+(SIDEBAR_WIDTH+1)+'px;  }'].join('\n')
     + '</style>');
 };
 
@@ -42,9 +42,9 @@ function setupIcons () {
 function setupPlayerStat () {
   // stock site updated to supply the actual player level, AP requirements and XM capacity values
   var level = PLAYER.verified_level;
-  PLAYER.level = level; //for historical reasons IITC expects PLAYER.level to contain the current player level
+  PLAYER.level = level; // for historical reasons IITC expects PLAYER.level to contain the current player level
 
-  var n = window.PLAYER.nickname;
+  var n = PLAYER.nickname;
   PLAYER.nickMatcher = new RegExp('\\b('+n+')\\b', 'ig');
 
   var ap = parseInt(PLAYER.ap);
@@ -66,7 +66,7 @@ function setupPlayerStat () {
         + 'XM:\t' + PLAYER.energy + ' / ' + xmMax + '\n'
         + 'AP:\t' + digits(ap) + '\n'
         + (nextLvlAp > 0 ? 'level up in:\t' + lvlUpAp + ' AP' : 'Maximum level reached(!)')
-        + '\n\Invites:\t'+PLAYER.available_invites
+        + '\nInvites:\t'+PLAYER.available_invites
         + '\n\nNote: your player stats can only be updated by a full reload (F5)';
 
   $('#playerstat').html(''
@@ -87,7 +87,7 @@ function setupSidebarToggle () {
   $('#sidebartoggle').on('click', function() {
     var toggle = $('#sidebartoggle');
     var sidebar = $('#scrollwrapper');
-    if(sidebar.is(':visible')) {
+    if (sidebar.is(':visible')) {
       sidebar.hide();
       $('.leaflet-right').css('margin-right','0');
       toggle.html('<span class="toggle open"></span>');

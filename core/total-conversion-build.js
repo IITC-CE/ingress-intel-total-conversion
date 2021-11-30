@@ -112,7 +112,7 @@ window.CHAT_SHRINKED = 60;
 window.FIELD_MU_DISPLAY_AREA_ZOOM_RATIO = 0.001;
 
 // Point tolerance for displaying MU's
-window.FIELD_MU_DISPLAY_POINT_TOLERANCE = 60
+window.FIELD_MU_DISPLAY_POINT_TOLERANCE = 60;
 
 window.COLOR_SELECTED_PORTAL = '#f0f';
 window.COLORS = ['#FF6600', '#0088FF', '#03DC03']; // none, res, enl
@@ -126,7 +126,7 @@ window.MOD_TYPE = {RES_SHIELD:'Shield', MULTIHACK:'Multi-hack', FORCE_AMP:'Force
 // it and how far the portal reaches (i.e. how far links may be made
 // from this portal)
 window.ACCESS_INDICATOR_COLOR = 'orange';
-window.RANGE_INDICATOR_COLOR = 'red'
+window.RANGE_INDICATOR_COLOR = 'red';
 
 // min zoom for intel map - should match that used by stock intel
 window.MIN_ZOOM = 3;
@@ -135,7 +135,7 @@ window.MIN_ZOOM = 3;
 window.DEFAULT_ZOOM = 15;
 
 window.DEFAULT_PORTAL_IMG = '//commondatastorage.googleapis.com/ingress.com/img/default-portal-image.png';
-//window.NOMINATIM = '//open.mapquestapi.com/nominatim/v1/search.php?format=json&polygon_geojson=1&q=';
+// window.NOMINATIM = '//open.mapquestapi.com/nominatim/v1/search.php?format=json&polygon_geojson=1&q=';
 window.NOMINATIM = '//nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=';
 
 // INGRESS CONSTANTS /////////////////////////////////////////////////
@@ -174,7 +174,8 @@ window.selectedPortal = null;
 window.portalRangeIndicator = null;
 window.portalAccessIndicator = null;
 window.mapRunsUserAction = false;
-//var portalsLayers, linksLayer, fieldsLayer;
+
+// var portalsLayers, linksLayer, fieldsLayer;
 var portalsFactionLayers, linksFactionLayers, fieldsFactionLayers;
 
 // contain references to all entities loaded from the server. If render limits are hit,
@@ -185,7 +186,7 @@ window.fields = {};
 
 // plugin framework. Plugins may load earlier than iitc, so don’t
 // overwrite data
-if(typeof window.plugin !== 'function') window.plugin = function() {};
+if (typeof window.plugin !== 'function') window.plugin = function() {};
 
 var ulog = (function (module) {
   '@include_raw:external/ulog.min.js@';
@@ -193,3 +194,5 @@ var ulog = (function (module) {
 }({})).exports;
 
 '@bundle_code@';
+
+/* exported ulog, portalsFactionLayers, linksFactionLayers, fieldsFactionLayers -- eslint */

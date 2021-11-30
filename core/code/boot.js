@@ -3,27 +3,27 @@
 // created a basic framework. All of these functions should only ever
 // be run once.
 
-window.setupTooltips = function(element) {
+window.setupTooltips = function (element) {
   element = element || $(document);
   element.tooltip({
     // disable show/hide animation
     show: { effect: 'none', duration: 0, delay: 350 },
     hide: false,
-    open: function(event, ui) {
+    open: function (event, ui) {
       // ensure all other tooltips are closed
-      $(".ui-tooltip").not(ui.tooltip).remove();
+      $('.ui-tooltip').not(ui.tooltip).remove();
     },
-    content: function() {
+    content: function () {
       var title = $(this).attr('title');
       return window.convertTextToTableMagic(title);
     }
   });
 
-  if(!window.tooltipClearerHasBeenSetup) {
+  if (!window.tooltipClearerHasBeenSetup) {
     window.tooltipClearerHasBeenSetup = true;
-    $(document).on('click', '.ui-tooltip', function() { $(this).remove(); });
+    $(document).on('click', '.ui-tooltip', function () { $(this).remove(); });
   }
-}
+};
 
 function setupIngressMarkers () {
   L.Icon.Default.mergeOptions({
@@ -67,7 +67,7 @@ function setupIngressMarkers () {
   L.divIcon.coloredSvg = function (color, options) {
     return new L.DivIcon.ColoredSvg(color, options);
   };
-};
+}
 
 /*
 OMS doesn't cancel the original click event, so the topmost marker will get a click event while spiderfying.
@@ -85,33 +85,35 @@ window.setupOMS = function() {
     }
   });
 
-  window.oms.addListener('click', function(marker) {
+  window.oms.addListener('click', function (marker) {
     map.closePopup();
     marker.fireEvent('spiderfiedclick', {target: marker});
   });
-  window.oms.addListener('spiderfy', function(markers) {
+  window.oms.addListener('spiderfy', function () {
     map.closePopup();
   });
-  map._container.addEventListener("keypress", function(ev) {
-    if(ev.keyCode === 27) // Esc
+  map._container.addEventListener('keypress', function (ev) {
+    if (ev.keyCode === 27) { // Esc
       window.oms.unspiderfy();
+    }
   }, false);
-}
+};
 
-window.registerMarkerForOMS = function(marker) {
+window.registerMarkerForOMS = function (marker) {
   marker.on('add', function () {
     window.oms.addMarker(marker);
   });
   marker.on('remove', function () {
     window.oms.removeMarker(marker);
   });
-  if(marker._map) // marker has already been added
+  if (marker._map) { // marker has already been added
     window.oms.addMarker(marker);
-}
+  }
+};
 
 // BOOTING ///////////////////////////////////////////////////////////
 
-function prepPluginsToLoad() {
+function prepPluginsToLoad () {
 
   var priorities = {
     lowest: 100,
@@ -120,7 +122,7 @@ function prepPluginsToLoad() {
     high: 25,
     highest: 0,
     boot: -100
-  }
+  };
 
   function getPriority (data) {
     var v = data && data.priority || 'normal';
@@ -182,10 +184,10 @@ function prepPluginsToLoad() {
   };
 }
 
-function boot() {
-  if(!isSmartphone()) // TODO remove completely?
+function boot () {
+  if (!isSmartphone()) { // TODO remove completely?
     window.debug.console.overwriteNativeIfRequired();
-
+  }
   log.log('loading done, booting. Built: '+'@build_date@');
   if (window.deviceID) {
     log.log('Your device ID: ' + window.deviceID);

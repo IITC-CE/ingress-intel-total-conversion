@@ -233,8 +233,8 @@ L.FileListLoader = L.Evented.extend({
     return this;
   },
 
-   // @event loaded: Event
-   // Fired after all files are processed (either with success or with error).
+  // @event loaded: Event
+  // Fired after all files are processed (either with success or with error).
   _loaded: function () {
     this._toload--;
     if (this._toload === 0) { this.fire('loaded'); }
