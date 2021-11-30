@@ -1,4 +1,15 @@
-window.setupLargeImagePreview = function () {
+window.setupSidebar = function() {
+  setupLargeImagePreview();
+  window.setupStyles();
+  setupIcons();
+  setupPlayerStat();
+  setupSidebarToggle();
+  setupAddons();
+  $('#sidebar').show();
+};
+
+// to be overrided in smartphone.js
+window.setupStyles = function () {
   $('#portaldetails').on('click', '.imgpreview', function (e) {
     var img = this.querySelector('img');
     //dialogs have 12px padding around the content
@@ -20,9 +31,9 @@ window.setupLargeImagePreview = function () {
       width: dlgWidth,
     });
   });
-}
+};
 
-window.setupStyles = function() {
+function setupStyles () {
   $('head').append('<style>' +
     [ '#largepreview.enl img { border:2px solid '+COLORS[TEAM_ENL]+'; } ',
       '#largepreview.res img { border:2px solid '+COLORS[TEAM_RES]+'; } ',
@@ -38,7 +49,7 @@ window.setupStyles = function() {
     + '</style>');
 }
 
-window.setupIcons = function() {
+function setupIcons () {
   $(['<svg>',
       // Material Icons
 
@@ -53,7 +64,7 @@ window.setupIcons = function() {
 // renders player details into the website. Since the player info is
 // included as inline script in the original site, the data is static
 // and cannot be updated.
-window.setupPlayerStat = function() {
+function setupPlayerStat () {
   // stock site updated to supply the actual player level, AP requirements and XM capacity values
   var level = PLAYER.verified_level;
   PLAYER.level = level; //for historical reasons IITC expects PLAYER.level to contain the current player level
@@ -97,7 +108,7 @@ window.setupPlayerStat = function() {
   );
 }
 
-window.setupSidebarToggle = function() {
+function setupSidebarToggle () {
   $('#sidebartoggle').on('click', function() {
     var toggle = $('#sidebartoggle');
     var sidebar = $('#scrollwrapper');
@@ -119,7 +130,7 @@ window.setupSidebarToggle = function() {
 
 // fixed Addons ****************************************************************
 
-window.aboutIITC = function () {
+function aboutIITC () {
   // Plugins metadata come from 2 sources:
   // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
   //   (only standard plugins)
@@ -229,7 +240,7 @@ function setPermaLink () {
   this.href = window.makePermalink(null, true);
 }
 
-window.setupAddons = function () {
+function setupAddons () {
   $('<a>')
     .html('Permalink')
     .attr({
@@ -252,4 +263,4 @@ window.setupAddons = function () {
   window.artifact.setup();
 
   window.RegionScoreboard.setup();
-};
+}

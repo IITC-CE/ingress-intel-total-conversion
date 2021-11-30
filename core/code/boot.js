@@ -159,26 +159,19 @@ function boot() {
   setupIngressMarkers();
   window.extractFromStock();
   window.setupIdle();
-  window.setupStyles();
-  window.setupIcons();
   window.setupDialogs();
   window.setupDataTileParams();
   window.setupMap();
   window.setupOMS();
-  window.search.setup();
-  window.setupRedeem();
-  window.setupLargeImagePreview();
-  window.setupSidebarToggle();
-  window.updateGameScore();
   window.ornaments.setup();
   layerChooser._lastPriority = 1000; // plugins overlays have priority >1000
-  window.setupPlayerStat();
   window.setupTooltips();
   window.chat.setup();
+  window.updateGameScore();
+  window.search.setup();
   window.portalDetail.setup();
-  window.setupAddons();
-
-  $('#sidebar').show();
+  window.setupRedeem();
+  window.setupSidebar();
 
   loadPlugins();
 
