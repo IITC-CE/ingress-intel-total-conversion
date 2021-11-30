@@ -24,12 +24,13 @@ def metaFDroid(outputFileName) {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
+    buildToolsVersion = '29.0.3'
 
     defaultConfig {
         applicationId "org.exarhteam.iitc_mobile"
         minSdkVersion 17
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode = getVersionCodeTimeStamps()
         versionName "0.32.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
