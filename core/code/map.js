@@ -229,6 +229,13 @@ window.setupMap = function() {
 
   map.attributionControl.setPrefix('');
 
+  map.on('moveend', function () {
+    var center = this.getCenter().wrap();
+    window.writeCookie('ingress.intelmap.lat', center.lat);
+    window.writeCookie('ingress.intelmap.lng', center.lng);
+    window.writeCookie('ingress.intelmap.zoom', this.getZoom());
+  });
+
   // map update status handling & update map hooks
   // ensures order of calls
   map.on('movestart', function() { window.mapRunsUserAction = true; window.requests.abort(); window.startRefreshTimeout(-1); });
@@ -271,13 +278,6 @@ window.setupMap = function() {
       window.urlPortalLL = normLL(pll[0], pll[1]).center;
     }
     window.urlPortal = window.getURLParam('pguid');
-
-    map.on('moveend', function () {
-      var center = this.getCenter().wrap();
-      window.writeCookie('ingress.intelmap.lat', center.lat);
-      window.writeCookie('ingress.intelmap.lng', center.lng);
-      window.writeCookie('ingress.intelmap.zoom', this.getZoom());
-    });
 
     // todo check
     // leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here

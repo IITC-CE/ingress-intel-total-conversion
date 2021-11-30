@@ -1,39 +1,15 @@
 window.setupSidebar = function() {
-  setupLargeImagePreview();
   window.setupStyles();
   setupIcons();
   setupPlayerStat();
   setupSidebarToggle();
+  setupLargeImagePreview();
   setupAddons();
   $('#sidebar').show();
 };
 
 // to be overrided in smartphone.js
 window.setupStyles = function () {
-  $('#portaldetails').on('click', '.imgpreview', function (e) {
-    var img = this.querySelector('img');
-    //dialogs have 12px padding around the content
-    var dlgWidth = Math.max(img.naturalWidth+24,500);
-    // This might be a case where multiple dialogs make sense, for example
-    // someone might want to compare images of multiple portals.  But
-    // usually we only want to show one version of each image.
-    // To support that, we'd need a unique key per portal.  Example, guid.
-    // So that would have to be in the html fetched into details.
-
-    var preview = new Image(img.width, img.height);
-    preview.src = img.src;
-    preview.style = 'margin: auto; display: block';
-    var title = e.delegateTarget.querySelector('.title').innerText;
-    dialog({
-      html: preview,
-      title: title,
-      id: 'iitc-portal-image',
-      width: dlgWidth,
-    });
-  });
-};
-
-function setupStyles () {
   $('head').append('<style>' +
     [ '#largepreview.enl img { border:2px solid '+COLORS[TEAM_ENL]+'; } ',
       '#largepreview.res img { border:2px solid '+COLORS[TEAM_RES]+'; } ',
@@ -47,7 +23,7 @@ function setupStyles () {
       '#scrollwrapper  { width:'+(SIDEBAR_WIDTH + 2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH)+'px; right:-'+(2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH-2)+'px } ',
       '#sidebar > * { width:'+(SIDEBAR_WIDTH+1)+'px;  }'].join("\n")
     + '</style>');
-}
+};
 
 function setupIcons () {
   $(['<svg>',
@@ -59,7 +35,6 @@ function setupIcons () {
       '</symbol>',
     '</svg>'].join('\\n')).appendTo('body');
 }
-
 
 // renders player details into the website. Since the player info is
 // included as inline script in the original site, the data is static
@@ -125,6 +100,30 @@ function setupSidebarToggle () {
       toggle.css('right', SIDEBAR_WIDTH+1+'px');
     }
     $('.ui-tooltip').remove();
+  });
+}
+
+function setupLargeImagePreview  () {
+  $('#portaldetails').on('click', '.imgpreview', function (e) {
+    var img = this.querySelector('img');
+    //dialogs have 12px padding around the content
+    var dlgWidth = Math.max(img.naturalWidth+24,500);
+    // This might be a case where multiple dialogs make sense, for example
+    // someone might want to compare images of multiple portals.  But
+    // usually we only want to show one version of each image.
+    // To support that, we'd need a unique key per portal.  Example, guid.
+    // So that would have to be in the html fetched into details.
+
+    var preview = new Image(img.width, img.height);
+    preview.src = img.src;
+    preview.style = 'margin: auto; display: block';
+    var title = e.delegateTarget.querySelector('.title').innerText;
+    dialog({
+      html: preview,
+      title: title,
+      id: 'iitc-portal-image',
+      width: dlgWidth,
+    });
   });
 }
 
