@@ -262,5 +262,5 @@ function setupAddons () {
 
   window.artifact.setup();
 
-  window.RegionScoreboard.setup();
+  window.RegionScoreboardSetup();
 }
