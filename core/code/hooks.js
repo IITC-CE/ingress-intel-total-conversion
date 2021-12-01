@@ -45,6 +45,13 @@
 //              displayed. The data hash contains both the unprocessed
 //              raw ajax response as well as the processed chat data
 //              that is going to be used for display.
+// alertsChatDataAvailable: this hook runs after data for the alerts
+//              chat has been received and processed, but not yet been
+//              displayed. The data hash contains both the unprocessed
+//              raw ajax response as well as the processed chat data
+//              that is going to be used for display.
+//     WARNING: this hook was disabled in earlier versions
+//              sideeffects possible but unknown. Use with care!
 // requestFinished: DEPRECATED: best to use mapDataRefreshEnd instead
 //              called after each map data request finished. Argument is
 //              {success: boolean} indicated the request success or fail.
