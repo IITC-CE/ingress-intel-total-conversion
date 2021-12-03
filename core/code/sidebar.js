@@ -219,8 +219,8 @@ function aboutIITC () {
   + '<hr>'
   + '<div>Version: ' + iitcVersion + '</div>';
 
-  if (window.isAndroid && android.getVersionName) {
-    html += '<div>IITC Mobile ' + android.getVersionName() + '</div>';
+  if (window.isApp && app.getVersionName) {
+    html += '<div>IITC Mobile ' + app.getVersionName() + '</div>';
   }
   if (plugins) {
     html += '<div><p>Plugins:</p><ul>' + plugins + '</ul></div>';

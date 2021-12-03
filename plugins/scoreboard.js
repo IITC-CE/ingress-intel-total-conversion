@@ -133,7 +133,7 @@ function displayScoreboard () {
   }
 
   html = '<div id="scoreboard">' + html + '</div>';
-  if (window.useAndroidPanes()) {
+  if (window.useAppPanes()) {
     $(html).addClass('mobile').appendTo(document.body);
   } else {
     dialog({
@@ -146,8 +146,8 @@ function displayScoreboard () {
 }
 
 function setup () {
-  if (window.useAndroidPanes()) {
-    android.addPane('plugin-Scoreboard', 'Scoreboard', 'ic_action_view_as_list_compact');
+  if (window.useAppPanes()) {
+    app.addPane('plugin-Scoreboard', 'Scoreboard', 'ic_action_view_as_list_compact');
     addHook('paneChanged', function (pane) {
       if (pane === 'plugin-Scoreboard') {
         displayScoreboard();

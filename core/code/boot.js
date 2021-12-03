@@ -193,7 +193,7 @@ function boot () {
     log.log('Your device ID: ' + window.deviceID);
   }
   window.runOnSmartphonesBeforeBoot();
-  window.runOnAndroidBeforeBoot();
+  window.runOnAppBeforeBoot();
 
   var loadPlugins = prepPluginsToLoad();
   loadPlugins('boot');
@@ -218,7 +218,7 @@ function boot () {
   loadPlugins();
 
   window.runOnSmartphonesAfterBoot();
-  window.runOnAndroidAfterBoot();
+  window.runOnAppAfterBoot();
 
   // workaround for #129. Not sure why this is required.
   // setTimeout('window.map.invalidateSize(false);', 500);

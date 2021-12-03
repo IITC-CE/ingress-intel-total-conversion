@@ -9,7 +9,7 @@ window.resetScrollOnNewPortal = function() {
   }
 };
 
-// to be ovewritten in android.js
+// to be ovewritten in app.js
 window.renderPortalUrl = function (lat, lng, title) {
   var linkDetails = $('.linkdetails');
 

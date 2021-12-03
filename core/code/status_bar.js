@@ -78,8 +78,8 @@ window.renderUpdateStatus = function() {
       progress = -1;
     }
 
-    if (window.isAndroid && android.setProgress) {
-      android.setProgress(progress);
+    if (window.isApp && app.setProgress) {
+      app.setProgress(progress);
     }
   }, 0);
 

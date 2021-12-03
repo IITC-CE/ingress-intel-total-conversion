@@ -22,16 +22,16 @@ window.addPortalHighlighter = function(name, data) {
 
   _highlighters[name] = data;
 
-  if (typeof android !== 'undefined' && android && android.addPortalHighlighter)
-    android.addPortalHighlighter(name);
+  if (window.isApp && app.addPortalHighlighter)
+    app.addPortalHighlighter(name);
 
   if(window._current_highlighter === undefined) {
     _current_highlighter = name;
   }
 
   if (_current_highlighter == name) {
-    if (typeof android !== 'undefined' && android && android.setActiveHighlighter)
-      android.setActiveHighlighter(name);
+    if (window.isApp && app.setActiveHighlighter)
+      app.setActiveHighlighter(name);
 
     // call the setSelected callback 
     if (_highlighters[_current_highlighter].setSelected) {
@@ -44,7 +44,7 @@ window.addPortalHighlighter = function(name, data) {
 
 // (re)creates the highlighter dropdown list
 window.updatePortalHighlighterControl = function() {
-  if (typeof android !== 'undefined' && android && android.addPortalHighlighter) {
+  if (isApp && app.addPortalHighlighter) {
     $('#portal_highlight_select').remove();
     return;
   }
@@ -76,8 +76,8 @@ window.changePortalHighlights = function(name) {
   }
 
   _current_highlighter = name;
-  if (typeof android !== 'undefined' && android && android.setActiveHighlighter)
-    android.setActiveHighlighter(name);
+  if (window.isApp && app.setActiveHighlighter)
+    app.setActiveHighlighter(name);
 
   // now call the setSelected callback for the new highlighter
   if (_current_highlighter && _highlighters[_current_highlighter] && _highlighters[_current_highlighter].setSelected) {

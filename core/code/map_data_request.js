@@ -60,7 +60,7 @@ window.MapDataRequest = function() {
   this.RENDER_BATCH_SIZE = window.map.options.preferCanvas ? 1E9 : 1500;
 
   // delay before repeating the render loop. this gives a better chance for user interaction
-  this.RENDER_PAUSE = window.isAndroid ? 0.2 : 0.1; // 200ms mobile, 100ms desktop
+  this.RENDER_PAUSE = window.isApp ? 0.2 : 0.1; // 200ms mobile, 100ms desktop
 
 
   this.REFRESH_CLOSE = 300;  // refresh time to use for close views z>12 when not idle and not moving

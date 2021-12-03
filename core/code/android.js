@@ -1,14 +1,21 @@
-/* global android -- eslint */
+/* global android, app -- eslint */
 
-var isAndroid = typeof android !== 'undefined';
-window.isAndroid = isAndroid;
+var isApp = typeof app !== 'undefined' || typeof android !== 'undefined';
+window.isApp = isApp;
 
-window.useAndroidPanes = function () {
+window.useAppPanes = function () {
   // isSmartphone is important to disable panes in desktop mode
-  return isAndroid && android.addPane && window.isSmartphone();
+  return isApp && app.addPane && window.isSmartphone();
 };
+window.useAndroidPanes = window.useAppPanes; // compatibility
 
-if (isAndroid) {
+if (isApp) {
+  if (typeof app === 'undefined') { // compatibility
+    window.app = android;
+  } else {
+    window.android = app;
+  }
+
   window.requestFile = function (callback) { // deprecated
     L.FileListLoader.loadFiles()
       .on('load', function (e) {
@@ -33,127 +40,127 @@ function debounce (callback, time) { // https://gist.github.com/nmsdvid/8807205#
 }
 
 function extendLayerChooser () {
-  if (android.setLayers) {
+  if (app.setLayers) {
     // hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
     window.LayerChooser.include({
-      _setAndroidLayers: debounce(function () {
+      _setAppLayers: debounce(function () {
         var l = this.getLayers();
-        android.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
+        app.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
       }, 1000),
 
       setLabel: (function (setLabel) {
         return function () {
-          this._setAndroidLayers();
+          this._setAppLayers();
           return setLabel.apply(this, arguments);
         };
       })(window.LayerChooser.prototype.setLabel),
 
       _update: function () {
-        this._setAndroidLayers();
+        this._setAppLayers();
         return L.Control.Layers.prototype._update.apply(this, arguments);
       }
     });
   }
 }
 
-window.runOnAndroidBeforeBoot = function () {
-  if (!isAndroid) { return; }
+window.runOnAppBeforeBoot = function () {
+  if (!isApp) { return; }
 
-  if (android.showZoom) {
-    window.mapOptions.zoomControl = android.showZoom();
+  if (app.showZoom) {
+    window.mapOptions.zoomControl = app.showZoom();
   }
 
   extendLayerChooser();
 
   // add jquery listeners ******************************************************
-  if (android.dialogOpened && android.dialogFocused) {
+  if (app.dialogOpened && app.dialogFocused) {
     $(document.body).on({
       // hints for iitc mobile
       dialogopen: function (e) {
         var id = $(e.target).data('id');
-        android.dialogOpened(id, true);
+        app.dialogOpened(id, true);
       },
       dialogclose: function (e) {
         var id = $(e.target).data('id');
-        android.dialogOpened(id, false);
+        app.dialogOpened(id, false);
       },
       dialogfocus: function (e) {
         var id = $(e.target).data('id');
-        android.dialogFocused(id);
+        app.dialogFocused(id);
       }
     });
   }
-  // notify android that a select spinner is enabled.
-  // this disables javascript injection on android side.
-  // if android is not notified, the spinner closes on the next JS call
-  if (android.spinnerEnabled) {
+  // notify app that a select spinner is enabled.
+  // this disables javascript injection on app's side.
+  // if app is not notified, the spinner closes on the next JS call
+  if (app.spinnerEnabled) {
     $(document.body).on('click', 'select', function () {
-      android.spinnerEnabled(true);
+      app.spinnerEnabled(true);
     });
   }
 
   // add iitc hooks ************************************************************
-  if (android.switchToPane) {
+  if (app.switchToPane) {
     window.addHook('paneChanged', function (name) { // https://stackoverflow.com/a/59158952/2520247
-      android.switchToPane(name);
+      app.switchToPane(name);
     });
   }
 
   // overwrite some functions **************************************************
-  if (android.copy) {
+  if (app.copy) {
     window.androidCopy = function (text) {
-      android.copy(text);
+      app.copy(text);
       return false;
     };
   }
 
-  if (android.saveFile) {
+  if (app.saveFile) {
     window.saveFile = function (data, filename, dataType) {
-      android.saveFile(filename || '', dataType || '*/*', data);
+      app.saveFile(filename || '', dataType || '*/*', data);
     };
   }
 
-  if (android.intentPosLink) {
+  if (app.intentPosLink) {
     window.renderPortalUrl = function (lat, lng, title) {
-      // one share link option - and the android app provides an interface to share the URL,
+      // one share link option - and the app provides an interface to share the URL,
       // share as a geo: intent (navigation via google maps), etc
 
       var shareLink = $('<a>').text('Share portal').click(function () {
-        android.intentPosLink(lat, lng, window.map.getZoom(), title, true);
+        app.intentPosLink(lat, lng, window.map.getZoom(), title, true);
       });
       $('.linkdetails').append($('<aside>').append(shareLink));
     };
   }
 };
 
-window.runOnAndroidAfterBoot = function () {
-  if (!isAndroid) { return; }
+window.runOnAppAfterBoot = function () {
+  if (!isApp) { return; }
 
-  if (android.intentPosLink) {
+  if (app.intentPosLink) {
     $('#permalink').click(function (e) {
       e.preventDefault();
       var center = window.map.getCenter();
-      android.intentPosLink(center.lat, center.lng, window.map.getZoom(), 'Selected map view', false);
+      app.intentPosLink(center.lat, center.lng, window.map.getZoom(), 'Selected map view', false);
     });
   }
 
   // add leaflet listeners *****************************************************
-  if (android.setPermalink) {
-    var setAndroidPermalink = function () {
+  if (app.setPermalink) {
+    var setAppPermalink = function () {
       var p = window.selectedPortal && window.portals[window.selectedPortal];
       var href = window.makePermalink(p && p.getLatLng(), {
         fullURL: true,
         includeMapView: true
       });
-      android.setPermalink(href);
+      app.setPermalink(href);
     };
 
-    window.map.on('moveend', setAndroidPermalink);
-    window.addHook('portalSelected', setAndroidPermalink);
+    window.map.on('moveend', setAppPermalink);
+    window.addHook('portalSelected', setAppPermalink);
   }
 
-  // hide layer chooser if booted with the iitcm android app
-  if (android.setLayers) {
+  // hide layer chooser if booted with the iitcm app
+  if (app.setLayers) {
     $('.leaflet-control-layers').hide();
   }
 
@@ -164,5 +171,5 @@ window.runOnAndroidAfterBoot = function () {
   setTimeout(function () { map.invalidateSize(); }, 0.2*1000);
   */
 
-  if (android.bootFinished) { android.bootFinished(); }
+  if (app.bootFinished) { app.bootFinished(); }
 };

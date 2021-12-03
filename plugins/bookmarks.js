@@ -636,8 +636,8 @@ window.plugin.bookmarks.loadStorageBox = function() {
   }
 
   window.plugin.bookmarks.optCopy = function() {
-    if(typeof android !== 'undefined' && android && android.shareString) {
-      return android.shareString(window.plugin.bookmarks.escapeUnicode(localStorage[window.plugin.bookmarks.KEY_STORAGE]));
+    if (window.isApp && app.shareString) {
+      return app.shareString(window.plugin.bookmarks.escapeUnicode(localStorage[window.plugin.bookmarks.KEY_STORAGE]));
     } else {
       dialog({
         html: '<p><a onclick="$(\'.ui-dialog-bkmrksSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p><textarea readonly>'+window.plugin.bookmarks.escapeUnicode(localStorage[window.plugin.bookmarks.KEY_STORAGE])+'</textarea>',
@@ -701,7 +701,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
   }
 
   window.plugin.bookmarks.optBox = function(command) {
-    if (!window.isAndroid) {
+    if (!window.isApp) {
       switch(command) {
         case 'save':
           var boxX = parseInt($('#bookmarksBox').css('top'));
@@ -1230,7 +1230,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
     actions += '<a onclick="window.plugin.bookmarks.optExport();return false;">Export bookmarks</a>';
 
     actions += '<a onclick="window.plugin.bookmarks.optRenameF();return false;">Rename Folder</a>'
-    if (!window.isAndroid) {
+    if (!window.isApp) {
       actions += '<a onclick="window.plugin.bookmarks.optBox(\'save\');return false;">Save box position</a>';
       actions += '<a onclick="window.plugin.bookmarks.optBox(\'reset\');return false;">Reset box position</a>';
     }
@@ -1311,8 +1311,8 @@ window.plugin.bookmarks.initMPE = function(){
       $('body').append(window.plugin.bookmarks.htmlBkmrksBox);
       $('#bookmarksBox').css("display", "none").addClass("mobile");
 
-      if(window.useAndroidPanes())
-        android.addPane("plugin-bookmarks", "Bookmarks", "ic_action_star");
+      if(window.useAppPanes())
+        app.addPane("plugin-bookmarks", "Bookmarks", "ic_action_star");
       window.addHook('paneChanged', window.plugin.bookmarks.onPaneChanged);
     }
     $('#toolbox').append(window.plugin.bookmarks.htmlCallSetBox+window.plugin.bookmarks.htmlCalldrawBox);

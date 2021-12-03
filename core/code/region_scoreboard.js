@@ -158,7 +158,7 @@ window.RegionScoreboardSetup = (function() {
 
   function showRegion(latE6,lngE6) {
     var text = 'Loading regional scores...';
-    if (window.useAndroidPanes()) {
+    if (window.useAppPanes()) {
       var style = 'position: absolute; top: 0; width: 100%; max-width: 412px';
       mainDialog = $('<div>',{style: style}).html(text).appendTo(document.body);
     } else {
@@ -450,8 +450,8 @@ window.RegionScoreboardSetup = (function() {
   }
 
   return function setup() {
-    if (window.useAndroidPanes()) {
-      android.addPane('regionScoreboard', 'Region scores', 'ic_action_view_as_list');
+    if (window.useAppPanes()) {
+      app.addPane('regionScoreboard', 'Region scores', 'ic_action_view_as_list');
       addHook('paneChanged', function (pane) {
         if (pane === 'regionScoreboard') {
           showDialog();

@@ -167,7 +167,7 @@ function createDefaultOverlays () {
   /* eslint-enable dot-notation  */
 }
 
-// to be extended in android.js (or by plugins: `setup.priority = 'boot';`)
+// to be extended in app.js (or by plugins: `setup.priority = 'boot';`)
 window.mapOptions = {
   preferCanvas: 'PREFER_CANVAS' in window
     ? window.PREFER_CANVAS

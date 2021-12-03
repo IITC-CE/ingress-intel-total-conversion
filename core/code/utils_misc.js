@@ -145,7 +145,7 @@ window.isTouchDevice = function() {
 };
 
 // !!deprecated
-// to be ovewritten in android.js
+// to be ovewritten in app.js
 window.androidCopy = function(text) {
   return true; // i.e. execute other actions
 }
