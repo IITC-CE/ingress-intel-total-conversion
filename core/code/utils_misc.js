@@ -1,41 +1,39 @@
 // UTILS + MISC  ///////////////////////////////////////////////////////
 
 window.aboutIITC = function () {
-  // Plugins metadata come from 2 sources:
-  // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
-  //   (only standard plugins)
-  // - script.name/version/description: from GM_info object, passed to wrapper
-  //   `script` may be not available if userscript manager does not provede GM_info
-  //   (atm: IITC-Mobile for iOS)
-  var pluginsInfo = window.bootPlugins.info;
-  var iitc = script_info;
-  var iitcVersion = (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
+  // Plugins metadata come from GM_info object, collected in wrapper.
+  // May not be not available if userscript manager does not provede GM_info
+  // (atm: IITC-Mobile for iOS)
+  // - script.name/version/description: avalable directly
+  // - scriptMetaStr: can be parsed for additional properties (such as @category, @author, etc)
+  function parseMeta (str) {
+    var re = /\s*\/\/\s*@(\w+)\s+(.+)$/;
+    var meta = str.split('\n').map(function (s) {
+      return s.match(re);
+    }).filter(function (a) { return a; });
+    var data = {};
+    meta.forEach(function (a) { data[a[1]] = a[2].trim(); });
+    return data;
+  }
+
+  var iitc = L.extend(parseMeta(script_info.scriptMetaStr), script_info.script);
+  var iitcVersion = (iitc.version) + ' [' + iitc.build + ']';
   function prepData (info,idx) { // try to gather plugin metadata from both sources
-    var data = {
-      build: info.buildName,
-      name: info.pluginId,
-      date: info.dateTimeVersion,
-      error: info.error
-    };
-    var script = info.script;
-    if (script) {
-      if (typeof script.name === 'string') { // cut non-informative name part
-        data.name = script.name.replace(/^IITC plugin: /,'');
-      }
-      data.version = script.version;
-      data.description = script.description;
+    var data = info.script;
+    if (info.scriptMetaStr) {
+      data = L.extend({}, parseMeta(info.scriptMetaStr), data);
     }
-    if (!data.name) {
-      if (iitc.script) { // check if GM_info is available
-        data.name = '[unknown plugin: index ' + idx + ']';
-        data.description = "this plugin does not have proper wrapper; report to it's author";
-      } else { // userscript manager fault
-        data.name = '[3rd-party plugin: index ' + idx + ']';
-      }
+    data.error = info.error;
+    if (typeof data.name === 'string') {
+      // cut non-informative name part
+      data.name = data.name.replace(/^IITC plugin: /,'');
+    } else {
+      data.name = '[unknown plugin: index ' + idx + ']';
+      data.description = "this plugin does not have proper wrapper; report to it's author";
     }
     return data;
   }
-  var extra = iitc.script && iitc.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
+  var extra = iitc.version.match(/^\d+\.\d+\.\d+(\..+)$/);
   extra = extra && extra[1];
   function formatVerInfo (p) {
     if (p.version && extra) {
@@ -56,7 +54,7 @@ window.aboutIITC = function () {
       });
     }
   }
-  var plugins = pluginsInfo.map(prepData)
+  var plugins = window.bootPlugins.info.map(prepData)
     .sort(function (a,b) { return a.name > b.name ? 1 : -1; })
     .map(function (p) {
       p.style = '';
@@ -64,7 +62,7 @@ window.aboutIITC = function () {
       if (p.error) {
         p.style += 'text-decoration:line-through;';
         p.description = p.error;
-      } else if (p.build === iitc.buildName && p.date === iitc.dateTimeVersion) { // is standard plugin
+      } else if (p.build === iitc.build && p.date === iitc.date) { // is standard plugin
         p.style += 'color:darkgray;';
       }
       p.verinfo = formatVerInfo(p) || '';

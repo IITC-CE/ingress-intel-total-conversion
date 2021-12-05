@@ -60,6 +60,8 @@ def fill_meta(source, plugin_name, dist_path):
                     line = line.replace(value, 'IITC plugin: ' + value)
         meta.append(line)
 
+    append_line('build', settings.build_name)
+    append_line('date', settings.build_date)
     append_line('id', plugin_name)
     append_line('namespace', settings.namespace)
 
