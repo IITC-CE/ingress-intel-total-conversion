@@ -278,7 +278,7 @@ window.setupMap = function() {
 
   window.layerChooser = new L.Control.Layers(baseLayers, addLayers);
 
-  // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers 
+  // Remove the hidden layer after layerChooser built, to avoid messing up ordering of layers
   $.each(hiddenLayer, function(ind, layer){
     map.removeLayer(layer);
 
@@ -686,31 +686,45 @@ function prepPluginsToLoad() {
   // executes setup function of plugin
   // and collects info for About IITC
   function safeSetup (setup) {
-    if (!setup) {
+    if(!setup) {
       log.warn('plugin must provide setup function');
       return;
     }
     var info = setup.info;
-    if (typeof info !== 'object') {
-      log.warn('plugin does not have proper wrapper:',setup);
+    if(typeof info !== 'object') {
+      log.warn('plugin does not have proper wrapper:', setup);
       info = {};
     }
     try {
       setup.call(this);
-    } catch (err) {
+    } catch(err) {
       var name = info.script && info.script.name || info.pluginId;
       log.error('error starting plugin:', name, ', error:', err);
       info.error = err;
     }
     pluginsInfo.push(info);
   }
-
-  if (window.bootPlugins) { // sort plugins by priority
-    bootPlugins.sort(function (a,b) {
-      return getPriority(a) - getPriority(b);
-    });
+  var bootPluginGroups = {};
+  var bootPluginGroupSetups = {};
+  var usedPriorities = [];
+  if (window.bootPlugins) { //group plugins by priority
+    for(let i=0; i<bootPlugins.length; i++){
+      var p = bootPlugins[i];
+      var prio = getPriority(p);
+      if(usedPriorities.indexOf(prio)===-1){
+        bootPluginGroups[prio] = [];
+        usedPriorities.push(prio);
+        bootPluginGroupSetups[prio] = [];
+      }
+      if(!p.hasOwnProperty('then') || typeof p.then !== 'function'){
+        bootPluginGroupSetups[prio].push(p);
+      }else{
+        bootPluginGroups[prio].push(p);
+      }
+    }
   } else {
     window.bootPlugins = [];
+    window.bootPluginGroups = {};
   }
 
   var pluginsInfo = []; // for About IITC
@@ -718,11 +732,47 @@ function prepPluginsToLoad() {
 
   // loader function returned
   // if called with parameter then load plugins with priorities up to specified
+  function loadPriority(prio){
+
+    return new Promise(function(resolve,reject) {
+      let started = [];
+      if(bootPluginGroupSetups.hasOwnProperty([prio])) {
+        const wrapper = new Promise(function(resolve, reject) {
+
+          for(var i = 0; i < bootPluginGroupSetups[ prio ].length; i++) {
+            safeSetup(bootPluginGroupSetups[ prio ][ i ]);
+          }
+          resolve();
+        });
+        started.push(wrapper);
+      }
+      if(bootPluginGroups.hasOwnProperty([prio])){
+        for(let i = 0; i < bootPluginGroups[ prio ].length; i++) {
+         started.push(bootPluginGroups[ prio ][ i ].call());
+        }
+      }
+      Promise.allSettled(started).then(resolve());
+    });
+  }
+
+  function loadGroup(keys, prio){
+
+    return new Promise(resolve => {
+      if(keys.length !== 0) {
+        if(keys[ 0 ] < priorities[ prio ] || prio === undefined) {
+          let next = keys.shift();
+          loadPriority(next).then(() => {
+            loadGroup(keys, prio).then(resolve());
+          });
+        }
+      }
+      resolve();
+    });
+
+  }
   return function (prio) {
-    while (bootPlugins[0]) {
-      if (prio && getPriority(bootPlugins[0]) > priorities[prio]) { break; }
-      safeSetup(bootPlugins.shift());
-    }
+    let keys = usedPriorities.sort();
+   return loadGroup(keys, prio);
   };
 }
 
@@ -737,58 +787,56 @@ function boot() {
   window.runOnSmartphonesBeforeBoot();
 
   var loadPlugins = prepPluginsToLoad();
-  loadPlugins('boot');
+  loadPlugins('boot').then(() => {
+    window.extendLeaflet();
+    window.extractFromStock();
+    window.setupIdle();
+    window.setupStyles();
+    window.setupIcons();
+    window.setupDialogs();
+    window.setupDataTileParams();
+    window.setupMap();
+    window.setupOMS();
+    window.search.setup();
+    window.setupRedeem();
+    window.setupLargeImagePreview();
+    window.setupSidebarToggle();
+    window.updateGameScore();
+    window.artifact.setup();
+    window.ornaments.setup();
+    window.setupPlayerStat();
+    window.setupTooltips();
+    window.chat.setup();
+    window.portalDetail.setup();
+    window.setupLayerChooserSelectOne();
+    window.setupLayerChooserStatusRecorder();
+    // read here ONCE, so the URL is only evaluated one time after the
+    // necessary data has been loaded.
+    urlPortalLL = getURLParam('pll');
+    if(urlPortalLL) {
+      urlPortalLL = urlPortalLL.split(",");
+      urlPortalLL = [parseFloat(urlPortalLL[0]) || 0.0, parseFloat(urlPortalLL[1]) || 0.0];
+    }
+    urlPortal = getURLParam('pguid');
 
-  window.extendLeaflet();
-  window.extractFromStock();
-  window.setupIdle();
-  window.setupStyles();
-  window.setupIcons();
-  window.setupDialogs();
-  window.setupDataTileParams();
-  window.setupMap();
-  window.setupOMS();
-  window.search.setup();
-  window.setupRedeem();
-  window.setupLargeImagePreview();
-  window.setupSidebarToggle();
-  window.updateGameScore();
-  window.artifact.setup();
-  window.ornaments.setup();
-  window.setupPlayerStat();
-  window.setupTooltips();
-  window.chat.setup();
-  window.portalDetail.setup();
-  window.setupLayerChooserSelectOne();
-  window.setupLayerChooserStatusRecorder();
-  // read here ONCE, so the URL is only evaluated one time after the
-  // necessary data has been loaded.
-  urlPortalLL = getURLParam('pll');
-  if(urlPortalLL) {
-    urlPortalLL = urlPortalLL.split(",");
-    urlPortalLL = [parseFloat(urlPortalLL[0]) || 0.0, parseFloat(urlPortalLL[1]) || 0.0];
-  }
-  urlPortal = getURLParam('pguid');
+    $('#sidebar').show();
+    return loadPlugins();
+  }).then(() => {
+      window.setMapBaseLayer();
+      window.setupLayerChooserApi();
 
-  $('#sidebar').show();
+      window.runOnSmartphonesAfterBoot();
 
-  loadPlugins();
+      // workaround for #129. Not sure why this is required.
+      // setTimeout('window.map.invalidateSize(false);', 500);
 
-  window.setMapBaseLayer();
-  window.setupLayerChooserApi();
+      window.iitcLoaded = true;
+      window.runHooks('iitcLoaded');
 
-  window.runOnSmartphonesAfterBoot();
-
-  // workaround for #129. Not sure why this is required.
-  // setTimeout('window.map.invalidateSize(false);', 500);
-
-  window.iitcLoaded = true;
-  window.runHooks('iitcLoaded');
-
-  if (typeof android !== 'undefined' && android.bootFinished) {
-    android.bootFinished();
-  }
-
+      if (typeof android !== 'undefined' && android.bootFinished) {
+        android.bootFinished();
+      }
+    });
 }
 
 /*
