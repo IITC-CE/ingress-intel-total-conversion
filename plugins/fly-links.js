@@ -1,7 +1,7 @@
 // @author         Fly33
 // @name           Fly Links
 // @category       Draw
-// @version        0.4.0
+// @version        0.5.0
 // @description    Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 
 
@@ -9,11 +9,7 @@
 window.plugin.flyLinks = function() {};
 
 // const values
-window.plugin.flyLinks.MAX_PORTALS_TO_OBSERVE = 1000;
 window.plugin.flyLinks.MAX_PORTALS_TO_LINK = 100;
-// zoom level used for projecting points between latLng and pixel coordinates. may affect precision of triangulation
-window.plugin.flyLinks.PROJECT_ZOOM = 16;
-
 
 window.plugin.flyLinks.linksLayerGroup = null;
 window.plugin.flyLinks.fieldsLayerGroup = null;
@@ -33,19 +29,12 @@ window.plugin.flyLinks.updateLayer = function() {
   };
 
   var drawLink = function(a, b, style) {
-    var alatlng = map.unproject(a, window.plugin.flyLinks.PROJECT_ZOOM);
-    var blatlng = map.unproject(b, window.plugin.flyLinks.PROJECT_ZOOM);
-
-    var poly = L.polyline([alatlng, blatlng], style);
+    var poly = L.polyline([a.latlng, b.latlng], style);
     poly.addTo(window.plugin.flyLinks.linksLayerGroup);
   }
   
   var drawField = function(a, b, c, style) {
-    var alatlng = map.unproject(a, window.plugin.flyLinks.PROJECT_ZOOM);
-    var blatlng = map.unproject(b, window.plugin.flyLinks.PROJECT_ZOOM);
-    var clatlng = map.unproject(c, window.plugin.flyLinks.PROJECT_ZOOM);
-    
-    var poly = L.polygon([alatlng, blatlng, clatlng], style);
+    var poly = L.polygon([a.latlng, b.latlng, c.latlng], style);
     poly.addTo(window.plugin.flyLinks.fieldsLayerGroup);
   }
   
@@ -238,51 +227,25 @@ window.plugin.flyLinks.updateLayer = function() {
     return triangulate2(index, line_indexes, line_edge_indexes, locations);
   }
 
-  var locations = [];
-
-  var bounds = map.getBounds();
-  $.each(window.portals, function(guid, portal) {
-    var ll = portal.getLatLng();
-    var p = map.project(ll, window.plugin.flyLinks.PROJECT_ZOOM);
-    locations.push(p);
-  });
-
   var edges = [];
   var triangles = [];
 
-  var markers = [];
   var lines = [];
-  for (var i in plugin.drawTools.drawnItems._layers) {
-    var layer = plugin.drawTools.drawnItems._layers[i];
-    if (layer instanceof L.Marker) {
-      var ll = layer.getLatLng();
-      var p = map.project(ll, window.plugin.flyLinks.PROJECT_ZOOM);
-      markers.push(p);
-    } else if (layer instanceof L.GeodesicPolyline) {
-      var p = []
-      var ll = layer.getLatLngs();
-      for (var j = 0; j < ll.length; ++j) {
-        p.push(map.project(ll[j], window.plugin.flyLinks.PROJECT_ZOOM))
+  if (plugin.drawTools) {
+    var polylines = [];
+    plugin.drawTools.drawnItems.eachLayer(function(layer) {
+      if (layer instanceof L.GeodesicPolyline) {
+        polylines.push(layer);
       }
+    });
+    polylines.forEach(function (polyline) {
+      if (!polyline._rings) { return; }
+      var p = polyline._rings[0];
       for (var j = 1; j < p.length; ++j) {
         lines.push([p[j-1], p[j]])
       }
-    }
+    });
   }
-
-  var filterMarkers = function(points, except) {
-    var result = [];
-    for (var i = 0; i < points.length; ++i) {
-      for (var j = 0; j < except.length; ++j) {
-        if (points[i].x === except[j].x && points[i].y === except[j].y)
-          break;
-      }
-      if (j < except.length)
-        continue;
-      result.push(points[i]);
-    }
-    return result;
-  };
 
   var filterLines = function(points, lines) {
     var result = [];
@@ -305,62 +268,35 @@ window.plugin.flyLinks.updateLayer = function() {
     return result
   }
 
-  var filterPolygon = function(points, polygon) {
-    var result = [];
-    for (var p = 0; p < points.length; ++p) {
-      var asum = 0;
-      for (var i = 0, j = polygon.length-1; i < polygon.length; j = i, ++i) {
-        var ax = polygon[i].x-points[p].x;
-        var ay = polygon[i].y-points[p].y;
-        var bx = polygon[j].x-points[p].x;
-        var by = polygon[j].y-points[p].y;
-        var la = Math.sqrt(ax*ax+ay*ay);
-        var lb = Math.sqrt(bx*bx+by*by);
-        if (Math.abs(la) <= EPS || Math.abs(lb) <= EPS) // the point is a vertex of the polygon
-          break;
-        var cos = (ax*bx+ay*by)/la/lb;
-        if (cos < -1)
-          cos = -1;
-        if (cos > 1)
-          cos = 1;
-        var alpha = Math.acos(cos);
-        var det = ax*by-ay*bx;
-        if (Math.abs(det) <= EPS && Math.abs(alpha - Math.PI) <= EPS) // the point is on a rib of the polygon
-          break;
-        if (det >= 0)
-          asum += alpha;
-        else
-          asum -= alpha;
-      }
-      if (i == polygon.length && Math.round(asum / Math.PI / 2) % 2 == 0)
-        continue;
-      result.push(points[p]);
-    }
-    return result;
-  };
-
-  locations = filterMarkers(locations, markers);
-
-  for (var i in plugin.drawTools.drawnItems._layers) {
-    var layer = plugin.drawTools.drawnItems._layers[i];
-    if (layer instanceof L.GeodesicPolygon) {
-      var ll = layer.getLatLngs();
-      var polygon = [];
-      for (var i = 0; i < ll.length; ++i) {
-        var p = map.project(ll[i], window.plugin.flyLinks.PROJECT_ZOOM);
-        polygon.push(p);
-      }
-      var points = filterPolygon(locations, polygon);
-      if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
-        //alert("Some polygon contains more than 100 portals.");
-        continue;
-      }
-      var triangulation = triangulate(points, lines);
-      edges = edges.concat(triangulation.edges);
-      triangles = triangles.concat(triangulation.triangles);
-    }
+  var filters = plugin.drawTools && plugin.drawTools.getLocationFilters && plugin.drawTools.getLocationFilters();
+  // fallback to map bounds if no drawn polygon (or no drawtools)
+  if (!filters || !filters.length) {
+    var bounds = map.getBounds();
+    filters = [function (p) {
+      return bounds.contains(p.getLatLng());
+    }];
   }
-  
+
+  filters.forEach(function (filter) {
+    var points = [];
+    for (var guid in window.portals) {
+      var location = window.portals[guid];
+      if (filter(location)) {
+        var point = location._point.clone();
+        point.latlng = location._latlng;
+        points.push(point);
+      }
+    }
+    if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
+      //alert("Some polygon contains more than 100 portals.");
+      return;
+    }
+    if (!points.length) return;
+    var triangulation = triangulate(points, lines);
+    edges = edges.concat(triangulation.edges);
+    triangles = triangles.concat(triangulation.triangles);
+  });
+
   $.each(edges, function(idx, edge) {
     drawLink(edge.a, edge.b, {
       color: '#FF0000',
@@ -400,6 +336,15 @@ window.plugin.flyLinks.setup = function() {
   window.plugin.flyLinks.linksLayerGroup = new L.LayerGroup();
   window.plugin.flyLinks.fieldsLayerGroup = new L.LayerGroup();
   
+  function update () {
+    if (!map.hasLayer(window.plugin.flyLinks.linksLayerGroup) ||
+        !map.hasLayer(window.plugin.flyLinks.fieldsLayerGroup)) {
+      window.plugin.flyLinks.updateLayer();
+    }
+  }
+  window.plugin.flyLinks.linksLayerGroup.on('add', update);
+  window.plugin.flyLinks.fieldsLayerGroup.on('add', update);
+
   window.addHook('mapDataRefreshEnd', function(e) {
     window.plugin.flyLinks.updateLayer();
   });
@@ -407,6 +352,10 @@ window.plugin.flyLinks.setup = function() {
   window.map.on('moveend', function() {
     window.plugin.flyLinks.updateLayer();
   });
+
+  if (window.plugin.drawTools && window.plugin.drawTools.filterEvents) {
+    window.plugin.drawTools.filterEvents.on('changed', window.plugin.flyLinks.updateLayer);
+  }
 
   window.addLayerGroup('Fly links', window.plugin.flyLinks.linksLayerGroup, false);
   window.addLayerGroup('Fly fields', window.plugin.flyLinks.fieldsLayerGroup, false);

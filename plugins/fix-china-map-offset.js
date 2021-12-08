@@ -1,7 +1,7 @@
 ﻿// @author         modos189
 // @name           Fix maps offsets in China
 // @category       Tweaks
-// @version        0.3.0
+// @version        0.3.1
 // @description    Show correct maps for China user by applying offset tweaks.
 
 
@@ -68,48 +68,6 @@ window.plugin.fixChinaMapOffset = fixChinaMapOffset;
 var insane_is_in_china = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/misc/insane_is_in_china.js
 /* eslint-disable */
   'use strict';
-
-  /// *** pnpoly *** ///
-  // Wm. Franklin's 8-line point-in-polygon C program
-  // Copyright (c) 1970-2003, Wm. Randolph Franklin
-  // Copyright (c) 2017, Mingye Wang (js translation)
-  //
-  // Permission is hereby granted, free of charge, to any person obtaining
-  // a copy of this software and associated documentation files (the
-  // "Software"), to deal in the Software without restriction, including
-  // without limitation the rights to use, copy, modify, merge, publish,
-  // distribute, sublicense, and/or sell copies of the Software, and to
-  // permit persons to whom the Software is furnished to do so, subject to
-  // the following conditions:
-  //
-  //   1. Redistributions of source code must retain the above copyright
-  //      notice, this list of conditions and the following disclaimers.
-  //   2. Redistributions in binary form must reproduce the above
-  //      copyright notice in the documentation and/or other materials
-  //      provided with the distribution.
-  //   3. The name of W. Randolph Franklin may not be used to endorse or
-  //      promote products derived from this Software without specific
-  //      prior written permission.
-  //
-  // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-  // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-  // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-  // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-  // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-  // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-  // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  var pnpoly = function (xs, ys, x, y) {
-    if (!(xs.length === ys.length)) { throw new Error('pnpoly: assert(xs.length === ys.length)'); }
-    var inside = 0;
-    // j records previous value. Also handles wrapping around.
-    for (var i = 0, j = xs.length - 1; i < xs.length; j = i++) {
-      inside ^= ys[i] > y !== ys[j] > y &&
-                x < (xs[j] - xs[i]) * (y - ys[i]) / (ys[j] - ys[i]) + xs[i];
-    }
-    // Let's make js as magical as C. Yay.
-    return !!inside;
-  };
-  /// ^^^ pnpoly ^^^ ///
 
   // This set of points roughly illustrates the scope of Google's
   // distortion. It has nothing to do with national borders etc.
@@ -195,12 +153,13 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
 
   var lats = POINTS.filter(function (_, idx) { return idx % 2 === 1; });
   var lons = POINTS.filter(function (_, idx) { return idx % 2 === 0; });
+  var XYs = lats.map(function (_, i) { return { x: lats[i], y: lons[i]}; });
 
   function isInChina (lat, lon) {
     // Yank out South China Sea as it's not distorted.
     if (lat >= 17.754 && lat <= 55.8271 &&
         lon >= 72.004 && lon <= 137.8347) {
-      return pnpoly(lats, lons, lat, lon);
+      return window.pnpoly(XYs, {x: lat, y: lon});
     }
   }
 
