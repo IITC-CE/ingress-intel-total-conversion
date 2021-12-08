@@ -715,7 +715,7 @@ window.chat.needMoreMessages = function() {
 
   if(activeTab === 'faction') {
     chat.requestFaction(true);
-  } else
+  } else {
     chat.requestPublic(true);
   }
 };
