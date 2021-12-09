@@ -6,22 +6,23 @@
 
 
 // use own namespace for plugin
-window.plugin.flyLinks = function() {};
+var flyLinks = {};
+window.plugin.flyLinks = flyLinks;
 
 // const values
-window.plugin.flyLinks.MAX_PORTALS_TO_LINK = 100;
+flyLinks.MAX_PORTALS_TO_LINK = 100;
 
-window.plugin.flyLinks.linksLayerGroup = null;
-window.plugin.flyLinks.fieldsLayerGroup = null;
+flyLinks.linksLayerGroup = null;
+flyLinks.fieldsLayerGroup = null;
 
-window.plugin.flyLinks.updateLayer = function() {
-  if (!window.map.hasLayer(window.plugin.flyLinks.linksLayerGroup) &&
-      !window.map.hasLayer(window.plugin.flyLinks.fieldsLayerGroup)) {
+flyLinks.updateLayer = function() {
+  if (!window.map.hasLayer(flyLinks.linksLayerGroup) &&
+      !window.map.hasLayer(flyLinks.fieldsLayerGroup)) {
     return;
   }
 
-  window.plugin.flyLinks.linksLayerGroup.clearLayers();
-  window.plugin.flyLinks.fieldsLayerGroup.clearLayers();
+  flyLinks.linksLayerGroup.clearLayers();
+  flyLinks.fieldsLayerGroup.clearLayers();
 
   var distance = function(a, b) {
     return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
@@ -29,12 +30,12 @@ window.plugin.flyLinks.updateLayer = function() {
 
   var drawLink = function(a, b, style) {
     var poly = L.polyline([a.latlng, b.latlng], style);
-    poly.addTo(window.plugin.flyLinks.linksLayerGroup);
+    poly.addTo(flyLinks.linksLayerGroup);
   };
 
   var drawField = function(a, b, c, style) {
     var poly = L.polygon([a.latlng, b.latlng, c.latlng], style);
-    poly.addTo(window.plugin.flyLinks.fieldsLayerGroup);
+    poly.addTo(flyLinks.fieldsLayerGroup);
   };
 
   var EPS = 1e-9;
@@ -197,18 +198,18 @@ window.plugin.flyLinks.updateLayer = function() {
     var makesubtriangulation = function _makesubtriangulation(ai, bi, ci, depth) {
       var _i = [ai, bi, ci].sort(function(a,b){return a-b;});
       if (data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index === -1) {
-        triangles.push(new window.plugin.flyLinks.Triangle(locations[ai], locations[bi], locations[ci], depth));
+        triangles.push(new flyLinks.Triangle(locations[ai], locations[bi], locations[ci], depth));
       } else {
         _makesubtriangulation(ai, bi, data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index, depth+1);
         _makesubtriangulation(bi, ci, data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index, depth+1);
         _makesubtriangulation(ci, ai, data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index, depth+1);
-        edges.push(new window.plugin.flyLinks.Edge(locations[ai], locations[data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index], depth));
-        edges.push(new window.plugin.flyLinks.Edge(locations[bi], locations[data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index], depth));
-        edges.push(new window.plugin.flyLinks.Edge(locations[ci], locations[data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index], depth));
+        edges.push(new flyLinks.Edge(locations[ai], locations[data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index], depth));
+        edges.push(new flyLinks.Edge(locations[bi], locations[data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index], depth));
+        edges.push(new flyLinks.Edge(locations[ci], locations[data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]].index], depth));
       }
     };
     var maketriangulation = function _maketriangulation(len, a) {
-      edges.push(new window.plugin.flyLinks.Edge(locations[index[a]], locations[index[a+len]], 0));
+      edges.push(new flyLinks.Edge(locations[index[a]], locations[index[a+len]], 0));
       if (best[len][a].length === -1) {
         return;
       }
@@ -243,9 +244,10 @@ window.plugin.flyLinks.updateLayer = function() {
   var triangles = [];
 
   var lines = [];
-  if (plugin.drawTools) {
+  var drawTools = window.plugin.drawTools;
+  if (drawTools) {
     var polylines = [];
-    plugin.drawTools.drawnItems.eachLayer(function(layer) {
+    drawTools.drawnItems.eachLayer(function(layer) {
       if (layer instanceof L.GeodesicPolyline) {
         polylines.push(layer);
       }
@@ -283,7 +285,7 @@ window.plugin.flyLinks.updateLayer = function() {
     return result;
   };
 
-  var filters = plugin.drawTools && plugin.drawTools.getLocationFilters && plugin.drawTools.getLocationFilters();
+  var filters = drawTools && drawTools.getLocationFilters && drawTools.getLocationFilters();
   // fallback to map bounds if no drawn polygon (or no drawtools)
   if (!filters || !filters.length) {
     var bounds = map.getBounds();
@@ -302,7 +304,7 @@ window.plugin.flyLinks.updateLayer = function() {
         points.push(point);
       }
     }
-    if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
+    if (points.length >= flyLinks.MAX_PORTALS_TO_LINK) {
       // alert("Some polygon contains more than 100 portals.");
       return;
     }
@@ -334,45 +336,45 @@ window.plugin.flyLinks.updateLayer = function() {
   });
 };
 
-window.plugin.flyLinks.Edge = function(a, b, depth) {
+flyLinks.Edge = function(a, b, depth) {
   this.a = a;
   this.b = b;
   this.depth = depth;
 };
 
-window.plugin.flyLinks.Triangle = function(a, b, c, depth) {
+flyLinks.Triangle = function(a, b, c, depth) {
   this.a = a;
   this.b = b;
   this.c = c;
   this.depth = depth;
 };
 
-window.plugin.flyLinks.setup = function() {
-  window.plugin.flyLinks.linksLayerGroup = new L.LayerGroup();
-  window.plugin.flyLinks.fieldsLayerGroup = new L.LayerGroup();
+function setup () {
+  flyLinks.linksLayerGroup = new L.LayerGroup();
+  flyLinks.fieldsLayerGroup = new L.LayerGroup();
 
   function update () {
-    if (!map.hasLayer(window.plugin.flyLinks.linksLayerGroup) ||
-        !map.hasLayer(window.plugin.flyLinks.fieldsLayerGroup)) {
-      window.plugin.flyLinks.updateLayer();
+    if (!map.hasLayer(flyLinks.linksLayerGroup) ||
+        !map.hasLayer(flyLinks.fieldsLayerGroup)) {
+      flyLinks.updateLayer();
     }
   }
-  window.plugin.flyLinks.linksLayerGroup.on('add', update);
-  window.plugin.flyLinks.fieldsLayerGroup.on('add', update);
+  flyLinks.linksLayerGroup.on('add', update);
+  flyLinks.fieldsLayerGroup.on('add', update);
 
   window.addHook('mapDataRefreshEnd', function() {
-    window.plugin.flyLinks.updateLayer();
+    flyLinks.updateLayer();
   });
 
   window.map.on('moveend', function() {
-    window.plugin.flyLinks.updateLayer();
+    flyLinks.updateLayer();
   });
 
-  if (window.plugin.drawTools && window.plugin.drawTools.filterEvents) {
-    window.plugin.drawTools.filterEvents.on('changed', window.plugin.flyLinks.updateLayer);
+  var drawTools = window.plugin.drawTools;
+  if (drawTools && drawTools.filterEvents) {
+    drawTools.filterEvents.on('changed', flyLinks.updateLayer);
   }
 
-  window.addLayerGroup('Fly links', window.plugin.flyLinks.linksLayerGroup, false);
-  window.addLayerGroup('Fly fields', window.plugin.flyLinks.fieldsLayerGroup, false);
-};
-var setup = window.plugin.flyLinks.setup;
+  window.addLayerGroup('Fly links', flyLinks.linksLayerGroup, false);
+  window.addLayerGroup('Fly fields', flyLinks.fieldsLayerGroup, false);
+}
