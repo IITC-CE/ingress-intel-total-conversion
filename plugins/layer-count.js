@@ -9,72 +9,66 @@
 var layerCount = {};
 window.plugin.layerCount = layerCount;
 
-layerCount.onBtnClick = function(ev) {
+layerCount.onBtnClick = function () {
   var btn = layerCount.button,
-    tooltip = layerCount.tooltip,
-    layer = layerCount.layer;
+    tooltip = layerCount.tooltip;
 
-  if(btn.classList.contains('active')) {
-    map.off('click', layerCount.calculate);
+  if (btn.classList.contains('active')) {
+    window.map.off('click', layerCount.calculate);
     btn.classList.remove('active');
   } else {
-    map.on('click', layerCount.calculate);
+    window.map.on('click', layerCount.calculate);
     btn.classList.add('active');
-    setTimeout(function(){
+    setTimeout(function () {
       tooltip.textContent = 'Click on map';
     }, 10);
   }
 };
 
-layerCount.latLngE6ToGooglePoint = function(point) {
-  return new google.maps.LatLng(point.latE6/1E6, point.lngE6/1E6);
-}
-
-layerCount.calculate = function(ev) {
+layerCount.calculate = function (ev) {
   var point = ev.layerPoint;
   var fields = window.fields;
-  var layersRes = layersEnl = layersDrawn = 0;
+  var layersRes = 0, layersEnl = 0, layersDrawn = 0;
 
-  for(var guid in fields) {
+  for (var guid in fields) {
     var field = fields[guid];
 
     // we don't need to check the field's bounds first. pnpoly is pretty simple math.
     // Checking the bounds is about 50 times slower than just using pnpoly
-    if(field._rings && window.pnpoly(field._rings[0], point)) {
-      if(field.options.team === TEAM_ENL) {
+    if (field._rings && window.pnpoly(field._rings[0], point)) {
+      if (field.options.team === TEAM_ENL) {
         layersEnl++;
-      } else if(field.options.team === TEAM_RES) {
+      } else if (field.options.team === TEAM_RES) {
         layersRes++;
       }
     }
   }
 
   if (window.plugin.drawTools) {
-    plugin.drawTools.drawnItems.eachLayer(function (layer) {
+    window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
       if (layer instanceof L.GeodesicPolygon && layer._rings && window.pnpoly(layer._rings[0], point)) {
         layersDrawn++;
       }
     });
   }
 
-  if(layersRes !== 0 && layersEnl !== 0)
-    var content = 'Res: ' + layersRes + ' + Enl: ' + layersEnl + ' = ' + (layersRes + layersEnl) + ' fields';
-  else if(layersRes !== 0)
-    var content = 'Res: ' + layersRes + ' field(s)';
-  else if(layersEnl !== 0)
-    var content = 'Enl: ' + layersEnl + ' field(s)';
-  else
-    var content = 'No fields';
-
-  if (layersDrawn !== 0)
+  var content;
+  if (layersRes !== 0 && layersEnl !== 0) {
+    content = 'Res: ' + layersRes + ' + Enl: ' + layersEnl + ' = ' + (layersRes + layersEnl) + ' fields';
+  } else if (layersRes !== 0) {
+    content = 'Res: ' + layersRes + ' field(s)';
+  } else if (layersEnl !== 0) {
+    content = 'Enl: ' + layersEnl + ' field(s)';
+  } else {
+    content = 'No fields';
+  }
+  if (layersDrawn !== 0) {
     content += '; draw: ' + layersDrawn + ' polygon(s)';
-
+  }
   layerCount.tooltip.innerHTML = content;
-
-  return false;
 };
 
-var setup = function() {
+function setup () {
   $('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
 
   var parent = $('.leaflet-top.leaflet-left', window.map.getContainer());
@@ -97,3 +91,5 @@ var setup = function() {
   layerCount.tooltip = tooltip;
   layerCount.container = container;
 }
+
+/* exported setup */
