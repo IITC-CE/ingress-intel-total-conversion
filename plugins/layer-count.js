@@ -6,18 +6,19 @@
 
 
 // use own namespace for plugin
-plugin.layerCount = {}
+var layerCount = {};
+window.plugin.layerCount = layerCount;
 
-plugin.layerCount.onBtnClick = function(ev) {
-  var btn = plugin.layerCount.button,
-    tooltip = plugin.layerCount.tooltip,
-    layer = plugin.layerCount.layer;
+layerCount.onBtnClick = function(ev) {
+  var btn = layerCount.button,
+    tooltip = layerCount.tooltip,
+    layer = layerCount.layer;
 
   if(btn.classList.contains("active")) {
-    map.off("click", plugin.layerCount.calculate);
+    map.off("click", layerCount.calculate);
     btn.classList.remove("active");
   } else {
-    map.on("click", plugin.layerCount.calculate);
+    map.on("click", layerCount.calculate);
     btn.classList.add("active");
     setTimeout(function(){
       tooltip.textContent = "Click on map";
@@ -25,11 +26,11 @@ plugin.layerCount.onBtnClick = function(ev) {
   }
 };
 
-plugin.layerCount.latLngE6ToGooglePoint = function(point) {
+layerCount.latLngE6ToGooglePoint = function(point) {
   return new google.maps.LatLng(point.latE6/1E6, point.lngE6/1E6);
 }
 
-plugin.layerCount.calculate = function(ev) {
+layerCount.calculate = function(ev) {
   var point = ev.layerPoint;
   var fields = window.fields;
   var layersRes = layersEnl = layersDrawn = 0;
@@ -68,7 +69,7 @@ plugin.layerCount.calculate = function(ev) {
   if (layersDrawn != 0)
     content += "; draw: " + layersDrawn + " polygon(s)";
 
-  plugin.layerCount.tooltip.innerHTML = content;
+  layerCount.tooltip.innerHTML = content;
 
   return false;
 };
@@ -80,7 +81,7 @@ var setup = function() {
 
   var button = document.createElement("a");
   button.className = "leaflet-bar-part";
-  button.addEventListener("click", plugin.layerCount.onBtnClick, false);
+  button.addEventListener("click", layerCount.onBtnClick, false);
   button.title = 'Count nested fields';
 
   var tooltip = document.createElement("div");
@@ -92,7 +93,7 @@ var setup = function() {
   container.appendChild(button);
   parent.append(container);
 
-  plugin.layerCount.button = button;
-  plugin.layerCount.tooltip = tooltip;
-  plugin.layerCount.container = container;
+  layerCount.button = button;
+  layerCount.tooltip = tooltip;
+  layerCount.container = container;
 }
