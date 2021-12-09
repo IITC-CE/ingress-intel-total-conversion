@@ -21,7 +21,7 @@ window.plugin.flyLinks.updateLayer = function() {
 
   window.plugin.flyLinks.linksLayerGroup.clearLayers();
   window.plugin.flyLinks.fieldsLayerGroup.clearLayers();
-  var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(), 
+  var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(),
               $('.leaflet-control-layers-selector + span:contains("Fly fields")').parent()];
 
   var distance = function(a, b) {
@@ -32,17 +32,17 @@ window.plugin.flyLinks.updateLayer = function() {
     var poly = L.polyline([a.latlng, b.latlng], style);
     poly.addTo(window.plugin.flyLinks.linksLayerGroup);
   };
-  
+
   var drawField = function(a, b, c, style) {
     var poly = L.polygon([a.latlng, b.latlng, c.latlng], style);
     poly.addTo(window.plugin.flyLinks.fieldsLayerGroup);
   };
-  
+
   var EPS = 1e-9;
   var det = function(a, b, c) {
     return a.x * b.y - a.y * b.x + b.x * c.y - b.y * c.x + c.x * a.y - c.y * a.x;
   };
-  
+
   var convexHull = function(points) {
     if (points.length < 3)
       return [];
@@ -85,7 +85,7 @@ window.plugin.flyLinks.updateLayer = function() {
     func(maxxi, minxi, index);
     return result;
   };
-  
+
   var triangulate2 = function(index, line_indexes, line_edge_indexes, locations) {
     if (index.length == 0)
       return {edges: [], triangles: []};
@@ -335,7 +335,7 @@ window.plugin.flyLinks.Triangle = function(a, b, c, depth) {
 window.plugin.flyLinks.setup = function() {
   window.plugin.flyLinks.linksLayerGroup = new L.LayerGroup();
   window.plugin.flyLinks.fieldsLayerGroup = new L.LayerGroup();
-  
+
   function update () {
     if (!map.hasLayer(window.plugin.flyLinks.linksLayerGroup) ||
         !map.hasLayer(window.plugin.flyLinks.fieldsLayerGroup)) {
