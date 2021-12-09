@@ -56,33 +56,45 @@ function calculate (ev) {
 function setup () {
   $('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
 
-  var parent = $('.leaflet-top.leaflet-left', window.map.getContainer());
+  var LayerCount = L.Control.extend({
+    options: {
+      position: 'topleft'
+    },
 
-  var button = document.createElement('a');
-  button.className = 'leaflet-bar-part';
-  button.addEventListener('click', function () {
-    var btn = this;
-    if (btn.classList.contains('active')) {
-      window.map.off('click', calculate);
-      btn.classList.remove('active');
-    } else {
-      window.map.on('click', calculate);
-      btn.classList.add('active');
-      setTimeout(function () {
-        tooltip.textContent = 'Click on map';
-      }, 10);
+    onAdd: function (map) {
+      var button = document.createElement('a');
+      button.className = 'leaflet-bar-part';
+      button.addEventListener('click', function toggle () {
+        var btn = this;
+        if (btn.classList.contains('active')) {
+          map.off('click', calculate);
+          btn.classList.remove('active');
+        } else {
+          map.on('click', calculate);
+          btn.classList.add('active');
+          setTimeout(function () {
+            tooltip.textContent = 'Click on map';
+          }, 10);
+        }
+      }, false);
+      button.title = 'Count nested fields';
+
+      tooltip = document.createElement('div');
+      tooltip.className = 'leaflet-control-layer-count-tooltip';
+      button.appendChild(tooltip);
+
+      var container = document.createElement('div');
+      container.className = 'leaflet-control-layer-count leaflet-bar';
+      container.appendChild(button);
+      return container;
+    },
+
+    onRemove: function (map) {
+      map.off('click', calculate);
     }
-  }, false);
-  button.title = 'Count nested fields';
-
-  tooltip = document.createElement('div');
-  tooltip.className = 'leaflet-control-layer-count-tooltip';
-  button.appendChild(tooltip);
-
-  var container = document.createElement('div');
-  container.className = 'leaflet-control-layer-count leaflet-bar leaflet-control';
-  container.appendChild(button);
-  parent.append(container);
+  });
+  var ctrl = new LayerCount;
+  ctrl.addTo(window.map);
 }
 
 /* exported setup */
