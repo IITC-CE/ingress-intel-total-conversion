@@ -14,14 +14,14 @@ layerCount.onBtnClick = function(ev) {
     tooltip = layerCount.tooltip,
     layer = layerCount.layer;
 
-  if(btn.classList.contains("active")) {
-    map.off("click", layerCount.calculate);
-    btn.classList.remove("active");
+  if(btn.classList.contains('active')) {
+    map.off('click', layerCount.calculate);
+    btn.classList.remove('active');
   } else {
-    map.on("click", layerCount.calculate);
-    btn.classList.add("active");
+    map.on('click', layerCount.calculate);
+    btn.classList.add('active');
     setTimeout(function(){
-      tooltip.textContent = "Click on map";
+      tooltip.textContent = 'Click on map';
     }, 10);
   }
 };
@@ -58,16 +58,16 @@ layerCount.calculate = function(ev) {
   }
 
   if(layersRes != 0 && layersEnl != 0)
-    var content = "Res: " + layersRes + " + Enl: " + layersEnl + " = " + (layersRes + layersEnl) + " fields";
+    var content = 'Res: ' + layersRes + ' + Enl: ' + layersEnl + ' = ' + (layersRes + layersEnl) + ' fields';
   else if(layersRes != 0)
-    var content = "Res: " + layersRes + " field(s)";
+    var content = 'Res: ' + layersRes + ' field(s)';
   else if(layersEnl != 0)
-    var content = "Enl: " + layersEnl + " field(s)";
+    var content = 'Enl: ' + layersEnl + ' field(s)';
   else
-    var content = "No fields";
+    var content = 'No fields';
 
   if (layersDrawn != 0)
-    content += "; draw: " + layersDrawn + " polygon(s)";
+    content += '; draw: ' + layersDrawn + ' polygon(s)';
 
   layerCount.tooltip.innerHTML = content;
 
@@ -77,19 +77,19 @@ layerCount.calculate = function(ev) {
 var setup = function() {
   $('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
 
-  var parent = $(".leaflet-top.leaflet-left", window.map.getContainer());
+  var parent = $('.leaflet-top.leaflet-left', window.map.getContainer());
 
-  var button = document.createElement("a");
-  button.className = "leaflet-bar-part";
-  button.addEventListener("click", layerCount.onBtnClick, false);
+  var button = document.createElement('a');
+  button.className = 'leaflet-bar-part';
+  button.addEventListener('click', layerCount.onBtnClick, false);
   button.title = 'Count nested fields';
 
-  var tooltip = document.createElement("div");
-  tooltip.className = "leaflet-control-layer-count-tooltip";
+  var tooltip = document.createElement('div');
+  tooltip.className = 'leaflet-control-layer-count-tooltip';
   button.appendChild(tooltip);
 
-  var container = document.createElement("div");
-  container.className = "leaflet-control-layer-count leaflet-bar leaflet-control";
+  var container = document.createElement('div');
+  container.className = 'leaflet-control-layer-count leaflet-bar leaflet-control';
   container.appendChild(button);
   parent.append(container);
 
