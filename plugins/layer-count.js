@@ -9,23 +9,8 @@
 var layerCount = {};
 window.plugin.layerCount = layerCount;
 
-layerCount.onBtnClick = function () {
-  var btn = layerCount.button,
-    tooltip = layerCount.tooltip;
-
-  if (btn.classList.contains('active')) {
-    window.map.off('click', layerCount.calculate);
-    btn.classList.remove('active');
-  } else {
-    window.map.on('click', layerCount.calculate);
-    btn.classList.add('active');
-    setTimeout(function () {
-      tooltip.textContent = 'Click on map';
-    }, 10);
-  }
-};
-
-layerCount.calculate = function (ev) {
+var tooltip;
+function calculate (ev) {
   var point = ev.layerPoint;
   var fields = window.fields;
   var layersRes = 0, layersEnl = 0, layersDrawn = 0;
@@ -65,8 +50,8 @@ layerCount.calculate = function (ev) {
   if (layersDrawn !== 0) {
     content += '; draw: ' + layersDrawn + ' polygon(s)';
   }
-  layerCount.tooltip.innerHTML = content;
-};
+  tooltip.innerHTML = content;
+}
 
 function setup () {
   $('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
@@ -75,10 +60,22 @@ function setup () {
 
   var button = document.createElement('a');
   button.className = 'leaflet-bar-part';
-  button.addEventListener('click', layerCount.onBtnClick, false);
+  button.addEventListener('click', function () {
+    var btn = this;
+    if (btn.classList.contains('active')) {
+      window.map.off('click', calculate);
+      btn.classList.remove('active');
+    } else {
+      window.map.on('click', calculate);
+      btn.classList.add('active');
+      setTimeout(function () {
+        tooltip.textContent = 'Click on map';
+      }, 10);
+    }
+  }, false);
   button.title = 'Count nested fields';
 
-  var tooltip = document.createElement('div');
+  tooltip = document.createElement('div');
   tooltip.className = 'leaflet-control-layer-count-tooltip';
   button.appendChild(tooltip);
 
@@ -86,10 +83,6 @@ function setup () {
   container.className = 'leaflet-control-layer-count leaflet-bar leaflet-control';
   container.appendChild(button);
   parent.append(container);
-
-  layerCount.button = button;
-  layerCount.tooltip = tooltip;
-  layerCount.container = container;
 }
 
 /* exported setup */
