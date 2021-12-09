@@ -22,8 +22,6 @@ window.plugin.flyLinks.updateLayer = function() {
 
   window.plugin.flyLinks.linksLayerGroup.clearLayers();
   window.plugin.flyLinks.fieldsLayerGroup.clearLayers();
-  var ctrl = [$('.leaflet-control-layers-selector + span:contains("Fly links")').parent(),
-              $('.leaflet-control-layers-selector + span:contains("Fly fields")').parent()];
 
   var distance = function(a, b) {
     return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
@@ -59,7 +57,7 @@ window.plugin.flyLinks.updateLayer = function() {
         var c = points[index[i]];
         var d = -det(a, b, c);
         if (d > EPS) {
-            _index.push(index[i]);
+          _index.push(index[i]);
         }
         if (maxd < d - EPS) {
           maxd = d;
@@ -174,7 +172,8 @@ window.plugin.flyLinks.updateLayer = function() {
         var tlen = -1;
         var i;
         for (i = 0; i < line_edge_indexes.length; ++i) {
-          var [i0, i1] = line_edge_indexes[i];
+          var indexes = line_edge_indexes[i];
+          var i0 = indexes[0], i1 = indexes[1];
           if (k < i0 && i0 < k+len && (i1 < k || k+len < i1) ||
               k < i1 && i1 < k+len && (i0 < k || k+len < i0)) {
             break;
@@ -220,7 +219,7 @@ window.plugin.flyLinks.updateLayer = function() {
     if (best[index.length - 1][0].height > 0) {
       maketriangulation(index.length - 1, 0);
     } else {
-      console.log("Fly links: no triangulation");
+      console.log('Fly links: no triangulation');
     }
     return {edges: edges, triangles: triangles};
   };
@@ -304,7 +303,7 @@ window.plugin.flyLinks.updateLayer = function() {
       }
     }
     if (points.length >= window.plugin.flyLinks.MAX_PORTALS_TO_LINK) {
-      //alert("Some polygon contains more than 100 portals.");
+      // alert("Some polygon contains more than 100 portals.");
       return;
     }
     if (!points.length) return;
@@ -361,7 +360,7 @@ window.plugin.flyLinks.setup = function() {
   window.plugin.flyLinks.linksLayerGroup.on('add', update);
   window.plugin.flyLinks.fieldsLayerGroup.on('add', update);
 
-  window.addHook('mapDataRefreshEnd', function(e) {
+  window.addHook('mapDataRefreshEnd', function() {
     window.plugin.flyLinks.updateLayer();
   });
 
