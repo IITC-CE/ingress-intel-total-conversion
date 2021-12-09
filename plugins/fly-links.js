@@ -16,8 +16,9 @@ window.plugin.flyLinks.fieldsLayerGroup = null;
 
 window.plugin.flyLinks.updateLayer = function() {
   if (!window.map.hasLayer(window.plugin.flyLinks.linksLayerGroup) &&
-      !window.map.hasLayer(window.plugin.flyLinks.fieldsLayerGroup))
+      !window.map.hasLayer(window.plugin.flyLinks.fieldsLayerGroup)) {
     return;
+  }
 
   window.plugin.flyLinks.linksLayerGroup.clearLayers();
   window.plugin.flyLinks.fieldsLayerGroup.clearLayers();
@@ -44,8 +45,9 @@ window.plugin.flyLinks.updateLayer = function() {
   };
 
   var convexHull = function(points) {
-    if (points.length < 3)
+    if (points.length < 3) {
       return [];
+    }
     var result = [];
     var func = function _func(ai, bi, index) {
       var maxd = 0;
@@ -76,10 +78,12 @@ window.plugin.flyLinks.updateLayer = function() {
     var index = [];
     for (var i = 0; i < points.length; ++i) {
       index.push(i);
-      if (points[minxi].x > points[i].x)
+      if (points[minxi].x > points[i].x) {
         minxi = i;
-      if (points[maxxi].x < points[i].x)
+      }
+      if (points[maxxi].x < points[i].x) {
         maxxi = i;
+      }
     }
     func(minxi, maxxi, index);
     func(maxxi, minxi, index);
@@ -87,15 +91,18 @@ window.plugin.flyLinks.updateLayer = function() {
   };
 
   var triangulate2 = function(index, line_indexes, line_edge_indexes, locations) {
-    if (index.length == 0)
+    if (index.length == 0) {
       return {edges: [], triangles: []};
+    }
     var data = [];
     var subtriangulate = function _subtriangulate(ai, bi, ci, index) {
       var _i = [ai, bi, ci].sort(function(a,b){return a-b;});
-      if (data[_i[0]] === undefined)
+      if (data[_i[0]] === undefined) {
         data[_i[0]] = [];
-      if (data[_i[0]][_i[1]-_i[0]] === undefined)
+      }
+      if (data[_i[0]][_i[1]-_i[0]] === undefined) {
         data[_i[0]][_i[1]-_i[0]] = [];
+      }
       if (data[_i[0]][_i[1]-_i[0]][_i[2]-_i[1]] === undefined) {
         var _index = [];
         for (var i = 0; i < index.length; ++i) {
@@ -112,10 +119,12 @@ window.plugin.flyLinks.updateLayer = function() {
         for (i = 0; i < line_indexes.length; ++i) {
           var f0 = _index.indexOf(line_indexes[i][0]) != -1;
           var f1 = _index.indexOf(line_indexes[i][1]) != -1;
-          if (f0 && !f1 && _i.indexOf(line_indexes[i][1]) == -1)
+          if (f0 && !f1 && _i.indexOf(line_indexes[i][1]) == -1) {
             break;
-          if (f1 && !f0 && _i.indexOf(line_indexes[i][0]) == -1)
+          }
+          if (f1 && !f0 && _i.indexOf(line_indexes[i][0]) == -1) {
             break;
+          }
         }
         if (i < line_indexes.length) {
           besth = 0;
@@ -167,8 +176,9 @@ window.plugin.flyLinks.updateLayer = function() {
         for (i = 0; i < line_edge_indexes.length; ++i) {
           var [i0, i1] = line_edge_indexes[i];
           if (k < i0 && i0 < k+len && (i1 < k || k+len < i1) ||
-              k < i1 && i1 < k+len && (i0 < k || k+len < i0))
+              k < i1 && i1 < k+len && (i0 < k || k+len < i0)) {
             break;
+          }
         }
         if (i >= line_edge_indexes.length) {
           for (var _len = 1; _len <= len - 1; ++_len) {
@@ -200,16 +210,18 @@ window.plugin.flyLinks.updateLayer = function() {
     };
     var maketriangulation = function _maketriangulation(len, a) {
       edges.push(new window.plugin.flyLinks.Edge(locations[index[a]], locations[index[a+len]], 0));
-      if (best[len][a].length == -1)
+      if (best[len][a].length == -1) {
         return;
+      }
       makesubtriangulation(index[a], index[a+best[len][a].length], index[a+len], 1);
       _maketriangulation(best[len][a].length, a);
       _maketriangulation(len - best[len][a].length, a + best[len][a].length);
     };
-    if (best[index.length - 1][0].height > 0)
+    if (best[index.length - 1][0].height > 0) {
       maketriangulation(index.length - 1, 0);
-    else
+    } else {
       console.log("Fly links: no triangulation");
+    }
     return {edges: edges, triangles: triangles};
   };
 
@@ -220,8 +232,9 @@ window.plugin.flyLinks.updateLayer = function() {
     for (var i = 0; i < line_indexes.length; ++i) {
       var i0 = index.indexOf(line_indexes[i][0]);
       var i1 = index.indexOf(line_indexes[i][1]);
-      if (i0 == -1 || i1 == -1)
+      if (i0 == -1 || i1 == -1) {
         continue;
+      }
       line_edge_indexes.push([i0, i1]);
     }
     return triangulate2(index, line_indexes, line_edge_indexes, locations);
@@ -251,18 +264,21 @@ window.plugin.flyLinks.updateLayer = function() {
     var result = [];
     var findPoint = function(points, point) {
       for (var i = 0; i < points.length; ++i) {
-        if (points[i].x === point.x && points[i].y === point.y)
+        if (points[i].x === point.x && points[i].y === point.y) {
           return i;
+        }
       }
       return -1;
     };
     for (var i = 0; i < lines.length; ++i) {
       var a = findPoint(points, lines[i][0]);
-      if (a == -1)
+      if (a == -1) {
         continue;
+      }
       var b = findPoint(points, lines[i][1]);
-      if (b == -1)
+      if (b == -1) {
         continue;
+      }
       result.push([a, b]);
     }
     return result;
