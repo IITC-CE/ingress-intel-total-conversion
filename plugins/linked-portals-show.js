@@ -29,8 +29,13 @@ showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing
       div.addClass('lastportal');
     }
   }
-  var lengthFull = digits(Math.round(length)) + 'm';
   var title = data && data.title;
+  if (!title) {
+    div.addClass('outOfRange');
+  }
+  var lengthFull = digits(Math.round(length)) + 'm';
+
+  // content
   if (title) {
     $('<img/>').attr({
       src: fixPortalImageUrl(data.image),
@@ -38,20 +43,19 @@ showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing
       alt: title,
     }).appendTo(div);
   } else {
-    title = 'Go to portal';
     var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
-    div
-      .addClass('outOfRange')
-      .append($('<span/>').html('Portal not loaded.<br>' + lengthShort));
+    div.append($('<span/>').html('Portal not loaded.<br>' + lengthShort));
   }
-  div.attr('title', $('<div/>')
-    .append($('<strong/>').text(title))
-    .append($('<br/>'))
-    .append($('<span/>').text(is_outgoing ? '↴ outgoing link' : '↳ incoming link'))
-    .append($('<br/>'))
-    .append($('<span/>').html(lengthFull))
-    .html());
-  return div;
+
+  var tooltip = $('<div/>').append(
+    $('<strong/>').text(data.title || 'Go to portal'),
+    $('<br/>'),
+    $('<span/>').text(is_outgoing ? '↴ outgoing link' : '↳ incoming link'),
+    $('<br/>'),
+    $('<span/>').html(lengthFull))
+    .html();
+
+  return div.attr('title', tooltip);
 };
 
 showLinkedPortal.portalDetail = function (data) {
@@ -62,7 +66,7 @@ showLinkedPortal.portalDetail = function (data) {
 
   var c = 1;
 
-  $('<div>',{id:'showLinkedPortalContainer'}).appendTo('.imgpreview');
+  var $showLinkedPortalContainer = $('<div>',{id:'showLinkedPortalContainer'}).appendTo('.imgpreview');
 
   function renderLinkedPortal(linkGuid) {
     if (c > 16) return;
@@ -85,7 +89,7 @@ showLinkedPortal.portalDetail = function (data) {
         'data-lng': lng,
         'data-length': length,
       })
-      .appendTo('#showLinkedPortalContainer');
+      .appendTo($showLinkedPortalContainer);
 
     c++;
   }
@@ -97,10 +101,10 @@ showLinkedPortal.portalDetail = function (data) {
     $('<div>')
       .addClass('showLinkedPortalOverflow')
       .text(length-16 + ' more')
-      .appendTo('#showLinkedPortalContainer');
+      .appendTo($showLinkedPortalContainer);
   }
 
-  $('#showLinkedPortalContainer')
+  $showLinkedPortalContainer
     .on('click', '.showLinkedPortalLink:not(".outOfRange")', showLinkedPortal.renderPortalDetails)
     .on('click', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
     .on('taphold', '.showLinkedPortalLink', { duration: 900 }, showLinkedPortal.showMap)
