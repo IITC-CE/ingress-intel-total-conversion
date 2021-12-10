@@ -6,10 +6,10 @@
 
 
 // use own namespace for plugin
-window.plugin.showLinkedPortal = function () {
-};
+var showLinkedPortal = {};
+window.plugin.showLinkedPortal = showLinkedPortal;
 
-plugin.showLinkedPortal.previewOptions = {
+showLinkedPortal.previewOptions = {
   color: '#C33',
   opacity: 1,
   weight: 5,
@@ -18,7 +18,7 @@ plugin.showLinkedPortal.previewOptions = {
   radius: 18,
 };
 
-plugin.showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) { // guid: potentially useful
+showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) { // guid: potentially useful
   div = div ? div.empty().removeClass('outOfRange') : $('<div>');
   var lengthFull = digits(Math.round(length)) + 'm';
   var title = data && data.title;
@@ -45,8 +45,8 @@ plugin.showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_o
   return div;
 };
 
-window.plugin.showLinkedPortal.portalDetail = function (data) {
-  plugin.showLinkedPortal.removePreview();
+showLinkedPortal.portalDetail = function (data) {
+  showLinkedPortal.removePreview();
 
   var portalLinks = getPortalLinks(data.guid);
   var length = portalLinks.in.length + portalLinks.out.length;
@@ -68,7 +68,7 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
     var length = L.latLng(link.oLatE6/1E6, link.oLngE6/1E6).distanceTo([link.dLatE6/1E6, link.dLngE6/1E6]);
     var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid);
 
-    plugin.showLinkedPortal.makePortalLinkInfo(null,guid,data,length,direction==='outgoing')
+    showLinkedPortal.makePortalLinkInfo(null,guid,data,length,direction==='outgoing')
       .addClass('showLinkedPortalLink showLinkedPortalLink' + c + ' ' + direction)
       .attr({
         'data-guid': guid,
@@ -92,16 +92,16 @@ window.plugin.showLinkedPortal.portalDetail = function (data) {
   }
 
   $('#showLinkedPortalContainer')
-    .on('click', '.showLinkedPortalLink:not(".outOfRange")', plugin.showLinkedPortal.onLinkedPortalClick)
-    .on('click', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalClick)
-    .on('taphold', '.showLinkedPortalLink', { duration: 900 }, plugin.showLinkedPortal.onLinkedPortalTapHold)
-    .on('mouseover', '.showLinkedPortalLink.outOfRange', plugin.showLinkedPortal.onOutOfRangePortalMouseOver)
-    .on('mouseover', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOver)
-    .on('mouseout', '.showLinkedPortalLink', plugin.showLinkedPortal.onLinkedPortalMouseOut);
+    .on('click', '.showLinkedPortalLink:not(".outOfRange")', showLinkedPortal.onLinkedPortalClick)
+    .on('click', '.showLinkedPortalLink.outOfRange', showLinkedPortal.onOutOfRangePortalClick)
+    .on('taphold', '.showLinkedPortalLink', { duration: 900 }, showLinkedPortal.onLinkedPortalTapHold)
+    .on('mouseover', '.showLinkedPortalLink.outOfRange', showLinkedPortal.onOutOfRangePortalMouseOver)
+    .on('mouseover', '.showLinkedPortalLink', showLinkedPortal.onLinkedPortalMouseOver)
+    .on('mouseout', '.showLinkedPortalLink', showLinkedPortal.onLinkedPortalMouseOut);
 };
 
-plugin.showLinkedPortal.onLinkedPortalClick = function() {
-  plugin.showLinkedPortal.removePreview();
+showLinkedPortal.onLinkedPortalClick = function() {
+  showLinkedPortal.removePreview();
 
   var element = $(this);
   var guid = element.attr('data-guid');
@@ -119,13 +119,13 @@ plugin.showLinkedPortal.onLinkedPortalClick = function() {
   }
 };
 
-plugin.showLinkedPortal.onOutOfRangePortalClick = function() {
+showLinkedPortal.onOutOfRangePortalClick = function() {
   var element = $(this);
   var guid = element.attr('data-guid');
   var length = element.attr('data-length');
   var is_outgoing = element.hasClass('outgoing');
   portalDetail.request(guid).done(function(data) {
-    plugin.showLinkedPortal.makePortalLinkInfo(element,guid,data,length,is_outgoing);
+    showLinkedPortal.makePortalLinkInfo(element,guid,data,length,is_outgoing);
     // update tooltip
     var tooltipId = element.attr('aria-describedby');
     if (tooltipId) {
@@ -134,15 +134,15 @@ plugin.showLinkedPortal.onOutOfRangePortalClick = function() {
   });
 };
 
-plugin.showLinkedPortal.onLinkedPortalTapHold = function() {
+showLinkedPortal.onLinkedPortalTapHold = function() {
   // close portal info in order to preview link on map
   if (isSmartphone()) { show('map'); }
 };
 
-plugin.showLinkedPortal.onOutOfRangePortalMouseOver = plugin.showLinkedPortal.onOutOfRangePortalClick;
+showLinkedPortal.onOutOfRangePortalMouseOver = showLinkedPortal.onOutOfRangePortalClick;
 
-plugin.showLinkedPortal.onLinkedPortalMouseOver = function() {
-  plugin.showLinkedPortal.removePreview();
+showLinkedPortal.onLinkedPortalMouseOver = function() {
+  showLinkedPortal.removePreview();
 
   var element = $(this);
   var lat = element.attr('data-lat');
@@ -151,27 +151,28 @@ plugin.showLinkedPortal.onLinkedPortalMouseOver = function() {
   var remote = L.latLng(lat, lng);
   var local = portals[selectedPortal].getLatLng();
 
-  plugin.showLinkedPortal.preview = L.layerGroup().addTo(map);
+  showLinkedPortal.preview = L.layerGroup().addTo(map);
 
-  L.circleMarker(remote, plugin.showLinkedPortal.previewOptions)
-    .addTo(plugin.showLinkedPortal.preview);
+  L.circleMarker(remote, showLinkedPortal.previewOptions)
+    .addTo(showLinkedPortal.preview);
 
-  L.geodesicPolyline([local, remote], plugin.showLinkedPortal.previewOptions)
-    .addTo(plugin.showLinkedPortal.preview);
+  L.geodesicPolyline([local, remote], showLinkedPortal.previewOptions)
+    .addTo(showLinkedPortal.preview);
 };
 
-plugin.showLinkedPortal.onLinkedPortalMouseOut = function() {
-  plugin.showLinkedPortal.removePreview();
+showLinkedPortal.onLinkedPortalMouseOut = function() {
+  showLinkedPortal.removePreview();
 };
 
-plugin.showLinkedPortal.removePreview = function() {
-  if (plugin.showLinkedPortal.preview) {
-    map.removeLayer(plugin.showLinkedPortal.preview);
+showLinkedPortal.removePreview = function() {
+  if (showLinkedPortal.preview) {
+    map.removeLayer(showLinkedPortal.preview);
   }
-  plugin.showLinkedPortal.preview = null;
+  showLinkedPortal.preview = null;
 };
 
-var setup = function () {
-  window.addHook('portalDetailsUpdated', window.plugin.showLinkedPortal.portalDetail);
+function setup () {
+  window.addHook('portalDetailsUpdated', showLinkedPortal.portalDetail);
   $('<style>').prop('type', 'text/css').html('@include_string:linked-portals-show.css@').appendTo('head');
-};
+}
+/* exported setup */
