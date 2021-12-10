@@ -92,15 +92,15 @@ showLinkedPortal.portalDetail = function (data) {
   }
 
   $('#showLinkedPortalContainer')
-    .on('click', '.showLinkedPortalLink:not(".outOfRange")', showLinkedPortal.onLinkedPortalClick)
-    .on('click', '.showLinkedPortalLink.outOfRange', showLinkedPortal.onOutOfRangePortalClick)
-    .on('taphold', '.showLinkedPortalLink', { duration: 900 }, showLinkedPortal.onLinkedPortalTapHold)
-    .on('mouseover', '.showLinkedPortalLink.outOfRange', showLinkedPortal.onOutOfRangePortalMouseOver)
-    .on('mouseover', '.showLinkedPortalLink', showLinkedPortal.onLinkedPortalMouseOver)
-    .on('mouseout', '.showLinkedPortalLink', showLinkedPortal.onLinkedPortalMouseOut);
+    .on('click', '.showLinkedPortalLink:not(".outOfRange")', showLinkedPortal.renderPortalDetails)
+    .on('click', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
+    .on('taphold', '.showLinkedPortalLink', { duration: 900 }, showLinkedPortal.showMap)
+    .on('mouseover', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
+    .on('mouseover', '.showLinkedPortalLink', showLinkedPortal.showPreview)
+    .on('mouseout', '.showLinkedPortalLink', showLinkedPortal.removePreview);
 };
 
-showLinkedPortal.onLinkedPortalClick = function() {
+showLinkedPortal.renderPortalDetails = function() {
   showLinkedPortal.removePreview();
 
   var element = $(this);
@@ -119,7 +119,7 @@ showLinkedPortal.onLinkedPortalClick = function() {
   }
 };
 
-showLinkedPortal.onOutOfRangePortalClick = function() {
+showLinkedPortal.requestPortalData = function() {
   var element = $(this);
   var guid = element.attr('data-guid');
   var length = element.attr('data-length');
@@ -134,14 +134,12 @@ showLinkedPortal.onOutOfRangePortalClick = function() {
   });
 };
 
-showLinkedPortal.onLinkedPortalTapHold = function() {
+showLinkedPortal.showMap = function() {
   // close portal info in order to preview link on map
   if (isSmartphone()) { show('map'); }
 };
 
-showLinkedPortal.onOutOfRangePortalMouseOver = showLinkedPortal.onOutOfRangePortalClick;
-
-showLinkedPortal.onLinkedPortalMouseOver = function() {
+showLinkedPortal.showPreview = function() {
   showLinkedPortal.removePreview();
 
   var element = $(this);
@@ -158,10 +156,6 @@ showLinkedPortal.onLinkedPortalMouseOver = function() {
 
   L.geodesicPolyline([local, remote], showLinkedPortal.previewOptions)
     .addTo(showLinkedPortal.preview);
-};
-
-showLinkedPortal.onLinkedPortalMouseOut = function() {
-  showLinkedPortal.removePreview();
 };
 
 showLinkedPortal.removePreview = function() {
