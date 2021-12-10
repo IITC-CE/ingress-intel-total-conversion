@@ -83,3 +83,7 @@
 	line-height: 10px;
 	font-size: 15px;
 }
+
+.showLinkedPortalLink.lastportal {
+	border-left: 2px solid yellow;
+}

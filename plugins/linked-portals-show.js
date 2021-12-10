@@ -18,8 +18,17 @@ showLinkedPortal.previewOptions = {
   radius: 18,
 };
 
-showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) { // guid: potentially useful
-  div = div ? div.empty().removeClass('outOfRange') : $('<div>');
+var lastPortal;
+
+showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) {
+  if (div) {
+    div.empty().removeClass('outOfRange');
+  } else {
+    div = $('<div>');
+    if (guid === lastPortal) {
+      div.addClass('lastportal');
+    }
+  }
   var lengthFull = digits(Math.round(length)) + 'm';
   var title = data && data.title;
   if (title) {
@@ -166,6 +175,12 @@ showLinkedPortal.removePreview = function() {
 };
 
 function setup () {
+  window.addHook('portalSelected', function (data) {
+    var sel = data.selectedPortalGuid;
+    var unsel = data.unselectedPortalGuid;
+    lastPortal = sel !== unsel ? unsel : lastPortal;
+  });
+
   window.addHook('portalDetailsUpdated', showLinkedPortal.portalDetail);
   $('<style>').prop('type', 'text/css').html('@include_string:linked-portals-show.css@').appendTo('head');
 }
