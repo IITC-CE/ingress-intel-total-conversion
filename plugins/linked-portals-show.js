@@ -18,9 +18,33 @@ showLinkedPortal.previewOptions = {
   radius: 18,
 };
 
-var lastPortal;
+showLinkedPortal.makePortalLinkContent = function (div,guid,data,length,is_outgoing) { // eslint-disable-line no-unused-vars
+  var lengthFull = digits(Math.round(length)) + 'm';
+  if (data.title) {
+    $('<img/>').attr({
+      src: fixPortalImageUrl(data.image),
+      class: 'minImg',
+      alt: data.title,
+    }).appendTo(div);
+  } else {
+    var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
+    div.append($('<span/>').html('Portal not loaded.<br>' + lengthShort));
+  }
+};
 
-showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) {
+showLinkedPortal.getPortalLinkTooltip = function (div,guid,data,length,is_outgoing) {
+  var lengthFull = digits(Math.round(length)) + 'm';
+  var tooltip = $('<div/>').append(
+    $('<strong/>').text(data.title || 'Go to portal'),
+    $('<br/>'),
+    $('<span/>').text(is_outgoing ? '↴ outgoing link' : '↳ incoming link'),
+    $('<br/>'),
+    $('<span/>').html(lengthFull));
+  return tooltip.html();
+};
+
+var lastPortal;
+showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing) { // eslint-disable-line no-unused-vars
   if (div) {
     div.empty().removeClass('outOfRange');
   } else {
@@ -29,33 +53,11 @@ showLinkedPortal.makePortalLinkInfo = function (div,guid,data,length,is_outgoing
       div.addClass('lastportal');
     }
   }
-  var title = data && data.title;
-  if (!title) {
+  if (!data.title) {
     div.addClass('outOfRange');
   }
-  var lengthFull = digits(Math.round(length)) + 'm';
-
-  // content
-  if (title) {
-    $('<img/>').attr({
-      src: fixPortalImageUrl(data.image),
-      class: 'minImg',
-      alt: title,
-    }).appendTo(div);
-  } else {
-    var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
-    div.append($('<span/>').html('Portal not loaded.<br>' + lengthShort));
-  }
-
-  var tooltip = $('<div/>').append(
-    $('<strong/>').text(data.title || 'Go to portal'),
-    $('<br/>'),
-    $('<span/>').text(is_outgoing ? '↴ outgoing link' : '↳ incoming link'),
-    $('<br/>'),
-    $('<span/>').html(lengthFull))
-    .html();
-
-  return div.attr('title', tooltip);
+  showLinkedPortal.makePortalLinkContent.apply(this, arguments);
+  return div.attr('title', showLinkedPortal.getPortalLinkTooltip.apply(this, arguments));
 };
 
 showLinkedPortal.portalDetail = function (data) {
@@ -79,7 +81,7 @@ showLinkedPortal.portalDetail = function (data) {
     var lng = link[key + 'LngE6']/1E6;
 
     var length = L.latLng(link.oLatE6/1E6, link.oLngE6/1E6).distanceTo([link.dLatE6/1E6, link.dLngE6/1E6]);
-    var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid);
+    var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid) || {};
 
     showLinkedPortal.makePortalLinkInfo(null,guid,data,length,direction==='outgoing')
       .addClass('showLinkedPortalLink showLinkedPortalLink' + c + ' ' + direction)
