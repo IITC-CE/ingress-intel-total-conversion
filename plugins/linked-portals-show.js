@@ -18,28 +18,44 @@ showLinkedPortal.previewOptions = {
   radius: 18,
 };
 
+showLinkedPortal.noimage = false;
+showLinkedPortal.imageInTooltip = true;
+
 showLinkedPortal.makePortalLinkContent = function (div,guid,data,length,is_outgoing) { // eslint-disable-line no-unused-vars
   var lengthFull = digits(Math.round(length)) + 'm';
-  if (data.title) {
-    $('<img/>').attr({
+  if (data.title && data.title.length > 40) {
+    var shortTitle = data.title.substring(0, 40) + '…';
+  }
+  $('<div>').addClass('showLinkedPortalLinkTitle')
+    .html(shortTitle || data.title || 'Go to portal')
+    .appendTo(div);
+
+  var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
+  $('<div>').addClass('showLinkedPortalLinkInfo')
+    .html(lengthShort)
+    .appendTo(div);
+
+  if (data.image) {
+    $('<img>').attr({
       src: fixPortalImageUrl(data.image),
       class: 'minImg',
       alt: data.title,
     }).appendTo(div);
-  } else {
-    var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
-    div.append($('<span/>').html('Portal not loaded.<br>' + lengthShort));
   }
 };
 
 showLinkedPortal.getPortalLinkTooltip = function (div,guid,data,length,is_outgoing) {
   var lengthFull = digits(Math.round(length)) + 'm';
-  var tooltip = $('<div/>').append(
-    $('<strong/>').text(data.title || 'Go to portal'),
-    $('<br/>'),
-    $('<span/>').text(is_outgoing ? '↴ outgoing link' : '↳ incoming link'),
-    $('<br/>'),
-    $('<span/>').html(lengthFull));
+  var tooltip = $('<div>').append(
+    $('<div>').attr('style', 'font-weight:bold').text(data.title || 'Go to portal'),
+    $('<div>').text(is_outgoing ? '↴ outgoing link' : '↳ incoming link'),
+    $('<div>').html(lengthFull));
+  if (showLinkedPortal.imageInTooltip && data.image) {
+    $('<img>')
+      .attr('src', fixPortalImageUrl(data.image))
+      .addClass('minImg')
+      .appendTo(tooltip);
+  }
   return tooltip.html();
 };
 
@@ -69,6 +85,9 @@ showLinkedPortal.portalDetail = function (data) {
   var c = 1;
 
   var $showLinkedPortalContainer = $('<div>',{id:'showLinkedPortalContainer'}).appendTo('.imgpreview');
+  if (showLinkedPortal.noimage) {
+    $showLinkedPortalContainer.addClass('noimage');
+  }
 
   function renderLinkedPortal(linkGuid) {
     if (c > 16) return;
@@ -109,10 +128,16 @@ showLinkedPortal.portalDetail = function (data) {
   $showLinkedPortalContainer
     .on('click', '.showLinkedPortalLink:not(".outOfRange")', showLinkedPortal.renderPortalDetails)
     .on('click', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
-    .on('taphold', '.showLinkedPortalLink', { duration: 900 }, showLinkedPortal.showMap)
+    .on('taphold', '.showLinkedPortalLink', showLinkedPortal.showMap)
     .on('mouseover', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
     .on('mouseover', '.showLinkedPortalLink', showLinkedPortal.showPreview)
     .on('mouseout', '.showLinkedPortalLink', showLinkedPortal.removePreview);
+
+  $('.imgpreview')
+    .on('taphold', { delay: 1100 }, function () {
+      showLinkedPortal.noimage = !showLinkedPortal.noimage;
+      $showLinkedPortalContainer.toggleClass('noimage');
+    });
 };
 
 showLinkedPortal.renderPortalDetails = function() {

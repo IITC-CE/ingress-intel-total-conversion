@@ -58,6 +58,7 @@ public class IITC_WebView extends WebView {
         mSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         mSettings.setAppCachePath(getContext().getCacheDir().getAbsolutePath());
         mSettings.setDatabasePath(getContext().getApplicationInfo().dataDir + "/databases/");
+        mSettings.setTextZoom(100); // otherwise zoom may vary depending on system font settings
 
         // enable mixed content (http on https...needed for some map tiles) mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

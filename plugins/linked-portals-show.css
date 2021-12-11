@@ -20,6 +20,7 @@
 .showLinkedPortalLink {
 	border-radius: 5px 0 5px 0;
 	box-shadow: 0 0 10px rgba(0,0,0,0.9);
+	user-select: none;
 }
 
 .showLinkedPortalOverflow {
@@ -31,10 +32,45 @@
 	font-size: 12px;
 }
 
+.showLinkedPortalLink>div {
+	position: absolute;
+}
+
+.showLinkedPortalLinkTitle {
+	bottom: 0;
+	word-wrap: break-all;
+	word-break: break-word;
+	font-weight: bold;
+	text-align: left;
+	line-height: 8px;
+	letter-spacing: -0.7px;
+	padding-left: 1px;
+}
+
+.showLinkedPortalLinkInfo {
+	top: -2px;
+	right: 0;
+}
+
 .showLinkedPortalLink .minImg {
 	height: 100%;
 	width: 100%;
 	object-fit: cover;
+	position: absolute;
+	left: 0;
+	top: 0;
+
+}
+
+#showLinkedPortalContainer.noimage .minImg {
+	display: none
+}
+
+.ui-tooltip .minImg {
+	max-width: 200px;
+	max-height: 200px;
+	display: block;
+	margin: auto;
 }
 
 .showLinkedPortalLink1, .showLinkedPortalLink2, .showLinkedPortalLink3, .showLinkedPortalLink4 {
@@ -76,8 +112,8 @@
 	z-index: 1;
 	content: "•";
 	position: absolute;
-	bottom: 0;
-	right: 0;
+	top: 0;
+	left: 0;
 	text-shadow: 0 0 2px #000;
 	color: yellow;
 	line-height: 10px;
