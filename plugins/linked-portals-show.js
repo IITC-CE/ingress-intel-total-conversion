@@ -126,12 +126,10 @@ plugin.showLinkedPortal.onOutOfRangePortalClick = function() {
   portalDetail.request(guid).done(function(data) {
     plugin.showLinkedPortal.makePortalLinkInfo(element,guid,data,length,is_outgoing);
     // update tooltip
-    $.each($(document).tooltip('instance').tooltips, function(id, ui) {
-      if (element.is(ui.element)) {
-        ui.tooltip.html(element.attr('title'));
-        return false;
-      }
-    });
+    var tooltipId = element.attr('aria-describedby');
+    if (tooltipId) {
+      $('#' + tooltipId).html(element.attr('title'));
+    }
   });
 };
 
