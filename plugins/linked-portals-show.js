@@ -20,6 +20,7 @@ showLinkedPortal.previewOptions = {
 
 showLinkedPortal.noimage = false;
 showLinkedPortal.imageInTooltip = true;
+showLinkedPortal.doubleTapToGo = true;
 
 showLinkedPortal.makePortalLinkContent = function (div,guid,data,length,is_outgoing) { // eslint-disable-line no-unused-vars
   var lengthFull = digits(Math.round(length)) + 'm';
@@ -137,7 +138,16 @@ showLinkedPortal.portalDetail = function (data) {
     });
 };
 
-showLinkedPortal.renderPortalDetails = function() {
+showLinkedPortal.renderPortalDetails = function (ev) {
+  function isTouch (event) {
+    return event.pointerType === 'touch' ||
+           event.sourceCapabilities && event.sourceCapabilities.firesTouchEvents;
+  }
+  var event = ev.originalEvent;
+  if (showLinkedPortal.doubleTapToGo && isTouch(event) && event.detail !== 2) {
+    return;
+  }
+
   showLinkedPortal.removePreview();
 
   var element = $(this);
