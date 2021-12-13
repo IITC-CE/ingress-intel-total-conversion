@@ -126,7 +126,7 @@ showLinkedPortal.portalDetail = function (data) {
   $showLinkedPortalContainer
     .on('click', '.showLinkedPortalLink:not(".outOfRange")', showLinkedPortal.renderPortalDetails)
     .on('click', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
-    .on('taphold', '.showLinkedPortalLink', showLinkedPortal.showMap)
+    .on('taphold', '.showLinkedPortalLink', showLinkedPortal.showLinkOnMap)
     .on('mouseover', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
     .on('mouseover', '.showLinkedPortalLink', showLinkedPortal.showPreview)
     .on('mouseout', '.showLinkedPortalLink', showLinkedPortal.removePreview);
@@ -157,7 +157,7 @@ showLinkedPortal.renderPortalDetails = function (ev) {
 
   var position = L.latLng(lat, lng);
   if (!map.getBounds().contains(position)) {
-    map.setView(position);
+    map.panInside(position);
   }
   if (portals[guid]) {
     renderPortalDetails(guid);
@@ -181,9 +181,23 @@ showLinkedPortal.requestPortalData = function() {
   });
 };
 
-showLinkedPortal.showMap = function() {
+showLinkedPortal.showLinkOnMap = function() {
   // close portal info in order to preview link on map
   if (isSmartphone()) { show('map'); }
+  if (!showLinkedPortal.preview) {
+    showLinkedPortal.showPreview.apply(this, arguments);
+  }
+
+  var element = $(this);
+  var guid = element.attr('data-guid');
+  var lat = element.attr('data-lat');
+  var lng = element.attr('data-lng');
+
+  var position = L.latLng(lat, lng);
+  if (!map.getBounds().contains(position)) {
+    var targetBounds = [position, portals[selectedPortal].getLatLng()];
+    map.fitBounds(targetBounds, { padding: [15, 15], maxZoom: map.getZoom() });
+  }
 };
 
 showLinkedPortal.showPreview = function() {
