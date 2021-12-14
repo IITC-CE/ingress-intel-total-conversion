@@ -55,19 +55,20 @@ deploy:
     on:
       all_branches: true
 
-  # deploy beta to google play
-  - provider: script
-    skip_cleanup: true
-    script: ./fastlane/push.sh
-    on:
-      branch: master
-
-  # deploy release to google play
-  - provider: script
-    skip_cleanup: true
-    script: ./fastlane/push.sh
-    on:
-      tags: true
+# Sending to Google Play is disabled because IITC Mobile does not meet the minimum required Android API Level 30 (in IITC Mobile - 29)
+#  # deploy beta to google play
+#  - provider: script
+#    skip_cleanup: true
+#    script: ./fastlane/push.sh
+#    on:
+#      branch: master
+#
+#  # deploy release to google play
+#  - provider: script
+#    skip_cleanup: true
+#    script: ./fastlane/push.sh
+#    on:
+#      tags: true
 
   # deploy to github releases
   - provider: releases
