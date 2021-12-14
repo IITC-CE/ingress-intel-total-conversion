@@ -23,16 +23,13 @@ showLinkedPortal.imageInTooltip = true;
 
 showLinkedPortal.makePortalLinkContent = function (div,guid,data,length,is_outgoing) { // eslint-disable-line no-unused-vars
   var lengthFull = digits(Math.round(length)) + 'm';
-  if (data.title && data.title.length > 40) {
-    var shortTitle = data.title.substring(0, 40) + '…';
-  }
-  $('<div>').addClass('showLinkedPortalLinkTitle')
-    .html(shortTitle || data.title || 'Go to portal')
-    .appendTo(div);
-
   var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
   $('<div>').addClass('showLinkedPortalLinkInfo')
     .html(lengthShort)
+    .appendTo(div);
+
+  $('<div>').addClass('showLinkedPortalLinkTitle')
+    .html(data.title || 'Go to portal')
     .appendTo(div);
 
   if (data.image) {
