@@ -1,10 +1,10 @@
-#level {
+#portaldetails #level {
 	text-align: center;
 	margin: auto;
 	float: none;
 }
 
-.showLinkedPortalLink, .showLinkedPortalOverflow {
+#showLinkedPortal .link, #showLinkedPortal .overflow {
 	cursor: pointer;
 	position: absolute;
 	height: 40px;
@@ -16,7 +16,7 @@
 	border-style: solid;
 }
 
-.showLinkedPortalLink {
+#showLinkedPortal .link {
 	border-radius: 5px 0 5px 0;
 	box-shadow: 0 0 10px rgba(0,0,0,0.9);
 	user-select: none;
@@ -25,7 +25,7 @@
 	justify-content: space-between;
 }
 
-.showLinkedPortalOverflow {
+#showLinkedPortal .overflow {
 	left: 50%;
 	margin-left:-25px;
 	cursor: default;
@@ -35,7 +35,7 @@
 	text-align: center;
 }
 
-.showLinkedPortalLinkTitle {
+#showLinkedPortal .title {
 	word-wrap: break-all;
 	word-break: break-word;
 	font-weight: bold;
@@ -48,12 +48,12 @@
 	-webkit-box-orient: vertical;
 }
 
-.showLinkedPortalLinkInfo {
+#showLinkedPortal .info {
 	text-align: right;
 	line-height: 8px;
 }
 
-.showLinkedPortalLink .minImg {
+#showLinkedPortal .minImg {
 	height: 100%;
 	width: 100%;
 	object-fit: cover;
@@ -63,7 +63,7 @@
 	pointer-events: none;
 }
 
-#showLinkedPortalContainer.noimage .minImg {
+#showLinkedPortal.noimage .minImg {
 	display: none
 }
 
@@ -74,42 +74,42 @@
 	margin: auto;
 }
 
-.showLinkedPortalLink1, .showLinkedPortalLink2, .showLinkedPortalLink3, .showLinkedPortalLink4 {
+#showLinkedPortal .link1, #showLinkedPortal .link2, #showLinkedPortal .link3, #showLinkedPortal .link4 {
 	left: 5px;
 }
-.showLinkedPortalLink5, .showLinkedPortalLink6, .showLinkedPortalLink7, .showLinkedPortalLink8 {
+#showLinkedPortal .link5, #showLinkedPortal .link6, #showLinkedPortal .link7, #showLinkedPortal .link8 {
 	right: 5px;
 }
-.showLinkedPortalLink9, .showLinkedPortalLink10, .showLinkedPortalLink11, .showLinkedPortalLink12 {
+#showLinkedPortal .link9, #showLinkedPortal .link10, #showLinkedPortal .link11, #showLinkedPortal .link12 {
 	left: 63px;
 }
-.showLinkedPortalLink13, .showLinkedPortalLink14, .showLinkedPortalLink15, .showLinkedPortalLink16 {
+#showLinkedPortal .link13, #showLinkedPortal .link14, #showLinkedPortal .link15, #showLinkedPortal .link16 {
 	right: 63px
 }
 
-.showLinkedPortalLink1, .showLinkedPortalLink5, .showLinkedPortalLink9, .showLinkedPortalLink13 {
+#showLinkedPortal .link1, #showLinkedPortal .link5, #showLinkedPortal .link9, #showLinkedPortal .link13 {
 	top: 0px;
 }
-.showLinkedPortalLink2, .showLinkedPortalLink6, .showLinkedPortalLink10, .showLinkedPortalLink14 {
+#showLinkedPortal .link2, #showLinkedPortal .link6, #showLinkedPortal .link10, .showLinkedPortal .link14 {
 	top: 49px;
 }
-.showLinkedPortalLink3, .showLinkedPortalLink7, .showLinkedPortalLink11, .showLinkedPortalLink15 {
+#showLinkedPortal .link3, #showLinkedPortal .link7, #showLinkedPortal .link11, #showLinkedPortal .link15 {
 	bottom: 49px;
 }
-.showLinkedPortalLink4, .showLinkedPortalLink8, .showLinkedPortalLink12, .showLinkedPortalLink16,
-.showLinkedPortalOverflow {
+#showLinkedPortal .link4, #showLinkedPortal .link8, #showLinkedPortal .link12, #showLinkedPortal .link16, 
+#showLinkedPortal .overflow {
 	bottom: 0px;
 }
 
-.showLinkedPortalLink.outgoing {
+#showLinkedPortal .outgoing {
 	border-style: dashed;
 }
 
-.showLinkedPortalLink.outgoing {
+#showLinkedPortal .outgoing {
 	border-style: dashed;
 }
 
-.showLinkedPortalLink.outgoing::before {
+#showLinkedPortal .outgoing::before {
 	z-index: 1;
 	content: "•";
 	position: absolute;
@@ -121,6 +121,6 @@
 	font-size: 15px;
 }
 
-.showLinkedPortalLink.lastportal {
+#showLinkedPortal .lastportal {
 	border-left: 2px solid yellow;
 }

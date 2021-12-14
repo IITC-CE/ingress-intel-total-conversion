@@ -25,11 +25,11 @@ showLinkedPortal.doubleTapToGo = true;
 showLinkedPortal.makePortalLinkContent = function (div,guid,data,length,is_outgoing) { // eslint-disable-line no-unused-vars
   var lengthFull = digits(Math.round(length)) + 'm';
   var lengthShort = length < 100000 ? lengthFull : digits(Math.round(length/1000)) + 'km';
-  $('<div>').addClass('showLinkedPortalLinkInfo')
+  $('<div>').addClass('info')
     .html(lengthShort)
     .appendTo(div);
 
-  $('<div>').addClass('showLinkedPortalLinkTitle')
+  $('<div>').addClass('title')
     .html(data.title || 'Go to portal')
     .appendTo(div);
 
@@ -82,7 +82,7 @@ showLinkedPortal.portalDetail = function (data) {
 
   var c = 1;
 
-  var $showLinkedPortalContainer = $('<div>',{id:'showLinkedPortalContainer'}).appendTo('.imgpreview');
+  var $showLinkedPortalContainer = $('<div>',{id:'showLinkedPortal'}).appendTo('.imgpreview');
   if (showLinkedPortal.noimage) {
     $showLinkedPortalContainer.addClass('noimage');
   }
@@ -101,7 +101,7 @@ showLinkedPortal.portalDetail = function (data) {
     var data = (portals[guid] && portals[guid].options.data) || portalDetail.get(guid) || {};
 
     showLinkedPortal.makePortalLinkInfo(null,guid,data,length,direction==='outgoing')
-      .addClass('showLinkedPortalLink showLinkedPortalLink' + c + ' ' + direction)
+      .addClass('link link' + c + ' ' + direction)
       .attr({
         'data-guid': guid,
         'data-lat': lat,
@@ -118,18 +118,18 @@ showLinkedPortal.portalDetail = function (data) {
 
   if (length > 16) {
     $('<div>')
-      .addClass('showLinkedPortalOverflow')
+      .addClass('overflow')
       .text(length-16 + ' more')
       .appendTo($showLinkedPortalContainer);
   }
 
   $showLinkedPortalContainer
-    .on('click', '.showLinkedPortalLink:not(".outOfRange")', showLinkedPortal.renderPortalDetails)
-    .on('click', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
-    .on('taphold', '.showLinkedPortalLink', showLinkedPortal.showLinkOnMap)
-    .on('mouseover', '.showLinkedPortalLink.outOfRange', showLinkedPortal.requestPortalData)
-    .on('mouseover', '.showLinkedPortalLink', showLinkedPortal.showPreview)
-    .on('mouseout', '.showLinkedPortalLink', showLinkedPortal.removePreview);
+    .on('click', '.link:not(".outOfRange")', showLinkedPortal.renderPortalDetails)
+    .on('click', '.link.outOfRange', showLinkedPortal.requestPortalData)
+    .on('taphold', '.link', showLinkedPortal.showLinkOnMap)
+    .on('mouseover', '.link.outOfRange', showLinkedPortal.requestPortalData)
+    .on('mouseover', '.link', showLinkedPortal.showPreview)
+    .on('mouseout', '.link', showLinkedPortal.removePreview);
 
   $('.imgpreview')
     .on('taphold', { delay: 1100 }, function () {
