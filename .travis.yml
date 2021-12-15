@@ -55,19 +55,20 @@ deploy:
     on:
       all_branches: true
 
-  # deploy beta to google play
-  - provider: script
-    skip_cleanup: true
-    script: ./fastlane/push.sh
-    on:
-      branch: master
-
-  # deploy release to google play
-  - provider: script
-    skip_cleanup: true
-    script: ./fastlane/push.sh
-    on:
-      tags: true
+# Sending to Google Play is disabled because IITC Mobile does not meet the minimum required Android API Level 30 (in IITC Mobile - 29)
+#  # deploy beta to google play
+#  - provider: script
+#    skip_cleanup: true
+#    script: ./fastlane/push.sh
+#    on:
+#      branch: master
+#
+#  # deploy release to google play
+#  - provider: script
+#    skip_cleanup: true
+#    script: ./fastlane/push.sh
+#    on:
+#      tags: true
 
   # deploy to github releases
   - provider: releases
@@ -81,3 +82,8 @@ deploy:
     - ./build/release/*.zip
     on:
       tags: true
+
+after_success:
+  - TEXT="**$TRAVIS_BRANCH:**\`$TRAVIS_COMMIT\`"$'\n'"$TRAVIS_COMMIT_MESSAGE"$'\n'"$TRAVIS_BUILD_WEB_URL"
+  - APIPARAMS="-F parse_mode=Markdown -F disable_notification=true -F chat_id=$tgchat_id https://api.telegram.org/bot$tgtoken/sendDocument"
+  - curl -s -F document=@"build/$BUILD_TYPE/IITC_Mobile-$BUILD_TYPE.apk" -F caption="$TEXT" $APIPARAMS
