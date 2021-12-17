@@ -1,64 +1,59 @@
 // @author         jonatkins
 // @name           Scoring cycle / checkpoint times
 // @category       Info
-// @version        0.1.0
+// @version        0.2.0
 // @description    Show the times used for the septicycle and checkpoints for regional scoreboards.
 
 
 // use own namespace for plugin
-window.plugin.scoreCycleTimes = function() {};
+var scoreCycleTimes = {};
+window.plugin.scoreCycleTimes = scoreCycleTimes;
 
-window.plugin.scoreCycleTimes.CHECKPOINT = 5*60*60; //5 hours per checkpoint
-window.plugin.scoreCycleTimes.CYCLE = 7*25*60*60; //7 25 hour 'days' per cycle
-
-
-window.plugin.scoreCycleTimes.setup  = function() {
-
-  // add a div to the sidebar, and basic style
-  $('#sidebar').append('<div id="score_cycle_times_display"></div>');
-  $('#score_cycle_times_display').css({'color':'#ffce00'});
-
-
-  window.plugin.scoreCycleTimes.update();
+scoreCycleTimes.CHECKPOINT = 5 * 60 * 60 * 1000; // 5 hours per checkpoint
+scoreCycleTimes.CYCLE = 7 * 5 * scoreCycleTimes.CHECKPOINT; // 7 25-hour 'days' per cycle
+scoreCycleTimes.locale = navigator.languages;
+scoreCycleTimes.dateTimeFormat = {
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit'
 };
 
+scoreCycleTimes.formatRow = function (label, time) {
+  var dateTime = new Date(time).toLocaleString(scoreCycleTimes.locale, scoreCycleTimes.dateTimeFormat);
+  return '<tr><td>' + label + '</td><td>' + dateTime + '</td></tr>';
+};
 
-
-window.plugin.scoreCycleTimes.update = function() {
-
+scoreCycleTimes.update = function () {
   // checkpoint and cycle start times are based on a simple modulus of the timestamp
   // no special epoch (other than the unix timestamp/javascript's 1970-01-01 00:00 UTC) is required
 
   // when regional scoreboards were introduced, the first cycle would have started at 2014-01-15 10:00 UTC - but it was
   // a few checkpoints in when scores were first added
 
-  var now = new Date().getTime();
+  var now = Date.now();
 
-  var cycleStart = Math.floor(now / (window.plugin.scoreCycleTimes.CYCLE*1000)) * (window.plugin.scoreCycleTimes.CYCLE*1000);
-  var cycleEnd = cycleStart + window.plugin.scoreCycleTimes.CYCLE*1000;
+  var cycleStart = Math.floor(now / scoreCycleTimes.CYCLE) * scoreCycleTimes.CYCLE;
+  var cycleEnd = cycleStart + scoreCycleTimes.CYCLE;
 
-  var checkpointStart = Math.floor(now / (window.plugin.scoreCycleTimes.CHECKPOINT*1000)) * (window.plugin.scoreCycleTimes.CHECKPOINT*1000);
-  var checkpointEnd = checkpointStart + window.plugin.scoreCycleTimes.CHECKPOINT*1000;
-
-
-  var formatRow = function(label,time) {
-    var timeStr = unixTimeToString(time,true);
-    timeStr = timeStr.replace(/:00$/,''); //FIXME: doesn't remove seconds from AM/PM formatted dates
-
-    return '<tr><td>'+label+'</td><td>'+timeStr+'</td></tr>';
-  };
+  var checkpointStart = Math.floor(now / scoreCycleTimes.CHECKPOINT) * scoreCycleTimes.CHECKPOINT;
+  var checkpointEnd = checkpointStart + scoreCycleTimes.CHECKPOINT;
 
   var html = '<table>'
-           + formatRow('Cycle start', cycleStart)
-           + formatRow('Previous checkpoint', checkpointStart)
-           + formatRow('Next checkpoint', checkpointEnd)
-           + formatRow('Cycle end', cycleEnd)
-           + '</table>';
+    + scoreCycleTimes.formatRow('Cycle start', cycleStart)
+    + scoreCycleTimes.formatRow('Previous checkpoint', checkpointStart)
+    + scoreCycleTimes.formatRow('Next checkpoint', checkpointEnd)
+    + scoreCycleTimes.formatRow('Cycle end', cycleEnd)
+    + '</table>';
 
   $('#score_cycle_times_display').html(html);
 
-  setTimeout ( window.plugin.scoreCycleTimes.update, checkpointEnd-now);
+  setTimeout(scoreCycleTimes.update, checkpointEnd-now);
 };
 
+function setup () {
+  $('#sidebar').append('<div id="score_cycle_times_display"></div>');
+  $('<style>')
+    .html('#score_cycle_times_display { color: #ffce00; }')
+    .appendTo('head');
 
-var setup =  window.plugin.scoreCycleTimes.setup;
+  scoreCycleTimes.update();
+}
