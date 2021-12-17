@@ -252,7 +252,7 @@ window.plugin.portalslist.displayPL = function() {
     list = $('<table class="noPortals"><tr><td>Nothing to show!</td></tr></table>');
   };
 
-  if(window.useAndroidPanes()) {
+  if (window.useAppPanes()) {
     $('<div id="portalslist" class="mobile">').append(list).appendTo(document.body);
   } else {
     dialog({
@@ -421,8 +421,8 @@ window.plugin.portalslist.onPaneChanged = function(pane) {
 };
 
 var setup =  function() {
-  if(window.useAndroidPanes()) {
-    android.addPane("plugin-portalslist", "Portals list", "ic_action_paste");
+  if (window.useAppPanes()) {
+    app.addPane("plugin-portalslist", "Portals list", "ic_action_paste");
     addHook("paneChanged", window.plugin.portalslist.onPaneChanged);
   } else {
     $('#toolbox').append('<a onclick="window.plugin.portalslist.displayPL()" title="Display a list of portals in the current view [t]" accesskey="t">Portals list</a>');

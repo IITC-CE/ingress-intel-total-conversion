@@ -1,120 +1,5 @@
 // UTILS + MISC  ///////////////////////////////////////////////////////
 
-window.aboutIITC = function () {
-  // Plugins metadata come from 2 sources:
-  // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
-  //   (only standard plugins)
-  // - script.name/version/description: from GM_info object, passed to wrapper
-  //   `script` may be not available if userscript manager does not provede GM_info
-  //   (atm: IITC-Mobile for iOS)
-  var pluginsInfo = window.bootPlugins.info;
-  var iitc = script_info;
-  var iitcVersion = (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
-  function prepData (info,idx) { // try to gather plugin metadata from both sources
-    var data = {
-      build: info.buildName,
-      name: info.pluginId,
-      date: info.dateTimeVersion,
-      error: info.error
-    };
-    var script = info.script;
-    if (script) {
-      if (typeof script.name === 'string') { // cut non-informative name part
-        data.name = script.name.replace(/^IITC plugin: /,'');
-      }
-      data.version = script.version;
-      data.description = script.description;
-    }
-    if (!data.name) {
-      if (iitc.script) { // check if GM_info is available
-        data.name = '[unknown plugin: index ' + idx + ']';
-        data.description = "this plugin does not have proper wrapper; report to it's author";
-      } else { // userscript manager fault
-        data.name = '[3rd-party plugin: index ' + idx + ']';
-      }
-    }
-    return data;
-  }
-  var extra = iitc.script && iitc.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
-  extra = extra && extra[1];
-  function formatVerInfo (p) {
-    if (p.version && extra) {
-      var cutPos = p.version.length-extra.length;
-      // cut extra version component (timestamp) if it is equal to main script's one
-      if (p.version.substring(cutPos) === extra) {
-        p.version = p.version.substring(0,cutPos);
-      }
-    }
-    p.version = p.version || p.date;
-    if (p.version) {
-      var tooltip = [];
-      if (p.build) { tooltip.push('[' + p.build + ']'); }
-      if (p.date && p.date !== p.version) { tooltip.push(p.date); }
-      return L.Util.template(' - <code{title}>{version}</code>', {
-        title: tooltip[0] ? ' title="' + tooltip.join(' ') + '"' : '',
-        version: p.version
-      });
-    }
-  }
-  var plugins = pluginsInfo.map(prepData)
-    .sort(function (a,b) { return a.name > b.name ? 1 : -1; })
-    .map(function (p) {
-      p.style = '';
-      p.description = p.description || '';
-      if (p.error) {
-        p.style += 'text-decoration:line-through;';
-        p.description = p.error;
-      } else if (p.build === iitc.buildName && p.date === iitc.dateTimeVersion) { // is standard plugin
-        p.style += 'color:darkgray;';
-      }
-      p.verinfo = formatVerInfo(p) || '';
-      return L.Util.template('<li style="{style}" title="{description}">{name}{verinfo}</li>', p);
-    })
-    .join('\n');
-
-  var html = ''
-  + '<div><b>About IITC</b></div> '
-  + '<div>Ingress Intel Total Conversion</div> '
-  + '<hr>'
-  + '<div>'
-  + '  <a href="'+'@url_homepage@'+'" target="_blank">IITC Homepage</a> |' +
-    '  <a href="'+'@url_tg@'+'" target="_blank">Telegram channel</a><br />'
-  + '   On the script’s homepage you can:'
-  + '   <ul>'
-  + '     <li>Find Updates</li>'
-  + '     <li>Get Plugins</li>'
-  + '     <li>Report Bugs</li>'
-  + '     <li>Contribute!</li>'
-  + '   </ul>'
-  + '</div>'
-  + '<hr>'
-  + '<div>Version: ' + iitcVersion + '</div>';
-
-  if (typeof android !== 'undefined' && android.getVersionName) {
-    html += '<div>IITC Mobile ' + android.getVersionName() + '</div>';
-  }
-  if (plugins) {
-    html += '<div><p>Plugins:</p><ul>' + plugins + '</ul></div>';
-  }
-
-  dialog({
-    title: 'IITC ' + iitcVersion,
-    id: 'iitc-about',
-    html: html,
-    width: 'auto',
-    dialogClass: 'ui-dialog-aboutIITC'
-  });
-}
-
-
-window.layerGroupLength = function(layerGroup) {
-  var layersCount = 0;
-  var layers = layerGroup._layers;
-  if (layers)
-    layersCount = Object.keys(layers).length;
-  return layersCount;
-}
-
 // retrieves parameter from the URL?query=string.
 window.getURLParam = function(param) {
   var items = window.location.search.substr(1).split('&');
@@ -240,26 +125,18 @@ window.rangeLinkClick = function() {
 }
 
 window.showPortalPosLinks = function(lat, lng, name) {
-  var encoded_name = 'undefined';
-  if(name !== undefined) {
-    encoded_name = encodeURIComponent(name);
-  }
-
-  if (typeof android !== 'undefined' && android && android.intentPosLink) {
-    android.intentPosLink(lat, lng, map.getZoom(), name, true);
-  } else {
-    var qrcode = '<div id="qrcode"></div>';
-    var script = '<script>$(\'#qrcode\').qrcode({text:\'GEO:'+lat+','+lng+'\'});</script>';
-    var gmaps = '<a href="https://maps.google.com/maps?ll='+lat+','+lng+'&q='+lat+','+lng+'%20('+encoded_name+')">Google Maps</a>';
-    var bingmaps = '<a href="https://www.bing.com/maps/?v=2&cp='+lat+'~'+lng+'&lvl=16&sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps</a>';
-    var osm = '<a href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lng+'&zoom=16">OpenStreetMap</a>';
-    var latLng = '<span>' + lat + ',' + lng +'</span>';
-    dialog({
-      html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
-      title: name,
-      id: 'poslinks'
-    });
-  }
+  var encoded_name = encodeURIComponent(name);
+  var qrcode = '<div id="qrcode"></div>';
+  var script = '<script>$(\'#qrcode\').qrcode({text:\'GEO:'+lat+','+lng+'\'});</script>';
+  var gmaps = '<a href="https://maps.google.com/maps?ll='+lat+','+lng+'&q='+lat+','+lng+'%20('+encoded_name+')">Google Maps</a>';
+  var bingmaps = '<a href="https://www.bing.com/maps/?v=2&cp='+lat+'~'+lng+'&lvl=16&sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps</a>';
+  var osm = '<a href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lng+'&zoom=16">OpenStreetMap</a>';
+  var latLng = '<span>' + lat + ',' + lng +'</span>';
+  dialog({
+    html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
+    title: name,
+    id: 'poslinks'
+  });
 }
 
 window.isTouchDevice = function() {
@@ -267,12 +144,10 @@ window.isTouchDevice = function() {
       || 'onmsgesturechange' in window; // works on ie10
 };
 
+// !!deprecated
+// to be ovewritten in app.js
 window.androidCopy = function(text) {
-  if(typeof android === 'undefined' || !android || !android.copy)
-    return true; // i.e. execute other actions
-  else
-    android.copy(text);
-  return false;
+  return true; // i.e. execute other actions
 }
 
 // returns number of pixels left to scroll down before reaching the
@@ -312,25 +187,6 @@ window.selectPortalByLatLng = function(lat, lng) {
   urlPortalLL = [lat, lng];
   map.setView(urlPortalLL, DEFAULT_ZOOM);
 };
-
-String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
-}
-
-// http://stackoverflow.com/a/646643/1684530 by Bergi and CMS
-if (typeof String.prototype.startsWith !== 'function') {
-  String.prototype.startsWith = function (str){
-    return this.slice(0, str.length) === str;
-  };
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc#polyfill
-// (required for KitKat support)
-if (!Math.trunc) {
-  Math.trunc = function (v) {
-    return v < 0 ? Math.ceil(v) : Math.floor(v);
-  };
-}
 
 // escape a javascript string, so quotes and backslashes are escaped with a backslash
 // (for strings passed as parameters to html onclick="..." for example)
@@ -407,53 +263,6 @@ window.convertTextToTableMagic = function(text) {
 window.calcTriArea = function(p) {
   return Math.abs((p[0].lat*(p[1].lng-p[2].lng)+p[1].lat*(p[2].lng-p[0].lng)+p[2].lat*(p[0].lng-p[1].lng))/2);
 }
-
-// Update layerGroups display status to window.overlayStatus and localStorage 'ingress.intelmap.layergroupdisplayed'
-window.updateDisplayedLayerGroup = function(name, display) {
-  overlayStatus[name] = display;
-  localStorage['ingress.intelmap.layergroupdisplayed'] = JSON.stringify(overlayStatus);
-}
-
-// Read layerGroup status from window.overlayStatus if it was added to map,
-// read from cookie if it has not added to map yet.
-// return 'defaultDisplay' if both overlayStatus and cookie didn't have the record
-window.isLayerGroupDisplayed = function(name, defaultDisplay) {
-  if(typeof(overlayStatus[name]) !== 'undefined') return overlayStatus[name];
-
-  convertCookieToLocalStorage('ingress.intelmap.layergroupdisplayed');
-  var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
-  if(!layersJSON) return defaultDisplay;
-
-  var layers = JSON.parse(layersJSON);
-  // keep latest overlayStatus
-  overlayStatus = $.extend(layers, overlayStatus);
-  if(typeof(overlayStatus[name]) === 'undefined') return defaultDisplay;
-  return overlayStatus[name];
-}
-
-window.addLayerGroup = function(name, layerGroup, defaultDisplay) {
-  if (defaultDisplay === undefined) defaultDisplay = true;
-
-  if(isLayerGroupDisplayed(name, defaultDisplay)) map.addLayer(layerGroup);
-  layerChooser.addOverlay(layerGroup, name);
-}
-
-window.removeLayerGroup = function(layerGroup) {
-  function find (arr, callback) { // ES5 doesn't include Array.prototype.find()
-    for (var i=0; i<arr.length; i++) {
-      if (callback(arr[i], i, arr)) { return arr[i]; }
-    }
-  }
-  var element = find(layerChooser._layers, function (el) { return el.layer === layerGroup; });
-  if (!element) {
-    throw new Error('Layer was not found');
-  }
-  // removing the layer will set it's default visibility to false (store if layer gets added again)
-  var enabled = isLayerGroupDisplayed(element.name);
-  map.removeLayer(layerGroup);
-  layerChooser.removeLayer(layerGroup);
-  updateDisplayedLayerGroup(element.name, enabled);
-};
 
 function clamp (n,max,min) {
   if (n===0) { return 0; }
@@ -534,17 +343,93 @@ window.makePermalink = function (latlng, options) {
   return url + '?' + args.join('&');
 };
 
-window.setPermaLink = function(elm) { // deprecated
-  $(elm).attr('href', window.makePermalink(null,true));
+Object.defineProperty(String.prototype, 'capitalize', {
+  value: function() {
+    return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+  }
+});
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith#polyfill
+if (!String.prototype.startsWith) {
+  Object.defineProperty(String.prototype, 'startsWith', {
+    value: function(search, rawPos) {
+      var pos = rawPos > 0 ? rawPos|0 : 0;
+      return this.substring(pos, pos + search.length) === search;
+    }
+  });
 }
 
-window.androidPermalink = function() { // deprecated
-  if(typeof android === 'undefined' || !android || !android.intentPosLink)
-    return true; // i.e. execute other actions
-
-  var center = map.getCenter();
-  android.intentPosLink(center.lat, center.lng, map.getZoom(), "Selected map view", false);
-  return false;
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc#polyfill
+// (required for KitKat support)
+if (!Math.trunc) {
+  Math.trunc = function (v) {
+    return v < 0 ? Math.ceil(v) : Math.floor(v);
+  };
 }
 
-// todo refactor main.js to get rid of setPermaLink and androidPermalink
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#polyfill
+// https://tc39.github.io/ecma262/#sec-array.prototype.find
+if (!Array.prototype.find) {
+  Object.defineProperty(Array.prototype, 'find', {
+    value: function(predicate) {
+      // 1. Let O be ? ToObject(this value).
+      if (this == null) {
+        throw TypeError('"this" is null or not defined');
+      }
+
+      var o = Object(this);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+      if (typeof predicate !== 'function') {
+        throw TypeError('predicate must be a function');
+      }
+
+      // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+      var thisArg = arguments[1];
+
+      // 5. Let k be 0.
+      var k = 0;
+
+      // 6. Repeat, while k < len
+      while (k < len) {
+        // a. Let Pk be ! ToString(k).
+        // b. Let kValue be ? Get(O, Pk).
+        // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+        // d. If testResult is true, return kValue.
+        var kValue = o[k];
+        if (predicate.call(thisArg, kValue, k, o)) {
+          return kValue;
+        }
+        // e. Increase k by 1.
+        k++;
+      }
+
+      // 7. Return undefined.
+      return undefined;
+    },
+    configurable: true,
+    writable: true
+  });
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#polyfill
+if (!Element.prototype.matches) {
+  Element.prototype.matches =
+    Element.prototype.msMatchesSelector ||
+    Element.prototype.webkitMatchesSelector;
+}
+
+if (!Element.prototype.closest) {
+  Element.prototype.closest = function(s) {
+    var el = this;
+
+    do {
+      if (Element.prototype.matches.call(el, s)) return el;
+      el = el.parentElement || el.parentNode;
+    } while (el !== null && el.nodeType === 1);
+    return null;
+  };
+}

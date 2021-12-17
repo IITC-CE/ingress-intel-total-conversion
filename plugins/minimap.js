@@ -64,12 +64,6 @@ function clone (layer) {
 
 var map, layerChooser;
 
-function find (arr, callback) { // ES5 doesn't include Array.prototype.find()
-  for (var i=0; i<arr.length; i++) {
-    if (callback(arr[i], i, arr)) { return arr[i]; }
-  }
-}
-
 function getMapping (name) {
   if (name in miniMap.layers) {
     return miniMap.layers[name] || miniMap.layers.default;
@@ -87,7 +81,7 @@ function getLayer (e) {
   var layer = cache[e.name];
   if (!layer) {
     if (mapped) {
-      e = find(layerChooser._layers, function (el) {
+      e = layerChooser._layers.find(function (el) {
         return el.name === mapped;
       });
       if (!e) { return; }
@@ -115,7 +109,7 @@ function setup () {
 
   miniMap.layers.default = miniMap.layers.default || 'unset';
 
-  var baseLayer = find(layerChooser._layers, function (el) {
+  var baseLayer = layerChooser._layers.find(function (el) {
     return !el.overlay && map.hasLayer(el.layer);
   });
   var current = baseLayer ? getLayerSafe(baseLayer) : L.layerGroup();

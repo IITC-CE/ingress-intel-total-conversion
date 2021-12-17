@@ -73,7 +73,7 @@ public class IITC_WebView extends WebView {
             mJsInterface = new IITC_JSInterface(mIitc);
         }
 
-        addJavascriptInterface(mJsInterface, "android");
+        addJavascriptInterface(mJsInterface, "app");
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
 
         // https://developer.chrome.com/multidevice/user-agent#webview_user_agent

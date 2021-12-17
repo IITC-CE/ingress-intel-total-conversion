@@ -9,6 +9,24 @@ window.resetScrollOnNewPortal = function() {
   }
 };
 
+// to be ovewritten in app.js
+window.renderPortalUrl = function (lat, lng, title) {
+  var linkDetails = $('.linkdetails');
+
+  // a permalink for the portal
+  var permaHtml = $('<a>').attr({
+    href: window.makePermalink([lat,lng]),
+    title: 'Create a URL link to this portal'}
+  ).text('Portal link');
+  linkDetails.append($('<aside>').append(permaHtml));
+
+  // and a map link popup dialog
+  var mapHtml = $('<a>').attr({
+    title: 'Link to alternative maps (Google, etc)'
+  }).text('Map links').click(window.showPortalPosLinks.bind(this, lat, lng, title));
+  linkDetails.append($('<aside>').append(mapHtml));
+};
+
 window.renderPortalDetails = function(guid) {
   selectPortal(window.portals[guid] ? guid : null);
   if ($('#sidebar').is(':visible')) {
@@ -77,33 +95,6 @@ window.renderPortalDetails = function(guid) {
   }
   levelDetails = "Level " + levelDetails;
 
-
-  var linkDetails = $('<div>', { class: 'linkdetails' });
-
-  var posOnClick = window.showPortalPosLinks.bind(this,lat,lng,title);
-
-  if (typeof android !== 'undefined' && android && android.intentPosLink) {
-    // android devices. one share link option - and the android app provides an interface to share the URL,
-    // share as a geo: intent (navigation via google maps), etc
-
-    var shareLink = $('<a>').text('Share portal').click(posOnClick);
-    linkDetails.append($('<aside>').append($('<div>').append(shareLink)));
-
-  } else {
-    // non-android - a permalink for the portal
-    var permaHtml = $('<a>').attr({
-      href: window.makePermalink([lat,lng]),
-      title: 'Create a URL link to this portal'}
-    ).text('Portal link');
-    linkDetails.append($('<aside>').append($('<div>').append(permaHtml)));
-
-    // and a map link popup dialog
-    var mapHtml = $('<a>').attr({
-      title: 'Link to alternative maps (Google, etc)'
-    }).text('Map links').click(posOnClick);
-    linkDetails.append($('<aside>').append($('<div>').append(mapHtml)));
-  }
-
   $('#portaldetails')
     .html('') //to ensure it's clear
     .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
@@ -148,9 +139,11 @@ window.renderPortalDetails = function(guid) {
       miscDetails,
       resoDetails,
       statusDetails,
-      linkDetails,
+      $('<div>', { class: 'linkdetails' }),
       historyDetails
     );
+
+  window.renderPortalUrl(lat, lng, title, guid);
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?

@@ -221,7 +221,7 @@ window.plugin.crossLinks.testForDeletedLinks = function () {
 window.plugin.crossLinks.createLayer = function () {
   window.plugin.crossLinks.linkLayer = new L.FeatureGroup();
   window.plugin.crossLinks.linkLayerGuids = {};
-  window.addLayerGroup('Cross Links', window.plugin.crossLinks.linkLayer, true);
+  window.layerChooser.addOverlay(window.plugin.crossLinks.linkLayer, 'Cross Links');
 
   map.on('layeradd', function (obj) {
     if (obj.layer === window.plugin.crossLinks.linkLayer) {

@@ -28,10 +28,6 @@ window.show = function(id) {
       window.smartphone.sideButton.click();
       break;
   }
-
-  if (typeof android !== 'undefined' && android && android.switchToPane) {
-    android.switchToPane(id);
-  }
 }
 
 window.hideall = function() {

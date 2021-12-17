@@ -30,9 +30,9 @@ window.ornaments = {
     this._layer = layerGroup();
     this._beacons = layerGroup();
     this._frackers = layerGroup();
-    window.addLayerGroup('Ornaments', this._layer, true);
-    window.addLayerGroup('Beacons', this._beacons, true);
-    window.addLayerGroup('Frackers', this._frackers, true);
+    window.layerChooser.addOverlay(this._layer, 'Ornaments');
+    window.layerChooser.addOverlay(this._beacons, 'Beacons');
+    window.layerChooser.addOverlay(this._frackers, 'Frackers');
   },
 
   addPortal: function (portal) {

@@ -122,7 +122,7 @@ window.plugin.missions = {
 		var content = this.renderMission(mission);
 		var id = mission.guid.replace(/\./g, '_'); // dots irritate the dialog framework and are not allowed in HTML IDs
 		
-		if(useAndroidPanes()) {
+		if (window.useAppPanes()) {
 			if(this.tabHeaders[id]) {
 				this.tabHeaders[id].parentNode.querySelector('.ui-icon-close').click();
 			}
@@ -987,7 +987,7 @@ window.plugin.missions = {
 		$('<style>').prop('type', 'text/css').html('@include_string:missions.css@').appendTo('head');
 		$('#toolbox').append('<a tabindex="0" onclick="plugin.missions.openTopMissions();">Missions in view</a>');
 
-		if(window.useAndroidPanes()) {
+		if (window.useAppPanes()) {
 			this.mobilePane = document.createElement('div');
 			this.mobilePane.className = 'plugin-mission-pane';
 			
@@ -1017,7 +1017,7 @@ window.plugin.missions = {
 					},
 				});
 			
-			android.addPane('plugin-missions', 'Missions', 'ic_missions');
+			app.addPane('plugin-missions', 'Missions', 'ic_missions');
 			addHook('paneChanged', this.onPaneChanged.bind(this));
 		}
 
@@ -1037,8 +1037,8 @@ window.plugin.missions = {
 		this.missionStartLayer = new L.LayerGroup();
 		this.missionLayer = new L.LayerGroup();
 
-		window.addLayerGroup('Mission start portals', this.missionStartLayer, false);
-		window.addLayerGroup('Mission portals', this.missionLayer, true);
+		window.layerChooser.addOverlay(this.missionStartLayer, 'Mission start portals', {default: false});
+		window.layerChooser.addOverlay(this.missionLayer, 'Mission portals');
 
 		// HOOKS:
 		// - plugin-missions-loaded-mission
