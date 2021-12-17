@@ -699,7 +699,10 @@ function prepPluginsToLoad() {
       setup.call(this);
     } catch (err) {
       var name = info.script && info.script.name || info.pluginId;
-      log.error('error starting plugin:', name, ', error:', err);
+      log.error('error starting plugin: ' + name,
+        '\n' + err,
+        '\nsetup: ', setup
+      );
       info.error = err;
     }
     pluginsInfo.push(info);
