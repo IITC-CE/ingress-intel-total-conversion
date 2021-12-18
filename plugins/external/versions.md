@@ -22,11 +22,6 @@
     Yandex.addon.LoadApi.js: ed47982c0c2c9037d74557ae46783e0f294a201b
     used in: basemap-yandex
 
-* https://github.com/makinacorpus/Leaflet.FileLayer
-  1.2.0-1-g4f0e011
-  leaflet.filelayer.js: 943f903d245b19523d17e24e4af5108ffafdeb7e
-  used in: overlay-kml
-
 * https://github.com/mapbox/togeojson
   v0.16.0-27-g72957d6
   togeojson.js: 72957d69545ed1f798d56618694473b603a0ba6f
