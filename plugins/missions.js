@@ -326,9 +326,9 @@ window.plugin.missions = {
 				$(openDialog).dialog({height: 'auto'});
 
 				// Restrict height of dialog to fit the screen
-				let dialogHeight = $(openDialog).parent().height();
-				let dialogTop = $(openDialog).parent().offset().top;
-				let mapHeight = $(window.map._container).height();
+        let dialogHeight = $(openDialog).parent().height();
+        let dialogTop = $(openDialog).parent().offset().top;
+        let mapHeight = map.getSize().y;
 
 				if (dialogTop + dialogHeight > mapHeight) {
 					let newHeight = mapHeight - dialogTop;
