@@ -238,9 +238,7 @@ window.plugin.missions = {
 		// Check whether dialog is already open
 		let openDialog = window.DIALOGS['dialog-missionsList'];
 		if (openDialog) {
-			// Dialog already there, expand if collpased
-			// NOTE: It would be really cool if the IITC core had some function to read and modify collpased state of dialogs
-			// but it hasn't so we need to access internal information here
+			// Dialog already there, expand if collapsed
 			if (plugin.missions.isMissionListCollapsed) {
 				let dia = $(openDialog).closest('.ui-dialog');
 				let button = dia.find('.ui-dialog-titlebar-button-collapse');
@@ -259,8 +257,7 @@ window.plugin.missions = {
 				expandCallback: this.onExpandMissionList,
 				dragStop: this.resizeMissionList,
 				title: caption,
-				buttons:
-				[
+				buttons: [
 					{
 						text: "Create new mission",
 						click: function() {
@@ -294,15 +291,12 @@ window.plugin.missions = {
 		openDialog = window.DIALOGS['dialog-missionsList'];
 
 		// Set content and title
-		$(openDialog).html(this.renderMissionList(missions));
-		$(openDialog).dialog({title: caption});
+		$(openDialog)
+     .html(this.renderMissionList(missions))
+		 .dialog({title: caption});
 
 		// When showing list for one portal, show button to switch back to general list, otherwise hide it
-		if (isPortalList) {
-			$(plugin.missions.fromPortalListToNormalListButton).show();
-		} else {
-			$(plugin.missions.fromPortalListToNormalListButton).hide();
-		}
+    $(plugin.missions.fromPortalListToNormalListButton)[isPortalList ? 'show' : 'hide']();
 
 		this.resizeMissionList();
 	},
@@ -323,8 +317,7 @@ window.plugin.missions = {
 	},
 
 	resizeMissionList: function() {
-		if(!plugin.missions.isMissionListCollapsed)
-		{
+		if (!plugin.missions.isMissionListCollapsed) {
 			let openDialog = window.DIALOGS['dialog-missionsList'];
 
 			if (openDialog) {
@@ -337,8 +330,7 @@ window.plugin.missions = {
 				let dialogTop = $(openDialog).parent().offset().top;
 				let mapHeight = $(window.map._container).height();
 
-				if(dialogTop + dialogHeight > mapHeight)
-				{
+				if (dialogTop + dialogHeight > mapHeight) {
 					let newHeight = mapHeight - dialogTop;
 					newHeight = Math.max(newHeight, 100);
 
@@ -726,8 +718,8 @@ window.plugin.missions = {
     for (var i = 0; i < resCount; i++) {
       var resonator = container.appendChild(document.createElement('div'));
       /* Firefox supports transform* without vendor prefix, but Android does not yet */
-      resonator.style.transform = 'rotate(' + i * 45 + 'deg)';
       resonator.style.webkitTransform = 'rotate(' + i * 45 + 'deg)';
+      resonator.style.transform = 'rotate(' + i * 45 + 'deg)';
     }
     return container;
   },
@@ -1067,7 +1059,7 @@ window.plugin.missions = {
 	onMoveEnd: function() {
 		// When autorefresh is enabled (currently always)
 		// and not showing mission list of one portal
-		// and window not collpased
+		// and window not collapsed
 		if (this.autoRefreshOnMoveEnd && !this.isShowingPortalList && !this.isMissionListCollapsed) {
 			// and if dialog is visible
 			if (window.DIALOGS['dialog-missionsList']) {
