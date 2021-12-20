@@ -1,7 +1,7 @@
 // @author         fkloft
 // @name           Layer count
 // @category       Info
-// @version        0.2.1
+// @version        0.2.2
 // @description    Allow users to count nested fields
 
 
@@ -9,7 +9,6 @@
 var layerCount = {};
 window.plugin.layerCount = layerCount;
 
-var tooltip;
 function calculate (ev) {
   var point = ev.layerPoint;
   var fields = window.fields;
@@ -50,51 +49,29 @@ function calculate (ev) {
   if (layersDrawn !== 0) {
     content += '; draw: ' + layersDrawn + ' polygon(s)';
   }
-  tooltip.innerHTML = content;
+  this.tooltip.innerHTML = content;
 }
 
 function setup () {
-  $('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
-
-  var LayerCount = L.Control.extend({
-    options: {
-      position: 'topleft'
-    },
-
-    onAdd: function (map) {
-      var button = document.createElement('a');
-      button.className = 'leaflet-bar-part';
-      button.addEventListener('click', function toggle () {
-        var btn = this;
-        if (btn.classList.contains('active')) {
-          map.off('click', calculate);
-          btn.classList.remove('active');
-        } else {
-          map.on('click', calculate);
-          btn.classList.add('active');
-          setTimeout(function () {
-            tooltip.textContent = 'Click on map';
-          }, 10);
-        }
-      }, false);
-      button.title = 'Count nested fields';
-
-      tooltip = document.createElement('div');
-      tooltip.className = 'leaflet-control-layer-count-tooltip';
-      button.appendChild(tooltip);
-
-      var container = document.createElement('div');
-      container.className = 'leaflet-control-layer-count leaflet-bar';
-      container.appendChild(button);
-      return container;
-    },
-
-    onRemove: function (map) {
-      map.off('click', calculate);
-    }
+  var ctrl = new L.Control.Button({
+    title: 'Count nested fields',
+    className: 'leaflet-control-layer-count',
+    style: '@include_string:layer-count.css@',
+    toggle: true
   });
-  var ctrl = new LayerCount;
-  ctrl.addTo(window.map);
+  ctrl.on('add', function () {
+    var tooltip = this.tooltip = document.createElement('div');
+    tooltip.className = 'leaflet-control-layer-count-tooltip';
+    this.button.appendChild(tooltip);
+  });
+  ctrl.on('toggle', function () {
+    map.on('click', calculate, this);
+      this.tooltip.textContent = 'Click on map';
+  });
+  ctrl.on('untoggle remove', function () {
+    map.off('click', calculate, this);
+  });
+  ctrl.addTo(map);
 }
 
 /* exported setup */
