@@ -330,7 +330,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, l
   ];
 
   this.createPortalEntity(ent, 'core'); // placeholder
-}
+};
 
 /**
  * Creates a portal entity from the provided game entity data.
@@ -351,8 +351,9 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
   // add missing fields
   data.guid = guid;
-  if (!data.timestamp)
+  if (!data.timestamp) {
     data.timestamp = ent[1];
+  }
 
   // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
   data.ent = ent;
@@ -386,14 +387,14 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   // check for URL links to portal, and select it if this is the one
   if (window.urlPortalLL && window.urlPortalLL[0] === latlng.lat && window.urlPortalLL[1] === latlng.lng) {
     // URL-passed portal found via pll parameter - set the guid-based parameter
-    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + urlPortalLL[1] + ' matches portal GUID ' + data.guid);
+    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + window.urlPortalLL[1] + ' matches portal GUID ' + data.guid);
 
     window.urlPortal = data.guid;
     window.urlPortalLL = undefined; // clear the URL parameter so it's not matched again
   }
   if (window.urlPortal === data.guid) {
     // URL-passed portal found via guid parameter - set it as the selected portal
-    log.log('urlPortal GUID ' + urlPortal + ' found - selecting...');
+    log.log('urlPortal GUID ' + window.urlPortal + ' found - selecting...');
     window.selectedPortal = data.guid;
     window.urlPortal = undefined; // clear the URL parameter so it's not matched again
   }
@@ -405,26 +406,28 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
     marker.updateDetails(data);
 
-    window.runHooks('portalAdded', {portal: marker, previousData: previousData});
+    window.runHooks('portalAdded', { portal: marker, previousData: previousData });
   } else {
-    marker = createMarker(latlng, data);
+    marker = window.createMarker(latlng, data);
 
     // in case of incomplete data while having fresh details in cache, update the portal with those details
-    if (portalDetail.isFresh(guid)) {
-      var oldDetails = portalDetail.get(guid);
+    if (window.portalDetail.isFresh(guid)) {
+      var oldDetails = window.portalDetail.get(guid);
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
-        portalDetail.remove(guid);
-      } else if (marker.willUpdate(oldDetails))
+        window.portalDetail.remove(guid);
+      } else if (marker.willUpdate(oldDetails)) {
         marker.updateDetails(oldDetails);
+      }
     }
 
     window.runHooks('portalAdded', { portal: marker });
 
     window.portals[data.guid] = marker;
 
-    if (selectedPortal === data.guid)
+    if (window.selectedPortal === data.guid) {
       marker.renderDetails();
+    }
   }
 
   window.ornaments.addPortal(marker);

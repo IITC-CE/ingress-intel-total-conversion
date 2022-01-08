@@ -59,12 +59,20 @@ window.getCurrentPortalEnergy = function (d) {
   return nrg;
 };
 
-window.getPortalHealth = function(d) {
-  var max = getTotalPortalEnergy(d);
-  var cur = getCurrentPortalEnergy(d);
+/**
+ * Calculates the health percentage of a portal based on its current and total energy.
+ *
+ * @function getPortalHealth
+ * @param {Object} d - The portal detail object containing resonator information.
+ * @returns {number} The portal health as a percentage (0-100).
+ *                   Returns 0 if the portal has no total energy.
+ */
+window.getPortalHealth = function (d) {
+  var max = window.getTotalPortalEnergy(d);
+  var cur = window.getCurrentPortalEnergy(d);
 
-  return max>0 ? Math.floor(cur/max*100) : 0;
-}
+  return max > 0 ? Math.floor((cur / max) * 100) : 0;
+};
 
 /**
  * Calculates the range of a portal for creating links. The range depends on portal level and any installed Link Amps.
@@ -75,7 +83,7 @@ window.getPortalHealth = function(d) {
  *                   total range after applying the boost (`range`),
  *                   and a boolean indicating if the portal is linkable (`isLinkable`).
  */
-window.getPortalRange = function(d) {
+window.getPortalRange = function (d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
   var range = {

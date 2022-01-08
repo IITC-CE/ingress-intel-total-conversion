@@ -69,10 +69,12 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
  *
  * @function renderPortalDetails
  * @param {string|null} guid - The globally unique identifier of the portal to display details for.
+ * @param {boolean} [forceSelect=false] - If true, forces the portal to be selected even if it's already the current portal.
  */
-window.renderPortalDetails = function(guid, forceSelect) {
-  if (forceSelect || window.selectedPortal !== guid)
+window.renderPortalDetails = function (guid, forceSelect) {
+  if (forceSelect || window.selectedPortal !== guid) {
     window.selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
+  }
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
@@ -184,7 +186,7 @@ window.renderPortalDetails = function(guid, forceSelect) {
   window.renderPortalUrl(lat, lng, title, guid);
 
   // compatibility
-  var data = hasFullDetails ? getPortalSummaryData(details) : details;
+  var data = hasFullDetails ? window.getPortalSummaryData(details) : details;
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?
@@ -348,11 +350,15 @@ window.selectPortal = function (guid, event) {
   if (!update && oldPortal) oldPortal.setSelected(false);
 
   // Change style of selected portal
-  if(newPortal) newPortal.setSelected(true);
+  if (newPortal) newPortal.setSelected(true);
 
   window.setPortalIndicators(newPortal);
 
-  window.runHooks('portalSelected', { selectedPortalGuid: guid, unselectedPortalGuid: oldPortalGuid, event: event });
+  window.runHooks('portalSelected', {
+    selectedPortalGuid: guid,
+    unselectedPortalGuid: oldPortalGuid,
+    event: event,
+  });
   return update;
 };
 

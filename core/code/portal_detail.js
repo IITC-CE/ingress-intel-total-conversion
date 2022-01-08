@@ -54,7 +54,7 @@ window.portalDetail.isFresh = function (guid) {
   return cache.isFresh(guid);
 };
 
-window.portalDetail.remove = function(guid) {
+window.portalDetail.remove = function (guid) {
   return cache.remove(guid);
 };
 
