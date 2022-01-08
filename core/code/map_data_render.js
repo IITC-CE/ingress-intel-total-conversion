@@ -268,7 +268,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
 
   this.createPortalEntity(ent, 'core'); // placeholder
 
-}
+};
 
 
 window.Render.prototype.createPortalEntity = function(ent, details) { // details expected in decodeArray.portal
@@ -281,8 +281,9 @@ window.Render.prototype.createPortalEntity = function(ent, details) { // details
 
   // add missing fields
   data.guid = guid;
-  if (!data.timestamp)
+  if (!data.timestamp) {
     data.timestamp = ent[1];
+  }
 
   // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
   data.ent = ent;
@@ -321,7 +322,7 @@ window.Render.prototype.createPortalEntity = function(ent, details) { // details
     urlPortal = data.guid;
     urlPortalLL = undefined;  // clear the URL parameter so it's not matched again
   }
-  if (urlPortal == data.guid) {
+  if (urlPortal === data.guid) {
     // URL-passed portal found via guid parameter - set it as the selected portal
     log.log('urlPortal GUID '+urlPortal+' found - selecting...');
     selectedPortal = data.guid;
@@ -345,25 +346,27 @@ window.Render.prototype.createPortalEntity = function(ent, details) { // details
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
         portalDetail.remove(guid);
-      } else if (marker.willUpdate(oldDetails))
+      } else if (marker.willUpdate(oldDetails)) {
         marker.updateDetails(oldDetails);
+      }
     }
 
     window.runHooks('portalAdded', {portal: marker});
 
     window.portals[data.guid] = marker;
 
-    if (selectedPortal === data.guid)
+    if (selectedPortal === data.guid) {
       marker.renderDetails();
+    }
   }
 
   window.ornaments.addPortal(marker);
 
-  //TODO? postpone adding to the map layer
+  // TODO? postpone adding to the map layer
   this.addPortalToMapLayer(marker);
 
   return marker;
-}
+};
 
 
 window.Render.prototype.createFieldEntity = function(ent) {

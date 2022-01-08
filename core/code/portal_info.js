@@ -38,12 +38,12 @@ window.getCurrentPortalEnergy = function(d) {
   return nrg;
 }
 
-window.getPortalHealth = function(d) {
+window.getPortalHealth = function (d) {
   var max = getTotalPortalEnergy(d);
   var cur = getCurrentPortalEnergy(d);
 
-  return max>0 ? Math.floor(cur/max*100) : 0;
-}
+  return max > 0 ? Math.floor((cur / max) * 100) : 0;
+};
 
 window.getPortalRange = function(d) {
   // formula by the great gals and guys at

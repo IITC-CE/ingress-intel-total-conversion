@@ -27,9 +27,10 @@ window.renderPortalUrl = function (lat, lng, title) {
   linkDetails.append($('<aside>').append(mapHtml));
 };
 
-window.renderPortalDetails = function(guid, forceSelect) {
-  if (forceSelect || selectedPortal !== guid)
+window.renderPortalDetails = function (guid, forceSelect) {
+  if (forceSelect || selectedPortal !== guid) {
     selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
+  }
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
@@ -57,21 +58,24 @@ window.renderPortalDetails = function(guid, forceSelect) {
   var hasFullDetails = portal.hasFullDetails();
   var historyDetails = getPortalHistoryDetails(details);
 
-  var modDetails = hasFullDetails ? '<div class="mods">'+getModDetails(details)+'</div>' : '';
-  var miscDetails = hasFullDetails ? getPortalMiscDetails(guid,details) : '';
+  var modDetails = hasFullDetails
+    ? '<div class="mods">' + getModDetails(details) + '</div>'
+    : '';
+  var miscDetails = hasFullDetails ? getPortalMiscDetails(guid, details) : '';
   var resoDetails = hasFullDetails ? getResonatorDetails(details) : '';
 
-//TODO? other status details...
-  var statusDetails = hasFullDetails ? '' : '<div id="portalStatus">Loading details...</div>';
+  // TODO? other status details...
+  var statusDetails = hasFullDetails
+    ? ''
+    : '<div id="portalStatus">Loading details...</div>';
 
   var img = fixPortalImageUrl(details.image);
   var title = details.title || 'null';
 
-  var lat = details.latE6/1E6;
-  var lng = details.lngE6/1E6;
+  var lat = details.latE6 / 1e6;
+  var lng = details.lngE6 / 1e6;
 
-  var imgTitle = title+'\n\nClick to show full image.';
-
+  var imgTitle = title + '\n\nClick to show full image.';
 
   // portal level. start with basic data - then extend with fractional info in tooltip if available
   var levelInt = portal.options.level;
@@ -272,7 +276,7 @@ window.setPortalIndicators = function(p) {
 // on old selection. Returns false if the selected portal changed.
 // Returns true if it's still the same portal that just needs an
 // update.
-window.selectPortal = function(guid, event) {
+window.selectPortal = function (guid, event) {
   var update = selectedPortal === guid;
   var oldPortalGuid = selectedPortal;
   selectedPortal = guid;
@@ -281,13 +285,17 @@ window.selectPortal = function(guid, event) {
   var newPortal = portals[guid];
 
   // Restore style of unselected portal
-  if(!update && oldPortal) oldPortal.setSelected(false);
+  if (!update && oldPortal) oldPortal.setSelected(false);
 
   // Change style of selected portal
-  if(newPortal) newPortal.setSelected(true);
+  if (newPortal) newPortal.setSelected(true);
 
   setPortalIndicators(newPortal);
 
-  runHooks('portalSelected', {selectedPortalGuid: guid, unselectedPortalGuid: oldPortalGuid, event: event});
+  runHooks('portalSelected', {
+    selectedPortalGuid: guid,
+    unselectedPortalGuid: oldPortalGuid,
+    event: event,
+  });
   return update;
-}
+};
