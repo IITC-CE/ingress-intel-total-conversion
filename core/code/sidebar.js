@@ -1,7 +1,7 @@
 window.setupSidebar = function() {
   window.setupStyles();
   setupIcons();
-  setupPlayerStat();
+  window.setupPlayerStat();
   setupSidebarToggle();
   setupLargeImagePreview();
   setupAddons();
@@ -39,7 +39,7 @@ function setupIcons () {
 // renders player details into the website. Since the player info is
 // included as inline script in the original site, the data is static
 // and cannot be updated.
-function setupPlayerStat () {
+window.setupPlayerStat = function () {
   // stock site updated to supply the actual player level, AP requirements and XM capacity values
   var level = PLAYER.verified_level;
   PLAYER.level = level; // for historical reasons IITC expects PLAYER.level to contain the current player level
@@ -81,7 +81,7 @@ function setupPlayerStat () {
     + '</div>'
     + '</h2>'
   );
-}
+};
 
 function setupSidebarToggle () {
   $('#sidebartoggle').on('click', function() {
