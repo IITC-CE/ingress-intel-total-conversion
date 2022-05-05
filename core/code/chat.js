@@ -375,7 +375,7 @@ window.chat.parseMsgData = function(data) {
   markup.forEach(function(ent) {
     switch (ent[0]) {
     case 'SENDER': // user generated messages
-      nick = ent[1].plain.slice(0, -2); // cut “: ” at end
+      nick = ent[1].plain.replace(/: $/, ''); // cut “: ” at end
       break;
 
     case 'PLAYER': // automatically generated messages
@@ -411,7 +411,9 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
 
   newData.result.forEach(function(json) {
     // avoid duplicates
-    if (json[0] in storageHash.data) return true;
+    if (json[0] in storageHash.data) {
+      return true;
+    }
 
     var parsedData = chat.parseMsgData(json);
 
@@ -456,14 +458,19 @@ window.chat.renderPortal = function (portal) {
 
 window.chat.renderFactionEnt = function (faction) {
   var name = faction.team === 'ENLIGHTENED' ? 'Enlightened' : 'Resistance';
-  var spanClass = faction.team === 'ENLIGHTENED' ? TEAM_ENL : TEAM_RES;
+  var spanClass = faction.team === 'ENLIGHTENED' ? TEAM_TO_CSS[TEAM_ENL] : TEAM_TO_CSS[TEAM_RES];
   return $('<div>').html($('<span>')
     .attr('class', spanClass)
     .text(name)).html();
 };
 
 window.chat.renderPlayer = function (player, at, sender) {
-  var name = (sender) ? player.plain.slice(0, -2) : (at) ? player.plain.slice(1) : player.plain;
+  var name = player.plain;
+  if (sender) {
+    name = player.plain.replace(/: $/, '');
+  } else if (at) {
+    name = player.plain.replace(/^@/, '');
+  }
   var thisToPlayer = name === window.PLAYER.nickname;
   var spanClass = thisToPlayer ? 'pl_nudge_me' : (player.team + ' pl_nudge_player');
   return $('<div>').html($('<span>')
@@ -517,7 +524,10 @@ window.chat.renderTimeCell = function(time, classNames) {
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
   // add <small> tags around the milliseconds
-  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
   return '<td><time class="' + classNames + '" title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time></td>';
 };
 
@@ -563,21 +573,24 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
   // add <small> tags around the milliseconds
-  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 
   // help cursor via “#chat time”
   var t = '<time title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time>';
-  if ( msgToPlayer )
-  {
+  if (msgToPlayer) {
     t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';
   }
-  if (systemNarrowcast)
-  {
+  if (systemNarrowcast) {
     msg = '<div class="system_narrowcast">' + msg + '</div>';
   }
   var color = COLORS[team];
   // highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
-  if (nick === window.PLAYER.nickname) color = '#fd6';
+  if (nick === window.PLAYER.nickname) {
+    color = '#fd6';
+  }
   var s = 'style="cursor:pointer; color:'+color+'"';
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
   return '<tr><td>'+t+'</td><td>'+i[0]+'<mark class="nickname" ' + s + '>'+ nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
@@ -592,10 +605,12 @@ window.chat.renderDivider = function(text) {
 // added. Latter is only required for scrolling.
 window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
   var elm = $('#'+element);
-  if (elm.is(':hidden')) return;
+  if (elm.is(':hidden')) {
+    return;
+  }
 
-  // discard guids and sort old to new
-//TODO? stable sort, to preserve server message ordering? or sort by GUID if timestamps equal?
+  // if sortedGuids is not specified (legacy), sort old to new
+  // (disregarding server order)
   var vals = sortedGuids;
   if (vals === undefined) {
     vals = $.map(data, function(v, k) { return [[v[0], k]]; });
@@ -609,8 +624,9 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
   vals.forEach(function(guid) {
     var msg = data[guid];
     var nextTime = new Date(msg[0]).toLocaleDateString();
-    if (prevTime && prevTime !== nextTime)
+    if (prevTime && prevTime !== nextTime) {
       msgs += chat.renderDivider(nextTime);
+    }
     msgs += msg[2];
     prevTime = nextTime;
   });
