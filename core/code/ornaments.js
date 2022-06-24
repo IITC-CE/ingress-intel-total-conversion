@@ -19,6 +19,7 @@ window.ornaments = {
 
   OVERLAY_SIZE: 60,
   OVERLAY_OPACITY: 0.6,
+  iconUrls: [],
 
   setup: function () {
     this._portals = {};
@@ -41,24 +42,37 @@ window.ornaments = {
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
-        var layer = this._layer;
+        var layer = this._layer; 
+        var opacity = this.OVERLAY_OPACITY;
+        var size = this.OVERLAY_SIZE;
+        var anchor = [size / 2, size / 2];
+        var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
+
         if (ornament.startsWith('pe')) {
           layer = ornament === 'peFRACK'
             ? this._frackers
             : this._beacons;
         }
-        var size = this.OVERLAY_SIZE;
+  
+        if (typeof (window.ornaments.iconUrls[ornament]) !== 'undefined') {
+            opacity = 1;
+            iconUrl = window.ornaments.iconUrls[ornament];
+            anchor = [size / 2, size];
+        }
+
         return L.marker(portal.getLatLng(), {
-          icon: L.icon({
-            iconUrl: '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png',
+          icon: L.icon({  
+            iconUrl: iconUrl,
             iconSize: [size, size],
-            iconAnchor: [size/2, size/2] // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4
+            iconAnchor: anchor, // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4
+            className: 'no-pointer-events'
           }),
           interactive: false,
           keyboard: false,
-          opacity: this.OVERLAY_OPACITY,
-          layer: layer
+          opacity: opacity,
+          layer: layer,
         }).addTo(layer);
+      
       }, this);
     }
   },
