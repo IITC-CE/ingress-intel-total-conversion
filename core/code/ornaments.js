@@ -20,6 +20,7 @@ window.ornaments = {
   OVERLAY_SIZE: 60,
   OVERLAY_OPACITY: 0.6,
   iconUrls: [],
+  excludedOrnaments: [],
 
   setup: function () {
     this._portals = {};
@@ -51,6 +52,12 @@ window.ornaments = {
         var size = this.OVERLAY_SIZE;
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
+
+        var hide = false;
+        this.excludedOrnaments.forEach(function(t, i) {
+          hide = hide || ornament.startsWith(t)
+        });
+        if (hide){ return }
 
         if (ornament.startsWith('pe')) {
           layer = ornament === 'peFRACK'
