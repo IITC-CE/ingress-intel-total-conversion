@@ -54,9 +54,11 @@ window.ornaments = {
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
         var hide = false;
-        this.excludedOrnaments.forEach(function(t, i) {
-          hide = hide || ornament.startsWith(t)
-        });
+        hide = excludedOrnaments.some( function(pattern) {
+              return ornaments.startsWith(pattern)
+                // or as regex match  ex: input = "b+"
+            // return ornaments.match(pattern)
+        });        
         if (hide){ return }
 
         if (ornament.startsWith('pe')) {
