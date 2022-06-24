@@ -31,9 +31,13 @@ window.ornaments = {
     this._layer = layerGroup();
     this._beacons = layerGroup();
     this._frackers = layerGroup();
+    this._scout = layerGroup();
+    this._battle = layerGroup();
     window.layerChooser.addOverlay(this._layer, 'Ornaments');
     window.layerChooser.addOverlay(this._beacons, 'Beacons');
     window.layerChooser.addOverlay(this._frackers, 'Frackers');
+    window.layerChooser.addOverlay(this._scout, 'Scouting');
+    window.layerChooser.addOverlay(this._battle, 'Battle');
   },
 
   addPortal: function (portal) {
@@ -54,6 +58,14 @@ window.ornaments = {
             : this._beacons;
         }
   
+        if (ornament.startsWith('sc')) {
+          layer = this._scout;
+        }
+
+        if (ornament.startsWith('bb')) {
+          layer = this._battle;
+        }
+
         if (typeof (window.ornaments.iconUrls[ornament]) !== 'undefined') {
             opacity = 1;
             iconUrl = window.ornaments.iconUrls[ornament];
