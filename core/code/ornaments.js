@@ -42,6 +42,7 @@ window.ornaments = {
     window.layerChooser.addOverlay(this._frackers, 'Frackers');
     window.layerChooser.addOverlay(this._scout, 'Scouting');
     window.layerChooser.addOverlay(this._battle, 'Battle');
+    window.layerChooser.addOverlay(this._excluded, 'Excluded'); //just for testing
 
     $('#toolbox').append('<a onclick="window.ornaments.ornamentsOpt();return false;" accesskey="o" title="Edit ornament exclusions [o]">Ornaments Opt</a>');
 
@@ -49,7 +50,6 @@ window.ornaments = {
 
   addPortal: function (portal) {
     this.removePortal(portal);
-// console.log("1:", portal,portal.options.guid);
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
@@ -82,8 +82,8 @@ window.ornaments = {
         var exclude = false;
         exclude = this.excludedOrnaments.some( function(pattern) {
               return ornament.startsWith(pattern)
-        });        
-        if (exclude){ return 
+        });
+        if (exclude){ 
 //          opacity = 0;
           layer = this._excluded;
         }
@@ -135,7 +135,28 @@ window.ornaments = {
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
              + '<input type="text" value="'+eO +'" id="ornaments_E"></input><br>'
-             + '(separator: space or komma allowed)'
+             + '(separator: space or komma allowed)<hr>'
+             + '<b>known Ornaments:</b><br>'
+             + 'ap1-ap9<br>'
+             + 'sc5_p<br>'
+             + 'bb_s<br>'
+             + 'peFRACK<br>'
+             + 'peNIA<br>'
+             + 'peBN_BLM<br>'
+             + 'peBN_ENL_WINNER-60<br>'
+             + 'peBN_RES_WINNER-60<br>'
+             + 'peBN_TIED_WINNER-60<br>'
+             + 'peBR_REWARD-10_125_38<br>'
+             + 'peBR_REWARD-10_150_75<br>'
+             + 'peBR_REWARD-10_175_113<br>'
+             + 'peFW_ENL<br>'
+             + 'peFW_RES<br>'
+             + 'peLOOK<br>'
+             + 'peNEMESIS<br>'
+             + 'peTOASTY<br>'
+             + 'peBB_BATTLE_RARE<br>'
+             + 'peBB_BATTLE<br>'
+             + '<br>'
              + '</div>';
 
     dialog({
