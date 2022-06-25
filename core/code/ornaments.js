@@ -35,6 +35,8 @@ window.ornaments = {
     this._frackers = layerGroup();
     this._scout = layerGroup();
     this._battle = layerGroup();
+    this._excluded = layerGroup(); //to keep excluded ornaments in an own layer
+    
     window.layerChooser.addOverlay(this._layer, 'Ornaments');
     window.layerChooser.addOverlay(this._beacons, 'Beacons');
     window.layerChooser.addOverlay(this._frackers, 'Frackers');
@@ -47,7 +49,7 @@ window.ornaments = {
 
   addPortal: function (portal) {
     this.removePortal(portal);
-
+// console.log("1:", portal,portal.options.guid);
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
@@ -56,12 +58,6 @@ window.ornaments = {
         var size = this.OVERLAY_SIZE;
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
-
-        var hide = false;
-        hide = this.excludedOrnaments.some( function(pattern) {
-              return ornament.startsWith(pattern)
-        });        
-        if (hide){ return }
 
         if (ornament.startsWith('pe')) {
           layer = ornament === 'peFRACK'
@@ -78,9 +74,18 @@ window.ornaments = {
         }
 
         if (typeof (window.ornaments.iconUrls[ornament]) !== 'undefined') {
-            opacity = 1;
-            iconUrl = window.ornaments.iconUrls[ornament];
-            anchor = [size / 2, size];
+          opacity = 1;
+          iconUrl = window.ornaments.iconUrls[ornament];
+          anchor = [size / 2, size];
+        }
+
+        var exclude = false;
+        exclude = this.excludedOrnaments.some( function(pattern) {
+              return ornament.startsWith(pattern)
+        });        
+        if (exclude){ return 
+//          opacity = 0;
+          layer = this._excluded;
         }
 
         return L.marker(portal.getLatLng(), {
@@ -103,6 +108,7 @@ window.ornaments = {
   removePortal: function (portal) {
     var guid = portal.options.guid;
     if (this._portals[guid]) {
+//      console.log(window.ornaments._portals[guid], guid);
       this._portals[guid].forEach(function (marker) {
         marker.options.layer.removeLayer(marker);
       });
@@ -141,10 +147,12 @@ window.ornaments = {
         'OK': function() {
           // stuff to do
           // remove markers
+//          debugger;
           window.ornaments.excludedOrnaments = $("#ornaments_E").val().split(/[\s,]+/);
           console.log(window.ornaments.excludedOrnaments);
           window.ornaments.save();
           // reload markers
+          
           $(this).dialog('close');
         }
       }
