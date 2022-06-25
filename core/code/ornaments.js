@@ -29,6 +29,7 @@ window.ornaments = {
       layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
     }
+    this.load();
     this._layer = layerGroup();
     this._beacons = layerGroup();
     this._frackers = layerGroup();
@@ -39,6 +40,9 @@ window.ornaments = {
     window.layerChooser.addOverlay(this._frackers, 'Frackers');
     window.layerChooser.addOverlay(this._scout, 'Scouting');
     window.layerChooser.addOverlay(this._battle, 'Battle');
+
+    $('#toolbox').append('<a onclick="window.ornaments.ornamentsOpt();return false;" accesskey="o" title="Edit ornament exclusions [o]">Ornaments Opt</a>');
+
   },
 
   addPortal: function (portal) {
@@ -54,10 +58,8 @@ window.ornaments = {
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
         var hide = false;
-        hide = excludedOrnaments.some( function(pattern) {
-              return ornaments.startsWith(pattern)
-                // or as regex match  ex: input = "b+"
-            // return ornaments.match(pattern)
+        hide = this.excludedOrnaments.some( function(pattern) {
+              return ornament.startsWith(pattern)
         });        
         if (hide){ return }
 
@@ -66,12 +68,12 @@ window.ornaments = {
             ? this._frackers
             : this._beacons;
         }
-  
+
         if (ornament.startsWith('sc')) {
           layer = this._scout;
         }
 
-        if (ornament.startsWith('bb')) {
+        if (ornament.startsWith('peB')) {
           layer = this._battle;
         }
 
@@ -93,7 +95,7 @@ window.ornaments = {
           opacity: opacity,
           layer: layer,
         }).addTo(layer);
-      
+
       }, this);
     }
   },
@@ -106,5 +108,46 @@ window.ornaments = {
       });
       delete this._portals[guid];
     }
+  },
+
+  load: function () {
+    try {
+      var dataStr = localStorage['excludedOrnaments'];
+      if (dataStr === undefined) return;
+      this.excludedOrnaments = JSON.parse(dataStr);
+    } catch(e) {
+    console.warn('ornaments: failed to load data from localStorage: '+e);
+    }
+  },
+
+  save: function () {
+    localStorage['excludedOrnaments'] = JSON.stringify(this.excludedOrnaments);
+  },
+
+  ornamentsOpt: function () {
+    var eO = window.ornaments.excludedOrnaments.toString();
+    var html = '<div class="ornamentsOpts">'
+             + 'Hide Ornaments from IITC that start with:<br>'
+             + '<input type="text" value="'+eO +'" id="ornaments_E"></input><br>'
+             + '(separator: space or komma allowed)'
+             + '</div>';
+
+    dialog({
+      html:html,
+      id:'ornamentsOpt',
+      dialogClass:'ui-dialog-content',
+      title:'Ornament excludes',
+      buttons: {
+        'OK': function() {
+          // stuff to do
+          // remove markers
+          window.ornaments.excludedOrnaments = $("#ornaments_E").val().split(/[\s,]+/);
+          console.log(window.ornaments.excludedOrnaments);
+          window.ornaments.save();
+          // reload markers
+          $(this).dialog('close');
+        }
+      }
+    });
   }
 };
