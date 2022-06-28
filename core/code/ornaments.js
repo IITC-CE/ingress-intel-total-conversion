@@ -21,6 +21,7 @@ window.ornaments = {
   OVERLAY_OPACITY: 0.6,
   iconUrls: [],
   excludedOrnaments: [],
+  knownOrnaments: {},
 
   setup: function () {
     this._portals = {};
@@ -59,6 +60,8 @@ window.ornaments = {
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
+        if (!this.knownOrnaments[ornament]) {this.knownOrnaments[ornament]=false};
+
         if (ornament.startsWith('pe')) {
           layer = ornament === 'peFRACK'
             ? this._frackers
@@ -80,9 +83,13 @@ window.ornaments = {
         }
 
         var exclude = false;
-        exclude = this.excludedOrnaments.some( function(pattern) {
-              return ornament.startsWith(pattern)
-        });
+        if (this.excludedOrnaments && this.excludedOrnaments!= [""]) {
+          exclude = this.excludedOrnaments.some( function(pattern) {
+                return ornament.startsWith(pattern)
+          });
+        }
+        debugger;
+        exclude += window.ornaments.knownOrnaments[ornament];
         if (exclude){ 
 //          opacity = 0;
           layer = this._excluded;
@@ -117,63 +124,103 @@ window.ornaments = {
   },
 
   load: function () {
+    var dataStr;
     try {
-      var dataStr = localStorage['excludedOrnaments'];
+      dataStr = localStorage['excludedOrnaments'];
       if (dataStr === undefined) return;
       this.excludedOrnaments = JSON.parse(dataStr);
     } catch(e) {
     console.warn('ornaments: failed to load data from localStorage: '+e);
+    };
+    try {
+      dataStr = localStorage['knownOrnaments'];
+      console.log(dataStr);
+      if (dataStr === undefined) {
+        this.knownOrnaments = {
+
+// commented out for testing. esp. "bb_s" and "sc5_p" should be easy to find on the map.
+// these Ornaments should be listed in the ornaments dialog.
+/*           "ap1":false,
+             "ap2":false,
+             "ap3":false,
+             "ap4":false,
+             "ap5":false,
+             "ap6":false,
+             "ap7":false,
+             "ap8":false,
+             "ap9":false,
+             "sc5_p":false,
+             "bb_s":false,
+             "peFRACK":false,
+             "peNIA":false,
+             "peNEMESIS":false,
+             "peTOASTY":false,
+             "peFW_ENL":false,
+             "peFW_RES":false,
+**********************/
+             "peBB_BATTLE_RARE":false,
+             "peBB_BATTLE":false,
+             "peBN_BLM":false,
+             "peBN_ENL_WINNER-60":false,
+             "peBN_RES_WINNER-60":false,
+             "peBN_TIED_WINNER-60":false,
+             "peBR_REWARD-10_125_38":false,
+             "peBR_REWARD-10_150_75":false,
+             "peBR_REWARD-10_175_113":false,
+             "peBR_REWARD-10_200_150":false,
+             "peBR_REWARD-10_225_188":false,
+             "peBR_REWARD-10_250_225":false,
+             "peLOOK":false
+        };
+        this.save;
+        return;
+      }
+      this.knownOrnaments = JSON.parse(dataStr);
+    } catch(e) {
+    console.warn('ornaments: failed to load data from localStorage: '+e);
     }
+    
   },
 
   save: function () {
     localStorage['excludedOrnaments'] = JSON.stringify(this.excludedOrnaments);
+    localStorage['knownOrnaments'] = JSON.stringify(this.knownOrnaments);
   },
 
   ornamentsOpt: function () {
     var eO = window.ornaments.excludedOrnaments.toString();
+    var text ='';
+    for (var name in window.ornaments.knownOrnaments) {
+      var checked = window.ornaments.knownOrnaments[name] ?  ' checked' : '';
+      text += '<label>' + name + '<input type="checkbox" ' + checked + '></label><br>';
+    }
+//    console.log (text);
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
              + '<input type="text" value="'+eO +'" id="ornaments_E"></input><br>'
-             + '(separator: space or komma allowed)<hr>'
-             + '<b>known Ornaments:</b><br>'
-             + 'ap1-ap9<br>'
-             + 'sc5_p<br>'
-             + 'bb_s<br>'
-             + 'peFRACK<br>'
-             + 'peNIA<br>'
-             + 'peBN_BLM<br>'
-             + 'peBN_ENL_WINNER-60<br>'
-             + 'peBN_RES_WINNER-60<br>'
-             + 'peBN_TIED_WINNER-60<br>'
-             + 'peBR_REWARD-10_125_38<br>'
-             + 'peBR_REWARD-10_150_75<br>'
-             + 'peBR_REWARD-10_175_113<br>'
-             + 'peFW_ENL<br>'
-             + 'peFW_RES<br>'
-             + 'peLOOK<br>'
-             + 'peNEMESIS<br>'
-             + 'peTOASTY<br>'
-             + 'peBB_BATTLE_RARE<br>'
-             + 'peBB_BATTLE<br>'
-             + '<br>'
+             + '(separator: space or comma allowed)<hr>'
+             + '<b>known Ornaments, check to hide:</b><br>'
+             + text
              + '</div>';
 
     dialog({
       html:html,
       id:'ornamentsOpt',
-      dialogClass:'ui-dialog-content',
+//      dialogClass:'ui-dialog-content',
       title:'Ornament excludes',
       buttons: {
         'OK': function() {
-          // stuff to do
           // remove markers
-//          debugger;
+          // todo
+          // process the input from the input
           window.ornaments.excludedOrnaments = $("#ornaments_E").val().split(/[\s,]+/);
+          window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (name) { return name !== ""; })
           console.log(window.ornaments.excludedOrnaments);
+          // process the input from the checkboxes
+          // todo
           window.ornaments.save();
           // reload markers
-          
+          // todo
           $(this).dialog('close');
         }
       }
