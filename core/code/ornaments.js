@@ -204,7 +204,7 @@ window.ornaments = {
     var text ='';
     for (var ornamentCode in window.ornaments.knownOrnaments) {
       var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name +" ("+ornamentCode+")" : ornamentCode)
-      var checked = window.ornaments.knownOrnaments[name] ?  ' checked' : '';
+      var checked = window.ornaments.knownOrnaments[ornamentCode] ?  ' checked' : '';
       text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked + '>' + name + '</label><br>';
     }
     var html = '<div class="ornamentsOpts">'
@@ -223,12 +223,12 @@ window.ornaments = {
         'OK': function() {
           // process the input from the input
           window.ornaments.excludedOrnaments = $("#ornaments_E").val().split(/[\s,]+/);
-          window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (name) { return name !== ""; })
+          window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ""; })
 
           // process the input from the checkboxes
-          for (var name in window.ornaments.knownOrnaments) {
-            var input = document.getElementById("chk_orn_"+name);
-            window.ornaments.knownOrnaments[name] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
+          for (var ornamentCode in window.ornaments.knownOrnaments) {
+            var input = document.getElementById("chk_orn_"+ornamentCode);
+            window.ornaments.knownOrnaments[ornamentCode] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
           }
           window.ornaments.save();
           // reload markers addPortal also calls removePortal
