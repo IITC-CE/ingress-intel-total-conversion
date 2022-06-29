@@ -88,7 +88,6 @@ window.ornaments = {
                 return ornament.startsWith(pattern)
           });
         }
-        debugger;
         exclude += window.ornaments.knownOrnaments[ornament];
         if (exclude){ 
 //          opacity = 0;
@@ -194,7 +193,6 @@ window.ornaments = {
       var checked = window.ornaments.knownOrnaments[name] ?  ' checked' : '';
       text += '<label><input id="chk_orn_' + name + '" type="checkbox" ' + checked + '>' + name + '</label><br>';
     }
-//    console.log (text);
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
              + '<input type="text" value="'+eO +'" id="ornaments_E"></input><br>'
@@ -206,12 +204,9 @@ window.ornaments = {
     dialog({
       html:html,
       id:'ornamentsOpt',
-//      dialogClass:'ui-dialog-content',
       title:'Ornament excludes',
       buttons: {
         'OK': function() {
-          // remove markers
-// todo
           // process the input from the input
           window.ornaments.excludedOrnaments = $("#ornaments_E").val().split(/[\s,]+/);
           window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (name) { return name !== ""; })
@@ -221,11 +216,12 @@ window.ornaments = {
             var input = document.getElementById("chk_orn_"+name);
             window.ornaments.knownOrnaments[name] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
           }
-          console.log(window.ornaments.excludedOrnaments);
-          console.log(window.ornaments.knownOrnaments);
           window.ornaments.save();
-          // reload markers
-// todo
+          // reload markers addPortal also calls removePortal
+          for (var guid in window.ornaments._portals) {
+            window.ornaments.addPortal(window.portals[guid])
+          };
+
           $(this).dialog('close');
         }
       }
