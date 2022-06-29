@@ -20,6 +20,7 @@ window.ornaments = {
   OVERLAY_SIZE: 60,
   OVERLAY_OPACITY: 0.6,
   iconUrls: [],
+  icon:[],
   excludedOrnaments: [],
   knownOrnaments: {},
 
@@ -43,7 +44,7 @@ window.ornaments = {
     window.layerChooser.addOverlay(this._frackers, 'Frackers');
     window.layerChooser.addOverlay(this._scout, 'Scouting');
     window.layerChooser.addOverlay(this._battle, 'Battle');
-    window.layerChooser.addOverlay(this._excluded, 'Excluded'); //just for testing
+    window.layerChooser.addOverlay(this._excluded, 'Excluded');
 
     $('#toolbox').append('<a onclick="window.ornaments.ornamentsOpt();return false;" accesskey="o" title="Edit ornament exclusions [o]">Ornaments Opt</a>');
 
@@ -76,10 +77,23 @@ window.ornaments = {
           layer = this._battle;
         }
 
-        if (typeof (window.ornaments.iconUrls[ornament]) !== 'undefined') {
+        if (typeof (window.ornaments.icon[ornament]) !== 'undefined') {
           opacity = 1;
-          iconUrl = window.ornaments.iconUrls[ornament];
-          anchor = [size / 2, size];
+          if (window.ornaments.icon[ornament].url) {
+             iconUrl = window.ornaments.icon[ornament].url;
+            if (window.ornaments.icon[ornament].offset) {
+              switch (window.ornaments.icon[ornament].offset) {
+                case 1: 
+                  anchor = [size / 2, size]; 
+                  break;
+                case 0: 
+                  anchor = [size / 2, size / 2]; 
+                  break;
+                case -1: 
+                  anchor = [size / 2, - size ];
+              }
+            }
+          } 
         }
 
         var exclude = false;
@@ -133,7 +147,6 @@ window.ornaments = {
     };
     try {
       dataStr = localStorage['knownOrnaments'];
-      console.log(dataStr);
       if (dataStr === undefined) {
         this.knownOrnaments = {
 
@@ -189,9 +202,10 @@ window.ornaments = {
   ornamentsOpt: function () {
     var eO = window.ornaments.excludedOrnaments.toString();
     var text ='';
-    for (var name in window.ornaments.knownOrnaments) {
+    for (var ornamentCode in window.ornaments.knownOrnaments) {
+      var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name +" ("+ornamentCode+")" : ornamentCode)
       var checked = window.ornaments.knownOrnaments[name] ?  ' checked' : '';
-      text += '<label><input id="chk_orn_' + name + '" type="checkbox" ' + checked + '>' + name + '</label><br>';
+      text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked + '>' + name + '</label><br>';
     }
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
