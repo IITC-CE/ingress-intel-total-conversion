@@ -192,7 +192,7 @@ window.ornaments = {
     var text ='';
     for (var name in window.ornaments.knownOrnaments) {
       var checked = window.ornaments.knownOrnaments[name] ?  ' checked' : '';
-      text += '<label>' + name + '<input type="checkbox" ' + checked + '></label><br>';
+      text += '<label><input id="chk_orn_' + name + '" type="checkbox" ' + checked + '>' + name + '</label><br>';
     }
 //    console.log (text);
     var html = '<div class="ornamentsOpts">'
@@ -211,16 +211,21 @@ window.ornaments = {
       buttons: {
         'OK': function() {
           // remove markers
-          // todo
+// todo
           // process the input from the input
           window.ornaments.excludedOrnaments = $("#ornaments_E").val().split(/[\s,]+/);
           window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (name) { return name !== ""; })
-          console.log(window.ornaments.excludedOrnaments);
+
           // process the input from the checkboxes
-          // todo
+          for (var name in window.ornaments.knownOrnaments) {
+            var input = document.getElementById("chk_orn_"+name);
+            window.ornaments.knownOrnaments[name] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
+          }
+          console.log(window.ornaments.excludedOrnaments);
+          console.log(window.ornaments.knownOrnaments);
           window.ornaments.save();
           // reload markers
-          // todo
+// todo
           $(this).dialog('close');
         }
       }
