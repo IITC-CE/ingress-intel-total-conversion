@@ -13,7 +13,15 @@
 // - Beacons (pe$TAG - $NAME) ie: 'peNIA - NIANTIC'
 // - Frackers ('peFRACK')
 // (there are 7 different colors for each of them)
+//
+// Ornament IDs are dynamic. NIANTIC might change them at any time without prior notice.
+// New ornamnent IDs found on the map will be recorded and saved to knownOrnaments from
+// which the Ornaments dialog will be filled with checked checkboxes.
+// To exclude a set of ornaments, even if they have not yet shown up on the map, the user
+// can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
+// future IDs. example: "ap" to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)
 
+/* global L, dialog */
 
 window.ornaments = {
 
@@ -37,8 +45,8 @@ window.ornaments = {
     this._frackers = layerGroup();
     this._scout = layerGroup();
     this._battle = layerGroup();
-    this._excluded = layerGroup(); //to keep excluded ornaments in an own layer
-    
+    this._excluded = layerGroup(); // to keep excluded ornaments in an own layer
+
     window.layerChooser.addOverlay(this._layer, 'Ornaments');
     window.layerChooser.addOverlay(this._beacons, 'Beacons');
     window.layerChooser.addOverlay(this._frackers, 'Frackers');
@@ -47,21 +55,29 @@ window.ornaments = {
     window.layerChooser.addOverlay(this._excluded, 'Excluded');
 
     $('#toolbox').append('<a onclick="window.ornaments.ornamentsOpt();return false;" accesskey="o" title="Edit ornament exclusions [o]">Ornaments Opt</a>');
-
-  },
+    $('<a>')
+      .html('Ornaments Opt')
+      .attr({
+        id: 'ornaments-toolbox-link',
+        title: 'Edit ornament exclusions',
+        accesskey: 'o'
+      })
+      .click(window.ornaments.ornamentsOpt)
+      .appendTo('#toolbox');
+    },
 
   addPortal: function (portal) {
     this.removePortal(portal);
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
-        var layer = this._layer; 
+        var layer = this._layer;
         var opacity = this.OVERLAY_OPACITY;
         var size = this.OVERLAY_SIZE;
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
-        if (!this.knownOrnaments[ornament]) {this.knownOrnaments[ornament]=false};
+        if (!this.knownOrnaments[ornament]) {this.knownOrnaments[ornament]=false;}
 
         if (ornament.startsWith('pe')) {
           layer = ornament === 'peFRACK'
@@ -80,36 +96,35 @@ window.ornaments = {
         if (typeof (window.ornaments.icon[ornament]) !== 'undefined') {
           opacity = 1;
           if (window.ornaments.icon[ornament].url) {
-             iconUrl = window.ornaments.icon[ornament].url;
+            iconUrl = window.ornaments.icon[ornament].url;
             if (window.ornaments.icon[ornament].offset) {
               switch (window.ornaments.icon[ornament].offset) {
-                case 1: 
-                  anchor = [size / 2, size]; 
-                  break;
-                case 0: 
-                  anchor = [size / 2, size / 2]; 
-                  break;
-                case -1: 
-                  anchor = [size / 2, - size ];
+              case 1:
+                anchor = [size / 2, size];
+                break;
+              case 0:
+                anchor = [size / 2, size / 2];
+                break;
+              case -1:
+                anchor = [size / 2, - size ];
               }
             }
-          } 
+          }
         }
 
         var exclude = false;
-        if (this.excludedOrnaments && this.excludedOrnaments!= [""]) {
+        if (this.excludedOrnaments && this.excludedOrnaments !== ['']) {
           exclude = this.excludedOrnaments.some( function(pattern) {
-                return ornament.startsWith(pattern)
+            return ornament.startsWith(pattern);
           });
         }
         exclude += window.ornaments.knownOrnaments[ornament];
-        if (exclude){ 
-//          opacity = 0;
+        if (exclude){
           layer = this._excluded;
         }
 
         return L.marker(portal.getLatLng(), {
-          icon: L.icon({  
+          icon: L.icon({
             iconUrl: iconUrl,
             iconSize: [size, size],
             iconAnchor: anchor, // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4
@@ -118,7 +133,7 @@ window.ornaments = {
           interactive: false,
           keyboard: false,
           opacity: opacity,
-          layer: layer,
+          layer: layer
         }).addTo(layer);
 
       }, this);
@@ -128,7 +143,6 @@ window.ornaments = {
   removePortal: function (portal) {
     var guid = portal.options.guid;
     if (this._portals[guid]) {
-//      console.log(window.ornaments._portals[guid], guid);
       this._portals[guid].forEach(function (marker) {
         marker.options.layer.removeLayer(marker);
       });
@@ -140,11 +154,11 @@ window.ornaments = {
     var dataStr;
     try {
       dataStr = localStorage['excludedOrnaments'];
-      if (dataStr === undefined) return;
+      if (dataStr === undefined) { return; }
       this.excludedOrnaments = JSON.parse(dataStr);
-    } catch(e) {
-    console.warn('ornaments: failed to load data from localStorage: '+e);
-    };
+    } catch (e) {
+      console.warn('ornaments: failed to load excludedOrnaments from localStorage: '+e);
+    }
     try {
       dataStr = localStorage['knownOrnaments'];
       if (dataStr === undefined) {
@@ -152,46 +166,53 @@ window.ornaments = {
 
 // commented out for testing. esp. "bb_s" and "sc5_p" should be easy to find on the map.
 // these Ornaments should be listed in the ornaments dialog.
-/*           "ap1":false,
-             "ap2":false,
-             "ap3":false,
-             "ap4":false,
-             "ap5":false,
-             "ap6":false,
-             "ap7":false,
-             "ap8":false,
-             "ap9":false,
-             "sc5_p":false,
-             "bb_s":false,
-             "peFRACK":false,
-             "peNIA":false,
-             "peNEMESIS":false,
-             "peTOASTY":false,
-             "peFW_ENL":false,
-             "peFW_RES":false,
+/**********************
+          // anomaly
+          'ap1':false,
+          'ap2':false,
+          'ap3':false,
+          'ap4':false,
+          'ap5':false,
+          'ap6':false,
+          'ap7':false,
+          'ap8':false,
+          'ap9':false,
+          // scouting
+          'sc5_p':false,
+          //
+          'bb_s':false,
+          // various beacons
+          'peFRACK':false,
+          'peNIA':false,
+          'peNEMESIS':false,
+          'peTOASTY':false,
+          'peFW_ENL':false,
+          'peFW_RES':false,
 **********************/
-             "peBB_BATTLE_RARE":false,
-             "peBB_BATTLE":false,
-             "peBN_BLM":false,
-             "peBN_ENL_WINNER-60":false,
-             "peBN_RES_WINNER-60":false,
-             "peBN_TIED_WINNER-60":false,
-             "peBR_REWARD-10_125_38":false,
-             "peBR_REWARD-10_150_75":false,
-             "peBR_REWARD-10_175_113":false,
-             "peBR_REWARD-10_200_150":false,
-             "peBR_REWARD-10_225_188":false,
-             "peBR_REWARD-10_250_225":false,
-             "peLOOK":false
+          // battle
+          'peBB_BATTLE_RARE':false,
+          'peBB_BATTLE':false,
+          'peBN_BLM':false,
+          'peBN_ENL_WINNER-60':false,
+          'peBN_RES_WINNER-60':false,
+          'peBN_TIED_WINNER-60':false,
+          'peBR_REWARD-10_125_38':false,
+          'peBR_REWARD-10_150_75':false,
+          'peBR_REWARD-10_175_113':false,
+          'peBR_REWARD-10_200_150':false,
+          'peBR_REWARD-10_225_188':false,
+          'peBR_REWARD-10_250_225':false,
+          // shards
+          'peLOOK':false
         };
-        this.save;
+        this.save();
         return;
       }
       this.knownOrnaments = JSON.parse(dataStr);
-    } catch(e) {
-    console.warn('ornaments: failed to load data from localStorage: '+e);
+    } catch (e) {
+      console.warn('ornaments: failed to load data from localStorage: '+e);
     }
-    
+
   },
 
   save: function () {
@@ -203,7 +224,7 @@ window.ornaments = {
     var eO = window.ornaments.excludedOrnaments.toString();
     var text ='';
     for (var ornamentCode in window.ornaments.knownOrnaments) {
-      var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name +" ("+ornamentCode+")" : ornamentCode)
+      var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name +' ('+ornamentCode+')' : ornamentCode);
       var checked = window.ornaments.knownOrnaments[ornamentCode] ?  ' checked' : '';
       text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked + '>' + name + '</label><br>';
     }
@@ -220,22 +241,20 @@ window.ornaments = {
       id:'ornamentsOpt',
       title:'Ornament excludes',
       buttons: {
-        'OK': function() {
+        OK : function() {
           // process the input from the input
-          window.ornaments.excludedOrnaments = $("#ornaments_E").val().split(/[\s,]+/);
-          window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ""; })
-
+          window.ornaments.excludedOrnaments = $('#ornaments_E').val().split(/[\s,]+/);
+          window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ''; });
           // process the input from the checkboxes
           for (var ornamentCode in window.ornaments.knownOrnaments) {
-            var input = document.getElementById("chk_orn_"+ornamentCode);
+            var input = document.getElementById('chk_orn_'+ornamentCode);
             window.ornaments.knownOrnaments[ornamentCode] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
           }
           window.ornaments.save();
           // reload markers addPortal also calls removePortal
           for (var guid in window.ornaments._portals) {
-            window.ornaments.addPortal(window.portals[guid])
-          };
-
+            window.ornaments.addPortal(window.portals[guid]);
+          }
           $(this).dialog('close');
         }
       }
