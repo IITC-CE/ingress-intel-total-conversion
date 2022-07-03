@@ -54,7 +54,6 @@ window.ornaments = {
     window.layerChooser.addOverlay(this._battle, 'Battle');
     window.layerChooser.addOverlay(this._excluded, 'Excluded');
 
-    $('#toolbox').append('<a onclick="window.ornaments.ornamentsOpt();return false;" accesskey="o" title="Edit ornament exclusions [o]">Ornaments Opt</a>');
     $('<a>')
       .html('Ornaments Opt')
       .attr({
