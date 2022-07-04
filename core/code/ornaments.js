@@ -63,7 +63,7 @@ window.ornaments = {
       })
       .click(window.ornaments.ornamentsOpt)
       .appendTo('#toolbox');
-    },
+  },
 
   addPortal: function (portal) {
     this.removePortal(portal);
@@ -76,7 +76,10 @@ window.ornaments = {
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
-        if (!this.knownOrnaments[ornament]) {this.knownOrnaments[ornament]=false;}
+        if (!this.knownOrnaments[ornament]) {
+          this.knownOrnaments[ornament]=false;
+//          this.knownOrnaments.sort();
+        }
 
         if (ornament.startsWith('pe')) {
           layer = ornament === 'peFRACK'
@@ -148,6 +151,53 @@ window.ornaments = {
       delete this._portals[guid];
     }
   },
+  initOrnaments: function () {
+    this.knownOrnaments = {
+// commented out for testing. esp. "bb_s" and "sc5_p" should be easy to find on the map.
+// these Ornaments should be listed in the ornaments dialog.
+/**********************
+      // anomaly
+      'ap1':false,
+      'ap2':false,
+      'ap3':false,
+      'ap4':false,
+      'ap5':false,
+      'ap6':false,
+      'ap7':false,
+      'ap8':false,
+      'ap9':false,
+      // various beacons
+      'peFRACK':false,
+      'peNIA':false,
+      'peNEMESIS':false,
+      'peTOASTY':false,
+      'peFW_ENL':false,
+      'peFW_RES':false,
+      // battle
+      'peBB_BATTLE_RARE':false,
+      'peBB_BATTLE':false,
+      'peBN_BLM':false,
+      'peBN_ENL_WINNER-60':false,
+      'peBN_RES_WINNER-60':false,
+      'peBN_TIED_WINNER-60':false,
+      'peBR_REWARD-10_125_38':false,
+      'peBR_REWARD-10_150_75':false,
+      'peBR_REWARD-10_175_113':false,
+      'peBR_REWARD-10_200_150':false,
+      'peBR_REWARD-10_225_188':false,
+      'peBR_REWARD-10_250_225':false,
+      // shards
+      'peLOOK':false
+**********************/
+      // scouting
+      sc5_p:false,        // volatile scouting portal
+      // battle
+      bb_s:false,         // scheduled RareBattleBeacons
+      // various beacons
+      peFRACK:false,      // Fracker beacon
+    };
+    this.save();
+  },
 
   load: function () {
     var dataStr;
@@ -161,50 +211,7 @@ window.ornaments = {
     try {
       dataStr = localStorage['knownOrnaments'];
       if (dataStr === undefined) {
-        this.knownOrnaments = {
-
-// commented out for testing. esp. "bb_s" and "sc5_p" should be easy to find on the map.
-// these Ornaments should be listed in the ornaments dialog.
-/**********************
-          // anomaly
-          'ap1':false,
-          'ap2':false,
-          'ap3':false,
-          'ap4':false,
-          'ap5':false,
-          'ap6':false,
-          'ap7':false,
-          'ap8':false,
-          'ap9':false,
-          // scouting
-          'sc5_p':false,
-          //
-          'bb_s':false,
-          // various beacons
-          'peFRACK':false,
-          'peNIA':false,
-          'peNEMESIS':false,
-          'peTOASTY':false,
-          'peFW_ENL':false,
-          'peFW_RES':false,
-**********************/
-          // battle
-          'peBB_BATTLE_RARE':false,
-          'peBB_BATTLE':false,
-          'peBN_BLM':false,
-          'peBN_ENL_WINNER-60':false,
-          'peBN_RES_WINNER-60':false,
-          'peBN_TIED_WINNER-60':false,
-          'peBR_REWARD-10_125_38':false,
-          'peBR_REWARD-10_150_75':false,
-          'peBR_REWARD-10_175_113':false,
-          'peBR_REWARD-10_200_150':false,
-          'peBR_REWARD-10_225_188':false,
-          'peBR_REWARD-10_250_225':false,
-          // shards
-          'peLOOK':false
-        };
-        this.save();
+        this.initOrnaments ();
         return;
       }
       this.knownOrnaments = JSON.parse(dataStr);
@@ -219,17 +226,32 @@ window.ornaments = {
     localStorage['knownOrnaments'] = JSON.stringify(this.knownOrnaments);
   },
 
+  // reload: addPortal also calls removePortal
+  reload: function () {
+    for (var guid in window.ornaments._portals) {
+      window.ornaments.addPortal(window.portals[guid]);
+    }
+  },
+
   ornamentsOpt: function () {
-    var eO = window.ornaments.excludedOrnaments.toString();
+    var excludedIDs = window.ornaments.excludedOrnaments.toString();
     var text ='';
-    for (var ornamentCode in window.ornaments.knownOrnaments) {
+    var sortedIDs = Object.keys(window.ornaments.knownOrnaments).sort();
+
+    sortedIDs.forEach ( function (ornamentCode) {
+      var hidden = window.ornaments.excludedOrnaments.some( function(code) {
+        return ornamentCode.startsWith(code);
+      });
       var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name +' ('+ornamentCode+')' : ornamentCode);
       var checked = window.ornaments.knownOrnaments[ornamentCode] ?  ' checked' : '';
-      text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked + '>' + name + '</label><br>';
-    }
+      text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked;
+      text += (hidden ? 'disabled':'');
+      text += '>'+ name + '</label><br>';
+    });
+
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
-             + '<input type="text" value="'+eO +'" id="ornaments_E"></input><br>'
+             + '<input type="text" value="' + excludedIDs + '" id="ornaments_E"></input><br>'
              + '(separator: space or comma allowed)<hr>'
              + '<b>known Ornaments, check to hide:</b><br>'
              + text
@@ -240,6 +262,11 @@ window.ornaments = {
       id:'ornamentsOpt',
       title:'Ornament excludes',
       buttons: {
+        RESET : function () {
+          $(this).dialog('close');
+          window.ornaments.initOrnaments();
+          window.ornaments.reload();
+        },
         OK : function() {
           // process the input from the input
           window.ornaments.excludedOrnaments = $('#ornaments_E').val().split(/[\s,]+/);
@@ -249,12 +276,10 @@ window.ornaments = {
             var input = document.getElementById('chk_orn_'+ornamentCode);
             window.ornaments.knownOrnaments[ornamentCode] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
           }
-          window.ornaments.save();
-          // reload markers addPortal also calls removePortal
-          for (var guid in window.ornaments._portals) {
-            window.ornaments.addPortal(window.portals[guid]);
-          }
           $(this).dialog('close');
+          window.ornaments.save();
+          window.ornaments.reload();
+
         }
       }
     });
