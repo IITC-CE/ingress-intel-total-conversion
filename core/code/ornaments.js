@@ -52,7 +52,7 @@ window.ornaments = {
     window.layerChooser.addOverlay(this._frackers, 'Frackers');
     window.layerChooser.addOverlay(this._scout, 'Scouting');
     window.layerChooser.addOverlay(this._battle, 'Battle');
-    window.layerChooser.addOverlay(this._excluded, 'Excluded');
+    window.layerChooser.addOverlay(this._excluded, 'Excluded', {default: false});
 
     $('<a>')
       .html('Ornaments Opt')
@@ -78,7 +78,6 @@ window.ornaments = {
 
         if (!this.knownOrnaments[ornament]) {
           this.knownOrnaments[ornament]=false;
-//          this.knownOrnaments.sort();
         }
 
         if (ornament.startsWith('pe')) {
@@ -173,10 +172,10 @@ window.ornaments = {
       'peTOASTY':false,
       'peFW_ENL':false,
       'peFW_RES':false,
+      'peBN_BLM':false,
       // battle
       'peBB_BATTLE_RARE':false,
       'peBB_BATTLE':false,
-      'peBN_BLM':false,
       'peBN_ENL_WINNER-60':false,
       'peBN_RES_WINNER-60':false,
       'peBN_TIED_WINNER-60':false,
@@ -233,8 +232,17 @@ window.ornaments = {
     }
   },
 
-  ornamentsOpt: function () {
-    var excludedIDs = window.ornaments.excludedOrnaments.toString();
+  processInput: function () {
+    window.ornaments.excludedOrnaments = $('#ornaments_E').val().split(/[\s,]+/);
+    window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ''; });
+    // process the input from the checkboxes
+    for (var ornamentCode in window.ornaments.knownOrnaments) {
+      var input = document.getElementById('chk_orn_'+ornamentCode);
+      window.ornaments.knownOrnaments[ornamentCode] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
+    }
+  },
+
+  ornamentsList: function() {
     var text ='';
     var sortedIDs = Object.keys(window.ornaments.knownOrnaments).sort();
 
@@ -242,19 +250,30 @@ window.ornaments = {
       var hidden = window.ornaments.excludedOrnaments.some( function(code) {
         return ornamentCode.startsWith(code);
       });
+
       var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name +' ('+ornamentCode+')' : ornamentCode);
-      var checked = window.ornaments.knownOrnaments[ornamentCode] ?  ' checked' : '';
+      var checked = (window.ornaments.knownOrnaments[ornamentCode]||hidden) ?  'checked ' : '';
       text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked;
+      text += ' onchange="window.ornaments.processInput();window.ornaments.save();window.ornaments.reload()"';
       text += (hidden ? 'disabled':'');
       text += '>'+ name + '</label><br>';
     });
+    return text;
+  },
 
+  replaceOL: function () {
+    document.getElementById('ornamentsList').innerHTML = window.ornaments.ornamentsList();
+  },
+
+  ornamentsOpt: function () {
+    var excludedIDs = window.ornaments.excludedOrnaments.toString();
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
-             + '<input type="text" value="' + excludedIDs + '" id="ornaments_E"></input><br>'
+             + '<input type="text" value="' + excludedIDs + '" id="ornaments_E"'
+             + ' onchange="window.ornaments.processInput();window.ornaments.replaceOL();window.ornaments.save();window.ornaments.reload()"></input><br>'
              + '(separator: space or comma allowed)<hr>'
              + '<b>known Ornaments, check to hide:</b><br>'
-             + text
+             + '<div id="ornamentsList"> ' + window.ornaments.ornamentsList() + '</div>'
              + '</div>';
 
     dialog({
@@ -263,22 +282,16 @@ window.ornaments = {
       title:'Ornament excludes',
       buttons: {
         RESET : function () {
-          $(this).dialog('close');
           window.ornaments.initOrnaments();
           window.ornaments.reload();
+          $(this).dialog('close');
         },
         OK : function() {
           // process the input from the input
-          window.ornaments.excludedOrnaments = $('#ornaments_E').val().split(/[\s,]+/);
-          window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ''; });
-          // process the input from the checkboxes
-          for (var ornamentCode in window.ornaments.knownOrnaments) {
-            var input = document.getElementById('chk_orn_'+ornamentCode);
-            window.ornaments.knownOrnaments[ornamentCode] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
-          }
-          $(this).dialog('close');
+          window.ornaments.processInput();
           window.ornaments.save();
           window.ornaments.reload();
+          $(this).dialog('close');
 
         }
       }
