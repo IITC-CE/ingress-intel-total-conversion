@@ -34,24 +34,17 @@ window.ornaments = {
 
   setup: function () {
     this._portals = {};
-    var layerGroup = L.layerGroup;
+    window.ornaments.layerGroup = L.layerGroup;
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
-      layerGroup = L.canvasIconLayer;
+      window.ornaments.layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
     }
     this.load();
-    this._layer = layerGroup();
-    this._beacons = layerGroup();
-    this._frackers = layerGroup();
-    this._scout = layerGroup();
-    this._battle = layerGroup();
-    this._excluded = layerGroup(); // to keep excluded ornaments in an own layer
+
+    this._layer = window.ornaments.layerGroup();
+    this._excluded = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
 
     window.layerChooser.addOverlay(this._layer, 'Ornaments');
-    window.layerChooser.addOverlay(this._beacons, 'Beacons');
-    window.layerChooser.addOverlay(this._frackers, 'Frackers');
-    window.layerChooser.addOverlay(this._scout, 'Scouting');
-    window.layerChooser.addOverlay(this._battle, 'Battle');
     window.layerChooser.addOverlay(this._excluded, 'Excluded', {default: false});
 
     $('<a>')
@@ -63,6 +56,10 @@ window.ornaments = {
       })
       .click(window.ornaments.ornamentsOpt)
       .appendTo('#toolbox');
+  },
+  createLayer: function (layerID) {
+    window.ornaments[layerID] = window.ornaments.layerGroup();
+    window.layerChooser.addOverlay(window.ornaments[layerID], layerID);
   },
 
   addPortal: function (portal) {
@@ -80,21 +77,14 @@ window.ornaments = {
           this.knownOrnaments[ornament]=false;
         }
 
-        if (ornament.startsWith('pe')) {
-          layer = ornament === 'peFRACK'
-            ? this._frackers
-            : this._beacons;
-        }
-
-        if (ornament.startsWith('sc')) {
-          layer = this._scout;
-        }
-
-        if (ornament.startsWith('peB')) {
-          layer = this._battle;
-        }
-
         if (typeof (window.ornaments.icon[ornament]) !== 'undefined') {
+          if (window.ornaments.icon[ornament].layer) {
+            if (window.ornaments[window.ornaments.icon[ornament].layer] === undefined){
+              console.log ('Add missing layer: ',window.ornaments.icon[ornament].layer);
+              window.ornaments.createLayer(window.ornaments.icon[ornament].layer);
+            }
+            layer =  window.ornaments[window.ornaments.icon[ornament].layer];
+          }
           opacity = 1;
           if (window.ornaments.icon[ornament].url) {
             iconUrl = window.ornaments.icon[ornament].url;
@@ -151,50 +141,7 @@ window.ornaments = {
     }
   },
   initOrnaments: function () {
-    this.knownOrnaments = {
-// commented out for testing. esp. "bb_s" and "sc5_p" should be easy to find on the map.
-// these Ornaments should be listed in the ornaments dialog.
-/**********************
-      // anomaly
-      'ap1':false,
-      'ap2':false,
-      'ap3':false,
-      'ap4':false,
-      'ap5':false,
-      'ap6':false,
-      'ap7':false,
-      'ap8':false,
-      'ap9':false,
-      // various beacons
-      'peFRACK':false,
-      'peNIA':false,
-      'peNEMESIS':false,
-      'peTOASTY':false,
-      'peFW_ENL':false,
-      'peFW_RES':false,
-      'peBN_BLM':false,
-      // battle
-      'peBB_BATTLE_RARE':false,
-      'peBB_BATTLE':false,
-      'peBN_ENL_WINNER-60':false,
-      'peBN_RES_WINNER-60':false,
-      'peBN_TIED_WINNER-60':false,
-      'peBR_REWARD-10_125_38':false,
-      'peBR_REWARD-10_150_75':false,
-      'peBR_REWARD-10_175_113':false,
-      'peBR_REWARD-10_200_150':false,
-      'peBR_REWARD-10_225_188':false,
-      'peBR_REWARD-10_250_225':false,
-      // shards
-      'peLOOK':false
-**********************/
-      // scouting
-      sc5_p:false,        // volatile scouting portal
-      // battle
-      bb_s:false,         // scheduled RareBattleBeacons
-      // various beacons
-      peFRACK:false,      // Fracker beacon
-    };
+    this.knownOrnaments = {};
     this.save();
   },
 
