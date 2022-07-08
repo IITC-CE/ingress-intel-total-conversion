@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server"
   },
   "dependencies": {
     "jquery": "^3.4.1",
@@ -42,7 +42,6 @@
     "style-loader": "^1.0.0",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.4.1",
-    "tslint": "^5.20.0",
     "typescript": "^3.6.4",
     "ulog": "^1.1.0",
     "url-loader": "^2.2.0",
