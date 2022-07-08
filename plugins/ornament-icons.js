@@ -55,7 +55,11 @@
 function setup () {
   window.ornaments.icon=
   {
-    // just give an ornament-ID a meaningful name
+    // name and layer, where the ornament is stored
+    peFRACK:{
+      name:'Fracker',
+      layer: 'Fracker'
+    },
     bb_s:{
       name:'Scheduled BB',
       layer: 'Battle'
@@ -64,13 +68,12 @@ function setup () {
       name:'Scout volatile',
       layer: 'Scouting'
     },
-    // name and layer, where the ornament should appear
+    // give a name, and url, offset defaults to '0' (zero)
     ap2:{
       name:'Anomaly Portal 2',
       layer: 'Anomaly',
       url: '@include_img:images/ornament-ap2.png@'
     },
-    // give a name, and url, offset defaults to '0' (zero)
     ap2_v:{
       name:'Anomaly Portal 2, volatile',
       layer: 'Anomaly',
