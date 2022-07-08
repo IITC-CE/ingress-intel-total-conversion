@@ -1,4 +1,5 @@
 import moment from "moment";
+import { HeaderObject } from "webpack-userscript";
 
 const getBuildDate = () => {
     return moment().utc().format("YYYY-MM-DD-HHmmSS");
@@ -13,13 +14,13 @@ export const environment = {
     BUILD_DATE: getBuildDate(),
 };
 
-export const generateHeader = () => ({
+export const generateHeader = (): HeaderObject => ({
     "id": "ingress-intel-total-conversion@jonatkins",
     "name": "IITC: Ingress intel map total conversion",
     "run-at": "document-end",
     "include": "https://intel.ingress.com/*",
     "match": "https://intel.ingress.com/*",
     "grant": "unsafeWindow",
-    "version": `0.29.1.${getBuildNumber()}`,
+    "version": `1.0.0.${getBuildNumber()}`,
     "description": `[${environment.BUILD_NAME}-${environment.BUILD_DATE}] Total conversion for the ingress intel map.`,
 });

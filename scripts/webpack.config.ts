@@ -5,7 +5,7 @@ import { environment, generateHeader } from "./build-settings";
 import { DIST_PATH, EXTERNAL_PATH, IMAGES_PATH, SRC_PATH } from "./paths";
 
 const config: webpack.Configuration = {
-  entry: "./main.js",
+  entry: "./core/total-conversion-build.js",
   output: {
     path: DIST_PATH,
     filename: "total-conversion-build.user.js",
