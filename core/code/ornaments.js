@@ -27,25 +27,25 @@ window.ornaments = {
 
   OVERLAY_SIZE: 60,
   OVERLAY_OPACITY: 0.6,
-  iconUrls: [],
   icon:[],
   excludedOrnaments: [],
   knownOrnaments: {},
 
   setup: function () {
     this._portals = {};
-    window.ornaments.layerGroup = L.layerGroup;
+    this.layerGroup = L.layerGroup;
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
-      window.ornaments.layerGroup = L.canvasIconLayer;
+      this.layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
     }
     this.load();
 
-    this._layer = window.ornaments.layerGroup();
-    this._excluded = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
+    this.layers = {};
+    this.layers._layer = window.ornaments.layerGroup();
+    this.layers._excluded = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
 
-    window.layerChooser.addOverlay(this._layer, 'Ornaments');
-    window.layerChooser.addOverlay(this._excluded, 'Excluded ornaments', {default: false});
+    window.layerChooser.addOverlay(this.layers._layer, 'Ornaments');
+    window.layerChooser.addOverlay(this.layers._excluded, 'Excluded ornaments', {default: false});
 
     $('<a>')
       .html('Ornaments Opt')
@@ -58,8 +58,8 @@ window.ornaments = {
       .appendTo('#toolbox');
   },
   createLayer: function (layerID) {
-    window.ornaments[layerID] = window.ornaments.layerGroup();
-    window.layerChooser.addOverlay(window.ornaments[layerID], layerID);
+    window.ornaments.layers[layerID] = window.ornaments.layerGroup();
+    window.layerChooser.addOverlay(window.ornaments.layers[layerID], layerID);
   },
 
   addPortal: function (portal) {
@@ -67,7 +67,7 @@ window.ornaments = {
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
-        var layer = this._layer;
+        var layer = this.layers._layer;
         var opacity = this.OVERLAY_OPACITY;
         var size = this.OVERLAY_SIZE;
         var anchor = [size / 2, size / 2];
@@ -79,11 +79,11 @@ window.ornaments = {
 
         if (typeof (window.ornaments.icon[ornament]) !== 'undefined') {
           if (window.ornaments.icon[ornament].layer) {
-            if (window.ornaments[window.ornaments.icon[ornament].layer] === undefined){
+            if (window.ornaments.layers[window.ornaments.icon[ornament].layer] === undefined){
               console.log ('Add missing layer: ',window.ornaments.icon[ornament].layer);
               window.ornaments.createLayer(window.ornaments.icon[ornament].layer);
             }
-            layer =  window.ornaments[window.ornaments.icon[ornament].layer];
+            layer =  window.ornaments.layers[window.ornaments.icon[ornament].layer];
           }
           opacity = 1;
           if (window.ornaments.icon[ornament].url) {
@@ -109,9 +109,9 @@ window.ornaments = {
             return ornament.startsWith(pattern);
           });
         }
-        exclude += window.ornaments.knownOrnaments[ornament];
+        exclude = exclude | window.ornaments.knownOrnaments[ornament];
         if (exclude){
-          layer = this._excluded;
+          layer = this.layers._excluded;
         }
 
         return L.marker(portal.getLatLng(), {
@@ -148,14 +148,14 @@ window.ornaments = {
   load: function () {
     var dataStr;
     try {
-      dataStr = localStorage['excludedOrnaments'];
+      dataStr = localStorage.getItem('excludedOrnaments');
       if (dataStr === undefined) { return; }
       this.excludedOrnaments = JSON.parse(dataStr);
     } catch (e) {
       console.warn('ornaments: failed to load excludedOrnaments from localStorage: '+e);
     }
     try {
-      dataStr = localStorage['knownOrnaments'];
+      dataStr = localStorage.getItem('knownOrnaments');
       if (dataStr === undefined) {
         this.initOrnaments ();
         return;
@@ -184,8 +184,8 @@ window.ornaments = {
     window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ''; });
     // process the input from the checkboxes
     for (var ornamentCode in window.ornaments.knownOrnaments) {
-      var input = document.getElementById('chk_orn_'+ornamentCode);
-      window.ornaments.knownOrnaments[ornamentCode] = input ? input.checked : false; // <- default value if the input is not found for unexpected reason
+      var input = $('#chk_orn_'+ornamentCode);
+      window.ornaments.knownOrnaments[ornamentCode] = input.is(':checked');
     }
   },
 
@@ -212,12 +212,19 @@ window.ornaments = {
     document.getElementById('ornamentsList').innerHTML = window.ornaments.ornamentsList();
   },
 
+  onChangeHandler: function () {
+    window.ornaments.processInput();
+    window.ornaments.replaceOL();
+    window.ornaments.save();
+    window.ornaments.reload();
+  },
+
   ornamentsOpt: function () {
     var excludedIDs = window.ornaments.excludedOrnaments.toString();
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
              + '<input type="text" value="' + excludedIDs + '" id="ornaments_E"'
-             + ' onchange="window.ornaments.processInput();window.ornaments.replaceOL();window.ornaments.save();window.ornaments.reload()"></input><br>'
+             + ' onchange="window.ornaments.onChangeHandler()"></input><br>'
              + '(separator: space or comma allowed)<hr>'
              + '<b>known Ornaments, check to hide:</b><br>'
              + '<div id="ornamentsList"> ' + window.ornaments.ornamentsList() + '</div>'
