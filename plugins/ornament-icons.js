@@ -1,5 +1,5 @@
 // @author         johtata
-// @name           ornament icons
+// @name           ornament icons basic
 // @category       Layer
 // @version        0.1.0
 // @description    Add own icons and names for ornaments
@@ -56,53 +56,60 @@ function setup () {
   window.ornaments.icon=
   {
     // name and layer, where the ornament is stored
-    peFRACK:{
-      name:'Fracker',
-      layer: 'Fracker'
-    },
-    bb_s:{
+    'bb_s':{
       name:'Scheduled BB',
       layer: 'Battle'
     },
-    sc5_p:{
+    'sc5_p':{
       name:'Scout volatile',
       layer: 'Scouting'
     },
     // give a name, and url, offset defaults to '0' (zero)
-    ap2:{
+    'ap2':{
       name:'Anomaly Portal 2',
       layer: 'Anomaly',
       url: '@include_img:images/ornament-ap2.png@'
     },
-    ap2_v:{
+    'ap2_v':{
       name:'Anomaly Portal 2, volatile',
       layer: 'Anomaly',
       url: '@include_img:images/ornament-ap2_v.png@'
     },
     // give a name, url and offset ("1" to place above the portal, "-1" to place below)
-    peTOASTY:{
+    'peTOASTY':{
       name:'TOASTY',
       offset: 1,
       url: '@include_img:images/ornament-peTOASTY.png@'
+    },
+    'peFRACK':{
+      name:'Fracker',
+      layer: 'Fracker',
+      url: '@include_img:images/ornament-Fracker.png@'
+    },
+    'peBR_REWARD-10_125_38':{
+      name:'Cat-I Reward',
+      url: '@include_img:images/ornament-Cat-I.png@'
+    },
+    'peBR_REWARD-10_150_75':{
+      name:'Cat-II Reward',
+      url: '@include_img:images/ornament-Cat-II.png@'
+    },
+    'peBR_REWARD-10_175_113':{
+      name:'Cat-III Reward',
+      url: '@include_img:images/ornament-Cat-III.png@'
+    },
+    'peBR_REWARD-10_200_150':{
+      name:'Cat-IV Reward',
+      url: '@include_img:images/ornament-Cat-IV.png@'
+    },
+    'peBR_REWARD-10_225_188':{
+      name:'Cat-V Reward',
+      url: '@include_img:images/ornament-Cat-V.png@'
+    },
+    'peBR_REWARD-10_250_225':{
+      name:'Cat-VI Reward',
+      url: '@include_img:images/ornament-Cat-VI.png@'
     }
-    // peBB_BATTLE
-    //   url: '@include_img:images/ornament-peBB_BATTLE.png@'
-    // peBB_BATTLE_RARE
-    //   url: '@include_img:images/ornament-peBB_BATTLE_RARE.png@'
-    // peNEMESIS
-    //   url: '@include_img:images/ornament-peNEMESIS.png@'
-    // peBN_ENL_WINNER
-    //   url: '@include_img:images/ornament-peBN_ENL_WINNER.png@'
-    // peBN_RES_WINNER
-    //   url: '@include_img:images/ornament-peBN_RES_WINNER.png@'
-    // peBN_TIED_WINNER
-    //   url: '@include_img:images/ornament-peBN_TIED_WINNER.png@'
-    // 'peBN_ENL_WINNER-60'
-    //   url: '@include_img:images/ornament-peBN_ENL_WINNER-60.png@'
-    // 'peBN_RES_WINNER-60'
-    //   url: '@include_img:images/ornament-peBN_RES_WINNER-60.png@'
-    // 'peBN_TIED_WINNER-60'
-    //   url: '@include_img:images/ornament-peBN_TIED_WINNER-60.png@'
   };
 }
 /* exported setup */

@@ -45,7 +45,7 @@ window.ornaments = {
     this._excluded = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
 
     window.layerChooser.addOverlay(this._layer, 'Ornaments');
-    window.layerChooser.addOverlay(this._excluded, 'Excluded', {default: false});
+    window.layerChooser.addOverlay(this._excluded, 'Excluded ornaments', {default: false});
 
     $('<a>')
       .html('Ornaments Opt')
