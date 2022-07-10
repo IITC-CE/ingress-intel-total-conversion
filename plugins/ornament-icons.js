@@ -79,7 +79,7 @@ function setup () {
     'peTOASTY':{
       name:'TOASTY',
       offset: 1,
-      url: '@include_img:images/ornament-peTOASTY.png@'
+      url: '@include_img:images/ornament-TOASTY.png@'
     },
     'peFRACK':{
       name:'Fracker',
