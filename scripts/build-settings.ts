@@ -20,7 +20,7 @@ export const generateHeader = (): HeaderObject => ({
     "run-at": "document-end",
     "include": "https://intel.ingress.com/*",
     "match": "https://intel.ingress.com/*",
-    "grant": "unsafeWindow",
+    "grant": "none",
     "version": `1.0.0.${getBuildNumber()}`,
     "description": `[${environment.BUILD_NAME}-${environment.BUILD_DATE}] Total conversion for the ingress intel map.`,
 });

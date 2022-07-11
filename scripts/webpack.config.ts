@@ -4,6 +4,7 @@ import WebpackUserscript from "webpack-userscript";
 import { environment, generateHeader } from "./build-settings";
 import { DIST_PATH, EXTERNAL_PATH, IMAGES_PATH, SRC_PATH } from "./paths";
 
+
 const config: webpack.Configuration = {
   entry: "./core/total-conversion-build.js",
   output: {
@@ -33,11 +34,7 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
-        loader: "url-loader",
-        include: [IMAGES_PATH],
-        options: {
-          limit: true,
-        },
+        type: 'asset/inline'
       },
     ],
   },
