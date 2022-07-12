@@ -1,5 +1,6 @@
-language: android
-jdk: oraclejdk8
+language: minimal
+os: linux
+dist: bionic
 
 branches:
   only:
@@ -7,17 +8,14 @@ branches:
     - test-builds
     - /^v([0-9]+)\.([0-9]+).*$/
 
-android:
-  components:
-  - platform-tools
-  - tools
-  - build-tools-30.0.0
-  - extra-android-m2repository
+env:
+  global:
+    # for updates check developer.android.com/studio#downloads (current 26.1.1)
+    - ANDROID_SDK_TOOLS=commandlinetools-linux-8512546_latest.zip
 
 addons:
   apt:
-    sources: deadsnakes
-    packages: python3.7
+    packages: python3.7 python3-apt android-sdk openjdk-8-jdk
   ssh_known_hosts: ssh.iitc.app
 
 notifications:
@@ -38,9 +36,26 @@ jobs:
       env: BUILD_TYPE=release
 
 before_install:
-  - yes | sdkmanager "platforms;android-30"
-  - sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+  # set JAVA_HOME path
+  - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+  # download and unzip Android SDK command line tools
+  - wget -nv https://dl.google.com/android/repository/$ANDROID_SDK_TOOLS
+  - mkdir -p $HOME/sdk/cmdline-tools
+  - unzip -q $ANDROID_SDK_TOOLS -d $HOME/sdk/cmdline-tools
+  - mv $HOME/sdk/cmdline-tools/cmdline-tools $HOME/sdk/cmdline-tools/tools
+  # set SDK tools path variable and ANDROID_HOME
+  - export PATH=$PATH:$HOME/sdk/cmdline-tools/tools/bin
+  - export ANDROID_HOME=$HOME/sdk
+  # create empty cfg file to prevent sdkmanager warning message
+  - mkdir -p $HOME/.android && touch $HOME/.android/repositories.cfg
+  # install dependencies for fastlane
   - bundle install --path vendor/bundle
+
+install:
+  - ls $HOME/sdk/cmdline-tools/tools/bin
+  - echo "PATH=$PATH"
+  # accept licenses for all available packages that have not already been accepted
+  - yes | sdkmanager --licenses
 
 before_script:
   - wget https://iitc.app/deploy/localbuildsettings.py
