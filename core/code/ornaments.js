@@ -39,6 +39,7 @@ window.ornaments = {
   //   offset: [1|0|-1]             // 1 to place above, 0 to center on or -1 to place below
   //                                // the portal marker, optional, will only be used if url
   //                                // is set. 0 (center) is default
+  //   opacity: 0..1                // optional, default is 0.6
   // }
   icon:{},
   excludedOrnaments: [],
@@ -54,8 +55,8 @@ window.ornaments = {
     this.load();
 
     this.layers = {};
-    this.layers._layer = window.ornaments.layerGroup();
-    this.layers._excluded = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
+    this.layers['Ornaments'] = window.ornaments.layerGroup();
+    this.layers['Excluded ornaments'] = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
 
     window.layerChooser.addOverlay(this.layers._layer, 'Ornaments');
     window.layerChooser.addOverlay(this.layers._excluded, 'Excluded ornaments', {default: false});
@@ -98,7 +99,6 @@ window.ornaments = {
             }
             layer =  window.ornaments.layers[window.ornaments.icon[ornament].layer];
           }
-          opacity = 1;
           if (window.ornaments.icon[ornament].url) {
             iconUrl = window.ornaments.icon[ornament].url;
             if (window.ornaments.icon[ornament].offset) {
@@ -112,6 +112,9 @@ window.ornaments = {
               case -1:
                 anchor = [size / 2, - size ];
               }
+            }
+            if (window.ornaments.icon[ornament].opacity) {
+              opacity = window.ornaments.icon[ornament].opacity;
             }
           }
         }
@@ -165,7 +168,7 @@ window.ornaments = {
       if (dataStr === undefined) { return; }
       this.excludedOrnaments = JSON.parse(dataStr);
     } catch (e) {
-      console.warn('ornaments: failed to load excludedOrnaments from localStorage: '+e);
+      log.warn('ornaments: failed to load excludedOrnaments from localStorage: '+e);
     }
     try {
       dataStr = localStorage.getItem('knownOrnaments');
