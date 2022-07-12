@@ -91,13 +91,13 @@ window.ornaments = {
           this.knownOrnaments[ornament]=false;
         }
 
-        if (typeof (window.ornaments.icon[ornament]) !== 'undefined') {
-          if (window.ornaments.icon[ornament].layer) {
-            if (window.ornaments.layers[window.ornaments.icon[ornament].layer] === undefined){
-              console.log ('Add missing layer: ',window.ornaments.icon[ornament].layer);
+        if (ornament in this.icon) {
+          if (this.icon[ornament].layer) {
+            if (this.layers[this.icon[ornament].layer] === undefined){
+              log.log ('Add missing layer: ',this.icon[ornament].layer);
               window.ornaments.createLayer(window.ornaments.icon[ornament].layer);
             }
-            layer =  window.ornaments.layers[window.ornaments.icon[ornament].layer];
+            layer =  this.layers[window.ornaments.icon[ornament].layer];
           }
           if (window.ornaments.icon[ornament].url) {
             iconUrl = window.ornaments.icon[ornament].url;
@@ -113,8 +113,8 @@ window.ornaments = {
                 anchor = [size / 2, - size ];
               }
             }
-            if (window.ornaments.icon[ornament].opacity) {
-              opacity = window.ornaments.icon[ornament].opacity;
+            if (this.icon[ornament].opacity) {
+              opacity = this.icon[ornament].opacity;
             }
           }
         }
@@ -125,7 +125,7 @@ window.ornaments = {
             return ornament.startsWith(pattern);
           });
         }
-        exclude = exclude | window.ornaments.knownOrnaments[ornament];
+        exclude = exclude | this.knownOrnaments[ornament];
         if (exclude){
           layer = this.layers['Excluded ornaments'];
         }
