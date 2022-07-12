@@ -40,7 +40,7 @@ and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/
 
 - **[IITC-Button]**: browser extension, the easiest (though not sole) way to use IITC on desktop.
 
-- **[IITC Mobile]**: Android app developed [here](https://github.com/IITC-CE/ingress-intel-total-conversion/tree/master/mobile).
+- **[IITC Mobile]**: Android app developed [here](https://github.com/IITC-CE/ingress-intel-total-conversion/tree/master/mobile) (available on [Google Play](https://play.google.com/store/apps/details?id=org.exarhteam.iitc_mobile) and [F-Droid](https://f-droid.org/packages/org.exarhteam.iitc_mobile/)).
 
 - **[IITC-Mobile for iOS]**: 3rd-party application, developed by [_Yangkun Zhang_](https://github.com/HubertZhang).
 
