@@ -21,7 +21,7 @@
 // can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
 // future IDs. example: "ap" to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)
 
-/* global L, dialog */
+/* global L, dialog, log */
 
 window.ornaments = {
 
@@ -58,8 +58,8 @@ window.ornaments = {
     this.layers['Ornaments'] = window.ornaments.layerGroup();
     this.layers['Excluded ornaments'] = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
 
-    window.layerChooser.addOverlay(this.layers._layer, 'Ornaments');
-    window.layerChooser.addOverlay(this.layers._excluded, 'Excluded ornaments', {default: false});
+    window.layerChooser.addOverlay(this.layers['Ornaments'], 'Ornaments');
+    window.layerChooser.addOverlay(this.layers['Excluded ornaments'], 'Excluded ornaments', {default: false});
 
     $('<a>')
       .html('Ornaments Opt')
@@ -81,7 +81,7 @@ window.ornaments = {
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
-        var layer = this.layers._layer;
+        var layer = this.layers['Ornaments'];
         var opacity = this.OVERLAY_OPACITY;
         var size = this.OVERLAY_SIZE;
         var anchor = [size / 2, size / 2];
@@ -127,7 +127,7 @@ window.ornaments = {
         }
         exclude = exclude | window.ornaments.knownOrnaments[ornament];
         if (exclude){
-          layer = this.layers._excluded;
+          layer = this.layers['Excluded ornaments'];
         }
 
         return L.marker(portal.getLatLng(), {
