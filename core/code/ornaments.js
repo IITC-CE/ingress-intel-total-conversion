@@ -27,7 +27,20 @@ window.ornaments = {
 
   OVERLAY_SIZE: 60,
   OVERLAY_OPACITY: 0.6,
-  icon:[],
+  // The icon object holds optional definitions for the ornaments an beacons. The object shall
+  // be filled from a plugin
+  // 'ornamentID' : {
+  //   name: 'meaningful name',     // shows up in dialog
+  //   layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
+  //                                // ornament will be in "Ornaments"
+  //   url: 'url',                  // from which the image will be taken, optional,
+  //                                // 84x84px is default, if not set, stock images will be
+  //                                // used
+  //   offset: [1|0|-1]             // 1 to place above, 0 to center on or -1 to place below
+  //                                // the portal marker, optional, will only be used if url
+  //                                // is set. 0 (center) is default
+  // }
+  icon:{},
   excludedOrnaments: [],
   knownOrnaments: {},
 

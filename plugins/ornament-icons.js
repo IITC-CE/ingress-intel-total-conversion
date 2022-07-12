@@ -49,67 +49,48 @@
       bb_s         // scheduled RareBattleBeacons
       // various beacons
       peFRACK      // Fracker beacon
+
+  The icon object holds optional definitions for the ornaments an beacons. 
+  'ornamentID' : {
+    name: 'meaningful name',     // shows up in dialog
+    layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
+                                 // ornament will be in "Ornaments"
+    url: 'url',                  // from which the image will be taken, optional,
+                                 // 84x84px is default, if not set, stock images will be
+                                 // used
+    offset: [1|0|-1]             // 1 to place above, 0 to center on or -1 to place below
+                                 // the portal marker, optional, will only be used if url
+                                 // is set. 0 (center) is default
+    opacity: 0..1                // optional, default is 0.6
+  }
+
 **********************/
 
+// use own namespace for plugin
+window.plugin.ornamentIcons = function () {};
 
-function setup () {
-  window.ornaments.icon=
-  {
-    // name and layer, where the ornament is stored
-    'bb_s':{
-      name:'Scheduled BB',
-      layer: 'Battle'
-    },
-    'sc5_p':{
-      name:'Scout volatile',
-      layer: 'Scouting'
-    },
-    // give a name, and url, offset defaults to '0' (zero)
-    'ap2':{
-      name:'Anomaly Portal 2',
-      layer: 'Anomaly',
-      url: '@include_img:images/ornament-ap2.png@'
-    },
-    'ap2_v':{
-      name:'Anomaly Portal 2, volatile',
-      layer: 'Anomaly',
-      url: '@include_img:images/ornament-ap2_v.png@'
-    },
-    // give a name, url and offset ("1" to place above the portal, "-1" to place below)
+window.plugin.ornamentIcons.jsonUrl = 'https://iitc.app/extras/ornaments.json';
+
+window.plugin.ornamentIcons.setLocalIcons = function() {
+   var localIconDefinitions= {
+    // give a name, leave layer to default, url and offset ("1" to place above the portal, "-1" to place below)
     'peTOASTY':{
       name:'TOASTY',
+      // layer: undefined, 
       offset: 1,
       url: '@include_img:images/ornament-TOASTY.png@'
-    },
-    'peFRACK':{
-      name:'Fracker',
-      layer: 'Fracker',
-      url: '@include_img:images/ornament-Fracker.png@'
-    },
-    'peBR_REWARD-10_125_38':{
-      name:'Cat-I Reward',
-      url: '@include_img:images/ornament-Cat-I.png@'
-    },
-    'peBR_REWARD-10_150_75':{
-      name:'Cat-II Reward',
-      url: '@include_img:images/ornament-Cat-II.png@'
-    },
-    'peBR_REWARD-10_175_113':{
-      name:'Cat-III Reward',
-      url: '@include_img:images/ornament-Cat-III.png@'
-    },
-    'peBR_REWARD-10_200_150':{
-      name:'Cat-IV Reward',
-      url: '@include_img:images/ornament-Cat-IV.png@'
-    },
-    'peBR_REWARD-10_225_188':{
-      name:'Cat-V Reward',
-      url: '@include_img:images/ornament-Cat-V.png@'
-    },
-    'peBR_REWARD-10_250_225':{
-      name:'Cat-VI Reward',
-      url: '@include_img:images/ornament-Cat-VI.png@'
     }
   };
+  Object.assign (window.ornaments.icon, localIconDefinitions);
+}
+
+function setup () {
+  fetch(window.plugin.ornamentIcons.jsonUrl).then(response => {
+    response.json().then(data => {
+      Object.assign (window.ornaments.icon,data.ornaments);
+      window.plugin.ornamentIcons.setLocalIcons; // append or overwrite external definitions
+    })
+  });
+
 }
 /* exported setup */
