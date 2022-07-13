@@ -36,9 +36,10 @@ window.ornaments = {
   //   url: 'url',                  // from which the image will be taken, optional,
   //                                // 84x84px is default, if not set, stock images will be
   //                                // used
-  //   offset: [1|0|-1]             // 1 to place above, 0 to center on or -1 to place below
-  //                                // the portal marker, optional, will only be used if url
-  //                                // is set. 0 (center) is default
+  //   offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
+  //                                // dx (vertical)and dy )horizontal.
+  //                                // [0.5,1.0] to place right above the portal.
+  //                                // default is [0.5,0.5] to center
   //   opacity: 0..1                // optional, default is 0.6
   // }
   icon:{},
@@ -61,14 +62,12 @@ window.ornaments = {
     window.layerChooser.addOverlay(this.layers['Ornaments'], 'Ornaments');
     window.layerChooser.addOverlay(this.layers['Excluded ornaments'], 'Excluded ornaments', {default: false});
 
-    $('<a>')
-      .html('Ornaments Opt')
-      .attr({
-        id: 'ornaments-toolbox-link',
-        title: 'Edit ornament exclusions',
-        accesskey: 'o'
-      })
-      .click(window.ornaments.ornamentsOpt)
+    $('<a>', {
+      text:'Ornaments Opt',
+      id: 'ornaments-toolbox-link',
+      title: 'Edit ornament exclusions',
+      accesskey: 'o',
+      click: window.ornaments.ornamentsOpt})
       .appendTo('#toolbox');
   },
   createLayer: function (layerID) {
@@ -101,17 +100,9 @@ window.ornaments = {
           }
           if (window.ornaments.icon[ornament].url) {
             iconUrl = window.ornaments.icon[ornament].url;
-            if (window.ornaments.icon[ornament].offset) {
-              switch (window.ornaments.icon[ornament].offset) {
-              case 1:
-                anchor = [size / 2, size];
-                break;
-              case 0:
-                anchor = [size / 2, size / 2];
-                break;
-              case -1:
-                anchor = [size / 2, - size ];
-              }
+            if (this.icon[ornament].offset) {
+              var offset = this.icon[ornament].offset;
+              anchor = [size * offset[0], size * offset[1]];
             }
             if (this.icon[ornament].opacity) {
               opacity = this.icon[ornament].opacity;
@@ -178,7 +169,7 @@ window.ornaments = {
       }
       this.knownOrnaments = JSON.parse(dataStr);
     } catch (e) {
-      console.warn('ornaments: failed to load data from localStorage: '+e);
+      log.warn('ornaments: failed to load data from localStorage: '+e);
     }
 
   },
@@ -236,7 +227,7 @@ window.ornaments = {
   },
 
   ornamentsOpt: function () {
-    var excludedIDs = window.ornaments.excludedOrnaments.toString();
+    var excludedIDs = window.ornaments.excludedOrnaments.join(',');
     var html = '<div class="ornamentsOpts">'
              + 'Hide Ornaments from IITC that start with:<br>'
              + '<input type="text" value="' + excludedIDs + '" id="ornaments_E"'

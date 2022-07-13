@@ -58,9 +58,9 @@
     url: 'url',                  // from which the image will be taken, optional,
                                  // 84x84px is default, if not set, stock images will be
                                  // used
-    offset: [1|0|-1]             // 1 to place above, 0 to center on or -1 to place below
-                                 // the portal marker, optional, will only be used if url
-                                 // is set. 0 (center) is default
+    offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
+                                 // dx*size and dy*size. negative values will shift down
+                                 // and left. [1,0] to place right above the portal.
     opacity: 0..1                // optional, default is 0.6
   }
 
@@ -72,12 +72,13 @@ window.plugin.ornamentIcons = function () {};
 window.plugin.ornamentIcons.jsonUrl = 'https://iitc.app/extras/ornaments.json';
 
 window.plugin.ornamentIcons.setLocalIcons = function() {
+   console.log("setting local definitions");
    var localIconDefinitions= {
     // give a name, leave layer to default, url and offset ("1" to place above the portal, "-1" to place below)
     'peTOASTY':{
       name:'TOASTY',
-      // layer: undefined, 
-      offset: 1,
+      // layer: undefined,
+      offset: [0.5, 1],
       url: '@include_img:images/ornament-TOASTY.png@'
     }
   };
@@ -88,7 +89,7 @@ function setup () {
   fetch(window.plugin.ornamentIcons.jsonUrl).then(response => {
     response.json().then(data => {
       Object.assign (window.ornaments.icon,data.ornaments);
-      window.plugin.ornamentIcons.setLocalIcons; // append or overwrite external definitions
+      window.plugin.ornamentIcons.setLocalIcons(); // append or overwrite external definitions
     })
   });
 
