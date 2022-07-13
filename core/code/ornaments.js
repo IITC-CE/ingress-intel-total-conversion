@@ -38,8 +38,8 @@ window.ornaments = {
   //                                // used
   //   offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
   //                                // dx (vertical)and dy )horizontal.
-  //                                // [0.5,1.0] to place right above the portal.
-  //                                // default is [0.5,0.5] to center
+  //                                // [0, 0.5] to place right above the portal.
+  //                                // default is [0, 0] to center
   //   opacity: 0..1                // optional, default is 0.6
   // }
   icon:{},
@@ -102,7 +102,7 @@ window.ornaments = {
             iconUrl = window.ornaments.icon[ornament].url;
             if (this.icon[ornament].offset) {
               var offset = this.icon[ornament].offset;
-              anchor = [size * offset[0], size * offset[1]];
+              anchor = [size * offset[0] + anchor[0], size * offset[1] + anchor[1]];
             }
             if (this.icon[ornament].opacity) {
               opacity = this.icon[ornament].opacity;
@@ -156,14 +156,14 @@ window.ornaments = {
     var dataStr;
     try {
       dataStr = localStorage.getItem('excludedOrnaments');
-      if (dataStr === undefined) { return; }
+      if (!dataStr) { return; }
       this.excludedOrnaments = JSON.parse(dataStr);
     } catch (e) {
       log.warn('ornaments: failed to load excludedOrnaments from localStorage: '+e);
     }
     try {
       dataStr = localStorage.getItem('knownOrnaments');
-      if (dataStr === undefined) {
+      if (!dataStr) {
         this.initOrnaments ();
         return;
       }

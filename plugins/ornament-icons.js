@@ -60,7 +60,8 @@
                                  // used
     offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
                                  // dx*size and dy*size. negative values will shift down
-                                 // and left. [1,0] to place right above the portal.
+                                 // and left. [0.5, 0] to place right above the portal.
+                                 // default is [0, 0] (center)
     opacity: 0..1                // optional, default is 0.6
   }
 
@@ -72,13 +73,12 @@ window.plugin.ornamentIcons = function () {};
 window.plugin.ornamentIcons.jsonUrl = 'https://iitc.app/extras/ornaments.json';
 
 window.plugin.ornamentIcons.setLocalIcons = function() {
-   console.log("setting local definitions");
    var localIconDefinitions= {
-    // give a name, leave layer to default, url and offset ("1" to place above the portal, "-1" to place below)
+    // give a name, leave layer to default, url and offset ([0, 0.5] to place above the portal)
     'peTOASTY':{
       name:'TOASTY',
       // layer: undefined,
-      offset: [0.5, 1],
+      offset: [0, 0.5],
       url: '@include_img:images/ornament-TOASTY.png@'
     }
   };
