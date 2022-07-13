@@ -836,6 +836,87 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
 };
 
 //
+// Posting
+//
+
+/**
+ * Posts a chat message to intel comm context.
+ *
+ * @function window.chat.postMsg
+ */
+window.chat.intelPost = function (msg) {
+  var tab = this.channel;
+  var latlng = map.getCenter();
+
+  var data = {message: msg,
+              latE6: Math.round(latlng.lat*1E6),
+              lngE6: Math.round(latlng.lng*1E6),
+              tab: tab};
+
+  var errMsg = 'Your message could not be delivered. You can copy&' +
+               'paste it here and try again if you want:\n\n' + msg;
+
+  window.postAjax('sendPlext', data,
+    function(response) {
+      if(response.error) alert(errMsg);
+      startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a send message
+    },
+    function() {
+      alert(errMsg);
+    }
+  );
+}
+
+/**
+ * Posts a chat message to the currently active chat tab.
+ *
+ * @function window.chat.postMsg
+ */
+window.chat.postMsg = function() {
+  var c = chat.getActive();
+  var commTab = chat.getCommTab(c);
+
+  var msg = $.trim($('#chatinput input').val());
+  if(!msg || msg === '') return;
+
+  if (commTab.sendMessage) {
+    commTab.sendMessage(msg);
+    $('#chatinput input').val('');
+  }
+}
+
+/**
+ * Sets up the chat message posting functionality.
+ *
+ * @function window.chat.setupPosting
+ */
+window.chat.setupPosting = function() {
+  if (!isSmartphone()) {
+    $('#chatinput input').keydown(function(event) {
+      try {
+        var kc = (event.keyCode ? event.keyCode : event.which);
+        if(kc === 13) { // enter
+          chat.postMsg();
+          event.preventDefault();
+        } else if (kc === 9) { // tab
+          event.preventDefault();
+          window.chat.handleTabCompletion();
+        }
+      } catch (e) {
+        log.error(e);
+        //if (e.stack) { console.error(e.stack); }
+      }
+    });
+  }
+
+  $('#chatinput').submit(function(event) {
+    event.preventDefault();
+    chat.postMsg();
+  });
+}
+
+
+//
 // Tabs
 //
 
@@ -847,7 +928,7 @@ window.chat.commTabs = [
   // name: visible name
   // inputPrompt: string for the input prompt
   // inputClass: (optional) class to apply to #chatinput
-  // sendMessage: (optional) function to send the message (to override the default of sendPlext)
+  // sendMessage: (optional) function to send the message
   // request: (optional) function to call to request new message
   //          first argument is `channel`
   //          second is true when trigger from scrolling to top
@@ -857,12 +938,14 @@ window.chat.commTabs = [
   {
     channel: 'all', name:'All', localBounds: true,
     inputPrompt: 'broadcast:', inputClass:'public',
-    request: chat.requestChannel, render: chat.renderChannel
+    request: chat.requestChannel, render: chat.renderChannel,
+    sendMessage: chat.intelPost,
   },
   {
     channel: 'faction', name:'Faction', localBounds: true,
     inputPrompt: 'tell faction:', inputClass:'faction',
-    request: chat.requestChannel, render: chat.renderChannel
+    request: chat.requestChannel, render: chat.renderChannel,
+    sendMessage: chat.intelPost,
   },
   {
     channel: 'alerts', name:'Alerts',
@@ -917,7 +1000,7 @@ window.chat.getActive = function() {
  * @returns {string} The corresponding channel name ('faction', 'alerts', or 'all').
  */
 window.chat.getCommTab = function (tab) {
-  var channelObject;
+  var channelObject = null;
   chat.commTabs.forEach(function (entry) {
     if (entry.channel === tab)
       channelObject = entry;
@@ -1022,18 +1105,29 @@ window.chat.needMoreMessages = function() {
  * @param {string} tab - The name of the chat tab to activate ('all', 'faction', or 'alerts').
  */
 window.chat.chooseTab = function(tab) {
-  if (chat.commTabs.every(function (entry) { return entry.channel !== tab; })) {
-    var tabsAvalaible = chat.commTabs.map(function (entry) { return '"' + entry.channel + '"'; }).join(', ');
-    log.warn('chat tab "'+tab+'" requested - but only ' + tabsAvalaible + ' are valid - assuming "all" wanted');
+  var commTab = chat.getCommTab(tab);
+
+  if (!commTab) {
+    var tabsAvalaible = chat.commTabs
+      .map(function (entry) {
+        return '"' + entry.channel + '"';
+      })
+      .join(', ');
+    log.warn(
+      'chat tab "' +
+        tab +
+        '" requested - but only ' +
+        tabsAvalaible +
+        ' are valid - assuming "all" wanted'
+    );
     tab = 'all';
+    commTab = chat.getCommTab(tab);
   }
 
   var oldTab = chat.getActive();
+  var oldCommTab = chat.getCommTab(oldTab);
 
   localStorage['iitc-chat-tab'] = tab;
-
-  var oldCommTab = chat.getCommTab(oldTab);
-  var commTab = chat.getCommTab(tab);
 
   var chatInput = $('#chatinput');
   if (oldCommTab && oldCommTab.inputClass) chatInput.removeClass(oldCommTab.inputClass);
@@ -1247,80 +1341,4 @@ window.chat.setupTime = function() {
   };
   updateTime();
   window.addResumeFunction(updateTime);
-}
-
-
-//
-// posting
-//
-
-/**
- * Sets up the chat message posting functionality.
- *
- * @function window.chat.setupPosting
- */
-window.chat.setupPosting = function() {
-  if (!isSmartphone()) {
-    $('#chatinput input').keydown(function(event) {
-      try {
-        var kc = (event.keyCode ? event.keyCode : event.which);
-        if(kc === 13) { // enter
-          chat.postMsg();
-          event.preventDefault();
-        } else if (kc === 9) { // tab
-          event.preventDefault();
-          window.chat.handleTabCompletion();
-        }
-      } catch (e) {
-        log.error(e);
-      }
-    });
-  }
-
-  $('#chatinput').submit(function(event) {
-    event.preventDefault();
-    chat.postMsg();
-  });
-}
-
-/**
- * Posts a chat message to the currently active chat tab.
- *
- * @function window.chat.postMsg
- */
-window.chat.postMsg = function() {
-  var c = chat.getActive();
-  var commTab = chat.getCommTab(c);
-
-  // unknown tab, ignore
-  if (c !== 'all' && c !== 'faction') {
-    return;
-  }
-
-  var msg = $.trim($('#chatinput input').val());
-  if(!msg || msg === '') return;
-
-  if (commTab.sendMessage) return commTab.sendMessage(msg);
-
-  var latlng = map.getCenter();
-
-  var data = {message: msg,
-              latE6: Math.round(latlng.lat*1E6),
-              lngE6: Math.round(latlng.lng*1E6),
-              tab: c};
-
-  var errMsg = 'Your message could not be delivered. You can copy&' +
-               'paste it here and try again if you want:\n\n' + msg;
-
-  window.postAjax('sendPlext', data,
-    function(response) {
-      if(response.error) alert(errMsg);
-      startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a send message
-    },
-    function() {
-      alert(errMsg);
-    }
-  );
-
-  $('#chatinput input').val('');
 }
