@@ -50,7 +50,7 @@
       // various beacons
       peFRACK      // Fracker beacon
 
-  The icon object holds optional definitions for the ornaments an beacons. 
+  The icon object holds optional definitions for the ornaments an beacons.
   'ornamentID' : {
     name: 'meaningful name',     // shows up in dialog
     layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
@@ -70,7 +70,7 @@
 // use own namespace for plugin
 window.plugin.ornamentIcons = function () {};
 
-window.plugin.ornamentIcons.jsonUrl = 'https://iitc.app/extras/ornaments.json';
+window.plugin.ornamentIcons.jsonUrl = 'https://iitc.app/extras/ornaments/definitions.json';
 
 window.plugin.ornamentIcons.setLocalIcons = function() {
    var localIconDefinitions= {
