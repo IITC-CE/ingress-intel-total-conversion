@@ -72,24 +72,23 @@ window.plugin.ornamentIcons = function () {};
 
 window.plugin.ornamentIcons.jsonUrl = 'https://iitc.app/extras/ornaments/definitions.json';
 
-window.plugin.ornamentIcons.setLocalIcons = function() {
-   var localIconDefinitions= {
+// append or overwrite external definitions
+window.plugin.ornamentIcons.setIcons = function(externalIconDefinitions) {
+  const localIconDefinitions = {
     // give a name, leave layer to default, url and offset ([0, 0.5] to place above the portal)
-    'peTOASTY':{
-      name:'TOASTY',
-      // layer: undefined,
-      offset: [0, 0.5],
-      url: '@include_img:images/ornament-TOASTY.png@'
-    }
+    // 'peTOASTY': {
+    //   name: 'TOASTY',
+    //   offset: [0, 0.5],
+    //   url: '@include_img:images/ornament-TOASTY.png@'
+    // }
   };
-  Object.assign (window.ornaments.icon, localIconDefinitions);
+  window.ornaments.icon = {...window.ornaments.icon, ...externalIconDefinitions, ...localIconDefinitions};
 }
 
 function setup () {
   fetch(window.plugin.ornamentIcons.jsonUrl).then(response => {
     response.json().then(data => {
-      Object.assign (window.ornaments.icon,data.ornaments);
-      window.plugin.ornamentIcons.setLocalIcons(); // append or overwrite external definitions
+      window.plugin.ornamentIcons.setIcons(data.ornaments);
     })
   });
 
