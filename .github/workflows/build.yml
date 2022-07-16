@@ -52,7 +52,6 @@ jobs:
         run: ./build.py $BUILD_TYPE
 
       - name: Set env with artifacts
-        if: ${{ github.event_name == 'pull_request' }}
         run: |
           echo "ARTIFACT_IITC_MOBILE=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.apk' )" >> "$GITHUB_ENV"
           echo "ARTIFACT_IITC_ZIP=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.zip' )" >> "$GITHUB_ENV"
