@@ -95,3 +95,13 @@ jobs:
           artifacts: "./build/${{ env.BUILD_TYPE }}/*.zip,./build/${{ env.BUILD_TYPE }}/*.apk"
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Send APK to Telegram
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        if: ${{ github.event_name == 'push' && env.TG_BOT_TOKEN != ''}}
+        run: |
+          TEXT="🤖 *New IITC ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+          APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"
+          curl -s -F document=@"${{ env.ARTIFACT_IITC_MOBILE }}" -F caption="$TEXT" $APIPARAMS
