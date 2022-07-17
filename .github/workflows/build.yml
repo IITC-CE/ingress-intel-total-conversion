@@ -84,7 +84,7 @@ jobs:
           destination_folder: 'static/build/${{ env.ARCHIVE_DIR }}/${{ env.BUILDSTAMP }}/'
           user_email: 'example@email.com'
           user_name: 'IITC Updates'
-          commit_message: '🤖 New IITC ${{ env.BUILD_TYPE }} build from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
+          commit_message: '🤖 New IITC Mobile ${{ env.BUILD_TYPE }} build from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
 
       - uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/v')
