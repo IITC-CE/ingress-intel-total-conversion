@@ -84,7 +84,7 @@ jobs:
           destination_folder: 'static/build/${{ env.ARCHIVE_DIR }}/${{ env.BUILDSTAMP }}/'
           user_email: 'example@email.com'
           user_name: 'IITC Updates'
-          commit_message: '🤖 New IITC Mobile ${{ env.BUILD_TYPE }} build from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
+          commit_message: '🤖 New IITC ${{ env.BUILD_TYPE }} build from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
 
       - uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/v')
@@ -101,6 +101,6 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         if: ${{ github.event_name == 'push' && env.TG_BOT_TOKEN != ''}}
         run: |
-          TEXT="🤖 *New IITC ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+          TEXT="🤖 *New IITC Mobile ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
           APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"
           curl -s -F document=@"${{ env.ARTIFACT_IITC_MOBILE }}" -F caption="$TEXT" $APIPARAMS
