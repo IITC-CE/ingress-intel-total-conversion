@@ -40,7 +40,7 @@ android {
             storeFile file("../keystore/debug.keystore")
         }
         release {
-            if (System.getenv("TRAVIS")) {
+            if (System.getenv("CI")) {
                 storeFile file("../keystore/android.jks")
                 storePassword System.getenv("KEYSTORE_PASS")
                 keyAlias System.getenv("ALIAS_NAME")

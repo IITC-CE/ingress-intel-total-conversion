@@ -1,0 +1,106 @@
+name: Build IITC and push artifacts
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          cache: 'gradle'
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Set env BRANCH
+        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)" >> $GITHUB_ENV
+
+      - name: Set env BUILD_TYPE and ARCHIVE_DIR (optional)
+        run: |
+          if [[ $GITHUB_EVENT_NAME == 'push' ]]; then
+            if [[ $BRANCH == 'master' ]]; then
+                echo "BUILD_TYPE=beta" >> "$GITHUB_ENV"
+                echo "ARCHIVE_DIR=beta_archive" >> "$GITHUB_ENV"
+            else
+                echo "BUILD_TYPE=release" >> "$GITHUB_ENV"
+                echo "ARCHIVE_DIR=release_archive" >> "$GITHUB_ENV"
+            fi
+          else
+              echo "BUILD_TYPE=test" >> "$GITHUB_ENV"
+          fi
+
+      - name: Download localbuildsettings.py
+        run: wget https://iitc.app/deploy/localbuildsettings.py
+
+      - name: Run build.py
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
+          ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
+        run: ./build.py $BUILD_TYPE
+
+      - name: Set env with artifacts
+        run: |
+          echo "ARTIFACT_IITC_MOBILE=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.apk' )" >> "$GITHUB_ENV"
+          echo "ARTIFACT_IITC_ZIP=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.zip' )" >> "$GITHUB_ENV"
+
+      - name: Push artifacts to PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: gavv/pull-request-artifacts@v1.0.0
+        with:
+          commit: ${{ github.event.pull_request.head.sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts-branch: artifacts
+          artifacts: |
+            ${{ env.ARTIFACT_IITC_MOBILE }}
+            ${{ env.ARTIFACT_IITC_ZIP }}
+
+      - name: Set env BUILDSTAMP
+        run: |
+          echo "BUILDSTAMP=$(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./build/${{ env.BUILD_TYPE }}/total-conversion-build.user.js)")" >> "$GITHUB_ENV"
+
+      - name: Push build artifacts to website
+        env:
+          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        if: ${{ github.event_name == 'push' && env.WEBSITE_REPO != '' }}
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        with:
+          source_file: "./build/${{ env.BUILD_TYPE }}/."
+          destination_repo: ${{ secrets.WEBSITE_REPO }}
+          destination_branch: master
+          destination_folder: 'static/build/${{ env.ARCHIVE_DIR }}/${{ env.BUILDSTAMP }}/'
+          user_email: 'example@email.com'
+          user_name: 'IITC Updates'
+          commit_message: '🤖 New IITC ${{ env.BUILD_TYPE }} build from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
+
+      - uses: ncipollo/release-action@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: "./build/${{ env.BUILD_TYPE }}/*.zip,./build/${{ env.BUILD_TYPE }}/*.apk"
+          generateReleaseNotes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Send APK to Telegram
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        if: ${{ github.event_name == 'push' && env.TG_BOT_TOKEN != ''}}
+        run: |
+          TEXT="🤖 *New IITC ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+          APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"
+          curl -s -F document=@"${{ env.ARTIFACT_IITC_MOBILE }}" -F caption="$TEXT" $APIPARAMS
