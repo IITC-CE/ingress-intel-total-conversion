@@ -6,7 +6,6 @@ on:
       - master
     tags:
       - '*'
-  pull_request:
 
 jobs:
   build:
@@ -29,16 +28,12 @@ jobs:
 
       - name: Set env BUILD_TYPE and ARCHIVE_DIR (optional)
         run: |
-          if [[ $GITHUB_EVENT_NAME == 'push' ]]; then
-            if [[ $BRANCH == 'master' ]]; then
-                echo "BUILD_TYPE=beta" >> "$GITHUB_ENV"
-                echo "ARCHIVE_DIR=beta_archive" >> "$GITHUB_ENV"
-            else
-                echo "BUILD_TYPE=release" >> "$GITHUB_ENV"
-                echo "ARCHIVE_DIR=release_archive" >> "$GITHUB_ENV"
-            fi
+          if [[ $BRANCH == 'master' ]]; then
+              echo "BUILD_TYPE=beta" >> "$GITHUB_ENV"
+              echo "ARCHIVE_DIR=beta_archive" >> "$GITHUB_ENV"
           else
-              echo "BUILD_TYPE=test" >> "$GITHUB_ENV"
+              echo "BUILD_TYPE=release" >> "$GITHUB_ENV"
+              echo "ARCHIVE_DIR=release_archive" >> "$GITHUB_ENV"
           fi
 
       - name: Download localbuildsettings.py
@@ -56,17 +51,6 @@ jobs:
           echo "ARTIFACT_IITC_MOBILE=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.apk' )" >> "$GITHUB_ENV"
           echo "ARTIFACT_IITC_ZIP=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.zip' )" >> "$GITHUB_ENV"
 
-      - name: Push artifacts to PR
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: gavv/pull-request-artifacts@v1.0.0
-        with:
-          commit: ${{ github.event.pull_request.head.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts-branch: artifacts
-          artifacts: |
-            ${{ env.ARTIFACT_IITC_MOBILE }}
-            ${{ env.ARTIFACT_IITC_ZIP }}
-
       - name: Set env BUILDSTAMP
         run: |
           echo "BUILDSTAMP=$(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./build/${{ env.BUILD_TYPE }}/total-conversion-build.user.js)")" >> "$GITHUB_ENV"
@@ -75,7 +59,7 @@ jobs:
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        if: ${{ github.event_name == 'push' && env.WEBSITE_REPO != '' }}
+        if: ${{ env.WEBSITE_REPO != '' }}
         uses: dmnemec/copy_file_to_another_repo_action@main
         with:
           source_file: "./build/${{ env.BUILD_TYPE }}/."
@@ -99,7 +83,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        if: ${{ github.event_name == 'push' && env.TG_BOT_TOKEN != ''}}
+        if: ${{ env.TG_BOT_TOKEN != ''}}
         run: |
           TEXT="🤖 *New IITC Mobile ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
           APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"

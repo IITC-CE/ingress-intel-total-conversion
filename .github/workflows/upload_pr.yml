@@ -1,0 +1,78 @@
+name: Upload PR
+
+# read-write repo token
+# access to secrets
+on:
+  workflow_run:
+    workflows: ["Build PR"]
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: >
+      ${{ github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: 'Download artifact'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "build"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/build.zip`, Buffer.from(download.data));
+
+      - name: 'Unzip artifact'
+        run: unzip build.zip
+
+      - name: Set env
+        run: |
+          echo "PR_NUMBER=$(cat ./.metadata/number)" >> "$GITHUB_ENV"
+          echo "COMMIT_HASH=$(cat ./.metadata/commit)" >> "$GITHUB_ENV"
+          echo "BUILD_APK_FILENAME=$(cat ./.metadata/apk_filename)" >> "$GITHUB_ENV"
+          echo "BUILD_ZIP_FILENAME=$(cat ./.metadata/zip_filename)" >> "$GITHUB_ENV"
+          echo "BUILDSTAMP=$(cat ./.metadata/buildstamp)" >> "$GITHUB_ENV"
+
+      - name: Push build artifacts to website
+        env:
+          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        if: ${{ env.WEBSITE_REPO != '' }}
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        with:
+          source_file: "./build/."
+          destination_repo: ${{ secrets.WEBSITE_REPO }}
+          destination_branch: master
+          destination_folder: 'static/build/artifact/PR${{ env.PR_NUMBER }}/'
+          user_email: 'example@email.com'
+          user_name: 'IITC Updates'
+          commit_message: '🤖 New IITC test build from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
+
+      - name: Comment with build url
+        if: ${{ env.WEBSITE_REPO != '' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr_release
+          number: ${{ env.PR_NUMBER }}
+          message: |
+            ## 🤖 Pull request artifacts
+            | file | commit |
+            | ---- | ------ |
+            | [`${{ env.BUILD_APK_FILENAME }}`](https://github.com/${{ secrets.WEBSITE_REPO }}/raw/master/static/build/artifact/PR${{ env.PR_NUMBER }}/${{ env.BUILD_APK_FILENAME }}) | ${{ env.COMMIT_HASH }} |
+            | [`${{ env.BUILD_ZIP_FILENAME }}`](https://github.com/${{ secrets.WEBSITE_REPO }}/raw/master/static/build/artifact/PR${{ env.PR_NUMBER }}/${{ env.BUILD_ZIP_FILENAME }}) | ${{ env.COMMIT_HASH }} |
+            See build on website](https://iitc.app/build/artifact/PR${{ env.PR_NUMBER }}/)
+
