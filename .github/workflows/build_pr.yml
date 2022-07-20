@@ -31,6 +31,8 @@ jobs:
         run: wget https://iitc.app/deploy/localbuildsettings.py
 
       - name: Run build.py
+        env:
+          PR_NUMBER: ${{ github.event.number }}
         run: ./build.py $BUILD_TYPE
 
       - name: Save PR metadata
