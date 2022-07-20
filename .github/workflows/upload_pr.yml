@@ -76,5 +76,5 @@ jobs:
             | ---- | ------ |
             | [`${{ env.BUILD_APK_FILENAME }}`](https://github.com/${{ secrets.WEBSITE_REPO }}/raw/master/static/build/artifact/PR${{ env.PR_NUMBER }}/${{ env.BUILD_APK_FILENAME }}) | ${{ env.COMMIT_HASH }} |
             | [`${{ env.BUILD_ZIP_FILENAME }}`](https://github.com/${{ secrets.WEBSITE_REPO }}/raw/master/static/build/artifact/PR${{ env.PR_NUMBER }}/${{ env.BUILD_ZIP_FILENAME }}) | ${{ env.COMMIT_HASH }} |
-            See build on website](https://iitc.app/build/artifact/PR${{ env.PR_NUMBER }}/)
-
+            
+            [See build on website](https://iitc.app/build/artifact/PR${{ env.PR_NUMBER }}/)
