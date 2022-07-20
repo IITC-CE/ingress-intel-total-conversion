@@ -64,6 +64,8 @@ jobs:
 
       - name: Comment with build url
         if: ${{ env.WEBSITE_REPO != '' }}
+        env:
+          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr_release
