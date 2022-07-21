@@ -423,30 +423,31 @@ window.RegionScoreboardSetup = (function() {
   }
 
   function onTimer() {
-    var d = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1) - (new Date());
-    $('#cycletimer',mainDialog).html(formatMinutes( Math.max(0,Math.floor(d/1000))) );
+    var d = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1) - Date.now();
+    $('#cycletimer', mainDialog).html(formatMinutes( Math.max(0, d)) );
   }
 
-  function formatMinutes(sec) {
-    var hours   = Math.floor(sec / 3600);
-    var minutes = Math.floor((sec % 3600) / 60);
-    sec = sec % 60;
-
-    var time='';
-    time += hours + ':';
-    if (minutes<10) time += '0';
-    time += minutes;
-    time += ':';
-    if (sec<10) time += '0';
-    time += sec;
-    return time;
+  // https://stackoverflow.com/a/25279399/2520247
+  function formatMinutes (ms) {
+    // valid while ms value is not greater than 24h
+    return new Date(ms).toISOString().substr(12, 7);
   }
+
+  this.timeFormat = {
+    hour: 'numeric', minute: 'numeric'
+  };
 
   function formatHours(time) {
-    return ('0' + time.getHours()).slice(-2) + ':00';
+    return time.toLocaleTimeString(window.locale, this.timeFormat);
   }
+
+  this.dateTimeFormat = {
+    month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  };
+
   function formatDayHours(time) {
-    return ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth() + 1)).slice(-2) + ' ' + ('0' + time.getHours()).slice(-2) + ':00';
+    return time.toLocaleString(window.locale, this.dateTimeFormat);
   }
 
   return function setup() {

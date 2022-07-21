@@ -487,14 +487,28 @@ window.chat.renderDivider = function(text) {
 }
 
 
+window.chat.timeFormat = {
+  timeStyle: 'short'
+};
+
+window.chat.timeDateFormat = {
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit',
+  hour12: false,
+  fractionalSecondDigits: 3
+};
+
 window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
-  var ta = unixTimeToHHmm(time);
-  var tb = unixTimeToDateTimeString(time, true);
+  var date = new Date(time);
+  var timeLong = date.toLocaleString(window.locale, window.chat.timeDateFormat);
   //add <small> tags around the milliseconds
-  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  var repl = '<small class="milliseconds">$1</small>'.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  timeLong = timeLong.replace(/(\.\d{3})$/, repl);
 
   // help cursor via “#chat time”
-  var t = '<time title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time>';
+  var t = '<time title="' + timeLong + '" data-timestamp="' + time + '">'
+    + date.toLocaleTimeString(window.locale, window.chat.timeFormat)
+    + '</time>';
   if ( msgToPlayer )
   {
     t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';

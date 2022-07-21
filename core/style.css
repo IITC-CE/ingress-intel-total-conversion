@@ -327,11 +327,13 @@ em {
 
 /* time */
 #chat td:first-child, #chatinput td:first-child {
-  width: 44px;
+  width: 55px;
   overflow: hidden;
   padding-left: 2px;
+  padding-right: 2px;
   color: #bbb;
   white-space: nowrap;
+  text-align: right;
 }
 
 #chat time {

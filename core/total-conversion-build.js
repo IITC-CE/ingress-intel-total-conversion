@@ -163,6 +163,9 @@ window.TEAM_ENL = 2;
 window.TEAM_TO_CSS = ['none', 'res', 'enl'];
 window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened'];
 
+// used in time/date formatting routines
+window.locale = navigator.languages.slice();
+
 // STORAGE ///////////////////////////////////////////////////////////
 // global variables used for storage. Most likely READ ONLY. Proper
 // way would be to encapsulate them in an anonymous function and write
