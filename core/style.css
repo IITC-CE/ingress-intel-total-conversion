@@ -1,5 +1,53 @@
 /* general rules ******************************************************/
 
+/* color vars */
+:root {
+  --html-background-color: #0e3d4e;
+  --ui-border-color: #20a8b1;
+  --ui-background-color: rgba(8, 48, 78, 0.9);
+  --ui-background-color-no-alpha: rgb(8, 48, 78);
+  --ui-title-background-color: rgba(8, 60, 78, 0.9);
+  --ui-title-button-background-color: #20a8b1;
+  --ui-title-color: #ffce00;
+  --ui-title-inactive-color: #ffffff;
+
+  --highlight-text-color: #ffce00;
+  --highlight-border-color: #ffce00;
+  --arrow-toggle-color: #ffce00;
+
+  --faction-none-light-color: #ffffff;
+  --faction-res-light-color: #00c5ff;
+  --faction-enl-light-color: #03fe03;
+
+  --faction-none-color: #ff6600;
+  --faction-res-color: #0088ff;
+  --faction-enl-color: #03dc03;
+
+  --level-0-color: #000;
+  --level-1-color: #fece5a;
+  --level-2-color: #ffa630;
+  --level-3-color: #ff7315;
+  --level-4-color: #e40000;
+  --level-5-color: #fd2992;
+  --level-6-color: #eb26cd;
+  --level-7-color: #c124e0;
+  --level-8-color: #9627f4;
+
+  --rarity-common-color: #8cffbf;
+  --rarity-rare-color: #73a8ff;
+  --rarity-very-rare: #b08cff;
+
+  --ui-text-on-color: #03fe03;
+  --ui-text-off-color: #ff4a4a;
+
+  --ui-content-color: #eee;
+  --ui-content-secondary-color: #bbb;
+
+  --input-background-color: rgba(0, 0, 0, 0.3);
+
+  --placeholder-background-color: rgba(0, 0, 0, 0.3);
+}
+
 /* for printing directly from the browser, hide all UI components
  * NOTE: @media needs to be first?
  */
@@ -25,7 +73,7 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden; /* workaround for #373 */
-  background: #0e3d4e;
+  background: var(--html-background-color);
 }
 
 #map {
@@ -69,9 +117,7 @@ i.large { font-size: 6rem; }
 }
 
 #sidebar {
-  background-color: rgba(8, 48, 78, 0.9);
-  border-left: 1px solid #20A8B1;
-  color: #888;
+  border-left: 1px solid;
   position: relative;
   left: 0;
   top: 0;
@@ -89,9 +135,7 @@ i.large { font-size: 6rem; }
   position: absolute;
   top: 108px;
   z-index: 3002;
-  background-color: rgba(8, 48, 78, 0.9);
-  color: #FFCE00;
-  border: 1px solid #20A8B1;
+  border: 1px solid;
   border-right: none;
   border-radius: 5px 0 0 5px;
   text-decoration: none;
@@ -99,11 +143,11 @@ i.large { font-size: 6rem; }
 }
 
 .enl {
-  color: #03fe03 !important;
+  color: var(--faction-enl-light-color) !important;
 }
 
 .res {
-  color: #00c5ff !important;
+  color: var(--faction-res-light-color) !important;
 }
 
 .none {
@@ -115,7 +159,6 @@ i.large { font-size: 6rem; }
 }
 
 a {
-  color: #ffce00;
   cursor: pointer;
   text-decoration: none;
 }
@@ -167,22 +210,10 @@ a:hover {
   width: 0;
 }
 
-/* field mu count */
-.fieldmu {
-  color: #FFCE00;
-  font-size: 13px;
-  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; /*override leaflet-container */
-  text-align: center;
-  text-shadow: 0 0 0.2em black, 0 0 0.2em black, 0 0 0.2em black;
-  pointer-events: none;
-}
-
 
 /* chat ***************************************************************/
 
 #chatcontrols {
-  color: #FFCE00;
-  background: rgba(8, 48, 78, 0.9);
   position: absolute;
   left: 0;
   z-index: 3000;
@@ -202,7 +233,7 @@ a:hover {
   text-align: center;
   height: 24px;
   line-height: 24px;
-  border: 1px solid #20A8B1;
+  border: 1px solid;
   vertical-align: top;
 }
 
@@ -212,26 +243,26 @@ a:hover {
 }
 
 #chatcontrols a.active {
-  border-color: #FFCE00;
+  border-color: var(--highlight-border-color);
   border-bottom-width:0px;
   font-weight:bold;
-  background: rgb(8, 48, 78);
+  background: var(--ui-background-color-no-alpha);
 }
 
 #chatcontrols a.active + a {
-  border-left-color: #FFCE00
+  border-left-color: var(--highlight-border-color)
 }
 
 
 #chatcontrols .toggle {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-bottom: 10px solid #FFCE00;
+  border-bottom: 10px solid var(--arrow-toggle-color);
   margin: 6px auto auto;
 }
 
 #chatcontrols.expand .toggle {
-  border-top: 10px solid #FFCE00;
+  border-top: 10px solid var(--arrow-toggle-color);
   border-bottom: none;
 }
 
@@ -268,10 +299,8 @@ a:hover {
   bottom: 23px;
   left: 0;
   z-index: 3000;
-  background: rgba(8, 48, 78, 0.9);
   line-height: 15px;
-  color: #eee;
-  border: 1px solid #20A8B1;
+  border: 1px solid;
   border-bottom: 0;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -330,7 +359,7 @@ em {
   width: 44px;
   overflow: hidden;
   padding-left: 2px;
-  color: #bbb;
+  color: var(--ui-content-secondary-color);
   white-space: nowrap;
 }
 
@@ -364,7 +393,7 @@ mark {
 
 /* divider */
 summary {
-  color: #bbb;
+  color: var(--ui-content-secondary-color);
   display: inline-block;
   height: 16px;
   overflow: hidden;
@@ -378,10 +407,9 @@ summary {
   bottom: 0;
   left: 0;
   padding: 0 2px;
-  background: rgba(8, 48, 78, 0.9);
   width: 708px;
   height: 23px;
-  border: 1px solid #20A8B1;
+  border: 1px solid;
   z-index: 3001;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -396,7 +424,6 @@ summary {
 
 #chatinput input {
   background: transparent;
-  color: #EEEEEE;
   width: 100%;
   height: 100%;
   padding:3px 4px 1px 4px;
@@ -407,13 +434,11 @@ summary {
 /* sidebar ************************************************************/
 
 #sidebar > * {
-  border-bottom: 1px solid #20A8B1;
+  border-bottom: 1px solid;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-
-
 
 #sidebartoggle .toggle {
   border-bottom: 10px solid transparent;
@@ -421,11 +446,11 @@ summary {
 }
 
 #sidebartoggle .open {
-  border-right: 10px solid #FFCE00;
+  border-right: 10px solid var(--arrow-toggle-color);
 }
 
 #sidebartoggle .close {
-  border-left: 10px solid #FFCE00;
+  border-left: 10px solid var(--arrow-toggle-color);
 }
 
 /* player stats */
@@ -434,7 +459,6 @@ summary {
 }
 
 h2 {
-  color: #ffce00;
   font-size: 21px;
   padding: 0 4px;
   margin: 0;
@@ -470,7 +494,6 @@ h2 #stats {
   position: absolute;
   top: 0;
   right: 0;
-  background-color: rgba(8, 48, 78, 0.5);
   display: none; /* starts hidden */
 }
 #name:hover #signout {
@@ -499,12 +522,12 @@ h2 sup, h2 sub {
 }
 
 #gamestat .res {
-  background: #005684;
+  background: linear-gradient(#0007,#0007) var(--faction-res-color);
   text-align: right;
 }
 
 #gamestat .enl {
-  background: #017f01;
+  background: linear-gradient(#0007,#0007) var(--faction-enl-color);
 }
 
 
@@ -513,8 +536,7 @@ input:not([type]), .input,
 input[type="text"], input[type="password"],
 input[type="number"], input[type="email"],
 input[type="search"], input[type="url"] {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: #ffce00;
+  background-color: var(--input-background-color);
   height: 24px;
   padding:0px 4px 0px 4px;
   font-size: 12px;
@@ -543,7 +565,7 @@ input[type="search"], input[type="url"] {
   background-color: transparent;
 }
 #buttongeolocation:focus {
-  outline: 1px dotted #ffce00;
+  outline: 1px dotted var(--highlight-border-color);
 }
 #buttongeolocation img {
   display: block;
@@ -588,7 +610,7 @@ input[type="search"], input[type="url"] {
   text-decoration: underline;
 }
 #searchwrapper li em {
-  color: #ccc;
+  color: var(--ui-content-secondary-color);
   font-size: 0.9em;
 }
 
@@ -655,7 +677,7 @@ h3.title {
 }
 
 .mods span {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--placeholder-background-color);
   /* can’t use inline-block because Webkit's implementation is buggy and
    * introduces additional margins in random cases. No clear necessary,
    * as that’s solved by setting height on .mods. */
@@ -676,10 +698,10 @@ h3.title {
 }
 
 .res .mods span, .res .meter {
-  border: 1px solid #0076b6;
+  border: 1px solid var(--faction-res-color);
 }
 .enl .mods span, .enl .meter {
-  border: 1px solid #017f01;
+  border: 1px solid var(--faction-enl-color);
 }
 
 /* random details, resonator details */
@@ -754,7 +776,7 @@ h3.title {
 }
 
 .meter {
-  background: #000;
+  background: var(--placeholder-background-color);
   cursor: help;
   display: inline-block;
   height: 18px;
@@ -838,35 +860,31 @@ h3.title {
   top: -2px;
   right: 2px;
   cursor: pointer;
-  color: #FFCE00;
   font-size: 16px;
 }
 
 /* history details */
 #historydetails {
   text-align: center;
-  color: #ffce00;
 }
 
 #historydetails .missing {
 }
 
 #historydetails span {
-  color: #ff4a4a;
+  color: var(--ui-text-off-color);
 }
 
 #historydetails span.completed {
-  color: #03fe03;
+  color: var(--ui-text-on-color);
 }
 
 /* update status */
 #updatestatus {
-  background-color: rgba(8, 48, 78, 0.9);
   border-bottom: 0;
-  border-top: 1px solid #20A8B1;
-  border-left: 1px solid #20A8B1;
+  border-top: 1px solid;
+  border-left: 1px solid;
   bottom: 0;
-  color: #ffce00;
   font-size:13px;
   padding: 4px;
   position: fixed;
@@ -886,7 +904,7 @@ h3.title {
   color: #000000;
   display: inline-block;
   min-width: 1.8em;
-  border: 1px solid #20A8B1;
+  border: 1px solid;
   border-width: 0 1px;
   margin: -4px 0;
   padding: 4px 0.2em;
@@ -897,9 +915,7 @@ h3.title {
 .ui-tooltip, .ui-dialog {
   position: absolute;
   z-index: 9500;
-  background-color: rgba(8, 48, 78, 0.9);
-  border: 1px solid #20A8B1;
-  color: #eee;
+  border: 1px solid;
   font-size: 13px;
   line-height: 15px;
   padding: 2px 4px;
@@ -928,10 +944,6 @@ h3.title {
   z-index: 10002 !important;
 }
 
-.ui-tooltip, .ui-dialog a {
-  color: #FFCE00;
-}
-
 .ui-dialog {
   padding: 0;
   border-radius: 2px;
@@ -946,7 +958,7 @@ h3.title {
   line-height: 15px;
   text-align: center;
   padding: 4px;
-  background-color: rgba(8, 60, 78, 0.9);
+  background-color: var(--ui-title-background-color);
 }
 
 .ui-dialog-title {
@@ -957,11 +969,11 @@ h3.title {
 }
 
 .ui-dialog-title-active {
-  color: #ffce00;
+  color: var(--ui-title-color);
 }
 
 .ui-dialog-title-inactive {
-  color: #ffffff;
+  color: var(--ui-title-inactive-color);
 }
 
 .ui-dialog-titlebar-button {
@@ -973,13 +985,13 @@ h3.title {
   height: 17px;
   top: 3px;
   cursor: pointer;
-  border: 1px solid rgb(32, 168, 177);
+  border: 1px solid;
   background-color: rgba(0, 0, 0, 0);
   padding: 0;
 }
 
 .ui-dialog-titlebar-button:active {
-  background-color: rgb(32, 168, 177);
+  background-color: var(--ui-title-button-background-color);
 }
 
 .ui-dialog-titlebar-button-close {
@@ -995,7 +1007,7 @@ h3.title {
 }
 
 .ui-dialog-titlebar-button-collapse-collapsed {
-  background-color: rgb(32, 168, 177);
+  background-color: var(--ui-title-button-background-color);
 }
 
 .ui-dialog-titlebar-button-collapse::after,
@@ -1008,7 +1020,7 @@ h3.title {
   width: 11px;
   margin-left: -6px;
   height: 0;
-  border-top: 2px solid rgb(32, 168, 177);
+  border-top: 2px;
 }
 .ui-dialog-titlebar-button-close::after {
   transform: translateY(3.5px) rotate(45deg);
@@ -1024,7 +1036,7 @@ h3.title {
 .ui-dialog-titlebar-button.ui-dialog-titlebar-button-collapse-collapsed::before,
 .ui-dialog-titlebar-button:active::after,
 .ui-dialog-titlebar-button:active::before {
-  border-top-color: rgba(8, 60, 78, 0.9);
+  border-top-color: var(--ui-title-background-color);
 }
 
 .ui-dialog-content {
@@ -1055,7 +1067,7 @@ h3.title {
 
 .ui-dialog-buttonpane {
   padding: 6px;
-  border-top: 1px solid #20A8B1;
+  border-top: 1px solid;
 }
 
 .ui-dialog-buttonset {
@@ -1066,9 +1078,7 @@ h3.title {
 .ui-dialog-content button {
   padding: 2px;
   min-width: 40px;
-  color: #FFCE00;
-  border: 1px solid #FFCE00;
-  background-color: rgba(8, 48, 78, 0.9);
+  border: 1px solid var(--highlight-border-color);
 }
 
 .ui-dialog-buttonset button:hover {
@@ -1145,11 +1155,11 @@ td + td {
 }
 
 .RESISTANCE {
-  color: #00c2ff;
+  color: var(--faction-res-light-color);
 }
 
 .ALIENS, .ENLIGHTENED {
-  color: #28f428;
+  color: var(--faction-enl-light-color);
 }
 
 #portal_highlight_select {
@@ -1158,9 +1168,7 @@ td + td {
   left:10px;
   z-index: 2500;
   font-size:11px;
-  background-color:#0E3C46;
-  color:#ffce00;
-
+  background-color: inherit;
 }
 
 
@@ -1185,10 +1193,6 @@ td + td {
 
 
 /** artifact dialog *****************/
-table.artifact tr > * {
-  background: rgba(8, 48, 78, 0.9);
-}
-
 table.artifact td.info {
   min-width: 110px; /* min-width for info column, to ensure really long portal names don't crowd things out */
 }
@@ -1206,13 +1210,12 @@ table.artifact .portal {
 #map .leaflet-popup-content-wrapper {
   border-radius: 0px;
   -webkit-border-radius: 0px;
-  border: 1px solid #20A8B1;
-  background: #0e3d4e;
+  border: 1px solid;
+  background: var(--html-background-color);
   pointer-events: auto;
 }
 
 #map .leaflet-popup-content {
-  color: #ffce00;
   margin: 5px 8px;
 }
 
@@ -1228,7 +1231,7 @@ table.artifact .portal {
 
 #map .leaflet-popup-tip {
   /* change the tip from an arrow to a simple line */
-  background: #20A8B1;
+  background: var(--ui-border-color);
   width: 1px;
   height: 20px;
   padding: 0;
@@ -1243,19 +1246,17 @@ table.artifact .portal {
 
 /* misc */
 .layer_off_warning {
-  color: #FFCE00;
   margin: 8px;
   text-align: center;
 }
 
 /* region scores */
 .cellscore .ui-accordion-header, .cellscore .ui-accordion-content {
-	border: 1px solid #20a8b1;
+	border: 1px solid;
 	margin-top: -1px;
 	display: block;
 }
 .cellscore .ui-accordion-header {
-	color: #ffce00;
 	outline: none
 }
 .cellscore .ui-accordion-header:before {
@@ -1337,7 +1338,7 @@ g.checkpoint:hover circle {
 /* tabs */
 .ui-tabs-nav {
 	display: block;
-	border-bottom: 1px solid #20a8b1;
+	border-bottom: 1px solid;
 	border-top: 1px solid transparent;
 	margin: 3px 0 0;
 	padding: 0;
@@ -1354,7 +1355,7 @@ g.checkpoint:hover circle {
 	display: block;
 	float:left;
 	margin: 0 0 -1px;
-	border: 1px solid #20a8b1;
+	border: 1px solid;
 }
 .ui-tabs-nav li.ui-tabs-active {
 	border-bottom-color: #0F2C3F;
@@ -1395,4 +1396,66 @@ svg.icon-button {
 .leaflet-marker-icon > svg {
 	height: inherit;
 	width: inherit;
+}
+
+/* border ui */
+.ui-tooltip, .ui-dialog,
+.ui-dialog-titlebar-button,
+.ui-dialog-titlebar-button-collapse::after,
+.ui-dialog-titlebar-button-close::after,
+.ui-dialog-titlebar-button-close::before,
+.ui-dialog-buttonpane,
+.ui-tabs-nav, .ui-tabs-nav li,
+#map .leaflet-popup-content-wrapper,
+.cellscore .ui-accordion-header, .cellscore .ui-accordion-content,
+#sidebar, #sidebar > *,
+#sidebartoggle,
+#updatestatus,
+#loadlevel,
+#chat,
+#chatinput,
+#chatcontrols a {
+  border-color: var(--ui-border-color);
+}
+
+/* highilight */
+a, h2, input:not([type]), .input,
+input[type="text"], input[type="password"],
+input[type="number"], input[type="email"],
+input[type="search"], input[type="url"],
+#chatcontrols,
+#sidebartoggle,
+#portaldetails .close,
+#historydetails,
+#updatestatus,
+#portal_highlight_select,
+.ui-tooltip, .ui-dialog a,
+.ui-dialog-buttonset button,
+.ui-dialog-content button,
+#map .leaflet-popup-content,
+.layer_off_warning,
+.cellscore .ui-accordion-header {
+  color: var(--highlight-text-color);
+}
+
+/* ui background */
+#sidebar,
+#sidebartoggle,
+#chatcontrols,
+#chat,
+#chatinput,
+#updatestatus,
+.ui-tooltip, .ui-dialog,
+.ui-dialog-buttonset button,
+.ui-dialog-content button,
+table.artifact tr > * {
+  background-color: var(--ui-background-color);
+}
+
+/* ui content color */
+#sidebar,
+#chat,
+#chatinput input,
+.ui-tooltip, .ui-dialog {
+  color: var(--ui-content-color);
 }
