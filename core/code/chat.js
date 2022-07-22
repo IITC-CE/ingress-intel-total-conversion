@@ -76,18 +76,21 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     // after the request is finished – i.e. there would be one almost
     // useless request.
     chat._faction.data = {};
+    chat._faction.guids = [];
     chat._faction.oldestTimestamp = -1;
     chat._faction.newestTimestamp = -1;
     delete chat._faction.oldestGUID;
     delete chat._faction.newestGUID;
 
     chat._public.data = {};
+    chat._public.guids = [];
     chat._public.oldestTimestamp = -1;
     chat._public.newestTimestamp = -1;
     delete chat._public.oldestGUID;
     delete chat._public.newestGUID;
 
     chat._alerts.data = {};
+    chat._alerts.guids = [];
     chat._alerts.oldestTimestamp = -1;
     chat._alerts.newestTimestamp = -1;
     delete chat._alerts.oldestGUID;
@@ -99,7 +102,6 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
   var ne = b.getNorthEast();
   var sw = b.getSouthWest();
   var data = {
-//    desiredNumItems: isFaction ? CHAT_FACTION_ITEMS : CHAT_PUBLIC_ITEMS ,
     minLatE6: Math.round(sw.lat*1E6),
     minLngE6: Math.round(sw.lng*1E6),
     maxLatE6: Math.round(ne.lat*1E6),
@@ -107,9 +109,9 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     minTimestampMs: -1,
     maxTimestampMs: -1,
     tab: channel,
-  }
+  };
 
-  if(getOlderMsgs) {
+  if (getOlderMsgs) {
     // ask for older chat when scrolling up
     data = $.extend(data, {
       maxTimestampMs: storageHash.oldestTimestamp,
@@ -119,18 +121,14 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     // ask for newer chat
     var min = storageHash.newestTimestamp;
     // the initial request will have both timestamp values set to -1,
-    // thus we receive the newest desiredNumItems. After that, we will
-    // only receive messages with a timestamp greater or equal to min
-    // above.
+    // thus we receive the newest 50. After that, we will only receive
+    // messages with a timestamp greater or equal to min above.
     // After resuming from idle, there might be more new messages than
     // desiredNumItems. So on the first request, we are not really up to
     // date. We will eventually catch up, as long as there are less new
-    // messages than desiredNumItems per each refresh cycle.
+    // messages than 50 per each refresh cycle.
     // A proper solution would be to query until no more new results are
-    // returned. Another way would be to set desiredNumItems to a very
-    // large number so we really get all new messages since the last
-    // request. Setting desiredNumItems to -1 does unfortunately not
-    // work.
+    // returned.
     // Currently this edge case is not handled. Let’s see if this is a
     // problem in crowded areas.
     $.extend(data, {
@@ -142,7 +140,7 @@ window.chat.genPostData = function(channel, storageHash, getOlderMsgs) {
     if (min > -1) $.extend(data, {ascendingTimestampOrder: true});
   }
   return data;
-}
+};
 
 
 
@@ -169,7 +167,7 @@ window.chat.requestFaction = function(getOlderMsgs, isRetry) {
 }
 
 
-window.chat._faction = {data:{}, oldestTimestamp:-1, newestTimestamp:-1};
+window.chat._faction = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
 window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
   chat._requestFactionRunning = false;
   $("#chatcontrols a:contains('faction')").removeClass('loading');
@@ -196,7 +194,7 @@ window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
 }
 
 window.chat.renderFaction = function(oldMsgsWereAdded) {
-  chat.renderData(chat._faction.data, 'chatfaction', oldMsgsWereAdded);
+  chat.renderData(chat._faction.data, 'chatfaction', oldMsgsWereAdded, chat._faction.guids);
 }
 
 
@@ -222,7 +220,7 @@ window.chat.requestPublic = function(getOlderMsgs, isRetry) {
   );
 }
 
-window.chat._public = {data:{}, oldestTimestamp:-1, newestTimestamp:-1};
+window.chat._public = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
 window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
   chat._requestPublicRunning = false;
   $("#chatcontrols a:contains('all')").removeClass('loading');
@@ -250,7 +248,7 @@ window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
 }
 
 window.chat.renderPublic = function(oldMsgsWereAdded) {
-  chat.renderData(chat._public.data, 'chatall', oldMsgsWereAdded);
+  chat.renderData(chat._public.data, 'chatall', oldMsgsWereAdded, chat._public.guids);
 }
 
 
@@ -277,7 +275,7 @@ window.chat.requestAlerts = function(getOlderMsgs, isRetry) {
 }
 
 
-window.chat._alerts = {data:{}, oldestTimestamp:-1, newestTimestamp:-1};
+window.chat._alerts = {data:{}, guids: [], oldestTimestamp:-1, newestTimestamp:-1};
 window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
   chat._requestAlertsRunning = false;
   $("#chatcontrols a:contains('alerts')").removeClass('loading');
@@ -293,14 +291,14 @@ window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
   chat.writeDataToHash(data, chat._alerts, undefined, olderMsgs, ascendingTimestampOrder); //NOTE: isPublic passed as undefined - it's nether public or private!
   var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
 
-// no hoot for alerts - API change planned here...
-//  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
+  // hook for alerts - API change planned here for next refactor
+  runHooks('alertsChatDataAvailable', {raw: data, result: data.result, processed: chat._alerts.data});
 
   window.chat.renderAlerts(oldMsgsWereAdded);
 }
 
 window.chat.renderAlerts = function(oldMsgsWereAdded) {
-  chat.renderData(chat._alerts.data, 'chatalerts', oldMsgsWereAdded);
+  chat.renderData(chat._alerts.data, 'chatalerts', oldMsgsWereAdded, chat._alerts.guids);
 }
 
 
@@ -309,9 +307,15 @@ window.chat.renderAlerts = function(oldMsgsWereAdded) {
 // common
 //
 
+window.chat.addNickname= function(nick) {
+  var c = document.getElementById("chattext");
+  c.value = [c.value.trim(), nick].join(" ").trim() + " ";
+  c.focus()
+}
+
 window.chat.nicknameClicked = function(event, nickname) {
   var hookData = { event: event, nickname: nickname };
-  
+
   if (window.runHooks('nicknameClicked', hookData)) {
     window.chat.addNickname('@' + nickname);
   }
@@ -321,10 +325,9 @@ window.chat.nicknameClicked = function(event, nickname) {
   return false;
 }
 
-window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
-
+window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAscendingOrder) {
+  // track oldest + newest timestamps/GUID
   if (newData.result.length > 0) {
-    //track oldest + newest timestamps/GUID
     var first = {
       guid: newData.result[0][0],
       time: newData.result[0][1]
@@ -339,184 +342,311 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
       last = temp;
     }
     if (storageHash.oldestTimestamp === -1 || storageHash.oldestTimestamp >= last.time) {
-      if (isOlderMsgs || storageHash.oldestTimestamp != last.time) {
+      if (isOlderMsgs || storageHash.oldestTimestamp !== last.time) {
         storageHash.oldestTimestamp = last.time;
         storageHash.oldestGUID = last.guid;
       }
     }
     if (storageHash.newestTimestamp === -1 || storageHash.newestTimestamp <= first.time) {
-      if (!isOlderMsgs || storageHash.newestTimestamp != first.time) {
+      if (!isOlderMsgs || storageHash.newestTimestamp !== first.time) {
         storageHash.newestTimestamp = first.time;
         storageHash.newestGUID = first.guid;
       }
     }
   }
-  $.each(newData.result, function(ind, json) {
-    // avoid duplicates
-    if(json[0] in storageHash.data) return true;
+};
 
-    var isSecureMessage = false;
-    var msgToPlayer = false;
+window.chat.parseMsgData = function(data) {
+  var categories = data[2].plext.categories;
+  var isPublic = (categories & 1) === 1;
+  var isSecure = (categories & 2) === 2;
+  var msgAlert = (categories & 4) === 4;
 
-    var time = json[1];
-    var team = json[2].plext.team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
-    var auto = json[2].plext.plextType !== 'PLAYER_GENERATED';
-    var systemNarrowcast = json[2].plext.plextType === 'SYSTEM_NARROWCAST';
+  var msgToPlayer = msgAlert && (isPublic || isSecure);
 
-    //remove "Your X on Y was destroyed by Z" from the faction channel
-//    if (systemNarrowcast && !isPublicChannel) return true;
+  var time = data[1];
+  var team = data[2].plext.team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
+  var auto = data[2].plext.plextType !== 'PLAYER_GENERATED';
+  var systemNarrowcast = data[2].plext.plextType === 'SYSTEM_NARROWCAST';
 
-    var msg = '', nick = '';
-    $.each(json[2].plext.markup, function(ind, markup) {
-      switch(markup[0]) {
-      case 'SENDER': // user generated messages
-        nick = markup[1].plain.slice(0, -2); // cut “: ” at end
-        break;
+  var markup = data[2].plext.markup;
 
-      case 'PLAYER': // automatically generated messages
-        nick = markup[1].plain;
-        team = markup[1].team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
-        if(ind > 0) msg += nick; // don’t repeat nick directly
-        break;
+  var nick = '';
+  markup.forEach(function(ent) {
+    switch (ent[0]) {
+    case 'SENDER': // user generated messages
+      nick = ent[1].plain.replace(/: $/, ''); // cut “: ” at end
+      break;
 
-      case 'TEXT':
-        msg += $('<div/>').text(markup[1].plain).html().autoLink();
-        break;
+    case 'PLAYER': // automatically generated messages
+      nick = ent[1].plain;
+      team = ent[1].team === 'RESISTANCE' ? TEAM_RES : TEAM_ENL;
+      break;
 
-      case 'AT_PLAYER':
-        var thisToPlayer = (markup[1].plain == ('@'+window.PLAYER.nickname));
-        var spanClass = thisToPlayer ? "pl_nudge_me" : (markup[1].team + " pl_nudge_player");
-        var atPlayerName = markup[1].plain.replace(/^@/, "");
-        msg += $('<div/>').html($('<span/>')
-                          .attr('class', spanClass)
-                          .attr('onclick',"window.chat.nicknameClicked(event, '"+atPlayerName+"')")
-                          .text(markup[1].plain)).html();
-        msgToPlayer = msgToPlayer || thisToPlayer;
-        break;
-
-      case 'PORTAL':
-        var lat = markup[1].latE6/1E6, lng = markup[1].lngE6/1E6;
-        var perma = window.makePermalink([lat,lng]);
-        var js = 'window.selectPortalByLatLng('+lat+', '+lng+');return false';
-
-        msg += '<a onclick="'+js+'"'
-          + ' title="'+markup[1].address+'"'
-          + ' href="'+perma+'" class="help">'
-          + window.chat.getChatPortalName(markup[1])
-          + '</a>';
-        break;
-
-      case 'SECURE':
-        //NOTE: we won't add the '[secure]' string here - it'll be handled below instead
-        isSecureMessage = true;
-        break;
-
-      default:
-        //handle unknown types by outputting the plain text version, marked with it's type
-        msg += $('<div/>').text(markup[0]+':<'+markup[1].plain+'>').html();
-        break;
-      }
-    });
-
-
-//    //skip secure messages on the public channel
-//    if (isPublicChannel && isSecureMessage) return true;
-
-//    //skip public messages (e.g. @player mentions) on the secure channel
-//    if ((!isPublicChannel) && (!isSecureMessage)) return true;
-
-
-    //NOTE: these two are redundant with the above two tests in place - but things have changed...
-    //from the server, private channel messages are flagged with a SECURE string '[secure] ', and appear in
-    //both the public and private channels
-    //we don't include this '[secure]' text above, as it's redundant in the faction-only channel
-    //let's add it here though if we have a secure message in the public channel, or the reverse if a non-secure in the faction one
-    if (!auto && !(isPublicChannel===false) && isSecureMessage) msg = '<span style="color: #f88; background-color: #500;">[faction]</span> ' + msg;
-    //and, add the reverse - a 'public' marker to messages in the private channel
-    if (!auto && !(isPublicChannel===true) && (!isSecureMessage)) msg = '<span style="color: #ff6; background-color: #550">[public]</span> ' + msg;
-
-
-    // format: timestamp, autogenerated, HTML message
-    storageHash.data[json[0]] = [json[1], auto, chat.renderMsg(msg, nick, time, team, msgToPlayer, systemNarrowcast), nick];
-
+    default:
+      break;
+    }
   });
-}
+
+  return {
+    guid: data[0],
+    time: time,
+    public: isPublic,
+    secure: isSecure,
+    alert: msgAlert,
+    msgToPlayer: msgToPlayer,
+    type: data[2].plext.plextType,
+    narrowcast: systemNarrowcast,
+    auto: auto,
+    player: {
+      name: nick,
+      team: team,
+    },
+    markup: markup,
+  };
+};
+
+window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
+  window.chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
+
+  newData.result.forEach(function(json) {
+    // avoid duplicates
+    if (json[0] in storageHash.data) {
+      return true;
+    }
+
+    var parsedData = chat.parseMsgData(json);
+
+    // format: timestamp, autogenerated, HTML message, nick, additional data (parsed, plugin specific data...)
+    storageHash.data[parsedData.guid] = [parsedData.time, parsedData.auto, chat.renderMsgRow(parsedData), parsedData.player.name, parsedData];
+    if (isAscendingOrder) {
+      storageHash.guids.push(parsedData.guid);
+    } else {
+      storageHash.guids.unshift(parsedData.guid);
+    }
+  });
+};
+
+//
+// Rendering primitive for markup, chat cells (td) and chat row (tr)
+//
+
+window.chat.renderText = function (text) {
+  return $('<div>').text(text.plain).html().autoLink();
+};
 
 // Override portal names that are used over and over, such as 'US Post Office'
 window.chat.getChatPortalName = function(markup) {
   var name = markup.name;
-  if(name === 'US Post Office') {
+  if (name === 'US Post Office') {
     var address = markup.address.split(',');
     name = 'USPS: ' + address[0];
   }
   return name;
-}
+};
 
-// renders data from the data-hash to the element defined by the given
-// ID. Set 3rd argument to true if it is likely that old data has been
-// added. Latter is only required for scrolling.
-window.chat.renderData = function(data, element, likelyWereOldMsgs) {
-  var elm = $('#'+element);
-  if(elm.is(':hidden')) return;
+window.chat.renderPortal = function (portal) {
+  var lat = portal.latE6/1E6, lng = portal.lngE6/1E6;
+  var perma = window.makePermalink([lat,lng]);
+  var js = 'window.selectPortalByLatLng('+lat+', '+lng+');return false';
+  return '<a onclick="'+js+'"'
+    + ' title="'+portal.address+'"'
+    + ' href="'+perma+'" class="help">'
+    + window.chat.getChatPortalName(portal)
+    + '</a>';
+};
 
-  // discard guids and sort old to new
-//TODO? stable sort, to preserve server message ordering? or sort by GUID if timestamps equal?
-  var vals = $.map(data, function(v, k) { return [v]; });
-  vals = vals.sort(function(a, b) { return a[0]-b[0]; });
+window.chat.renderFactionEnt = function (faction) {
+  var name = faction.team === 'ENLIGHTENED' ? 'Enlightened' : 'Resistance';
+  var spanClass = faction.team === 'ENLIGHTENED' ? TEAM_TO_CSS[TEAM_ENL] : TEAM_TO_CSS[TEAM_RES];
+  return $('<div>').html($('<span>')
+    .attr('class', spanClass)
+    .text(name)).html();
+};
 
-  // render to string with date separators inserted
-  var msgs = '';
-  var prevTime = null;
-  $.each(vals, function(ind, msg) {
-    var nextTime = new Date(msg[0]).toLocaleDateString();
-    if(prevTime && prevTime !== nextTime)
-      msgs += chat.renderDivider(nextTime);
-    msgs += msg[2];
-    prevTime = nextTime;
+window.chat.renderPlayer = function (player, at, sender) {
+  var name = player.plain;
+  if (sender) {
+    name = player.plain.replace(/: $/, '');
+  } else if (at) {
+    name = player.plain.replace(/^@/, '');
+  }
+  var thisToPlayer = name === window.PLAYER.nickname;
+  var spanClass = thisToPlayer ? 'pl_nudge_me' : (player.team + ' pl_nudge_player');
+  return $('<div>').html($('<span>')
+    .attr('class', spanClass)
+    .attr('onclick',"window.chat.nicknameClicked(event, '"+name+"')")
+    .text((at ? '@' : '') + name)).html();
+};
+
+window.chat.renderMarkupEntity = function (ent) {
+  switch (ent[0]) {
+  case 'TEXT':
+    return chat.renderText(ent[1]);
+  case 'PORTAL':
+    return chat.renderPortal(ent[1]);
+  case 'FACTION':
+    return chat.renderFactionEnt(ent[1]);
+  case 'SENDER':
+    return chat.renderPlayer(ent[1], false, true);
+  case 'PLAYER':
+    return chat.renderPlayer(ent[1]);
+  case 'AT_PLAYER':
+    return chat.renderPlayer(ent[1], true);
+  default:
+  }
+  return $('<div>').text(ent[0]+':<'+ent[1].plain+'>').html();
+};
+
+window.chat.renderMarkup = function (markup) {
+  var msg = '';
+  markup.forEach(function(ent, ind) {
+    switch (ent[0]) {
+    case 'SENDER':
+    case 'SECURE':
+      // skip as already handled
+      break;
+
+    case 'PLAYER': // automatically generated messages
+      if (ind > 0) msg += chat.renderMarkupEntity(ent); // don’t repeat nick directly
+      break;
+
+    default:
+      // add other enitities whatever the type
+      msg += chat.renderMarkupEntity(ent);
+      break;
+    }
   });
+  return msg;
+};
 
-  var scrollBefore = scrollBottom(elm);
-  elm.html('<table>' + msgs + '</table>');
-  chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
-}
+window.chat.renderTimeCell = function(time, classNames) {
+  var ta = unixTimeToHHmm(time);
+  var tb = unixTimeToDateTimeString(time, true);
+  // add <small> tags around the milliseconds
+  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+  return '<td><time class="' + classNames + '" title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time></td>';
+};
 
+window.chat.renderNickCell = function(nick, classNames) {
+  var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
+  return '<td>'+i[0]+'<mark class="' + classNames + '">'+ nick+'</mark>'+i[1]+'</td>';
+};
 
-window.chat.renderDivider = function(text) {
-  var d = ' ──────────────────────────────────────────────────────────────────────────';
-  return '<tr><td colspan="3" style="padding-top:3px"><summary>─ ' + text + d + '</summary></td></tr>';
-}
+window.chat.renderMsgCell = function(msg, classNames) {
+  return '<td class="' + classNames + '">'+msg+'</td>';
+};
 
+window.chat.renderMsgRow = function(data) {
+  var timeClass = (data.msgToPlayer) ? 'pl_nudge_date' : '';
+  var timeCell = chat.renderTimeCell(data.time, timeClass);
 
+  var nickClasses = ['nickname'];
+  if (data.player.team === TEAM_ENL || data.player.team === TEAM_RES) {
+    nickClasses.push(TEAM_TO_CSS[data.player.team]);
+  }
+  // highlight things said/done by the player in a unique colour
+  // (similar to @player mentions from others in the chat text itself)
+  if (data.player.name === window.PLAYER.nickname) {
+    nickClasses.push('pl_nudge_me');
+  }
+  var nickCell = chat.renderNickCell(data.player.name, nickClasses.join(' '));
+
+  var msg = chat.renderMarkup(data.markup);
+  var msgClass = data.narrowcast ? 'system_narrowcast' : '';
+  var msgCell = chat.renderMsgCell(msg, msgClass);
+
+  var className = '';
+  if (!data.auto && data.public) {
+    className = 'public';
+  } else if (!data.auto && data.secure) {
+    className = 'faction';
+  }
+  return '<tr data-guid="' + data.guid + '" class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
+};
+
+// legacy rendering, not used internaly, but left there for backward compatibilty in case a plugin uses it directly
 window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
   var ta = unixTimeToHHmm(time);
   var tb = unixTimeToDateTimeString(time, true);
-  //add <small> tags around the milliseconds
-  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  // add <small> tags around the milliseconds
+  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 
   // help cursor via “#chat time”
   var t = '<time title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time>';
-  if ( msgToPlayer )
-  {
+  if (msgToPlayer) {
     t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';
   }
-  if (systemNarrowcast)
-  {
+  if (systemNarrowcast) {
     msg = '<div class="system_narrowcast">' + msg + '</div>';
   }
   var color = COLORS[team];
-  if (nick === window.PLAYER.nickname) color = '#fd6';    //highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
+  // highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
+  if (nick === window.PLAYER.nickname) {
+    color = '#fd6';
+  }
   var s = 'style="cursor:pointer; color:'+color+'"';
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
   return '<tr><td>'+t+'</td><td>'+i[0]+'<mark class="nickname" ' + s + '>'+ nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
 }
 
-window.chat.addNickname= function(nick) {
-  var c = document.getElementById("chattext");
-  c.value = [c.value.trim(), nick].join(" ").trim() + " ";
-  c.focus()
-}
+window.chat.renderDivider = function(text) {
+  return '<tr class="divider"><td><hr></td><td>' + text + '</td><td><hr></td></tr>';
+};
 
+// renders data from the data-hash to the element defined by the given
+// ID. Set 3rd argument to true if it is likely that old data has been
+// added. Latter is only required for scrolling.
+window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
+  var elm = $('#'+element);
+  if (elm.is(':hidden')) {
+    return;
+  }
 
+  // if sortedGuids is not specified (legacy), sort old to new
+  // (disregarding server order)
+  var vals = sortedGuids;
+  if (vals === undefined) {
+    vals = $.map(data, function(v, k) { return [[v[0], k]]; });
+    vals = vals.sort(function(a, b) { return a[0]-b[0]; });
+    vals = vals.map(function(v) { return v[1]; });
+  }
+
+  // render to string with date separators inserted
+  var msgs = '';
+  var prevTime = null;
+  vals.forEach(function(guid) {
+    var msg = data[guid];
+    var nextTime = new Date(msg[0]).toLocaleDateString();
+    if (prevTime && prevTime !== nextTime) {
+      msgs += chat.renderDivider(nextTime);
+    }
+    msgs += msg[2];
+    prevTime = nextTime;
+  });
+
+  var firstRender = elm.is(':empty');
+  var scrollBefore = scrollBottom(elm);
+  elm.html('<table>' + msgs + '</table>');
+
+  if (firstRender) {
+    elm.data('needsScrollTop', 99999999);
+  } else {
+    chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
+  }
+
+  if(elm.data('needsScrollTop')) {
+    elm.data('ignoreNextScroll', true);
+    elm.scrollTop(elm.data('needsScrollTop'));
+    elm.data('needsScrollTop', null);
+  }
+};
 
 
 window.chat.getActive = function() {
@@ -600,11 +730,12 @@ window.chat.needMoreMessages = function() {
   var hasScrollbar = scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
   var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
   if(hasScrollbar && !nearTop) return;
-  
-  if(activeTab === 'faction')
+
+  if(activeTab === 'faction') {
     chat.requestFaction(true);
-  else
+  } else {
     chat.requestPublic(true);
+  }
 };
 
 
@@ -658,12 +789,6 @@ window.chat.chooseTab = function(tab) {
 
     default:
       throw new Error('chat.chooser was asked to handle unknown button: ' + tt);
-  }
-
-  if(elm.data('needsScrollTop')) {
-    elm.data('ignoreNextScroll', true);
-    elm.scrollTop(elm.data('needsScrollTop'));
-    elm.data('needsScrollTop', null);
   }
 }
 
