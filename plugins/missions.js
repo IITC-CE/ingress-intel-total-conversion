@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.2.2
+// @version        0.3.0
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 var MissionOrder = {
@@ -136,7 +136,10 @@ window.plugin.missions = {
   },
 
   openPortalMissions: function () {
-    this.loadPortalMissions(window.selectedPortal, function (missions) {
+
+    let selectedPortalGuid = window.selectedPortal;
+
+    this.loadPortalMissions(selectedPortalGuid, function(missions) {
       if (!missions.length) {
         return;
       }
@@ -144,7 +147,8 @@ window.plugin.missions = {
       if (missions.length === 1) {
         this.loadMission(missions[0].guid, this.showMissionDialog.bind(this));
       } else {
-        this.showMissionListDialog(missions);
+        let selectedPortal = window.portals[selectedPortalGuid];
+        this.showMissionListDialog(missions, 'Missions at ' + selectedPortal.options.data.title, true);
       }
     }.bind(this));
   },
@@ -228,18 +232,115 @@ window.plugin.missions = {
     }
   },
 
-  showMissionListDialog: function (missions) {
-    window.dialog({
-      html: this.renderMissionList(missions),
-      height: 'auto',
-      width: '400px',
-      collapseCallback: this.collapseFix,
-      expandCallback: this.collapseFix,
-    }).dialog('option', 'buttons', {
-      'Create new mission': function () { open('//missions.ingress.com'); },
-      'OK': function () { $(this).dialog('close'); },
-    });
-  },
+	showMissionListDialog: function(missions, caption, isPortalList) {
+		this.isShowingPortalList = isPortalList;
+
+		// Check whether dialog is already open
+		let openDialog = window.DIALOGS['dialog-missionsList'];
+		if (openDialog) {
+			// Dialog already there, expand if collapsed
+			if (plugin.missions.isMissionListCollapsed) {
+				let dia = $(openDialog).closest('.ui-dialog');
+				let button = dia.find('.ui-dialog-titlebar-button-collapse');
+				if (button) {
+					$(button).click();
+				}
+			}
+		} else {
+			// If dialog is not open, open it
+			window.dialog({
+				id: 'missionsList',
+				html: this.renderMissionList(missions),
+				height: 'auto',
+				width: '400px',
+				collapseCallback: this.onCollapseMissionList,
+				expandCallback: this.onExpandMissionList,
+				dragStop: this.resizeMissionList,
+				title: caption,
+				buttons: [
+					{
+						text: "Create new mission",
+						click: function() {
+							open('https://missions.ingress.com/');
+						}
+					},
+					{
+						text: "Ok",
+						click: function() {
+							$(this).dialog('close');
+						}
+					},
+					{
+						text: "Missions in view",
+						css: {float: "left", "margin-right": "2px"},
+						click: function() {
+							plugin.missions.openTopMissions();
+						},
+						create: function() {
+							// Store a link to the button so that we can hide or show it.
+							plugin.missions.fromPortalListToNormalListButton = this;
+						}
+					}
+				]
+			});
+
+			this.isMissionListCollapsed = false;
+		}
+
+		// Dialog will be open now
+		openDialog = window.DIALOGS['dialog-missionsList'];
+
+		// Set content and title
+		$(openDialog)
+     .html(this.renderMissionList(missions))
+		 .dialog({title: caption});
+
+		// When showing list for one portal, show button to switch back to general list, otherwise hide it
+    $(plugin.missions.fromPortalListToNormalListButton)[isPortalList ? 'show' : 'hide']();
+
+		this.resizeMissionList();
+	},
+
+	onCollapseMissionList: function() {
+		plugin.missions.isMissionListCollapsed = true;
+		plugin.missions.collapseFix();
+	},
+
+	onExpandMissionList: function() {
+		plugin.missions.isMissionListCollapsed = false;
+		plugin.missions.collapseFix();
+
+		// When showing missions in View and not portal mission list, refresh list now
+		if (!plugin.missions.isShowingPortalList) {
+			plugin.missions.openTopMissions();
+		}
+	},
+
+	resizeMissionList: function() {
+		if (!plugin.missions.isMissionListCollapsed) {
+			let openDialog = window.DIALOGS['dialog-missionsList'];
+
+			if (openDialog) {
+				// Make dialog choose height automatically based on content first
+				// A few lines down we will restrict height to fit the screen
+				$(openDialog).dialog({height: 'auto'});
+
+				// Restrict height of dialog to fit the screen
+        let dialogHeight = $(openDialog).parent().height();
+        let dialogTop = $(openDialog).parent().offset().top;
+        let mapHeight = map.getSize().y;
+
+				if (dialogTop + dialogHeight > mapHeight) {
+					let newHeight = mapHeight - dialogTop;
+					newHeight = Math.max(newHeight, 100);
+
+					$(openDialog).dialog({
+						height: newHeight
+					});
+				}
+			}
+		}
+	},
 
   collapseFix: function () {
     if (this && this.parentNode) {
@@ -275,7 +376,7 @@ window.plugin.missions = {
         }
         return;
       }
-      callback(missions);
+      callback(missions, "Missions in View");
     }, function (error) {
       console.error('Error loading missions in bounds', arguments);
       if (errorcallback) {
@@ -358,6 +459,20 @@ window.plugin.missions = {
 
   renderMissionList: function (missions) {
     var container = document.createElement('div');
+
+    // Sort by name
+    function compare(a, b) {
+      if (a.title < b.title) {
+        return -1;
+      }
+      if (a.title > b.title) {
+        return 1;
+      }
+      return 0;
+    }
+
+    missions.sort(compare);
+
     missions.forEach(function (mission) {
       container.appendChild(this.renderMissionSummary(mission));
     }, this);
@@ -603,8 +718,8 @@ window.plugin.missions = {
     for (var i = 0; i < resCount; i++) {
       var resonator = container.appendChild(document.createElement('div'));
       /* Firefox supports transform* without vendor prefix, but Android does not yet */
-      resonator.style.transform = 'rotate(' + i * 45 + 'deg)';
       resonator.style.webkitTransform = 'rotate(' + i * 45 + 'deg)';
+      resonator.style.transform = 'rotate(' + i * 45 + 'deg)';
     }
     return container;
   },
@@ -720,6 +835,8 @@ window.plugin.missions = {
     this.loadLocal('checkedWaypoints');
     this.loadLocal('checkedWaypointsUpdateQueue');
     this.loadLocal('checkedWaypointsUpdatingQueue');
+
+    this.autoRefreshOnMoveEnd = true;
   },
 
   loadLocal: function (key) {
@@ -932,12 +1049,25 @@ window.plugin.missions = {
   },
 
   onPaneChanged: function (pane) {
-    if (pane == 'plugin-missions') {
+    if (pane === 'plugin-missions') {
       document.body.appendChild(this.mobilePane);
     } else if (this.mobilePane.parentNode) {
       this.mobilePane.parentNode.removeChild(this.mobilePane);
     }
   },
+
+	onMoveEnd: function() {
+		// When autorefresh is enabled (currently always)
+		// and not showing mission list of one portal
+		// and window not collapsed
+		if (this.autoRefreshOnMoveEnd && !this.isShowingPortalList && !this.isMissionListCollapsed) {
+			// and if dialog is visible
+			if (window.DIALOGS['dialog-missionsList']) {
+				// then refresh the mission list
+				this.openTopMissions();
+			}
+		}
+	},
 
   onSearch: function (query) {
     var self = this;
@@ -1029,7 +1159,7 @@ window.plugin.missions = {
 
       var button = this.mobilePane.appendChild(document.createElement('button'));
       button.textContent = 'Missions in view';
-      button.addEventListener('click', function () { this.openTopMissions(); }.bind(this), false);
+      button.addEventListener('click', function() { this.openTopMissions(); }.bind(this), false);
 
       this.tabs = this.mobilePane.appendChild(document.createElement('div'));
       this.tabBar = this.tabs.appendChild(document.createElement('ul'));
@@ -1062,13 +1192,15 @@ window.plugin.missions = {
 
     window.addHook('search', this.onSearch.bind(this));
 
-    var me = this;
-    window.addHook('portalAdded', function (data) {
-      me.onPortalChanged('add', data.portal.options.guid, data.portal);
-    });
-    window.addHook('portalRemoved', function (data) {
-      me.onPortalChanged('delete', data.portal.options.guid, data.portal);
-    });
+		window.map.on('moveend', this.onMoveEnd, this);
+
+		var me = this;
+		window.addHook('portalAdded', function (data) {
+			me.onPortalChanged('add', data.portal.options.guid, data.portal);
+		});
+		window.addHook('portalRemoved', function (data) {
+			me.onPortalChanged('delete', data.portal.options.guid, data.portal);
+		});
 
     this.missionStartLayer = new L.LayerGroup();
     this.missionLayer = new L.LayerGroup();
