@@ -20,7 +20,7 @@ window.plugin.ornamentIconsExt.setIcons = function(externalIconDefinitions) {
 }
 
 function setup () {
-  fetch(window.plugin.ornamentIcons.jsonUrl).then(response => {
+  fetch(window.plugin.ornamentIconsExt.jsonUrl).then(response => {
     response.json().then(data => {
       window.plugin.ornamentIconsExt.setIcons(data.ornaments);
     })
