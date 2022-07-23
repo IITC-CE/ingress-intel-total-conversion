@@ -101,8 +101,8 @@ window.outOfDateUserPrompt = function()
            +'In this case, try clearing your cache, or waiting 15-30 minutes for the stale data to expire.</p>',
       buttons: {
         'RELOAD': function() {
-          if (typeof android !== 'undefined' && android && android.reloadIITC) {
-            android.reloadIITC();
+          if (window.isApp && app.reloadIITC) {
+            app.reloadIITC();
           } else {
             window.location.reload();
           }

@@ -14,12 +14,14 @@ defaults = {
     'gradle_buildtype': 'debug',
     'gradle_options'  : '',
     'gradle_buildfile': None,  # default: '<mobile_source>/build.gradle'
+    'gradle_distributiontypes': ['apk'],
     'ignore_patterns' : [      # exclude desktop-only plugins from mobile assets
         'scroll-wheel-zoom-disable*', '*.meta.js',
     ],
 }
 iitc_script = 'total-conversion-build.user.js'
-buildtypes = {'debug', 'beta', 'release'}
+buildtypes = {'debug', 'beta', 'release', 'copyonly'}
+distributiontypes = {'apk', 'aab'}
 
 
 def add_default_settings(build_source):
@@ -33,14 +35,25 @@ def add_default_settings(build_source):
         settings.mobile_source = build_source / 'mobile'
 
 
-def exec_gradle(source):
+def exec_gradle(source, dist_ext):
     gradlew = source / 'gradlew'
     options = settings.gradle_options
     buildfile = settings.gradle_buildfile or source / 'build.gradle'
     buildtype = settings.gradle_buildtype
     if buildtype not in buildtypes:
         raise UserWarning('gradle_buildtype value must be in: {}'.format(', '.join(buildtypes)))
-    build_action = 'assemble' + buildtype.capitalize()
+
+    if dist_ext == 'apk':
+        build_folder_name = 'apk'
+        build_action = 'assemble' + buildtype.capitalize()
+        build_file_name = f'app-{buildtype}.{dist_ext}'
+    elif dist_ext == 'aab':
+        build_folder_name = 'bundle'
+        build_action = build_folder_name + buildtype.capitalize()
+        build_file_name = 'app.' + dist_ext
+    else:
+        raise UserWarning(f'Unknown value in gradle_distributiontypes: {dist_ext}')
+
     status = os.system('{} {} -b {} {}'.format(gradlew, options, buildfile, build_action))
     try:
         if not os.WIFEXITED(status):
@@ -53,11 +66,11 @@ def exec_gradle(source):
     if exit_code != 0:
         raise UserWarning(f'gradlew returned {exit_code}')
 
-    return source / 'app/build/outputs/apk' / buildtype / f'app-{buildtype}.apk'
+    return source / 'app/build/outputs' / build_folder_name / buildtype / build_file_name
 
 
 def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
-    """Build IITC-Mobile apk file, embedding scripts from given directory."""
+    """Build IITC-Mobile apk/aab file, embedding scripts from given directory."""
     assets_dir = source / 'assets'
     if assets_dir.exists():
         shutil.rmtree(assets_dir)
@@ -70,11 +83,20 @@ def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
     user_location_plug = source / 'plugins' / 'user-location.js'
     build_plugin.process_file(user_location_plug, assets_dir)
 
-    apk = exec_gradle(source)
-    out_name = out_name or 'IITC_Mobile-{.build_name}.apk'.format(settings)
-    out_dir = out_dir or scripts_dir
-    shutil.copy(apk, out_dir / out_name)
-    shutil.copy(apk.with_name('version_fdroid.txt'), out_dir)
+    if settings.gradle_buildtype == 'copyonly':
+        return
+
+    for dist_ext in settings.gradle_distributiontypes:
+        if dist_ext not in distributiontypes:
+            raise UserWarning('gradle_distributiontypes value must be in: {}'.format(', '.join(distributiontypes)))
+
+        app = exec_gradle(source, dist_ext)
+        out_appname = out_name or 'IITC_Mobile-{.build_name}.{}'.format(settings, dist_ext)
+        out_dir = out_dir or scripts_dir
+        shutil.copy(app, out_dir / out_appname)
+
+        if dist_ext == 'apk':
+            shutil.copy(app.with_name('version_fdroid.txt'), out_dir)
 
 
 def iitc_build(iitc_source, build_outdir):

@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.8.3
+// @version        0.10.0
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 
@@ -342,8 +342,8 @@ window.plugin.drawTools.isEmpty = function() {
 window.plugin.drawTools.optCopy = function() {
   if (window.plugin.drawTools.isEmpty()) { return; }
 
-  if (typeof android !== 'undefined' && android.shareString) {
-    android.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
+  if (window.isApp && app.shareString) {
+    app.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
   } else {
     var stockWarnings = {};
     var stockLinks = [];
@@ -656,7 +656,7 @@ window.plugin.drawTools.boot = function() {
   plugin.drawTools.addDrawControl();
   window.plugin.drawTools.setDrawColor(window.plugin.drawTools.currentColor);
 
-  //start off hidden. if the layer is enabled, the below addLayerGroup will add it, triggering a 'show'
+  //start off hidden. if the layer is enabled, the below layerChooser.addOverlay will add it, triggering a 'show'
   $('.leaflet-draw-section').hide();
 
 
@@ -673,7 +673,7 @@ window.plugin.drawTools.boot = function() {
   });
 
   //add the layer
-  window.addLayerGroup('Drawn Items', window.plugin.drawTools.drawnItems, true);
+  window.layerChooser.addOverlay(window.plugin.drawTools.drawnItems, 'Drawn Items');
 
   //place created items into the specific layer
   map.on('draw:created', function(e) {
@@ -830,10 +830,10 @@ window.plugin.drawTools.initMPE = function(){
       window.plugin.drawTools.load();
       console.log('DRAWTOOLS: reset all drawn items (func_post)');
 
-      if (window.plugin.crossLinks !== undefined && window.overlayStatus['Cross Links']) {
+      if (window.plugin.crossLinks) {
         window.plugin.crossLinks.checkAllLinks();
 
-        if (window.plugin.destroyedLinks !== undefined && window.overlayStatus['Destroyed Links Simulator']){
+        if (window.plugin.destroyedLinks) {
           window.plugin.destroyedLinks.cross.removeCrossAll();
         }
       }
@@ -846,12 +846,66 @@ window.plugin.drawTools.initMPE = function(){
   });
 }
 
-function setup () {
-  loadExternals();                              // initialize leaflet
-  window.plugin.drawTools.boot();               // initialize drawtools
-  window.plugin.drawTools.initMPE();            // register to MPE if available
-  window.plugin.drawTools.initEDF();            // initialize empty drawn fields
+var cachedFilters;
+window.plugin.drawTools.getLocationFilters = function () {
+  if (cachedFilters) { return cachedFilters; }
+  var filters;
+  if (!map.hasLayer(plugin.drawTools.drawnItems)) {
+    return [];
+  }
+  var markers = [];
+  var polygons = [];
+  plugin.drawTools.drawnItems.eachLayer(function(layer) {
+    if (layer instanceof L.GeodesicPolygon) {
+      polygons.push(layer);
+    } else if (layer instanceof L.Marker) {
+      markers.push(layer);
+    }
+  });
+  markers = markers.filter(function(marker) { return marker._icon._leaflet_pos; });
+  polygons = polygons.filter(function(poly) { return poly._rings && poly._rings.length; });
+  polygons = polygons.map(function(poly) { return poly._rings[0]; });
+  filters = polygons.map(function (poly) {
+    return function (portal) { // portal|Point|LatLng
+      var point;
+      if ('_point' in portal || portal instanceof L.CircleMarker) {
+        point = portal._point;
+        if (!point) { return false; }
+      } else if ('x' in portal) {
+        point = portal;
+      } else if ('lat' in portal) {
+        point = map.latLngToLayerPoint(portal);
+      } else if (portal.getLatLng) {
+        point = map.latLngToLayerPoint(portal.getLatLng());
+      }
+      if (markers.some(function (marker) {
+        return marker._icon._leaflet_pos.equals(point);
+      })) {
+        return false;
+      }
+      return window.pnpoly(poly, point);
+    };
+  });
+  cachedFilters = filters;
+  return filters;
 }
+
+function setup () {
+  loadExternals(); // initialize leaflet
+  window.plugin.drawTools.boot(); // initialize drawtools
+  window.plugin.drawTools.initMPE(); // register to MPE if available
+  window.plugin.drawTools.initEDF(); // initialize empty drawn fields
+
+  var filterEvents = new L.Evented();
+  window.map.on('draw:created draw:edited draw:deleted', function (e) {
+    filterEvents.fire('changed', { originalEvent: e });
+  });
+  filterEvents.on('changed', function () {
+    cachedFilters = null;
+  });
+  window.plugin.drawTools.filterEvents = filterEvents;
+}
+setup.priority = 'high';
 
 function loadExternals () {
   try {

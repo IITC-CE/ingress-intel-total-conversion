@@ -1,7 +1,7 @@
 // @author         boombuler
 // @name           Tidy Links
 // @category       Draw
-// @version        0.5.0
+// @version        0.6.0
 // @description    Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (former `Max Links`)
 
 
@@ -25,23 +25,39 @@ tidyLinks.STROKE_STYLE = { // https://leafletjs.com/reference-1.4.0.html#polylin
 var map;
 
 tidyLinks.getLocations = function (limit) {
-  var locations = [];
-  var bounds = map.getBounds();
-  for (var guid in window.portals) {
-    if (limit && locations.length > limit) { return; }
-    var ll = window.portals[guid].getLatLng();
-    if (bounds.contains(ll)) { locations.push(ll); }
+  var filters = plugin.drawTools && plugin.drawTools.getLocationFilters && plugin.drawTools.getLocationFilters();
+  // fallback to map bounds if no drawn polygon (or no drawtools)
+  if (!filters || !filters.length) {
+    var bounds = map.getBounds();
+    filters = [function (p) {
+      return bounds.contains(p.getLatLng());
+    }];
   }
-  return locations;
+
+  var locationsArray = [];
+  var counter = 0;
+  filters.forEach(function (filter) {
+    var points = [];
+    for (var guid in window.portals) {
+      if (limit) {
+        counter++;
+        if (counter > limit) { return; }
+      }
+      var location = window.portals[guid];
+      if (filter(location)) {
+        points.push(location);
+      }
+    }
+    if (!points.length) return;
+    locationsArray.push(points);
+  });
+  return locationsArray;
 };
 
 tidyLinks.draw = function (locations, layer) {
-  var triangles = tidyLinks.Delaunay.triangulate(locations.map(function (latlng) {
-    var point = map.project(latlng, tidyLinks.PROJECT_ZOOM);
-    return [point.x,point.y];
+  var triangles = tidyLinks.Delaunay.triangulate(locations.map(function(location) {
+    return [location._point.x, location._point.y];
   }));
-
-  layer.clearLayers();
 
   var drawnLinks = {};
 
@@ -56,7 +72,9 @@ tidyLinks.draw = function (locations, layer) {
 
     if (!(b in drawnLinks[a])) { // no line from a to b yet
       drawnLinks[a][b] = true;
-      L.polyline([locations[a], locations[b]], tidyLinks.STROKE_STYLE).addTo(layer);
+      var aLL = locations[a].getLatLng();
+      var bLL = locations[b].getLatLng();
+      L.polyline([aLL, bLL], tidyLinks.STROKE_STYLE).addTo(layer);
     }
   }
   for (var i = 0; i<triangles.length;) {
@@ -74,9 +92,14 @@ tidyLinks.setOverflow = function (isOveflowed) {
 };
 
 tidyLinks.update = function () {
-  var locations = tidyLinks.getLocations(tidyLinks.MAX_PORTALS_TO_LINK);
-  if (locations) { tidyLinks.draw(locations, tidyLinks.layer); }
-  tidyLinks.setOverflow(!locations);
+  var locationsArray = tidyLinks.getLocations();
+  if (locationsArray.length) {
+    tidyLinks.layer.clearLayers();
+    locationsArray.forEach(function (locations) {
+      tidyLinks.draw(locations, tidyLinks.layer);
+    });
+  }
+  tidyLinks.setOverflow(!locationsArray.length);
 };
 
 function setup () {
@@ -87,9 +110,15 @@ function setup () {
     .on('add', function () {
       tidyLinks.update();
       window.addHook('mapDataRefreshEnd', tidyLinks.update);
+      if (plugin.drawTools && plugin.drawTools.filterEvents) {
+        plugin.drawTools.filterEvents.on('changed', tidyLinks.update);
+      }
     })
     .on('remove', function () {
       window.removeHook('mapDataRefreshEnd', tidyLinks.update);
+      if (plugin.drawTools && plugin.drawTools.filterEvents) {
+        plugin.drawTools.filterEvents.off('changed', tidyLinks.update);
+      }
     })
     .bindTooltip('Tidy Links: too many portals!', {
       className: 'tidy-links-error',
@@ -97,7 +126,7 @@ function setup () {
     });
   tidyLinks.layer.getCenter = function () { return map.getCenter(); }; // for tooltip position
 
-  window.addLayerGroup('Tidy Links', tidyLinks.layer, false);
+  window.layerChooser.addOverlay(tidyLinks.layer, 'Tidy Links', {default: false});
 
   $('<style>').html('\
     .tidy-links-error {\

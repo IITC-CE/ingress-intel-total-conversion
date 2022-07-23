@@ -6,7 +6,9 @@
 
 * https://jqueryui.com/
   1.12.1
-  http://code.jquery.com/ui/1.12.1/jquery-ui.min.js
+  jquer-ui-1.12.1.min.js: http://code.jquery.com/ui/1.12.1/jquery-ui.min.js
+  jquer-ui-1.12.1-resizable.css: https://github.com/jquery/jquery-ui/blob/1.12.1/themes/base/resizable.css
+
 
 * https://github.com/jeromeetienne/jquery-qrcode
   jquery.qrcode.min.js: 2b253c58f4f23f7c522c9f24627d4a51412f8588

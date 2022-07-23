@@ -32,7 +32,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 29
         versionCode = getVersionCodeTimeStamps()
-        versionName "0.32.0"
+        versionName "0.32.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -40,7 +40,7 @@ android {
             storeFile file("../keystore/debug.keystore")
         }
         release {
-            if (System.getenv("TRAVIS")) {
+            if (System.getenv("CI")) {
                 storeFile file("../keystore/android.jks")
                 storePassword System.getenv("KEYSTORE_PASS")
                 keyAlias System.getenv("ALIAS_NAME")
@@ -89,7 +89,7 @@ android {
         variant.resValue  "string", "application_id", variant.applicationId
         variant.getAssembleProvider().configure() {
             it.doLast {
-                metaFDroid(project.file("build/outputs/apk/${variant.name}/"))
+                metaFDroid(variant.getPackageApplicationProvider().get().outputDirectory)
             }
         }
     }

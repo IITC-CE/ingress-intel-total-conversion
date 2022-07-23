@@ -228,7 +228,7 @@ window.search.doSearch = function(term, confirmed) {
   // clear results
   if(term == '') return;
 
-  if(useAndroidPanes()) show('info');
+  if(useAppPanes()) show('info');
 
   $('.ui-tooltip').remove();
 

@@ -2,8 +2,7 @@ Ingress Intel Total Conversion (IITC)
 =====================================
 
 <!-- [START badges] -->
-[![Build Status](https://img.shields.io/travis/com/iitc-ce/ingress-intel-total-conversion/master?label=beta)](https://travis-ci.com/IITC-CE/ingress-intel-total-conversion)
-[![Build Status](https://img.shields.io/travis/com/iitc-ce/ingress-intel-total-conversion/test-builds?label=test-builds)](https://travis-ci.com/IITC-CE/ingress-intel-total-conversion)
+[![Build Status](https://github.com/IITC-CE/ingress-intel-total-conversion/actions/workflows/build.yml/badge.svg)](https://github.com/IITC-CE/ingress-intel-total-conversion/actions/workflows/build.yml)
 [![Docs Status](https://readthedocs.org/projects/iitc-ce/badge/?version=latest)](https://readthedocs.org/projects/iitc-ce/)
 [![LICENSE](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
 <!-- [END badges] -->
@@ -40,7 +39,7 @@ and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/
 
 - **[IITC-Button]**: browser extension, the easiest (though not sole) way to use IITC on desktop.
 
-- **[IITC Mobile]**: Android app developed [here](https://github.com/IITC-CE/ingress-intel-total-conversion/tree/master/mobile).
+- **[IITC Mobile]**: Android app developed [here](https://github.com/IITC-CE/ingress-intel-total-conversion/tree/master/mobile) (available on [Google Play](https://play.google.com/store/apps/details?id=org.exarhteam.iitc_mobile) and [F-Droid](https://f-droid.org/packages/org.exarhteam.iitc_mobile/)).
 
 - **[IITC-Mobile for iOS]**: 3rd-party application, developed by [_Yangkun Zhang_](https://github.com/HubertZhang).
 

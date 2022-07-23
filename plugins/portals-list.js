@@ -14,10 +14,11 @@ window.plugin.portalslist.sortOrder = -1;
 window.plugin.portalslist.enlP = 0;
 window.plugin.portalslist.resP = 0;
 window.plugin.portalslist.neuP = 0;
+window.plugin.portalslist.visitedP = 0;
+window.plugin.portalslist.capturedP = 0;
+window.plugin.portalslist.scoutControlledP = 0;
 
 window.plugin.portalslist.filter = 0;
-
-window.plugin.portalslist.historySymbol = String.fromCharCode(0x25CF);
 
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
@@ -136,7 +137,7 @@ window.plugin.portalslist.fields = [
     },
     defaultOrder: -1,
   },
-  { 
+  {
     title: 'V/C',
     value: function(portal) {
       var history = portal.options.data.history;
@@ -153,12 +154,12 @@ window.plugin.portalslist.fields = [
         'history',
         ['unvisited', 'visited', 'captured'][value]
       ]);
-      cell.append(window.plugin.portalslist.historySymbol);
+      $(cell).append('<div class="icon"></div>');
     }
   },
   {
     title: 'S',
-    value: function(portal) { 
+    value: function(portal) {
       var history = portal.options.data.history;
       if (history) {
         return history.scoutControlled ? 1 : 0;
@@ -171,7 +172,7 @@ window.plugin.portalslist.fields = [
         'history',
         ['unvisited', 'scoutControlled'][value]
       ]);
-      cell.append(window.plugin.portalslist.historySymbol);
+      $(cell).append('<div class="icon"></div>');
     }
   }
 ];
@@ -204,6 +205,9 @@ window.plugin.portalslist.getPortals = function() {
       default:
         window.plugin.portalslist.neuP++;
     }
+    if (portal.options.data.history.visited) window.plugin.portalslist.visitedP++;
+    if (portal.options.data.history.captured) window.plugin.portalslist.capturedP++;
+    if (portal.options.data.history.scoutControlled) window.plugin.portalslist.scoutControlledP++;
 
     // cache values and DOM nodes
     var obj = { portal: portal, values: [], sortValues: [] };
@@ -244,15 +248,18 @@ window.plugin.portalslist.displayPL = function() {
   window.plugin.portalslist.enlP = 0;
   window.plugin.portalslist.resP = 0;
   window.plugin.portalslist.neuP = 0;
+  window.plugin.portalslist.visitedP = 0;
+  window.plugin.portalslist.capturedP = 0;
+  window.plugin.portalslist.scoutControlledP = 0;
   window.plugin.portalslist.filter = 0;
 
   if (window.plugin.portalslist.getPortals()) {
-    list = window.plugin.portalslist.portalTable(window.plugin.portalslist.sortBy, window.plugin.portalslist.sortOrder,window.plugin.portalslist.filter);
+    list = window.plugin.portalslist.portalTable(window.plugin.portalslist.sortBy, window.plugin.portalslist.sortOrder,window.plugin.portalslist.filter, false);
   } else {
     list = $('<table class="noPortals"><tr><td>Nothing to show!</td></tr></table>');
   };
 
-  if(window.useAndroidPanes()) {
+  if (window.useAppPanes()) {
     $('<div id="portalslist" class="mobile">').append(list).appendTo(document.body);
   } else {
     dialog({
@@ -265,7 +272,7 @@ window.plugin.portalslist.displayPL = function() {
   }
 }
 
-window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
+window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reversed) {
   // save the sortBy/sortOrder/filter
   window.plugin.portalslist.sortBy = sortBy;
   window.plugin.portalslist.sortOrder = sortOrder;
@@ -293,63 +300,83 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
 
   if(filter !== 0) {
     portals = portals.filter(function(obj) {
-      return filter < 0
-        ? obj.portal.options.team+1 != -filter
-        : obj.portal.options.team+1 == filter;
+      switch (filter) {
+        case 1:
+        case 2:
+        case 3:
+          return reversed ^ (1+obj.portal.options.team === filter);
+        case 4:
+          return reversed ^ obj.portal.options.data.history.visited;
+        case 5:
+          return reversed ^ obj.portal.options.data.history.captured;
+        case 6:
+          return reversed ^ obj.portal.options.data.history.scoutControlled;
+      };
     });
   }
 
-  var table, row, cell;
   var container = $('<div>');
 
-  table = document.createElement('table');
-  table.className = 'filter';
-  container.append(table);
-
-  row = table.insertRow(-1);
+  filters = document.createElement('div');
+  filters.className = 'filters';
+  container.append(filters);
 
   var length = window.plugin.portalslist.listPortals.length;
 
-  ["All", "Neutral", "Resistance", "Enlightened"].forEach(function(label, i) {
-    cell = row.appendChild(document.createElement('th'));
-    cell.className = 'filter' + label.substr(0, 3);
+  ['All', 'Neutral', 'Resistance', 'Enlightened', 'Visited', 'Captured', 'Scout Controlled' ].forEach(function(label, i) {
+    var cell = filters.appendChild(document.createElement('div'));
+    cell.className = 'name filter' + label.substr(0, 3);
     cell.textContent = label+':';
-    cell.title = 'Show only portals of this color';
+    cell.title = 'Show only '+label+' portals';
     $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i));
+      if (this.classList.contains('active')) {
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, 0, false));
+      } else {
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i, false));
+      }
     });
 
+    if (filter === i && !reversed) {
+      cell.classList.add('active');
+    }
 
-    cell = row.insertCell(-1);
-    cell.className = 'filter' + label.substr(0, 3);
-    if(i != 0) cell.title = 'Hide portals of this color';
-    $(cell).click(function() {
-      $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, -i));
-    });
+    cell = filters.appendChild(document.createElement('div'));
+    cell.className = 'count filter' + label.substr(0, 3);
 
-    switch(i-1) {
-      case -1:
-        cell.textContent = length;
-        break;
-      case 0:
-        cell.textContent = window.plugin.portalslist.neuP + ' (' + Math.round(window.plugin.portalslist.neuP/length*100) + '%)';
-        break;
-      case 1:
-        cell.textContent = window.plugin.portalslist.resP + ' (' + Math.round(window.plugin.portalslist.resP/length*100) + '%)';
-        break;
-      case 2:
-        cell.textContent = window.plugin.portalslist.enlP + ' (' + Math.round(window.plugin.portalslist.enlP/length*100) + '%)';
+    if (i == 0) {
+      cell.textContent = length;
+    } else {
+      cell.title = 'Hide '+label+' portals ';
+      $(cell).click(function() {
+        if (this.classList.contains('active')) {
+          $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, 0, false));
+        } else {
+          $('#portalslist').empty().append(window.plugin.portalslist.portalTable(sortBy, sortOrder, i, true));
+        }
+      });
+
+      if (filter === i && reversed) {
+        cell.classList.add('active');
+      }
+
+      var name = ['neuP', 'resP', 'enlP', 'visitedP', 'capturedP', 'scoutControlledP'][i-1];
+      var count = window.plugin.portalslist[name];
+      cell.textContent = count + ' (' + Math.round(count/length*100) + '%)';
     }
   });
 
-  table = document.createElement('table');
+  var tableDiv = document.createElement('div');
+  tableDiv.className = 'table-container';
+  container.append(tableDiv);
+
+  var table = document.createElement('table');
   table.className = 'portals';
-  container.append(table);
+  tableDiv.appendChild(table);
 
   var thead = table.appendChild(document.createElement('thead'));
-  row = thead.insertRow(-1);
+  var row = thead.insertRow(-1);
 
-  cell = row.appendChild(document.createElement('th'));
+  var cell = row.appendChild(document.createElement('th'));
   cell.textContent = '#';
 
   window.plugin.portalslist.fields.forEach(function(field, i) {
@@ -369,7 +396,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
           order = field.defaultOrder < 0 ? -1 : 1;
         }
 
-        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(i, order, filter));
+        $('#portalslist').empty().append(window.plugin.portalslist.portalTable(i, order, filter, reversed));
       });
     }
   });
@@ -384,7 +411,10 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter) {
   });
 
   container.append('<div class="disclaimer">Click on portals table headers to sort by that column. '
-    + 'Click on <b>All, Neutral, Resistance, Enlightened</b> to only show portals owner by that faction or on the number behind the factions to show all but those portals.</div>');
+    + 'Click on <b>All, Neutral, Resistance, Enlightened</b> to only show portals owned '
+    + 'by that faction or on the number behind the factions to show all but those portals. '
+    + 'Click on <b>Visited, Captured or Scout Controlled</b> to only show portals the user has a history for '
+    + 'or on the number to hide those. </div>');
 
   return container;
 }
@@ -421,8 +451,8 @@ window.plugin.portalslist.onPaneChanged = function(pane) {
 };
 
 var setup =  function() {
-  if(window.useAndroidPanes()) {
-    android.addPane("plugin-portalslist", "Portals list", "ic_action_paste");
+  if (window.useAppPanes()) {
+    app.addPane("plugin-portalslist", "Portals list", "ic_action_paste");
     addHook("paneChanged", window.plugin.portalslist.onPaneChanged);
   } else {
     $('#toolbox').append('<a onclick="window.plugin.portalslist.displayPL()" title="Display a list of portals in the current view [t]" accesskey="t">Portals list</a>');

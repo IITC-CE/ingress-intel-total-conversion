@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Player activity tracker
 // @category       Layer
-// @version        0.12.0
+// @version        0.12.1
 // @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
 
@@ -35,11 +35,11 @@ window.plugin.playerTracker.setup = function() {
   plugin.playerTracker.drawnTracesRes = new L.LayerGroup();
   // to avoid any favouritism, we'll put the player's own faction layer first
   if (PLAYER.team == 'RESISTANCE') {
-    window.addLayerGroup('Player Tracker Resistance', plugin.playerTracker.drawnTracesRes, true);
-    window.addLayerGroup('Player Tracker Enlightened', plugin.playerTracker.drawnTracesEnl, true);
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesRes, 'Player Tracker Resistance');
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesEnl, 'Player Tracker Enlightened');
   } else {
-    window.addLayerGroup('Player Tracker Enlightened', plugin.playerTracker.drawnTracesEnl, true);
-    window.addLayerGroup('Player Tracker Resistance', plugin.playerTracker.drawnTracesRes, true);
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesEnl, 'Player Tracker Enlightened');
+    window.layerChooser.addOverlay(plugin.playerTracker.drawnTracesRes, 'Player Tracker Resistance');
   }
   map.on('layeradd',function(obj) {
     if(obj.layer === plugin.playerTracker.drawnTracesEnl || obj.layer === plugin.playerTracker.drawnTracesRes) {
@@ -100,7 +100,7 @@ window.plugin.playerTracker.zoomListener = function() {
 }
 
 window.plugin.playerTracker.getLimit = function() {
- return new Date().getTime() - window.PLAYER_TRACKER_MAX_TIME;
+ return Date.now() - window.PLAYER_TRACKER_MAX_TIME;
 }
 
 window.plugin.playerTracker.discardOldData = function() {
@@ -266,7 +266,7 @@ window.plugin.playerTracker.drawData = function() {
   var polyLineByAgeRes = [[], [], [], []];
 
   var split = PLAYER_TRACKER_MAX_TIME / 4;
-  var now = new Date().getTime();
+  var now = Date.now();
   $.each(plugin.playerTracker.stored, function(plrname, playerData) {
     if(!playerData || playerData.events.length === 0) {
       console.warn('broken player data for plrname=' + plrname);
@@ -528,6 +528,11 @@ window.plugin.playerTracker.onSearchResultSelected = function(result, event) {
   return true;
 };
 
+window.plugin.playerTracker.locale = navigator.languages;
+
+window.plugin.playerTracker.dateTimeFormat = {
+};
+
 window.plugin.playerTracker.onSearch = function(query) {
   var term = query.term.toLowerCase();
 
@@ -541,7 +546,8 @@ window.plugin.playerTracker.onSearch = function(query) {
     query.addResult({
       title: '<mark class="nickname help '+TEAM_TO_CSS[getTeam(data)]+'">' + nick + '</mark>',
       nickname: nick,
-      description: data.team.substr(0,3) + ', last seen ' + unixTimeToDateTimeString(event.time),
+      description: data.team.substr(0,3) + ', last seen ' +
+        new Date(event.time).toLocaleString(window.plugin.playerTracker.locale, window.plugin.playerTracker.dateTimeFormat),
       position: plugin.playerTracker.getLatLngFromEvent(event),
       onSelected: window.plugin.playerTracker.onSearchResultSelected,
     });
