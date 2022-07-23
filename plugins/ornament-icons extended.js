@@ -9,7 +9,7 @@
 // use own namespace for plugin
 window.plugin.ornamentIconsExt = function () {};
 
-window.plugin.ornamentIconsExt.jsonUrl = 'https://iitc.app/extras/ornaments/definitions_extended.json';
+window.plugin.ornamentIconsExt.jsonUrl = 'https://iitc.app/extras/ornaments/definitions_ext.json';
 
 // append or overwrite external definitions
 window.plugin.ornamentIconsExt.setIcons = function(externalIconDefinitions) {
