@@ -1,5 +1,5 @@
 // @author         johtata
-// @name           ornament icons basic
+// @name           Ornament icons basic
 // @category       Layer
 // @version        0.1.0
 // @description    Add own icons and names for ornaments
