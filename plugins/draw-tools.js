@@ -1,7 +1,7 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.9.0
+// @version        0.10.0
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 
@@ -274,6 +274,11 @@ window.plugin.drawTools.manualOpt = function() {
     mergeStatusCheck = 'checked';
   }
 
+  var edfStatusCheck = '';
+  if (!window.plugin.drawTools.EDFstatus){
+    edfStatusCheck = 'checked';
+  }
+
   var html = '<div class="drawtoolsStyles">'
            + '<input type="color" name="drawColor" id="drawtools_color"></input>'
 //TODO: add line style choosers: thickness, maybe dash styles?
@@ -287,6 +292,8 @@ window.plugin.drawTools.manualOpt = function() {
            + '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>'
            + '<center><label id="MergeToggle"><input type="checkbox" '+mergeStatusCheck+' name="merge" '
            +   'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>'
+           + '<center><label id="edfToggle"><input type="checkbox" '+edfStatusCheck+' name="edf"'
+           +   'onchange="window.plugin.drawTools.edfStatusToggle();return false;" />Fill the polygon(s)</label></center>'
            + '</div>';
 
   dialog({
@@ -378,10 +385,26 @@ window.plugin.drawTools.optCopy = function() {
     if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
     if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
 
-    var html = '<p><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p>'
-              +'<textarea readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea\').select();">'+window.localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>'
-              +'<p>or, export as a link for the standard intel map (for non IITC users)</p>'
-              +'<input onclick="event.target.select();" type="text" size="90" value="'+stockUrl+'"/>';
+    // Export Normal draw
+    var html = ''
+      +'<p style="margin:0 0 6px;">Normal export:</p>'
+      +'<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+      +'<textarea id="copyNorm" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">'
+      +localStorage[window.plugin.drawTools.KEY_STORAGE]+'</textarea>';
+
+    // Export draw (polygons as lines)
+    html += '<hr/>'
+      +'<p style="margin:0 0 6px;">or export with polygons as lines (not filled):</p>'
+      +'<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+      +'<textarea id="copyEDF" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">'
+      +window.plugin.drawTools.getDrawAsLines()+'</textarea>';
+
+    // Export for intel stock URL (only lines)
+    html += '<hr/>'
+      +'<p style="margin:0 0 6px;">or export as a link for the standard intel map (for non IITC users):</p>'
+      +'<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'input\').select();">Select all</a> and press CTRL+C to copy it.</p>'
+      +'<input onclick="event.target.select();" type="text" size="49" value="'+stockUrl+'"/>';
+
     if (stockWarnTexts.length>0) {
       html += '<ul><li>'+stockWarnTexts.join('</li><li>')+'</li></ul>';
     }
@@ -663,7 +686,27 @@ window.plugin.drawTools.boot = function() {
       window.registerMarkerForOMS(layer);
     }
 
+    if (window.plugin.drawTools.EDFstatus){
+      //    window.plugin.drawTools.toggleOpacityOpt(); // disabled by Zaso
+      window.plugin.drawTools.clearAndDraw();
+    }
+
     runHooks('pluginDrawTools',{event:'layerCreated',layer:layer});
+  });
+
+  window.plugin.drawTools.oldEDFstatus = false;
+  map.on('draw:deletestart', function(e) {
+    console.log('draw:deletestart');
+    window.plugin.drawTools.oldEDFstatus = window.plugin.drawTools.EDFstatus;
+    window.plugin.drawTools.EDFstatus = false;
+    window.plugin.drawTools.toggleOpacityOpt();
+    window.plugin.drawTools.clearAndDraw();
+  });
+  map.on('draw:deletestop', function(e) {
+    console.log('draw:deletestop');
+    window.plugin.drawTools.EDFstatus = window.plugin.drawTools.oldEDFstatus;
+    window.plugin.drawTools.toggleOpacityOpt();
+    window.plugin.drawTools.clearAndDraw();
   });
 
   map.on('draw:deleted', function(e) {
@@ -675,15 +718,90 @@ window.plugin.drawTools.boot = function() {
     window.plugin.drawTools.save();
     runHooks('pluginDrawTools',{event:'layersEdited'});
   });
+
   //add options menu
   $('#toolbox').append('<a onclick="window.plugin.drawTools.manualOpt();return false;" accesskey="x" title="[x]">DrawTools Opt</a>');
 
   $('head').append('<style>' +
         '.drawtoolsSetbox > a { display:block; color:#ffce00; border:1px solid #ffce00; padding:3px 0; margin:10px auto; width:80%; text-align:center; background:rgba(8,48,78,.9); }'+
-        '.ui-dialog-drawtoolsSet-copy textarea { width:96%; height:250px; resize:vertical; }'+
+        '.ui-dialog-drawtoolsSet-copy textarea { width:96%; height:150px; resize:vertical; }'+
         '</style>');
 
 }
+
+// ---------------------------------------------------------------------------------
+// EXPORT (POLYS AS LINES)
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.getDrawAsLines = function(){
+  var rawDraw = JSON.parse(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
+  var draw = [];
+
+  for (i in rawDraw){
+    var elemDraw = rawDraw[i];
+
+    if (elemDraw.type === 'polygon'){
+      var convElemDraw = {};
+      convElemDraw.color = elemDraw.color;
+      convElemDraw.type = 'polyline';
+      convElemDraw.latLngs = [];
+
+      for (j in elemDraw.latLngs){
+        var ll = elemDraw.latLngs[j];
+        convElemDraw.latLngs.push(ll);
+      }
+      convElemDraw.latLngs.push(elemDraw.latLngs[0]);
+
+      draw.push(convElemDraw);
+    } else {
+      draw.push(elemDraw);
+    }
+  }
+
+  return JSON.stringify(draw);
+};
+
+// ---------------------------------------------------------------------------------
+// EMPTY POLYGONS (EMPTY DRAWN FIELDS)
+// ---------------------------------------------------------------------------------
+window.plugin.drawTools.EDFstatus = false;
+
+window.plugin.drawTools.initEDF = function(){
+  // window.addHook('pluginDrawTools', window.plugin.drawTools.edf.hookManagement);
+  window.addHook('iitcLoaded', function(){
+    if (window.plugin.drawTools.EDFstatus){
+      window.plugin.drawTools.toggleOpacityOpt();
+      window.plugin.drawTools.clearAndDraw();
+    }
+  });
+};
+
+window.plugin.drawTools.toggleEDF = function(){
+  var status = window.plugin.drawTools.EDFstatus;
+  status = Boolean(!status);
+  window.plugin.drawTools.EDFstatus = status;
+};
+
+window.plugin.drawTools.toggleOpacityOpt = function(){
+  if (window.plugin.drawTools.EDFstatus){
+    window.plugin.drawTools.polygonOptions.fillOpacity = 0.0;
+    window.plugin.drawTools.polygonOptions.interactive = false;
+  } else {
+    window.plugin.drawTools.polygonOptions.fillOpacity = 0.2;
+    window.plugin.drawTools.polygonOptions.interactive = true;
+  }
+};
+
+window.plugin.drawTools.clearAndDraw = function(){
+  window.plugin.drawTools.drawnItems.clearLayers();
+  window.plugin.drawTools.load();
+  console.log('DRAWTOOLS: reset all drawn items');
+};
+
+window.plugin.drawTools.edfStatusToggle = function(){
+  window.plugin.drawTools.toggleEDF();
+  window.plugin.drawTools.toggleOpacityOpt();
+  window.plugin.drawTools.clearAndDraw();
+};
 
 // ---------------------------------------------------------------------------------
 // MPE - MULTI PROJECTS EXTENSION
@@ -773,9 +891,10 @@ window.plugin.drawTools.getLocationFilters = function () {
 }
 
 function setup () {
-  loadExternals();
-  window.plugin.drawTools.boot();
-  window.plugin.drawTools.initMPE();
+  loadExternals(); // initialize leaflet
+  window.plugin.drawTools.boot(); // initialize drawtools
+  window.plugin.drawTools.initMPE(); // register to MPE if available
+  window.plugin.drawTools.initEDF(); // initialize empty drawn fields
 
   var filterEvents = new L.Evented();
   window.map.on('draw:created draw:edited draw:deleted', function (e) {
