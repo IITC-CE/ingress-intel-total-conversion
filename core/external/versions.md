@@ -38,8 +38,7 @@
   used in: bookmarks, draw-tools, player-activity-tracker
 
 * https://github.com/IITC-CE/Leaflet.Canvas-Markers
-  leaflet.canvas-markers.js: affa3f5c1c5b8aee979fa79532a1223dcb3f7e34
-  (https://github.com/Spaction/Leaflet.Canvas-Markers/pull/3)
+  leaflet.canvas-markers.js: ae78845c80d1fadfc11841e6aa895c5a123d89c3
   used in: ornaments.js
 
 
