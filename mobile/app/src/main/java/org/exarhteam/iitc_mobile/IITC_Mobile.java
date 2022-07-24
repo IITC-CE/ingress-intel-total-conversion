@@ -113,6 +113,7 @@ public class IITC_Mobile extends AppCompatActivity
     private IITC_DebugHistory debugHistory;
     private int debugHistoryPosition = -1;
     private String debugInputStore = "";
+    private Set<String> mInternalHostnames = new HashSet<>();
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -839,6 +840,7 @@ public class IITC_Mobile extends AppCompatActivity
         mIitcWebView.getWebViewClient().reset();
         mBackStack.clear();
         mCurrentPane = Pane.MAP;
+        mInternalHostnames = new HashSet<>();
     }
 
     // inject the iitc-script and load the intel url
@@ -1250,5 +1252,21 @@ public class IITC_Mobile extends AppCompatActivity
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    /**
+     * Add host name that should be opened in the internal webview.
+     * @param hostname host name.
+     */
+    public void addInternalHostname(String hostname) {
+        mInternalHostnames.add(hostname);
+    }
+
+    /**
+     * @param hostname host name.
+     * @return <code>true</code> if a host name should be opened in the internal webview.
+     */
+    public boolean isInternalHostname(String hostname) {
+        return mInternalHostnames.contains(hostname);
     }
 }
