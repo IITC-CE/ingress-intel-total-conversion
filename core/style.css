@@ -1431,3 +1431,11 @@ svg.icon-button {
   text-shadow: 1px 1px black, -1px -1px black;
   text-align: center;
 }
+
+.ui-dialog-aboutIITC .plugin-is-standard {
+  color: darkgray;
+}
+
+.ui-dialog-aboutIITC .plugin-error {
+  text-decoration: line-through;
+}

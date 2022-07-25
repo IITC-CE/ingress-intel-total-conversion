@@ -105,22 +105,22 @@ function convertPluginInfo(info, index) {
 
 function pluginInfoToString(p, extra) {
   var info = {
-    style: '',
+    class: '',
     description: p.description || '',
     name: p.name,
     verinfo: formatVerInfo(p, extra)
   };
 
   if (isStandardPlugin(p)) {
-    info.style += 'color:darkgray;';
+    info.class += 'plugin-is-standard';
   }
 
   if (p.error) {
-    info.style += 'text-decoration:line-through;';
+    info.class += ' plugin-error';
     info.description = p.error;
   }
 
-  return L.Util.template('<li style="{style}" title="{description}">{name}{verinfo}</li>', info);
+  return L.Util.template('<li class="{class}" title="{description}">{name}{verinfo}</li>', info);
 }
 
 
