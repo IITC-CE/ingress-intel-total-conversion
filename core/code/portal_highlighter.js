@@ -89,9 +89,8 @@ window.changePortalHighlights = function(name) {
 }
 
 window.highlightPortal = function(p) {
-  
   if(_highlighters !== null && _highlighters[_current_highlighter] !== undefined) {
-    _highlighters[_current_highlighter].highlight({portal: p});
+    return _highlighters[_current_highlighter].highlight({portal: p});
   }
 }
 

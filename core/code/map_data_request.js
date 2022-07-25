@@ -69,15 +69,6 @@ window.MapDataRequest = function() {
 
   // ensure we have some initial map status
   this.setStatus ('startup', undefined, -1);
-
-  // add a portalDetailLoaded hook, so we can use the extended details to update portals on the map
-  var _this = this;
-  addHook('portalDetailLoaded', function(data){
-    if(data.success) {
-      _this.render.createPortalEntity(data.ent, 'detailed');
-    }
-  });
-
 }
 
 

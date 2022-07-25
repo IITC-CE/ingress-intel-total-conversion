@@ -27,8 +27,10 @@ window.renderPortalUrl = function (lat, lng, title) {
   linkDetails.append($('<aside>').append(mapHtml));
 };
 
-window.renderPortalDetails = function(guid) {
-  selectPortal(window.portals[guid] ? guid : null);
+window.renderPortalDetails = function (guid, forceSelect) {
+  if (forceSelect || selectedPortal !== guid) {
+    selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
+  }
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
@@ -52,36 +54,33 @@ window.renderPortalDetails = function(guid) {
   }
 
   var portal = window.portals[guid];
-  var data = portal.options.data;
-  var details = portalDetail.get(guid);
-  var historyDetails = getPortalHistoryDetails(data);
+  var details = portal.getDetails();
+  var hasFullDetails = portal.hasFullDetails();
+  var historyDetails = getPortalHistoryDetails(details);
 
-  // details and data can get out of sync. if we have details, construct a matching 'data'
-  if (details) {
-    data = getPortalSummaryData(details);
-  }
+  var modDetails = hasFullDetails
+    ? '<div class="mods">' + getModDetails(details) + '</div>'
+    : '';
+  var miscDetails = hasFullDetails ? getPortalMiscDetails(guid, details) : '';
+  var resoDetails = hasFullDetails ? getResonatorDetails(details) : '';
 
+  // TODO? other status details...
+  var statusDetails = hasFullDetails
+    ? ''
+    : '<div id="portalStatus">Loading details...</div>';
 
-  var modDetails = details ? '<div class="mods">'+getModDetails(details)+'</div>' : '';
-  var miscDetails = details ? getPortalMiscDetails(guid,details) : '';
-  var resoDetails = details ? getResonatorDetails(details) : '';
+  var img = fixPortalImageUrl(details.image);
+  var title = details.title || 'null';
 
-//TODO? other status details...
-  var statusDetails = details ? '' : '<div id="portalStatus">Loading details...</div>';
+  var lat = details.latE6 / 1e6;
+  var lng = details.lngE6 / 1e6;
 
-  var img = fixPortalImageUrl(details ? details.image : data.image);
-  var title = (details && details.title) || (data && data.title) || 'null';
-
-  var lat = data.latE6/1E6;
-  var lng = data.lngE6/1E6;
-
-  var imgTitle = title+'\n\nClick to show full image.';
-
+  var imgTitle = title + '\n\nClick to show full image.';
 
   // portal level. start with basic data - then extend with fractional info in tooltip if available
-  var levelInt = (teamStringToId(data.team) == TEAM_NONE) ? 0 : data.level;
+  var levelInt = portal.options.level;
   var levelDetails = levelInt;
-  if (details) {
+  if (hasFullDetails) {
     levelDetails = getPortalLevel(details);
     if(levelDetails != 8) {
       if(levelDetails==Math.ceil(levelDetails))
@@ -97,7 +96,7 @@ window.renderPortalDetails = function(guid) {
 
   $('#portaldetails')
     .html('') //to ensure it's clear
-    .attr('class', TEAM_TO_CSS[teamStringToId(data.team)])
+    .attr('class', TEAM_TO_CSS[teamStringToId(details.team)])
     .append(
       $('<h3>', { class:'title' })
         .text(title)
@@ -108,7 +107,7 @@ window.renderPortalDetails = function(guid) {
               style: 'float: left'
             })
             .click(function() {
-              zoomToAndShowPortal(guid,[data.latE6/1E6,data.lngE6/1E6]);
+              zoomToAndShowPortal(guid,[details.latE6/1E6,details.lngE6/1E6]);
               if (isSmartphone()) { show('map') };
             })),
 
@@ -145,9 +144,12 @@ window.renderPortalDetails = function(guid) {
 
   window.renderPortalUrl(lat, lng, title, guid);
 
+  // compatibility
+  var data = hasFullDetails ? getPortalSummaryData(details) : details;
+
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?
-  if (details) {
+  if (hasFullDetails) {
     runHooks('portalDetailsUpdated', {guid: guid, portal: portal, portalDetails: details, portalData: data});
   }
 }
@@ -217,7 +219,7 @@ window.getPortalMiscDetails = function(guid,d) {
 
     if (d.artifactBrief && d.artifactBrief.target && Object.keys(d.artifactBrief.target).length > 0) {
       var targets = Object.keys(d.artifactBrief.target);
-//currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s) 
+//currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s)
        randDetails += '<div id="artifact_target">Target portal: '+targets.map(function(x) { return x.capitalize(); }).join(', ')+'</div>';
     }
 
@@ -274,7 +276,7 @@ window.setPortalIndicators = function(p) {
 // on old selection. Returns false if the selected portal changed.
 // Returns true if it's still the same portal that just needs an
 // update.
-window.selectPortal = function(guid) {
+window.selectPortal = function (guid, event) {
   var update = selectedPortal === guid;
   var oldPortalGuid = selectedPortal;
   selectedPortal = guid;
@@ -283,19 +285,17 @@ window.selectPortal = function(guid) {
   var newPortal = portals[guid];
 
   // Restore style of unselected portal
-  if(!update && oldPortal) setMarkerStyle(oldPortal,false);
+  if (!update && oldPortal) oldPortal.setSelected(false);
 
   // Change style of selected portal
-  if(newPortal) {
-    setMarkerStyle(newPortal, true);
-
-    if (map.hasLayer(newPortal)) {
-      newPortal.bringToFront();
-    }
-  }
+  if (newPortal) newPortal.setSelected(true);
 
   setPortalIndicators(newPortal);
 
-  runHooks('portalSelected', {selectedPortalGuid: guid, unselectedPortalGuid: oldPortalGuid});
+  runHooks('portalSelected', {
+    selectedPortalGuid: guid,
+    unselectedPortalGuid: oldPortalGuid,
+    event: event,
+  });
   return update;
-}
+};
