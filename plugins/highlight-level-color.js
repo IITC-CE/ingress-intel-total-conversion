@@ -1,14 +1,13 @@
 // @author         vita10gy
 // @name           Highlight portals by level color
 // @category       Highlighter
-// @version        0.1.2
+// @version        0.2.0
 // @description    Use the portal fill color to denote the portal level by using the game level colors.
 
+/* exported setup --eslint */
+/* global COLORS_LVL*/
 
-// use own namespace for plugin
-window.plugin.portalHighlighterPortalsLevelColor = function() {};
-
-window.plugin.portalHighlighterPortalsLevelColor.colorLevel = function(data) {
+function highlightLevelColor (data) {
   var portal_level = data.portal.options.data.level;
   if (portal_level !== undefined) {
     var opacity = .6;
@@ -16,6 +15,6 @@ window.plugin.portalHighlighterPortalsLevelColor.colorLevel = function(data) {
   }
 }
 
-var setup =  function() {
-  window.addPortalHighlighter('Level Color', window.plugin.portalHighlighterPortalsLevelColor.colorLevel);
+function setup () {
+  window.addPortalHighlighter('Level Color', highlightLevelColor);
 }
