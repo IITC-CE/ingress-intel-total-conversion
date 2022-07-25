@@ -1,12 +1,13 @@
 // @author         jonatkins
 // @name           Stamen.com map layers
 // @category       Map Tiles
-// @version        0.2.1
+// @version        0.2.2
 // @description    Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
 
+/* exported setup --eslint */
+/* global L, layerChooser */
 // use own namespace for plugin
 var mapStamen = {};
-// window.plugin.mapStamen = mapStamen;
 
 // see API here http://maps.stamen.com/
 // https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js (overcomplicated)
@@ -64,7 +65,8 @@ mapStamen.setup = function () {
     ].join('')
   };
   addLayer('Watercolor',options);
-}
-function setup () {
+};
+
+function setup() {
   mapStamen.setup();
 }
