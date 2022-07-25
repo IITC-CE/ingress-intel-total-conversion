@@ -1,5 +1,5 @@
 // @author         johtata
-// @name           ornament icons basic
+// @name           Ornament icons basic
 // @category       Layer
 // @version        0.1.0
 // @description    Add own icons and names for ornaments
@@ -79,7 +79,7 @@ window.plugin.ornamentIcons.setIcons = function(externalIconDefinitions) {
     // 'peTOASTY': {
     //   name: 'TOASTY',
     //   offset: [0, 0.5],
-    //   url: '@include_img:images/ornament-TOASTY.png@'
+    //   url: '##include_img:images/ornament-TOASTY.svg##' // replace "##" with single "@"
     // }
   };
   window.ornaments.icon = {...window.ornaments.icon, ...externalIconDefinitions, ...localIconDefinitions};
