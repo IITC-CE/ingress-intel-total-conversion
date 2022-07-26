@@ -102,7 +102,7 @@ function removeDrawToolsStyle () {
   });
 }
 
-var showDialog = function () {
+linkShowDirection.showDialog = function () {
   var div = document.createElement('div');
 
   $.each(styles, function(style) {
@@ -159,7 +159,8 @@ var showDialog = function () {
 };
 
 function setup () {
-  $('#toolbox').append(' <a>LinkDirection Opt</a>').on('click', showDialog);
+  $('#toolbox').append('<a onclick="window.plugin.linkShowDirection.showDialog();return false;" title="Change LinkDirection settings">LinkDirection Opt</a>');
+
   addHook('linkAdded', function(data) { addLinkStyle(data.link); });
 
   try {
