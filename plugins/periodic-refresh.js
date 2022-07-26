@@ -10,12 +10,13 @@
 var periodicRefresh = {};
 window.plugin.periodicRefresh = periodicRefresh;
 
+periodicRefresh.refreshMinutes = 60;
+
 function wakeup () {
   console.log('periodicRefresh: timer fired - leaving idle mode');
   idleReset();
 }
 
 function setup () {
-  var refreshMinutes = 60;
-  setInterval (wakeup, refreshMinutes*60*1000 );
+  setInterval (wakeup, periodicRefresh.refreshMinutes*60*1000 );
 }
