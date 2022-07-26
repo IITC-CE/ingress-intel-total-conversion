@@ -10,15 +10,14 @@
 // use own namespace for plugin
 var linkShowDirection = {};
 window.plugin.linkShowDirection = linkShowDirection;
-
-// exposed
-// linkShowDirection.showDialog = showDialog;
+var styles = {};
+linkShowDirection.styles = styles;
 
 var ANIMATE_UPDATE_TIME = 1000; // 1000ms = 1s
 
 // Hack:
 // 100000 - a large enough number to be the equivalent of 100%, which is not supported Leaflet when displaying with canvas
-var styles = {
+styles = {
   'Disabled': [null],
   'Static *': [
     '30,5,15,5,15,5,2,5,2,5,2,5,2,5,30,0',
