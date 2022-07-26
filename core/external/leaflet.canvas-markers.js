@@ -170,7 +170,8 @@ function layerFactory (L) {
         },
 
         _redraw: function () {
-            this._redrawRequest = this._redrawRequest || L.Util.requestAnimFrame(L.Canvas.prototype._redraw, this);
+            this._redrawRequest = this._redrawRequest || 
+                L.Util.requestAnimFrame(L.Canvas.prototype._redraw, this);
         },
 
         _clear: function () {
