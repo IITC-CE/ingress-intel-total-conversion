@@ -1,7 +1,7 @@
 // @author         ZasoGD
 // @name           Portal Names
 // @category       Layer
-// @version        0.2.0
+// @version        0.2.1
 // @description    Show portal names on the map.
 
 

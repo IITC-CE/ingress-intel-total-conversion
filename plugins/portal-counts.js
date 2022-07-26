@@ -1,7 +1,7 @@
 // @author         yenky
 // @name           Portal count
 // @category       Info
-// @version        0.2.0
+// @version        0.2.1
 // @description    Display a list of all localized portals by level and faction.
 
 
