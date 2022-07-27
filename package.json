@@ -6,7 +6,10 @@
   "license": "ISC",
   "private": true,
   "devDependencies": {
-    "eslint": "^7.21.0"
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1"
   },
   "scripts": {
     "build": "npm run build:local",
