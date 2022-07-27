@@ -1,7 +1,7 @@
 // @author         rongou
 // @name           Portal Level Numbers
 // @category       Layer
-// @version        0.2.0
+// @version        0.2.1
 // @description    Show portal level numbers on map.
 
 

@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Ingress scoring regions
 // @category       Layer
-// @version        0.2.0
+// @version        0.2.1
 // @description    Show the regional scoring cells grid on the map
 
 

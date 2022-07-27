@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Done links
 // @category       Draw
-// @version        0.1.0
+// @version        0.1.1
 // @description    A companion to the Cross Links plugin. Highlights any links that match existing draw-tools line/polygon edges
 
 

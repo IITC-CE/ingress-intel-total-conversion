@@ -1,7 +1,7 @@
 // @author         ZasoGD
 // @name           Zaprange
 // @category       Layer
-// @version        0.1.4
+// @version        0.1.5
 // @description    Shows the maximum range of attack by the portals.
 
 
