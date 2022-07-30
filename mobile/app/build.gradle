@@ -65,6 +65,7 @@ android {
             signingConfig signingConfigs.debug
         }
         beta {
+            applicationIdSuffix ".beta"
             versionNameSuffix "-beta-$BUILD_DATE"
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
