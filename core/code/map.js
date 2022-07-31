@@ -155,10 +155,6 @@ function createDefaultOverlays() {
   addLayers[linksLayer.options.name] = linksLayer;
 
   // faction-specific layers
-  var neutralLayer = new IITC.filters.FilterLayer({
-    name: window.TEAM_NAME_NONE,
-    filter: { portal: true, data: { team: 'N' } },
-  });
   var resistanceLayer = new IITC.filters.FilterLayer({
     name: window.TEAM_NAME_RES,
     filter: { portal: true, link: true, field: true, data: { team: 'R' } },
@@ -172,7 +168,6 @@ function createDefaultOverlays() {
     filter: { portal: true, link: true, field: true, data: { team: 'M' } },
   });
 
-  addLayers[neutralLayer.options.name] = neutralLayer;
   // to avoid any favouritism, we'll put the player's own faction layer first
   if (PLAYER.team === 'RESISTANCE') {
     addLayers[resistanceLayer.options.name] = resistanceLayer;
@@ -233,8 +228,6 @@ window.setupMap = function () {
   }
   var baseLayers = createDefaultBaseMapLayers();
   var overlays = createDefaultOverlays();
-  map.addLayer(overlays.Neutral);
-  delete overlays.Neutral;
 
   var layerChooser = window.layerChooser = new window.LayerChooser(baseLayers, overlays, {map: map})
     .addTo(map);
