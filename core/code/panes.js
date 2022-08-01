@@ -24,7 +24,7 @@ window.show = function(id) {
   runHooks("paneChanged", id);
 
   // look for comm tab first
-  if (window.chat.getCommTab(id)) window.chat.show(id);
+  if (window.chat.getChannelDesc(id)) window.chat.show(id);
   else {
     switch(id) {
       case 'map':

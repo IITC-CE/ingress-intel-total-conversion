@@ -9,9 +9,9 @@ var chat = window.chat;
 /**
  * Handles tab completion in chat input.
  *
- * @function window.chat.handleTabCompletion
+ * @function chat.handleTabCompletion
  */
-window.chat.handleTabCompletion = function() {
+chat.handleTabCompletion = function() {
   var el = $('#chatinput input');
   var curPos = el.get(0).selectionStart;
   var text = el.val();
@@ -19,7 +19,7 @@ window.chat.handleTabCompletion = function() {
 
   var list = $('#chat > div:visible mark');
   list = list.map(function(ind, mark) { return $(mark).text(); } );
-  list = uniqueArray(list);
+  list = window.uniqueArray(list);
 
   var nick = null;
   for(var i = 0; i < list.length; i++) {
@@ -46,23 +46,23 @@ window.chat.handleTabCompletion = function() {
 // clear management
 //
 
-window.chat._oldBBox = null;
+chat._oldBBox = null;
 
 /**
  * Generates post data for chat requests.
  *
- * @function window.chat.genPostData
+ * @function chat.genPostData
  * @param {string} channel - The chat channel.
  * @param {Object} storageHash - Storage hash for the chat.
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
  * @returns {Object} The generated post data.
  */
-window.chat.genPostData = function(channel, _storageHash, getOlderMsgs) {
+chat.genPostData = function(channel, _storageHash, getOlderMsgs) {
   if (typeof channel !== 'string') {
     throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
   }
 
-  var b = clampLatLngBounds(map.getBounds());
+  var b = window.clampLatLngBounds(map.getBounds());
 
   // set a current bounding box if none set so far
   if (!chat._oldBBox) chat._oldBBox = b;
@@ -77,10 +77,10 @@ window.chat.genPostData = function(channel, _storageHash, getOlderMsgs) {
     // need to reset these flags now because clearing will only occur
     // after the request is finished – i.e. there would be one almost
     // useless request.
-    window.chat.commTabs.forEach(function (entry) {
+    chat.channels.forEach(function (entry) {
       if (entry.localBounds) {
         chat.initChannelData(entry);
-        $('#chat' + entry.channel).data('needsClearing', true);
+        $('#chat' + entry.id).data('needsClearing', true);
       }
     });
 
@@ -132,10 +132,10 @@ window.chat.genPostData = function(channel, _storageHash, getOlderMsgs) {
   return data;
 };
 
-window.chat._requestRunning = {}
-window.chat.requestChannel = function (channel, getOlderMsgs, isRetry) {
+chat._requestRunning = {}
+chat.requestChannel = function (channel, getOlderMsgs, isRetry) {
   if(chat._requestRunning[channel] && !isRetry) return;
-  if(isIdle()) return renderUpdateStatus();
+  if(window.isIdle()) return window.renderUpdateStatus();
   chat._requestRunning[channel] = true;
   $("#chatcontrols a[data-channel='" + channel + "']").addClass('loading');
 
@@ -145,12 +145,12 @@ window.chat.requestChannel = function (channel, getOlderMsgs, isRetry) {
     d,
     function(data, textStatus, jqXHR) { chat.handleChannel(channel, data, getOlderMsgs, d.ascendingTimestampOrder); },
     isRetry
-      ? function() { window.chat._requestRunning[channel] = false; }
-      : function() { window.chat.requestChannel(channel, getOlderMsgs, true) }
+      ? function() { chat._requestRunning[channel] = false; }
+      : function() { chat.requestChannel(channel, getOlderMsgs, true) }
   );
 };
 
-window.chat.handleChannel = function (channel, data, olderMsgs, ascendingTimestampOrder) {
+chat.handleChannel = function (channel, data, olderMsgs, ascendingTimestampOrder) {
   chat._requestRunning[channel] = false;
   $("#chatcontrols a[data-channel='" + channel + "']").removeClass('loading');
 
@@ -173,15 +173,15 @@ window.chat.handleChannel = function (channel, data, olderMsgs, ascendingTimesta
   var hook = channel + 'ChatDataAvailable';
   // backward compability
   if (channel === 'all') hook = 'publicChatDataAvailable';
-  runHooks(hook, {raw: data, result: data.result, processed: chat._channels[channel].data});
+  window.runHooks(hook, {raw: data, result: data.result, processed: chat._channels[channel].data});
 
   // generic hook
-  runHooks('chatDataAvailable', {channel: channel, raw: data, result: data.result, processed: chat._channels[channel].data});
+  window.runHooks('chatDataAvailable', {channel: channel, raw: data, result: data.result, processed: chat._channels[channel].data});
 
-  window.chat.renderChannel(channel, oldMsgsWereAdded);
+  chat.renderChannel(channel, oldMsgsWereAdded);
 };
 
-window.chat.renderChannel = function(channel, oldMsgsWereAdded) {
+chat.renderChannel = function(channel, oldMsgsWereAdded) {
   chat.renderData(chat._channels[channel].data, 'chat' + channel, oldMsgsWereAdded, chat._channels[channel].guids);
 }
 
@@ -192,34 +192,34 @@ window.chat.renderChannel = function(channel, oldMsgsWereAdded) {
 /**
  * Requests faction chat messages.
  *
- * @function window.chat.requestFaction
+ * @function chat.requestFaction
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
  * @param {boolean} [isRetry=false] - Flag to indicate if this is a retry attempt.
  */
-window.chat.requestFaction = function(getOlderMsgs, isRetry) {
-  return window.chat.requestChannel('faction', getOlderMsgs, isRetry);
+chat.requestFaction = function(getOlderMsgs, isRetry) {
+  return chat.requestChannel('faction', getOlderMsgs, isRetry);
 };
 
 /**
  * Handles faction chat response.
  *
- * @function window.chat.handleFaction
+ * @function chat.handleFaction
  * @param {Object} data - Response data from server.
  * @param {boolean} olderMsgs - Indicates if older messages were requested.
  * @param {boolean} ascendingTimestampOrder - Indicates if messages are in ascending timestamp order.
  */
-window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
-  return window.chat.handleChannel('faction', data, olderMsgs, ascendingTimestampOrder);
+chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
+  return chat.handleChannel('faction', data, olderMsgs, ascendingTimestampOrder);
 };
 
 /**
  * Renders faction chat.
  *
- * @function window.chat.renderFaction
+ * @function chat.renderFaction
  * @param {boolean} oldMsgsWereAdded - Indicates if old messages were added in the current rendering.
  */
-window.chat.renderFaction = function(oldMsgsWereAdded) {
-  return window.chat.renderChannel('faction', oldMsgsWereAdded);
+chat.renderFaction = function(oldMsgsWereAdded) {
+  return chat.renderChannel('faction', oldMsgsWereAdded);
 };
 
 
@@ -230,34 +230,34 @@ window.chat.renderFaction = function(oldMsgsWereAdded) {
 /**
  * Initiates a request for public chat data.
  *
- * @function window.chat.requestPublic
+ * @function chat.requestPublic
  * @param {boolean} getOlderMsgs - Whether to retrieve older messages.
  * @param {boolean} [isRetry=false] - Whether the request is a retry.
  */
-window.chat.requestPublic = function(getOlderMsgs, isRetry) {
-  return window.chat.requestChannel('all', getOlderMsgs, isRetry);
+chat.requestPublic = function(getOlderMsgs, isRetry) {
+  return chat.requestChannel('all', getOlderMsgs, isRetry);
 };
 
 /**
  * Handles the public chat data received from the server.
  *
- * @function window.chat.handlePublic
+ * @function chat.handlePublic
  * @param {Object} data - The public chat data.
  * @param {boolean} olderMsgs - Whether the received messages are older.
  * @param {boolean} ascendingTimestampOrder - Whether messages are in ascending timestamp order.
  */
-window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
-  return window.chat.handleChannel('all', data, olderMsgs, ascendingTimestampOrder);
+chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
+  return chat.handleChannel('all', data, olderMsgs, ascendingTimestampOrder);
 };
 
 /**
  * Renders public chat in the UI.
  *
- * @function window.chat.renderPublic
+ * @function chat.renderPublic
  * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
  */
-window.chat.renderPublic = function(oldMsgsWereAdded) {
-  return window.chat.renderChannel('all', oldMsgsWereAdded);
+chat.renderPublic = function(oldMsgsWereAdded) {
+  return chat.renderChannel('all', oldMsgsWereAdded);
 };
 
 
@@ -268,34 +268,34 @@ window.chat.renderPublic = function(oldMsgsWereAdded) {
 /**
  * Initiates a request for alerts chat data.
  *
- * @function window.chat.requestAlerts
+ * @function chat.requestAlerts
  * @param {boolean} getOlderMsgs - Whether to retrieve older messages.
  * @param {boolean} [isRetry=false] - Whether the request is a retry.
  */
-window.chat.requestAlerts = function(getOlderMsgs, isRetry) {
-  return window.chat.requestChannel('alerts', getOlderMsgs, isRetry);
+chat.requestAlerts = function(getOlderMsgs, isRetry) {
+  return chat.requestChannel('alerts', getOlderMsgs, isRetry);
 };
 
 /**
  * Handles the alerts chat data received from the server.
  *
- * @function window.chat.handleAlerts
+ * @function chat.handleAlerts
  * @param {Object} data - The alerts chat data.
  * @param {boolean} olderMsgs - Whether the received messages are older.
  * @param {boolean} ascendingTimestampOrder - Whether messages are in ascending timestamp order.
  */
-window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
-  return window.chat.handleChannel('alerts', data, olderMsgs, ascendingTimestampOrder);
+chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
+  return chat.handleChannel('alerts', data, olderMsgs, ascendingTimestampOrder);
 };
 
 /**
  * Renders alerts chat in the UI.
  *
- * @function window.chat.renderAlerts
+ * @function chat.renderAlerts
  * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
  */
-window.chat.renderAlerts = function(oldMsgsWereAdded) {
-  return window.chat.renderChannel('alerts', oldMsgsWereAdded);
+chat.renderAlerts = function(oldMsgsWereAdded) {
+  return chat.renderChannel('alerts', oldMsgsWereAdded);
 };
 
 
@@ -306,10 +306,10 @@ window.chat.renderAlerts = function(oldMsgsWereAdded) {
 /**
  * Adds a nickname to the chat input.
  *
- * @function window.chat.addNickname
+ * @function chat.addNickname
  * @param {string} nick - The nickname to add.
  */
-window.chat.addNickname= function(nick) {
+chat.addNickname= function(nick) {
   var c = document.getElementById("chattext");
   c.value = [c.value.trim(), nick].join(" ").trim() + " ";
   c.focus()
@@ -318,12 +318,12 @@ window.chat.addNickname= function(nick) {
 /**
  * Handles click events on nicknames in the chat.
  *
- * @function window.chat.nicknameClicked
+ * @function chat.nicknameClicked
  * @param {Event} event - The click event.
  * @param {string} nickname - The clicked nickname.
  * @returns {boolean} Always returns false.
  */
-window.chat.nicknameClicked = function(event, nickname) {
+chat.nicknameClicked = function(event, nickname) {
   // suppress @ if coming from chat
   if (nickname.startsWith('@')) {
     nickname = nickname.slice(1);
@@ -331,7 +331,7 @@ window.chat.nicknameClicked = function(event, nickname) {
   var hookData = { event: event, nickname: nickname };
 
   if (window.runHooks('nicknameClicked', hookData)) {
-    window.chat.addNickname('@' + nickname);
+    chat.addNickname('@' + nickname);
   }
 
   event.preventDefault();
@@ -342,13 +342,13 @@ window.chat.nicknameClicked = function(event, nickname) {
 /**
  * Updates the oldest and newest message timestamps and GUIDs in the chat storage.
  *
- * @function window.chat.updateOldNewHash
+ * @function chat.updateOldNewHash
  * @param {Object} newData - The new chat data received.
  * @param {Object} storageHash - The chat storage object.
  * @param {boolean} isOlderMsgs - Whether the new data contains older messages.
  * @param {boolean} isAscendingOrder - Whether the new data is in ascending order.
  */
-window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAscendingOrder) {
+chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAscendingOrder) {
   // track oldest + newest timestamps/GUID
   if (newData.result.length > 0) {
     var first = {
@@ -382,11 +382,11 @@ window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAsc
 /**
  * Parses chat message data into a more convenient format.
  *
- * @function window.chat.parseMsgData
+ * @function chat.parseMsgData
  * @param {Object} data - The raw chat message data.
  * @returns {Object} The parsed chat message data.
  */
-window.chat.parseMsgData = function (data) {
+chat.parseMsgData = function (data) {
   var categories = data[2].plext.categories;
   var isPublic = (categories & 1) === 1;
   var isSecure = (categories & 2) === 2;
@@ -440,14 +440,14 @@ window.chat.parseMsgData = function (data) {
 /**
  * Writes new chat data to the chat storage and manages the order of messages.
  *
- * @function window.chat.writeDataToHash
+ * @function chat.writeDataToHash
  * @param {Object} newData - The new chat data received.
  * @param {Object} storageHash - The chat storage object.
  * @param {boolean} isOlderMsgs - Whether the new data contains older messages.
  * @param {boolean} isAscendingOrder - Whether the new data is in ascending order.
  */
-window.chat.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAscendingOrder) {
-  window.chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
+chat.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAscendingOrder) {
+  chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
   newData.result.forEach(function(json) {
     // avoid duplicates
@@ -474,11 +474,11 @@ window.chat.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAsc
 /**
  * Renders text for the chat, converting plain text to HTML and adding links.
  *
- * @function window.chat.renderText
+ * @function chat.renderText
  * @param {Object} text - An object containing the plain text to render.
  * @returns {string} The rendered HTML string.
  */
-window.chat.renderText = function (text) {
+chat.renderText = function (text) {
   let content;
 
   if (text.team) {
@@ -496,11 +496,11 @@ window.chat.renderText = function (text) {
 /**
  * Overrides portal names used repeatedly in chat, such as 'US Post Office', with more specific names.
  *
- * @function window.chat.getChatPortalName
+ * @function chat.getChatPortalName
  * @param {Object} markup - An object containing portal markup, including the name and address.
  * @returns {string} The processed portal name.
  */
-window.chat.getChatPortalName = function (markup) {
+chat.getChatPortalName = function (markup) {
   var name = markup.name;
   if (name === 'US Post Office') {
     var address = markup.address.split(',');
@@ -512,25 +512,25 @@ window.chat.getChatPortalName = function (markup) {
 /**
  * Renders a portal link for use in the chat.
  *
- * @function window.chat.renderPortal
+ * @function chat.renderPortal
  * @param {Object} portal - The portal data.
  * @returns {string} HTML string of the portal link.
  */
-window.chat.renderPortal = function (portal) {
+chat.renderPortal = function (portal) {
   var lat = portal.latE6/1E6, lng = portal.lngE6/1E6;
   var perma = window.makePermalink([lat,lng]);
   var js = 'window.selectPortalByLatLng('+lat+', '+lng+');return false';
-  return '<a onclick="' + js + '"' + ' title="' + portal.address + '"' + ' href="' + perma + '" class="help">' + window.chat.getChatPortalName(portal) + '</a>';
+  return '<a onclick="' + js + '"' + ' title="' + portal.address + '"' + ' href="' + perma + '" class="help">' + chat.getChatPortalName(portal) + '</a>';
 };
 
 /**
  * Renders a faction entity for use in the chat.
  *
- * @function window.chat.renderFactionEnt
+ * @function chat.renderFactionEnt
  * @param {Object} faction - The faction data.
  * @returns {string} HTML string representing the faction.
  */
-window.chat.renderFactionEnt = function (faction) {
+chat.renderFactionEnt = function (faction) {
   var teamId = window.teamStringToId(faction.team);
   var name = window.TEAM_NAMES[teamId];
   var spanClass = window.TEAM_TO_CSS[teamId];
@@ -542,13 +542,13 @@ window.chat.renderFactionEnt = function (faction) {
 /**
  * Renders a player's nickname in chat.
  *
- * @function window.chat.renderPlayer
+ * @function chat.renderPlayer
  * @param {Object} player - The player object containing nickname and team.
  * @param {boolean} at - Whether to prepend '@' to the nickname.
  * @param {boolean} sender - Whether the player is the sender of a message.
  * @returns {string} The HTML string representing the player's nickname in chat.
  */
-window.chat.renderPlayer = function (player, at, sender) {
+chat.renderPlayer = function (player, at, sender) {
   var name = player.plain;
   if (sender) {
     name = player.plain.replace(/: $/, '');
@@ -565,11 +565,11 @@ window.chat.renderPlayer = function (player, at, sender) {
 /**
  * Renders a chat message entity based on its type.
  *
- * @function window.chat.renderMarkupEntity
+ * @function chat.renderMarkupEntity
  * @param {Array} ent - The entity array, where the first element is the type and the second element is the data.
  * @returns {string} The HTML string representing the chat message entity.
  */
-window.chat.renderMarkupEntity = function (ent) {
+chat.renderMarkupEntity = function (ent) {
   switch (ent[0]) {
   case 'TEXT':
     return chat.renderText(ent[1]);
@@ -591,11 +591,11 @@ window.chat.renderMarkupEntity = function (ent) {
 /**
  * Renders the markup of a chat message, converting special entities like player names, portals, etc., into HTML.
  *
- * @function window.chat.renderMarkup
+ * @function chat.renderMarkup
  * @param {Array} markup - The markup array of a chat message.
  * @returns {string} The HTML string representing the complete rendered chat message.
  */
-window.chat.renderMarkup = function (markup) {
+chat.renderMarkup = function (markup) {
   var msg = '';
 
   markup.forEach(function (ent, ind) {
@@ -621,7 +621,7 @@ window.chat.renderMarkup = function (markup) {
 /**
  * Transforms a given markup array into an older, more straightforward format for easier understanding.
  *
- * @function window.chat.transformMessage
+ * @function chat.transformMessage
  * @param {Array} markup - An array representing the markup to be transformed.
  * @returns {Array} The transformed markup array with a simplified structure.
  */
@@ -658,12 +658,12 @@ function transformMessage(markup) {
  * Renders a cell in the chat table to display the time a message was sent.
  * Formats the time and adds it to a <time> HTML element with a tooltip showing the full date and time.
  *
- * @function window.chat.renderTimeCell
+ * @function chat.renderTimeCell
  * @param {number} time - The timestamp of the message.
  * @param {string} classNames - Additional class names to be added to the time cell.
  * @returns {string} The HTML string representing a table cell with the formatted time.
  */
-window.chat.renderTimeCell = function (time, classNames) {
+chat.renderTimeCell = function (time, classNames) {
   const ta = window.unixTimeToHHmm(time);
   let tb = window.unixTimeToDateTimeString(time, true);
   // add <small> tags around the milliseconds
@@ -675,12 +675,12 @@ window.chat.renderTimeCell = function (time, classNames) {
  * Renders a cell in the chat table for a player's nickname.
  * Wraps the nickname in <mark> HTML element for highlighting.
  *
- * @function window.chat.renderNickCell
+ * @function chat.renderNickCell
  * @param {string} nick - The nickname of the player.
  * @param {string} classNames - Additional class names to be added to the nickname cell.
  * @returns {string} The HTML string representing a table cell with the player's nickname.
  */
-window.chat.renderNickCell = function (nick, classNames) {
+chat.renderNickCell = function (nick, classNames) {
   const i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
   return '<td>' + i[0] + '<mark class="' + classNames + '">' + nick + '</mark>' + i[1] + '</td>';
 };
@@ -689,23 +689,23 @@ window.chat.renderNickCell = function (nick, classNames) {
  * Renders a cell in the chat table for a chat message.
  * The message is inserted as inner HTML of the table cell.
  *
- * @function window.chat.renderMsgCell
+ * @function chat.renderMsgCell
  * @param {string} msg - The chat message to be displayed.
  * @param {string} classNames - Additional class names to be added to the message cell.
  * @returns {string} The HTML string representing a table cell with the chat message.
  */
-window.chat.renderMsgCell = function (msg, classNames) {
+chat.renderMsgCell = function (msg, classNames) {
   return '<td class="' + classNames + '">' + msg + '</td>';
 };
 
 /**
  * Renders a row for a chat message including time, nickname, and message cells.
  *
- * @function window.chat.renderMsgRow
+ * @function chat.renderMsgRow
  * @param {Object} data - The data for the message, including time, player, and message content.
  * @returns {string} The HTML string representing a row in the chat table.
  */
-window.chat.renderMsgRow = function (data) {
+chat.renderMsgRow = function (data) {
   var timeClass = data.msgToPlayer ? 'pl_nudge_date' : '';
   var timeCell = chat.renderTimeCell(data.time, timeClass);
 
@@ -737,7 +737,7 @@ window.chat.renderMsgRow = function (data) {
 /**
  * Legacy function for rendering chat messages. Used for backward compatibility with plugins.
  *
- * @function window.chat.renderMsg
+ * @function chat.renderMsg
  * @param {string} msg - The chat message.
  * @param {string} nick - The nickname of the player who sent the message.
  * @param {number} time - The timestamp of the message.
@@ -746,9 +746,9 @@ window.chat.renderMsgRow = function (data) {
  * @param {boolean} systemNarrowcast - Flag indicating if the message is a system narrowcast.
  * @returns {string} The HTML string representing a chat message row.
  */
-window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
-  var ta = unixTimeToHHmm(time);
-  var tb = unixTimeToDateTimeString(time, true);
+chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
+  var ta = window.unixTimeToHHmm(time);
+  var tb = window.unixTimeToDateTimeString(time, true);
   // add <small> tags around the milliseconds
   tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>')
     .replace(/</g,'&lt;')
@@ -776,24 +776,24 @@ window.chat.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarro
 /**
  * Renders a divider row in the chat table.
  *
- * @function window.chat.renderDivider
+ * @function chat.renderDivider
  * @param {string} text - Text to display within the divider row.
  * @returns {string} The HTML string representing a divider row in the chat table.
  */
-window.chat.renderDivider = function(text) {
+chat.renderDivider = function(text) {
   return '<tr class="divider"><td><hr></td><td>' + text + '</td><td><hr></td></tr>';
 };
 
 /**
  * Renders data from the data-hash to the element defined by the given ID.
  *
- * @function window.chat.renderData
+ * @function chat.renderData
  * @param {Object} data - Chat data to be rendered.
  * @param {string} element - ID of the DOM element to render the chat into.
  * @param {boolean} likelyWereOldMsgs - Flag indicating if older messages are likely to have been added.
  * @param {Array} sortedGuids - Sorted array of GUIDs representing the order of messages.
  */
-window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
+chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
   var elm = $('#'+element);
   if (elm.is(':hidden')) {
     return;
@@ -822,7 +822,7 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
   });
 
   var firstRender = elm.is(':empty');
-  var scrollBefore = scrollBottom(elm);
+  var scrollBefore = window.scrollBottom(elm);
   elm.html('<table>' + msgs + '</table>');
 
   if (firstRender) {
@@ -845,11 +845,11 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
 /**
  * Posts a chat message to intel comm context.
  *
- * @function window.chat.sendChatMessage
+ * @function chat.sendChatMessage
  * @param {string} tab intel tab name (either all or faction)
  * @param {string} msg message to be sent
  */
-window.chat.sendChatMessage = function (tab, msg) {
+chat.sendChatMessage = function (tab, msg) {
   if (tab !== 'all' && tab !== 'faction') return;
 
   var latlng = map.getCenter();
@@ -865,7 +865,7 @@ window.chat.sendChatMessage = function (tab, msg) {
   window.postAjax('sendPlext', data,
     function(response) {
       if(response.error) alert(errMsg);
-      startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a send message
+      window.startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a send message
     },
     function() {
       alert(errMsg);
@@ -874,38 +874,39 @@ window.chat.sendChatMessage = function (tab, msg) {
 };
 
 //
-// Tabs
+// Channels
 //
 
-//WORK IN PROGRESS
+// WORK IN PROGRESS
 // 'all' 'faction' and 'alerts' channels are hard coded in several places (including mobile app)
-// dont change those channels
-window.chat.commTabs = [
-  // channel: the COMM channel ('tab' parameter in server requests)
+// dont change those channels since they refer to stock channels
+// you can add channels from another source provider (message relay, logging from plugins...)
+chat.channels = [
+  // id: uniq id, matches 'tab' parameter for server requests
   // name: visible name
-  // inputPrompt: string for the input prompt
+  // inputPrompt: (optional) string for the input prompt
   // inputClass: (optional) class to apply to #chatinput
-  // sendMessage: (optional) function to send the message
-  // request: (optional) function to call to request new message
-  //          first argument is `channel`
-  //          second is true when trigger from scrolling to top
-  // render: (optional) function to render channel content
-  //          argument is `channel`
+  // sendMessage(id, msg): (optional) function to send the message
+  //              first argument is `id`
+  // request(id, getOlderMsgs, isRetry): (optional) function to call
+  //          to request new message, first argument is `id`, second is true
+  //          when trigger from scrolling to top
+  // render(id, oldMsgsWereAdded): (optional) function to render channel content
   // localBounds: (optional) if true, reset on view change
   {
-    channel: 'all', name:'All', localBounds: true,
-    inputPrompt: 'broadcast:', inputClass:'public',
+    id: 'all', name: 'All', localBounds: true,
+    inputPrompt: 'broadcast:', inputClass: 'public',
     request: chat.requestChannel, render: chat.renderChannel,
-    sendMessage: chat.intelPost,
+    sendMessage: chat.sendChatMessage,
   },
   {
-    channel: 'faction', name:'Faction', localBounds: true,
+    id: 'faction', name: 'Faction', localBounds: true,
     inputPrompt: 'tell faction:', inputClass:'faction',
     request: chat.requestChannel, render: chat.renderChannel,
-    sendMessage: chat.intelPost,
+    sendMessage: chat.sendChatMessage,
   },
   {
-    channel: 'alerts', name:'Alerts',
+    id: 'alerts', name: 'Alerts',
     inputPrompt: 'tell Jarvis:', inputClass: 'alerts',
     request: chat.requestChannel, render: chat.renderChannel,
     sendMessage: function() {
@@ -920,46 +921,46 @@ window.chat.commTabs = [
  * @memberof window.chat
  * @type {Object}
  */
-window.chat._channels = {};
+chat._channels = {};
 
 /**
  * Initialize the channel data.
  *
- * @function window.chat.initChannelData
+ * @function chat.initChannelData
  * @returns {string} The channel object.
  */
-window.chat.initChannelData = function (commTab) {
+chat.initChannelData = function (channel) {
   // preserve channel object
-  if (!window.chat._channels[commTab.channel]) window.chat._channels[commTab.channel] = {};
-  window.chat._channels[commTab.channel].data = {};
-  window.chat._channels[commTab.channel].guids = [];
-  window.chat._channels[commTab.channel].oldestTimestamp = -1;
-  delete window.chat._channels[commTab.channel].oldestGUID;
-  window.chat._channels[commTab.channel].newestTimestamp = -1;
-  delete window.chat._channels[commTab.channel].newestGUID;
+  if (!chat._channels[channel.id]) chat._channels[channel.id] = {};
+  chat._channels[channel.id].data = {};
+  chat._channels[channel.id].guids = [];
+  chat._channels[channel.id].oldestTimestamp = -1;
+  delete chat._channels[channel.id].oldestGUID;
+  chat._channels[channel.id].newestTimestamp = -1;
+  delete chat._channels[channel.id].newestGUID;
 };
 
 /**
  * Gets the name of the active chat tab.
  *
- * @function window.chat.getActive
+ * @function chat.getActive
  * @returns {string} The name of the active chat tab.
  */
-window.chat.getActive = function() {
+chat.getActive = function() {
   return $('#chatcontrols .active').data('channel');
 }
 
 /**
  * Converts a chat tab name to its corresponding channel object.
  *
- * @function window.chat.getCommTab
+ * @function chat.getChannelDesc
  * @param {string} tab - The name of the chat tab.
  * @returns {string} The corresponding channel name ('faction', 'alerts', or 'all').
  */
-window.chat.getCommTab = function (tab) {
+chat.getChannelDesc = function (tab) {
   var channelObject = null;
-  chat.commTabs.forEach(function (entry) {
-    if (entry.channel === tab)
+  chat.channels.forEach(function (entry) {
+    if (entry.id === tab)
       channelObject = entry;
   });
   return channelObject;
@@ -970,9 +971,9 @@ window.chat.getCommTab = function (tab) {
  * When expanded, the chat window covers a larger area of the screen.
  * This function also ensures that the chat is scrolled to the bottom when collapsed.
  *
- * @function window.chat.toggle
+ * @function chat.toggle
  */
-window.chat.toggle = function() {
+chat.toggle = function() {
   var c = $('#chat, #chatcontrols');
   if(c.hasClass('expand')) {
     c.removeClass('expand');
@@ -992,26 +993,26 @@ window.chat.toggle = function() {
  * that need to process COMM data even when the user is not actively viewing the COMM channels.
  * It tracks the requested channels for each plugin instance and updates the global state accordingly.
  *
- * @function window.chat.backgroundChannelData
+ * @function chat.backgroundChannelData
  * @param {string} instance - A unique identifier for the plugin or instance requesting background COMM data.
  * @param {string} channel - The name of the COMM channel ('all', 'faction', or 'alerts').
  * @param {boolean} flag - Set to true to request data for the specified channel, false to stop requesting.
  */
-window.chat.backgroundChannelData = function(instance,channel,flag) {
+chat.backgroundChannelData = function(instance,channel,flag) {
   //first, store the state for this instance
-  if (!window.chat.backgroundInstanceChannel) window.chat.backgroundInstanceChannel = {};
-  if (!window.chat.backgroundInstanceChannel[instance]) window.chat.backgroundInstanceChannel[instance] = {};
-  window.chat.backgroundInstanceChannel[instance][channel] = flag;
+  if (!chat.backgroundInstanceChannel) chat.backgroundInstanceChannel = {};
+  if (!chat.backgroundInstanceChannel[instance]) chat.backgroundInstanceChannel[instance] = {};
+  chat.backgroundInstanceChannel[instance][channel] = flag;
 
   //now, to simplify the request code, merge the flags for all instances into one
   // 1. clear existing overall flags
-  window.chat.backgroundChannels = {};
+  chat.backgroundChannels = {};
   // 2. for each instance monitoring COMM...
-  $.each(window.chat.backgroundInstanceChannel, function(instance,channels) {
+  $.each(chat.backgroundInstanceChannel, function(instance,channels) {
     // 3. and for each channel monitored by this instance...
-    $.each(window.chat.backgroundInstanceChannel[instance],function(channel,flag) {
+    $.each(chat.backgroundInstanceChannel[instance],function(channel,flag) {
       // 4. if it's monitored, set the channel flag
-      if (flag) window.chat.backgroundChannels[channel] = true;
+      if (flag) chat.backgroundChannels[channel] = true;
     });
   });
 
@@ -1021,14 +1022,14 @@ window.chat.backgroundChannelData = function(instance,channel,flag) {
  * Requests chat messages for the currently active chat tab and background channels.
  * It calls the appropriate request function based on the active tab or background channels.
  *
- * @function window.chat.request
+ * @function chat.request
  */
-window.chat.request = function() {
+chat.request = function() {
   var channel = chat.getActive();
-  chat.commTabs.forEach(function (entry) {
-    if (channel === entry.channel || (window.chat.backgroundChannels && window.chat.backgroundChannels[entry.channel])) {
+  chat.channels.forEach(function (entry) {
+    if (channel === entry.id || (chat.backgroundChannels && chat.backgroundChannels[entry.id])) {
       if (entry.request)
-        entry.request(entry.channel, false);
+        entry.request(entry.id, false);
     }
   });
 }
@@ -1037,73 +1038,62 @@ window.chat.request = function() {
  * Checks if the currently selected chat tab needs more messages.
  * This function is triggered by scroll events and loads older messages when the user scrolls to the top.
  *
- * @function window.chat.needMoreMessages
+ * @function chat.needMoreMessages
  */
-window.chat.needMoreMessages = function() {
+chat.needMoreMessages = function() {
   var activeTab = chat.getActive();
-  var commTab = chat.getCommTab(activeTab);
-  if(!commTab.request) return;
+  var channel = chat.getChannelDesc(activeTab);
+  if(!channel || !channel.request) return;
 
   var activeChat = $('#chat > :visible');
   if(activeChat.length === 0) return;
 
-  var hasScrollbar = scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
+  var hasScrollbar = window.scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
   var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
   if(hasScrollbar && !nearTop) return;
 
-  commTab.request(commTab.channel, false);
+  channel.request(channel.id, false);
 };
 
 /**
  * Chooses and activates a specified chat tab.
  * Also triggers an early refresh of the chat data when switching tabs.
  *
- * @function window.chat.chooseTab
+ * @function chat.chooseTab
  * @param {string} tab - The name of the chat tab to activate ('all', 'faction', or 'alerts').
  */
-window.chat.chooseTab = function(tab) {
-  var commTab = chat.getCommTab(tab);
-
-  if (!commTab) {
-    var tabsAvalaible = chat.commTabs
-      .map(function (entry) {
-        return '"' + entry.channel + '"';
-      })
-      .join(', ');
-    log.warn(
-      'chat tab "' +
-        tab +
-        '" requested - but only ' +
-        tabsAvalaible +
-        ' are valid - assuming "all" wanted'
-    );
+chat.chooseTab = function(tab) {
+  if (chat.channels.every(function (entry) { return entry.id !== tab; })) {
+    var tabsAvalaible = chat.channels.map(function (entry) { return '"' + entry.id + '"'; }).join(', ');
+    log.warn('chat tab "' + tab + '" requested - but only ' + tabsAvalaible + ' are valid - assuming "all" wanted');
     tab = 'all';
-    commTab = chat.getCommTab(tab);
   }
 
   var oldTab = chat.getActive();
-  var oldCommTab = chat.getCommTab(oldTab);
 
   localStorage['iitc-chat-tab'] = tab;
 
+  var oldChannel = chat.getChannelDesc(oldTab);
+  var channel = chat.getChannelDesc(tab);
+
   var chatInput = $('#chatinput');
-  if (oldCommTab && oldCommTab.inputClass) chatInput.removeClass(oldCommTab.inputClass);
-  if (commTab.inputClass) chatInput.addClass(commTab.inputClass);
+  if (oldChannel && oldChannel.inputClass) chatInput.removeClass(oldChannel.inputClass);
+  if (channel.inputClass) chatInput.addClass(channel.inputClass);
 
   var mark = $('#chatinput mark');
-  mark.text(commTab.inputPrompt);
+  mark.text(channel.inputPrompt || '');
 
   $('#chatcontrols .active').removeClass('active');
   $("#chatcontrols a[data-channel='" + tab + "']").addClass('active');
 
-  if (tab != oldTab) startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a tab change
+  if (tab != oldTab) window.startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a tab change
 
   $('#chat > div').hide();
 
   var elm = $('#chat' + tab);
   elm.show();
 
-  if (commTab.render) commTab.render(tab);
+  if (channel.render) channel.render(tab);
 
   if(elm.data('needsScrollTop')) {
     elm.data('ignoreNextScroll', true);
@@ -1115,16 +1105,16 @@ window.chat.chooseTab = function(tab) {
 /**
  * Displays the chat interface and activates a specified chat tab.
  *
- * @function window.chat.show
+ * @function chat.show
  * @param {string} name - The name of the chat tab to show and activate.
  */
-window.chat.show = function(name) {
+chat.show = function(name) {
     window.isSmartphone()
         ? $('#updatestatus').hide()
         : $('#updatestatus').show();
     $('#chat, #chatinput').show();
 
-    window.chat.chooseTab(name);
+    chat.chooseTab(name);
 }
 
 /**
@@ -1132,13 +1122,13 @@ window.chat.show = function(name) {
  * This function is triggered by a click event on the chat tab. It reads the tab name from the event target
  * and activates the corresponding chat tab.
  *
- * @function window.chat.chooser
+ * @function chat.chooser
  * @param {Event} event - The event triggered by clicking a chat tab.
  */
-window.chat.chooser = function(event) {
+chat.chooser = function(event) {
   var t = $(event.target);
   var tab = t.data('channel');
-  window.chat.chooseTab(tab);
+  chat.chooseTab(tab);
 }
 
 /**
@@ -1146,12 +1136,12 @@ window.chat.chooser = function(event) {
  * This function is designed to keep the scroll position fixed when old messages are loaded, and to automatically scroll
  * to the bottom when new messages are added if the user is already at the bottom of the chat.
  *
- * @function window.chat.keepScrollPosition
+ * @function chat.keepScrollPosition
  * @param {jQuery} box - The jQuery object of the chat box.
  * @param {number} scrollBefore - The scroll position before new messages were added.
  * @param {boolean} isOldMsgs - Indicates if the added messages are older messages.
  */
-window.chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
+chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
   // If scrolled down completely, keep it that way so new messages can
   // be seen easily. If scrolled up, only need to fix scroll position
   // when old messages are added. New messages added at the bottom don’t
@@ -1165,7 +1155,7 @@ window.chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
 
   if(scrollBefore === 0 || isOldMsgs) {
     box.data('ignoreNextScroll', true);
-    box.scrollTop(box.scrollTop() + (scrollBottom(box)-scrollBefore));
+    box.scrollTop(box.scrollTop() + (window.scrollBottom(box)-scrollBefore));
   }
 }
 
@@ -1173,56 +1163,56 @@ window.chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
 // comm tab api
 //
 
-function createCommTab (commTab) {
+function createChannelTab (channelDesc) {
   var chatControls = $('#chatcontrols');
   var chatDiv = $('#chat');
   var accessLink = L.Util.template(
-    '<a data-channel="{channel}" accesskey="{index}" title="[{index}]">{name}</a>',
-    commTab
+    '<a data-channel="{id}" accesskey="{index}" title="[{index}]">{name}</a>',
+    channelDesc
   );
-  $(accessLink).appendTo(chatControls).click(window.chat.chooser);
+  $(accessLink).appendTo(chatControls).click(chat.chooser);
 
   var channelDiv = L.Util.template(
-    '<div id="chat{channel}"><table></table></div>',
-    commTab
+    '<div id="chat{id}"><table></table></div>',
+    channelDesc
   );
   var elm = $(channelDiv).appendTo(chatDiv);
-  if (commTab.request) {
+  if (channelDesc.request) {
     elm.scroll(function() {
       var t = $(this);
       if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
       if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP)
-        commTab.request(commTab.channel, true);
-      if(scrollBottom(t) === 0)
-        commTab.request(commTab.channel, false);
+        channelDesc.request(channelDesc.id, true);
+      if(window.scrollBottom(t) === 0)
+        channelDesc.request(channelDesc.id, false);
     });
   }
 
   // pane
-  if (useAndroidPanes()) {
+  if (window.useAndroidPanes()) {
     // exlude hard coded panes
-    if (commTab.channel !== 'all' && commTab.channel !== 'faction' && commTab.channel !== 'alerts') {
-      android.addPane(commTab.channel, commTab.name, 'ic_action_view_as_list');
+    if (channelDesc.id !== 'all' && channelDesc.id !== 'faction' && channelDesc.id !== 'alerts') {
+      android.addPane(channelDesc.id, channelDesc.name, 'ic_action_view_as_list');
     }
   }
 }
 
 var isTabsSetup = false;
-window.chat.addCommTab = function (commTab) {
+chat.addChannel = function (channelDesc) {
   // deny reserved name
-  if (commTab.channel == 'info' || commTab.channel == 'map') {
-    log.warn('could not add commtab "' + commTab.channel + '": reserved');
+  if (channelDesc.id == 'info' || channelDesc.id == 'map') {
+    log.warn('could not add channel "' + channelDesc.id + '": reserved');
     return false;
   }
-  if (chat.getCommTab(commTab.channel)) {
-    log.warn('could not add commtab "' + commTab.channel + '": already exist');
+  if (chat.getChannelDesc(channelDesc.id)) {
+    log.warn('could not add channel "' + channelDesc.id + '": already exist');
     return false;
   }
 
-  chat.commTabs.push(commTab);
-  commTab.index = chat.commTabs.length;
+  chat.channels.push(channelDesc);
+  channelDesc.index = chat.channels.length;
 
-  if (isTabsSetup) createCommTab(commTab);
+  if (isTabsSetup) createChannelTab(channelDesc);
 
   return true;
 };
@@ -1232,25 +1222,25 @@ window.chat.addCommTab = function (commTab) {
 // setup
 //
 
-window.chat.setupTabs = function () {
+chat.setupTabs = function () {
   isTabsSetup = true;
-  window.chat.commTabs.forEach(function (entry, i) {
+  chat.channels.forEach(function (entry, i) {
     entry.index = i+1;
     chat.initChannelData(entry);
-    createCommTab(entry);
+    createChannelTab(entry);
   });
   // legacy compatibility
-  window.chat._public = window.chat._channels.all;
-  window.chat._faction = window.chat._channels.faction;
-  window.chat._alerts = window.chat._channels.alert;
+  chat._public = chat._channels.all;
+  chat._faction = chat._channels.faction;
+  chat._alerts = chat._channels.alerts;
 };
 
 /**
  * Sets up the chat interface.
  *
- * @function window.chat.setup
+ * @function chat.setup
  */
-window.chat.setup = function() {
+chat.setup = function() {
   chat.setupTabs();
 
   if (localStorage['iitc-chat-tab']) {
@@ -1259,15 +1249,15 @@ window.chat.setup = function() {
 
   $('#chatcontrols, #chat, #chatinput').show();
 
-  $('#chatcontrols a:first').click(window.chat.toggle);
+  $('#chatcontrols a:first').click(chat.toggle);
 
 
   $('#chatinput').click(function() {
     $('#chatinput input').focus();
   });
 
-  window.chat.setupTime();
-  window.chat.setupPosting();
+  chat.setupTime();
+  chat.setupPosting();
 
   window.requests.addRefreshFunction(chat.request);
 
@@ -1275,7 +1265,7 @@ window.chat.setup = function() {
   $('#chatinput mark').addClass(cls);
 
   $(document).on('click', '.nickname', function(event) {
-    return window.chat.nicknameClicked(event, $(this).text());
+    return chat.nicknameClicked(event, $(this).text());
   });
 }
 
@@ -1283,9 +1273,9 @@ window.chat.setup = function() {
  * Sets up the time display in the chat input box.
  * This function updates the time displayed next to the chat input field every minute to reflect the current time.
  *
- * @function window.chat.setupTime
+ * @function chat.setupTime
  */
-window.chat.setupTime = function() {
+chat.setupTime = function() {
   var inputTime = $('#chatinput time');
   var updateTime = function() {
     if(window.isIdle()) return;
@@ -1309,10 +1299,10 @@ window.chat.setupTime = function() {
 /**
  * Sets up the chat message posting functionality.
  *
- * @function window.chat.setupPosting
+ * @function chat.setupPosting
  */
-window.chat.setupPosting = function() {
-  if (!isSmartphone()) {
+chat.setupPosting = function() {
+  if (!window.isSmartphone()) {
     $('#chatinput input').keydown(function(event) {
       try {
         var kc = (event.keyCode ? event.keyCode : event.which);
@@ -1321,7 +1311,7 @@ window.chat.setupPosting = function() {
           event.preventDefault();
         } else if (kc === 9) { // tab
           event.preventDefault();
-          window.chat.handleTabCompletion();
+          chat.handleTabCompletion();
         }
       } catch (e) {
         log.error(e);
@@ -1339,11 +1329,11 @@ window.chat.setupPosting = function() {
 /**
  * Posts a chat message to the currently active chat tab.
  *
- * @function window.chat.postMsg
+ * @function chat.postMsg
  */
-window.chat.postMsg = function() {
+chat.postMsg = function() {
   var c = chat.getActive();
-  var channel = chat.getCommTab(c);
+  var channel = chat.getChannelDesc(c);
 
   var msg = $.trim($('#chatinput input').val());
   if(!msg || msg === '') return;
