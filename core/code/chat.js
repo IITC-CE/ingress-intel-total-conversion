@@ -845,10 +845,13 @@ window.chat.renderData = function(data, element, likelyWereOldMsgs, sortedGuids)
 /**
  * Posts a chat message to intel comm context.
  *
- * @function window.chat.postMsg
+ * @function window.chat.sendChatMessage
+ * @param {string} tab intel tab name (either all or faction)
+ * @param {string} msg message to be sent
  */
-window.chat.intelPost = function (msg) {
-  var tab = this.channel;
+window.chat.sendChatMessage = function (tab, msg) {
+  if (tab !== 'all' && tab !== 'faction') return;
+
   var latlng = map.getCenter();
 
   var data = {message: msg,
@@ -868,56 +871,7 @@ window.chat.intelPost = function (msg) {
       alert(errMsg);
     }
   );
-}
-
-/**
- * Posts a chat message to the currently active chat tab.
- *
- * @function window.chat.postMsg
- */
-window.chat.postMsg = function() {
-  var c = chat.getActive();
-  var commTab = chat.getCommTab(c);
-
-  var msg = $.trim($('#chatinput input').val());
-  if(!msg || msg === '') return;
-
-  if (commTab.sendMessage) {
-    commTab.sendMessage(msg);
-    $('#chatinput input').val('');
-  }
-}
-
-/**
- * Sets up the chat message posting functionality.
- *
- * @function window.chat.setupPosting
- */
-window.chat.setupPosting = function() {
-  if (!isSmartphone()) {
-    $('#chatinput input').keydown(function(event) {
-      try {
-        var kc = (event.keyCode ? event.keyCode : event.which);
-        if(kc === 13) { // enter
-          chat.postMsg();
-          event.preventDefault();
-        } else if (kc === 9) { // tab
-          event.preventDefault();
-          window.chat.handleTabCompletion();
-        }
-      } catch (e) {
-        log.error(e);
-        //if (e.stack) { console.error(e.stack); }
-      }
-    });
-  }
-
-  $('#chatinput').submit(function(event) {
-    event.preventDefault();
-    chat.postMsg();
-  });
-}
-
+};
 
 //
 // Tabs
@@ -1345,3 +1299,57 @@ window.chat.setupTime = function() {
   updateTime();
   window.addResumeFunction(updateTime);
 }
+
+
+//
+// posting
+//
+
+
+/**
+ * Sets up the chat message posting functionality.
+ *
+ * @function window.chat.setupPosting
+ */
+window.chat.setupPosting = function() {
+  if (!isSmartphone()) {
+    $('#chatinput input').keydown(function(event) {
+      try {
+        var kc = (event.keyCode ? event.keyCode : event.which);
+        if(kc === 13) { // enter
+          chat.postMsg();
+          event.preventDefault();
+        } else if (kc === 9) { // tab
+          event.preventDefault();
+          window.chat.handleTabCompletion();
+        }
+      } catch (e) {
+        log.error(e);
+        //if (e.stack) { console.error(e.stack); }
+      }
+    });
+  }
+
+  $('#chatinput').submit(function(event) {
+    event.preventDefault();
+    chat.postMsg();
+  });
+};
+
+/**
+ * Posts a chat message to the currently active chat tab.
+ *
+ * @function window.chat.postMsg
+ */
+window.chat.postMsg = function() {
+  var c = chat.getActive();
+  var channel = chat.getCommTab(c);
+
+  var msg = $.trim($('#chatinput input').val());
+  if(!msg || msg === '') return;
+
+  if (channel.sendMessage) {
+    channel.sendMessage(msg);
+    $('#chatinput input').val('');
+  }
+};
