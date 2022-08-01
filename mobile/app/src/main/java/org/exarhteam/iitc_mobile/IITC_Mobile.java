@@ -917,7 +917,9 @@ public class IITC_Mobile extends AppCompatActivity
     public void dialogOpened(final String id, final boolean open) {
         if (open) {
             Log.d("Dialog " + id + " added");
-            mDialogStack.push(id);
+	    if (!mDialogStack.contains(id)) {
+                mDialogStack.push(id);
+	    }
         } else {
             Log.d("Dialog " + id + " closed");
             mDialogStack.remove(id);
