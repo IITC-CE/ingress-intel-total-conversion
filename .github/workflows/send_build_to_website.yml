@@ -1,19 +1,17 @@
-name: Upload PR
+name: Send build to website
 
 # read-write repo token
 # access to secrets
 on:
   workflow_run:
-    workflows: ["Build PR"]
+    workflows: ["Build PR", "Build IITC and push artifacts"]
     types:
       - completed
 
 jobs:
   upload:
     runs-on: ubuntu-latest
-    if: >
-      ${{ github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: 'Download artifact'
         uses: actions/github-script@v6
@@ -39,42 +37,31 @@ jobs:
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/build.zip`, Buffer.from(download.data));
 
+            core.exportVariable('REPO_OWNER', context.repo.owner);
+            core.exportVariable('REPO_NAME', context.repo.repo);
+            core.exportVariable('ARTIFACT_ID', matchArtifact.id);
+
       - name: 'Unzip artifact'
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-        if: ${{ env.WEBSITE_REPO != '' }}
+        if: ${{ env.WEBSITE_REPO != '' && github.event.workflow_run.event == 'pull_request' }}
         run: unzip build.zip
 
       - name: Set env
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-        if: ${{ env.WEBSITE_REPO != '' }}
+        if: ${{ env.WEBSITE_REPO != '' && github.event.workflow_run.event == 'pull_request' }}
         run: |
-          echo "PR_NUMBER=$(cat ./.metadata/number)" >> "$GITHUB_ENV"
+          echo "PR_NUMBER=$(cat ./.metadata/pr_number)" >> "$GITHUB_ENV"
           echo "COMMIT_HASH=$(cat ./.metadata/commit)" >> "$GITHUB_ENV"
           echo "BUILD_APK_FILENAME=$(cat ./.metadata/apk_filename)" >> "$GITHUB_ENV"
           echo "BUILD_ZIP_FILENAME=$(cat ./.metadata/zip_filename)" >> "$GITHUB_ENV"
           echo "BUILDSTAMP=$(cat ./.metadata/buildstamp)" >> "$GITHUB_ENV"
 
-      - name: Push build artifacts to website
+      - name: Comment with build url for PR
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        if: ${{ env.WEBSITE_REPO != '' }}
-        uses: dmnemec/copy_file_to_another_repo_action@main
-        with:
-          source_file: "./build/."
-          destination_repo: ${{ secrets.WEBSITE_REPO }}
-          destination_branch: master
-          destination_folder: 'static/build/artifact/PR${{ env.PR_NUMBER }}/'
-          user_email: 'example@email.com'
-          user_name: 'IITC Updates'
-          commit_message: '🤖 New build PR №${{ env.PR_NUMBER }} from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
-
-      - name: Comment with build url
-        env:
-          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-        if: ${{ env.WEBSITE_REPO != '' }}
+        if: ${{ env.WEBSITE_REPO != '' && github.event.workflow_run.event == 'pull_request' }}
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr_release
@@ -87,3 +74,14 @@ jobs:
             | [`${{ env.BUILD_ZIP_FILENAME }}`](https://github.com/${{ secrets.WEBSITE_REPO }}/raw/master/static/build/artifact/PR${{ env.PR_NUMBER }}/${{ env.BUILD_ZIP_FILENAME }}) | ${{ env.COMMIT_HASH }} |
             
             [See build on website](https://iitc.app/build/artifact/PR${{ env.PR_NUMBER }}/)
+
+      - name: Send build artifacts to website
+        env:
+          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
+        if: ${{ env.WEBSITE_REPO != '' }}
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+          repository: ${{ env.WEBSITE_REPO }}
+          event-type: 'new_iitc_build'
+          client-payload: '{ "repo": {"owner": "${{ env.REPO_OWNER }}", "repo": "${{ env.REPO_NAME }}"}, "artifact_id": "${{ env.ARTIFACT_ID }}" }'

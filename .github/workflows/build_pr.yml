@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '8'
+          java-version: '11'
           cache: 'gradle'
 
       - uses: actions/setup-python@v4
@@ -39,7 +39,8 @@ jobs:
         run: |
           mv ./build/${{ env.BUILD_TYPE }} ./build/build
           mkdir -p ./build/.metadata
-          echo ${{ github.event.number }} > ./build/.metadata/number
+          echo "PR" > ./build/.metadata/build_type
+          echo ${{ github.event.number }} > ./build/.metadata/pr_number
           echo ${{ github.event.pull_request.head.sha }} > ./build/.metadata/commit
           echo $( ls ./build/build/ | grep '.apk' ) > ./build/.metadata/apk_filename
           echo $( ls ./build/build/ | grep '.zip' ) > ./build/.metadata/zip_filename
