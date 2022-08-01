@@ -324,6 +324,10 @@ window.chat.addNickname= function(nick) {
  * @returns {boolean} Always returns false.
  */
 window.chat.nicknameClicked = function(event, nickname) {
+  // suppress @ if coming from chat
+  if (nickname.startsWith('@')) {
+    nickname = nickname.slice(1);
+  }
   var hookData = { event: event, nickname: nickname };
 
   if (window.runHooks('nicknameClicked', hookData)) {
@@ -552,10 +556,9 @@ window.chat.renderPlayer = function (player, at, sender) {
     name = player.plain.replace(/^@/, '');
   }
   var thisToPlayer = name === window.PLAYER.nickname;
-  var spanClass = thisToPlayer ? 'pl_nudge_me' : (player.team + ' pl_nudge_player');
+  var spanClass = 'nickname ' + (thisToPlayer ? 'pl_nudge_me' : (player.team + ' pl_nudge_player'));
   return $('<div>').html($('<span>')
     .attr('class', spanClass)
-    .attr('onclick',"window.chat.nicknameClicked(event, '"+name+"')")
     .text((at ? '@' : '') + name)).html();
 };
 
