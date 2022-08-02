@@ -4,21 +4,21 @@
 
 // returns a float. Displayed portal level is always rounded down from
 // that value.
-window.getPortalLevel = function(d) {
+window.getPortalLevel = function (d) {
   var lvl = 0;
   var hasReso = false;
-  $.each(d.resonators, function(ind, reso) {
-    if(!reso) return true;
+  $.each(d.resonators, function (ind, reso) {
+    if (!reso) return true;
     lvl += parseInt(reso.level);
     hasReso = true;
   });
-  return hasReso ? Math.max(1, lvl/8) : 0;
+  return hasReso ? Math.max(1, lvl / 8) : 0;
 }
 
-window.getTotalPortalEnergy = function(d) {
+window.getTotalPortalEnergy = function (d) {
   var nrg = 0;
-  $.each(d.resonators, function(ind, reso) {
-    if(!reso) return true;
+  $.each(d.resonators, function (ind, reso) {
+    if (!reso) return true;
     var level = parseInt(reso.level);
     var max = RESO_NRG[level];
     nrg += max;
@@ -29,16 +29,16 @@ window.getTotalPortalEnergy = function(d) {
 // For backwards compatibility
 window.getPortalEnergy = window.getTotalPortalEnergy;
 
-window.getCurrentPortalEnergy = function(d) {
+window.getCurrentPortalEnergy = function (d) {
   var nrg = 0;
-  $.each(d.resonators, function(ind, reso) {
-    if(!reso) return true;
+  $.each(d.resonators, function (ind, reso) {
+    if (!reso) return true;
     nrg += parseInt(reso.energy);
   });
   return nrg;
 }
 
-window.getPortalRange = function(d) {
+window.getPortalRange = function (d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
 
@@ -49,15 +49,15 @@ window.getPortalRange = function(d) {
     resoMissing = true;
   }
   // but in the past we used to always get an array of 8, but will 'null' objects for some entries. maybe that will return?
-  $.each(d.resonators, function(ind, reso) {
-    if(!reso) {
+  $.each(d.resonators, function (ind, reso) {
+    if (!reso) {
       resoMissing = true;
       return;
     }
   });
 
   var range = {
-    base: 160*Math.pow(getPortalLevel(d), 4),
+    base: 160 * Math.pow(getPortalLevel(d), 4),
     boost: getLinkAmpRangeBoost(d)
   };
 
@@ -67,7 +67,7 @@ window.getPortalRange = function(d) {
   return range;
 }
 
-window.getLinkAmpRangeBoost = function(d) {
+window.getLinkAmpRangeBoost = function (d) {
   // additional range boost calculation
 
   // link amps scale: first is full, second a quarter, the last two an eighth
@@ -77,34 +77,34 @@ window.getLinkAmpRangeBoost = function(d) {
 
   var linkAmps = getPortalModsByType(d, 'LINK_AMPLIFIER');
 
-  linkAmps.forEach(function(mod, i) {
+  linkAmps.forEach(function (mod, i) {
     // link amp stat LINK_RANGE_MULTIPLIER is 2000 for rare, and gives 2x boost to the range
     // and very-rare is 7000 and gives 7x the range
-    var baseMultiplier = mod.stats.LINK_RANGE_MULTIPLIER/1000;
-    boost += baseMultiplier*scale[i];
+    var baseMultiplier = mod.stats.LINK_RANGE_MULTIPLIER / 1000;
+    boost += baseMultiplier * scale[i];
   });
 
   return (linkAmps.length > 0) ? boost : 1.0;
 }
 
 
-window.getAttackApGain = function(d,fieldCount,linkCount) {
+window.getAttackApGain = function (d, fieldCount, linkCount) {
   if (!fieldCount) fieldCount = 0;
 
   var resoCount = 0;
   var maxResonators = MAX_RESO_PER_PLAYER.slice(0);
-  var curResonators = [ 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  var curResonators = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-  for(var n = PLAYER.level + 1; n < 9; n++) {
+  for (var n = PLAYER.level + 1; n < 9; n++) {
     maxResonators[n] = 0;
   }
-  $.each(d.resonators, function(ind, reso) {
-    if(!reso)
+  $.each(d.resonators, function (ind, reso) {
+    if (!reso)
       return true;
     resoCount += 1;
-    var reslevel=parseInt(reso.level);
-    if(reso.owner === PLAYER.nickname) {
-      if(maxResonators[reslevel] > 0) {
+    var reslevel = parseInt(reso.level);
+    if (reso.owner === PLAYER.nickname) {
+      if (maxResonators[reslevel] > 0) {
         maxResonators[reslevel] -= 1;
       }
     } else {
@@ -123,10 +123,10 @@ window.getAttackApGain = function(d,fieldCount,linkCount) {
   var completionAp = (deployCount > 0) ? COMPLETION_BONUS : 0;
   var upgradeCount = 0;
   var upgradeAvailable = maxResonators[8];
-  for(var n = 7; n >= 0; n--) {
+  for (var n = 7; n >= 0; n--) {
     upgradeCount += curResonators[n];
-    if(upgradeAvailable < upgradeCount) {
-        upgradeCount -= (upgradeCount - upgradeAvailable);
+    if (upgradeAvailable < upgradeCount) {
+      upgradeCount -= (upgradeCount - upgradeAvailable);
     }
     upgradeAvailable += maxResonators[n];
   }
@@ -143,47 +143,47 @@ window.getAttackApGain = function(d,fieldCount,linkCount) {
 }
 
 //This function will return the potential level a player can upgrade it to
-window.potentialPortalLevel = function(d) {
+window.potentialPortalLevel = function (d) {
   var current_level = getPortalLevel(d);
   var potential_level = current_level;
-  
-  if(PLAYER.team === d.team) {
+
+  if (PLAYER.team === d.team) {
     var resonators_on_portal = d.resonators;
     var resonator_levels = new Array();
     // figure out how many of each of these resonators can be placed by the player
     var player_resontators = new Array();
-    for(var i=1;i<=MAX_PORTAL_LEVEL; i++) {
+    for (var i = 1; i <= MAX_PORTAL_LEVEL; i++) {
       player_resontators[i] = i > PLAYER.level ? 0 : MAX_RESO_PER_PLAYER[i];
     }
-    $.each(resonators_on_portal, function(ind, reso) {
-      if(reso !== null && reso.owner === window.PLAYER.nickname) {
+    $.each(resonators_on_portal, function (ind, reso) {
+      if (reso !== null && reso.owner === window.PLAYER.nickname) {
         player_resontators[reso.level]--;
       }
-      resonator_levels.push(reso === null ? 0 : reso.level);  
+      resonator_levels.push(reso === null ? 0 : reso.level);
     });
-    
-    resonator_levels.sort(function(a, b) {
-      return(a - b);
+
+    resonator_levels.sort(function (a, b) {
+      return (a - b);
     });
-    
+
     // Max out portal
     var install_index = 0;
-    for(var i=MAX_PORTAL_LEVEL;i>=1; i--) {
-      for(var install = player_resontators[i]; install>0; install--) {
-        if(resonator_levels[install_index] < i) {
+    for (var i = MAX_PORTAL_LEVEL; i >= 1; i--) {
+      for (var install = player_resontators[i]; install > 0; install--) {
+        if (resonator_levels[install_index] < i) {
           resonator_levels[install_index] = i;
           install_index++;
         }
       }
     }
     //log.log(resonator_levels);
-    potential_level = resonator_levels.reduce(function(a, b) {return a + b;}) / 8;
+    potential_level = resonator_levels.reduce(function (a, b) { return a + b; }) / 8;
   }
-  return(potential_level);
+  return (potential_level);
 }
 
 
-window.fixPortalImageUrl = function(url) {
+window.fixPortalImageUrl = function (url) {
   if (url) {
     if (window.location.protocol === 'https:') {
       url = url.replace(/^http:\/\//, '//');
@@ -196,7 +196,7 @@ window.fixPortalImageUrl = function(url) {
 }
 
 
-window.getPortalModsByType = function(d, type) {
+window.getPortalModsByType = function (d, type) {
   var mods = [];
 
   var typeToStat = {
@@ -211,13 +211,13 @@ window.getPortalModsByType = function(d, type) {
 
   var stat = typeToStat[type];
 
-  $.each(d.mods || [], function(i,mod) {
+  $.each(d.mods || [], function (i, mod) {
     if (mod && mod.stats.hasOwnProperty(stat)) mods.push(mod);
   });
 
 
   // sorting mods by the stat keeps code simpler, when calculating combined mod effects
-  mods.sort (function(a,b) {
+  mods.sort(function (a, b) {
     return b.stats[stat] - a.stats[stat];
   });
 
@@ -226,18 +226,18 @@ window.getPortalModsByType = function(d, type) {
 
 
 
-window.getPortalShieldMitigation = function(d) {
+window.getPortalShieldMitigation = function (d) {
   var shields = getPortalModsByType(d, 'RES_SHIELD');
 
   var mitigation = 0;
-  $.each(shields, function(i,s) {
+  $.each(shields, function (i, s) {
     mitigation += parseInt(s.stats.MITIGATION);
   });
 
   return mitigation;
 }
 
-window.getPortalLinkDefenseBoost = function(d) {
+window.getPortalLinkDefenseBoost = function (d) {
   var ultraLinkAmps = getPortalModsByType(d, 'ULTRA_LINK_AMP');
 
   var linkDefenseBoost = 1;
@@ -249,12 +249,12 @@ window.getPortalLinkDefenseBoost = function(d) {
   return Math.round(10 * linkDefenseBoost) / 10;
 }
 
-window.getPortalLinksMitigation = function(linkCount) {
-  var mitigation = Math.round(400/9*Math.atan(linkCount/Math.E));
+window.getPortalLinksMitigation = function (linkCount) {
+  var mitigation = Math.round(400 / 9 * Math.atan(linkCount / Math.E));
   return mitigation;
 }
 
-window.getPortalMitigationDetails = function(d,linkCount) {
+window.getPortalMitigationDetails = function (d, linkCount) {
   var linkDefenseBoost = getPortalLinkDefenseBoost(d);
 
   var mitigation = {
@@ -264,53 +264,53 @@ window.getPortalMitigationDetails = function(d,linkCount) {
   };
 
   // mitigation is limited to 95% (as confirmed by Brandon Badger on G+)
-  mitigation.total = Math.min(95, mitigation.shields+mitigation.links);
+  mitigation.total = Math.min(95, mitigation.shields + mitigation.links);
 
-  var excess = (mitigation.shields+mitigation.links) - mitigation.total;
+  var excess = (mitigation.shields + mitigation.links) - mitigation.total;
   mitigation.excess = Math.round(10 * excess) / 10;
 
   return mitigation;
 }
 
-window.getMaxOutgoingLinks = function(d) {
+window.getMaxOutgoingLinks = function (d) {
   var linkAmps = getPortalModsByType(d, 'ULTRA_LINK_AMP');
 
   var links = 8;
 
-  linkAmps.forEach(function(mod, i) {
+  linkAmps.forEach(function (mod, i) {
     links += parseInt(mod.stats.OUTGOING_LINKS_BONUS);
   });
 
   return links;
 };
 
-window.getPortalHackDetails = function(d) {
+window.getPortalHackDetails = function (d) {
 
   var heatsinks = getPortalModsByType(d, 'HEATSINK');
   var multihacks = getPortalModsByType(d, 'MULTIHACK');
 
   // first mod of type is fully effective, the others are only 50% effective
-  var effectivenessReduction = [ 1, 0.5, 0.5, 0.5 ];
+  var effectivenessReduction = [1, 0.5, 0.5, 0.5];
 
-  var cooldownTime = BASE_HACK_COOLDOWN;
+  var cooldownTime = PLAYER.team.startsWith(d.team) ? HACK_COOLDOWN_FRIENDLY : HACK_COOLDOWN_ENEMY;
 
-  $.each(heatsinks, function(index,mod) {
-    var hackSpeed = parseInt(mod.stats.HACK_SPEED)/1000000;
+  $.each(heatsinks, function (index, mod) {
+    var hackSpeed = parseInt(mod.stats.HACK_SPEED) / 1000000;
     cooldownTime = Math.round(cooldownTime * (1 - hackSpeed * effectivenessReduction[index]));
   });
 
   var hackCount = BASE_HACK_COUNT; // default hacks
 
-  $.each(multihacks, function(index,mod) {
+  $.each(multihacks, function (index, mod) {
     var extraHacks = parseInt(mod.stats.BURNOUT_INSULATION);
     hackCount = hackCount + (extraHacks * effectivenessReduction[index]);
   });
 
-  return {cooldown: cooldownTime, hacks: hackCount, burnout: cooldownTime*(hackCount-1)};
+  return { cooldown: cooldownTime, hacks: hackCount, burnout: cooldownTime * (hackCount - 1) };
 }
 
 // given a detailed portal structure, return summary portal data, as seen in the map tile data
-window.getPortalSummaryData = function(d) {
+window.getPortalSummaryData = function (d) {
 
   // NOTE: the summary data reports unclaimed portals as level 1 - not zero as elsewhere in IITC
   var level = parseInt(getPortalLevel(d));
@@ -324,7 +324,7 @@ window.getPortalSummaryData = function(d) {
   }
   var maxEnergy = getTotalPortalEnergy(d);
   var curEnergy = getCurrentPortalEnergy(d);
-  var health = maxEnergy>0 ? parseInt(curEnergy/maxEnergy*100) : 0;
+  var health = maxEnergy > 0 ? parseInt(curEnergy / maxEnergy * 100) : 0;
 
   return {
     level: level,
@@ -339,7 +339,7 @@ window.getPortalSummaryData = function(d) {
   };
 }
 
-window.getPortalAttackValues = function(d) {
+window.getPortalAttackValues = function (d) {
   var forceamps = getPortalModsByType(d, 'FORCE_AMP');
   var turrets = getPortalModsByType(d, 'TURRET');
 
@@ -359,13 +359,13 @@ window.getPortalAttackValues = function(d) {
     attack_frequency: 0,
   };
 
-  forceamps.forEach(function(mod, i) {
+  forceamps.forEach(function (mod, i) {
     // force amp stat FORCE_AMPLIFIER is 2000 for rare, and gives 2x boost to the range
     var baseMultiplier = mod.stats.FORCE_AMPLIFIER / 1000;
     attackValues.force_amplifier += baseMultiplier * scale[i];
   });
 
-  turrets.forEach(function(mod, i) {
+  turrets.forEach(function (mod, i) {
     // turret stat ATTACK_FREQUENCY is 2000 for rare, and gives 2x boost to the range
     var baseMultiplier = mod.stats.ATTACK_FREQUENCY / 1000;
     attackValues.attack_frequency += baseMultiplier * scale[i];
