@@ -1233,6 +1233,26 @@ chat.setupTabs = function () {
   chat._public = chat._channels.all;
   chat._faction = chat._channels.faction;
   chat._alerts = chat._channels.alerts;
+
+  chat.requestPublic = function (getOlderMsgs, isRetry) {
+    return chat.requestChannel('all', getOlderMsgs, isRetry);
+  };
+  chat.requestFaction = function (getOlderMsgs, isRetry) {
+    return chat.requestChannel('faction', getOlderMsgs, isRetry);
+  };
+  chat.requestAlerts = function (getOlderMsgs, isRetry) {
+    return chat.requestChannel('alerts', getOlderMsgs, isRetry);
+  };
+
+  chat.renderPublic = function (oldMsgsWereAdded) {
+    return chat.renderChannel('all', oldMsgsWereAdded);
+  }
+  chat.renderFaction = function (oldMsgsWereAdded) {
+    return chat.renderChannel('faction', oldMsgsWereAdded);
+  }
+  chat.renderAlerts = function (oldMsgsWereAdded) {
+    return chat.renderChannel('allerts', oldMsgsWereAdded);
+  }
 };
 
 /**
