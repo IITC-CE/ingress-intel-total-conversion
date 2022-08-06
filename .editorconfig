@@ -13,7 +13,7 @@ indent_size = 2
 
 [*.py]
 indent_size = 4
-dashArray = [1,2];
+
 # Following JS code style rules do not have EditorConfig support yet:
 # - Use identity operators (===) over equality operators (==).
 # - Opening brace at end of line. e.g. "if (a) {", "} else {", "} else if (b) }"

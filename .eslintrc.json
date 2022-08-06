@@ -1,30 +1,23 @@
 {
     "env": {
         "browser": true,
-        "es6": false,
+        "es6": true,
         "jquery": true,
         "greasemonkey": true
     },
     "extends": [
-        "eslint:recommended"
+        "eslint:recommended",
+        "plugin:prettier/recommended",
+        "prettier"
     ],
     "ignorePatterns": [
-        "/core/external/*.js", 
+        "/core/external/*.js",
         "/plugins/external/*.js"
     ],
+    "plugins": ["prettier"],
     "rules": {
         "eqeqeq": "error",
-        "indent": ["warn", 2],
-        "brace-style": ["error","1tbs", { "allowSingleLine": true }],
-        "curly": ["error", "multi-line"],
-        "keyword-spacing": "error",
         "spaced-comment": "error",
-        "quotes": ["error", "single", { "avoidEscape": true }],
-        "no-trailing-spaces": "error",
-        "max-len": ["warn", { "code": 160 }],
-        "semi": "error",
-        "eol-last": "error",
-        "quote-props": ["error","consistent-as-needed"],
         "no-unused-expressions": "error"
     }
 }
