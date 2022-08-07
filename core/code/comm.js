@@ -45,11 +45,11 @@ comm.updateOldNewHash = function (newData, storageHash, isOlderMsgs, isAscending
   if (newData.result.length > 0) {
     var first = {
       guid: newData.result[0][0],
-      time: newData.result[0][1]
+      time: newData.result[0][1],
     };
     var last = {
       guid: newData.result[newData.result.length - 1][0],
-      time: newData.result[newData.result.length - 1][1]
+      time: newData.result[newData.result.length - 1][1],
     };
     if (isAscendingOrder) {
       var temp = first;
@@ -173,15 +173,16 @@ comm.sendChatMessage = function (tab, msg) {
 
   var data = {
     message: msg,
-    latE6: Math.round(latlng.lat * 1E6),
-    lngE6: Math.round(latlng.lng * 1E6),
-    tab: tab
+    latE6: Math.round(latlng.lat * 1e6),
+    lngE6: Math.round(latlng.lng * 1e6),
+    tab: tab,
   };
 
-  var errMsg = 'Your message could not be delivered. You can copy&' +
-    'paste it here and try again if you want:\n\n' + msg;
+  var errMsg = 'Your message could not be delivered. You can copy&' + 'paste it here and try again if you want:\n\n' + msg;
 
-  window.postAjax('sendPlext', data,
+  window.postAjax(
+    'sendPlext',
+    data,
     function (response) {
       if (response.error) alert(errMsg);
       window.startRefreshTimeout(0.1 * 1000); // only comm uses the refresh timer stuff, so a perfect way of forcing an early refresh after a send message
@@ -191,7 +192,6 @@ comm.sendChatMessage = function (tab, msg) {
     }
   );
 };
-
 
 comm._oldBBox = null;
 /**
@@ -208,7 +208,7 @@ comm.genPostData = function (channel, _, getOlderMsgs) {
     throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
   }
 
-  var b = clampLatLngBounds(map.getBounds());
+  var b = window.clampLatLngBounds(map.getBounds());
 
   // set a current bounding box if none set so far
   if (!comm._oldBBox) comm._oldBBox = b;
@@ -237,10 +237,10 @@ comm.genPostData = function (channel, _, getOlderMsgs) {
   var ne = b.getNorthEast();
   var sw = b.getSouthWest();
   var data = {
-    minLatE6: Math.round(sw.lat * 1E6),
-    minLngE6: Math.round(sw.lng * 1E6),
-    maxLatE6: Math.round(ne.lat * 1E6),
-    maxLngE6: Math.round(ne.lng * 1E6),
+    minLatE6: Math.round(sw.lat * 1e6),
+    minLngE6: Math.round(sw.lng * 1e6),
+    maxLatE6: Math.round(ne.lat * 1e6),
+    maxLngE6: Math.round(ne.lng * 1e6),
     minTimestampMs: -1,
     maxTimestampMs: -1,
     tab: channel,
@@ -250,7 +250,7 @@ comm.genPostData = function (channel, _, getOlderMsgs) {
     // ask for older comm when scrolling up
     data = $.extend(data, {
       maxTimestampMs: storageHash.oldestTimestamp,
-      plextContinuationGuid: storageHash.oldestGUID
+      plextContinuationGuid: storageHash.oldestGUID,
     });
   } else {
     // ask for newer comm
@@ -268,7 +268,7 @@ comm.genPostData = function (channel, _, getOlderMsgs) {
     // problem in crowded areas.
     $.extend(data, {
       minTimestampMs: min,
-      plextContinuationGuid: storageHash.newestGUID
+      plextContinuationGuid: storageHash.newestGUID,
     });
     // when requesting with an actual minimum timestamp, request oldest rather than newest first.
     // this matches the stock intel site, and ensures no gaps when continuing after an extended idle period
@@ -289,18 +289,24 @@ comm._requestRunning = {};
  */
 comm.requestChannel = function (channel, getOlderMsgs, isRetry) {
   if (comm._requestRunning[channel] && !isRetry) return;
-  if (isIdle()) return renderUpdateStatus();
+  if (window.isIdle()) return window.renderUpdateStatus();
   comm._requestRunning[channel] = true;
   $("#chatcontrols a[data-channel='" + channel + "']").addClass('loading');
 
   var d = comm.genPostData(channel, comm._channels[channel], getOlderMsgs);
-  var r = window.postAjax(
+  window.postAjax(
     'getPlexts',
     d,
-    function (data, textStatus, jqXHR) { comm.handleChannel(channel, data, getOlderMsgs, d.ascendingTimestampOrder); },
+    function (data) {
+      comm.handleChannel(channel, data, getOlderMsgs, d.ascendingTimestampOrder);
+    },
     isRetry
-      ? function () { comm._requestRunning[channel] = false; }
-      : function () { comm.requestChannel(channel, getOlderMsgs, true); }
+      ? function () {
+          comm._requestRunning[channel] = false;
+        }
+      : function () {
+          comm.requestChannel(channel, getOlderMsgs, true);
+        }
   );
 };
 
@@ -336,10 +342,10 @@ comm.handleChannel = function (channel, data, olderMsgs, ascendingTimestampOrder
   var hook = channel + 'ChatDataAvailable';
   // backward compability
   if (channel === 'all') hook = 'publicChatDataAvailable';
-  runHooks(hook, { raw: data, result: data.result, processed: comm._channels[channel].data });
+  window.runHooks(hook, { raw: data, result: data.result, processed: comm._channels[channel].data });
 
   // generic hook
-  runHooks('commDataAvailable', { channel: channel, raw: data, result: data.result, processed: comm._channels[channel].data });
+  window.runHooks('commDataAvailable', { channel: channel, raw: data, result: data.result, processed: comm._channels[channel].data });
 
   comm.renderChannel(channel, oldMsgsWereAdded);
 };
@@ -405,9 +411,10 @@ comm.getChatPortalName = function (markup) {
  * @returns {string} HTML string of the portal link.
  */
 comm.renderPortal = function (portal) {
-  var lat = portal.latE6/1E6, lng = portal.lngE6/1E6;
-  var perma = window.makePermalink([lat,lng]);
-  var js = 'window.selectPortalByLatLng('+lat+', '+lng+');return false';
+  var lat = portal.latE6 / 1e6,
+    lng = portal.lngE6 / 1e6;
+  var perma = window.makePermalink([lat, lng]);
+  var js = 'window.selectPortalByLatLng(' + lat + ', ' + lng + ');return false';
   return '<a onclick="' + js + '"' + ' title="' + portal.address + '"' + ' href="' + perma + '" class="help">' + comm.getChatPortalName(portal) + '</a>';
 };
 
@@ -422,9 +429,7 @@ comm.renderFactionEnt = function (faction) {
   var teamId = window.teamStringToId(faction.team);
   var name = window.TEAM_NAMES[teamId];
   var spanClass = window.TEAM_TO_CSS[teamId];
-  return $('<div>').html($('<span>')
-    .attr('class', spanClass)
-    .text(name)).html();
+  return $('<div>').html($('<span>').attr('class', spanClass).text(name)).html();
 };
 
 /**
@@ -444,10 +449,14 @@ comm.renderPlayer = function (player, at, sender) {
     name = player.plain.replace(/^@/, '');
   }
   var thisToPlayer = name === window.PLAYER.nickname;
-  var spanClass = 'nickname ' + (thisToPlayer ? 'pl_nudge_me' : (player.team + ' pl_nudge_player'));
-  return $('<div>').html($('<span>')
-    .attr('class', spanClass)
-    .text((at ? '@' : '') + name)).html();
+  var spanClass = 'nickname ' + (thisToPlayer ? 'pl_nudge_me' : player.team + ' pl_nudge_player');
+  return $('<div>')
+    .html(
+      $('<span>')
+        .attr('class', spanClass)
+        .text((at ? '@' : '') + name)
+    )
+    .html();
 };
 
 /**
@@ -459,21 +468,23 @@ comm.renderPlayer = function (player, at, sender) {
  */
 comm.renderMarkupEntity = function (ent) {
   switch (ent[0]) {
-  case 'TEXT':
-    return comm.renderText(ent[1]);
-  case 'PORTAL':
-    return comm.renderPortal(ent[1]);
-  case 'FACTION':
-    return comm.renderFactionEnt(ent[1]);
-  case 'SENDER':
-    return comm.renderPlayer(ent[1], false, true);
-  case 'PLAYER':
-    return comm.renderPlayer(ent[1]);
-  case 'AT_PLAYER':
-    return comm.renderPlayer(ent[1], true);
-  default:
+    case 'TEXT':
+      return comm.renderText(ent[1]);
+    case 'PORTAL':
+      return comm.renderPortal(ent[1]);
+    case 'FACTION':
+      return comm.renderFactionEnt(ent[1]);
+    case 'SENDER':
+      return comm.renderPlayer(ent[1], false, true);
+    case 'PLAYER':
+      return comm.renderPlayer(ent[1]);
+    case 'AT_PLAYER':
+      return comm.renderPlayer(ent[1], true);
+    default:
   }
-  return $('<div>').text(ent[0]+':<'+ent[1].plain+'>').html();
+  return $('<div>')
+    .text(ent[0] + ':<' + ent[1].plain + '>')
+    .html();
 };
 
 /**
@@ -598,7 +609,7 @@ comm.renderMsgRow = function (data) {
   var timeCell = comm.renderTimeCell(data.time, timeClass);
 
   var nickClasses = ['nickname'];
-  if (window.TEAM_TO_CSS[data.player.team]) {
+  if (data.player.team === window.TEAM_ENL || data.player.team === window.TEAM_RES) {
     nickClasses.push(window.TEAM_TO_CSS[data.player.team]);
   }
   // highlight things said/done by the player in a unique colour
@@ -634,32 +645,29 @@ comm.renderMsgRow = function (data) {
  * @param {boolean} systemNarrowcast - Flag indicating if the message is a system narrowcast.
  * @returns {string} The HTML string representing a chat message row.
  */
-comm.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) {
+comm.renderMsg = function (msg, nick, time, team, msgToPlayer, systemNarrowcast) {
   var ta = window.unixTimeToHHmm(time);
   var tb = window.unixTimeToDateTimeString(time, true);
   // add <small> tags around the milliseconds
-  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+  tb = (tb.slice(0, 19) + '<small class="milliseconds">' + tb.slice(19) + '</small>').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   // help cursor via “#chat time”
-  var t = '<time title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time>';
+  var t = '<time title="' + tb + '" data-timestamp="' + time + '">' + ta + '</time>';
   if (msgToPlayer) {
     t = '<div class="pl_nudge_date">' + t + '</div><div class="pl_nudge_pointy_spacer"></div>';
   }
   if (systemNarrowcast) {
     msg = '<div class="system_narrowcast">' + msg + '</div>';
   }
-  var color = COLORS[team];
+  var color = window.COLORS[team];
   // highlight things said/done by the player in a unique colour (similar to @player mentions from others in the chat text itself)
   if (nick === window.PLAYER.nickname) {
     color = '#fd6';
   }
-  var s = 'style="cursor:pointer; color:'+color+'"';
+  var s = 'style="cursor:pointer; color:' + color + '"';
   var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
-  return '<tr><td>'+t+'</td><td>'+i[0]+'<mark class="nickname" ' + s + '>'+ nick+'</mark>'+i[1]+'</td><td>'+msg+'</td></tr>';
-}
+  return '<tr><td>' + t + '</td><td>' + i[0] + '<mark class="nickname" ' + s + '>' + nick + '</mark>' + i[1] + '</td><td>' + msg + '</td></tr>';
+};
 
 /**
  * Renders a divider row in the chat table.
@@ -668,7 +676,7 @@ comm.renderMsg = function(msg, nick, time, team, msgToPlayer, systemNarrowcast) 
  * @param {string} text - Text to display within the divider row.
  * @returns {string} The HTML string representing a divider row in the chat table.
  */
-comm.renderDivider = function(text) {
+comm.renderDivider = function (text) {
   return '<tr class="divider"><td><hr></td><td>' + text + '</td><td><hr></td></tr>';
 };
 
@@ -681,8 +689,8 @@ comm.renderDivider = function(text) {
  * @param {boolean} likelyWereOldMsgs - Flag indicating if older messages are likely to have been added.
  * @param {Array} sortedGuids - Sorted array of GUIDs representing the order of messages.
  */
-comm.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
-  var elm = $('#'+element);
+comm.renderData = function (data, element, likelyWereOldMsgs, sortedGuids) {
+  var elm = $('#' + element);
   if (elm.is(':hidden')) {
     return;
   }
@@ -691,15 +699,21 @@ comm.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
   // (disregarding server order)
   var vals = sortedGuids;
   if (vals === undefined) {
-    vals = $.map(data, function(v, k) { return [[v[0], k]]; });
-    vals = vals.sort(function(a, b) { return a[0]-b[0]; });
-    vals = vals.map(function(v) { return v[1]; });
+    vals = $.map(data, function (v, k) {
+      return [[v[0], k]];
+    });
+    vals = vals.sort(function (a, b) {
+      return a[0] - b[0];
+    });
+    vals = vals.map(function (v) {
+      return v[1];
+    });
   }
 
   // render to string with date separators inserted
   var msgs = '';
   var prevTime = null;
-  vals.forEach(function(guid) {
+  vals.forEach(function (guid) {
     var msg = data[guid];
     var nextTime = new Date(msg[0]).toLocaleDateString();
     if (prevTime && prevTime !== nextTime) {
@@ -719,7 +733,7 @@ comm.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
     chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
   }
 
-  if(elm.data('needsScrollTop')) {
+  if (elm.data('needsScrollTop')) {
     elm.data('ignoreNextScroll', true);
     elm.scrollTop(elm.data('needsScrollTop'));
     elm.data('needsScrollTop', null);
@@ -728,29 +742,40 @@ comm.renderData = function(data, element, likelyWereOldMsgs, sortedGuids) {
 
 comm.channels = [
   {
-    id: 'all', name: 'All', localBounds: true,
-    inputPrompt: 'broadcast:', inputClass: 'public',
-    request: comm.requestChannel, render: comm.renderChannel,
+    id: 'all',
+    name: 'All',
+    localBounds: true,
+    inputPrompt: 'broadcast:',
+    inputClass: 'public',
+    request: comm.requestChannel,
+    render: comm.renderChannel,
     sendMessage: comm.sendChatMessage,
   },
   {
-    id: 'faction', name: 'Faction', localBounds: true,
-    inputPrompt: 'tell faction:', inputClass: 'faction',
-    request: comm.requestChannel, render: comm.renderChannel,
+    id: 'faction',
+    name: 'Faction',
+    localBounds: true,
+    inputPrompt: 'tell faction:',
+    inputClass: 'faction',
+    request: comm.requestChannel,
+    render: comm.renderChannel,
     sendMessage: comm.sendChatMessage,
   },
   {
-    id: 'alerts', name: 'Alerts',
-    inputPrompt: 'tell Jarvis:', inputClass: 'alerts',
-    request: comm.requestChannel, render: comm.renderChannel,
+    id: 'alerts',
+    name: 'Alerts',
+    inputPrompt: 'tell Jarvis:',
+    inputClass: 'alerts',
+    request: comm.requestChannel,
+    render: comm.renderChannel,
     sendMessage: function () {
       alert("Jarvis: A strange game. The only winning move is not to play. How about a nice game of chess?\n(You can't comm to the 'alerts' channel!)");
-    }
-  }
+    },
+  },
 ];
 
 for (const channel of comm.channels) {
   comm.initChannelData(channel);
 }
 
-/* global log, map */
+/* global log, map, chat */

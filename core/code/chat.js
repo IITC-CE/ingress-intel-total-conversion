@@ -16,11 +16,11 @@ var chat = window.chat;
  * @function chat.addNickname
  * @param {string} nick - The nickname to add.
  */
-chat.addNickname= function(nick) {
-  var c = document.getElementById("chattext");
-  c.value = [c.value.trim(), nick].join(" ").trim() + " ";
-  c.focus()
-}
+chat.addNickname = function (nick) {
+  var c = document.getElementById('chattext');
+  c.value = [c.value.trim(), nick].join(' ').trim() + ' ';
+  c.focus();
+};
 
 /**
  * Handles click events on nicknames in the chat.
@@ -30,7 +30,7 @@ chat.addNickname= function(nick) {
  * @param {string} nickname - The clicked nickname.
  * @returns {boolean} Always returns false.
  */
-chat.nicknameClicked = function(event, nickname) {
+chat.nicknameClicked = function (event, nickname) {
   // suppress @ if coming from chat
   if (nickname.startsWith('@')) {
     nickname = nickname.slice(1);
@@ -44,13 +44,7 @@ chat.nicknameClicked = function(event, nickname) {
   event.preventDefault();
   event.stopPropagation();
   return false;
-}
-
-
-//
-// Posting
-//
-
+};
 
 //
 // Channels
@@ -74,8 +68,8 @@ chat.channels = [
   // inputClass: (optional) class to apply to #chatinput
   // sendMessage(id, msg): (optional) function to send the message
   //              first argument is `id`
-  // request(id, getOlderMsgs, isRetry): (optional) function to call 
-  //          to request new message, first argument is `id`, second is true 
+  // request(id, getOlderMsgs, isRetry): (optional) function to call
+  //          to request new message, first argument is `id`, second is true
   //          when trigger from scrolling to top
   // render(id, oldMsgsWereAdded): (optional) function to render channel content
   // localBounds: (optional) if true, reset on view change
@@ -89,9 +83,9 @@ chat.channels = [
  * @function chat.getActive
  * @returns {string} The name of the active chat tab.
  */
-chat.getActive = function() {
+chat.getActive = function () {
   return $('#chatcontrols .active').data('channel');
-}
+};
 
 /**
  * Converts a chat tab name to its corresponding channel object.
@@ -103,8 +97,7 @@ chat.getActive = function() {
 chat.getChannelDesc = function (tab) {
   var channelObject = null;
   chat.channels.forEach(function (entry) {
-    if (entry.id === tab)
-      channelObject = entry;
+    if (entry.id === tab) channelObject = entry;
   });
   return channelObject;
 };
@@ -116,9 +109,9 @@ chat.getChannelDesc = function (tab) {
  *
  * @function chat.toggle
  */
-chat.toggle = function() {
+chat.toggle = function () {
   var c = $('#chat, #chatcontrols');
-  if(c.hasClass('expand')) {
+  if (c.hasClass('expand')) {
     c.removeClass('expand');
     var div = $('#chat > div:visible');
     div.data('ignoreNextScroll', true);
@@ -141,24 +134,24 @@ chat.toggle = function() {
  * @param {string} channel - The name of the COMM channel ('all', 'faction', or 'alerts').
  * @param {boolean} flag - Set to true to request data for the specified channel, false to stop requesting.
  */
-chat.backgroundChannelData = function(instance,channel,flag) {
-  //first, store the state for this instance
+chat.backgroundChannelData = function (instance, channel, flag) {
+  // first, store the state for this instance
   if (!chat.backgroundInstanceChannel) chat.backgroundInstanceChannel = {};
   if (!chat.backgroundInstanceChannel[instance]) chat.backgroundInstanceChannel[instance] = {};
   chat.backgroundInstanceChannel[instance][channel] = flag;
 
-  //now, to simplify the request code, merge the flags for all instances into one
+  // now, to simplify the request code, merge the flags for all instances into one
   // 1. clear existing overall flags
   chat.backgroundChannels = {};
   // 2. for each instance monitoring COMM...
-  $.each(chat.backgroundInstanceChannel, function(instance,channels) {
+  $.each(chat.backgroundInstanceChannel, function (instance) {
     // 3. and for each channel monitored by this instance...
-    $.each(chat.backgroundInstanceChannel[instance],function(channel,flag) {
+    $.each(chat.backgroundInstanceChannel[instance], function (channel, flag) {
       // 4. if it's monitored, set the channel flag
       if (flag) chat.backgroundChannels[channel] = true;
     });
   });
-}
+};
 
 /**
  * Requests chat messages for the currently active chat tab and background channels.
@@ -166,15 +159,14 @@ chat.backgroundChannelData = function(instance,channel,flag) {
  *
  * @function chat.request
  */
-chat.request = function() {
+chat.request = function () {
   var channel = chat.getActive();
   chat.channels.forEach(function (entry) {
     if (channel === entry.id || (chat.backgroundChannels && chat.backgroundChannels[entry.id])) {
-      if (entry.request)
-        entry.request(entry.id, false);
+      if (entry.request) entry.request(entry.id, false);
     }
   });
-}
+};
 
 /**
  * Checks if the currently selected chat tab needs more messages.
@@ -182,17 +174,17 @@ chat.request = function() {
  *
  * @function chat.needMoreMessages
  */
-chat.needMoreMessages = function() {
+chat.needMoreMessages = function () {
   var activeTab = chat.getActive();
   var channel = chat.getChannelDesc(activeTab);
-  if(!channel || !channel.request) return;
+  if (!channel || !channel.request) return;
 
   var activeChat = $('#chat > :visible');
-  if(activeChat.length === 0) return;
+  if (activeChat.length === 0) return;
 
   var hasScrollbar = window.scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
-  var nearTop = activeChat.scrollTop() <= CHAT_REQUEST_SCROLL_TOP;
-  if(hasScrollbar && !nearTop) return;
+  var nearTop = activeChat.scrollTop() <= window.CHAT_REQUEST_SCROLL_TOP;
+  if (hasScrollbar && !nearTop) return;
 
   channel.request(channel.id, false);
 };
@@ -204,9 +196,17 @@ chat.needMoreMessages = function() {
  * @function chat.chooseTab
  * @param {string} tab - The name of the chat tab to activate ('all', 'faction', or 'alerts').
  */
-chat.chooseTab = function(tab) {
-  if (chat.channels.every(function (entry) { return entry.id !== tab; })) {
-    var tabsAvalaible = chat.channels.map(function (entry) { return '"' + entry.id + '"'; }).join(', ');
+chat.chooseTab = function (tab) {
+  if (
+    chat.channels.every(function (entry) {
+      return entry.id !== tab;
+    })
+  ) {
+    var tabsAvalaible = chat.channels
+      .map(function (entry) {
+        return '"' + entry.id + '"';
+      })
+      .join(', ');
     log.warn('chat tab "' + tab + '" requested - but only ' + tabsAvalaible + ' are valid - assuming "all" wanted');
     tab = 'all';
   }
@@ -228,7 +228,7 @@ chat.chooseTab = function(tab) {
   $('#chatcontrols .active').removeClass('active');
   $("#chatcontrols a[data-channel='" + tab + "']").addClass('active');
 
-  if (tab != oldTab) window.startRefreshTimeout(0.1*1000); //only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a tab change
+  if (tab !== oldTab) window.startRefreshTimeout(0.1 * 1000); // only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a tab change
 
   $('#chat > div').hide();
 
@@ -237,12 +237,12 @@ chat.chooseTab = function(tab) {
 
   if (channel.render) channel.render(tab);
 
-  if(elm.data('needsScrollTop')) {
+  if (elm.data('needsScrollTop')) {
     elm.data('ignoreNextScroll', true);
     elm.scrollTop(elm.data('needsScrollTop'));
     elm.data('needsScrollTop', null);
   }
-}
+};
 
 /**
  * Displays the chat interface and activates a specified chat tab.
@@ -250,14 +250,16 @@ chat.chooseTab = function(tab) {
  * @function chat.show
  * @param {string} name - The name of the chat tab to show and activate.
  */
-chat.show = function(name) {
-    window.isSmartphone()
-        ? $('#updatestatus').hide()
-        : $('#updatestatus').show();
-    $('#chat, #chatinput').show();
+chat.show = function (name) {
+  if (window.isSmartphone()) {
+    $('#updatestatus').hide();
+  } else {
+    $('#updatestatus').show();
+  }
+  $('#chat, #chatinput').show();
 
-    chat.chooseTab(name);
-}
+  chat.chooseTab(name);
+};
 
 /**
  * Chat tab chooser handler.
@@ -267,11 +269,11 @@ chat.show = function(name) {
  * @function chat.chooser
  * @param {Event} event - The event triggered by clicking a chat tab.
  */
-chat.chooser = function(event) {
+chat.chooser = function (event) {
   var t = $(event.target);
   var tab = t.data('channel');
   chat.chooseTab(tab);
-}
+};
 
 /**
  * Maintains the scroll position of a chat box when new messages are added.
@@ -283,50 +285,42 @@ chat.chooser = function(event) {
  * @param {number} scrollBefore - The scroll position before new messages were added.
  * @param {boolean} isOldMsgs - Indicates if the added messages are older messages.
  */
-chat.keepScrollPosition = function(box, scrollBefore, isOldMsgs) {
+chat.keepScrollPosition = function (box, scrollBefore, isOldMsgs) {
   // If scrolled down completely, keep it that way so new messages can
   // be seen easily. If scrolled up, only need to fix scroll position
   // when old messages are added. New messages added at the bottom don’t
   // change the view and enabling this would make the chat scroll down
   // for every added message, even if the user wants to read old stuff.
 
-  if(box.is(':hidden') && !isOldMsgs) {
+  if (box.is(':hidden') && !isOldMsgs) {
     box.data('needsScrollTop', 99999999);
     return;
   }
 
-  if(scrollBefore === 0 || isOldMsgs) {
+  if (scrollBefore === 0 || isOldMsgs) {
     box.data('ignoreNextScroll', true);
-    box.scrollTop(box.scrollTop() + (window.scrollBottom(box)-scrollBefore));
+    box.scrollTop(box.scrollTop() + (window.scrollBottom(box) - scrollBefore));
   }
-}
+};
 
 //
 // comm tab api
 //
 
-function createChannelTab (channelDesc) {
+function createChannelTab(channelDesc) {
   var chatControls = $('#chatcontrols');
   var chatDiv = $('#chat');
-  var accessLink = L.Util.template(
-    '<a data-channel="{id}" accesskey="{index}" title="[{index}]">{name}</a>',
-    channelDesc
-  );
+  var accessLink = L.Util.template('<a data-channel="{id}" accesskey="{index}" title="[{index}]">{name}</a>', channelDesc);
   $(accessLink).appendTo(chatControls).click(chat.chooser);
 
-  var channelDiv = L.Util.template(
-    '<div id="chat{id}"><table></table></div>',
-    channelDesc
-  );
+  var channelDiv = L.Util.template('<div id="chat{id}"><table></table></div>', channelDesc);
   var elm = $(channelDiv).appendTo(chatDiv);
   if (channelDesc.request) {
-    elm.scroll(function() {
+    elm.scroll(function () {
       var t = $(this);
-      if(t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-      if(t.scrollTop() < CHAT_REQUEST_SCROLL_TOP)
-        channelDesc.request(channelDesc.id, true);
-      if(window.scrollBottom(t) === 0)
-        channelDesc.request(channelDesc.id, false);
+      if (t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
+      if (t.scrollTop() < window.CHAT_REQUEST_SCROLL_TOP) channelDesc.request(channelDesc.id, true);
+      if (window.scrollBottom(t) === 0) channelDesc.request(channelDesc.id, false);
     });
   }
 
@@ -342,7 +336,7 @@ function createChannelTab (channelDesc) {
 var isTabsSetup = false;
 chat.addChannel = function (channelDesc) {
   // deny reserved name
-  if (channelDesc.id == 'info' || channelDesc.id == 'map') {
+  if (channelDesc.id === 'info' || channelDesc.id === 'map') {
     log.warn('could not add channel "' + channelDesc.id + '": reserved');
     return false;
   }
@@ -370,7 +364,7 @@ chat.setupTabs = function () {
   chat.channels.splice(0, 0, ...comm.channels);
 
   chat.channels.forEach(function (entry, i) {
-    entry.index = i+1;
+    entry.index = i + 1;
     createChannelTab(entry);
   });
 
@@ -450,19 +444,18 @@ chat.setupTabs = function () {
  *
  * @function chat.setup
  */
-chat.setup = function() {
+chat.setup = function () {
   chat.setupTabs();
 
   if (localStorage['iitc-chat-tab']) {
     chat.chooseTab(localStorage['iitc-chat-tab']);
- }
+  }
 
   $('#chatcontrols, #chat, #chatinput').show();
 
   $('#chatcontrols a:first').click(chat.toggle);
 
-
-  $('#chatinput').click(function() {
+  $('#chatinput').click(function () {
     $('#chatinput input').focus();
   });
 
@@ -474,10 +467,10 @@ chat.setup = function() {
   var cls = PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
   $('#chatinput mark').addClass(cls);
 
-  $(document).on('click', '.nickname', function(event) {
+  $(document).on('click', '.nickname', function (event) {
     return chat.nicknameClicked(event, $(this).text());
   });
-}
+};
 
 /**
  * Sets up the time display in the chat input box.
@@ -485,21 +478,22 @@ chat.setup = function() {
  *
  * @function chat.setupTime
  */
-chat.setupTime = function() {
+chat.setupTime = function () {
   var inputTime = $('#chatinput time');
-  var updateTime = function() {
-    if(window.isIdle()) return;
+  var updateTime = function () {
+    if (window.isIdle()) return;
     var d = new Date();
-    var h = d.getHours() + ''; if(h.length === 1) h = '0' + h;
-    var m = d.getMinutes() + ''; if(m.length === 1) m = '0' + m;
-    inputTime.text(h+':'+m);
+    var h = d.getHours() + '';
+    if (h.length === 1) h = '0' + h;
+    var m = d.getMinutes() + '';
+    if (m.length === 1) m = '0' + m;
+    inputTime.text(h + ':' + m);
     // update ON the minute (1ms after)
     setTimeout(updateTime, (60 - d.getSeconds()) * 1000 + 1);
   };
   updateTime();
   window.addResumeFunction(updateTime);
-}
-
+};
 
 //
 // posting
@@ -510,83 +504,90 @@ chat.setupTime = function() {
  *
  * @function chat.handleTabCompletion
  */
-chat.handleTabCompletion = function() {
+chat.handleTabCompletion = function () {
   var el = $('#chatinput input');
   var curPos = el.get(0).selectionStart;
   var text = el.val();
-  var word = text.slice(0, curPos).replace(/.*\b([a-z0-9-_])/, '$1').toLowerCase();
+  var word = text
+    .slice(0, curPos)
+    .replace(/.*\b([a-z0-9-_])/, '$1')
+    .toLowerCase();
 
   var list = $('#chat > div:visible mark');
-  list = list.map(function(ind, mark) { return $(mark).text(); } );
-  list = uniqueArray(list);
+  list = list.map(function (ind, mark) {
+    return $(mark).text();
+  });
+  list = window.uniqueArray(list);
 
   var nick = null;
-  for(var i = 0; i < list.length; i++) {
-    if(!list[i].toLowerCase().startsWith(word)) continue;
-    if(nick && nick !== list[i]) {
-      log.warn('More than one nick matches, aborting. ('+list[i]+' vs '+nick+')');
+  for (var i = 0; i < list.length; i++) {
+    if (!list[i].toLowerCase().startsWith(word)) continue;
+    if (nick && nick !== list[i]) {
+      log.warn('More than one nick matches, aborting. (' + list[i] + ' vs ' + nick + ')');
       return;
     }
     nick = list[i];
   }
-  if(!nick) {
+  if (!nick) {
     return;
   }
 
   var posStart = curPos - word.length;
   var newText = text.substring(0, posStart);
-  var atPresent = text.substring(posStart-1, posStart) === '@';
+  var atPresent = text.substring(posStart - 1, posStart) === '@';
   newText += (atPresent ? '' : '@') + nick + ' ';
   newText += text.substring(curPos);
   el.val(newText);
-}
+};
 
 /**
  * Posts a chat message to the currently active chat tab.
  *
  * @function chat.postMsg
  */
-chat.postMsg = function() {
+chat.postMsg = function () {
   var c = chat.getActive();
   var channel = chat.getChannelDesc(c);
 
   var msg = $.trim($('#chatinput input').val());
-  if(!msg || msg === '') return;
+  if (!msg || msg === '') return;
 
   if (channel.sendMessage) {
     $('#chatinput input').val('');
     return channel.sendMessage(c, msg);
   }
-}
+};
 
 /**
  * Sets up the chat message posting functionality.
  *
  * @function chat.setupPosting
  */
-chat.setupPosting = function() {
+chat.setupPosting = function () {
   if (!window.isSmartphone()) {
-    $('#chatinput input').keydown(function(event) {
+    $('#chatinput input').keydown(function (event) {
       try {
-        var kc = (event.keyCode ? event.keyCode : event.which);
-        if(kc === 13) { // enter
+        var kc = event.keyCode ? event.keyCode : event.which;
+        if (kc === 13) {
+          // enter
           chat.postMsg();
           event.preventDefault();
-        } else if (kc === 9) { // tab
+        } else if (kc === 9) {
+          // tab
           event.preventDefault();
           chat.handleTabCompletion();
         }
       } catch (e) {
         log.error(e);
-        //if (e.stack) { console.error(e.stack); }
+        // if (e.stack) { console.error(e.stack); }
       }
     });
   }
 
-  $('#chatinput').submit(function(event) {
+  $('#chatinput').submit(function (event) {
     event.preventDefault();
     chat.postMsg();
   });
 };
 
-/* global log comm */
+/* global log, PLAYER, L, comm, android */
