@@ -26,7 +26,7 @@ window.show = function(id) {
   // look for comm tab first
   if (window.chat.getChannelDesc(id)) window.chat.show(id);
   else {
-    switch(id) {
+    switch (id) {
       case 'map':
         window.smartphone.mapButton.click();
         $('#portal_highlight_select').show();
