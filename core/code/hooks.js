@@ -31,7 +31,7 @@
  * - `fieldRemoved`: Triggered when a field has been removed.
  * - `portalDetailsUpdated`: Fired after the details in the sidebar have been (re-)rendered.
  *                           Provides data about the selected portal.
- * - `chatDataAvailable`: Runs after data for any of the chats has been received and processed, but not yet
+ * - `commDataAvailable`: Runs after data for any of the chats has been received and processed, but not yet
  *                        been displayed. The data hash contains both the unprocessed raw ajax response as
  *                        well as the chat data that is going to be used for display.
  * - `publicChatDataAvailable`: Similar to `chatDataAvailable`, but for all chat only.
