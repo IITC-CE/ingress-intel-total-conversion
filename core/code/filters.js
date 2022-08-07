@@ -49,7 +49,8 @@ Examples:
 
   { portal: true, link: true, field: true, options: { timestamp: ['<',
   Date.now() - 3600000] } }
-      filters all entities with no change since 1 hour.
+      filters all entities with no change since 1 hour (from the creation of
+      the filter)
 */
 
 IITC.filters = {};
@@ -99,7 +100,9 @@ function compareValue(constraint, value) {
     if (!(value instanceof Object)) return false;
     // implicit AND on object properties
     for (const prop in constraint) {
-      if (!genericCompare(constraint[prop], value[prop])) {return false;}
+      if (!genericCompare(constraint[prop], value[prop])) {
+        return false;
+      }
     }
     return true;
   }
@@ -111,11 +114,16 @@ function compareNumber(constraint, value) {
   if (typeof constraint[1] !== 'number') return false;
   const v = constraint[1];
   switch (constraint[0]) {
-  case '==': return value === v;
-  case '<': return value < v;
-  case '<=': return value <= v;
-  case '>': return value > v;
-  case '>=': return value >= v;
+    case '==':
+      return value === v;
+    case '<':
+      return value < v;
+    case '<=':
+      return value <= v;
+    case '>':
+      return value > v;
+    case '>=':
+      return value >= v;
   }
   return false;
 }
@@ -125,54 +133,54 @@ function genericCompare(constraint, object) {
     if (constraint.length !== 2) return false;
     const [op, args] = constraint;
     switch (op) {
-    case 'eq':
-      return compareValue(args, object);
-    case 'or':
-      if (args instanceof Array) {
-        for (const arg of args) {
-          if (genericCompare(arg, object)) {
-            return true;
+      case 'eq':
+        return compareValue(args, object);
+      case 'or':
+        if (args instanceof Array) {
+          for (const arg of args) {
+            if (genericCompare(arg, object)) {
+              return true;
+            }
           }
         }
-      }
-      return false;
-    case 'and':
-      if (args instanceof Array) {
-        for (const arg of args) {
-          if (!genericCompare(arg, object)) {
-            return false;
+        return false;
+      case 'and':
+        if (args instanceof Array) {
+          for (const arg of args) {
+            if (!genericCompare(arg, object)) {
+              return false;
+            }
           }
         }
-      }
-      return true;
-    case 'some':
-      if (object instanceof Array) {
-        for (const obj of object) {
-          if (genericCompare(args, obj)) {
-            return true;
+        return true;
+      case 'some':
+        if (object instanceof Array) {
+          for (const obj of object) {
+            if (genericCompare(args, obj)) {
+              return true;
+            }
           }
         }
-      }
-      return false;
-    case 'every':
-      if (object instanceof Array) {
-        for (const obj of object) {
-          if (!genericCompare(args, obj)) {
-            return false;
+        return false;
+      case 'every':
+        if (object instanceof Array) {
+          for (const obj of object) {
+            if (!genericCompare(args, obj)) {
+              return false;
+            }
           }
         }
-      }
-      return true;
-    case 'not':
-      return !genericCompare(args, object);
-    case '==':
-    case '<':
-    case '<=':
-    case '>':
-    case '>=':
-      return compareNumber(constraint, object);
-    default:
-        // unknown op
+        return true;
+      case 'not':
+        return !genericCompare(args, object);
+      case '==':
+      case '<':
+      case '<=':
+      case '>':
+      case '>=':
+        return compareNumber(constraint, object);
+      default:
+      // unknown op
     }
     return false;
   }
@@ -194,7 +202,9 @@ IITC.filters.testFilter = function (type, entity, filter) {
   // if doesn't match data constraint
   if (filter.data && !genericCompare(filter.data, entity.options.data)) return false;
   // if doesn't match options
-  if (filter.options && !genericCompare(filter.options, entity.options)) {return false;}
+  if (filter.options && !genericCompare(filter.options, entity.options)) {
+    return false;
+  }
   // else it matches
   return true;
 };
@@ -203,7 +213,9 @@ function arrayFilter(type, entity, filters) {
   if (!Array.isArray(filters)) filters = [filters];
   filters = filters.flat();
   for (let i = 0; i < filters.length; i++) {
-    if (IITC.filters.testFilter(type, entity, filters[i])) {return true;}
+    if (IITC.filters.testFilter(type, entity, filters[i])) {
+      return true;
+    }
   }
   return false;
 }

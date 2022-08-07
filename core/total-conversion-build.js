@@ -5,7 +5,7 @@
 // @run-at         document-end
 
 // create IITC scope
-var IITC = {}
+var IITC = {};
 window.IITC = IITC;
 
 window.script_info = plugin_info;

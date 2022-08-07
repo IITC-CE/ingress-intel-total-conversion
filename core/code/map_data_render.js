@@ -506,3 +506,5 @@ window.Render.prototype.removePortalFromMapLayer = function(portal) {
   //remove it from the portalsLevels layer
   portal.remove();
 }
+
+/* global IITC */

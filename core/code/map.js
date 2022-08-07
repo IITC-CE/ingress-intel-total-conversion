@@ -345,3 +345,5 @@ window.setupMap = function () {
   };
   */
 };
+
+/* global IITC, PLAYER */
