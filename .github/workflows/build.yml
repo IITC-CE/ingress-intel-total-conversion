@@ -55,28 +55,12 @@ jobs:
         run: |
           echo "BUILDSTAMP=$(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./build/${{ env.BUILD_TYPE }}/total-conversion-build.user.js)")" >> "$GITHUB_ENV"
 
-      - name: Push build artifacts to website
-        env:
-          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        if: ${{ env.WEBSITE_REPO != '' }}
-        uses: dmnemec/copy_file_to_another_repo_action@main
-        with:
-          source_file: "./build/${{ env.BUILD_TYPE }}/."
-          destination_repo: ${{ secrets.WEBSITE_REPO }}
-          destination_branch: master
-          destination_folder: 'static/build/${{ env.ARCHIVE_DIR }}/${{ env.BUILDSTAMP }}/'
-          user_email: 'example@email.com'
-          user_name: 'IITC Updates'
-          commit_message: '🤖 New IITC ${{ env.BUILD_TYPE }} build from https://github.com/${{ github.repository }}/commit/${{ github.sha }}'
-
       - uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           allowUpdates: true
           artifactErrorsFailBuild: true
           artifacts: "./build/${{ env.BUILD_TYPE }}/*.zip,./build/${{ env.BUILD_TYPE }}/*.apk"
-          generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Send APK to Telegram
@@ -88,3 +72,21 @@ jobs:
           TEXT="🤖 *New IITC Mobile ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
           APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"
           curl -s -F document=@"${{ env.ARTIFACT_IITC_MOBILE }}" -F caption="$TEXT" $APIPARAMS
+
+      - name: Save PR metadata
+        run: |
+          mkdir artifact
+          mv ./build/${{ env.BUILD_TYPE }} ./artifact/build
+          mkdir -p ./artifact/.metadata
+          echo ${{ env.BUILD_TYPE }} > ./artifact/.metadata/build_type
+          echo ${{ github.sha }} > ./artifact/.metadata/commit
+          echo $( ls ./artifact/build/ | grep '.apk' ) > ./artifact/.metadata/apk_filename
+          echo $( ls ./artifact/build/ | grep '.zip' ) > ./artifact/.metadata/zip_filename
+          echo $(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./artifact/build/total-conversion-build.user.js)") > ./artifact/.metadata/buildstamp
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: |
+            ./artifact/.metadata/
+            ./artifact/build/

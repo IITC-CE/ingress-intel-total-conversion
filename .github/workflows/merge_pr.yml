@@ -7,36 +7,17 @@ on:
 
 jobs:
   if_merged:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v3
+      - name: Delete PR artifact from website
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         if: ${{ env.WEBSITE_REPO != '' }}
+        uses: peter-evans/repository-dispatch@v2
         with:
-          repository: ${{ secrets.WEBSITE_REPO }}
-          ref: 'master'
-          token:  ${{ secrets.API_TOKEN_GITHUB }}
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+          repository: ${{ env.WEBSITE_REPO }}
+          event-type: 'delete_iitc_pr_build'
+          client-payload: '{ "pr_number": "${{ github.event.number }}" }'
 
-      - name: Setup git config
-        env:
-          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-        if: ${{ env.WEBSITE_REPO != '' }}
-        run: |
-          git config user.name "userz"
-          git config user.email "<>"
-
-      - name: Delete old build artifacts
-        env:
-          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-        if: ${{ env.WEBSITE_REPO != '' }}
-        run: |
-          git rm -r static/build/artifact/PR${{ github.event.number }}/
-          git commit -m "🤖 PR №${{ github.event.number }} merged, deleting old build artifacts"
-
-      - run: git push origin master
-        env:
-          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
-        if: ${{ env.WEBSITE_REPO != '' }}
