@@ -116,4 +116,33 @@
         <item>es</item>
         <item>th</item>
     </string-array>
+
+    <string-array name="pref_webview_zoom">
+        <item>@string/pref_webview_zoom_defaultValue</item>
+        <item>200%</item>
+        <item>175%</item>
+        <item>150%</item>
+        <item>125%</item>
+        <item>110%</item>
+        <item>100%</item>
+        <item>90%</item>
+        <item>80%</item>
+        <item>75%</item>
+        <item>66%</item>
+        <item>50%</item>
+    </string-array>
+    <string-array name="pref_webview_zoomValues">
+        <item>-1</item>
+        <item>200</item>
+        <item>175</item>
+        <item>150</item>
+        <item>125</item>
+        <item>110</item>
+        <item>100</item>
+        <item>90</item>
+        <item>80</item>
+        <item>75</item>
+        <item>66</item>
+        <item>50</item>
+    </string-array>
 </resources>
