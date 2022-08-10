@@ -43,12 +43,14 @@ public class IITC_WebView extends WebView {
     private final String mDesktopUserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0)" +
             " Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
     private String mMobileUserAgent;
-            
+
 
     // init web view
     private void iitc_init(final Context c) {
         if (isInEditMode()) return;
         mIitc = (IITC_Mobile) c;
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
+
         mSettings = getSettings();
         mSettings.setJavaScriptEnabled(true);
         mSettings.setDomStorageEnabled(true);
@@ -57,8 +59,10 @@ public class IITC_WebView extends WebView {
         mSettings.setAppCacheEnabled(true);
         mSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         mSettings.setAppCachePath(getContext().getCacheDir().getAbsolutePath());
-        mSettings.setDatabasePath(getContext().getApplicationInfo().dataDir + "/databases/");
-        mSettings.setTextZoom(100); // otherwise zoom may vary depending on system font settings
+        int zoom = Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1"));
+        if (zoom != -1) {
+            mSettings.setTextZoom(zoom);
+        }
 
         // enable mixed content (http on https...needed for some map tiles) mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -74,7 +78,6 @@ public class IITC_WebView extends WebView {
         }
 
         addJavascriptInterface(mJsInterface, "app");
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
 
         // https://developer.chrome.com/multidevice/user-agent#webview_user_agent
         final String original_ua = mSettings.getUserAgentString();

@@ -25,7 +25,13 @@
             android:persistent="true"
             android:summary="@string/pref_fullscreen_sum"
             android:title="@string/pref_fullscreen"/>
-
+        <ListPreference
+                android:defaultValue="-1"
+                android:key="pref_webview_zoom"
+                android:summary="@string/pref_webview_zoom_sum"
+                android:title="@string/pref_webview_zoom"
+                android:entries="@array/pref_webview_zoom"
+                android:entryValues="@array/pref_webview_zoomValues" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="pref_force_desktop"
