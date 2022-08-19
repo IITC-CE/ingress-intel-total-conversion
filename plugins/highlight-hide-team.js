@@ -1,20 +1,17 @@
 // @author         vita10gy
 // @name           Hide portal ownership
 // @category       Highlighter
-// @version        0.1.1
+// @version        0.2.0
 // @description    Show all portals as neutral, as if uncaptured. Great for creating plans.
 
+/* exported setup --eslint */
+/* global TEAM_NONE, getMarkerStyleOptions*/
 
-// use own namespace for plugin
-window.plugin.portalHighlighterHideOwnership = function() {};
-
-window.plugin.portalHighlighterHideOwnership.highlight = function(data) {
-  var scale = window.portalMarkerScale();
-
+function hideOwnership (data) {
   var params = getMarkerStyleOptions({team: TEAM_NONE, level: 0});
   data.portal.setStyle(params);
 }
 
-var setup =  function() {
-  window.addPortalHighlighter('Hide portal ownership', window.plugin.portalHighlighterHideOwnership.highlight);
+function setup () {
+  window.addPortalHighlighter('Hide portal ownership', hideOwnership);
 }

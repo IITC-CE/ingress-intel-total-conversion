@@ -1,10 +1,10 @@
 #portalslist.mobile {
   background: transparent;
-  border: 0 none !important;
-  height: 100% !important;
-  width: 100% !important;
-  left: 0 !important;
-  top: 0 !important;
+  border: 0 none;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
   position: absolute;
   overflow: auto;
 }
@@ -22,6 +22,8 @@
   border-bottom: 1px solid #0b314e;
   color: white;
   padding: 3px;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 #portalslist table th {
@@ -41,8 +43,8 @@
 }
 
 #portalslist table .portalTitle {
-  min-width: 120px !important;
-  max-width: 240px !important;
+  min-width: 120px;
+  max-width: 240px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -52,36 +54,140 @@
   color: #FFCE00;
 }
 
-#portalslist table.filter {
-  table-layout: fixed;
-  cursor: pointer;
-  border-collapse: separate;
-  border-spacing: 1px;
+#portalslist .filters {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto;
+  grid-gap: 1px
 }
 
-#portalslist table.filter th {
-  text-align: left;
-  padding-left: 0.3em;
+#portalslist .filters div {
+  padding: 0.2em 0.3em;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: #0005;
+  white-space: nowrap;
 }
 
-#portalslist table.filter td {
+#portalslist .filters .count {
   text-align: right;
-  padding-right: 0.3em;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-#portalslist .filterNeu {
+#portalslist .filters .active {
+  font-weight: bolder;
+  color: #FFCE00;
+}
+
+#portalslist .filters .filterAll {
+  display: none;
+}
+
+#portalslist.mobile .filters .filterAll {
+  display: block;
+}
+
+/* kitkat fallback */
+#portalslist.mobile .filters .name {
+  float: left;
+}
+
+#portalslist .filters .filterNeu,
+#portalslist .filters .filterRes,
+#portalslist .filters .filterEnl {
+  grid-row: 2;
+}
+
+#portalslist .filters .filterVis,
+#portalslist .filters .filterCap,
+#portalslist .filters .filterSco {
+  grid-row: 3;
+}
+
+/* 2 columns */
+@media (orientation: portrait) {
+  #portalslist.mobile .filters {
+    grid-template-columns: 1fr auto 1fr auto;
+  }
+
+  #portalslist.mobile .filters .filterNeu.name,
+  #portalslist.mobile .filters .filterRes.name,
+  #portalslist.mobile .filters .filterEnl.name {
+    grid-column: 1;
+  }
+
+  #portalslist.mobile .filters .filterNeu.count,
+  #portalslist.mobile .filters .filterRes.count,
+  #portalslist.mobile .filters .filterEnl.count {
+    grid-column: 2;
+  }
+
+  #portalslist.mobile .filters .filterVis.name,
+  #portalslist.mobile .filters .filterCap.name,
+  #portalslist.mobile .filters .filterSco.name {
+    grid-column: 3;
+  }
+
+  #portalslist.mobile .filters .filterVis.count,
+  #portalslist.mobile .filters .filterCap.count,
+  #portalslist.mobile .filters .filterSco.count {
+    grid-column: 4;
+  }
+
+  #portalslist.mobile .filters .filterNeu,
+  #portalslist.mobile .filters .filterVis {
+    grid-row: 2
+  }
+
+  #portalslist.mobile .filters .filterRes,
+  #portalslist.mobile .filters .filterCap {
+    grid-row: 3
+  }
+
+  #portalslist.mobile .filters .filterEnl,
+  #portalslist.mobile .filters .filterSco {
+    grid-row: 4
+  }
+}
+
+#portalslist .filters .filterNeu {
   background-color: #666;
 }
 
-#portalslist table tr.res td, #portalslist .filterRes {
+#portalslist .filterVis.name:before,
+#portalslist .filterCap.name:before,
+#portalslist .filterSco.name:before {
+  content: '';
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 6px;
+  margin: auto;
+  margin-right: 0.2em;
+  vertical-align: -8%;
+}
+
+#portalslist .filterVis:before {
+  background-color: yellow;
+}
+
+#portalslist .filterCap:before {
+  background-color: red;
+}
+
+#portalslist .filterSco:before {
+  background-color: purple;
+}
+
+#portalslist .table-container {
+  overflow-y: hidden;
+}
+
+#portalslist table tr.res td,
+#portalslist .filters .filterRes {
   background-color: #005684;
 }
 
-#portalslist table tr.enl td, #portalslist .filterEnl {
+#portalslist table tr.enl td,
+#portalslist .filters .filterEnl {
   background-color: #017f01;
 }
 
@@ -91,39 +197,29 @@
 
 #portalslist .disclaimer {
   margin-top: 10px;
-  font-size: 10px;
 }
 
-#portalslist .history {
-  text-align: center;
-  font-size: 20px;
-  line-height: 13px;
-  vertical-align: middle;
+#portalslist .history .icon {
+  width: 11px;
+  height: 11px;
+  border-radius: 6px;
+  margin: auto;
 }
 
-#portalslist .history.unvisited {
-  color: white;
+#portalslist .history.unvisited .icon{
+  background-color: white;
 }
 
-#portalslist .history.visited {
-  color: yellow;
+#portalslist .history.visited .icon {
+  background-color: yellow;
 }
 
-#portalslist .history.captured {
-  color: red;
+#portalslist .history.captured .icon {
+  background-color: red;
 }
 
-#portalslist .history.scoutControlled {
-  color: purple;
-}
-
-#portalslist.mobile table.filter tr {
-  display: block;
-  text-align: center;
-}
-#portalslist.mobile table.filter th, #portalslist.mobile table.filter td {
-  display: inline-block;
-  width: 22%;
+#portalslist .history.scoutControlled .icon {
+  background-color: purple;
 }
 
 .ui-dialog.ui-dialog-portalslist {

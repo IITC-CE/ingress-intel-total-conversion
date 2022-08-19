@@ -1,7 +1,7 @@
 // @author         johnd0e
 // @name           Mini map
 // @category       Controls
-// @version        0.4.0
+// @version        0.4.1
 // @description    Show a mini map on the corner of the map.
 
 

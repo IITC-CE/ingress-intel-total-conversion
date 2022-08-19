@@ -1,0 +1,92 @@
+name: Build IITC and push artifacts
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'gradle'
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Set env BRANCH
+        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)" >> $GITHUB_ENV
+
+      - name: Set env BUILD_TYPE and ARCHIVE_DIR (optional)
+        run: |
+          if [[ $BRANCH == 'master' ]]; then
+              echo "BUILD_TYPE=beta" >> "$GITHUB_ENV"
+              echo "ARCHIVE_DIR=beta_archive" >> "$GITHUB_ENV"
+          else
+              echo "BUILD_TYPE=release" >> "$GITHUB_ENV"
+              echo "ARCHIVE_DIR=release_archive" >> "$GITHUB_ENV"
+          fi
+
+      - name: Download localbuildsettings.py
+        run: wget https://iitc.app/deploy/localbuildsettings.py
+
+      - name: Run build.py
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
+          ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
+        run: ./build.py $BUILD_TYPE
+
+      - name: Set env with artifacts
+        run: |
+          echo "ARTIFACT_IITC_MOBILE=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.apk' )" >> "$GITHUB_ENV"
+          echo "ARTIFACT_IITC_ZIP=$( ls -d ./build/${{ env.BUILD_TYPE }}/* | grep '.zip' )" >> "$GITHUB_ENV"
+
+      - name: Set env BUILDSTAMP
+        run: |
+          echo "BUILDSTAMP=$(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./build/${{ env.BUILD_TYPE }}/total-conversion-build.user.js)")" >> "$GITHUB_ENV"
+
+      - uses: ncipollo/release-action@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: "./build/${{ env.BUILD_TYPE }}/*.zip,./build/${{ env.BUILD_TYPE }}/*.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Send APK to Telegram
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        if: ${{ env.TG_BOT_TOKEN != ''}}
+        run: |
+          TEXT="🤖 *New IITC Mobile ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+          APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"
+          curl -s -F document=@"${{ env.ARTIFACT_IITC_MOBILE }}" -F caption="$TEXT" $APIPARAMS
+
+      - name: Save PR metadata
+        run: |
+          mkdir artifact
+          mv ./build/${{ env.BUILD_TYPE }} ./artifact/build
+          mkdir -p ./artifact/.metadata
+          echo ${{ env.BUILD_TYPE }} > ./artifact/.metadata/build_type
+          echo ${{ github.sha }} > ./artifact/.metadata/commit
+          echo $( ls ./artifact/build/ | grep '.apk' ) > ./artifact/.metadata/apk_filename
+          echo $( ls ./artifact/build/ | grep '.zip' ) > ./artifact/.metadata/zip_filename
+          echo $(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./artifact/build/total-conversion-build.user.js)") > ./artifact/.metadata/buildstamp
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: |
+            ./artifact/.metadata/
+            ./artifact/build/

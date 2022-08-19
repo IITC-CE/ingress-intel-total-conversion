@@ -1,0 +1,23 @@
+name: After PR merging
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Delete PR artifact from website
+        env:
+          WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
+        if: ${{ env.WEBSITE_REPO != '' }}
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+          repository: ${{ env.WEBSITE_REPO }}
+          event-type: 'delete_iitc_pr_build'
+          client-payload: '{ "pr_number": "${{ github.event.number }}" }'
+

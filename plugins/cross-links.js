@@ -1,7 +1,7 @@
 // @author         mcben
 // @name           Cross links
 // @category       Draw
-// @version        1.3.0
+// @version        1.3.1
 // @description    Checks for existing links that cross planned links. Requires draw-tools plugin.
 
 

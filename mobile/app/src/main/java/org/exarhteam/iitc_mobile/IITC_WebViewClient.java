@@ -294,6 +294,10 @@ public class IITC_WebViewClient extends WebViewClient {
             Log.d("Google login");
             return false;
         }
+        if (mIitc.isInternalHostname(uriHost)) {
+            Log.d("internal host");
+            return false;
+        }
         Log.d("no ingress intel link, start external app to load url: " + url);
         final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         // make new activity independent from iitcm
