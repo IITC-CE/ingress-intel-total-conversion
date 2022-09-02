@@ -21,9 +21,15 @@ window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
   if (a0.equals(b0) || a0.equals(b1)) return false;
   if (a1.equals(b0) || a1.equals(b1)) return false;
 
-  // check for 'horizontal' overlap in longitude
-  if (Math.min(a0.lng, a1.lng) > Math.max(b0.lng, b1.lng)) return false;
-  if (Math.max(a0.lng, a1.lng) < Math.min(b0.lng, b1.lng)) return false;
+  // check for 'horizontal' overlap in longitude (if not crossing antimeridian)
+  const minA = Math.min(a0.lng, a1.lng);
+  const maxA = Math.max(a0.lng, a1.lng);
+  const minB = Math.min(b0.lng, b1.lng);
+  const maxB = Math.max(b0.lng, b1.lng);
+  if (minA * maxA >= 0 && minB * maxB >= 0) {
+    if (minA > maxB) return false;
+    if (maxA < minB) return false;
+  }
 
   // a) convert into 3D coordinates on a unit sphere
   var ca0 = toCartesian(a0.lat, a0.lng);
