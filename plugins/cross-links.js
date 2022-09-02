@@ -26,7 +26,7 @@ window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
   const maxA = Math.max(a0.lng, a1.lng);
   const minB = Math.min(b0.lng, b1.lng);
   const maxB = Math.max(b0.lng, b1.lng);
-  if (minA * maxA >= 0 && minB * maxB >= 0) {
+  if (maxA - minA < 180 && maxB - minB < 180) {
     if (minA > maxB) return false;
     if (maxA < minB) return false;
   }
