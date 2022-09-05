@@ -9,6 +9,7 @@ window.plugin.crossLinks = function () { };
 
 /**
  * greatCircleArcIntersect
+ * note: assume B is a DrawTool line and can have longitude <-180 or >180
  */
 window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
 
@@ -24,8 +25,10 @@ window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
   // check for 'horizontal' overlap in longitude (if not crossing antimeridian)
   const minA = Math.min(a0.lng, a1.lng);
   const maxA = Math.max(a0.lng, a1.lng);
-  const minB = Math.min(b0.lng, b1.lng);
-  const maxB = Math.max(b0.lng, b1.lng);
+  const b0Lng = ((b0.lng + 180) % 360 + 360) % 360 - 180; // wrap B because B can be out-of-bounds
+  const b1Lng = ((b1.lng + 180) % 360 + 360) % 360 - 180;
+  const minB = Math.min(b0Lng, b1Lng);
+  const maxB = Math.max(b0Lng, b1Lng);
   if (maxA - minA < 180 && maxB - minB < 180) {
     if (minA > maxB) return false;
     if (maxA < minB) return false;
