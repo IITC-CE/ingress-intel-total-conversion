@@ -85,7 +85,7 @@
 		}
 	};
 
-	LRUMap.prototype._markEntryAsUsed = function _markEntryAsUsed (entry) {
+	LRUMap.prototype._markEntryAsUsed = function _markEntryAsUsed(entry) {
 		if (entry === this.newest) {
 			// Already the most recenlty used entry, so no need to update the list
 			return;
@@ -111,7 +111,7 @@
 		this.newest = entry;
 	};
 
-	LRUMap.prototype.assign = function assign (entries) {
+	LRUMap.prototype.assign = function assign(entries) {
 		var entry,
 			limit = this.limit || Number.MAX_VALUE;
 		this._keymap.clear();
@@ -134,7 +134,7 @@
 		this.size = this._keymap.size;
 	};
 
-	LRUMap.prototype.get = function get (key) {
+	LRUMap.prototype.get = function get(key) {
 		// First, find our cache entry
 		var entry = this._keymap.get(key);
 		if (!entry) { return; } // Not cached. Sorry.
@@ -143,7 +143,7 @@
 		return entry.value;
 	};
 
-	LRUMap.prototype.set = function set (key, value) {
+	LRUMap.prototype.set = function set(key, value) {
 		var entry = this._keymap.get(key);
 
 		if (entry) {
@@ -176,7 +176,7 @@
 		return this;
 	};
 
-	LRUMap.prototype.shift = function shift () {
+	LRUMap.prototype.shift = function shift() {
 		// todo: handle special case when limit == 1
 		var entry = this.oldest;
 		if (entry) {
@@ -202,16 +202,16 @@
 	// Following code (until end of class definition) is optional and can be removed without
 	// breaking the core functionality.
 
-	LRUMap.prototype.find = function find (key) {
+	LRUMap.prototype.find = function find(key) {
 		var e = this._keymap.get(key);
 		return e ? e.value : undefined;
 	};
 
-	LRUMap.prototype.has = function has (key) {
+	LRUMap.prototype.has = function has(key) {
 		return this._keymap.has(key);
 	};
 
-	LRUMap.prototype.delete = function delete$1 (key) {
+	LRUMap.prototype.delete = function delete$1(key) {
 		var entry = this._keymap.get(key);
 		if (!entry) { return; }
 		this._keymap.delete(entry.key);
@@ -238,22 +238,22 @@
 		return entry.value;
 	};
 
-	LRUMap.prototype.clear = function clear () {
+	LRUMap.prototype.clear = function clear() {
 		// Not clearing links should be safe, as we don't expose live links to user
 		this.oldest = this.newest = undefined;
 		this.size = 0;
 		this._keymap.clear();
 	};
 
-	LRUMap.prototype.keys = function keys () {
+	LRUMap.prototype.keys = function keys() {
 		return new KeyIterator(this.oldest);
 	};
 
-	LRUMap.prototype.values = function values () {
+	LRUMap.prototype.values = function values() {
 		return new ValueIterator(this.oldest);
 	};
 
-	LRUMap.prototype.entries = function entries () {
+	LRUMap.prototype.entries = function entries() {
 		return this;
 	};
 
@@ -261,7 +261,7 @@
 		return new EntryIterator(this.oldest);
 	};
 
-	LRUMap.prototype.forEach = function forEach (fun, thisObj) {
+	LRUMap.prototype.forEach = function forEach(fun, thisObj) {
 		if (typeof thisObj !== "object") {
 			thisObj = this;
 		}
@@ -273,7 +273,7 @@
 	};
 
 	/** Returns a JSON (array) representation */
-	LRUMap.prototype.toJSON = function toJSON () {
+	LRUMap.prototype.toJSON = function toJSON() {
 		var s = new Array(this.size),
 			i = 0,
 			entry = this.oldest;
@@ -285,7 +285,7 @@
 	};
 
 	/** Returns a String representation */
-	LRUMap.prototype.toString = function toString () {
+	LRUMap.prototype.toString = function toString() {
 		var s = "",
 			entry = this.oldest;
 		while (entry) {
@@ -794,4 +794,4 @@
 	};
 
 }());
-//# sourceMappingURL=Leaflet.GoogleMutant.js.map
+//# NosourceMappingURL=Leaflet.GoogleMutant.js.map
