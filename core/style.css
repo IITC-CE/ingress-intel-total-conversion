@@ -20,7 +20,8 @@ html,
 body {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* workaround for #373 */
+  overflow: hidden;
+  /* workaround for #373 */
   background: #0e3d4e;
 }
 
@@ -49,12 +50,15 @@ body {
 i.tiny {
   font-size: 1rem;
 }
+
 i.small {
   font-size: 2rem;
 }
+
 i.medium {
   font-size: 4rem;
 }
+
 i.large {
   font-size: 6rem;
 }
@@ -119,47 +123,13 @@ a:hover {
 .fieldmu {
   color: #ffce00;
   font-size: 13px;
-  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; /*override leaflet-container */
+  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif;
+  /*override leaflet-container */
   text-align: center;
   text-shadow: 0 0 0.2em black, 0 0 0.2em black, 0 0 0.2em black;
   pointer-events: none;
 }
 
-  text-decoration: none;
-  /* make the table always scrollable */
-  min-height: 100%;
-  margin-bottom: 1px;
-}
-
-/* expand last row if needed */
-#chat table tr:last-child {
-    height: 100%;
-#chat .divider {
-  color: #bbb;
-}
-
-#chat .divider td:nth-child(2) {
-  text-align: center;
-}
-
-#chat td.system_narrowcast {
-  color: #f66;
-}
-
-#chatall tr.faction td:nth-child(3):before,
-#chatalerts tr.faction td:nth-child(3):before {
-  content: '[faction]';
-  color: #f88;
-  background-color: #500;
-  margin-right: .2rem;
-}
-
-#chatall tr.public td:nth-child(3):before,
-#chatalerts tr.public td:nth-child(3):before {
-  content: '[public]';
-  color: #ff6;
-  background-color: #550;
-  margin-right: .2rem;
 /* history details */
 #historydetails {
   text-align: center;
@@ -206,14 +176,15 @@ a:hover {
   margin: -4px 0;
   padding: 4px 0.2em;
 }
+
 .pl_nudge_date:after {
   background: no-repeat url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
-  position:absolute;
-  content:"";
-  height:20px;
+  position: absolute;
+  content: "";
+  height: 20px;
   width: 5px;
-  right:-5px;
-  top:-1px
+  right: -5px;
+  top: -1px
 }
 
 
@@ -303,6 +274,7 @@ a:hover {
   margin: 3px 0 0;
   padding: 0;
 }
+
 .ui-tabs-nav::after {
   content: "";
   clear: left;
@@ -310,6 +282,7 @@ a:hover {
   height: 0;
   width: 0;
 }
+
 .ui-tabs-nav li {
   list-style: none;
   display: block;
@@ -317,6 +290,7 @@ a:hover {
   margin: 0 0 -1px;
   border: 1px solid #20a8b1;
 }
+
 .ui-tabs-nav li.ui-tabs-active {
   border-bottom-color: #0f2c3f;
   background: #0f2c3f;
@@ -324,10 +298,12 @@ a:hover {
   font-weight: bold;
   margin: -1px 1px;
 }
+
 .ui-tabs-nav a {
   display: inline-block;
   padding: 0.2em 0.7em;
 }
+
 .ui-tabs-nav .ui-icon {
   display: inline-block;
   font-size: 0;
@@ -337,6 +313,7 @@ a:hover {
   vertical-align: top;
   width: 16px;
 }
+
 .ui-tabs-nav .ui-icon-close::before {
   content: "×";
   font-size: 16px;
@@ -353,7 +330,7 @@ svg.icon-button {
   fill: currentColor;
 }
 
-.leaflet-marker-icon > svg {
+.leaflet-marker-icon>svg {
   height: inherit;
   width: inherit;
 }
