@@ -14,7 +14,7 @@ const config: webpack.Configuration = {
   resolve: {
     alias: {
       "jquery-ui-static": path.join(__dirname, "node_modules", "jquery-ui"),
-      "./images": IMAGES_PATH,
+      "./images": IMAGES_PATH
     },
     // Add `.ts` and `.tsx` as a resolvable extension.
     extensions: [".ts", ".tsx", ".js"],
@@ -28,9 +28,18 @@ const config: webpack.Configuration = {
         exclude: [/node_modules/, EXTERNAL_PATH],
       },
       {
-        test: /\.css?$/,
-        loader: "css-loader",
-        include: [EXTERNAL_PATH],
+        test: /\.p?css$/,
+        use: [
+          'style-loader',
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          {
+            loader: 'postcss-loader', options: {
+              postcssOptions: {
+                config: path.resolve(__dirname, 'postcss.config.js'),
+              }
+            }
+          },
+        ]
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
