@@ -15,8 +15,8 @@ export const environment = {
 };
 
 export const generateHeader = (): HeaderObject => ({
-    "id": "ingress-intel-total-conversion@jonatkins",
-    "name": "IITC: Ingress intel map total conversion",
+    "id": "ingress-intel-total-conversion@McBen",
+    "name": "IITC: Ingress intel map total conversion WEBPACK",
     "run-at": "document-end",
     "include": "https://intel.ingress.com/*",
     "match": "https://intel.ingress.com/*",
