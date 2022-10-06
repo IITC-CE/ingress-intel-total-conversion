@@ -228,29 +228,30 @@ function boot() {
   window.runHooks('iitcLoaded');
 }
 
-try {
-  '@include_raw:external/autolink-min.js@';
 
-  window.L_NO_TOUCH = navigator.maxTouchPoints === 0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
-  '@include_raw:external/leaflet-src.js@';
-  '@include_raw:external/L.Geodesic.js@';
-  '@include_raw:external/Leaflet.GoogleMutant.js@';
-  '@include_raw:external/oms.min.js@';
-  L.CanvasIconLayer = (function (module) {
-    '@include_raw:external/rbush.min.js@';
-    '@include_raw:external/leaflet.canvas-markers.js@';
-    return module;
-  }({})).exports(L);
+require("../external/jquery-ui-1.12.1-resizable.css");
+require("../style.css");
+require("../external/leaflet.css");
 
-  '@include_raw:external/jquery-3.6.0.min.js@';
-  '@include_raw:external/jquery-ui-1.12.1.min.js@';
-  '@include_raw:external/taphold.js@';
-  '@include_raw:external/jquery.qrcode.min.js@';
 
-} catch (e) {
-  log.error("External's js loading failed");
-  throw e;
-}
+require("../external/autolink-min.js"); // TODO move to dependencies
+window.L_NO_TOUCH = navigator.maxTouchPoints === 0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
+require("../external/leaflet-src.js"); // TODO move to dependencies
+require("../external/L.Geodesic.js"); // TODO move to dependencies
+require("../external/Leaflet.GoogleMutant.js"); // TODO move to dependencies
+require("../external/oms.min.js"); // TODO move to dependencies
+
+// L.CanvasIconLayer = (function (module) { // FIXME: 
+require("../external/rbush.min.js"); // TODO move to dependencies
+require("../external/leaflet.canvas-markers.js"); // TODO move to dependencies
+// }
+
+
+// require("../external/jquery-3.6.0.min.js"); // TODO move to dependencies
+// require("../external/jquery-ui-1.12.1.min.js"); // TODO move to dependencies
+require("../external/taphold.js"); // TODO move to dependencies
+require("../external/jquery.qrcode.min.js"); // TODO move to dependencies
+
 
 if (document.readyState === 'complete') { // IITCm
   setTimeout(boot);

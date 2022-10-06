@@ -68,9 +68,6 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // possible without requiring scripts.
 document.head.innerHTML = ''
   + '<title>Ingress Intel Map</title>'
-  + '<style>' + '@include_css:external/jquery-ui-1.12.1-resizable.css@' + '</style>'
-  + `<style>${require("!!raw-loader!./style.css").default}</style>`
-  + `<style>${require("./external/leaflet.css").toString()}</style>`
   + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
 // remove body element entirely to remove event listeners
@@ -115,8 +112,8 @@ document.body.innerHTML = ''
 // CONFIG OPTIONS ////////////////////////////////////////////////////
 window.REFRESH = 30; // refresh view every 30s (base time)
 window.ZOOM_LEVEL_ADJ = 5; // add 5 seconds per zoom level
-window.ON_MOVE_REFRESH = 2.5;  //refresh time to use after a movement event
-window.MINIMUM_OVERRIDE_REFRESH = 10; //limit on refresh time since previous refresh, limiting repeated move refresh rate
+window.ON_MOVE_REFRESH = 2.5; // refresh time to use after a movement event
+window.MINIMUM_OVERRIDE_REFRESH = 10; // limit on refresh time since previous refresh, limiting repeated move refresh rate
 window.REFRESH_GAME_SCORE = 15 * 60; // refresh game score every 15 minutes
 window.MAX_IDLE_TIME = 15 * 60; // stop updating map after 15min idling
 window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH = 20;
