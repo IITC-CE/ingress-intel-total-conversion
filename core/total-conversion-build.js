@@ -36,8 +36,8 @@ window.iitcBuildDate = process.env.BUILD_DATE;
 window.onload = function () { };
 document.body.onload = function () { };
 
-//originally code here parsed the <Script> tags from the page to find the one that defined the PLAYER object
-//however, that's already been executed, so we can just access PLAYER - no messing around needed!
+// originally code here parsed the <Script> tags from the page to find the one that defined the PLAYER object
+// however, that's already been executed, so we can just access PLAYER - no messing around needed!
 
 if (!window.PLAYER || !PLAYER.nickname) {
   // page doesn’t have a script tag with player information.
@@ -52,10 +52,7 @@ if (!window.PLAYER || !PLAYER.nickname) {
   // FIXME: handle nia takedown in progress
 
   // add login form stylesheet
-  var style = document.createElement('style');
-  style.type = 'text/css';
-  style.appendChild(document.createTextNode(require("!!raw-loader!./login.css").default));
-  document.head.appendChild(style);
+  require("./login.css");
 
   throw new Error("Couldn't retrieve player data. Are you logged in?");
 }
