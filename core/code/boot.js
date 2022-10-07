@@ -243,7 +243,7 @@ require("../external/oms.min.js"); // TODO move to dependencies
 
 // L.CanvasIconLayer = (function (module) { // FIXME: 
 require("../external/rbush.min.js"); // TODO move to dependencies
-require("../external/leaflet.canvas-markers.js"); // TODO move to dependencies
+L.CanvasIconLayer = require("../external/leaflet.canvas-markers.js")(L); // TODO move to dependencies
 // }
 
 

@@ -4,7 +4,7 @@
 // Uses the map data cache class to reduce network requests
 
 
-window.MapDataRequest = function() {
+window.MapDataRequest = function () {
   this.cache = new DataCache();
   this.render = new Render();
   this.debugTiles = new RenderDebugTiles();
@@ -68,12 +68,12 @@ window.MapDataRequest = function() {
   this.FETCH_TO_REFRESH_FACTOR = 2;  //minimum refresh time is based on the time to complete a data fetch, times this value
 
   // ensure we have some initial map status
-  this.setStatus ('startup', undefined, -1);
+  this.setStatus('startup', undefined, -1);
 
   // add a portalDetailLoaded hook, so we can use the extended details to update portals on the map
   var _this = this;
-  addHook('portalDetailLoaded', function(data){
-    if(data.success) {
+  addHook('portalDetailLoaded', function (data) {
+    if (data.success) {
       _this.render.createPortalEntity(data.ent, 'detailed');
     }
   });
@@ -81,11 +81,11 @@ window.MapDataRequest = function() {
 }
 
 
-window.MapDataRequest.prototype.start = function() {
+window.MapDataRequest.prototype.start = function () {
   var savedContext = this;
 
   // setup idle resume function
-  window.addResumeFunction ( function() { savedContext.idleResume(); } );
+  window.addResumeFunction(function () { savedContext.idleResume(); });
 
   // and map move start/end callbacks
   window.map.on('movestart', this.mapMoveStart, this);
@@ -93,14 +93,14 @@ window.MapDataRequest.prototype.start = function() {
 
 
   // then set a timeout to start the first refresh
-  this.refreshOnTimeout (this.STARTUP_REFRESH);
-  this.setStatus ('refreshing', undefined, -1);
+  this.refreshOnTimeout(this.STARTUP_REFRESH);
+  this.setStatus('refreshing', undefined, -1);
 
-  this.cache && this.cache.startExpireInterval (15);
+  this.cache && this.cache.startExpireInterval(15);
 }
 
 
-window.MapDataRequest.prototype.mapMoveStart = function() {
+window.MapDataRequest.prototype.mapMoveStart = function () {
   log.log('refresh map movestart');
 
   this.setStatus('paused');
@@ -108,7 +108,7 @@ window.MapDataRequest.prototype.mapMoveStart = function() {
   this.pauseRenderQueue(true);
 }
 
-window.MapDataRequest.prototype.mapMoveEnd = function() {
+window.MapDataRequest.prototype.mapMoveEnd = function () {
   var bounds = clampLatLngBounds(map.getBounds());
   var zoom = map.getZoom();
 
@@ -118,10 +118,10 @@ window.MapDataRequest.prototype.mapMoveEnd = function() {
       // ... and the zoom level is the same and the current bounds is inside the fetched bounds
       // so, no need to fetch data. if there's time left, restore the original timeout
 
-      var remainingTime = (this.timerExpectedTimeoutTime - new Date().getTime())/1000;
+      var remainingTime = (this.timerExpectedTimeoutTime - new Date().getTime()) / 1000;
 
       if (remainingTime > this.MOVE_REFRESH) {
-        this.setStatus('done','Map moved, but no data updates needed');
+        this.setStatus('done', 'Map moved, but no data updates needed');
         this.refreshOnTimeout(remainingTime);
         this.pauseRenderQueue(false);
         return;
@@ -133,7 +133,7 @@ window.MapDataRequest.prototype.mapMoveEnd = function() {
   this.refreshOnTimeout(this.MOVE_REFRESH);
 }
 
-window.MapDataRequest.prototype.idleResume = function() {
+window.MapDataRequest.prototype.idleResume = function () {
   // if we have no timer set and there are no active requests, refresh has gone idle and the timer needs restarting
 
   if (this.idle) {
@@ -145,7 +145,7 @@ window.MapDataRequest.prototype.idleResume = function() {
 }
 
 
-window.MapDataRequest.prototype.clearTimeout = function() {
+window.MapDataRequest.prototype.clearTimeout = function () {
 
   if (this.timer) {
     log.log('cancelling existing map refresh timer');
@@ -154,38 +154,38 @@ window.MapDataRequest.prototype.clearTimeout = function() {
   }
 }
 
-window.MapDataRequest.prototype.refreshOnTimeout = function(seconds) {
+window.MapDataRequest.prototype.refreshOnTimeout = function (seconds) {
   this.clearTimeout();
 
-  log.log('starting map refresh in '+seconds+' seconds');
+  log.log('starting map refresh in ' + seconds + ' seconds');
 
   // 'this' won't be right inside the callback, so save it
   // also, double setTimeout used to ensure the delay occurs after any browser-related rendering/updating/etc
   var _this = this;
-  this.timer = setTimeout ( function() {
-    _this.timer = setTimeout ( function() { _this.timer = undefined; _this.refresh(); }, seconds*1000);
+  this.timer = setTimeout(function () {
+    _this.timer = setTimeout(function () { _this.timer = undefined; _this.refresh(); }, seconds * 1000);
   }, 0);
-  this.timerExpectedTimeoutTime = new Date().getTime() + seconds*1000;
+  this.timerExpectedTimeoutTime = new Date().getTime() + seconds * 1000;
 }
 
 
-window.MapDataRequest.prototype.setStatus = function(short,long,progress) {
+window.MapDataRequest.prototype.setStatus = function (short, long, progress) {
   this.status = { short: short, long: long, progress: progress };
   window.renderUpdateStatus();
 }
 
 
-window.MapDataRequest.prototype.getStatus = function() {
+window.MapDataRequest.prototype.getStatus = function () {
   return this.status;
 };
 
 
-window.MapDataRequest.prototype.refresh = function() {
+window.MapDataRequest.prototype.refresh = function () {
 
   // if we're idle, don't refresh
   if (window.isIdle()) {
     log.log('suspending map refresh - is idle');
-    this.setStatus ('idle');
+    this.setStatus('idle');
     this.idle = true;
     return;
   }
@@ -214,11 +214,11 @@ window.MapDataRequest.prototype.refresh = function() {
   var tileParams = getMapZoomTileParameters(dataZoom);
 
 
-//DEBUG: resize the bounds so we only retrieve some data
-//bounds = bounds.pad(-0.4);
+  //DEBUG: resize the bounds so we only retrieve some data
+  //bounds = bounds.pad(-0.4);
 
-//var debugrect = L.rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
-//setTimeout (function(){ map.removeLayer(debugrect); }, 10*1000);
+  //var debugrect = L.rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
+  //setTimeout (function(){ map.removeLayer(debugrect); }, 10*1000);
 
   var x1 = lngToTile(bounds.getWest(), tileParams);
   var x2 = lngToTile(bounds.getEast(), tileParams);
@@ -227,28 +227,28 @@ window.MapDataRequest.prototype.refresh = function() {
 
   // calculate the full bounds for the data - including the part of the tiles off the screen edge
   var dataBounds = L.latLngBounds([
-    [tileToLat(y2+1,tileParams), tileToLng(x1,tileParams)],
-    [tileToLat(y1,tileParams), tileToLng(x2+1,tileParams)]
+    [tileToLat(y2 + 1, tileParams), tileToLng(x1, tileParams)],
+    [tileToLat(y1, tileParams), tileToLng(x2 + 1, tileParams)]
   ]);
-//var debugrect2 = L.rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
-//setTimeout (function(){ map.removeLayer(debugrect2); }, 10*1000);
+  //var debugrect2 = L.rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
+  //setTimeout (function(){ map.removeLayer(debugrect2); }, 10*1000);
 
   // store the parameters used for fetching the data. used to prevent unneeded refreshes after move/zoom
   this.fetchedDataParams = { bounds: dataBounds, mapZoom: mapZoom, dataZoom: dataZoom };
 
 
-  window.runHooks ('mapDataRefreshStart', {bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom, minPortalLevel: tileParams.level, tileBounds: dataBounds});
+  window.runHooks('mapDataRefreshStart', { bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom, minPortalLevel: tileParams.level, tileBounds: dataBounds });
 
   this.render.startRenderPass(tileParams.level, dataBounds);
 
-  window.runHooks ('mapDataEntityInject', {callback: this.render.processGameEntities.bind(this.render)});
+  window.runHooks('mapDataEntityInject', { callback: this.render.processGameEntities.bind(this.render) });
 
 
   this.render.processGameEntities(artifact.getArtifactEntities(), 'summary');
 
-  var logMessage = 'requesting data tiles at zoom '+dataZoom;
-  logMessage += ' (L'+tileParams.level+'+ portals';
-  logMessage += ', '+tileParams.tilesPerEdge+' tiles per global edge), map zoom is '+mapZoom;
+  var logMessage = 'requesting data tiles at zoom ' + dataZoom;
+  logMessage += ' (L' + tileParams.level + '+ portals';
+  logMessage += ', ' + tileParams.tilesPerEdge + ' tiles per global edge), map zoom is ' + mapZoom;
 
   log.log(logMessage);
 
@@ -269,21 +269,21 @@ window.MapDataRequest.prototype.refresh = function() {
     // x goes from bottom to top(?)
     for (var x = x1; x <= x2; x++) {
       var tile_id = pointToTileId(tileParams, x, y);
-      var latNorth = tileToLat(y,tileParams);
-      var latSouth = tileToLat(y+1,tileParams);
-      var lngWest = tileToLng(x,tileParams);
-      var lngEast = tileToLng(x+1,tileParams);
+      var latNorth = tileToLat(y, tileParams);
+      var latSouth = tileToLat(y + 1, tileParams);
+      var lngWest = tileToLng(x, tileParams);
+      var lngEast = tileToLng(x + 1, tileParams);
 
-      this.debugTiles.create(tile_id,[[latSouth,lngWest],[latNorth,lngEast]]);
+      this.debugTiles.create(tile_id, [[latSouth, lngWest], [latNorth, lngEast]]);
 
-//TODO: with recent backend changes there are now multiple zoom levels of data that is identical except perhaps for some
-// reduction of detail when zoomed out. to take good advantage of the cache, a check for cached data at a closer zoom
-// but otherwise the same parameters (min portal level, tiles per edge) will mean less downloads when zooming out
-// (however, the default code in getDataZoomForMapZoom currently reduces the need for this, as it forces the furthest 
-//  out zoom tiles for a detail level)
-      if (this.cache && this.cache.isFresh(tile_id) ) {
+      //TODO: with recent backend changes there are now multiple zoom levels of data that is identical except perhaps for some
+      // reduction of detail when zoomed out. to take good advantage of the cache, a check for cached data at a closer zoom
+      // but otherwise the same parameters (min portal level, tiles per edge) will mean less downloads when zooming out
+      // (however, the default code in getDataZoomForMapZoom currently reduces the need for this, as it forces the furthest 
+      //  out zoom tiles for a detail level)
+      if (this.cache && this.cache.isFresh(tile_id)) {
         // data is fresh in the cache - just render it
-        this.pushRenderQueue(tile_id,this.cache.get(tile_id),'cache-fresh');
+        this.pushRenderQueue(tile_id, this.cache.get(tile_id), 'cache-fresh');
         this.cachedTileCount += 1;
       } else {
 
@@ -291,14 +291,14 @@ window.MapDataRequest.prototype.refresh = function() {
 
         // tile needed. calculate the distance from the centre of the screen, to optimise the load order
 
-        var latCenter = (latNorth+latSouth)/2;
-        var lngCenter = (lngEast+lngWest)/2;
-        var tileLatLng = L.latLng(latCenter,lngCenter);
+        var latCenter = (latNorth + latSouth) / 2;
+        var lngCenter = (lngEast + lngWest) / 2;
+        var tileLatLng = L.latLng(latCenter, lngCenter);
 
         var tilePoint = map.project(tileLatLng, mapZoom);
 
         var delta = mapCenterPoint.subtract(tilePoint);
-        var distanceSquared = delta.x*delta.x + delta.y*delta.y;
+        var distanceSquared = delta.x * delta.x + delta.y * delta.y;
 
         tilesToFetchDistance[tile_id] = distanceSquared;
         this.requestedTileCount += 1;
@@ -308,8 +308,8 @@ window.MapDataRequest.prototype.refresh = function() {
 
   // re-order the tile list by distance from the centre of the screen. this should load more relevant data first
   var tilesToFetch = Object.keys(tilesToFetchDistance);
-  tilesToFetch.sort(function(a,b) {
-    return tilesToFetchDistance[a]-tilesToFetchDistance[b];
+  tilesToFetch.sort(function (a, b) {
+    return tilesToFetchDistance[a] - tilesToFetchDistance[b];
   });
 
   for (var i in tilesToFetch) {
@@ -320,35 +320,35 @@ window.MapDataRequest.prototype.refresh = function() {
 
 
 
-  this.setStatus ('loading', undefined, -1);
+  this.setStatus('loading', undefined, -1);
 
   // technically a request hasn't actually finished - however, displayed portal data has been refreshed
   // so as far as plugins are concerned, it should be treated as a finished request
-  window.runHooks('requestFinished', {success: true});
+  window.runHooks('requestFinished', { success: true });
 
-  log.log ('done request preparation (cleared out-of-bounds and invalid for zoom, and rendered cached data)');
+  log.log('done request preparation (cleared out-of-bounds and invalid for zoom, and rendered cached data)');
 
   if (Object.keys(this.queuedTiles).length > 0) {
     // queued requests - don't start processing the download queue immediately - start it after a short delay
-    this.delayProcessRequestQueue (this.DOWNLOAD_DELAY,true);
+    this.delayProcessRequestQueue(this.DOWNLOAD_DELAY, true);
   } else {
     // all data was from the cache, nothing queued - run the queue 'immediately' so it handles the end request processing
-    this.delayProcessRequestQueue (0,true);
+    this.delayProcessRequestQueue(0, true);
   }
 }
 
 
-window.MapDataRequest.prototype.delayProcessRequestQueue = function(seconds,isFirst) {
+window.MapDataRequest.prototype.delayProcessRequestQueue = function (seconds, isFirst) {
   if (this.timer === undefined) {
     var _this = this;
-    this.timer = setTimeout ( function() {
-      _this.timer = setTimeout ( function() { _this.timer = undefined; _this.processRequestQueue(isFirst); }, seconds*1000 );
+    this.timer = setTimeout(function () {
+      _this.timer = setTimeout(function () { _this.timer = undefined; _this.processRequestQueue(isFirst); }, seconds * 1000);
     }, 0);
   }
 }
 
 
-window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
+window.MapDataRequest.prototype.processRequestQueue = function (isFirstPass) {
 
   // if nothing left in the queue, finish
   if (Object.keys(this.queuedTiles).length == 0) {
@@ -365,28 +365,28 @@ window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
   // create a list of tiles that aren't requested over the network
   var pendingTiles = [];
   for (var id in this.queuedTiles) {
-    if (!(id in this.requestedTiles) ) {
+    if (!(id in this.requestedTiles)) {
       pendingTiles.push(id);
     }
   }
 
-//  log.log('- request state: '+Object.keys(this.requestedTiles).length+' tiles in '+this.activeRequestCount+' active requests, '+pendingTiles.length+' tiles queued');
+  //  log.log('- request state: '+Object.keys(this.requestedTiles).length+' tiles in '+this.activeRequestCount+' active requests, '+pendingTiles.length+' tiles queued');
 
   var requestBuckets = this.MAX_REQUESTS - this.activeRequestCount;
   if (pendingTiles.length > 0 && requestBuckets > 0) {
 
     var requestBucketSize = Math.min(this.NUM_TILES_PER_REQUEST, Math.max(5, Math.ceil(pendingTiles.length / requestBuckets)));
-    for (var bucket=0; bucket < requestBuckets; bucket++) {
+    for (var bucket = 0; bucket < requestBuckets; bucket++) {
 
       // if the tiles for this request have had several retries, use smaller requests
       // maybe some of the tiles caused all the others to error? no harm anyway, and it may help...
       var numTilesThisRequest = Math.min(requestBucketSize, pendingTiles.length);
 
       var id = pendingTiles[0];
-      var retryTotal = (this.tileErrorCount[id]||0);
-      for (var i=1; i<numTilesThisRequest; i++) {
+      var retryTotal = (this.tileErrorCount[id] || 0);
+      for (var i = 1; i < numTilesThisRequest; i++) {
         id = pendingTiles[i];
-        retryTotal += (this.tileErrorCount[id]||0);
+        retryTotal += (this.tileErrorCount[id] || 0);
         if (retryTotal > this.MAX_TILE_RETRIES) {
           numTilesThisRequest = i;
           break;
@@ -403,33 +403,33 @@ window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
 
 
   // update status
-  var pendingTileCount = this.requestedTileCount - (this.successTileCount+this.failedTileCount+this.staleTileCount);
+  var pendingTileCount = this.requestedTileCount - (this.successTileCount + this.failedTileCount + this.staleTileCount);
   var longText = 'Tiles: ' + this.cachedTileCount + ' cached, ' +
-                 this.successTileCount + ' loaded, ' +
-                 (this.staleTileCount ? this.staleTileCount + ' stale, ' : '') +
-                 (this.failedTileCount ? this.failedTileCount + ' failed, ' : '') +
-                 pendingTileCount + ' remaining';
+    this.successTileCount + ' loaded, ' +
+    (this.staleTileCount ? this.staleTileCount + ' stale, ' : '') +
+    (this.failedTileCount ? this.failedTileCount + ' failed, ' : '') +
+    pendingTileCount + ' remaining';
 
-  progress = this.requestedTileCount > 0 ? (this.requestedTileCount-pendingTileCount) / this.requestedTileCount : undefined;
-  this.setStatus ('loading', longText, progress);
+  const progress = this.requestedTileCount > 0 ? (this.requestedTileCount - pendingTileCount) / this.requestedTileCount : undefined;
+  this.setStatus('loading', longText, progress);
 }
 
 
-window.MapDataRequest.prototype.sendTileRequest = function(tiles) {
+window.MapDataRequest.prototype.sendTileRequest = function (tiles) {
 
   var tilesList = [];
 
   for (var i in tiles) {
     var id = tiles[i];
 
-    this.debugTiles.setState (id, 'requested');
+    this.debugTiles.setState(id, 'requested');
 
     this.requestedTiles[id] = true;
 
     if (id in this.queuedTiles) {
-      tilesList.push (id);
+      tilesList.push(id);
     } else {
-      log.warn('no queue entry for tile id '+id);
+      log.warn('no queue entry for tile id ' + id);
     }
   }
 
@@ -440,19 +440,19 @@ window.MapDataRequest.prototype.sendTileRequest = function(tiles) {
   var savedThis = this;
 
   // NOTE: don't add the request with window.request.add, as we don't want the abort handling to apply to map data any more
-  window.postAjax('getEntities', data, 
-    function(data, textStatus, jqXHR) { savedThis.handleResponse (data, tiles, true); },  // request successful callback
-    function() { savedThis.handleResponse (undefined, tiles, false); }  // request failed callback
+  window.postAjax('getEntities', data,
+    function (data, textStatus, jqXHR) { savedThis.handleResponse(data, tiles, true); },  // request successful callback
+    function () { savedThis.handleResponse(undefined, tiles, false); }  // request failed callback
   );
 }
 
-window.MapDataRequest.prototype.requeueTile = function(id, error) {
+window.MapDataRequest.prototype.requeueTile = function (id, error) {
   if (id in this.queuedTiles) {
     // tile is currently wanted...
 
     // first, see if the error can be ignored due to retry counts
     if (error) {
-      this.tileErrorCount[id] = (this.tileErrorCount[id]||0)+1;
+      this.tileErrorCount[id] = (this.tileErrorCount[id] || 0) + 1;
       if (this.tileErrorCount[id] <= this.MAX_TILE_RETRIES) {
         // retry limit low enough - clear the error flag
         error = false;
@@ -464,11 +464,11 @@ window.MapDataRequest.prototype.requeueTile = function(id, error) {
       var data = this.cache ? this.cache.get(id) : undefined;
       if (data) {
         // we have cached data - use it, even though it's stale
-        this.pushRenderQueue(id,data,'cache-stale');
+        this.pushRenderQueue(id, data, 'cache-stale');
         this.staleTileCount += 1;
       } else {
         // no cached data
-        this.debugTiles.setState (id, 'error');
+        this.debugTiles.setState(id, 'error');
         this.failedTileCount += 1;
       }
       // and delete from the pending requests...
@@ -476,7 +476,7 @@ window.MapDataRequest.prototype.requeueTile = function(id, error) {
 
     } else {
       // if false, was a 'timeout' or we're retrying, so unlimited retries (as the stock site does)
-      this.debugTiles.setState (id, 'retrying');
+      this.debugTiles.setState(id, 'retrying');
 
       // FIXME? it's nice to move retried tiles to the end of the request queue. however, we don't actually have a
       // proper queue, just an object with guid as properties. Javascript standards don't guarantee the order of properties
@@ -501,7 +501,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   var unaccountedTiles = tiles.slice(0); // Clone
 
   if (!success || !data || !data.result) {
-    log.warn('Request.handleResponse: request failed - requeuing...'+(data && data.error?' error: '+data.error:''));
+    log.warn('Request.handleResponse: request failed - requeuing...' + (data && data.error ? ' error: ' + data.error : ''));
 
     //request failed - requeue all the tiles(?)
 
@@ -511,19 +511,19 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
       for (var i in tiles) {
         var id = tiles[i];
         retryTiles.push(id);
-        this.debugTiles.setState (id, 'retrying');
+        this.debugTiles.setState(id, 'retrying');
       }
 
-      window.runHooks('requestFinished', {success: false});
+      window.runHooks('requestFinished', { success: false });
 
     } else {
       for (var i in tiles) {
         var id = tiles[i];
         errorTiles.push(id);
-        this.debugTiles.setState (id, 'request-fail');
+        this.debugTiles.setState(id, 'request-fail');
       }
 
-      window.runHooks('requestFinished', {success: false});
+      window.runHooks('requestFinished', { success: false });
     }
     unaccountedTiles = [];
   } else {
@@ -540,24 +540,24 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
 
         if (val.error == "TIMEOUT") {
           // TIMEOUT errors for individual tiles are quite common. used to be unlimited retries, but not any more
-          timeoutTiles.push (id);
+          timeoutTiles.push(id);
         } else {
-          log.warn('map data tile '+id+' failed: error=='+val.error);
-          errorTiles.push (id);
-          this.debugTiles.setState (id, 'tile-fail');
+          log.warn('map data tile ' + id + ' failed: error==' + val.error);
+          errorTiles.push(id);
+          this.debugTiles.setState(id, 'tile-fail');
         }
       } else {
         // no error for this data tile - process it
-        successTiles.push (id);
+        successTiles.push(id);
 
         // store the result in the cache
-        this.cache && this.cache.store (id, val);
+        this.cache && this.cache.store(id, val);
 
         // if this tile was in the render list, render it
         // (requests aren't aborted when new requests are started, so it's entirely possible we don't want to render it!)
         if (id in this.queuedTiles) {
 
-          this.pushRenderQueue(id,val,'ok');
+          this.pushRenderQueue(id, val, 'ok');
 
           delete this.queuedTiles[id];
           this.successTileCount += 1;
@@ -570,22 +570,22 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
     // TODO? check for any requested tiles in 'tiles' not being mentioned in the response - and handle as if it's a 'timeout'?
 
 
-    window.runHooks('requestFinished', {success: true});
+    window.runHooks('requestFinished', { success: true });
   }
 
   // set the queue delay based on any errors or timeouts
   // NOTE: retryTimes are retried at the regular delay - no longer wait as for error/timeout cases
   var nextQueueDelay = errorTiles.length > 0 ? this.BAD_REQUEST_RUN_QUEUE_DELAY :
-                       unaccountedTiles.length > 0 ? this.EMPTY_RESPONSE_RUN_QUEUE_DELAY :
-                       timeoutTiles.length > 0 ? this.TIMEOUT_REQUEST_RUN_QUEUE_DELAY :
-                       this.RUN_QUEUE_DELAY;
-  var statusMsg = 'getEntities status: '+tiles.length+' tiles: ';
-  statusMsg += successTiles.length+' successful';
-  if (retryTiles.length) statusMsg += ', '+retryTiles.length+' retried';
-  if (timeoutTiles.length) statusMsg += ', '+timeoutTiles.length+' timed out';
-  if (errorTiles.length) statusMsg += ', '+errorTiles.length+' failed';
-  if (unaccountedTiles.length) statusMsg += ', '+unaccountedTiles.length+' unaccounted';
-  statusMsg += '. delay '+nextQueueDelay+' seconds';
+    unaccountedTiles.length > 0 ? this.EMPTY_RESPONSE_RUN_QUEUE_DELAY :
+      timeoutTiles.length > 0 ? this.TIMEOUT_REQUEST_RUN_QUEUE_DELAY :
+        this.RUN_QUEUE_DELAY;
+  var statusMsg = 'getEntities status: ' + tiles.length + ' tiles: ';
+  statusMsg += successTiles.length + ' successful';
+  if (retryTiles.length) statusMsg += ', ' + retryTiles.length + ' retried';
+  if (timeoutTiles.length) statusMsg += ', ' + timeoutTiles.length + ' timed out';
+  if (errorTiles.length) statusMsg += ', ' + errorTiles.length + ' failed';
+  if (unaccountedTiles.length) statusMsg += ', ' + unaccountedTiles.length + ' unaccounted';
+  statusMsg += '. delay ' + nextQueueDelay + ' seconds';
   log.log(statusMsg);
 
 
@@ -634,41 +634,42 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
 }
 
 
-window.MapDataRequest.prototype.resetRenderQueue = function() {
+window.MapDataRequest.prototype.resetRenderQueue = function () {
   this.renderQueue = [];
 
   if (this.renderQueueTimer) {
     clearTimeout(this.renderQueueTimer);
     this.renderQueueTimer = undefined;
   }
-  this.renderQueuePaused = false;  
+  this.renderQueuePaused = false;
 }
 
 
 window.MapDataRequest.prototype.pushRenderQueue = function (id, data, status) {
-  this.debugTiles.setState(id,'render-queue');
+  this.debugTiles.setState(id, 'render-queue');
   this.renderQueue.push({
-    id:id,
+    id: id,
     // the data in the render queue is modified as we go, so we need to copy the values of the arrays. just storing the reference would modify the data in the cache!
-    deleted: (data.deletedGameEntityGuids||[]).slice(0),
-    entities: (data.gameEntities||[]).slice(0),
-    status:status});
+    deleted: (data.deletedGameEntityGuids || []).slice(0),
+    entities: (data.gameEntities || []).slice(0),
+    status: status
+  });
 
   if (!this.renderQueuePaused) {
     this.startQueueTimer(this.RENDER_PAUSE);
   }
 }
 
-window.MapDataRequest.prototype.startQueueTimer = function(delay) {
+window.MapDataRequest.prototype.startQueueTimer = function (delay) {
   if (this.renderQueueTimer === undefined) {
     var _this = this;
-    this.renderQueueTimer = setTimeout( function() {
-      _this.renderQueueTimer = setTimeout ( function() { _this.renderQueueTimer = undefined; _this.processRenderQueue(); }, (delay||0)*1000 );
+    this.renderQueueTimer = setTimeout(function () {
+      _this.renderQueueTimer = setTimeout(function () { _this.renderQueueTimer = undefined; _this.processRenderQueue(); }, (delay || 0) * 1000);
     }, 0);
   }
 }
 
-window.MapDataRequest.prototype.pauseRenderQueue = function(pause) {
+window.MapDataRequest.prototype.pauseRenderQueue = function (pause) {
   this.renderQueuePaused = pause;
   if (pause) {
     if (this.renderQueueTimer) {
@@ -682,29 +683,29 @@ window.MapDataRequest.prototype.pauseRenderQueue = function(pause) {
   }
 }
 
-window.MapDataRequest.prototype.processRenderQueue = function() {
+window.MapDataRequest.prototype.processRenderQueue = function () {
   var drawEntityLimit = this.RENDER_BATCH_SIZE;
 
 
-//TODO: we don't take account of how many of the entities are actually new/removed - they
-// could already be drawn and not changed. will see how it works like this...
+  //TODO: we don't take account of how many of the entities are actually new/removed - they
+  // could already be drawn and not changed. will see how it works like this...
   while (drawEntityLimit > 0 && this.renderQueue.length > 0) {
     var current = this.renderQueue[0];
 
     if (current.deleted.length > 0) {
-      var deleteThisPass = current.deleted.splice(0,drawEntityLimit);
+      var deleteThisPass = current.deleted.splice(0, drawEntityLimit);
       drawEntityLimit -= deleteThisPass.length;
       this.render.processDeletedGameEntityGuids(deleteThisPass);
     }
 
     if (drawEntityLimit > 0 && current.entities.length > 0) {
-      var drawThisPass = current.entities.splice(0,drawEntityLimit);
+      var drawThisPass = current.entities.splice(0, drawEntityLimit);
       drawEntityLimit -= drawThisPass.length;
       this.render.processGameEntities(drawThisPass, 'extended');
     }
 
     if (current.deleted.length == 0 && current.entities.length == 0) {
-      this.renderQueue.splice(0,1);
+      this.renderQueue.splice(0, 1);
       this.debugTiles.setState(current.id, current.status);
     }
 
@@ -718,23 +719,23 @@ window.MapDataRequest.prototype.processRenderQueue = function() {
     this.render.endRenderPass();
 
     var endTime = new Date().getTime();
-    var duration = (endTime - this.refreshStartTime)/1000;
+    var duration = (endTime - this.refreshStartTime) / 1000;
 
-    log.log('finished requesting data! (took '+duration+' seconds to complete)');
+    log.log('finished requesting data! (took ' + duration + ' seconds to complete)');
 
-    window.runHooks ('mapDataRefreshEnd', {});
+    window.runHooks('mapDataRefreshEnd', {});
 
     var longStatus = 'Tiles: ' + this.cachedTileCount + ' cached, ' +
-                 this.successTileCount + ' loaded, ' +
-                 (this.staleTileCount ? this.staleTileCount + ' stale, ' : '') +
-                 (this.failedTileCount ? this.failedTileCount + ' failed, ' : '') +
-                 'in ' + duration + ' seconds';
+      this.successTileCount + ' loaded, ' +
+      (this.staleTileCount ? this.staleTileCount + ' stale, ' : '') +
+      (this.failedTileCount ? this.failedTileCount + ' failed, ' : '') +
+      'in ' + duration + ' seconds';
 
     // refresh timer based on time to run this pass, with a minimum of REFRESH seconds
-    var minRefresh = map.getZoom()>12 ? this.REFRESH_CLOSE : this.REFRESH_FAR;
-    var refreshTimer = Math.max(minRefresh, duration*this.FETCH_TO_REFRESH_FACTOR);
+    var minRefresh = map.getZoom() > 12 ? this.REFRESH_CLOSE : this.REFRESH_FAR;
+    var refreshTimer = Math.max(minRefresh, duration * this.FETCH_TO_REFRESH_FACTOR);
     this.refreshOnTimeout(refreshTimer);
-    this.setStatus (this.failedTileCount ? 'errors' : this.staleTileCount ? 'out of date' : 'done', longStatus);
+    this.setStatus(this.failedTileCount ? 'errors' : this.staleTileCount ? 'out of date' : 'done', longStatus);
 
   }
 

@@ -42,12 +42,13 @@ window.ornaments = {
   //                                // default is [0, 0] to center
   //   opacity: 0..1                // optional, default is 0.6
   // }
-  icon:{},
+  icon: {},
   excludedOrnaments: [],
   knownOrnaments: {},
+  _portals: {},
 
   setup: function () {
-    _portals = {};
+    window.ornaments._portals = {};
     this.layerGroup = L.layerGroup;
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
       this.layerGroup = L.canvasIconLayer;
@@ -60,14 +61,15 @@ window.ornaments = {
     this.layers['Excluded ornaments'] = window.ornaments.layerGroup(); // to keep excluded ornaments in an own layer
 
     window.layerChooser.addOverlay(this.layers['Ornaments'], 'Ornaments');
-    window.layerChooser.addOverlay(this.layers['Excluded ornaments'], 'Excluded ornaments', {default: false});
+    window.layerChooser.addOverlay(this.layers['Excluded ornaments'], 'Excluded ornaments', { default: false });
 
     $('<a>', {
-      text:'Ornaments Opt',
+      text: 'Ornaments Opt',
       id: 'ornaments-toolbox-link',
       title: 'Edit ornament exclusions',
       accesskey: 'o',
-      click: window.ornaments.ornamentsOpt})
+      click: window.ornaments.ornamentsOpt
+    })
       .appendTo('#toolbox');
   },
   createLayer: function (layerID) {
@@ -79,7 +81,7 @@ window.ornaments = {
     this.removePortal(portal);
     var ornaments = portal.options.data.ornaments;
     if (ornaments && ornaments.length) {
-      _portals[portal.options.guid] = ornaments.map(function (ornament) {
+      window.ornaments._portals[portal.options.guid] = ornaments.map(function (ornament) {
         var layer = this.layers['Ornaments'];
         var opacity = this.OVERLAY_OPACITY;
         var size = this.OVERLAY_SIZE * window.portalMarkerScale();
@@ -87,16 +89,16 @@ window.ornaments = {
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
         if (!this.knownOrnaments[ornament]) {
-          this.knownOrnaments[ornament]=false;
+          this.knownOrnaments[ornament] = false;
         }
 
         if (ornament in this.icon) {
           if (this.icon[ornament].layer) {
-            if (this.layers[this.icon[ornament].layer] === undefined){
-              log.log ('Add missing layer: ',this.icon[ornament].layer);
+            if (this.layers[this.icon[ornament].layer] === undefined) {
+              log.log('Add missing layer: ', this.icon[ornament].layer);
               window.ornaments.createLayer(window.ornaments.icon[ornament].layer);
             }
-            layer =  this.layers[window.ornaments.icon[ornament].layer];
+            layer = this.layers[window.ornaments.icon[ornament].layer];
           }
           if (window.ornaments.icon[ornament].url) {
             iconUrl = window.ornaments.icon[ornament].url;
@@ -112,12 +114,12 @@ window.ornaments = {
 
         var exclude = false;
         if (this.excludedOrnaments && this.excludedOrnaments !== ['']) {
-          exclude = this.excludedOrnaments.some( function(pattern) {
+          exclude = this.excludedOrnaments.some(function (pattern) {
             return ornament.startsWith(pattern);
           });
         }
         exclude = exclude | this.knownOrnaments[ornament];
-        if (exclude){
+        if (exclude) {
           layer = this.layers['Excluded ornaments'];
         }
 
@@ -140,11 +142,11 @@ window.ornaments = {
 
   removePortal: function (portal) {
     var guid = portal.options.guid;
-    if (_portals[guid]) {
-      _portals[guid].forEach(function (marker) {
+    if (window.ornaments._portals[guid]) {
+      window.ornaments._portals[guid].forEach(function (marker) {
         marker.options.layer.removeLayer(marker);
       });
-      delete _portals[guid];
+      delete window.ornaments._portals[guid];
     }
   },
   initOrnaments: function () {
@@ -159,17 +161,17 @@ window.ornaments = {
       if (!dataStr) { return; }
       this.excludedOrnaments = JSON.parse(dataStr);
     } catch (e) {
-      log.warn('ornaments: failed to load excludedOrnaments from localStorage: '+e);
+      log.warn('ornaments: failed to load excludedOrnaments from localStorage: ' + e);
     }
     try {
       dataStr = localStorage.getItem('knownOrnaments');
       if (!dataStr) {
-        this.initOrnaments ();
+        this.initOrnaments();
         return;
       }
       this.knownOrnaments = JSON.parse(dataStr);
     } catch (e) {
-      log.warn('ornaments: failed to load data from localStorage: '+e);
+      log.warn('ornaments: failed to load data from localStorage: ' + e);
     }
 
   },
@@ -191,26 +193,26 @@ window.ornaments = {
     window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ''; });
     // process the input from the checkboxes
     for (var ornamentCode in window.ornaments.knownOrnaments) {
-      var input = $('#chk_orn_'+ornamentCode);
+      var input = $('#chk_orn_' + ornamentCode);
       window.ornaments.knownOrnaments[ornamentCode] = input.is(':checked');
     }
   },
 
-  ornamentsList: function() {
-    var text ='';
+  ornamentsList: function () {
+    var text = '';
     var sortedIDs = Object.keys(window.ornaments.knownOrnaments).sort();
 
-    sortedIDs.forEach ( function (ornamentCode) {
-      var hidden = window.ornaments.excludedOrnaments.some( function(code) {
+    sortedIDs.forEach(function (ornamentCode) {
+      var hidden = window.ornaments.excludedOrnaments.some(function (code) {
         return ornamentCode.startsWith(code);
       });
 
-      var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name +' ('+ornamentCode+')' : ornamentCode);
-      var checked = (window.ornaments.knownOrnaments[ornamentCode]||hidden) ?  'checked ' : '';
+      var name = (window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name + ' (' + ornamentCode + ')' : ornamentCode);
+      var checked = (window.ornaments.knownOrnaments[ornamentCode] || hidden) ? 'checked ' : '';
       text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked;
       text += ' onchange="window.ornaments.processInput();window.ornaments.save();window.ornaments.reload()"';
-      text += (hidden ? 'disabled':'');
-      text += '>'+ name + '</label><br>';
+      text += (hidden ? 'disabled' : '');
+      text += '>' + name + '</label><br>';
     });
     return text;
   },
@@ -229,25 +231,25 @@ window.ornaments = {
   ornamentsOpt: function () {
     var excludedIDs = window.ornaments.excludedOrnaments.join(',');
     var html = '<div class="ornamentsOpts">'
-             + 'Hide Ornaments from IITC that start with:<br>'
-             + '<input type="text" value="' + excludedIDs + '" id="ornaments_E"'
-             + ' onchange="window.ornaments.onChangeHandler()"></input><br>'
-             + '(separator: space or comma allowed)<hr>'
-             + '<b>known Ornaments, check to hide:</b><br>'
-             + '<div id="ornamentsList"> ' + window.ornaments.ornamentsList() + '</div>'
-             + '</div>';
+      + 'Hide Ornaments from IITC that start with:<br>'
+      + '<input type="text" value="' + excludedIDs + '" id="ornaments_E"'
+      + ' onchange="window.ornaments.onChangeHandler()"></input><br>'
+      + '(separator: space or comma allowed)<hr>'
+      + '<b>known Ornaments, check to hide:</b><br>'
+      + '<div id="ornamentsList"> ' + window.ornaments.ornamentsList() + '</div>'
+      + '</div>';
 
     dialog({
-      html:html,
-      id:'ornamentsOpt',
-      title:'Ornament excludes',
+      html: html,
+      id: 'ornamentsOpt',
+      title: 'Ornament excludes',
       buttons: {
-        RESET : function () {
+        RESET: function () {
           window.ornaments.initOrnaments();
           window.ornaments.reload();
           $(this).dialog('close');
         },
-        OK : function() {
+        OK: function () {
           // process the input from the input
           window.ornaments.processInput();
           window.ornaments.save();
