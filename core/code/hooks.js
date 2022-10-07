@@ -76,14 +76,15 @@ window.runHooks = function(event, data) {
   var interrupted = false;
   isRunning++;
   $.each(_hooks[event], function (ind, callback) {
-    try {
-      if (callback(data) === false) {
-        interrupted = true;
-        return false; // break from $.each
-      }
-    } catch (e) {
-      log.error('error running hook', { event: event, error: e, source: callback && callback.toString(), data: data });
+    // try {
+    if (callback(data) === false) {
+      interrupted = true;
+      return false; // break from $.each
     }
+    // FIXME catch error only in production code
+    /* } catch (e) {
+      log.error('error running hook', { event: event, error: e, source: callback && callback.toString(), data: data });
+    } */
   });
   isRunning--;
   return !interrupted;
