@@ -2509,10 +2509,15 @@ kurly@^2.0.0-beta.3:
   resolved "https://registry.yarnpkg.com/kurly/-/kurly-2.0.0-beta.3.tgz#571b02745f9c68b6a5ee012fda8106bd54a87203"
   integrity sha512-WXSRkhL2VV9lI/sPomBDV9Xf4oQ1s/RiUqzxKt4slkG7ndCxcDfXJ2ZXdxEYDRfevnkSOxmiVX3etunBlHqTAw==
 
-leaflet@^1.5.1:
-  version "1.9.2"
-  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.2.tgz#168b6c6ef1d4d1e8409bde2c4ad050c249c4dbe6"
-  integrity sha512-Kc77HQvWO+y9y2oIs3dn5h5sy2kr3j41ewdqCMEUA4N89lgfUUfOBy7wnnHEstDpefiGFObq12FdopGRMx4J7g==
+leaflet.gridlayer.googlemutant@^0.13.5:
+  version "0.13.5"
+  resolved "https://registry.yarnpkg.com/leaflet.gridlayer.googlemutant/-/leaflet.gridlayer.googlemutant-0.13.5.tgz#7182c26f479e726bff8b85a7ebf9d3f44dd3ea57"
+  integrity sha512-DHUEXpo1t0WZ9tpdLUHHkrTK7LldCXr/gqkV5E/4hHidDJB2srceLLCZj4PV/pl0jPdTkVBT+Lr8nL9EZDB5hw==
+
+leaflet@~1.8:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.8.0.tgz#4615db4a22a304e8e692cae9270b983b38a2055e"
+  integrity sha512-gwhMjFCQiYs3x/Sf+d49f10ERXaEFCPr+nVTryhAW8DWbMGqJqt9G4XuIaHmFW08zYvhgdzqXGr8AlW8v8dQkA==
 
 levn@^0.4.1:
   version "0.4.1"

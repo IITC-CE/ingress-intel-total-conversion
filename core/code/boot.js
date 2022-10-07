@@ -228,17 +228,18 @@ function boot() {
   window.runHooks('iitcLoaded');
 }
 
-
+// Styles
 require("../external/jquery-ui-1.12.1-resizable.css");
 require("../style.css");
-require("../external/leaflet.css");
 
+// Leaflet
+window.L_NO_TOUCH = navigator.maxTouchPoints === 0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
+require("leaflet");
+require("leaflet/dist/leaflet.css");
+require("leaflet.gridlayer.googlemutant");
 
 require("../external/autolink-min.js"); // TODO move to dependencies
-window.L_NO_TOUCH = navigator.maxTouchPoints === 0; // prevent mobile style on desktop https://github.com/IITC-CE/ingress-intel-total-conversion/pull/189
-require("../external/leaflet-src.js"); // TODO move to dependencies
 require("../external/L.Geodesic.js"); // TODO move to dependencies
-require("../external/Leaflet.GoogleMutant.js"); // TODO move to dependencies
 require("../external/oms.min.js"); // TODO move to dependencies
 
 // L.CanvasIconLayer = (function (module) { // FIXME: 
