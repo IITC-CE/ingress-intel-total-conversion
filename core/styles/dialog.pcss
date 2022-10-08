@@ -1,0 +1,188 @@
+.ui-tooltip,
+.ui-dialog {
+  position: absolute;
+  z-index: 9500;
+  background-color: rgba(8, 48, 78, 0.9);
+  border: 1px solid #20a8b1;
+  color: #eee;
+  font-size: 13px;
+  line-height: 15px;
+  padding: 2px 4px;
+}
+
+.ui-dialog {
+  padding: 0;
+  border-radius: 2px;
+  max-width: calc(100vw - 2px);
+}
+
+@media (min-width: 700px) {
+  .ui-dialog {
+    max-width: 600px;
+  }
+}
+
+.ui-tooltip,
+.ui-dialog a {
+  color: #ffce00;
+}
+
+.ui-tooltip {
+  max-width: 300px;
+  z-index: 10002 !important;
+}
+
+.ui-widget-overlay {
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10000;
+  background: #444;
+  opacity: 0.6;
+}
+
+.ui-modal {
+  z-index: 10001 !important;
+}
+
+.ui-dialog-modal .ui-dialog-titlebar-close {
+  display: none;
+}
+
+.ui-dialog-titlebar {
+  font-size: 13px;
+  line-height: 15px;
+  text-align: center;
+  padding: 4px;
+  background-color: rgba(8, 60, 78, 0.9);
+}
+
+.ui-dialog-title {
+  font-weight: bold;
+  margin-left: 8px;
+  margin-right: 45px;
+  width: calc(100% - 45px);
+}
+
+.ui-dialog-title-active {
+  color: #ffce00;
+}
+
+.ui-dialog-title-inactive {
+  color: #ffffff;
+}
+
+.ui-dialog-titlebar-button {
+  position: absolute;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  width: 17px;
+  height: 17px;
+  top: 3px;
+  cursor: pointer;
+  border: 1px solid rgb(32, 168, 177);
+  background-color: rgba(0, 0, 0, 0);
+  padding: 0;
+
+  &:active {
+    background-color: rgb(32, 168, 177);
+  }
+}
+
+.ui-dialog-titlebar-button-close {
+  right: 4px;
+}
+
+.ui-dialog-titlebar-button-collapse {
+  right: 25px;
+}
+
+.ui-dialog-titlebar-button-collapse-collapsed {
+  background-color: rgb(32, 168, 177);
+}
+
+.ui-dialog-titlebar-button-collapse::after,
+.ui-dialog-titlebar-button-close::after,
+.ui-dialog-titlebar-button-close::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  width: 11px;
+  margin-left: -6px;
+  height: 0;
+  border-top: 2px solid rgb(32, 168, 177);
+}
+
+.ui-dialog-titlebar-button-close::after {
+  transform: translateY(3.5px) rotate(45deg);
+  -webkit-transform: translateY(3.5px) rotate(45deg);
+}
+
+.ui-dialog-titlebar-button-close::before {
+  transform: translateY(3.5px) rotate(-45deg);
+  -webkit-transform: translateY(3.5px) rotate(-45deg);
+}
+
+.ui-dialog-titlebar-button.ui-state-active::after,
+.ui-dialog-titlebar-button.ui-state-active::before,
+.ui-dialog-titlebar-button.ui-dialog-titlebar-button-collapse-collapsed::after,
+.ui-dialog-titlebar-button.ui-dialog-titlebar-button-collapse-collapsed::before,
+.ui-dialog-titlebar-button:active::after,
+.ui-dialog-titlebar-button:active::before {
+  border-top-color: rgba(8, 60, 78, 0.9);
+}
+
+.ui-dialog-content {
+  padding: 12px;
+  overflow: auto;
+  position: relative;
+
+  /* Limiting the height of dialog content on small screens */
+  /* 57px – height .ui-dialog-titlebar + .ui-dialog-buttonpane */
+  /* 24px – padding 12px * 2 */
+  /*  2px – border 1px * 2 */
+  max-height: calc(100vh - 57px - 24px - 2px) !important;
+}
+
+.ui-dialog-content-hidden {
+  display: none !important;
+}
+
+.ui-dialog-buttonpane {
+  padding: 6px;
+  border-top: 1px solid #20a8b1;
+}
+
+.ui-dialog-buttonset {
+  text-align: right;
+}
+
+.ui-dialog-buttonset button,
+.ui-dialog-content button {
+  padding: 2px;
+  min-width: 40px;
+  color: #ffce00;
+  border: 1px solid #ffce00;
+  background-color: rgba(8, 48, 78, 0.9);
+}
+
+.ui-dialog-buttonset button:hover {
+  text-decoration: underline;
+}
+
+td {
+  padding: 0;
+  vertical-align: top;
+}
+
+td + td {
+  padding-left: 4px;
+}
+
+#qrcode > canvas {
+  border: 8px solid white;
+}

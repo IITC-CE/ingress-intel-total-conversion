@@ -1,0 +1,31 @@
+.leaflet-control-layers-overlays label.disabled {
+  text-decoration: line-through;
+  cursor: help;
+}
+
+/* base layer selection - first column */
+.leaflet-control-layers-base {
+  float: left;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+/* overlays layer selection - 2nd column */
+.leaflet-control-layers-overlays {
+  float: left;
+  margin-left: 8px;
+  border-left: 1px solid #dddddd;
+  padding-left: 8px;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+/* hide the usual separator */
+.leaflet-control-layers-separator {
+  display: none;
+}
+
+/* shift controls when chat is expanded */
+.leaflet-left .leaflet-control.chat-expand {
+  margin-left: 720px;
+}

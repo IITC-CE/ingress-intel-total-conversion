@@ -9,6 +9,8 @@ from functools import partial
 from importlib import import_module
 from mimetypes import guess_type
 from pathlib import Path
+import subprocess
+import platform
 
 import settings
 
@@ -150,6 +152,32 @@ def expand_template(match, path=None):
         pattern = r'(?<=url\()["\']?(?P<filename>[^)#]+?)["\']?(?=\))'
         css = re.sub(pattern, partial(imgrepl, path=fullname.parent), readtext(fullname))
         return quote % multi_line(css)
+    elif kw == "require_css":
+        print("postcss {}".format(filename))
+        postCMD = ("postcss.cmd" if platform.system() == "Windows" else "postcss")
+        postcss = Path("node_modules/.bin/") / postCMD
+
+        result = subprocess.run(
+            [postcss, "--no-map", fullname],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="utf-8",
+            universal_newlines=True,
+        )
+
+        if result.stderr:
+            raise UserWarning(print(result.stderr))
+
+        return """// *** include CSS: {filename} ***
+(function () {{
+var style = document.createElement('style');
+style.type = 'text/css';
+style.appendChild(document.createTextNode('{content}'));
+document.head.appendChild(style);
+}})();
+""".format(
+            filename=filename, content=multi_line(result.stdout)
+        )
 
 
 def process_file(source, out_dir, dist_path=None, deps_list=None):

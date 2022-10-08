@@ -1,0 +1,95 @@
+.cellscore {
+  .ui-accordion-header,
+  .ui-accordion-content {
+    border: 1px solid #20a8b1;
+    margin-top: -1px;
+    display: block;
+  }
+
+  .ui-accordion-header {
+    color: #ffce00;
+    outline: none;
+
+    &:before {
+      font-size: 18px;
+      margin-right: 2px;
+      content: "⊞";
+    }
+  }
+
+  .ui-accordion-header-active:before {
+    content: "⊟";
+  }
+
+  table {
+    width: 90%;
+    max-width: 360px; /* prevent width change on scrollbar appearance (after animation) */
+  }
+
+  /* prevent nonfunctional horizontal scrollbar in Chrome (perhaps jQuery issue) */
+  .historychart > div {
+    overflow: auto;
+  }
+
+  .logscale {
+    vertical-align: middle;
+    margin-top: 0;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding-left: 5px;
+  }
+
+  #overview {
+    width: 100%;
+
+    td {
+      white-space: nowrap;
+      width: 1%;
+      text-align: right;
+    }
+    th {
+      white-space: nowrap;
+      width: 1%;
+      text-align: left;
+      padding-left: 4px;
+    }
+  }
+}
+
+/* hack for gecko */
+@-moz-document url-prefix() {
+  .cellscore .logscale {
+    transform: scale(0.8);
+  }
+
+  /* prevent nonfunctional vertical scrollbar in Firefox (perhaps jQuery issue) */
+  .cellscore > .historychart {
+    overflow-y: hidden !important;
+  }
+}
+
+g.checkpoint:hover circle {
+  fill-opacity: 1;
+  stroke-width: 2px;
+}
+
+.checkpointtooltip {
+  min-width: 180px;
+}
+
+.checkpoint_timers table {
+  padding-top: 4px;
+  width: 100%;
+}
+
+.checkpoint_table {
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: right;
+  }
+}

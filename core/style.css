@@ -1,15 +1,11 @@
-/* general rules ******************************************************/
-
-/* for printing directly from the browser, hide all UI components
- * NOTE: @media needs to be first?
- */
-@media print {
-  .leaflet-control-container { display: none !important; }
-  #chatcontrols, #chat, #chatinput { display: none !important; }
-  #sidebartoggle, #sidebar { display: none !important; }
-  #updatestatus { display: none !important; }
-  #portal_highlight_select { display: none !important; }
-}
+@import "styles/leaflet_tweaks";
+@import "styles/print";
+@import "styles/chat.pcss";
+@import "styles/dialog.pcss";
+@import "styles/sidebar.pcss";
+@import "styles/artifact.pcss";
+@import "styles/redeem.pcss";
+@import "styles/regionscore.pcss";
 
 .text-overflow-ellipsis {
   display: inline-block;
@@ -20,8 +16,8 @@
   width: 100%;
 }
 
-
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow: hidden; /* workaround for #373 */
@@ -33,7 +29,6 @@ html, body {
   height: 100%;
   width: 100%;
 }
-
 
 body {
   font-size: 14px;
@@ -51,10 +46,18 @@ body {
   cursor: pointer;
 }
 
-i.tiny { font-size: 1rem; }
-i.small { font-size: 2rem; }
-i.medium { font-size: 4rem; }
-i.large { font-size: 6rem; }
+i.tiny {
+  font-size: 1rem;
+}
+i.small {
+  font-size: 2rem;
+}
+i.medium {
+  font-size: 4rem;
+}
+i.large {
+  font-size: 6rem;
+}
 
 #scrollwrapper {
   overflow-x: hidden;
@@ -68,34 +71,12 @@ i.large { font-size: 6rem; }
   pointer-events: none;
 }
 
-#sidebar {
-  background-color: rgba(8, 48, 78, 0.9);
-  border-left: 1px solid #20A8B1;
-  color: #888;
-  position: relative;
-  left: 0;
-  top: 0;
-  max-height: 100%;
-  overflow-y:scroll;
-  overflow-x:hidden;
-  pointer-events: auto;
+.RESISTANCE {
+  color: #00c2ff;
 }
 
-#sidebartoggle {
-  display: block;
-  padding: 20px 5px;
-  margin-top: -31px; /* -(toggle height / 2) */
-  line-height: 10px;
-  position: absolute;
-  top: 108px;
-  z-index: 3002;
-  background-color: rgba(8, 48, 78, 0.9);
-  color: #FFCE00;
-  border: 1px solid #20A8B1;
-  border-right: none;
-  border-radius: 5px 0 0 5px;
-  text-decoration: none;
-  right: -50px; /* overwritten later by the script with SIDEBAR_WIDTH */
+.ENLIGHTENED {
+  color: #28f428;
 }
 
 .enl {
@@ -124,39 +105,6 @@ a:hover {
   text-decoration: underline;
 }
 
-.leaflet-control-layers-overlays label.disabled {
-  text-decoration: line-through;
-  cursor: help;
-}
-
-/* base layer selection - first column */
-.leaflet-control-layers-base {
-  float: left;
-  overflow-y: auto;
-  max-height: 600px;
-}
-
-/* overlays layer selection - 2nd column */
-.leaflet-control-layers-overlays {
-  float: left;
-  margin-left: 8px;
-  border-left: 1px solid #DDDDDD;
-  padding-left: 8px;
-  overflow-y: auto;
-  max-height: 600px;
-}
-
-/* hide the usual separator */
-.leaflet-control-layers-separator {
-  display: none;
-}
-
-
-/* shift controls when chat is expanded */
-.leaflet-left .leaflet-control.chat-expand {
-  margin-left: 720px;
-}
-
 .help {
   cursor: help;
 }
@@ -169,7 +117,7 @@ a:hover {
 
 /* field mu count */
 .fieldmu {
-  color: #FFCE00;
+  color: #ffce00;
   font-size: 13px;
   font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; /*override leaflet-container */
   text-align: center;
@@ -177,134 +125,7 @@ a:hover {
   pointer-events: none;
 }
 
-
-/* chat ***************************************************************/
-
-#chatcontrols {
-  color: #FFCE00;
-  background: rgba(8, 48, 78, 0.9);
-  position: absolute;
-  left: 0;
-  z-index: 3000;
-  height: 26px;
-  padding-left:1px;
-}
-
-#chatcontrols.expand {
-  top: 0;
-  bottom: auto;
-}
-
-#chatcontrols a {
-  margin-left: -1px;
-  display: inline-block;
-  width: 94px;
-  text-align: center;
-  height: 24px;
-  line-height: 24px;
-  border: 1px solid #20A8B1;
-  vertical-align: top;
-}
-
-#chatcontrols a:first-child {
-  letter-spacing:-1px;
   text-decoration: none;
-}
-
-#chatcontrols a.active {
-  border-color: #FFCE00;
-  border-bottom-width:0px;
-  font-weight:bold;
-  background: rgb(8, 48, 78);
-}
-
-#chatcontrols a.active + a {
-  border-left-color: #FFCE00
-}
-
-
-#chatcontrols .toggle {
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: 10px solid #FFCE00;
-  margin: 6px auto auto;
-}
-
-#chatcontrols.expand .toggle {
-  border-top: 10px solid #FFCE00;
-  border-bottom: none;
-}
-
-#chatcontrols .loading {
-  background-color: rgba(255,0,0,0.3);
-  -webkit-animation: chatloading 1.2s infinite linear;
-  -moz-animation: chatloading 1.2s infinite linear;
-  animation: chatloading 1.2s infinite linear;
-}
-
-@-webkit-keyframes chatloading {
-    0% { background-color: rgba(255,0,0,0.4) }
-   50% { background-color: rgba(255,0,0,0.1) }
-  100% { background-color: rgba(255,0,0,0.4) }
-}
-
-@-moz-keyframes chatloading {
-    0% { background-color: rgba(255,0,0,0.4) }
-   50% { background-color: rgba(255,0,0,0.1) }
-  100% { background-color: rgba(255,0,0,0.4) }
-}
-
-@keyframes chatloading {
-    0% { background-color: rgba(255,0,0,0.4) }
-   50% { background-color: rgba(255,0,0,0.1) }
-  100% { background-color: rgba(255,0,0,0.4) }
-}
-
-
-
-#chat {
-  position: absolute;
-  width: 708px;
-  bottom: 23px;
-  left: 0;
-  z-index: 3000;
-  background: rgba(8, 48, 78, 0.9);
-  line-height: 15px;
-  color: #eee;
-  border: 1px solid #20A8B1;
-  border-bottom: 0;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-em {
-  color: red;
-  font-style: normal;
-}
-
-#chat.expand {
-  height:auto;
-  top: 25px;
-}
-
-
-#chat > div {
-  overflow-x:hidden;
-  overflow-y:scroll;
-  height: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  padding: 2px;
-  position:relative;
-}
-
-#chat table, #chatinput table {
-  width: 100%;
-  table-layout: fixed;
-  border-spacing: 0;
-  border-collapse: collapse;
   /* make the table always scrollable */
   min-height: 100%;
   margin-bottom: 1px;
@@ -313,45 +134,12 @@ em {
 /* expand last row if needed */
 #chat table tr:last-child {
     height: 100%;
-}
-
-#chatinput table {
-  height: 100%;
-}
-
-#chat td, #chatinput td {
-  font-size: 13px;
-  vertical-align: top;
-  padding-bottom: 3px;
-}
-
 #chat .divider {
   color: #bbb;
 }
 
 #chat .divider td:nth-child(2) {
   text-align: center;
-}
-
-/* time */
-#chat td:first-child, #chatinput td:first-child {
-  width: 44px;
-  overflow: hidden;
-  padding-left: 2px;
-  color: #bbb;
-  white-space: nowrap;
-}
-
-#chat time {
-  cursor: help;
-}
-
-/* nick */
-#chat td:nth-child(2), #chatinput td:nth-child(2) {
-  width: 91px;
-  overflow: hidden;
-  padding-left: 2px;
-  white-space: nowrap;
 }
 
 #chat td.system_narrowcast {
@@ -372,507 +160,10 @@ em {
   color: #ff6;
   background-color: #550;
   margin-right: .2rem;
-}
-
-mark {
-  background: transparent;
-}
-
-.invisep {
-  display: inline-block;
-  width: 1px;
-  height: 1px;
-  overflow:hidden;
-  color: transparent;
-}
-
-/* divider */
-summary {
-  color: #bbb;
-  display: inline-block;
-  height: 16px;
-  overflow: hidden;
-  padding: 0 2px;
-  white-space: nowrap;
-  width: 100%;
-}
-
-#chatinput {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  padding: 0 2px;
-  background: rgba(8, 48, 78, 0.9);
-  width: 708px;
-  height: 23px;
-  border: 1px solid #20A8B1;
-  z-index: 3001;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-#chatinput td {
-  padding-bottom: 1px;
-  vertical-align: middle;
-}
-
-
-#chatinput input {
-  background: transparent;
-  color: #EEEEEE;
-  width: 100%;
-  height: 100%;
-  padding:3px 4px 1px 4px;
-}
-
-
-
-/* sidebar ************************************************************/
-
-#sidebar > * {
-  border-bottom: 1px solid #20A8B1;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-
-
-#sidebartoggle .toggle {
-  border-bottom: 10px solid transparent;
-  border-top: 10px solid transparent;
-}
-
-#sidebartoggle .open {
-  border-right: 10px solid #FFCE00;
-}
-
-#sidebartoggle .close {
-  border-left: 10px solid #FFCE00;
-}
-
-/* player stats */
-#playerstat {
-  height: 30px;
-}
-
-h2 {
-  color: #ffce00;
-  font-size: 21px;
-  padding: 0 4px;
-  margin: 0;
-  cursor:help;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  width: 100%;
-}
-
-h2 #name {
-  font-weight: 300;
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: top;
-  white-space: nowrap;
-  width: 205px;
-  position: relative;
-}
-
-h2 #stats {
-  float: right;
-  height: 100%;
-  overflow: hidden;
-}
-
-#signout {
-  font-size: 12px;
-  font-weight: normal;
-  line-height: 29px;
-  padding: 0 4px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: rgba(8, 48, 78, 0.5);
-  display: none; /* starts hidden */
-}
-#name:hover #signout {
-  display: block;
-}
-
-h2 sup, h2 sub {
-  display: block;
-  font-size: 11px;
-  margin-bottom: -2px;
-}
-
-
-/* gamestats */
-#gamestat {
-  height: 22px;
-}
-
-#gamestat span {
-  display: block;
-  float: left;
-  font-weight: bold;
-  cursor:help;
-  height: 21px;
-  line-height: 22px;
-}
-
-#gamestat .res {
-  background: #005684;
-  text-align: right;
-}
-
-#gamestat .enl {
-  background: #017f01;
-}
-
-
-/* search input, and others */
-input:not([type]), .input,
-input[type="text"], input[type="password"],
-input[type="number"], input[type="email"],
-input[type="search"], input[type="url"] {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: #ffce00;
-  height: 24px;
-  padding:0px 4px 0px 4px;
-  font-size: 12px;
-  border:0;
-  font-family:inherit;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-#searchwrapper {
-  position: relative;
-}
-#search {
-  width: 100%;
-  padding-right: 24px;
-}
-#buttongeolocation {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 0;
-  border: 0 none transparent;
-  padding: 0 2px 0 0;
-  height: 24px;
-  background-color: transparent;
-}
-#buttongeolocation:focus {
-  outline: 1px dotted #ffce00;
-}
-#buttongeolocation img {
-  display: block;
-}
-#searchwrapper h3 {
-  font-size: 1em;
-  height: auto;
-  cursor: pointer;
-}
-.searchquery {
-  max-height: 25em;
-  overflow-y: auto;
-}
-#searchwrapper .ui-accordion-header::before {
-  font-size: 18px;
-  margin-right: 2px;
-  font-weight: normal;
-  line-height: 1em;
-  content: "⊞";
-}
-#searchwrapper .ui-accordion-header-active::before {
-  content: "⊟";
-}
-#searchwrapper .ui-accordion-content {
-  margin: 0;
-  overflow: hidden;
-}
-#searchwrapper ul {
-  padding-left: 14px;
-}
-#searchwrapper li {
-  cursor: pointer;
-}
-#searchwrapper li a {
-  margin-left: -14px;
-  padding-left: 14px;
-  background-position: 1px center;
-  background-repeat: no-repeat;
-  background-size: 12px 12px;
-}
-#searchwrapper li:focus a, #searchwrapper li:hover a {
-  text-decoration: underline;
-}
-#searchwrapper li em {
-  color: #ccc;
-  font-size: 0.9em;
-}
-
-::-webkit-input-placeholder {
-  font-style: italic;
-}
-
-:-moz-placeholder {
-  font-style: italic;
-}
-
-::-moz-placeholder {
-  font-style: italic;
-}
-
-.leaflet-control-layers input {
-  height: auto;
-  padding: 0;
-}
-
-
-/* portal title and image */
-h3.title {
-  padding-right: 17px; /* to not overlap with close button */
-  margin: 2px 0;
-  line-height: 24px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.imgpreview {
-  height: 190px;
-  background: no-repeat center center;
-  background-size: contain;
-  cursor: help;
-  overflow: hidden;
-  position: relative;
-}
-
-.imgpreview img.hide {
-  display: none;
-}
-
-.imgpreview .portalDetails {
-  display: none;
-}
-
-#level {
-  font-size: 40px;
-  text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000, 0 0 5px #fff;
-  display: block;
-  margin-right: 15px;
-  text-align:right;
-  float: right;
-}
-
-/* portal mods */
-.mods {
-  margin: 3px auto 1px auto;
-  width: 296px;
-  height: 67px;
-  text-align: center;
-}
-
-.mods span {
-  background-color: rgba(0, 0, 0, 0.3);
-  /* can’t use inline-block because Webkit's implementation is buggy and
-   * introduces additional margins in random cases. No clear necessary,
-   * as that’s solved by setting height on .mods. */
-  display: block;
-  float:left;
-  height: 63px;
-  margin: 0 2px;
-  overflow: hidden;
-  padding: 2px;
-  text-align: center;
-  width: 63px;
-  cursor:help;
-  border: 1px solid #666;
-}
-
-.mods span:not([title]) {
-  cursor: auto;
-}
-
-.res .mods span, .res .meter {
-  border: 1px solid #0076b6;
-}
-.enl .mods span, .enl .meter {
-  border: 1px solid #017f01;
-}
-
-/* random details, resonator details */
-#randdetails, #resodetails {
-  width: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  padding: 0 4px;
-  table-layout: fixed;
-  border-spacing: 0m;
-  border-collapse: collapse;
-}
-
-#randdetails td, #resodetails td {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: top;
-  white-space: nowrap;
-  width: 50%;
-}
-
-#randdetails th, #resodetails th {
-  font-weight: normal;
-  text-align: right;
-  width: 62px;
-  padding:0px;
-  padding-right:4px;
-  padding-left:4px;
-}
-
-#randdetails th + th, #resodetails th + th {
-  text-align: left;
-  padding-right: 4px;
-  padding-left: 4px;
-}
-
-#randdetails td:first-child, #resodetails td:first-child {
-  text-align: right;
-  padding-left: 2px;
-}
-
-#randdetails td:last-child, #resodetails td:last-child {
-  text-align: left;
-  padding-right: 2px;
-}
-
-
-#randdetails {
-  margin-top: 4px;
-  margin-bottom: 5px;
-}
-
-
-#randdetails tt {
-  font-family: inherit;
-  cursor: help;
-}
-
-#artifact_target, #artifact_fragments {
-  margin-top: 4px;
-  margin-bottom: 4px;
-
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
-
-/* resonators */
-#resodetails {
-  margin-bottom: 0px;
-}
-
-.meter {
-  background: #000;
-  cursor: help;
-  display: inline-block;
-  height: 18px;
-  padding: 1px;
-  width: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  position: relative;
-  left: 0;
-  top: 0;
-}
-
-.meter.north {
-  overflow: hidden;
-}
-.meter.north:before {
-  content: "";
-  background-color: red;
-  border: 1px solid #000000;
-  border-radius: 100%;
-  display: block;
-  height: 6px;
-  width: 6px;
-  left: 50%;
-  top: -3px;
-  margin-left: -4px;
-  position: absolute;
-}
-
-.meter span {
-  display: block;
-  height: 14px;
-}
-
-.meter-level {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -2px;
-  text-shadow: 0.0em 0.0em 0.3em #808080;
-  text-align: center;
-  word-spacing: 4px; /* to leave some space for the north indicator */
-}
-
-/* links below resos */
-
-.linkdetails {
-  margin-bottom: 0px;
-  text-align: center;
-}
-
-.linkdetails aside {
-  display: inline-block;
-  white-space: nowrap;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-#toolbox {
-  text-align: left;    /* centre didn't look as nice here as it did above in .linkdetails */
-}
-
-#toolbox > a {
-  margin-left: 5px;
-  margin-right: 5px;
-  white-space: nowrap;
-  display: inline-block;
-}
-
-/* a common portal display takes this much space (prevents moving
- * content when first selecting a portal) */
-
-#portaldetails {
-  min-height: 63px;
-  position: relative; /* so the below '#portaldetails .close' is relative to this */
-}
-
-#portaldetails .close {
-  position: absolute;
-  top: -2px;
-  right: 2px;
-  cursor: pointer;
-  color: #FFCE00;
-  font-size: 16px;
-}
-
 /* history details */
 #historydetails {
   text-align: center;
   color: #ffce00;
-}
-
-#historydetails .missing {
 }
 
 #historydetails span {
@@ -887,11 +178,11 @@ h3.title {
 #updatestatus {
   background-color: rgba(8, 48, 78, 0.9);
   border-bottom: 0;
-  border-top: 1px solid #20A8B1;
-  border-left: 1px solid #20A8B1;
+  border-top: 1px solid #20a8b1;
+  border-left: 1px solid #20a8b1;
   bottom: 0;
   color: #ffce00;
-  font-size:13px;
+  font-size: 13px;
   padding: 4px;
   position: fixed;
   right: 0;
@@ -906,239 +197,15 @@ h3.title {
 }
 
 #loadlevel {
-  background: #FFF;
+  background: #fff;
   color: #000000;
   display: inline-block;
   min-width: 1.8em;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   border-width: 0 1px;
   margin: -4px 0;
   padding: 4px 0.2em;
 }
-
-/* Dialogs
- */
-.ui-tooltip, .ui-dialog {
-  position: absolute;
-  z-index: 9500;
-  background-color: rgba(8, 48, 78, 0.9);
-  border: 1px solid #20A8B1;
-  color: #eee;
-  font-size: 13px;
-  line-height: 15px;
-  padding: 2px 4px;
-}
-
-.ui-tooltip {
-  max-width: 300px;
-}
-
-.ui-widget-overlay {
-  height: 100%;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 10000;
-  background:  #444;
-  opacity: 0.6;
-}
-
-.ui-modal {
-  z-index: 10001 !important;
-}
-
-.ui-tooltip {
-  z-index: 10002 !important;
-}
-
-.ui-tooltip, .ui-dialog a {
-  color: #FFCE00;
-}
-
-.ui-dialog {
-  padding: 0;
-  border-radius: 2px;
-}
-
-.ui-dialog-modal .ui-dialog-titlebar-close {
-  display: none;
-}
-
-.ui-dialog-titlebar {
-  font-size: 13px;
-  line-height: 15px;
-  text-align: center;
-  padding: 4px;
-  background-color: rgba(8, 60, 78, 0.9);
-}
-
-.ui-dialog-title {
-  font-weight: bold;
-  margin-left: 8px;
-  margin-right: 45px;
-  width: calc(100% - 45px);
-}
-
-.ui-dialog-title-active {
-  color: #ffce00;
-}
-
-.ui-dialog-title-inactive {
-  color: #ffffff;
-}
-
-.ui-dialog-titlebar-button {
-  position: absolute;
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-  width: 17px;
-  height: 17px;
-  top: 3px;
-  cursor: pointer;
-  border: 1px solid rgb(32, 168, 177);
-  background-color: rgba(0, 0, 0, 0);
-  padding: 0;
-}
-
-.ui-dialog-titlebar-button:active {
-  background-color: rgb(32, 168, 177);
-}
-
-.ui-dialog-titlebar-button-close {
-  right: 4px;
-}
-
-.ui-dialog-titlebar-button-collapse {
-  right: 25px;
-}
-
-.ui-dialog-titlebar-button-collapse-expanded {
-  /* For future changes */
-}
-
-.ui-dialog-titlebar-button-collapse-collapsed {
-  background-color: rgb(32, 168, 177);
-}
-
-.ui-dialog-titlebar-button-collapse::after,
-.ui-dialog-titlebar-button-close::after,
-.ui-dialog-titlebar-button-close::before {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 50%;
-  width: 11px;
-  margin-left: -6px;
-  height: 0;
-  border-top: 2px solid rgb(32, 168, 177);
-}
-.ui-dialog-titlebar-button-close::after {
-  transform: translateY(3.5px) rotate(45deg);
-  -webkit-transform: translateY(3.5px) rotate(45deg);
-}
-.ui-dialog-titlebar-button-close::before {
-  transform: translateY(3.5px) rotate(-45deg);
-  -webkit-transform: translateY(3.5px) rotate(-45deg);
-}
-.ui-dialog-titlebar-button.ui-state-active::after,
-.ui-dialog-titlebar-button.ui-state-active::before,
-.ui-dialog-titlebar-button.ui-dialog-titlebar-button-collapse-collapsed::after,
-.ui-dialog-titlebar-button.ui-dialog-titlebar-button-collapse-collapsed::before,
-.ui-dialog-titlebar-button:active::after,
-.ui-dialog-titlebar-button:active::before {
-  border-top-color: rgba(8, 60, 78, 0.9);
-}
-
-.ui-dialog-content {
-  padding: 12px;
-  overflow: auto;
-  position: relative;
-
-  /* Limiting the height of dialog content on small screens */
-  /* 57px – height .ui-dialog-titlebar + .ui-dialog-buttonpane */
-  /* 24px – padding 12px * 2 */
-  /*  2px – border 1px * 2 */
-  max-height: calc(100vh - 57px - 24px - 2px) !important;
-}
-
-.ui-dialog {
-  max-width: calc(100vw - 2px);
-}
-
-@media (min-width: 700px) {
-  .ui-dialog {
-    max-width: 600px;
-  }
-}
-
-.ui-dialog-content-hidden {
-  display: none !important;
-}
-
-.ui-dialog-buttonpane {
-  padding: 6px;
-  border-top: 1px solid #20A8B1;
-}
-
-.ui-dialog-buttonset {
-  text-align: right;
-}
-
-.ui-dialog-buttonset button,
-.ui-dialog-content button {
-  padding: 2px;
-  min-width: 40px;
-  color: #FFCE00;
-  border: 1px solid #FFCE00;
-  background-color: rgba(8, 48, 78, 0.9);
-}
-
-.ui-dialog-buttonset button:hover {
-  text-decoration: underline;
-}
-
-td {
-  padding: 0;
-  vertical-align: top;
-}
-
-td + td {
-  padding-left: 4px;
-}
-
-#qrcode > canvas {
-  border: 8px solid white;
-}
-
-/* redeem results *****************************************************/
-.redeemReward {
-  font-family: Inconsolata, Consolas, Menlo, "Courier New", monospace;
-  list-style-type: none;
-  padding: 0;
-  font-size: 14px;
-}
-.redeemReward .itemlevel {
-  font-weight: bold;
-  text-shadow: 0 0 1px #000; /* L8 is hard to read on blue background */
-}
-/*
-.redeem-result-table {
-  font-size: 14px;
-  table-layout: fixed;
-}
-
-.redeem-result tr > td:first-child {
-  width: 50px;
-  text-align: right;
-}
-
-.redeem-result-html {
-  font-family: Inconsolata, Consolas, Menlo, "Courier New", monospace;
-}
-*/
-
 .pl_nudge_date:after {
   background: no-repeat url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
   position:absolute;
@@ -1149,50 +216,19 @@ td + td {
   top:-1px
 }
 
-.pl_nudge_date {
-  background-color: #724510;
-  border-left: 1px solid #ffd652;
-  border-bottom: 1px solid #ffd652;
-  border-top: 1px solid #ffd652;
-  color: #ffd652;
-  display: block;
-  position:relative;
-  height: 18px;
-  width: 36px;
-  padding-left: 2px;
-  left: -2px;
-}
-
-.pl_nudge_player {
-  cursor: pointer;
-}
-
-.pl_nudge_me {
-  color: #ffd652;
-}
-
-.RESISTANCE {
-  color: #00c2ff;
-}
-
-.ALIENS, .ENLIGHTENED {
-  color: #28f428;
-}
 
 #portal_highlight_select {
   position: absolute;
-  top:5px;
-  left:10px;
+  top: 5px;
+  left: 10px;
   z-index: 2500;
-  font-size:11px;
-  background-color:#0E3C46;
-  color:#ffce00;
-
+  font-size: 11px;
+  background-color: #0e3c46;
+  color: #ffce00;
 }
 
-
-
-.portal_details th, .portal_details td {
+.portal_details th,
+.portal_details td {
   vertical-align: top;
   text-align: left;
 }
@@ -1202,28 +238,14 @@ td + td {
   padding-right: 1em;
 }
 
-.portal_details tr.padding-top th, .portal_details tr.padding-top td {
+.portal_details tr.padding-top th,
+.portal_details tr.padding-top td {
   padding-top: 0.7em;
 }
 
 #play_button {
   display: none;
 }
-
-
-/** artifact dialog *****************/
-table.artifact tr > * {
-  background: rgba(8, 48, 78, 0.9);
-}
-
-table.artifact td.info {
-  min-width: 110px; /* min-width for info column, to ensure really long portal names don't crowd things out */
-}
-
-table.artifact .portal {
-  min-width: 200px; /* min-width for portal names, to ensure really long lists of artifacts don't crowd names out */
-}
-
 
 /* leaflet popups - restyle to match the theme of IITC */
 #map .leaflet-popup {
@@ -1233,7 +255,7 @@ table.artifact .portal {
 #map .leaflet-popup-content-wrapper {
   border-radius: 0px;
   -webkit-border-radius: 0px;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   background: #0e3d4e;
   pointer-events: auto;
 }
@@ -1252,10 +274,9 @@ table.artifact .portal {
   pointer-events: auto;
 }
 
-
 #map .leaflet-popup-tip {
   /* change the tip from an arrow to a simple line */
-  background: #20A8B1;
+  background: #20a8b1;
   width: 1px;
   height: 20px;
   padding: 0;
@@ -1267,161 +288,74 @@ table.artifact .portal {
   transform: none;
 }
 
-
 /* misc */
 .layer_off_warning {
-  color: #FFCE00;
+  color: #ffce00;
   margin: 8px;
   text-align: center;
 }
 
-/* region scores */
-.cellscore .ui-accordion-header, .cellscore .ui-accordion-content {
-	border: 1px solid #20a8b1;
-	margin-top: -1px;
-	display: block;
-}
-.cellscore .ui-accordion-header {
-	color: #ffce00;
-	outline: none
-}
-.cellscore .ui-accordion-header:before {
-	font-size: 18px;
-	margin-right: 2px;
-	content: "⊞";
-}
-.cellscore .ui-accordion-header-active:before {
-	content: "⊟";
-}
-.cellscore table {
-	width: 90%;
-	max-width: 360px; /* prevent width change on scrollbar appearance (after animation) */
-}
-
-/* prevent nonfunctional horizontal scrollbar in Chrome (perhaps jQuery issue) */
-.cellscore .historychart > div {
-  overflow: auto;
-}
-
-.cellscore .logscale {
-  vertical-align: middle;
-  margin-top: 0;
-}
-
-@-moz-document url-prefix() {
- .cellscore .logscale {
-    transform: scale(0.8);
-  }
-
-  /* prevent nonfunctional vertical scrollbar in Firefox (perhaps jQuery issue) */
-  .cellscore > .historychart {
-    overflow-y: hidden !important;
-  }
-}
-
-g.checkpoint:hover circle {
-  fill-opacity: 1;
-  stroke-width: 2px;
-}
-
-.cellscore th, .cellscore td {
-	text-align: left;
-	padding-left: 5px;
-}
-.checkpoint_table {
-	border-collapse: collapse;
-}
-.checkpoint_table th, .checkpoint_table td {
-	text-align: right;
-}
-
-.cellscore #overview {
-  width: 100%;
-}
-
-.cellscore #overview td {
-  white-space: nowrap;
-  width: 1%;
-  text-align: right;
-}
-
-.cellscore #overview th {
-  white-space: nowrap;
-  width: 1%;
-  text-align: left;
-  padding-left: 4px;
-}
-
-.checkpointtooltip {
-  min-width: 180px;
-}
-
-.checkpoint_timers table {
-  padding-top: 4px;
-  width: 100%;
-}
-
 /* tabs */
 .ui-tabs-nav {
-	display: block;
-	border-bottom: 1px solid #20a8b1;
-	border-top: 1px solid transparent;
-	margin: 3px 0 0;
-	padding: 0;
+  display: block;
+  border-bottom: 1px solid #20a8b1;
+  border-top: 1px solid transparent;
+  margin: 3px 0 0;
+  padding: 0;
 }
 .ui-tabs-nav::after {
-	content: '';
-	clear: left;
-	display: block;
-	height: 0;
-	width: 0;
+  content: "";
+  clear: left;
+  display: block;
+  height: 0;
+  width: 0;
 }
 .ui-tabs-nav li {
-	list-style: none;
-	display: block;
-	float:left;
-	margin: 0 0 -1px;
-	border: 1px solid #20a8b1;
+  list-style: none;
+  display: block;
+  float: left;
+  margin: 0 0 -1px;
+  border: 1px solid #20a8b1;
 }
 .ui-tabs-nav li.ui-tabs-active {
-	border-bottom-color: #0F2C3F;
-	background: #0F2C3F;
-	border-width: 2px 2px 1px;
-	font-weight: bold;
-	margin: -1px 1px;
+  border-bottom-color: #0f2c3f;
+  background: #0f2c3f;
+  border-width: 2px 2px 1px;
+  font-weight: bold;
+  margin: -1px 1px;
 }
 .ui-tabs-nav a {
-	display: inline-block;
-	padding: 0.2em 0.7em;
+  display: inline-block;
+  padding: 0.2em 0.7em;
 }
 .ui-tabs-nav .ui-icon {
-	display: inline-block;
-	font-size: 0;
-	height: 22px;
-	overflow: hidden;
-	position: relative;
-	vertical-align: top;
-	width: 16px;
+  display: inline-block;
+  font-size: 0;
+  height: 22px;
+  overflow: hidden;
+  position: relative;
+  vertical-align: top;
+  width: 16px;
 }
 .ui-tabs-nav .ui-icon-close::before {
-	content: "×";
-	font-size: 16px;
-	height: 16px;
-	position: absolute;
-	text-align: center;
-	top: 2px;
-	vertical-align: baseline;
-	width: 16px;
-	cursor: pointer;
+  content: "×";
+  font-size: 16px;
+  height: 16px;
+  position: absolute;
+  text-align: center;
+  top: 2px;
+  vertical-align: baseline;
+  width: 16px;
+  cursor: pointer;
 }
 
 svg.icon-button {
-	fill: currentColor;
+  fill: currentColor;
 }
 
 .leaflet-marker-icon > svg {
-	height: inherit;
-	width: inherit;
+  height: inherit;
+  width: inherit;
 }
 
 /* Warning text */
