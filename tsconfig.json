@@ -3,13 +3,18 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
     "moduleResolution": "node",
-    "module": "commonjs",
-    "target": "es5",
-    "allowJs": true,
+    "module": "es6",
+    "target": "es6",
+    "allowJs": false, // true,
     "esModuleInterop": true,
     "importHelpers": true,
     "sourceMap": true,
     "jsx": "react",
-    "baseUrl": "./"
+    "baseUrl": "./",
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
   }
 }
