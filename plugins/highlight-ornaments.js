@@ -12,7 +12,7 @@ window.plugin.highlightOrnaments = highlightOrnaments;
 
 highlightOrnaments.styles = {
   common: {
-    fillcolor: 'red',
+    fillColor: 'red',
     fillOpacity: 0.75
   }
 };
