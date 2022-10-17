@@ -12,7 +12,7 @@ window.plugin.highlightMissingResonators = highlightMissingResonators;
 
 highlightMissingResonators.styles = {
   common: {
-    fillcolor: 'red'
+    fillColor: 'red'
   }
 };
 
