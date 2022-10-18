@@ -8,8 +8,6 @@ window.Render = function () {
 
 // start a render pass. called as we start to make the batch of data requests to the servers
 window.Render.prototype.startRenderPass = function (bounds) {
-  this.isRendering = true;
-
   this.deletedGuid = {};  // object - represents the set of all deleted game entity GUIDs seen in a render pass
 
   this.seenPortalsGuid = {};
@@ -158,8 +156,6 @@ window.Render.prototype.endRenderPass = function() {
 
   // reorder portals to be after links/fields
   this.bringPortalsToFront();
-
-  this.isRendering = false;
 
   // re-select the selected portal, to re-render the side-bar. ensures that any data calculated from the map data is up to date
   if (selectedPortal) {
