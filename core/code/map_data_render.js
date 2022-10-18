@@ -8,7 +8,7 @@ window.Render = function() {
 }
 
 // start a render pass. called as we start to make the batch of data requests to the servers
-window.Render.prototype.startRenderPass = function(level,bounds) {
+window.Render.prototype.startRenderPass = function (bounds) {
   this.isRendering = true;
 
   this.deletedGuid = {};  // object - represents the set of all deleted game entity GUIDs seen in a render pass
@@ -16,9 +16,6 @@ window.Render.prototype.startRenderPass = function(level,bounds) {
   this.seenPortalsGuid = {};
   this.seenLinksGuid = {};
   this.seenFieldsGuid = {};
-
-  this.bounds = bounds;
-  this.level = level;
 
   // we pad the bounds used for clearing a litle bit, as entities are sometimes returned outside of their specified tile boundaries
   // this will just avoid a few entity removals at start of render when they'll just be added again

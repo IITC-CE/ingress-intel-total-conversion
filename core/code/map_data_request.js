@@ -239,7 +239,7 @@ window.MapDataRequest.prototype.refresh = function() {
 
   window.runHooks ('mapDataRefreshStart', {bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom, minPortalLevel: tileParams.level, tileBounds: dataBounds});
 
-  this.render.startRenderPass(tileParams.level, dataBounds);
+  this.render.startRenderPass(dataBounds);
 
   window.runHooks ('mapDataEntityInject', {callback: this.render.processGameEntities.bind(this.render)});
 
