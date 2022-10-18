@@ -1,9 +1,8 @@
 // MAP DATA RENDER ////////////////////////////////////////////////
 // class to handle rendering into leaflet the JSON data from the servers
+/* global L */
 
-
-
-window.Render = function() {
+window.Render = function () {
   this.portalMarkerScale = undefined;
 }
 
