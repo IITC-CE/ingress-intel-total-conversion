@@ -239,7 +239,6 @@ window.Render.prototype.deleteLinkEntity = function(guid) {
 window.Render.prototype.deleteFieldEntity = function(guid) {
   if (guid in window.fields) {
     var f = window.fields[guid];
-    var fd = f.options.details;
 
     fieldsFactionLayers[f.options.team].removeLayer(f);
     delete window.fields[guid];
