@@ -108,9 +108,8 @@ window.MapDataRequest.prototype.mapMoveStart = function() {
   this.pauseRenderQueue(true);
 }
 
-window.MapDataRequest.prototype.mapMoveEnd = function() {
+window.MapDataRequest.prototype.mapMoveEnd = function () {
   var bounds = clampLatLngBounds(map.getBounds());
-  var zoom = map.getZoom();
 
   if (this.fetchedDataParams) {
     // we have fetched (or are fetching) data...
