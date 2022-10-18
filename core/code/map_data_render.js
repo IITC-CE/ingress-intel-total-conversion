@@ -435,7 +435,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
   fieldsFactionLayers[poly.options.team].addLayer(poly);
 }
 
-window.Render.prototype.createLinkEntity = function(ent,faked) {
+window.Render.prototype.createLinkEntity = function (ent) {
   // Niantic have been faking link entities, based on data from fields
   // these faked links are sent along with the real portal links, causing duplicates
   // the faked ones all have longer GUIDs, based on the field GUID (with _ab, _ac, _bc appended)
@@ -463,10 +463,7 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
 
   // check if entity already exists
   if (ent[0] in window.links) {
-    // yes. now, as sometimes links are 'faked', they have incomplete data. if the data we have is better, replace the data
     var l = window.links[ent[0]];
-
-    // the faked data will have older timestamps than real data (currently, faked set to zero)
     if (l.options.timestamp >= ent[1]) return; // this data is older or identical to the rendered data - abort processing
 
     // the data is newer/better - two options
@@ -483,7 +480,7 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
   var poly = L.geodesicPolyline(latlngs, {
     color: COLORS[team],
     opacity: 1,
-    weight: faked ? 1 : 2,
+    weight: 2,
     interactive: false,
 
     team: team,
