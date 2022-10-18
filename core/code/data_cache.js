@@ -105,9 +105,3 @@ window.DataCache.prototype.runExpire = function() {
     }
   }
 }
-
-
-window.DataCache.prototype.debug = function() {
-//NOTE: ECMAScript strings use 16 bit chars (it's in the standard), so convert for bytes/Kb
-  return 'Cache: '+Object.keys(this._cache).length+' items, '+(this._cacheCharSize*2).toLocaleString()+' bytes ('+Math.ceil(this._cacheCharSize/512).toLocaleString()+'K)';
-}
