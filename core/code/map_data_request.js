@@ -324,26 +324,27 @@ window.MapDataRequest.prototype.refresh = function() {
 
   if (Object.keys(this.queuedTiles).length > 0) {
     // queued requests - don't start processing the download queue immediately - start it after a short delay
-    this.delayProcessRequestQueue (this.DOWNLOAD_DELAY,true);
+    this.delayProcessRequestQueue(this.DOWNLOAD_DELAY);
   } else {
     // all data was from the cache, nothing queued - run the queue 'immediately' so it handles the end request processing
-    this.delayProcessRequestQueue (0,true);
+    this.delayProcessRequestQueue(0);
   }
 }
 
-
-window.MapDataRequest.prototype.delayProcessRequestQueue = function(seconds,isFirst) {
+window.MapDataRequest.prototype.delayProcessRequestQueue = function (seconds) {
   if (this.timer === undefined) {
     var _this = this;
-    this.timer = setTimeout ( function() {
-      _this.timer = setTimeout ( function() { _this.timer = undefined; _this.processRequestQueue(isFirst); }, seconds*1000 );
+    this.timer = setTimeout(function () {
+      _this.timer = setTimeout(function () {
+        _this.timer = undefined;
+        _this.processRequestQueue();
+      }, seconds * 1000);
     }, 0);
   }
 }
 
 
-window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
-
+window.MapDataRequest.prototype.processRequestQueue = function () {
   // if nothing left in the queue, finish
   if (Object.keys(this.queuedTiles).length == 0) {
     // we leave the renderQueue code to handle ending the render pass now
