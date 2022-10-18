@@ -562,10 +562,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
 
     }
 
-    // TODO? check for any requested tiles in 'tiles' not being mentioned in the response - and handle as if it's a 'timeout'?
-
-
-    window.runHooks('requestFinished', {success: true});
+    window.runHooks('requestFinished', { success: true });
   }
 
   // set the queue delay based on any errors or timeouts
