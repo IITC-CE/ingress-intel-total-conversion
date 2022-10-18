@@ -71,10 +71,6 @@ Constants
 
   Controls height of chat when chat is collapsed, in pixels, default 60
 
-.. data:: window.FIELD_MU_DISPLAY_POINT_TOLERANCE
-
-  Point tolerance(?) for displaying MUs, in unknown units, default 60
-
 .. data:: window.COLOR_SELECTED_PORTAL
 
   What colour should the selected portal be, string(css hex code),
