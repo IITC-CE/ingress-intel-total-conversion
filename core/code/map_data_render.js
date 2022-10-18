@@ -33,20 +33,17 @@ window.Render.prototype.startRenderPass = function(level,bounds) {
   this.rescalePortalMarkers();
 }
 
-window.Render.prototype.clearPortalsOutsideBounds = function(bounds) {
-  var count = 0;
+window.Render.prototype.clearPortalsOutsideBounds = function (bounds) {
   for (var guid in window.portals) {
     var p = portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
     if (!bounds.contains(p.getLatLng()) && guid !== selectedPortal && !artifact.isInterestingPortal(guid)) {
       this.deletePortalEntity(guid);
-      count++;
     }
   }
 }
 
-window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
-  var count = 0;
+window.Render.prototype.clearLinksOutsideBounds = function (bounds) {
   for (var guid in window.links) {
     var l = links[guid];
 
@@ -57,24 +54,21 @@ window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
 
     if (!bounds.intersects(linkBounds)) {
       this.deleteLinkEntity(guid);
-      count++;
     }
   }
 }
 
-window.Render.prototype.clearFieldsOutsideBounds = function(bounds) {
-  var count = 0;
+window.Render.prototype.clearFieldsOutsideBounds = function (bounds) {
   for (var guid in window.fields) {
     var f = fields[guid];
 
     // NOTE: our geodesic polys can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on corner points will be good enough for this check
     var lls = f.getLatLngs();
-    var fieldBounds = L.latLngBounds([lls[0],lls[1]]).extend(lls[2]);
+    var fieldBounds = L.latLngBounds([lls[0], lls[1]]).extend(lls[2]);
 
     if (!bounds.intersects(fieldBounds)) {
       this.deleteFieldEntity(guid);
-      count++;
     }
   }
 }
