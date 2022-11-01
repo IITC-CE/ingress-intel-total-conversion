@@ -228,11 +228,6 @@ Variables
   Reference to the hacking range indicator of the selected portal. This is a
   Leaflet layer.
 
-.. data:: window.mapRunsUserAction
-
-  Bool, true if the map is currently being moved. More precisely, this is true
-  between the ``movestart`` and ``moveend`` events of the Leaflet map.
-
 .. data:: window.portals
           window.links
           window.fields
