@@ -289,7 +289,7 @@ window.setupMap = function () {
       pos = {center: [0, 0], zoom: 1};
       map.locate({setView: true});
     }
-    map.setView(pos.center, pos.zoom, {reset: true});
+    map.setView(pos.center, pos.zoom);
 
     // read here ONCE, so the URL is only evaluated one time after the
     // necessary data has been loaded.
