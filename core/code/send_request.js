@@ -79,7 +79,6 @@ window.postAjax = function(action, data, successCallback, errorCallback) {
       req.setRequestHeader('X-CSRFToken', readCookie('csrftoken'));
     }
   });
-  result.action = action;
 
   requests.add(result);
 
