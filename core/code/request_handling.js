@@ -74,19 +74,14 @@ window.startRefreshTimeout = function (override) {
 }
 
 window.requests._onRefreshFunctions = [];
-window.requests._callOnRefreshFunctions = function() {
-//  log.log('running refresh at ' + new Date().toLocaleTimeString());
+window.requests._callOnRefreshFunctions = function () {
   startRefreshTimeout();
 
   if (window.isIdle()) {
-//    log.log('user has been idle for ' + idleTime + ' seconds, or window hidden. Skipping refresh.');
     renderUpdateStatus();
     return;
   }
 
-//  log.log('refreshing');
-
-  //store the timestamp of this refresh
   window.requests._lastRefreshTime = new Date().getTime();
 
   $.each(window.requests._onRefreshFunctions, function (ind, f) {
