@@ -20,7 +20,13 @@ function calculate (ev) {
 
     // we don't need to check the field's bounds first. pnpoly is pretty simple math.
     // Checking the bounds is about 50 times slower than just using pnpoly
-    if (field._rings && window.pnpoly(field._rings[0], point)) {
+    var rings = field._rings ? field._rings[0] : [];
+    if (!rings.length) {
+      for (var i = 0, len = field._latlngs.length; i < len; i++) {
+        rings.push(window.map.latLngToLayerPoint(field._latlngs[i]));
+      }
+    }
+    if (window.pnpoly(rings, point)) {
       if (field.options.team === TEAM_ENL) {
         layersEnl++;
       } else if (field.options.team === TEAM_RES) {
