@@ -42,7 +42,6 @@ window.getPortalRange = function(d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
 
-  var lvl = 0;
   var resoMissing = false;
   // currently we get a short resonator array when some are missing
   if (d.resonators.length < 8) {
