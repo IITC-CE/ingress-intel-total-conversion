@@ -102,14 +102,6 @@ Constants
   Colour values for displaying mods, consistent with Ingress.
   Very Rare also used for AXA shields and Ultra Links.
 
-.. data:: window.MOD_TYPE
-
-  ::
-
-    {RES_SHIELD:'Shield', MULTIHACK:'Multi-hack', FORCE_AMP:'Force Amp', HEATSINK:'Heat Sink', TURRET:'Turret', LINK_AMPLIFIER: 'Link Amp'}
-
-  Mod type dict for displaying mod names.
-
 .. data:: window.ACCESS_INDICATOR_COLOR
 
   What colour should the hacking range circle be (the small circle that appears

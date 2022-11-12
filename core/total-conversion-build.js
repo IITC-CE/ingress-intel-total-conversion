@@ -111,10 +111,7 @@ window.CHAT_SHRINKED = 60;
 window.COLOR_SELECTED_PORTAL = '#f0f';
 window.COLORS = ['#FF6600', '#0088FF', '#03DC03']; // none, res, enl
 window.COLORS_LVL = ['#000', '#FECE5A', '#FFA630', '#FF7315', '#E40000', '#FD2992', '#EB26CD', '#C124E0', '#9627F4'];
-window.COLORS_MOD = {VERY_RARE: '#b08cff', RARE: '#73a8ff', COMMON: '#8cffbf'};
-
-
-window.MOD_TYPE = {RES_SHIELD:'Shield', MULTIHACK:'Multi-hack', FORCE_AMP:'Force Amp', HEATSINK:'Heat Sink', TURRET:'Turret', LINK_AMPLIFIER: 'Link Amp'};
+window.COLORS_MOD = { VERY_RARE: '#b08cff', RARE: '#73a8ff', COMMON: '#8cffbf' };
 
 // circles around a selected portal that show from where you can hack
 // it and how far the portal reaches (i.e. how far links may be made
