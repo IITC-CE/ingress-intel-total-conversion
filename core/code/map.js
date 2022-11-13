@@ -163,9 +163,9 @@ function createDefaultOverlays () {
     addLayers['Resistance'] = factionLayers[window.TEAM_RES];
   }
 
-  // and just put Machina faction last
-  delete addLayers['Machina'];
-  addLayers['Machina'] = factionLayers[window.TEAM_MAC];
+  // and just put U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅ faction last
+  delete addLayers['U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅'];
+  addLayers['U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅'] = factionLayers[window.TEAM_MAC];
 
   return addLayers;
   /* eslint-enable dot-notation  */
