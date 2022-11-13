@@ -22,7 +22,7 @@ function getPortalsInfo (portals,bounds) {
       health: 0
     };
   }
-  var score = [init(),init(),init()];
+  var score = window.TEAM_NAMES.map(() => init());
   portals = portals.filter(function (portal) { // only consider portals in view
     return bounds.contains(portal.getLatLng());
   });
@@ -65,12 +65,14 @@ function getEntitiesCount (entities,bounds) {
       return bounds.contains(point);
     });
   });
-  var enl = total.reduce(function (n, l) {
-    return (l.options.team === TEAM_ENL) ? n+1 : n;
-  },0);
+
+  var counts = total.reduce((n, l) => {
+    n[l.options.team] = (n[l.options.team] || 0) + 1;
+    return n;
+  }, []);
   return {
-    enl: enl,
-    res: total.length - enl
+    enl: counts[window.TEAM_ENL] || 0,
+    res: counts[window.TEAM_RES] || 0,
   };
 }
 
