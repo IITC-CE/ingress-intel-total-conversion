@@ -21,8 +21,7 @@ defaults = {  # common for all build targets
     'url_tg': 'https://t.me/iitc_news',
 
     # these settings should not be touched unless intel url(s) changed
-    'url_intel_base': 'https://intel.ingress.com/',
-    'match': 'https://intel.ingress.com/*',
+    'match': ['https://intel.ingress.com/*', 'https://intel-x.ingress.com/*'],
 
     'plugin_wrapper': 'pluginwrapper', # use wrapper from pluginwrapper.py
 
@@ -33,7 +32,7 @@ defaults = {  # common for all build targets
     'watch_mode': False,               # otherwise can be activated with --watch commandline argument
     'watch_interval': 1,               # (seconds)
     'on_fail': lambda: print('\a'),    # function (or string for os.system)
-    'on_success': lambda: print('Build successed'),
+    'on_success': lambda: print('Build succeeded'),
 
     # other:
     # runtime settings set in settings.py also can be overriden
