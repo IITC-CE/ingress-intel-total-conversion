@@ -115,7 +115,7 @@ window.FIELD_MU_DISPLAY_AREA_ZOOM_RATIO = 0.001;
 window.FIELD_MU_DISPLAY_POINT_TOLERANCE = 60;
 
 window.COLOR_SELECTED_PORTAL = '#f0f';
-window.COLORS = ['#FF6600', '#0088FF', '#03DC03']; // none, res, enl
+window.COLORS = ['#FF6600', '#0088FF', '#03DC03', '#FF0028']; // none, res, enl, mac
 window.COLORS_LVL = ['#000', '#FECE5A', '#FFA630', '#FF7315', '#E40000', '#FD2992', '#EB26CD', '#C124E0', '#9627F4'];
 window.COLORS_MOD = {VERY_RARE: '#b08cff', RARE: '#73a8ff', COMMON: '#8cffbf'};
 
@@ -160,8 +160,9 @@ window.BASE_HACK_COUNT = 4;
 window.TEAM_NONE = 0;
 window.TEAM_RES = 1;
 window.TEAM_ENL = 2;
-window.TEAM_TO_CSS = ['none', 'res', 'enl'];
-window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened'];
+window.TEAM_MAC = 3;
+window.TEAM_TO_CSS = ['none', 'res', 'enl', 'mac'];
+window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened', 'Machina'];
 
 // STORAGE ///////////////////////////////////////////////////////////
 // global variables used for storage. Most likely READ ONLY. Proper

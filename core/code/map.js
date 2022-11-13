@@ -1,4 +1,4 @@
-/* global log -- eslint */
+/* global log,L -- eslint */
 function setupCRS () {
 
   // use the earth radius value from s2 geometry library
@@ -126,17 +126,17 @@ function createDefaultOverlays () {
   portalsFactionLayers = [];
   var portalsLayers = [];
   for (var i = 0; i <= 8; i++) {
-    portalsFactionLayers[i] = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+    portalsFactionLayers[i] = [L.layerGroup(), L.layerGroup(), L.layerGroup(), L.layerGroup()];
     portalsLayers[i] = L.layerGroup();
     var t = (i === 0 ? 'Unclaimed/Placeholder' : 'Level ' + i) + ' Portals';
     addLayers[t] = portalsLayers[i];
   }
 
-  fieldsFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+  fieldsFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup(), L.layerGroup()];
   var fieldsLayer = L.layerGroup();
   addLayers['Fields'] = fieldsLayer;
 
-  linksFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+  linksFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup(), L.layerGroup()];
   var linksLayer = L.layerGroup();
   addLayers['Links'] = linksLayer;
 
@@ -144,7 +144,7 @@ function createDefaultOverlays () {
   // these layers don't actually contain any data. instead, every time they're added/removed from the map,
   // the matching sub-layers within the above portals/fields/links are added/removed from their parent with
   // the below 'onoverlayadd/onoverlayremove' events
-  var factionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+  var factionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup(), L.layerGroup()];
   factionLayers.forEach(function (facLayer, facIdx) {
     facLayer.on('add remove', function (e) {
       var fn = e.type + 'Layer';
@@ -162,6 +162,10 @@ function createDefaultOverlays () {
     delete addLayers['Resistance'];
     addLayers['Resistance'] = factionLayers[window.TEAM_RES];
   }
+
+  // and just put Machina faction last
+  delete addLayers['Machina'];
+  addLayers['Machina'] = factionLayers[window.TEAM_MAC];
 
   return addLayers;
   /* eslint-enable dot-notation  */
