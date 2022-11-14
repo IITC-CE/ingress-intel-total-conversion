@@ -16,10 +16,10 @@ window.teamStringToId = function(teamStr) {
   var team = TEAM_NONE;
   if(teamStr === 'ENLIGHTENED') team = TEAM_ENL;
   if(teamStr === 'RESISTANCE') team = TEAM_RES;
-  if (teamStr === 'U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅') team = TEAM_MAC;
+  if (teamStr === window.TEAM_NAME_MAC) team = TEAM_MAC;
   if(teamStr === 'E') team = TEAM_ENL;
   if(teamStr === 'R') team = TEAM_RES;
-  if (teamStr === 'M') team = TEAM_MAC;
+  if (teamStr === window.TEAM_CODE_MAC) team = TEAM_MAC;
   return team;
 }
 

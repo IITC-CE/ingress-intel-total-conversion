@@ -163,11 +163,17 @@ window.TEAM_ENL = 2;
 window.TEAM_MAC = 3;
 window.TEAM_TO_CSS = ['none', 'res', 'enl', 'mac'];
 window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened', 'U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅'];
+window.TEAM_CODES = ['N', 'R', 'E', 'M'];
 
 window.TEAM_NAME_NONE = window.TEAM_NAMES[window.TEAM_NONE];
 window.TEAM_NAME_RES = window.TEAM_NAMES[window.TEAM_RES];
 window.TEAM_NAME_ENL = window.TEAM_NAMES[window.TEAM_ENL];
 window.TEAM_NAME_MAC = window.TEAM_NAMES[window.TEAM_MAC];
+
+window.TEAM_CODE_NONE = window.TEAM_CODES[window.TEAM_NONE];
+window.TEAM_CODE_RES = window.TEAM_CODES[window.TEAM_RES];
+window.TEAM_CODE_ENL = window.TEAM_CODES[window.TEAM_ENL];
+window.TEAM_CODE_MAC = window.TEAM_CODES[window.TEAM_MAC];
 
 // STORAGE ///////////////////////////////////////////////////////////
 // global variables used for storage. Most likely READ ONLY. Proper
