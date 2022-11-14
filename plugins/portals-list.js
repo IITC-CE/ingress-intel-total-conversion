@@ -416,12 +416,10 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
     table.appendChild(row);
   });
 
-  container.append(
-    '<div class="disclaimer">Click on portals table headers to sort by that column. ' +
-    + 'Click on <b>All, Neutral, Resistance, Enlightened, Unknown</b> to only show portals owned '
-    + 'by that faction or on the number behind the factions to show all but those portals. '
-    + 'Click on <b>Visited, Captured or Scout Controlled</b> to only show portals the user has a history for '
-    + 'or on the number to hide those. </div>');
+  container.append(`<div class="disclaimer">Click on portals table headers to sort by that column.
+Click on <b>All, Neutral, Resistance, Enlightened, Unknown</b> to only show portals owned by that faction or on the number behind the factions to show all but those portals.
+Click on <b>Visited, Captured or Scout Controlled</b> to only show portals the user has a history for or on the number to hide those.
+</div>`);
 
   return container;
 }
