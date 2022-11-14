@@ -14,6 +14,7 @@ window.plugin.portalslist.sortOrder = -1;
 window.plugin.portalslist.enlP = 0;
 window.plugin.portalslist.resP = 0;
 window.plugin.portalslist.neuP = 0;
+window.plugin.portalslist.macP = 0;
 window.plugin.portalslist.visitedP = 0;
 window.plugin.portalslist.capturedP = 0;
 window.plugin.portalslist.scoutControlledP = 0;
@@ -63,7 +64,7 @@ window.plugin.portalslist.fields = [
     title: "Team",
     value: function(portal) { return portal.options.team; },
     format: function(cell, portal, value) {
-      $(cell).text(['NEU', 'RES', 'ENL'][value]);
+      $(cell).text(['NEU', 'RES', 'ENL', 'UNK'][value]);
     }
   },
   {
@@ -196,11 +197,14 @@ window.plugin.portalslist.getPortals = function() {
     retval=true;
 
     switch (portal.options.team) {
-      case TEAM_RES:
+      case window.TEAM_RES:
         window.plugin.portalslist.resP++;
         break;
-      case TEAM_ENL:
+      case window.TEAM_ENL:
         window.plugin.portalslist.enlP++;
+        break;
+      case window.TEAM_MAC:
+        window.plugin.portalslist.macP++;
         break;
       default:
         window.plugin.portalslist.neuP++;
@@ -248,6 +252,7 @@ window.plugin.portalslist.displayPL = function() {
   window.plugin.portalslist.enlP = 0;
   window.plugin.portalslist.resP = 0;
   window.plugin.portalslist.neuP = 0;
+  window.plugin.portalslist.macP = 0;
   window.plugin.portalslist.visitedP = 0;
   window.plugin.portalslist.capturedP = 0;
   window.plugin.portalslist.scoutControlledP = 0;
@@ -304,12 +309,13 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
         case 1:
         case 2:
         case 3:
-          return reversed ^ (1+obj.portal.options.team === filter);
         case 4:
-          return reversed ^ obj.portal.options.data.history.visited;
+          return reversed ^ (1 + obj.portal.options.team === filter);
         case 5:
-          return reversed ^ obj.portal.options.data.history.captured;
+          return reversed ^ obj.portal.options.data.history.visited;
         case 6:
+          return reversed ^ obj.portal.options.data.history.captured;
+        case 7:
           return reversed ^ obj.portal.options.data.history.scoutControlled;
       };
     });
@@ -323,7 +329,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
 
   var length = window.plugin.portalslist.listPortals.length;
 
-  ['All', 'Neutral', 'Resistance', 'Enlightened', 'Visited', 'Captured', 'Scout Controlled' ].forEach(function(label, i) {
+  ['All', 'Neutral', 'Resistance', 'Enlightened', 'Unknown', 'Visited', 'Captured', 'Scout Controlled'].forEach((label, i) => {
     var cell = filters.appendChild(document.createElement('div'));
     cell.className = 'name filter' + label.substr(0, 3);
     cell.textContent = label+':';
@@ -359,7 +365,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
         cell.classList.add('active');
       }
 
-      var name = ['neuP', 'resP', 'enlP', 'visitedP', 'capturedP', 'scoutControlledP'][i-1];
+      var name = ['neuP', 'resP', 'enlP', 'macP', 'visitedP', 'capturedP', 'scoutControlledP'][i - 1];
       var count = window.plugin.portalslist[name];
       cell.textContent = count + ' (' + Math.round(count/length*100) + '%)';
     }
@@ -411,7 +417,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
   });
 
   container.append('<div class="disclaimer">Click on portals table headers to sort by that column. '
-    + 'Click on <b>All, Neutral, Resistance, Enlightened</b> to only show portals owned '
+    + 'Click on <b>All, Neutral, Resistance, Enlightened, Unknown</b> to only show portals owned '
     + 'by that faction or on the number behind the factions to show all but those portals. '
     + 'Click on <b>Visited, Captured or Scout Controlled</b> to only show portals the user has a history for '
     + 'or on the number to hide those. </div>');
