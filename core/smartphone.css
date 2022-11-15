@@ -69,7 +69,7 @@ body {
   height: 6px;
   width: 6px;
   left: 50%;
-  top: -3px; 
+  top: -3px;
   margin-left: -3px;
   position: absolute;
   z-index: -1;
@@ -87,6 +87,10 @@ body {
 
 #mobileinfo .res .filllevel {
   background-color: #00c5ff !important;
+}
+
+#mobileinfo .mac .filllevel {
+  background-color: #ff0028 !important;
 }
 
 #name #signout { /* no hover, always show signout button */

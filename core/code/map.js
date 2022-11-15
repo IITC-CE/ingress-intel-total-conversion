@@ -1,4 +1,4 @@
-/* global log -- eslint */
+/* global log,L -- eslint */
 function setupCRS () {
 
   // use the earth radius value from s2 geometry library
@@ -117,6 +117,10 @@ function createDefaultBaseMapLayers () {
   return baseLayers;
 }
 
+function createFactionLayersArray() {
+  return window.TEAM_NAMES.map(() => L.layerGroup());
+}
+
 function createDefaultOverlays () {
   /* global portalsFactionLayers: true, linksFactionLayers: true, fieldsFactionLayers: true -- eslint*/
   /* eslint-disable dot-notation  */
@@ -126,17 +130,17 @@ function createDefaultOverlays () {
   portalsFactionLayers = [];
   var portalsLayers = [];
   for (var i = 0; i <= 8; i++) {
-    portalsFactionLayers[i] = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+    portalsFactionLayers[i] = createFactionLayersArray();
     portalsLayers[i] = L.layerGroup();
     var t = (i === 0 ? 'Unclaimed/Placeholder' : 'Level ' + i) + ' Portals';
     addLayers[t] = portalsLayers[i];
   }
 
-  fieldsFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+  fieldsFactionLayers = createFactionLayersArray();
   var fieldsLayer = L.layerGroup();
   addLayers['Fields'] = fieldsLayer;
 
-  linksFactionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+  linksFactionLayers = createFactionLayersArray();
   var linksLayer = L.layerGroup();
   addLayers['Links'] = linksLayer;
 
@@ -144,7 +148,7 @@ function createDefaultOverlays () {
   // these layers don't actually contain any data. instead, every time they're added/removed from the map,
   // the matching sub-layers within the above portals/fields/links are added/removed from their parent with
   // the below 'onoverlayadd/onoverlayremove' events
-  var factionLayers = [L.layerGroup(), L.layerGroup(), L.layerGroup()];
+  var factionLayers = createFactionLayersArray();
   factionLayers.forEach(function (facLayer, facIdx) {
     facLayer.on('add remove', function (e) {
       var fn = e.type + 'Layer';
@@ -159,9 +163,13 @@ function createDefaultOverlays () {
 
   // to avoid any favouritism, we'll put the player's own faction layer first
   if (window.PLAYER.team !== 'RESISTANCE') {
-    delete addLayers['Resistance'];
-    addLayers['Resistance'] = factionLayers[window.TEAM_RES];
+    delete addLayers[window.TEAM_NAME_RES];
+    addLayers[window.TEAM_NAME_RES] = factionLayers[window.TEAM_RES];
   }
+
+  // and just put U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅ faction last
+  delete addLayers[window.TEAM_NAME_MAC];
+  addLayers[window.TEAM_NAME_MAC] = factionLayers[window.TEAM_MAC];
 
   return addLayers;
   /* eslint-enable dot-notation  */

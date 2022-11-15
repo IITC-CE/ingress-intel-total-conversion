@@ -56,7 +56,7 @@
 
 #portalslist .filters {
   display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr auto;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto;
   grid-gap: 1px
 }
 
@@ -91,60 +91,67 @@
 }
 
 #portalslist .filters .filterNeu,
+#portalslist .filters .filterEnl,
 #portalslist .filters .filterRes,
-#portalslist .filters .filterEnl {
-  grid-row: 2;
+#portalslist .filters .filterUnk {
+  grid-row: 1;
 }
 
 #portalslist .filters .filterVis,
 #portalslist .filters .filterCap,
 #portalslist .filters .filterSco {
-  grid-row: 3;
+  grid-row: 2;
 }
 
 /* 2 columns */
 @media (orientation: portrait) {
-  #portalslist.mobile .filters {
+  #portalslist .filters {
     grid-template-columns: 1fr auto 1fr auto;
   }
 
-  #portalslist.mobile .filters .filterNeu.name,
-  #portalslist.mobile .filters .filterRes.name,
-  #portalslist.mobile .filters .filterEnl.name {
+  #portalslist .filters .filterNeu.name,
+  #portalslist .filters .filterRes.name,
+  #portalslist .filters .filterEnl.name,
+  #portalslist .filters .filterUnk.name {
     grid-column: 1;
   }
 
-  #portalslist.mobile .filters .filterNeu.count,
-  #portalslist.mobile .filters .filterRes.count,
-  #portalslist.mobile .filters .filterEnl.count {
+  #portalslist .filters .filterNeu.count,
+  #portalslist .filters .filterRes.count,
+  #portalslist .filters .filterEnl.count,
+  #portalslist .filters .filterUnk.count {
     grid-column: 2;
   }
 
-  #portalslist.mobile .filters .filterVis.name,
-  #portalslist.mobile .filters .filterCap.name,
-  #portalslist.mobile .filters .filterSco.name {
+  #portalslist .filters .filterVis.name,
+  #portalslist .filters .filterCap.name,
+  #portalslist .filters .filterSco.name {
     grid-column: 3;
   }
 
-  #portalslist.mobile .filters .filterVis.count,
-  #portalslist.mobile .filters .filterCap.count,
-  #portalslist.mobile .filters .filterSco.count {
+  #portalslist .filters .filterVis.count,
+  #portalslist .filters .filterCap.count,
+  #portalslist .filters .filterSco.count {
     grid-column: 4;
   }
 
-  #portalslist.mobile .filters .filterNeu,
-  #portalslist.mobile .filters .filterVis {
-    grid-row: 2
+  #portalslist .filters .filterNeu,
+  #portalslist .filters .filterVis {
+    grid-row: 1;
   }
 
-  #portalslist.mobile .filters .filterRes,
-  #portalslist.mobile .filters .filterCap {
-    grid-row: 3
+  #portalslist .filters .filterEnl,
+  #portalslist .filters .filterCap {
+    grid-row: 2;
   }
 
-  #portalslist.mobile .filters .filterEnl,
-  #portalslist.mobile .filters .filterSco {
-    grid-row: 4
+  #portalslist .filters .filterRes,
+  #portalslist .filters .filterSco {
+    grid-row: 3;
+  }
+
+  #portalslist .filters .filterUnk {
+    grid-row: 4;
   }
 }
 
@@ -189,6 +196,11 @@
 #portalslist table tr.enl td,
 #portalslist .filters .filterEnl {
   background-color: #017f01;
+}
+
+#portalslist table tr.mac td,
+#portalslist .filters .filterUnk {
+  background-color: #a00;
 }
 
 #portalslist table tr.none td {

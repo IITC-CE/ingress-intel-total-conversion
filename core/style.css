@@ -106,6 +106,10 @@ i.large { font-size: 6rem; }
   color: #00c5ff;
 }
 
+.mac {
+  color: #ff2020;
+}
+
 .none {
   color: #fff;
 }

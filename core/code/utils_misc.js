@@ -339,7 +339,11 @@ window.makePermalink = function (latlng, options) {
     if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
     args.push('pll='+latlng.join(','));
   }
-  var url = options.fullURL ? '@url_intel_base@' : '/';
+  var url = '';
+  if (options.fullURL) {
+    url += new URL(document.baseURI).origin;
+  }
+  url += '/';
   return url + '?' + args.join('&');
 };
 
