@@ -11,20 +11,9 @@ window.getTeam = function (details) {
 };
 
 window.teamStringToId = function (teamStr) {
-  switch (teamStr) {
-    case window.TEAM_NAME_ENL:
-    case window.TEAM_CODE_ENL:
-      return window.TEAM_ENL;
-
-    case window.TEAM_NAME_RES:
-    case window.TEAM_CODE_RES:
-      return window.TEAM_RES;
-
-    case window.TEAM_NAME_MAC:
-    case window.TEAM_CODE_MAC:
-      return window.TEAM_MAC;
-
-    default:
-      return window.TEAM_NONE;
-  }
+  var teamIndex = window.TEAM_NAMES.indexOf(teamStr);
+  if (teamIndex >= 0) return teamIndex;
+  teamIndex = window.TEAM_CODES.indexOf(teamStr);
+  if (teamIndex >= 0) return teamIndex;
+  return window.TEAM_NONE;
 };
