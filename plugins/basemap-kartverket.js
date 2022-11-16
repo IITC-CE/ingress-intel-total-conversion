@@ -1,11 +1,15 @@
 ﻿// @author         johnd0e
 // @name           Kartverket.no maps (Norway)
 // @category       Map Tiles
-// @version        0.2.1
+// @version        0.2.2
 // @description    Add Kartverket.no map layers.
 
+/* exported setup --eslint */
+/* global L, layerChooser */
+// use own namespace for plugin
+var mapKartverket = {};
 
-function setup () {
+mapKartverket.setup = function () {
 
   L.TileLayer.Kartverket = L.TileLayer.extend({
 
@@ -72,4 +76,8 @@ function setup () {
     l = L.tileLayer.kartverket(layer);
     layerChooser.addBaseLayer(l, l._name);
   }
+};
+
+function setup() {
+  mapKartverket.setup();
 }
