@@ -117,7 +117,7 @@ window.plugin.portalslist.fields = [
     value: function(portal) {
       var links = window.getPortalLinks(portal.options.guid);
       var fields = getPortalFieldsCount(portal.options.guid);
-      return portalApGainMaths(portal.options.data.resCount, links.in.length+links.out.length, fields);
+      return plugin.portalslist.portalApGainMaths(portal.options.data.resCount, links.in.length + links.out.length, fields);
     },
     sortValue: function(value, portal) { return value.enemyAp; },
     format: function(cell, portal, value) {
@@ -467,4 +467,31 @@ var setup =  function() {
     .html('@include_string:portals-list.css@')
     .appendTo("head");
 
+}
+
+
+// given counts of resonators, links and fields, calculate the available AP
+// doesn't take account AP for resonator upgrades or AP for adding mods
+window.plugin.portalslist.portalApGainMaths = function (resCount, linkCount, fieldCount) {
+
+  var deployAp = (8 - resCount) * DEPLOY_RESONATOR;
+  if (resCount == 0) deployAp += CAPTURE_PORTAL;
+  if (resCount != 8) deployAp += COMPLETION_BONUS;
+  // there could also be AP for upgrading existing resonators, and for deploying mods - but we don't have data for that
+  var friendlyAp = deployAp;
+
+  var destroyResoAp = resCount * DESTROY_RESONATOR;
+  var destroyLinkAp = linkCount * DESTROY_LINK;
+  var destroyFieldAp = fieldCount * DESTROY_FIELD;
+  var captureAp = CAPTURE_PORTAL + 8 * DEPLOY_RESONATOR + COMPLETION_BONUS;
+  var destroyAp = destroyResoAp + destroyLinkAp + destroyFieldAp;
+  var enemyAp = destroyAp + captureAp;
+
+  return {
+    friendlyAp: friendlyAp,
+    enemyAp: enemyAp,
+    destroyAp: destroyAp,
+    destroyResoAp: destroyResoAp,
+    captureAp: captureAp
+  }
 }
