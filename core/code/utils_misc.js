@@ -38,18 +38,6 @@ window.eraseCookie = function(name) {
   document.cookie = name + '=; expires=Thu, 1 Jan 1970 00:00:00 GMT; path=/';
 }
 
-//certain values were stored in cookies, but we're better off using localStorage instead - make it easy to convert
-window.convertCookieToLocalStorage = function(name) {
-  var cookie=readCookie(name);
-  if(cookie !== undefined) {
-    log.log('converting cookie '+name+' to localStorage');
-    if(localStorage[name] === undefined) {
-      localStorage[name] = cookie;
-    }
-    eraseCookie(name);
-  }
-}
-
 // add thousand separators to given number.
 // http://stackoverflow.com/a/1990590/1684530 by Doug Neiner.
 window.digits = function(d) {
@@ -259,14 +247,9 @@ window.convertTextToTableMagic = function(text) {
   return table;
 }
 
-// Given 3 sets of points in an array[3]{lat, lng} returns the area of the triangle
-window.calcTriArea = function(p) {
-  return Math.abs((p[0].lat*(p[1].lng-p[2].lng)+p[1].lat*(p[2].lng-p[0].lng)+p[2].lat*(p[0].lng-p[1].lng))/2);
-}
-
-function clamp (n,max,min) {
-  if (n===0) { return 0; }
-  return n>0 ? Math.min(n,max) : Math.max(n,min);
+function clamp(n, max, min) {
+  if (n === 0) return 0;
+  return n > 0 ? Math.min(n, max) : Math.max(n, min);
 }
 
 var MAX_LATITUDE = 85.051128; // L.Projection.SphericalMercator.MAX_LATITUDE

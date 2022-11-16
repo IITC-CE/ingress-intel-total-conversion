@@ -24,11 +24,7 @@ window.DataCache = function() {
 
 }
 
-window.DataCache.prototype.store = function(qk,data,freshTime) {
-  // fixme? common behaviour for objects is that properties are kept in the order they're added
-  // this is handy, as it allows easy retrieval of the oldest entries for expiring
-  // however, this is not guaranteed by the standards, but all our supported browsers work this way
-
+window.DataCache.prototype.store = function (qk, data, freshTime) {
   this.remove(qk);
 
   var time = new Date().getTime();
@@ -93,21 +89,11 @@ window.DataCache.prototype.runExpire = function() {
 
   var cacheSize = Object.keys(this._cache).length;
 
-  for(var qk in this._cache) {
-
-    // fixme? our MAX_SIZE test here assumes we're processing the oldest first. this relies
-    // on looping over object properties in the order they were added. this is true in most browsers,
-    // but is not a requirement of the standards
+  for (var qk in this._cache) {
     if (cacheSize > this.REQUEST_CACHE_MAX_ITEMS || this._cacheCharSize > this.REQUEST_CACHE_MAX_CHARS || this._cache[qk].time < t) {
       this._cacheCharSize -= this._cache[qk].dataStr.length;
       delete this._cache[qk];
       cacheSize--;
     }
   }
-}
-
-
-window.DataCache.prototype.debug = function() {
-//NOTE: ECMAScript strings use 16 bit chars (it's in the standard), so convert for bytes/Kb
-  return 'Cache: '+Object.keys(this._cache).length+' items, '+(this._cacheCharSize*2).toLocaleString()+' bytes ('+Math.ceil(this._cacheCharSize/512).toLocaleString()+'K)';
 }

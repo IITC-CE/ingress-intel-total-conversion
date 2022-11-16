@@ -108,9 +108,8 @@ window.MapDataRequest.prototype.mapMoveStart = function() {
   this.pauseRenderQueue(true);
 }
 
-window.MapDataRequest.prototype.mapMoveEnd = function() {
+window.MapDataRequest.prototype.mapMoveEnd = function () {
   var bounds = clampLatLngBounds(map.getBounds());
-  var zoom = map.getZoom();
 
   if (this.fetchedDataParams) {
     // we have fetched (or are fetching) data...
@@ -239,7 +238,7 @@ window.MapDataRequest.prototype.refresh = function() {
 
   window.runHooks ('mapDataRefreshStart', {bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom, minPortalLevel: tileParams.level, tileBounds: dataBounds});
 
-  this.render.startRenderPass(tileParams.level, dataBounds);
+  this.render.startRenderPass(dataBounds);
 
   window.runHooks ('mapDataEntityInject', {callback: this.render.processGameEntities.bind(this.render)});
 
@@ -276,12 +275,7 @@ window.MapDataRequest.prototype.refresh = function() {
 
       this.debugTiles.create(tile_id,[[latSouth,lngWest],[latNorth,lngEast]]);
 
-//TODO: with recent backend changes there are now multiple zoom levels of data that is identical except perhaps for some
-// reduction of detail when zoomed out. to take good advantage of the cache, a check for cached data at a closer zoom
-// but otherwise the same parameters (min portal level, tiles per edge) will mean less downloads when zooming out
-// (however, the default code in getDataZoomForMapZoom currently reduces the need for this, as it forces the furthest 
-//  out zoom tiles for a detail level)
-      if (this.cache && this.cache.isFresh(tile_id) ) {
+      if (this.cache && this.cache.isFresh(tile_id)) {
         // data is fresh in the cache - just render it
         this.pushRenderQueue(tile_id,this.cache.get(tile_id),'cache-fresh');
         this.cachedTileCount += 1;
@@ -330,26 +324,27 @@ window.MapDataRequest.prototype.refresh = function() {
 
   if (Object.keys(this.queuedTiles).length > 0) {
     // queued requests - don't start processing the download queue immediately - start it after a short delay
-    this.delayProcessRequestQueue (this.DOWNLOAD_DELAY,true);
+    this.delayProcessRequestQueue(this.DOWNLOAD_DELAY);
   } else {
     // all data was from the cache, nothing queued - run the queue 'immediately' so it handles the end request processing
-    this.delayProcessRequestQueue (0,true);
+    this.delayProcessRequestQueue(0);
   }
 }
 
-
-window.MapDataRequest.prototype.delayProcessRequestQueue = function(seconds,isFirst) {
+window.MapDataRequest.prototype.delayProcessRequestQueue = function (seconds) {
   if (this.timer === undefined) {
     var _this = this;
-    this.timer = setTimeout ( function() {
-      _this.timer = setTimeout ( function() { _this.timer = undefined; _this.processRequestQueue(isFirst); }, seconds*1000 );
+    this.timer = setTimeout(function () {
+      _this.timer = setTimeout(function () {
+        _this.timer = undefined;
+        _this.processRequestQueue();
+      }, seconds * 1000);
     }, 0);
   }
 }
 
 
-window.MapDataRequest.prototype.processRequestQueue = function(isFirstPass) {
-
+window.MapDataRequest.prototype.processRequestQueue = function () {
   // if nothing left in the queue, finish
   if (Object.keys(this.queuedTiles).length == 0) {
     // we leave the renderQueue code to handle ending the render pass now
@@ -567,10 +562,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
 
     }
 
-    // TODO? check for any requested tiles in 'tiles' not being mentioned in the response - and handle as if it's a 'timeout'?
-
-
-    window.runHooks('requestFinished', {success: true});
+    window.runHooks('requestFinished', { success: true });
   }
 
   // set the queue delay based on any errors or timeouts

@@ -59,35 +59,8 @@ window.setupDataTileParams = function() {
 }
 
 
-window.debugMapZoomParameters = function() {
-
-  //for debug purposes, log the tile params used for each zoom level
-  log.log('DEBUG: Map Zoom Parameters');
-  var doneZooms = {};
-  for (var z=MIN_ZOOM; z<=21; z++) {
-    var ourZoom = getDataZoomForMapZoom(z);
-    log.log('DEBUG: map zoom '+z+': IITC requests '+ourZoom+(ourZoom!=z?' instead':''));
-    if (!doneZooms[ourZoom]) {
-      var params = getMapZoomTileParameters(ourZoom);
-      var msg = 'DEBUG: data zoom '+ourZoom;
-      if (params.hasPortals) {
-        msg += ' has portals, L'+params.level+'+';
-      } else {
-        msg += ' NO portals (was L'+params.level+'+)';
-      }
-      msg += ', minLinkLength='+params.minLinkLength;
-      msg += ', tiles per edge='+params.tilesPerEdge;
-      log.log(msg);
-      doneZooms[ourZoom] = true;
-    }
-  }
-}
-
-
-
-window.getMapZoomTileParameters = function(zoom) {
-
-  var maxTilesPerEdge = window.TILE_PARAMS.TILES_PER_EDGE[window.TILE_PARAMS.TILES_PER_EDGE.length-1];
+window.getMapZoomTileParameters = function (zoom) {
+  var maxTilesPerEdge = window.TILE_PARAMS.TILES_PER_EDGE[window.TILE_PARAMS.TILES_PER_EDGE.length - 1];
 
   return {
     level: window.TILE_PARAMS.ZOOM_TO_LEVEL[zoom] || 0, // deprecated

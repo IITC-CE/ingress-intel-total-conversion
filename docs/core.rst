@@ -71,10 +71,6 @@ Constants
 
   Controls height of chat when chat is collapsed, in pixels, default 60
 
-.. data:: window.FIELD_MU_DISPLAY_POINT_TOLERANCE
-
-  Point tolerance(?) for displaying MUs, in unknown units, default 60
-
 .. data:: window.COLOR_SELECTED_PORTAL
 
   What colour should the selected portal be, string(css hex code),
@@ -105,14 +101,6 @@ Constants
 
   Colour values for displaying mods, consistent with Ingress.
   Very Rare also used for AXA shields and Ultra Links.
-
-.. data:: window.MOD_TYPE
-
-  ::
-
-    {RES_SHIELD:'Shield', MULTIHACK:'Multi-hack', FORCE_AMP:'Force Amp', HEATSINK:'Heat Sink', TURRET:'Turret', LINK_AMPLIFIER: 'Link Amp'}
-
-  Mod type dict for displaying mod names.
 
 .. data:: window.ACCESS_INDICATOR_COLOR
 
@@ -231,11 +219,6 @@ Variables
 
   Reference to the hacking range indicator of the selected portal. This is a
   Leaflet layer.
-
-.. data:: window.mapRunsUserAction
-
-  Bool, true if the map is currently being moved. More precisely, this is true
-  between the ``movestart`` and ``moveend`` events of the Leaflet map.
 
 .. data:: window.portals
           window.links

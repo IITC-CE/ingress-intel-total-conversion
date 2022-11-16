@@ -1,24 +1,18 @@
 // MAP DATA RENDER ////////////////////////////////////////////////
 // class to handle rendering into leaflet the JSON data from the servers
+/* global L */
 
-
-
-window.Render = function() {
+window.Render = function () {
   this.portalMarkerScale = undefined;
 }
 
 // start a render pass. called as we start to make the batch of data requests to the servers
-window.Render.prototype.startRenderPass = function(level,bounds) {
-  this.isRendering = true;
-
+window.Render.prototype.startRenderPass = function (bounds) {
   this.deletedGuid = {};  // object - represents the set of all deleted game entity GUIDs seen in a render pass
 
   this.seenPortalsGuid = {};
   this.seenLinksGuid = {};
   this.seenFieldsGuid = {};
-
-  this.bounds = bounds;
-  this.level = level;
 
   // we pad the bounds used for clearing a litle bit, as entities are sometimes returned outside of their specified tile boundaries
   // this will just avoid a few entity removals at start of render when they'll just be added again
@@ -33,20 +27,17 @@ window.Render.prototype.startRenderPass = function(level,bounds) {
   this.rescalePortalMarkers();
 }
 
-window.Render.prototype.clearPortalsOutsideBounds = function(bounds) {
-  var count = 0;
+window.Render.prototype.clearPortalsOutsideBounds = function (bounds) {
   for (var guid in window.portals) {
     var p = portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
     if (!bounds.contains(p.getLatLng()) && guid !== selectedPortal && !artifact.isInterestingPortal(guid)) {
       this.deletePortalEntity(guid);
-      count++;
     }
   }
 }
 
-window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
-  var count = 0;
+window.Render.prototype.clearLinksOutsideBounds = function (bounds) {
   for (var guid in window.links) {
     var l = links[guid];
 
@@ -57,24 +48,21 @@ window.Render.prototype.clearLinksOutsideBounds = function(bounds) {
 
     if (!bounds.intersects(linkBounds)) {
       this.deleteLinkEntity(guid);
-      count++;
     }
   }
 }
 
-window.Render.prototype.clearFieldsOutsideBounds = function(bounds) {
-  var count = 0;
+window.Render.prototype.clearFieldsOutsideBounds = function (bounds) {
   for (var guid in window.fields) {
     var f = fields[guid];
 
     // NOTE: our geodesic polys can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on corner points will be good enough for this check
     var lls = f.getLatLngs();
-    var fieldBounds = L.latLngBounds([lls[0],lls[1]]).extend(lls[2]);
+    var fieldBounds = L.latLngBounds([lls[0], lls[1]]).extend(lls[2]);
 
     if (!bounds.intersects(fieldBounds)) {
       this.deleteFieldEntity(guid);
-      count++;
     }
   }
 }
@@ -169,8 +157,6 @@ window.Render.prototype.endRenderPass = function() {
   // reorder portals to be after links/fields
   this.bringPortalsToFront();
 
-  this.isRendering = false;
-
   // re-select the selected portal, to re-render the side-bar. ensures that any data calculated from the map data is up to date
   if (selectedPortal) {
     renderPortalDetails (selectedPortal);
@@ -239,7 +225,6 @@ window.Render.prototype.deleteLinkEntity = function(guid) {
 window.Render.prototype.deleteFieldEntity = function(guid) {
   if (guid in window.fields) {
     var f = window.fields[guid];
-    var fd = f.options.details;
 
     fieldsFactionLayers[f.options.team].removeLayer(f);
     delete window.fields[guid];
@@ -446,7 +431,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
   fieldsFactionLayers[poly.options.team].addLayer(poly);
 }
 
-window.Render.prototype.createLinkEntity = function(ent,faked) {
+window.Render.prototype.createLinkEntity = function (ent) {
   // Niantic have been faking link entities, based on data from fields
   // these faked links are sent along with the real portal links, causing duplicates
   // the faked ones all have longer GUIDs, based on the field GUID (with _ab, _ac, _bc appended)
@@ -474,10 +459,7 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
 
   // check if entity already exists
   if (ent[0] in window.links) {
-    // yes. now, as sometimes links are 'faked', they have incomplete data. if the data we have is better, replace the data
     var l = window.links[ent[0]];
-
-    // the faked data will have older timestamps than real data (currently, faked set to zero)
     if (l.options.timestamp >= ent[1]) return; // this data is older or identical to the rendered data - abort processing
 
     // the data is newer/better - two options
@@ -494,7 +476,7 @@ window.Render.prototype.createLinkEntity = function(ent,faked) {
   var poly = L.geodesicPolyline(latlngs, {
     color: COLORS[team],
     opacity: 1,
-    weight: faked ? 1 : 2,
+    weight: 2,
     interactive: false,
 
     team: team,
