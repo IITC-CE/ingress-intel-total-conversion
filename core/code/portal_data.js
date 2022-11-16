@@ -143,24 +143,6 @@ window.findPortalLatLng = function(guid) {
 })();
 
 
-// get the AP gains from a portal, based only on the brief summary data from portals, links and fields
-// not entirely accurate - but available for all portals on the screen
-window.getPortalApGain = function(guid) {
-
-  var p = window.portals[guid];
-  if (p) {
-    var data = p.options.data;
-
-    var linkCount = getPortalLinksCount(guid);
-    var fieldCount = getPortalFieldsCount(guid);
-
-    var result = portalApGainMaths(data.resCount, linkCount, fieldCount);
-    return result;
-  }
-
-  return undefined;
-}
-
 // given counts of resonators, links and fields, calculate the available AP
 // doesn't take account AP for resonator upgrades or AP for adding mods
 window.portalApGainMaths = function(resCount, linkCount, fieldCount) {
