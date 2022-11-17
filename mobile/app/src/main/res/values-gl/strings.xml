@@ -3,7 +3,7 @@
     <string name="pref_secure_updates_sum">Se está activado, só se permitirán actualizacións por https</string>
     <string name="pref_force_plugin_update_sum">Actualiza tódolos plugins de usuario activos</string>
     <string name="pref_update_plugins_interval_sum">Cada canto debería buscar IITCm novas versións de plugins</string>
-    <string name="pref_android_menu_sum">Fai visibles ou oculta as entradas do menú do IITCm</string>
+    <string name="pref_android_menu_sum">Altera visibilidade das entradas do menú do IITCm</string>
     <string name="pref_fake_user_agent_sum">Permite que o IITCm se mostre ao sitio do intel como un navegador de escritorio. Nota: se simplemente queres usar o modo de escritorio, usa o axuste \"forzar modo de escritorio\"</string>
     <string name="pref_enable_dev_mode_sum">Si está activado, tódalas fontes de IITC cargaranse desde o almacenamento externo do dispositivo Android. Terás que copiar tódalas fontes de $IITC_folder/build/mobile/ a /sdcard/IITC_Mobile/dev/.</string>
     <string name="pref_advanced_options_sum">Opcións de desenvolvedor e modificacións avanzadas</string>
@@ -17,7 +17,7 @@
     <string name="pref_plugins_sum">Os plugins extenden/modifican a experiencia de uso do IITC. A maioría dos plugins usados polo IITC de escritorio pódense atopar aquí.</string>
     <string name="pref_about_title">Acerca do IITC Mobile</string>
     <string name="activity_share_to_clipboard">Copiar ao portapapeis</string>
-    <string name="activity_settings">Configuración de IITC Mobile</string>
+    <string name="activity_settings">Axustes de IITC Mobile</string>
     <string name="install_dialog_msg">&lt;p&gt;Solicitóuselle ao IITCm que instalase o seguinte ficheiro javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ten coidado:&lt;/b&gt; Javascript de fontes externas pode conter código malicioso (spyware, etc.)! &lt;p&gt;Seguro que queres continuar\?</string>
     <string name="install_dialog_top">Instalar plugin externo\?</string>
     <string name="label_overlay_layers">Capas superpostas</string>
@@ -52,7 +52,7 @@
     <string name="menu_reload">Reiniciar IITC</string>
     <string name="pref_secure_updates">Requerir actualizacións seguras</string>
     <string name="pref_force_plugin_update">Forzar actualización dos plugins</string>
-    <string name="pref_update_plugins_interval">Intervalo de actualización dos plugins</string>
+    <string name="pref_update_plugins_interval">configura intervalo de actualización dos plugins</string>
     <string name="pref_update_plugins_cat">Actualizacións dos plugins do usuario</string>
     <string name="pref_android_menu">Configurar menú de IITCm</string>
     <string name="pref_fake_user_agent">User Agent falso</string>
@@ -71,7 +71,7 @@
     <string name="pref_user_location">Mostrar posición do usuario no mapa</string>
     <string name="pref_plugins_title">Plugins dispoñibles</string>
     <string name="pref_plugins">Plugins de IITC</string>
-    <string name="pref_tweaks_cat">Modificacións</string>
+    <string name="pref_tweaks_cat">Axustes</string>
     <string name="pref_misc_cat">Outros</string>
     <string name="pref_ui_cat">Interface</string>
     <string name="close">Cerrar</string>
@@ -88,4 +88,24 @@
     <string name="notice_sharing">&lt;p&gt;Con &lt;em&gt;Compartir portal&lt;/em&gt; podes: &lt;p&gt; • enviar a ligazón do portal a outras persoas&lt;br&gt; • ver a posición do portal seleccionada noutra aplicación &lt;br&gt; • abrir a ligazón do portal nunha navegador web &lt;br&gt; &lt;p&gt; Consello: seleccionando Google Maps (ou calquera outro software de navegación instalado), podes navegar rápidamente ao portal seleccionado. &lt;p&gt;Estes consellos tamén se aplican ao &lt;em&gt;enlace permanente&lt;/em&gt;.</string>
     <string name="notice_extplugins">&lt;p&gt;Consello: &lt;p&gt;IITC Móbil tamén pode cargar complementos externos. &lt;p&gt;Engádeos facendo clic na icona (+) da parte superior dereita. Os ficheiros do complemento teñen que rematar con \'.user.js\' e son copiados en &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="notice_info">&lt;p&gt;Consello: formas alternativas de abrir a pantalla de información:&lt;p&gt; • toca e manten o portal por un segundo&lt;br&gt; • toca na metade esquerda da barra de estado&lt;br&gt;</string>
+    <string name="bugtracker">bugtracker</string>
+    <string name="appintro_welcome_description">Esta é unha versión móbil do axudante indispensable para o xogador de Ingress.
+\n
+\nIngress Intel Total Conversion (IITC) é un complemento que funciona como superposición para o mapa oficial de Intel Ingress.
+\n
+\nIITC cambia completamente a forma de traballar co mapa, aumenta significativamente a eficiencia aplicando aceleración de hardware e amplía as capacidades mediante o uso de varios complementos.</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 semanas</string>
+    <string name="pref_update_plugins_interval_1_week">1 semana</string>
+    <string name="pref_update_plugins_interval_2_days">2 días</string>
+    <string name="pref_update_plugins_interval_1_day">1 día</string>
+    <string name="pref_update_plugins_interval_disable">Desactivar</string>
+    <string name="pref_user_location_show_position_and_orientation">Amosar ubicación e orientación do usuario no mapa</string>
+    <string name="pref_user_location_show_position">Amosar localización do usuario no mapa</string>
+    <string name="pref_user_location_dont_show">Non amosar localización do usuario</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Barra de navegación do sistema</string>
+    <string name="pref_hide_fullscreen_status_bar">Barra de estado IITC</string>
+    <string name="pref_hide_fullscreen_action_bar">Barra de acción IITC</string>
+    <string name="pref_hide_fullscreen_notification_bar">Barra de notidicacións do sistema</string>
+    <string name="pref_language">Idioma</string>
+    <string name="iitc_website">Web IITC</string>
 </resources>
