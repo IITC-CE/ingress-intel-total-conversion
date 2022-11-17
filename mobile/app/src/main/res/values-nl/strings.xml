@@ -87,4 +87,5 @@
     <string name="plugins_permission_denied">Toestemming geweigerd. Je mag geen plugins toevoegen.</string>
     <string name="file_browser_choose_file">Kies bestand</string>
     <string name="plugins_user_plugins">Gebruikersplugins</string>
+    <string name="activity_share">Delen met…</string>
 </resources>
