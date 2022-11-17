@@ -1,7 +1,7 @@
 // @author         fkloft
 // @name           Layer count
 // @category       Info
-// @version        0.2.1
+// @version        0.2.2
 // @description    Allow users to count nested fields
 
 
