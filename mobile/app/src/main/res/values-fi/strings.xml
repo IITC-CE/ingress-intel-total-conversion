@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pane_map">Kartta</string>
+    <string name="pane_info">Tiedot</string>
+    <string name="pane_alerts">Hälytykset</string>
+    <string name="pane_faction">Faktio</string>
+    <string name="pane_all">Kaikki</string>
+    <string name="plugin_updated">Lisäosa päivitetty</string>
+    <string name="toast_press_twice_to_exit">Paina kahdesti poistuaksesi</string>
+    <string name="plugins_official_plugins">Viralliset lisäosat</string>
+    <string name="plugins_user_plugins">Käyttäjän lisäosat</string>
+    <string name="file_browser_choose_file">Valitse tiedosto</string>
+    <string name="file_browser_is_required">Tiedostonvalitsinta ei löydetty. Asenna valitsemasi tiedostoselainsovellus!</string>
+    <string name="plugins_permission_granted">Käyttöoikeus myönnetty. Toista edellinen toimenpide.</string>
+    <string name="plugins_permission_denied">Käyttöoikeus evätty. Et voi lisätä lisäosia.</string>
+    <string name="show_appintro_screen_title">Näytä esittely</string>
+    <string name="appintro_plugins_description">Voit aloittaa IITC-CE:n käytön välittömästi.
+\n
+\n Mutta tärkein etu verrattuna viralliseen Intel-karttaan ovat lukuisat lisäosat, jotka laajentavat kartan kykyjä.
+\n
+\n Voit lisätä virallisia tai ulkoisia lisäosia asetuksissa.</string>
+    <string name="appintro_plugins_title">Lisäosat</string>
+    <string name="appintro_layers_description"> Pyyhkäise näytön oikeasta reunasta (tai klikkaa tasonvalitsin-ikonia toimintopalkissa) avataksesi <i>tasovalikon</i>.
+\n
+\n Täällä voit vaihtaa karttapalvelua tai kytkeä karttaelementtejä päälle tai pois. </string>
+    <string name="appintro_layers_title">Tasot/korostus</string>
+    <string name="appintro_navigation_description"> Pyyhkäise näytön vasemmasta reunasta (tai klikkaa valikkonappia) avataksesi <i>navigaatiovalikon</i>.
+\n Klikkaa takaisin-nappia palataksesi kartalle.
+\n
+\n Jotkin lisäosat (kuten <i>portals list</i> ja <i>bookmarks</i>) löytyvät nyt nopeasti <i>navigaatiovalikosta</i>.
+\n Ne eivät näy enää tietonäkymässä. </string>
+    <string name="appintro_navigation_title">Navigointi</string>
+    <string name="appintro_nfc_description">Voit lähettää linkin nykyiseen portaaliin tai näkymään nopeasti toiseen laitteeseen, jos molemmat laitteet tukevat NFC:tä.
+\n
+\n Pidä laitteita selät vastakkain ja kosketa näyttöä lähettääksesi kartan toiseen laitteeseen.</string>
+    <string name="appintro_nfc_title">NFC-käyttöoikeus</string>
+    <string name="appintro_location_description">IITC-CE Mobile vaatii pääsyn sijaintiisi helppoa navigointia varten.
+\n
+\n Älä huoli: emme lähetä tietoa sijainnistasi mihinkään.</string>
+    <string name="appintro_location_title">Sijaintitietojen käyttöoikeus</string>
+    <string name="appintro_welcome_description">Tämä on mobiiliversio Ingress-pelaajan korvaamattomasta apuvälineestä.
+\n
+\n Ingress Intel Total Conversion (IITC) is on lisäosa, joka laajentaa virallista Ingress Intel-karttaa.
+\n
+\n IITC muuttaa täysin tavan käyttää karttaa, tehostaa sen toimintaa huomattavasti laitteistokiihdytyksellä ja laajentaa sen kykyjä erilaisilla lisäosilla.</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm:ää pyydettiin asentamaan seuraava javascript-tiedosto: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ole varovainen:&lt;/b&gt; Ulkoisista lähteistä peräisin oleva javascript-koodi voi olla haitallista (vakoiluohjelmat yms.)! &lt;p&gt;Haluatko varmasti jatkaa\?</string>
+    <string name="install_dialog_top">Asenna ulkoinen lisäosa\?</string>
+    <string name="label_overlay_layers">Tasot</string>
+    <string name="label_base_layer">Tausta</string>
+    <string name="label_highlighter">Korostus</string>
+    <string name="tab_browser">Intel</string>
+    <string name="tab_share">Jaa</string>
+    <string name="tab_map">Sijainti</string>
+    <string name="sign_in_action">Kirjaudu sisään</string>
+    <string name="password">Salasana</string>
+    <string name="username">Käyttäjänimi</string>
+    <string name="sign_in_to">Kirjaudu sisään: %1$s %2$s</string>
+    <string name="notice_do_not_show_again">Älä näytä uudelleen</string>
+    <string name="msg_take_screenshot">Luodaan kuvakaappausta…</string>
+    <string name="msg_prepare_screenshot">Valmistellaan…</string>
+    <string name="msg_copied">Kopioitu leikepöydälle…</string>
+    <string name="intent_error">Osoitetta ei voitu avata</string>
+    <string name="search_hint">Etsi sijainteja</string>
+    <string name="login_failed">Kirjautuminen epäonnistui.</string>
+    <string name="choose_account_to_login">Valitse tili kirjautuaksesi</string>
+    <string name="menu_delete">Poista</string>
+    <string name="menu_copy">Kopioi</string>
+    <string name="menu_plugins_add">Lisää ulkoisia lisäosia</string>
+    <string name="menu_send_screenshot">Lähetä kuvakaappaus</string>
+    <string name="menu_debug">Virheenkorjaustila</string>
+    <string name="menu_open_plugins">Lisäosat</string>
+    <string name="menu_locate">Paikanna</string>
+    <string name="menu_search">Etsi</string>
+    <string name="menu_clear_cookies">Tyhjennä evästeet</string>
+    <string name="menu_layer_chooser">Tasot</string>
+    <string name="menu_toggle_fullscreen">Koko näyttö</string>
+    <string name="menu_reload">Päivitä IITC</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 viikkoa</string>
+    <string name="pref_update_plugins_interval_1_week">1 viikko</string>
+    <string name="pref_update_plugins_interval_2_days">2 päivää</string>
+    <string name="pref_update_plugins_interval_1_day">1 päivä</string>
+    <string name="pref_update_plugins_interval_disable">Pois käytöstä</string>
+    <string name="pref_user_location_show_position_and_orientation">Näytä käyttäjän sijainti ja suunta kartalla</string>
+    <string name="pref_user_location_show_position">Näytä käyttäjän sijainti kartalla</string>
+    <string name="pref_user_location_dont_show">Älä näytä käyttäjän sijaintia</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Järjestelmän navigaatiopalkki</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC:n tilarivi</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC:n toimintopalkki</string>
+    <string name="pref_hide_fullscreen_notification_bar">Järjestelmän ilmoituspalkki</string>
+    <string name="pref_secure_updates_sum">Jos käytössä, päivitykset sallitaan vain https-osoitteista</string>
+    <string name="pref_secure_updates">Vaadi suojatut päivitykset</string>
+    <string name="pref_force_plugin_update_sum">Päivitä kaikki käytössä olevat käyttäjän lisäosat</string>
+    <string name="pref_force_plugin_update">Pakota lisäosien päivitys</string>
+    <string name="pref_update_plugins_interval_sum">Miten usein IITCm etsii päivityksiä lisäosiin</string>
+    <string name="pref_update_plugins_interval">Lisäosien päivitystiheys</string>
+    <string name="pref_update_plugins_cat">Käyttäjän lisäosien päivitykset</string>
+    <string name="pref_android_menu_sum">Valitse IITCm:n valikossa näkyvät vaihtoehdot</string>
+    <string name="pref_android_menu">IITCm-valikon asetukset</string>
+    <string name="pref_fake_user_agent_sum">Esitä työpöytäselainta intel-sivustolle. Huomaa: Jos haluat vain käyttää työpöytänäkymää, käytä \'pakota työpöytänäkymä\' -asetusta</string>
+    <string name="pref_fake_user_agent">Väärennä User Agent</string>
+    <string name="pref_disable_splash">Poista käynnistysnäkymä käytöstä</string>
+    <string name="pref_enable_dev_mode_sum">Kehittäjätilassa kaikki IITC:n kooditiedostot ladataan ulkoisesta tallennustilasta. Kopioi kaikki tiedostot kansiosta $IITC_folder/build/mobile/ kansioon /sdcard/IITC_Mobile/dev/.</string>
+    <string name="pref_enable_dev_mode">Kehittäjätila</string>
+    <string name="pref_advanced_options_sum">Kehittäjäasetukset ja lisävalinnat</string>
+    <string name="pref_advanced_options">Lisäasetukset</string>
+    <string name="pref_press_twice_to_exit_sum">Estää poistumisen sovelluksesta vahingossa</string>
+    <string name="pref_press_twice_to_exit">Paina takaisin-nappia kahdesti poistuaksesi</string>
+    <string name="pref_external_storage_sum">Uudelleenkäynnistys vaaditaan! Tallenna välimuisti SD-kortille. Ulkoisen tallennustilan tulee olla liitettynä.</string>
+    <string name="pref_external_storage">Siirrä karttavälimuisti ulkoiseen tallennustilaan</string>
+    <string name="pref_language">Kieli</string>
+    <string name="pref_dex_desktop_sum">Pakota työpöytänäkymä DeX-tilassa</string>
+    <string name="pref_dex_desktop">Samsung DeX -tuki</string>
+    <string name="pref_force_desktop_sum">Kätevä tableteilla, näyttää kauhealta puhelimilla</string>
+    <string name="pref_force_desktop">Pakota työpöytänäkymä</string>
+    <string name="pref_fullscreen_sum">Valitse, mitkä elementit piilotetaan koko näytön tilassa. Huomaa: IITCm:n navigaatiovalikot toimivat joka tapauksessa</string>
+    <string name="pref_fullscreen">Koko näytön tilan asetukset</string>
+    <string name="pref_user_zoom_sum">Näytä +/- napit myös multitouch-näytöillä.</string>
+    <string name="pref_user_zoom">Näytä zoomausnapit</string>
+    <string name="pref_persistent_zoom_sum">Älä vaihta zoomaustasoa, kun paikannusnappia painetaan</string>
+    <string name="pref_persistent_zoom">Säilytä zoomaustaso</string>
+    <string name="pref_user_location">Näytä käyttäjän sijainti kartalla</string>
+    <string name="pref_plugins_title">Saatavilla olevat lisäosat</string>
+    <string name="pref_plugins_sum">Lisäosat laajentavat tai muokkaavat IITC:tä. Suurin osa työpöytä-IITC:n lisäosista löytyy täältä.</string>
+    <string name="pref_plugins">IITC-lisäosat</string>
+    <string name="pref_tweaks_cat">Muokkaukset</string>
+    <string name="pref_misc_cat">Lisäasetukset</string>
+    <string name="pref_ui_cat">Käyttöliittymä</string>
+    <string name="notice_sharing">&lt;p&gt;&lt;em&gt;Jaa portaali&lt;/em&gt; -näkymässä voit: &lt;p&gt; • jakaa linkin portaaliin muille&lt;br&gt; • näyttää portaalin sijainnin toisessa sovelluksessa&lt;br&gt; • avata linkin portaaliin selaimessa&lt;br&gt; &lt;p&gt;Vihje: Valitsemalla Google Mapsin (tai toisen navigointisovelluksen) voit navigoida nopeasti valitulle portaalille. &lt;p&gt;Vihjeet pätevät myös &lt;em&gt;permalinkeille&lt;/em&gt;.</string>
+    <string name="notice_extplugins">&lt;p&gt;Vihje: &lt;p&gt;IITC Mobile voi ladata myös ulkoisia lisäosia! &lt;p&gt;Lisää niitä klikkaamalla (+)-ikonia yläoikealla. Tiedostonimien tulee päättyä \'.user.js\' ja ne kopioidaan kansioon &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="notice_info">&lt;p&gt;Vihje: Muita tapoja tietonäkymän avaamiseen: &lt;p&gt; • kosketa portaalia sekunnin ajan&lt;br&gt; • kosketa tilarivin vasenta puoliskoa&lt;br&gt;</string>
+    <string name="bugtracker">buginseurannassa</string>
+    <string name="iitc_website">IITC:n verkkosivuilta</string>
+    <string name="pref_about_title">Tietoja IITC Mobilesta</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Koontiversio: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC-versio: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;by ${cradle_link}, ${fkloft_link} and contributors&lt;/b&gt; &lt;p&gt;&lt;b&gt;Icon by ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; on optimoitu mobiiliselain &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; -userscriptille. &lt;h3&gt;Yhteisö:&lt;/h3&gt; • Uudet versiot ja työpöytäversio löytyvät ${website_link}.&lt;br&gt; • Seuraa tiedotteita Telegram-kanavalla ${tg_iitc_news_link} ja liity ${tg_iitc_group_link} -chattiin.&lt;br&gt; • Reddit-yhteisössä ${reddit_iitc_link} voit pyytää apua ja keskustella muiden käyttäjien kanssa.&lt;br&gt; • Kerro ongelmista ja ehdota parannuksia ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Kehittäjät:&lt;/h3&gt; ${github_iitc_link} GitHubissa. &lt;h3&gt;IITC:n lisenssi:&lt;/h3&gt; ${ISC_license_text}</string>
+    <string name="download_description">Ladataan viimeisintä intel-pakettia…</string>
+    <string name="close">Sulje</string>
+    <string name="drawer_close">Sulje valikko</string>
+    <string name="drawer_open">Näytä valikko</string>
+    <string name="action_settings">Asetukset</string>
+    <string name="activity_save_to_file">Tallenna tiedostoon</string>
+    <string name="activity_share_to_clipboard">Kopioi leikepöydälle</string>
+    <string name="activity_share">Jaa käyttäen…</string>
+    <string name="activity_plugins">IITC-lisäosat</string>
+    <string name="activity_settings">IITC Mobilen asetukset</string>
+    <string name="debug_run">Suorita</string>
+    <string name="clear_log">Tyhjennä loki</string>
+    <string name="toggle_map">Näytä/piilota kartta</string>
+</resources>

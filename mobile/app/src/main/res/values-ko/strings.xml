@@ -82,4 +82,6 @@
     <string name="version">버전 표시</string>
     <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;빌드 버전: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC 버전: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;by ${cradle_link}, ${fkloft_link} 및 기여자&lt;/b&gt; &lt;p&gt;&lt;b&gt;아이콘 제공 ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; 은&lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; 유저스크립트에 최적화된 브라우저입니다. &lt;h3&gt;커뮤니티:&lt;/h3&gt; • 새 버전을 확인하거나 데스크탑 버전을 보려면 ${website_link} 를 방문하세요.&lt;br&gt; • ${tg_iitc_news_link} 텔레그램 채널을 팔로우하여 공지사항을 확인하고 ${tg_iitc_group_link} 채팅에 참여하세요.&lt;br&gt; • ${reddit_iitc_link} 레딧 커뮤니티에 참여하세요 - 도움을 요청하고 다른 사용자와 상의할 수 있는 장소입니다.&lt;br&gt; • 새로운 기능 추가와 버그 제보는 ${bugtracker_link}에 제안해주세요.&lt;br&gt; &lt;h3&gt;개발자:&lt;/h3&gt; ${github_iitc_link} on Github. &lt;h3&gt;IITC 라이선스:&lt;/h3&gt; ${ISC_license_text}</string>
     <string name="bugtracker">버그트래커</string>
+    <string name="pref_enable_dev_mode_sum">활성화된 경우 모든 IITC 소스는 안드로이드 기기의 외부 저장소에서 로드됩니다. $IITC_folder/build/mobile/ 에서 /sdcard/IITC_Mobile/dev/로 모든 소스를 복사해 주십시오.</string>
+    <string name="iitc_website">IITC 홈페이지</string>
 </resources>

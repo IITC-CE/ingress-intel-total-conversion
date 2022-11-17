@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="close">Stäng</string>
-    <string name="download_description">Laddar ner senaste intelpaketet</string>
+    <string name="download_description">Laddar ner senaste intelpaketet…</string>
     <string name="activity_settings">IITC Mobile Inställningar</string>
     <string name="iitc_website">IITC webbsida</string>
     <string name="pref_user_location">Visa använderens plats på kartan</string>

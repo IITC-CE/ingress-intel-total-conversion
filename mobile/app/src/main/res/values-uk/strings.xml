@@ -31,7 +31,7 @@
     <string name="appintro_location_description">IITC-CE Mobile потрібен дозвіл для доступу до вашого місця розташування для спрощення навігації.
 \n
 \nАле не хвилюйтеся: ми нікуди не відправляємо дані про місцезнаходження.</string>
-    <string name="appintro_welcome_description">Це мобільна версія незамінного помічника гравця Ingress.
+    <string name="appintro_welcome_description">Це мобільна версія незамінного помічника гравця Ingress. 
 \n
 \nIngress Intel Total Conversion (IITC) - це додаток, що працює поверх офіційної Ingress карти Intel.
 \n
@@ -67,7 +67,7 @@
     <string name="pref_hide_fullscreen_status_bar">Панель статуса IITC</string>
     <string name="pref_hide_fullscreen_action_bar">Панель дій IITC</string>
     <string name="pref_hide_fullscreen_notification_bar">Системна панель повідомлень</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm було запропоновано встановити наступний файл javascript: &lt;p&gt;%1$s &lt;p&gt; &lt;b&gt;Будьте обережні:&lt;/ b&gt; Javascript із зовнішніх джерел може містити шкідливий код (шпигунське ПЗ і т. д.)! &lt;p&gt;Ви впевнені, що хочете продовжити\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm було запропоновано встановити наступний файл javascript: &lt;p&gt;%1$s &lt;p&gt; &lt;b&gt;Будьте обережні:&lt;/ b&gt; Javascript із зовнішніх джерел може містити шкідливий код (шпигунське ПЗ і т. д.)!&lt;p&gt;Ви впевнені, що хочете продовжити\?</string>
     <string name="install_dialog_top">Встановити зовнішній плагін\?</string>
     <string name="label_overlay_layers">Накладення шарів</string>
     <string name="label_base_layer">Базовий шар</string>
@@ -136,4 +136,5 @@
     <string name="activity_share">Поділитися через …</string>
     <string name="debug_run">Виконати</string>
     <string name="toggle_map">Переключити видимість карти</string>
+    <string name="appintro_navigation_description"></string>
 </resources>

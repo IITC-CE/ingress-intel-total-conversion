@@ -36,7 +36,7 @@
     <string name="username">Usuario</string>
     <string name="sign_in_to">Inicia sesión en %1$s %2$s</string>
     <string name="msg_take_screenshot">Realizando captura de pantalla…</string>
-    <string name="msg_prepare_screenshot">Preparando...</string>
+    <string name="msg_prepare_screenshot">Preparando…</string>
     <string name="msg_copied">Copiado al portapapeles…</string>
     <string name="intent_error">La dirección no se pudo abrir</string>
     <string name="search_hint">Buscar ubicaciones</string>
@@ -121,6 +121,7 @@
     <string name="appintro_layers_title">Capas/Resaltadores</string>
     <string name="appintro_navigation_description"> Arrastra desde el margen izquierdo de tu pantalla (o haz click en el icono de menú) para abrir el <i>Cajón de navegación</i>
 \nHaz click en el icono atrás para regresar al mapa.
+\n
 \nAlgunos plugins (por ej. <i>portals list</i> y <i>bookmarks</i>) ahora aparecen en el <i>Cajón de navegación</i> para un acceso rápido.
 \n Ya no aparecerán en el panel de Info. </string>
     <string name="plugins_user_plugins">Plugins de usuario</string>

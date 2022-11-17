@@ -146,4 +146,7 @@
     <string name="pref_external_storage">Перемещать тайлы карт во внешнее хранилище</string>
     <string name="pref_language">Язык</string>
     <string name="pref_persistent_zoom_sum">Не изменять уровень масштабирования при включенном позиционировании</string>
+    <string name="pref_webview_zoom">Масштаб WebView</string>
+    <string name="pref_webview_zoom_defaultValue">Системные настройки</string>
+    <string name="pref_webview_zoom_sum">Масштаб встроенного WebView (требуется перезапуск)</string>
 </resources>
