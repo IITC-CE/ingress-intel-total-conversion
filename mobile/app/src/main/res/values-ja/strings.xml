@@ -28,20 +28,20 @@
 \n&lt;h3&gt;開発者：&lt;/h3&gt;${github_iitc_link}。 
 \n&lt;h3&gt;IITCライセンス：&lt;/h3&gt;${ISC_license_text}</string>
     <string name="version">バージョン表示</string>
-    <string name="pref_ui_cat">ユーザーインタフェース</string>
+    <string name="pref_ui_cat">UI</string>
     <string name="pref_plugins">IITCプラグイン</string>
     <string name="sign_in_action">サインイン</string>
     <string name="pref_plugins_sum">プラグインはIITCの動作を拡張/変更します。 デスクトップ版IITCにも使われているプラグインは、ほぼ全てこちらにもあります。</string>
     <string name="pref_user_zoom_sum">マルチタッチ可能な機種でも+/-ボタンを表示します。</string>
-    <string name="pref_fullscreen_sum">全画面表示の際に隠す項目。 ※この状態でも、ナビゲーションドロワー（左スワイプ）によりIITCmを操作できます</string>
+    <string name="pref_fullscreen_sum">全画面表示時に隠す項目を指定。 ※この状態でも、ナビゲーションドロワーからIITCmを操作できます</string>
     <string name="notice_info">&lt;p&gt;ヒント：詳細画面を開く別のやり方: &lt;p&gt; • ポータルを1秒間押し続けます&lt;br&gt; • ステータスバーの左半分をタップします&lt;br&gt;</string>
     <string name="pref_tweaks_cat">その他の微調整</string>
-    <string name="pref_user_location">ユーザーの場所を地図上に表示</string>
-    <string name="pref_user_zoom">拡大・縮小を表示</string>
-    <string name="pref_fullscreen">全画面表示で表示する項目</string>
-    <string name="pref_dex_desktop_sum">DeX モード時はデスクトップ版表示を強制します</string>
-    <string name="pref_press_twice_to_exit_sum">予期しないアプリ終了操作を防ぎます</string>
-    <string name="pref_advanced_options_sum">開発者向けのオプションと詳細な微調整</string>
+    <string name="pref_user_location">ユーザーの位置を地図上に表示</string>
+    <string name="pref_user_zoom">ズームコントロールを表示</string>
+    <string name="pref_fullscreen">全画面表示設定</string>
+    <string name="pref_dex_desktop_sum">DeX モード時はデスクトップ版表示になります</string>
+    <string name="pref_press_twice_to_exit_sum">予期しないアプリ終了を防ぎます</string>
+    <string name="pref_advanced_options_sum">開発者向けのオプションと詳細な設定</string>
     <string name="pref_plugins_title">利用可能なプラグイン</string>
     <string name="pref_persistent_zoom">ズームレベルを維持</string>
     <string name="pref_persistent_zoom_sum">現在地ボタンをタップした時もズームレベルを維持します</string>
@@ -54,7 +54,7 @@
     <string name="pref_enable_dev_mode">開発者モードを有効にする</string>
     <string name="pref_disable_splash">スプラッシュ画面をオフにする</string>
     <string name="pref_update_plugins_cat">ユーザープラグインの更新</string>
-    <string name="pref_update_plugins_interval_sum">IITCmがプラグインの新しいバージョンを確認する間隔を設定できます</string>
+    <string name="pref_update_plugins_interval_sum">プラグインの新しいバージョンを確認する間隔を設定</string>
     <string name="menu_toggle_fullscreen">全画面表示</string>
     <string name="menu_locate">現在地を表示</string>
     <string name="menu_clear_cookies">Cookieを消去</string>
@@ -69,14 +69,14 @@
     <string name="search_hint">場所を検索</string>
     <string name="msg_copied">クリップボードにコピーしました…</string>
     <string name="msg_prepare_screenshot">準備しています…</string>
-    <string name="menu_reload">IITCを再読込する</string>
-    <string name="pref_force_plugin_update_sum">現在有効なユーザプラグインをすべて更新します</string>
-    <string name="pref_force_plugin_update">強制的にプラグインを更新する</string>
-    <string name="pref_secure_updates">安全な更新のみ使用</string>
-    <string name="pref_secure_updates_sum">有効時は、httpsによる更新に限定されます</string>
-    <string name="pref_fake_user_agent">ユーザーエージェント文字列を偽装</string>
-    <string name="pref_android_menu">IITCm メニューの設定</string>
-    <string name="pref_android_menu_sum">IITCm メニューに表示する項目を選択できます</string>
+    <string name="menu_reload">再読込</string>
+    <string name="pref_force_plugin_update_sum">現在有効な全プラグインを更新</string>
+    <string name="pref_force_plugin_update">プラグインを更新</string>
+    <string name="pref_secure_updates">安全な更新</string>
+    <string name="pref_secure_updates_sum">httpsによる更新に限定します</string>
+    <string name="pref_fake_user_agent">ユーザーエージェントを偽装</string>
+    <string name="pref_android_menu">メニューの設定</string>
+    <string name="pref_android_menu_sum">メニューに表示する項目を選択できます</string>
     <string name="notice_do_not_show_again">次回からは表示しない</string>
     <string name="sign_in_to">ログイン先: %1$s %2$s</string>
     <string name="username">ユーザー名</string>
@@ -96,9 +96,9 @@
     <string name="msg_take_screenshot">スクリーンショットを取得しています…</string>
     <string name="notice_extplugins">&lt;p&gt;ヒント: &lt;p&gt;IITC Mobileは外部プラグインも読み込めます。 &lt;p&gt;右上の（+）アイコンをクリックして、プラグインを追加します。 プラグインのファイル名は「.user.js」で終わる必要があります。ファイルのコピー先は以下のとおりです: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="notice_sharing">&lt;p&gt;&lt;em&gt;ポータルの共有&lt;/em&gt;では、次のことができます。&lt;p&gt;•ポータルリンクを他の人に送信する&lt;br&gt;•選択したポータルの位置を別のアプリで表示する&lt;br&gt;•Webブラウザでポータルリンクを開く&lt;br&gt;&lt;p&gt;ヒント：Googleマップ（またはインストールされているその他のナビアプリ）を選択すると、選択したポータルにすばやく移動できます。&lt;p&gt;これらのヒントは、&lt;em&gt;パーマリンク&lt;/em&gt;にも適用されます。</string>
-    <string name="pref_fake_user_agent_sum">IITCmはIntelサイトのデスクトップブラウザーとして振る舞います。 ※デスクトップ版IITCを使いたい場合は、設定の「デスクトップ版表示を強制する」を使用します</string>
-    <string name="menu_layer_chooser">レイヤーを選択</string>
-    <string name="pref_update_plugins_interval">プラグイン更新チェック間隔</string>
+    <string name="pref_fake_user_agent_sum">Intelサイトに対してデスクトップブラウザーであるように振る舞います。 ※デスクトップ版表示にしたい場合は、「デスクトップ版表示を強制する」設定を使用します</string>
+    <string name="menu_layer_chooser">レイヤー選択</string>
+    <string name="pref_update_plugins_interval">チェック間隔</string>
     <string name="pref_update_plugins_interval_1_day">1日</string>
     <string name="pane_map">マップ</string>
     <string name="appintro_plugins_title">プラグイン</string>
@@ -113,7 +113,7 @@
 \n 公式提供のプラグインや外部プラインを設定から追加できます</string>
     <string name="file_browser_choose_file">ファイルを選ぶ</string>
     <string name="toast_press_twice_to_exit">2度押して終了</string>
-    <string name="plugin_updated">プラグインが更新されました</string>
+    <string name="plugin_updated">プラグイン更新</string>
     <string name="pane_info">情報</string>
     <string name="pref_language">言語</string>
     <string name="pref_hide_fullscreen_status_bar">IITC ステータスバー</string>
@@ -139,6 +139,20 @@
 \n両デバイスの後ろと後ろを合わせてスクリーンをタップするとマップを相手デバイスに送信できます。</string>
     <string name="appintro_nfc_title">NFC権限</string>
     <string name="pref_user_location_show_position_and_orientation">マップに位置と向きを表示</string>
-    <string name="pref_user_location_show_position">マップに位置を表示</string>
-    <string name="pref_user_location_dont_show">位置を表示しない</string>
+    <string name="pref_user_location_show_position">位置情報をマップに表示する</string>
+    <string name="pref_user_location_dont_show">位置情報を表示しない</string>
+    <string name="appintro_location_description">IITC-CE Mobileはナビゲーションの為に位置情報へのアクセス権が必要です。
+\n
+\n心配しないでください、あなたの位置情報はどこへも送信されません。</string>
+    <string name="appintro_location_title">位置情報権限</string>
+    <string name="appintro_layers_title">レイヤー/ハイライト</string>
+    <string name="plugins_permission_granted">許可されました。操作を繰り返してください。</string>
+    <string name="appintro_layers_description"> スクリーンの右端からスワイプ(もしくはアクションバーのレイヤー選択アイコンをクリック)して<i>レイヤードロワー</i>を呼び出します。
+\n
+\nここでは地図サービスを切り替えたりmマップ上の表示情報を有効化/無効化できます。 </string>
+    <string name="appintro_welcome_description">これはIngressプレイヤーの定番ツールのモバイル版です。
+\n
+\n Ingress Intel Total Conversion (IITC)は、公式インテルマップのアドオンとして動作します。
+\n
+\nIITCはハードウェアアクセラレータを活用して効率を上げ、多様なプラグインを使用して機能拡張する事で、インテルマップの作業を完全に変更します。</string>
 </resources>
