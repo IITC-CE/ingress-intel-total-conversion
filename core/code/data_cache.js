@@ -24,13 +24,11 @@ window.DataCache = function() {
 
 }
 
-window.DataCache.prototype.store = function (qk, data, freshTime) {
+window.DataCache.prototype.store = function (qk, data) {
   this.remove(qk);
 
   var time = new Date().getTime();
-
-  if (freshTime===undefined) freshTime = this.REQUEST_CACHE_FRESH_AGE*1000;
-  var expire = time + freshTime;
+  var expire = time + this.REQUEST_CACHE_FRESH_AGE * 1000;
 
   var dataStr = JSON.stringify(data);
 
