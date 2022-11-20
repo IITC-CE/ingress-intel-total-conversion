@@ -2,7 +2,7 @@
 // @author         Perringaiden
 // @name           IITC plugin: Machina Tools
 // @category       Misc
-// @version        0.1
+// @version        0.2
 // @description    Machina investigation tools
 // @id             misc-wolf-machina
 // @updateURL      https://bitbucket.org/perringaiden/iitc/raw/master/iitc-plugin-wolf-machina.meta.js
