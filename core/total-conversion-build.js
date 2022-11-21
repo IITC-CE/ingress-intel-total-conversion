@@ -155,6 +155,7 @@ window.TEAM_MAC = 3;
 window.TEAM_TO_CSS = ['none', 'res', 'enl', 'mac'];
 window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened', 'U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅'];
 window.TEAM_CODES = ['N', 'R', 'E', 'M'];
+window.TEAM_CODENAMES = ['NEUTRAL', 'RESISTANCE', 'ENLIGHTENED', 'MACHINA'];
 
 window.TEAM_NAME_NONE = window.TEAM_NAMES[window.TEAM_NONE];
 window.TEAM_NAME_RES = window.TEAM_NAMES[window.TEAM_RES];

@@ -11,7 +11,7 @@ window.getTeam = function (details) {
 };
 
 window.teamStringToId = function (teamStr) {
-  var teamIndex = window.TEAM_NAMES.indexOf(teamStr);
+  var teamIndex = window.TEAM_CODENAMES.indexOf(teamStr);
   if (teamIndex >= 0) return teamIndex;
   teamIndex = window.TEAM_CODES.indexOf(teamStr);
   if (teamIndex >= 0) return teamIndex;
