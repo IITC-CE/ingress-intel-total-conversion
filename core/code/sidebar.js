@@ -63,9 +63,9 @@ window.setupPlayerStat = function () {
 
 
   var t = 'Level:\t' + level + '\n'
-        + 'XM:\t' + PLAYER.energy + ' / ' + xmMax + '\n'
+        + 'XM:\t' + digits(PLAYER.energy) + ' / ' + digits(xmMax) + '\n'
         + 'AP:\t' + digits(ap) + '\n'
-        + (nextLvlAp > 0 ? 'level up in:\t' + lvlUpAp + ' AP' : 'Maximum level reached(!)')
+        + (nextLvlAp > 0 ? 'Level up in:\t' + lvlUpAp + ' AP' : 'Maximum level reached(!)')
         + '\nInvites:\t'+PLAYER.available_invites
         + '\n\nNote: your player stats can only be updated by a full reload (F5)';
 
