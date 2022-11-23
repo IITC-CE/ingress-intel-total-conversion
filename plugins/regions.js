@@ -131,11 +131,16 @@ window.plugin.regions.d2xy = function(n, d) {
   return xy;
 }
 
+// using some old search, because in actual version the it's broken,
+// for example "NR02-JULIET-12" returns NR02-JULIET-14 and etc.
+// source - https://github.com/IITC-CE/ingress-intel-total-conversion/blob/a98809ccd51c223735553faa6e4d09ac2d44718c/plugins/regions.user.js
 window.plugin.regions.getSearchResult = function(match) {
   var faceId = window.plugin.regions.FACE_NAMES.indexOf(match[1]);
   var id1 = parseInt(match[2]);
   var codeWordId = window.plugin.regions.CODE_WORDS.indexOf(match[3]);
   var id2 = match[4] === undefined ? undefined : parseInt(match[4]);
+
+  var result = {};
 
   if(faceId === -1 || id1 < 1 && id1 > 16 || codeWordId === -1 || id2 < 0 || id2 > 15) return;
 
@@ -147,34 +152,52 @@ window.plugin.regions.getSearchResult = function(match) {
   var regionI = id1-1;
   var regionJ = codeWordId;
 
-  var result = {}, level;
+  // the final 2 bits of I and J are tricky - easiest way is to try all 16 cells given the 4 bits of I/J we have so far...
 
-  if(id2 === undefined) {
-    result.description = 'Regional score cells (cluster of 16 cells)';
+  if(id2 === undefined) { // level 4 cell
+    // as in the name-construction above, for odd numbered faces, the I and J need swapping
+    var cell = (faceId == 1 || faceId == 3 || faceId == 5) ?
+      S2.S2Cell.FromFaceIJ(faceId, [regionJ,regionI], 4) :
+      S2.S2Cell.FromFaceIJ(faceId, [regionI,regionJ], 4) ;
+    result.title = window.plugin.regions.FACE_NAMES[faceId] + zeroPad(id1,2) + '-' + window.plugin.regions.CODE_WORDS[codeWordId];
+
+    var corners = cell.getCornerLatLngs();
+    result.layer = L.geodesicPolygon(corners, { fill: false, color: 'red', clickable: false });
+
+    result.bounds = L.latLngBounds(corners);
     result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
-    level = 4;
-  } else {
-    result.description = 'Regional score cell';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@');
-    level = 6;
-
-    var xy = window.plugin.regions.d2xy(4, id2);
-    regionI = (regionI << 2) + xy[0];
-    regionJ = (regionJ << 2) + xy[1];
+    result.description = 'Regional score cells (cluster of 16 cells)'
+    return result;
   }
 
-  // as in the name-construction above, for odd numbered faces, the I and J need swapping
-  var cell = (faceId % 2 == 1)
-    ? S2.S2Cell.FromFaceIJ(faceId, [regionJ,regionI], level)
-    : S2.S2Cell.FromFaceIJ(faceId, [regionI,regionJ], level);
+  for(var i=0; i<4; i++) {
+    for(var j=0; j<4; j++) {
 
-  var corners = cell.getCornerLatLngs();
+      var cell = S2.S2Cell.FromFaceIJ(faceId, [regionI*4+i,regionJ*4+j], 6);
 
-  result.title = window.plugin.regions.regionName(cell);
-  result.layer = L.geodesicPolygon(corners, { fill: false, color: 'red', interactive: false });
-  result.bounds = L.latLngBounds(corners);
+      var facequads = cell.getFaceAndQuads();
+      var number = facequads[1][4]*4+facequads[1][5];
 
-  return result;
+      if (number == id2) {
+        // we have a match!
+
+        // as in the name-construction above, for odd numbered faces, the I and J need swapping
+        if (cell.face == 1 || cell.face == 3 || cell.face == 5) {
+          cell = S2.S2Cell.FromFaceIJ ( cell.face, [cell.ij[1], cell.ij[0]], cell.level );
+        }
+
+        result.title = window.plugin.regions.FACE_NAMES[faceId]+zeroPad(id1,2)+'-'+window.plugin.regions.CODE_WORDS[codeWordId]+'-'+zeroPad(id2,2);
+        var corners = cell.getCornerLatLngs();
+        result.layer = L.geodesicPolygon(corners, { fill: false, color: 'red', clickable: false });
+        result.bounds = L.latLngBounds(corners);
+        result.icon ='data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@');
+        result.description = 'Regional score cell';
+        return result;
+      }
+    }
+  }
+
+  console.error('thought we had a region cell search match - but failed to find it!');
 }
 
 window.plugin.regions.update = function() {
