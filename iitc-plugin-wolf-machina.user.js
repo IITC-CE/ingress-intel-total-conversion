@@ -2,7 +2,7 @@
 // @name           IITC plugin: Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.4
+// @version        0.5
 // @description    Machina investigation tools
 // @id             misc-wolf-machina
 // @updateURL      https://bitbucket.org/perringaiden/iitc/raw/master/iitc-plugin-wolf-machina.meta.js
@@ -143,7 +143,8 @@ function wrapper(plugin_info) {
 
             rc.children.push({
                 childGuid: ld.dGuid,
-                linkTime: l.options.timestamp
+                linkTime: l.options.timestamp,
+                length: L.latLng(ld.oLatE6 / 1E6, ld.oLngE6 / 1E6).distanceTo([ld.dLatE6 / 1E6, ld.dLngE6 / 1E6])
             });
         });
 
@@ -211,7 +212,15 @@ function wrapper(plugin_info) {
                     let childPortal = clusterData.portals[child.childGuid];
 
                     if (childPortal != undefined) {
-                        rc += '<li>' + new Date(child.linkTime).toUTCString() + ' link to <a onclick="window.zoomToAndShowPortal(\'' + child.childGuid + '\', [' + childPortal.latlng + ']);" title="' + childPortal.name + '">' + childPortal.name + '</a>(' + childPortal.level + ')</li>';
+                        let lengthDescription;
+
+                        if (child.length < 100000) {
+                            lengthDescription = digits(Math.round(child.length)) + 'm';
+                        } else {
+                            lengthDescription = digits(Math.round(child.length / 1000)) + 'km';
+                        }
+
+                        rc += '<li>' + new Date(child.linkTime).toUTCString() + ' link to <a onclick="window.zoomToAndShowPortal(\'' + child.childGuid + '\', [' + childPortal.latlng + ']);" title="' + childPortal.name + '">' + childPortal.name + '</a>(' + childPortal.level + ') - ' + lengthDescription + '</li>';
                     } else {
                         rc += '<li>' + new Date(child.linkTime).toUTCString() + ' link to UNKNOWN</li>';
                     }
