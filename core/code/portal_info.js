@@ -56,7 +56,7 @@ window.getPortalRange = function(d) {
   });
 
   var range = {
-    base: d.team === 'M' ? window.LINK_RANGE_MAC[d.level] : 160*Math.pow(getPortalLevel(d), 4),
+    base: d.team === 'M' ? window.LINK_RANGE_MAC[d.level] : 160 * Math.pow(window.getPortalLevel(d), 4),
     boost: getLinkAmpRangeBoost(d)
   };
 
