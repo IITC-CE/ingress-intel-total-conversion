@@ -74,6 +74,8 @@ def fill_meta(source, plugin_name, dist_path):
         append_line('downloadURL', path + '.user.js')
 
     if keys.isdisjoint({'match', 'include'}):
+        if isinstance(settings.match, str):
+            settings.match = [settings.match]
         for m in settings.match:
             append_line('match', m)
 
