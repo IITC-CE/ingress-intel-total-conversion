@@ -20,6 +20,8 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep class androidx.appcompat.widget.SearchView { *; }
+
 -keepclassmembers class * extends android.webkit.WebChromeClient{
     public void openFileChooser(...);
 }
