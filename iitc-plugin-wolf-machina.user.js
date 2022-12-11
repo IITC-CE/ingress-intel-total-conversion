@@ -2,7 +2,7 @@
 // @name           IITC plugin: Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.5
+// @version        0.6
 // @description    Machina investigation tools
 // @id             misc-wolf-machina
 // @updateURL      https://bitbucket.org/perringaiden/iitc/raw/master/iitc-plugin-wolf-machina.meta.js
@@ -17,19 +17,19 @@ function wrapper(plugin_info) {
 
     // use own namespace for plugin
     window.plugin.wolfMachina = function () { };
-    let wm = window.plugin.wolfMachina;
+    var wm = window.plugin.wolfMachina;
 
     window.plugin.wolfMachina.findParent = function (portalGuid) {
         // Get the portal's data.
-        let parent = undefined;
+        var parent = undefined;
 
 
         if (portalGuid !== 'undefined') {
 
-            let linkGuids = getPortalLinks(portalGuid);
+            var linkGuids = getPortalLinks(portalGuid);
             $.each(linkGuids.in, function (i, lguid) {
-                let l = window.links[lguid];
-                let ld = l.options.data;
+                var l = window.links[lguid];
+                var ld = l.options.data;
 
                 if (ld.dGuid == portalGuid) {
                     parent = {};
@@ -47,7 +47,7 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.wolfMachina.goToParent = function (portalGuid) {
-        let parent;
+        var parent;
 
 
         parent = window.plugin.wolfMachina.findParent(portalGuid);
@@ -64,8 +64,8 @@ function wrapper(plugin_info) {
     };
 
     window.plugin.wolfMachina.findSeed = function (portalGuid) {
-        let parent = undefined;
-        let portal = window.portals[portalGuid];
+        var parent = undefined;
+        var portal = window.portals[portalGuid];
 
 
         if (portal != undefined) {
@@ -78,7 +78,7 @@ function wrapper(plugin_info) {
             parent.lng = portal.options.data.lngE6 / 1E6;
 
             while (portalGuid != undefined) {
-                let newParent;
+                var newParent;
 
                 newParent = window.plugin.wolfMachina.findParent(portalGuid);
 
@@ -95,7 +95,7 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wolfMachina.goToSeed = function (portalGuid) {
-        let seed;
+        var seed;
 
         seed = window.plugin.wolfMachina.findSeed(portalGuid)
 
@@ -123,8 +123,8 @@ function wrapper(plugin_info) {
     */
 
     window.plugin.wolfMachina.gatherMachinaPortalDetail = function (portalGuid, depth) {
-        let rc = {};
-        let portal = window.portals[portalGuid];
+        var rc = {};
+        var portal = window.portals[portalGuid];
 
 
         rc.children = [];
@@ -134,12 +134,12 @@ function wrapper(plugin_info) {
         rc.level = portal.options.data.level;
         rc.name = portal.options.data.title;
 
-        let linkGuids = getPortalLinks(portalGuid);
+        var linkGuids = getPortalLinks(portalGuid);
 
 
         $.each(linkGuids.out, function (i, lguid) {
-            let l = window.links[lguid];
-            let ld = l.options.data;
+            var l = window.links[lguid];
+            var ld = l.options.data;
 
             rc.children.push({
                 childGuid: ld.dGuid,
@@ -154,10 +154,10 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wolfMachina.gatherCluster = function (portalGuid) {
-        let rc = {};
-        let processingQueue = [];
-        let seed = wm.findSeed(portalGuid);
-        let curPortal = undefined;
+        var rc = {};
+        var processingQueue = [];
+        var seed = wm.findSeed(portalGuid);
+        var curPortal = undefined;
 
 
         if (seed != undefined) {
@@ -196,23 +196,23 @@ function wrapper(plugin_info) {
 
 
     window.plugin.wolfMachina.clusterDisplayString = function (clusterData) {
-        let rc = '';
+        var rc = '';
 
 
         rc += '<div>';
 
-        for (const guid in clusterData.portals) {
-            let portal = clusterData.portals[guid];
+        for (var guid in clusterData.portals) {
+            var portal = clusterData.portals[guid];
 
             rc += 'Portal: <a onclick="window.zoomToAndShowPortal(\'' + guid + '\', [' + portal.latlng + ']);" title="' + portal.name + '">' + portal.name + '</a>(' + portal.level + ') [Depth: ' + portal.depth + ']<br/>';
             if (portal.children.length > 0) {
                 rc += '<ul>'
 
                 portal.children.forEach(child => {
-                    let childPortal = clusterData.portals[child.childGuid];
+                    var childPortal = clusterData.portals[child.childGuid];
 
                     if (childPortal != undefined) {
-                        let lengthDescription;
+                        var lengthDescription;
 
                         if (child.length < 100000) {
                             lengthDescription = digits(Math.round(child.length)) + 'm';
@@ -238,10 +238,10 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wolfMachina.displayCluster = function (portalGuid) {
-        let clusterData = wm.gatherCluster(portalGuid);
+        var clusterData = wm.gatherCluster(portalGuid);
 
         if (clusterData != undefined) {
-            let html = '';
+            var html = '';
 
             html += '<div id="machina-cluster">';
             html += wm.clusterDisplayString(clusterData);
@@ -265,7 +265,7 @@ function wrapper(plugin_info) {
     }
 
     window.plugin.wolfMachina.onPortalDetailsUpdated = function () {
-        let portalData;
+        var portalData;
 
         // If the portal was cleared then exit.
         if (window.selectedPortal === null) return;
@@ -284,7 +284,7 @@ function wrapper(plugin_info) {
     };
 
 
-    let setup = function () {
+    var setup = function () {
         window.addHook('portalDetailsUpdated', window.plugin.wolfMachina.onPortalDetailsUpdated);
     }
 
@@ -295,8 +295,8 @@ function wrapper(plugin_info) {
     if (window.iitcLoaded && typeof setup === 'function') setup();
 } // wrapper end
 // inject code into site context
-let script = document.createElement('script');
-let info = {};
+var script = document.createElement('script');
+var info = {};
 if (typeof GM_info !== 'undefined' && GM_info && GM_info.script) info.script = {
     version: GM_info.script.version,
     name: GM_info.script.name,
