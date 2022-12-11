@@ -134,6 +134,17 @@ function wrapper(plugin_info) {
         rc.level = portal.options.data.level;
         rc.name = portal.options.data.title;
 
+        /* 
+        Since Machina portal levels are defined by their resonator
+        levels not the sum total of their resonators, find the 
+        highest level resonator.
+        */
+        for (var resonator in portal.options.data.resonators) {
+            if (rc.level < portal.options.data.resonators[resonator].level) {
+                rc.level = portal.options.data.resonators[resonator].level;
+            };
+        };
+
         var linkGuids = getPortalLinks(portalGuid);
 
 
