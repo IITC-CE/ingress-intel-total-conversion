@@ -1443,3 +1443,11 @@ svg.icon-button {
 .ui-dialog-aboutIITC .plugin-error {
   text-decoration: line-through;
 }
+
+.ui-dialog-non-standard-intel .ui-dialog-buttonset button:first-child {
+  display: none;
+}
+
+.ui-dialog-non-standard-intel .ui-dialog-buttonset button:nth-child(2) {
+  float: left;
+}
