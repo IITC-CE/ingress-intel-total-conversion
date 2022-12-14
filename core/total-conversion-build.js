@@ -133,6 +133,7 @@ window.NOMINATIM = '//nominatim.openstreetmap.org/search?format=json&polygon_geo
 // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
 window.RESO_NRG = [0, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000];
 window.HACK_RANGE = 40; // in meters, max. distance from portal to be able to access it
+window.LINK_RANGE_MAC = [0, 0, 500, 750, 1000, 1500, 2000, 3000, 5000, 5000]; // in meters
 window.OCTANTS = ['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'];
 window.OCTANTS_ARROW = ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'];
 window.DESTROY_RESONATOR = 75; //AP for destroying portal
