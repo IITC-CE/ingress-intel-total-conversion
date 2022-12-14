@@ -2,7 +2,7 @@
 // @name           IITC plugin: Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.6
+// @version        0.7
 // @description    Machina investigation tools
 // @id             misc-wolf-machina
 // @updateURL      https://bitbucket.org/perringaiden/iitc/raw/master/iitc-plugin-wolf-machina.meta.js
@@ -18,6 +18,21 @@ function wrapper(plugin_info) {
     // use own namespace for plugin
     window.plugin.wolfMachina = function () { };
     var wm = window.plugin.wolfMachina;
+
+    window.plugin.wolfMachina.portalRanges = {
+        1: 0,
+        2: 500,
+        3: 750,
+        4: 1000,
+        5: 1500,
+        6: 2000,
+        7: 3000,
+        8: 5000
+    };
+
+    // Provides a circle object storage array for adding and
+    // removing specific circles from layers.  Keyed by GUID.
+    window.plugin.wolfMachina.portalCircles = {};
 
     window.plugin.wolfMachina.findParent = function (portalGuid) {
         // Get the portal's data.
@@ -204,8 +219,6 @@ function wrapper(plugin_info) {
         return rc;
     }
 
-
-
     window.plugin.wolfMachina.clusterDisplayString = function (clusterData) {
         var rc = '';
 
@@ -229,6 +242,10 @@ function wrapper(plugin_info) {
                             lengthDescription = digits(Math.round(child.length)) + 'm';
                         } else {
                             lengthDescription = digits(Math.round(child.length / 1000)) + 'km';
+                        }
+
+                        if (window.plugin.wolfMachina.portalRanges[portal.level] < child.length) {
+                            lengthDescription += " (EXCEEDS EXPECTED MAX)";
                         }
 
                         rc += '<li>' + new Date(child.linkTime).toUTCString() + ' link to <a onclick="window.zoomToAndShowPortal(\'' + child.childGuid + '\', [' + childPortal.latlng + ']);" title="' + childPortal.name + '">' + childPortal.name + '</a>(' + childPortal.level + ') - ' + lengthDescription + '</li>';
@@ -294,9 +311,116 @@ function wrapper(plugin_info) {
         }
     };
 
+    /**
+     * Indicates whether portals are displayed at the current level.  Simply using zoom level
+     * does not factor in other tools that adjust display capabilities.
+     */
+    window.plugin.wolfMachina.zoomLevelHasPortals = function () {
+        return window.getMapZoomTileParameters(window.getDataZoomForMapZoom(window.map.getZoom())).hasPortals;
+    };
 
+    /**
+     * Draw the level-up link radius for a specific portal.
+     */
+    window.plugin.wolfMachina.drawPortalExclusion = function (guid) {
+        // Gather the location of the portal, and generate a 20m
+        // radius red circle centered on the lat/lng of the portal.
+        var d = window.portals[guid];
+        var coo = d._latlng;
+        var latlng = new L.LatLng(coo.lat, coo.lng);
+        var optCircle = { color: 'gray', opacity: 0.7, fillColor: 'red', fillOpacity: 0.1, weight: 1, clickable: false };
+        var range = window.plugin.wolfMachina.portalRanges[Math.min(d.options.level + 1, 8)];
+        var circle = new L.Circle(latlng, range, optCircle);
+
+
+        // Add the circle to the circle display layer.
+        circle.addTo(window.plugin.wolfMachina.circleDisplayLayer);
+
+        // Store a reference to the circle to allow removal.
+        window.plugin.wolfMachina.portalCircles[guid] = circle;
+    }
+
+    /**
+     * Removes the level-up link radius for a specific portal.
+     */
+    window.plugin.wolfMachina.removePortalExclusion = function (guid) {
+        var previousLayer = window.plugin.wolfMachina.portalCircles[guid];
+
+
+        if (previousLayer) {
+            // Remove the circle from the layer.
+            window.plugin.wolfMachina.circleDisplayLayer.removeLayer(previousLayer);
+
+            // Delete the circle from storage, so we don't build up
+            // a big cache, and we don't have complex checking on adds.
+            delete window.plugin.wolfMachina.portalCircles[guid];
+        }
+    }
+
+    /**
+     * Reacts to a portal being added or removed.
+     */
+    window.plugin.wolfMachina.portalAdded = function (data) {
+        // Draw the circle if the team of the portal is Machina.
+        data.portal.on('add', function () {
+            debugger;
+            if (TEAM_NAMES[this.options.team] != undefined) {
+                if (TEAM_NAMES[this.options.team] == TEAM_NAME_MAC) {
+                    window.plugin.wolfMachina.drawPortalExclusion(this.options.guid);
+                }
+            }
+        });
+
+        // Remove all circles if they exist, since the team may have changed.
+        data.portal.on('remove', function () {
+            window.plugin.wolfMachina.removePortalExclusion(this.options.guid);
+        });
+    }
+
+    /**
+     * Hides or shows the circle display layer as requested.
+     */
+    window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius = function () {
+
+        if (window.plugin.wolfMachina.zoomLevelHasPortals()) {
+            // Add the circle layer back to the display layer if necessary, and remove the disabled mark.
+            if (!window.plugin.wolfMachina.displayLayer.hasLayer(window.plugin.wolfMachina.circleDisplayLayer)) {
+                window.plugin.wolfMachina.displayLayer.addLayer(window.plugin.wolfMachina.circleDisplayLayer);
+                $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")').parent('label').removeClass('disabled').attr('title', '');
+            }
+        } else {
+            // Remove the circle layer from the display layer if necessary, and add the disabled mark.
+            if (window.plugin.wolfMachina.displayLayer.hasLayer(window.plugin.wolfMachina.circleDisplayLayer)) {
+                window.plugin.wolfMachina.displayLayer.removeLayer(window.plugin.wolfMachina.circleDisplayLayer);
+                $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+            }
+        };
+    }
     var setup = function () {
         window.addHook('portalDetailsUpdated', window.plugin.wolfMachina.onPortalDetailsUpdated);
+
+        // This layer is added to the layer chooser, to be toggled on/off, regardless of zoom.
+        window.plugin.wolfMachina.displayLayer = new L.LayerGroup();
+
+        // This layer is added into the above layer, and removed from it when we zoom out too far.
+        window.plugin.wolfMachina.circleDisplayLayer = new L.LayerGroup();
+
+        // Initially add the circle display layer into base display layer.  We will trigger an assessment below.
+        window.plugin.wolfMachina.displayLayer.addLayer(window.plugin.wolfMachina.circleDisplayLayer);
+
+        // Add the base layer to the main window.
+        window.addLayerGroup('Machina Level Up Link Radius', window.plugin.wolfMachina.displayLayer, false);
+
+        // Hook the portalAdded event so that we can adjust circles.
+        window.addHook('portalAdded', window.plugin.wolfMachina.portalAdded);
+
+        // Add a hook to trigger the showOrHide method when the map finishes zooming or reloads.
+        map.on('zoomend', window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius);
+        map.on('loading', window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius);
+        map.on('load', window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius);
+
+        // Trigger an initial assessment of displaying the circleDisplayLayer.
+        window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius();
     }
 
     setup.info = plugin_info; //add the script info data to the function as a property
