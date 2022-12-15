@@ -1,7 +1,9 @@
-/// SETUP /////////////////////////////////////////////////////////////
+// SETUP /////////////////////////////////////////////////////////////
 // these functions set up specific areas after the boot function
 // created a basic framework. All of these functions should only ever
 // be run once.
+
+/* global L, dialog -- eslint */
 
 window.setupTooltips = function (element) {
   element = element || $(document);
@@ -67,6 +69,25 @@ function setupIngressMarkers () {
   L.divIcon.coloredSvg = function (color, options) {
     return new L.DivIcon.ColoredSvg(color, options);
   };
+}
+
+function checkingIntelURL() {
+  if (window.location.hostname !== 'intel.ingress.com' && localStorage['pass-checking-intel-url'] !== 'true') {
+    dialog({
+      title: 'IITC Warning',
+      html: '<p>You are running IITC on a non-standard Intel domain. Correct behavior is not guaranteed. It is recommended to use the IITC at <a href="https://intel.ingress.com">intel.ingress.com</a></p>',
+      dialogClass: 'ui-dialog-non-standard-intel',
+      buttons: {
+        "Don't remind me": function () {
+          $(this).dialog('close');
+          localStorage['pass-checking-intel-url'] = true;
+        },
+        Dismiss: function () {
+          $(this).dialog('close');
+        },
+      },
+    });
+  }
 }
 
 /*
@@ -195,6 +216,7 @@ function boot() {
   var loadPlugins = prepPluginsToLoad();
   loadPlugins('boot');
 
+  checkingIntelURL();
   setupIngressMarkers();
   window.extractFromStock();
   window.setupIdle();
