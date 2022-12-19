@@ -70,7 +70,7 @@ jobs:
         if: ${{ env.TG_BOT_TOKEN != ''}}
         run: |
           TEXT="🤖 *New IITC Mobile ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
-          APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"
+          APIPARAMS="-F parse_mode=MarkdownV2 -F disable_notification=true -F chat_id=${{ env.TG_CHAT_ID }} -F is_topic_message=true -F message_thread_id=${{ env.TG_THREAD_ID }} https://api.telegram.org/bot${{ env.TG_BOT_TOKEN }}/sendDocument"
           curl -s -F document=@"${{ env.ARTIFACT_IITC_MOBILE }}" -F caption="$TEXT" $APIPARAMS
 
       - name: Save PR metadata
