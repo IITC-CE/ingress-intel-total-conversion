@@ -23,6 +23,7 @@ plugin_info.pluginId = '@plugin_id@';
 
 """
 
+
 setup = """
 setup.info = plugin_info; //add the script info data to the function as a property
 if(!window.bootPlugins) window.bootPlugins = [];
