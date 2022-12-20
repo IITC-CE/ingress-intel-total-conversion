@@ -15,7 +15,6 @@ It is available for desktop browsers, such as Firefox and Chrome, and as a mobil
 
 **[Website](https://iitc.app/) | [Documentation](https://iitc-ce.rtfd.io/) | [Telegram channel](https://t.me/iitc_news)**
 
-
 ## Users
 
 Install IITC: https://iitc.app/
