@@ -32,7 +32,19 @@ function wrapper(plugin_info) {
 
     // Provides a circle object storage array for adding and
     // removing specific circles from layers.  Keyed by GUID.
-    window.plugin.wolfMachina.portalCircles = {};
+    window.plugin.wolfMachina.portalCircles = {}; // usual circles
+    window.plugin.wolfMachina.conflictZones = {}; // LGeo circles
+    window.plugin.wolfMachina.optConflictZone = {
+      color: 'red',
+      opacity: 0.7,
+      fillColor: 'red',
+      fillOpacity: 0.1,
+      weight: 3,
+      interactive: false,
+      clickable: false,
+      parts: 144 };
+
+//    window.plugin.wolfMachina.confArea = {};
 
     window.plugin.wolfMachina.findParent = function (portalGuid) {
         // Get the portal's data.
@@ -308,6 +320,9 @@ function wrapper(plugin_info) {
             $('.linkdetails').append('<aside><a onclick="window.plugin.wolfMachina.displayCluster(\'' + window.selectedPortal + '\')" title="Display Machina Cluster">Cluster Details</a></aside>');
             // Add the 'trace children' button.
 
+            // Add this portal's conflict zone to the conflict area
+            window.plugin.wolfMachina.drawPortalExclusion(window.selectedPortal);
+            window.plugin.wolfMachina.updateConflictArea();
         }
     };
 
@@ -318,8 +333,28 @@ function wrapper(plugin_info) {
     window.plugin.wolfMachina.zoomLevelHasPortals = function () {
         return window.getMapZoomTileParameters(window.getDataZoomForMapZoom(window.map.getZoom())).hasPortals;
     };
-
     /**
+      *Create a cumulative multi polygon from conflict zones aroung MAC portals
+     */
+
+    window.plugin.wolfMachina.addConflictZone = function (zone) {
+      if (!window.plugin.wolfMachina.conflictArea) {
+        window.plugin.wolfMachina.conflictArea = zone.toGeoJSON();
+      } else {
+        window.plugin.wolfMachina.conflictArea = turf.union(window.plugin.wolfMachina.conflictArea, zone.toGeoJSON());
+      }
+    };
+
+
+    window.plugin.wolfMachina.updateConflictArea = function () {
+       if (window.plugin.wolfMachina.conflictAreaLast) {
+         map.removeLayer(window.plugin.wolfMachina.conflictAreaLast);
+       };
+       window.plugin.wolfMachina.conflictAreaLast = L.geoJson(window.plugin.wolfMachina.conflictArea);
+       window.plugin.wolfMachina.conflictAreaLayer.addLayer(window.plugin.wolfMachina.conflictAreaLast);
+       window.plugin.wolfMachina.conflictAreaLast.setStyle(window.plugin.wolfMachina.optConflictZone);
+    };
+   /**
      * Draw the level-up link radius for a specific portal.
      */
     window.plugin.wolfMachina.drawPortalExclusion = function (guid) {
@@ -329,15 +364,25 @@ function wrapper(plugin_info) {
         var coo = d._latlng;
         var latlng = new L.LatLng(coo.lat, coo.lng);
         var optCircle = { color: 'gray', opacity: 0.7, fillColor: 'red', fillOpacity: 0.1, weight: 1, clickable: false };
-        var range = window.plugin.wolfMachina.portalRanges[Math.min(d.options.level + 1, 8)];
+       debugger;
+        if (d.options.level === 0) {
+          var range = 500;          
+        } else {
+          var range = window.plugin.wolfMachina.portalRanges[Math.min(d.options.level + 1, 8)];
         var circle = new L.Circle(latlng, range, optCircle);
-
+        };
+        var conflictZone = new LGeo.circle(latlng, range, window.plugin.wolfMachina.optConflictZone);
 
         // Add the circle to the circle display layer.
-        circle.addTo(window.plugin.wolfMachina.circleDisplayLayer);
-
-        // Store a reference to the circle to allow removal.
+       if (circle) {
+         circle.addTo(window.plugin.wolfMachina.circleDisplayLayer);
         window.plugin.wolfMachina.portalCircles[guid] = circle;
+        };
+        // Store a reference to the circle to allow removal.
+        window.plugin.wolfMachina.portalCircles[guid] = circle; 
+        // Store a reference to the zone to allow recreation (not implemented yet)
+        // window.plugin.wolfMachina.conflictZones[guid] = conflictZone;
+        window.plugin.wolfMachina.addConflictZone(conflictZone);
     }
 
     /**
@@ -364,11 +409,11 @@ function wrapper(plugin_info) {
         // Draw the circle if the team of the portal is Machina.
         data.portal.on('add', function () {
             debugger;
-            if (TEAM_NAMES[this.options.team] != undefined) {
+//            if (TEAM_NAMES[this.options.team] != undefined) {
                 if (TEAM_NAMES[this.options.team] == TEAM_NAME_MAC) {
                     window.plugin.wolfMachina.drawPortalExclusion(this.options.guid);
                 }
-            }
+//            }
         });
 
         // Remove all circles if they exist, since the team may have changed.
@@ -395,24 +440,42 @@ function wrapper(plugin_info) {
                 $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
             }
         };
-    }
-    var setup = function () {
+   };
+
+    window.plugin.wolfMachina.showOrHideMachinaConflictArea = function () {
+
+      if (!window.plugin.wolfMachina.conflictLayer.hasLayer(window.plugin.wolfMachina.conflictAreaLayer)) {
+        window.plugin.wolfMachina.conflictLayer.addLayer(window.plugin.wolfMachina.conflictAreaLayer);
+        console.log('conflictAreaLayer activated');
+        $('.leaflet-control-layers-list span:contains("Machina Conflict Area)').parent('label').removeClass('disabled').attr('title', '');
+      } else {
+        window.plugin.wolfMachina.conflictLayer.removeLayer(window.plugin.wolfMachina.conflictAreaLayer);
+        console.log('conflictAreaLayer disabled');
+        $('.leaflet-control-layers-list span:contains("Machina Conflict Area")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+      }
+    };
+   var setup = function () {
         window.addHook('portalDetailsUpdated', window.plugin.wolfMachina.onPortalDetailsUpdated);
 
         // This layer is added to the layer chooser, to be toggled on/off, regardless of zoom.
         window.plugin.wolfMachina.displayLayer = new L.LayerGroup();
+        window.plugin.wolfMachina.conflictLayer = new L.LayerGroup();
 
         // This layer is added into the above layer, and removed from it when we zoom out too far.
         window.plugin.wolfMachina.circleDisplayLayer = new L.LayerGroup();
+        window.plugin.wolfMachina.conflictAreaLayer = new L.LayerGroup();
 
         // Initially add the circle display layer into base display layer.  We will trigger an assessment below.
         window.plugin.wolfMachina.displayLayer.addLayer(window.plugin.wolfMachina.circleDisplayLayer);
+        window.plugin.wolfMachina.conflictLayer.addLayer(window.plugin.wolfMachina.conflictAreaLayer);
 
         // Add the base layer to the main window.
         window.addLayerGroup('Machina Level Up Link Radius', window.plugin.wolfMachina.displayLayer, false);
+        window.addLayerGroup('Machina Conflict Area', window.plugin.wolfMachina.conflictLayer, false);
 
         // Hook the portalAdded event so that we can adjust circles.
         window.addHook('portalAdded', window.plugin.wolfMachina.portalAdded);
+        window.addHook('mapDataRefreshEnd', window.plugin.wolfMachina.updateConflictArea);
 
         // Add a hook to trigger the showOrHide method when the map finishes zooming or reloads.
         map.on('zoomend', window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius);
@@ -422,7 +485,8 @@ function wrapper(plugin_info) {
         // Trigger an initial assessment of displaying the circleDisplayLayer.
         window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius();
     }
-
+/* eslint-disable */
+/* eslint-enable */
     setup.info = plugin_info; //add the script info data to the function as a property
     if (!window.bootPlugins) window.bootPlugins = [];
     window.bootPlugins.push(setup);
