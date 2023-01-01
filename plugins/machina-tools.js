@@ -1,7 +1,7 @@
 // @name           Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.7
+// @version        0.7.0
 // @description    Machina investigation tools
 
 /* exported setup --eslint */
@@ -41,9 +41,7 @@ window.plugin.wolfMachina.findParent = function (portalGuid) {
   // Get the portal's data.
   var parent = undefined;
 
-
   if (portalGuid !== 'undefined') {
-
     var linkGuids = getPortalLinks(portalGuid);
     $.each(linkGuids.in, function (i, lguid) {
       var l = window.links[lguid];
@@ -58,7 +56,6 @@ window.plugin.wolfMachina.findParent = function (portalGuid) {
         return false;
       }
     });
-
   }
 
   return parent;
@@ -343,9 +340,8 @@ window.plugin.wolfMachina.drawPortalExclusion = function (guid) {
   // Gather the location of the portal, and generate a 20m
   // radius red circle centered on the lat/lng of the portal.
   var d = window.portals[guid];
-  var coo = d._latlng;
-  var latlng = new L.LatLng(coo.lat, coo.lng);
-  var optCircle = { color: 'gray', opacity: 0.7, fillColor: 'red', fillOpacity: 0.1, weight: 1, clickable: false };
+  var latlng = d.getLatLng();
+  var optCircle = { color: 'gray', opacity: 0.7, fillColor: 'red', fillOpacity: 0.1, weight: 1, clickable: false, interactive: false };
   var range;
 
 // debugger;
@@ -355,7 +351,7 @@ window.plugin.wolfMachina.drawPortalExclusion = function (guid) {
     range = window.plugin.wolfMachina.portalRanges[Math.min(d.options.level + 1, 8)];
     var circle = new L.Circle(latlng, range, optCircle);
   }
-  var conflictZone = new LGeo.circle(latlng, range, window.plugin.wolfMachina.optConflictZone);
+  var conflictZone = new L.geodesicCircle(latlng, range, window.plugin.wolfMachina.optConflictZone);
 
   // Add the circle to the circle display layer.
   if (circle) {
@@ -393,7 +389,7 @@ window.plugin.wolfMachina.portalAdded = function (data) {
   data.portal.on('add', function () {
 //debugger;
   // if (TEAM_NAMES[this.options.team] != undefined) {
-    if (TEAM_NAMES[this.options.team] == TEAM_NAME_MAC) {
+    if (TEAM_NAMES[this.options.team] === TEAM_NAME_MAC) {
       window.plugin.wolfMachina.drawPortalExclusion(this.options.guid);
     }
   // }
@@ -437,6 +433,8 @@ window.plugin.wolfMachina.showOrHideMachinaConflictArea = function () {
 };
 
 var setup = function () {
+  loadExternals(); // initialize leaflet-geodesy and turf-union
+
   window.addHook('portalDetailsUpdated', window.plugin.wolfMachina.onPortalDetailsUpdated);
 
   // This layer is added to the layer chooser, to be toggled on/off, regardless of zoom.
@@ -468,5 +466,12 @@ var setup = function () {
   window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius();
 };
 /* eslint-disable */
-
+function loadExternals () {
+  try {
+   '@include_raw:external/turf-union.js@';
+  } catch (e) {
+    console.error('turf-union.js loading failed');
+    throw e;
+  }
+};
 /* eslint-enable */
