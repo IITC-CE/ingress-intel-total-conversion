@@ -5,27 +5,17 @@
 // @description    Machina investigation tools
 
 /* exported setup --eslint */
-/* global L, map, dialog, getPortalLinks, portalDetail */
-// use own namespace for plugin
-window.plugin.wolfMachina = function () {};
-var wm = window.plugin.wolfMachina;
+/* global , digits, L, map, dialog, getPortalLinks, portalDetail, turf */
 
-window.plugin.wolfMachina.portalRanges = {
-  1: 0,
-  2: 500,
-  3: 750,
-  4: 1000,
-  5: 1500,
-  6: 2000,
-  7: 3000,
-  8: 5000
-};
+// use own namespace for plugin
+var machinaTools = {};
+window.plugin.machinaTools = machinaTools;
 
 // Provides a circle object storage array for adding and
 // removing specific circles from layers.  Keyed by GUID.
-window.plugin.wolfMachina.portalCircles = {}; // usual circles
-// window.plugin.wolfMachina.conflictZones = {}; // LGeo circles
-window.plugin.wolfMachina.optConflictZone = {
+machinaTools.portalCircles = {}; // usual circles
+// machinaTools.conflictZones = {}; // LGeo circles
+machinaTools.optConflictZone = {
   color: 'red',
   opacity: 0.7,
   fillColor: 'red',
@@ -35,7 +25,7 @@ window.plugin.wolfMachina.optConflictZone = {
   clickable: false,
   parts: 144,
 };
-window.plugin.wolfMachina.optCircle = {
+machinaTools.optCircle = {
   color: 'gray',
   opacity: 0.7,
   fillColor: 'red',
@@ -45,9 +35,9 @@ window.plugin.wolfMachina.optCircle = {
   interactive: false,
 };
 
-//    window.plugin.wolfMachina.confArea = {};
+//    machinaTools.confArea = {};
 
-window.plugin.wolfMachina.findParent = function (portalGuid) {
+machinaTools.findParent = function (portalGuid) {
   // Get the portal's data.
   var parent = undefined;
 
@@ -71,10 +61,10 @@ window.plugin.wolfMachina.findParent = function (portalGuid) {
   return parent;
 };
 
-window.plugin.wolfMachina.goToParent = function (portalGuid) {
+machinaTools.goToParent = function (portalGuid) {
   var parent;
 
-  parent = window.plugin.wolfMachina.findParent(portalGuid);
+  parent = machinaTools.findParent(portalGuid);
 
   if (parent !== undefined) {
     window.zoomToAndShowPortal(parent.guid, [parent.lat, parent.lng]);
@@ -82,18 +72,16 @@ window.plugin.wolfMachina.goToParent = function (portalGuid) {
     dialog({
       html: $('<div id="no-machina-parent">No Parent found.</div>'),
       title: 'Machina Tools',
-      id: 'no-machina-parent'
+      id: 'no-machina-parent',
     });
   }
 };
 
-window.plugin.wolfMachina.findSeed = function (portalGuid) {
+machinaTools.findSeed = function (portalGuid) {
   var parent = undefined;
   var portal = window.portals[portalGuid];
 
-
   if (portal !== undefined) {
-
     // Since we could be the seed, if there's no
     // parent, then we have to return the portal.
     parent = {};
@@ -104,7 +92,7 @@ window.plugin.wolfMachina.findSeed = function (portalGuid) {
     while (portalGuid !== undefined) {
       var newParent;
 
-      newParent = window.plugin.wolfMachina.findParent(portalGuid);
+      newParent = machinaTools.findParent(portalGuid);
 
       if (newParent !== undefined) {
         parent = newParent;
@@ -118,10 +106,10 @@ window.plugin.wolfMachina.findSeed = function (portalGuid) {
   return parent;
 };
 
-window.plugin.wolfMachina.goToSeed = function (portalGuid) {
+machinaTools.goToSeed = function (portalGuid) {
   var seed;
 
-  seed = window.plugin.wolfMachina.findSeed(portalGuid);
+  seed = machinaTools.findSeed(portalGuid);
 
   if (seed !== undefined) {
     window.zoomToAndShowPortal(seed.guid, [seed.lat, seed.lng]);
@@ -146,22 +134,21 @@ window.plugin.wolfMachina.goToSeed = function (portalGuid) {
 
 */
 
-window.plugin.wolfMachina.getOLatLng = function (link) {
+machinaTools.getOLatLng = function (link) {
   return L.latLng(link.oLatE6 / 1e6, link.oLngE6 / 1e6);
 };
 
-window.plugin.wolfMachina.getDLatLng = function (link) {
+machinaTools.getDLatLng = function (link) {
   return L.latLng(link.dLatE6 / 1e6, link.dLngE6 / 1e6);
 };
 
-window.plugin.wolfMachina.getLinkLength = function (link) {
-  return wm.getOLatLng(link).distanceTo([link.dLatE6 / 1e6, link.dLngE6 / 1e6]);
-}
+machinaTools.getLinkLength = function (link) {
+  return machinaTools.getOLatLng(link).distanceTo([link.dLatE6 / 1e6, link.dLngE6 / 1e6]);
+};
 
-window.plugin.wolfMachina.gatherMachinaPortalDetail = function (portalGuid, depth) {
+machinaTools.gatherMachinaPortalDetail = function (portalGuid, depth) {
   var rc = {};
   var portal = window.portals[portalGuid];
-
 
   rc.children = [];
   rc.guid = portalGuid;
@@ -183,7 +170,6 @@ window.plugin.wolfMachina.gatherMachinaPortalDetail = function (portalGuid, dept
 
   var linkGuids = getPortalLinks(portalGuid);
 
-
   $.each(linkGuids.out, function (i, lguid) {
     var l = window.links[lguid];
     var ld = l.options.data;
@@ -191,19 +177,21 @@ window.plugin.wolfMachina.gatherMachinaPortalDetail = function (portalGuid, dept
     rc.children.push({
       childGuid: ld.dGuid,
       linkTime: l.options.timestamp,
-      length: wm.getLinkLength(ld),
+      length: machinaTools.getLinkLength(ld),
     });
   });
 
-  rc.children.sort(function (a, b) {return a.linkTime - b.linkTime });
+  rc.children.sort(function (a, b) {
+    return a.linkTime - b.linkTime;
+  });
 
   return rc;
 };
 
-window.plugin.wolfMachina.gatherCluster = function (portalGuid) {
+machinaTools.gatherCluster = function (portalGuid) {
   var rc = {};
   var processingQueue = [];
-  var seed = wm.findSeed(portalGuid);
+  var seed = machinaTools.findSeed(portalGuid);
   var curPortal = undefined;
 
   if (seed !== undefined) {
@@ -211,22 +199,18 @@ window.plugin.wolfMachina.gatherCluster = function (portalGuid) {
     rc.portals = {};
 
     // Add the seed GUID to the queue.
-    processingQueue.push(
-      {guid: seed.guid,
-       depth: 0
-      }
-    );
+    processingQueue.push({ guid: seed.guid, depth: 0 });
   }
 
   curPortal = processingQueue.shift();
 
   while (curPortal !== undefined) {
-    rc.portals[curPortal.guid] = wm.gatherMachinaPortalDetail(curPortal.guid, curPortal.depth);
+    rc.portals[curPortal.guid] = machinaTools.gatherMachinaPortalDetail(curPortal.guid, curPortal.depth);
 
     rc.portals[curPortal.guid].children.forEach((element) => {
       processingQueue.push({
         guid: element.childGuid,
-        depth: curPortal.depth + 1
+        depth: curPortal.depth + 1,
       });
     });
 
@@ -237,12 +221,12 @@ window.plugin.wolfMachina.gatherCluster = function (portalGuid) {
   return rc;
 };
 
-window.plugin.wolfMachina.clusterDisplayString = function (clusterData) {
+machinaTools.clusterDisplayString = function (clusterData) {
   var rc = '';
   rc += '<div>';
   for (var guid in clusterData.portals) {
     var portal = clusterData.portals[guid];
-    rc += 'Portal: <a onclick="window.zoomToAndShowPortal(\'' + guid + '\', [' + portal.latlng + ']);" title="' + portal.name + '">';
+    rc += 'Portal: <a onclick="window.zoomToAndShowPortal(\'' + guid + "', [" + portal.latlng + ']);" title="' + portal.name + '">';
     rc += portal.name + '</a>(' + portal.level + ') [Depth: ' + portal.depth + ']<br/>';
     if (portal.children.length > 0) {
       rc += '<ul>';
@@ -256,11 +240,11 @@ window.plugin.wolfMachina.clusterDisplayString = function (clusterData) {
             lengthDescription = digits(Math.round(child.length / 1000)) + 'km';
           }
 
-          if (window.plugin.wolfMachina.portalRanges[portal.level] < child.length) {
+          if (window.LINK_RANGE_MAC[portal.level] < child.length) {
             lengthDescription += ' (EXCEEDS EXPECTED MAX)';
           }
           rc += '<li>' + new Date(child.linkTime).toUTCString() + ' link to <a onclick="window.zoomToAndShowPortal(\'';
-          rc += child.childGuid + '\', [' + childPortal.latlng + ']);" title="' + childPortal.name + '">' + childPortal.name;
+          rc += child.childGuid + "', [" + childPortal.latlng + ']);" title="' + childPortal.name + '">' + childPortal.name;
           rc += '</a>(' + childPortal.level + ') - ' + lengthDescription + '</li>';
         } else {
           rc += '<li>' + new Date(child.linkTime).toUTCString() + ' link to UNKNOWN</li>';
@@ -278,34 +262,33 @@ window.plugin.wolfMachina.clusterDisplayString = function (clusterData) {
   return rc;
 };
 
-window.plugin.wolfMachina.displayCluster = function (portalGuid) {
-  var clusterData = wm.gatherCluster(portalGuid);
+machinaTools.displayCluster = function (portalGuid) {
+  var clusterData = machinaTools.gatherCluster(portalGuid);
 
   if (clusterData !== undefined) {
     var html = '';
 
     html += '<div id="machina-cluster">';
-    html += wm.clusterDisplayString(clusterData);
+    html += machinaTools.clusterDisplayString(clusterData);
     html += '<br/><pre>' + JSON.stringify(clusterData, null, 4) + '</pre>';
     html += '</div>';
-
 
     dialog({
       html: html,
       title: 'Machina Cluster',
       id: 'machina-cluster',
-      width: 'auto'
+      width: 'auto',
     });
   } else {
     dialog({
       html: $('<div id="no-machina-cluster">No Cluster found.</div>'),
       title: 'Machina Tools',
-      id: 'no-machina-cluster'
+      id: 'no-machina-cluster',
     });
   }
 };
 
-window.plugin.wolfMachina.onPortalDetailsUpdated = function () {
+machinaTools.onPortalDetailsUpdated = function () {
   var portalData;
 
   // If the portal was cleared then exit.
@@ -314,15 +297,22 @@ window.plugin.wolfMachina.onPortalDetailsUpdated = function () {
   portalData = portalDetail.get(window.selectedPortal);
 
   if (portalData.team === 'M') {
-
     // Add the 'find Parent' button.
-    $('.linkdetails').append('<aside><a onclick="window.plugin.wolfMachina.goToParent(\'' + window.selectedPortal + '\')" title=" Find Machina Parent ">Find Parent</a></aside>');
-    $('.linkdetails').append('<aside><a onclick="window.plugin.wolfMachina.goToSeed(\'' + window.selectedPortal + '\')" title="Find Machina Seed">Find Seed</a></aside>');
-    $('.linkdetails').append('<aside><a onclick="window.plugin.wolfMachina.displayCluster(\'' + window.selectedPortal + '\')" title="Display Machina Cluster">Cluster Details</a></aside>');
+    $('.linkdetails').append(
+      '<aside><a onclick="window.plugin.machinaTools.goToParent(\'' + window.selectedPortal + '\')" title=" Find Machina Parent ">Find Parent</a></aside>'
+    );
+    $('.linkdetails').append(
+      '<aside><a onclick="window.plugin.machinaTools.goToSeed(\'' + window.selectedPortal + '\')" title="Find Machina Seed">Find Seed</a></aside>'
+    );
+    $('.linkdetails').append(
+      '<aside><a onclick="window.plugin.machinaTools.displayCluster(\'' +
+        window.selectedPortal +
+        '\')" title="Display Machina Cluster">Cluster Details</a></aside>'
+    );
     // Add the 'trace children' button.
 
     // Add this portal's conflict zone to the conflict area
-    window.plugin.wolfMachina.drawPortalExclusion(window.selectedPortal);
+    machinaTools.drawPortalExclusion(window.selectedPortal);
   }
 };
 
@@ -330,151 +320,153 @@ window.plugin.wolfMachina.onPortalDetailsUpdated = function () {
  * Indicates whether portals are displayed at the current level.  Simply using zoom level
  * does not factor in other tools that adjust display capabilities.
  */
-window.plugin.wolfMachina.zoomLevelHasPortals = function () {
+machinaTools.zoomLevelHasPortals = function () {
   return window.getMapZoomTileParameters(window.getDataZoomForMapZoom(window.map.getZoom())).hasPortals;
 };
 
-
-window.plugin.wolfMachina.updateConflictArea = function () {
-  if (window.plugin.wolfMachina.conflictAreaLast) {
-    window.plugin.wolfMachina.conflictAreaLayer.removeLayer(window.plugin.wolfMachina.conflictAreaLast);
+machinaTools.updateConflictArea = function () {
+  if (machinaTools.conflictAreaLast) {
+    machinaTools.conflictAreaLayer.removeLayer(machinaTools.conflictAreaLast);
   }
-  window.plugin.wolfMachina.conflictAreaLast = L.geoJson(window.plugin.wolfMachina.conflictArea);
-  window.plugin.wolfMachina.conflictAreaLayer.addLayer(window.plugin.wolfMachina.conflictAreaLast);
-  window.plugin.wolfMachina.conflictAreaLast.setStyle(window.plugin.wolfMachina.optConflictZone);
+  machinaTools.conflictAreaLast = L.geoJson(machinaTools.conflictArea);
+  machinaTools.conflictAreaLayer.addLayer(machinaTools.conflictAreaLast);
+  machinaTools.conflictAreaLast.setStyle(machinaTools.optConflictZone);
 };
 
-window.plugin.wolfMachina.addPortalCircle = function (guid, circle) {
-  window.plugin.wolfMachina.removePortalExclusion(guid);
-  circle.addTo(window.plugin.wolfMachina.circleDisplayLayer);
+machinaTools.addPortalCircle = function (guid, circle) {
+  machinaTools.removePortalExclusion(guid);
+  circle.addTo(machinaTools.circleDisplayLayer);
   // Store a reference to the circle to allow removal.
-  window.plugin.wolfMachina.portalCircles[guid] = circle;
-}
+  machinaTools.portalCircles[guid] = circle;
+};
 
-window.plugin.wolfMachina.drawExclusion = function (guid, level, latlng, placeholder) {
-  var range = window.plugin.wolfMachina.portalRanges[Math.min(level + 1, 8)];
+machinaTools.drawExclusion = function (guid, level, latlng, placeholder) {
+  var range = window.LINK_RANGE_MAC[level + 1];
 
   // add circles only when handling real portals
   if (!placeholder) {
-    window.plugin.wolfMachina.addPortalCircle(guid, new L.Circle(latlng, range, wm.optCircle));
+    machinaTools.addPortalCircle(guid, new L.Circle(latlng, range, machinaTools.optCircle));
   }
 
-  let zone = new L.geodesicCircle(latlng, range, window.plugin.wolfMachina.optConflictZone);
-  wm.addConflictZone(guid, zone);
-  wm.updateConflictArea();
+  let zone = new L.geodesicCircle(latlng, range, machinaTools.optConflictZone);
+  machinaTools.addConflictZone(guid, zone);
+  machinaTools.updateConflictArea();
 };
 
-window.plugin.wolfMachina.addConflictZone = function (guid, zone) {
-  // window.plugin.wolfMachina.conflictZones[guid] = zone;
-  if (!window.plugin.wolfMachina.conflictArea) {
-    window.plugin.wolfMachina.conflictArea = zone.toGeoJSON();
+machinaTools.addConflictZone = function (guid, zone) {
+  // machinaTools.conflictZones[guid] = zone;
+  if (!machinaTools.conflictArea) {
+    machinaTools.conflictArea = zone.toGeoJSON();
   } else {
-    window.plugin.wolfMachina.conflictArea = turf.union(window.plugin.wolfMachina.conflictArea, zone.toGeoJSON());
+    machinaTools.conflictArea = turf.union(machinaTools.conflictArea, zone.toGeoJSON());
   }
 };
 
 /**
  * Draw the level-up link radius for a specific portal.
  */
-window.plugin.wolfMachina.drawPortalExclusion = function (guid) {
+machinaTools.drawPortalExclusion = function (guid) {
   // Gather the location of the portal, and generate a 20m
   // radius red circle centered on the lat/lng of the portal.
   var d = window.portals[guid];
-  wm.drawExclusion(guid, d.options.level, d.getLatLng());
+  machinaTools.drawExclusion(guid, d.options.level, d.getLatLng());
 };
 
 /**
  * Removes the level-up link radius for a specific portal.
  */
-window.plugin.wolfMachina.removePortalExclusion = function (guid) {
-  var previousLayer = window.plugin.wolfMachina.portalCircles[guid];
+machinaTools.removePortalExclusion = function (guid) {
+  var previousLayer = machinaTools.portalCircles[guid];
   if (previousLayer) {
     // Remove the circle from the layer.
-    window.plugin.wolfMachina.circleDisplayLayer.removeLayer(previousLayer);
+    machinaTools.circleDisplayLayer.removeLayer(previousLayer);
 
     // Delete the circle from storage, so we don't build up
     // a big cache, and we don't have complex checking on adds.
-    delete window.plugin.wolfMachina.portalCircles[guid];
+    delete machinaTools.portalCircles[guid];
   }
 };
 
-window.plugin.wolfMachina.removeConflictZone = function(guid) {
-  delete window.plugin.wolfMachina.conflictZones[guid];
+machinaTools.removeConflictZone = function (guid) {
+  delete machinaTools.conflictZones[guid];
 };
 /**
  * Reacts to a portal being added or removed.
  */
-window.plugin.wolfMachina.portalAdded = function (data) {
+machinaTools.portalAdded = function (data) {
   // Draw the circle if the team of the portal is Machina.
   data.portal.on('add', function () {
-//debugger;
-  // if (TEAM_NAMES[this.options.team] != undefined) {
-    if (TEAM_NAMES[this.options.team] === TEAM_NAME_MAC) {
-      window.plugin.wolfMachina.drawPortalExclusion(this.options.guid);
+    // debugger;
+    // if (TEAM_NAMES[this.options.team] != undefined) {
+    if (window.TEAM_NAMES[this.options.team] === window.TEAM_NAME_MAC) {
+      machinaTools.drawPortalExclusion(this.options.guid);
     }
-  // }
+    // }
   });
 
   // Remove all circles if they exist, since the team may have changed.
   data.portal.on('remove', function () {
-    window.plugin.wolfMachina.removePortalExclusion(this.options.guid);
-    // window.plugin.wolfMachina.removeConflictZone(this.options.guid);
+    machinaTools.removePortalExclusion(this.options.guid);
+    // machinaTools.removeConflictZone(this.options.guid);
   });
 };
 
 /**
  * Hides or shows the circle display layer as requested.
  */
-window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius = function () {
-  if (window.plugin.wolfMachina.zoomLevelHasPortals()) {
+machinaTools.showOrHideMachinaLevelUpRadius = function () {
+  if (machinaTools.zoomLevelHasPortals()) {
     // Add the circle layer back to the display layer if necessary, and remove the disabled mark.
-    if (!window.plugin.wolfMachina.displayLayer.hasLayer(window.plugin.wolfMachina.circleDisplayLayer)) {
-      window.plugin.wolfMachina.displayLayer.addLayer(window.plugin.wolfMachina.circleDisplayLayer);
+    if (!machinaTools.displayLayer.hasLayer(machinaTools.circleDisplayLayer)) {
+      machinaTools.displayLayer.addLayer(machinaTools.circleDisplayLayer);
       $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")').parent('label').removeClass('disabled').attr('title', '');
     }
   } else {
     // Remove the circle layer from the display layer if necessary, and add the disabled mark.
-    if (window.plugin.wolfMachina.displayLayer.hasLayer(window.plugin.wolfMachina.circleDisplayLayer)) {
-      window.plugin.wolfMachina.displayLayer.removeLayer(window.plugin.wolfMachina.circleDisplayLayer);
-      $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+    if (machinaTools.displayLayer.hasLayer(machinaTools.circleDisplayLayer)) {
+      machinaTools.displayLayer.removeLayer(machinaTools.circleDisplayLayer);
+      $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")')
+        .parent('label')
+        .addClass('disabled')
+        .attr('title', 'Zoom in to show those.');
     }
   }
 };
 
-window.plugin.wolfMachina.showOrHideMachinaConflictArea = function () {
-  if (!window.plugin.wolfMachina.conflictLayer.hasLayer(window.plugin.wolfMachina.conflictAreaLayer)) {
-    window.plugin.wolfMachina.conflictLayer.addLayer(window.plugin.wolfMachina.conflictAreaLayer);
+machinaTools.showOrHideMachinaConflictArea = function () {
+  if (!machinaTools.conflictLayer.hasLayer(machinaTools.conflictAreaLayer)) {
+    machinaTools.conflictLayer.addLayer(machinaTools.conflictAreaLayer);
     console.log('conflictAreaLayer activated');
     $('.leaflet-control-layers-list span:contains("Machina Conflict Area)').parent('label').removeClass('disabled').attr('title', '');
   } else {
-    window.plugin.wolfMachina.conflictLayer.removeLayer(window.plugin.wolfMachina.conflictAreaLayer);
+    machinaTools.conflictLayer.removeLayer(machinaTools.conflictAreaLayer);
     console.log('conflictAreaLayer disabled');
     $('.leaflet-control-layers-list span:contains("Machina Conflict Area")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
   }
 };
 
-window.plugin.wolfMachina.guessLevelByRange = function (linkLength) {
-  for (const level in wm.portalRanges) {
-    if (wm.portalRanges[level] >= linkLength) {
-      return Number(level);
+machinaTools.guessLevelByRange = function (linkLength) {
+  for (var level = 0; level <= 8; ++level) {
+    if (window.LINK_RANGE_MAC[level] >= linkLength) {
+      return level;
     }
   }
   return 0;
 };
 
-window.plugin.wolfMachina.linkAdded = function (data) {
+machinaTools.linkAdded = function (data) {
   data.link.on('add', function () {
     // if (TEAM_NAMES[this.options.team] != undefined) {
     if (window.TEAM_NAMES[this.options.team] === window.TEAM_NAME_MAC) {
       var link = data.link.options.data;
 
       // add destination portal - 1 level
-      wm.drawExclusion(link.dGuid, 1, wm.getDLatLng(link), true);
+      machinaTools.drawExclusion(link.dGuid, 1, machinaTools.getDLatLng(link), true);
 
       // add origin portal - level based on link length
-      var linkLength = wm.getLinkLength(link);
-      var level = wm.guessLevelByRange(linkLength);
-      wm.drawExclusion(link.oGuid, level, wm.getOLatLng(link), true);
+      var linkLength = machinaTools.getLinkLength(link);
+      var level = machinaTools.guessLevelByRange(linkLength);
+      machinaTools.drawExclusion(link.oGuid, level, machinaTools.getOLatLng(link), true);
     }
     // }
   });
@@ -483,36 +475,36 @@ window.plugin.wolfMachina.linkAdded = function (data) {
 var setup = function () {
   loadExternals(); // initialize leaflet-geodesy and turf-union
 
-  window.addHook('portalDetailsUpdated', window.plugin.wolfMachina.onPortalDetailsUpdated);
+  window.addHook('portalDetailsUpdated', machinaTools.onPortalDetailsUpdated);
 
   // This layer is added to the layer chooser, to be toggled on/off, regardless of zoom.
-  window.plugin.wolfMachina.displayLayer = new L.LayerGroup();
-  window.plugin.wolfMachina.conflictLayer = new L.LayerGroup();
+  machinaTools.displayLayer = new L.LayerGroup();
+  machinaTools.conflictLayer = new L.LayerGroup();
 
   // This layer is added into the above layer, and removed from it when we zoom out too far.
-  window.plugin.wolfMachina.circleDisplayLayer = new L.LayerGroup();
-  window.plugin.wolfMachina.conflictAreaLayer = new L.LayerGroup();
+  machinaTools.circleDisplayLayer = new L.LayerGroup();
+  machinaTools.conflictAreaLayer = new L.LayerGroup();
 
   // Initially add the circle display layer into base display layer.  We will trigger an assessment below.
-  window.plugin.wolfMachina.displayLayer.addLayer(window.plugin.wolfMachina.circleDisplayLayer);
-  window.plugin.wolfMachina.conflictLayer.addLayer(window.plugin.wolfMachina.conflictAreaLayer);
+  machinaTools.displayLayer.addLayer(machinaTools.circleDisplayLayer);
+  machinaTools.conflictLayer.addLayer(machinaTools.conflictAreaLayer);
 
   // Add the base layer to the main window.
-  window.addLayerGroup('Machina Level Up Link Radius', window.plugin.wolfMachina.displayLayer, false);
-  window.addLayerGroup('Machina Conflict Area', window.plugin.wolfMachina.conflictLayer, false);
+  window.addLayerGroup('Machina Level Up Link Radius', machinaTools.displayLayer, false);
+  window.addLayerGroup('Machina Conflict Area', machinaTools.conflictLayer, false);
 
   // Hook the portalAdded event so that we can adjust circles.
-  window.addHook('portalAdded', window.plugin.wolfMachina.portalAdded);
-  window.addHook('linkAdded', window.plugin.wolfMachina.linkAdded);
-  window.addHook('mapDataRefreshEnd', window.plugin.wolfMachina.updateConflictArea);
+  window.addHook('portalAdded', machinaTools.portalAdded);
+  window.addHook('linkAdded', machinaTools.linkAdded);
+  window.addHook('mapDataRefreshEnd', machinaTools.updateConflictArea);
 
   // Add a hook to trigger the showOrHide method when the map finishes zooming or reloads.
-  map.on('zoomend', window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius);
-  map.on('loading', window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius);
-  map.on('load', window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius);
+  map.on('zoomend', machinaTools.showOrHideMachinaLevelUpRadius);
+  map.on('loading', machinaTools.showOrHideMachinaLevelUpRadius);
+  map.on('load', machinaTools.showOrHideMachinaLevelUpRadius);
 
   // Trigger an initial assessment of displaying the circleDisplayLayer.
-  window.plugin.wolfMachina.showOrHideMachinaLevelUpRadius();
+  machinaTools.showOrHideMachinaLevelUpRadius();
 };
 /* eslint-disable */
 function loadExternals () {
@@ -522,5 +514,5 @@ function loadExternals () {
     console.error('turf-union.js loading failed');
     throw e;
   }
-};
+}
 /* eslint-enable */
