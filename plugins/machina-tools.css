@@ -1,0 +1,29 @@
+div[aria-describedby="dialog-machina-conflict-area-info"] button {
+    margin: 2px;
+}
+
+div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
+    float: right;
+}
+
+.leaflet-control-machina-record a.recording {
+    background-color: #BBB;
+    fill: #f00;
+}
+
+.leaflet-control-machina-record a svg {
+    width: inherit;
+    height: inherit;
+}
+
+.leaflet-control-machina-record a svg circle {
+    cx: 13px;
+    cy: 13px;
+    r: 8px;
+}
+
+.leaflet-touch .leaflet-control-machina-record a svg circle {
+    cx: 15px;
+    cy: 15px;
+    r: 9px;
+}
