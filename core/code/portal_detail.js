@@ -21,6 +21,10 @@ window.portalDetail.get = function(guid) {
   return cache.get(guid);
 }
 
+window.portalDetail.store = function (guid, dict, freshtime) {
+  return cache.store(guid, dict, freshtime);
+};
+
 window.portalDetail.isFresh = function(guid) {
   return cache.isFresh(guid);
 }
