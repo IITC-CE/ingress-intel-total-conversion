@@ -67,6 +67,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_THREAD_ID: ${{ secrets.TG_THREAD_ID }}
         if: ${{ env.TG_BOT_TOKEN != ''}}
         run: |
           TEXT="🤖 *New IITC Mobile ${{ env.BUILD_TYPE }} build: *[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
