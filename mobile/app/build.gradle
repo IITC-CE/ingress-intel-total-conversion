@@ -110,7 +110,7 @@ dependencies {
 
 task copyUserscripts(type: Copy) {
     description = 'Updating prebuilt plugins'
-    from 'C:\\Users\\jonas\\AndroidStudioProjects\\IITC_2\\assets'
+    from '../assets'
     into 'src/main/assets'
     include('*')
     include('**/*')
