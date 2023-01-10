@@ -8,6 +8,7 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -140,11 +141,16 @@ public class PluginPreferenceActivity extends PreferenceActivity {
             case R.id.menu_plugins_add:
                 if (mFileManager.checkWriteStoragePermissionGranted()) {
                     // create the chooser Intent
+
+                    Log.i("ABLAGE2--> "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/IITC_Mobile/");
+
+
+
                     final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
 
                     target.setType("*/*");
                     // iitcm only parses *.user.js scripts
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                         String[] mimeTypes = {"application/javascript", "text/plain", "text/javascript", "application/octet-stream"};
                         target.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
                     }
@@ -280,6 +286,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         String plugin_name = info.get("name");
         final String plugin_cat = info.get("category");
         final String plugin_desc = info.get("description");
+        final String plugin_version = info.get("version");
 
         // remove IITC plugin prefix from plugin_name
         plugin_name = plugin_name.replace("IITC Plugin: ", "");
@@ -309,7 +316,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         final PluginPreference plugin_pref = new PluginPreference(this);
         plugin_pref.setKey(plugin_key);
         plugin_pref.setTitle(plugin_name);
-        plugin_pref.setSummary(plugin_desc);
+        plugin_pref.setSummary(plugin_desc+"\n\n[v: "+plugin_version+" ]");
         plugin_pref.setDefaultValue(false);
         plugin_pref.setPersistent(true);
         final ArrayList<PluginPreference> list =
@@ -343,7 +350,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         final Header newHeader = new Header();
         newHeader.title = title;
         newHeader.fragmentArguments = bundle;
-        newHeader.fragment = "org.exarhteam.iitc_mobile.fragments.PluginsFragment";
+        newHeader.fragment = "org.exarhteam.iitc_mobile_px.fragments.PluginsFragment";
         mHeaders.add(newHeader);
     }
 

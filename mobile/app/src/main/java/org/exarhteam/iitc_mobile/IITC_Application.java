@@ -1,6 +1,7 @@
 package org.exarhteam.iitc_mobile;
 
 import android.app.Application;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import java.io.File;
@@ -25,7 +26,7 @@ public class IITC_Application extends Application {
     @Override
     public File getFilesDir() {
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_external_storage", false)) {
-            return (getExternalFilesDir(null) != null) ? getExternalFilesDir(null) : super.getFilesDir();
+            return (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) != null) ? Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) : super.getFilesDir();
         } else {
             return super.getFilesDir();
         }

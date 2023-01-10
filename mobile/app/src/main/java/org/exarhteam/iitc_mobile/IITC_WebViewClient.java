@@ -41,7 +41,7 @@ public class IITC_WebViewClient extends WebViewClient {
     public IITC_WebViewClient(final IITC_Mobile iitc) {
         mIitc = iitc;
         mTileManager = new IITC_TileManager(mIitc);
-        mIitcPath = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
+        mIitcPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/IITC_Mobile/";
     }
 
     @SuppressLint("InflateParams")
@@ -259,8 +259,12 @@ public class IITC_WebViewClient extends WebViewClient {
 
         final Uri uri = Uri.parse(url);
         if (uri.getHost() != null && uri.getHost().endsWith(DOMAIN) &&
-                ("http".equals(uri.getScheme()) || "https".equals(uri.getScheme())))
+                ("http".equals(uri.getScheme()) || "https".equals(uri.getScheme()))
+        )
+
+
             return mIitc.getFileManager().getResponse(uri);
+        Log.i("File --> + " +uri);
 
         return super.shouldInterceptRequest(view, url);
     }

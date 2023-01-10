@@ -1,5 +1,6 @@
 package org.exarhteam.iitc_mobile;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
@@ -23,6 +24,7 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
@@ -162,6 +164,28 @@ public class IITC_Mobile extends AppCompatActivity
             //Handle the IllegalAccessException
         } catch(IllegalArgumentException e) {
             //Handle the IllegalArgumentException
+        }
+
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (shouldShowRequestPermissionRationale(
+                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    // Explain to the user why we need to read the contacts
+                }
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        355);
+            }
+
+            // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
+            // app-defined int constant that should be quite unique
+
+           // return;
         }
 
         // enable progress bar above action bar
@@ -335,6 +359,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     protected void onNewIntent(final Intent intent) {
+        super.onNewIntent(intent);
         setIntent(intent);
         handleIntent(intent, false);
     }
@@ -483,7 +508,7 @@ public class IITC_Mobile extends AppCompatActivity
             if (findViewById(R.id.imageLoading).getVisibility() == View.GONE) {
                 // enough idle...let's do some work
                 Log.d("resuming...reset idleTimer");
-                mIitcWebView.loadJS("(function(){if(window.idleReset) window.idleReset();})();");
+                mIitcWebView.loadJS("(function(){if(3,,window.idleReset) window.idleReset();})();");
             }
         }
 
@@ -1095,7 +1120,7 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     private void deleteUpdateFile() {
-        final File file = new File(getExternalFilesDir(null).toString() + "/iitcUpdate.apk");
+        final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/iitcUpdate.apk");
         if (file != null) file.delete();
     }
 
@@ -1104,7 +1129,7 @@ public class IITC_Mobile extends AppCompatActivity
         request.setDescription(getString(R.string.download_description));
         request.setTitle("IITCm Update");
         request.allowScanningByMediaScanner();
-        final Uri fileUri = Uri.parse("file://" + getExternalFilesDir(null).toString() + "/iitcUpdate.apk");
+        final Uri fileUri = Uri.parse("file://" + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/iitcUpdate.apk");
         request.setDestinationUri(fileUri);
         // remove old update file...we don't want to spam the external storage
         deleteUpdateFile();
@@ -1114,7 +1139,7 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     private void installIitcUpdate() {
-        final String iitcUpdatePath = getExternalFilesDir(null).toString() + "/iitcUpdate.apk";
+        final String iitcUpdatePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/iitcUpdate.apk";
         final Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(new File(iitcUpdatePath)), "application/vnd.android.package-archive");
         startActivity(intent);
@@ -1253,6 +1278,16 @@ public class IITC_Mobile extends AppCompatActivity
                 mUserLocation.onRuntimePermissionsGranted();
             }
         }
+        if (requestCode == 355) {
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted.
+                Log.i("FILE -- TRUE");
+            } else {
+                // User refused to grant permission.
+                Log.i("FILE -- FALSE");
+            }
+        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -1271,4 +1306,6 @@ public class IITC_Mobile extends AppCompatActivity
     public boolean isInternalHostname(String hostname) {
         return mInternalHostnames.contains(hostname);
     }
+
+
 }

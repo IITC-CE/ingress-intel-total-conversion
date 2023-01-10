@@ -17,22 +17,21 @@ def getVersionCodeTimeStamps = { ->
 }
 
 def metaFDroid(outputFileName) {
-    new File(outputFileName, "version_fdroid.txt").text = [
+    new File("C:\\Users\\jonas\\AndroidStudioProjects\\iitc\\mobile\\app\\build\\outputs\\fdroid", "version_fdroid.txt").text = [
             ["versionName", android.defaultConfig.versionName].join("="),
             ["versionCode", android.defaultConfig.versionCode].join("="),
     ].join("\n")
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion = '29.0.3'
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "org.exarhteam.iitc_mobile"
-        minSdkVersion 17
-        targetSdkVersion 29
+        minSdkVersion 23
+        targetSdkVersion 33
         versionCode = getVersionCodeTimeStamps()
-        versionName "0.34.1"
+        versionName "0.40.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -60,7 +59,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
-            versionNameSuffix "-test-$BUILD_DATE"
+            versionNameSuffix "-test-px-$BUILD_DATE"
             minifyEnabled false
             signingConfig signingConfigs.debug
         }
@@ -78,38 +77,40 @@ android {
         }
     }
 
-    lintOptions {
-        abortOnError false
-    }
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+    namespace 'org.exarhteam.iitc_mobile'
+    lint {
+        abortOnError false
     }
 
     applicationVariants.all { variant ->
         variant.resValue  "string", "application_id", variant.applicationId
         variant.getAssembleProvider().configure() {
-            it.doLast {
-                metaFDroid(variant.getPackageApplicationProvider().get().outputDirectory)
+            def outputDir = new File("${project.buildDir.absolutePath}/outputs/apk/${variant.flavorName}/${variant.buildType.name}")
+           it.doLast {
+                metaFDroid(outputDir)
             }
         }
     }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation 'com.github.AppIntro:AppIntro:6.0.0'
-    implementation 'com.akexorcist:localization:1.2.5'
+    implementation 'com.akexorcist:localization:1.2.10'
     implementation 'org.apache.commons:commons-text:1.8'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'com.melnykov:floatingactionbutton:1.3.0'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 task copyUserscripts(type: Copy) {
     description = 'Updating prebuilt plugins'
-    from '../assets'
+    from 'C:\\Users\\jonas\\AndroidStudioProjects\\IITC_2\\assets'
     into 'src/main/assets'
     include('*')
     include('**/*')

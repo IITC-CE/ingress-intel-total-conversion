@@ -140,12 +140,14 @@ public class IITC_FileManager {
     private final Activity mActivity;
     private final String mIitcPath;
     private final SharedPreferences mPrefs;
-    public static final String PLUGINS_PATH = Environment.getExternalStorageDirectory().getPath()
-            + "/IITC_Mobile/plugins/";
+    public static String PLUGINS_PATH = null;
 
     public IITC_FileManager(final Activity activity) {
         mActivity = activity;
-        mIitcPath = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
+
+        PLUGINS_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath()
+                + "/IITC_Mobile/plugins/";
+        mIitcPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/IITC_Mobile/";
         mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
         mAssetManager = mActivity.getAssets();
     }
@@ -381,7 +383,7 @@ public class IITC_FileManager {
     }
 
     public boolean checkWriteStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT < 33) {
             if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 return true;
             } else {

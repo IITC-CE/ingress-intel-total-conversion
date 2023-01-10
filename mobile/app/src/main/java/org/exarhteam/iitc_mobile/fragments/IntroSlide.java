@@ -8,10 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.R;
-
-import java.util.Locale;
 
 public class IntroSlide extends Fragment {
     private static final String ARG_LAYOUT_RES_ID = "layoutResId";
@@ -48,10 +45,6 @@ public class IntroSlide extends Fragment {
         View btn = getView().findViewById(R.id.appintro_welcome_change_language);
         if (btn == null) return;
 
-        if (((IntroActivity)getActivity()).getCurrentLanguage().equals(Locale.ENGLISH)) {
-            btn.setVisibility(View.INVISIBLE);
-        } else {
-            btn.setOnClickListener( (View v) -> ((IntroActivity)getActivity()).setEnglishLocale() );
-        }
+
     }
 }

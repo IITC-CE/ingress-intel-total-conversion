@@ -38,7 +38,7 @@ public class IITC_NotificationHelper {
                 break;
             case NOTICE_EXTPLUGINS:
                 text = mActivity.getString(R.string.notice_extplugins);
-                text = String.format(text, Environment.getExternalStorageDirectory().getPath()
+                text = String.format(text, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath()
                         + "/IITC_Mobile/plugins/");
                 break;
             case NOTICE_SHARING:

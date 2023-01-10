@@ -105,6 +105,7 @@ public class IntroActivity extends AppIntro implements OnLocaleChangedListener {
         addSlide(IntroSlide.newInstance(R.layout.intro_plugins));
 
 
+
         setBarColor(ResourcesCompat.getColor(getResources(), R.color.iitc_blue_dark, null));
         setButtonsEnabled(true);
         setVibrate(true);
