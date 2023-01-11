@@ -40,6 +40,7 @@ def exec_gradle(source, dist_ext):
     options = settings.gradle_options
     buildfile = settings.gradle_buildfile or source / 'build.gradle'
     buildtype = settings.gradle_buildtype
+    build_file_name = f'app--{buildtype}.{dist_ext}'
     if buildtype not in buildtypes:
         raise UserWarning('gradle_buildtype value must be in: {}'.format(', '.join(buildtypes)))
 
