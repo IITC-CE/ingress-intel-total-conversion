@@ -89,8 +89,9 @@ android {
     applicationVariants.all { variant ->
         variant.resValue  "string", "application_id", variant.applicationId
         variant.getAssembleProvider().configure() {
-            it.doLast {
-                metaFDroid(variant.getPackageApplicationProvider().get().outputDirectory)
+            def outputDir = new File("${project.buildDir.absolutePath}/outputs/apk/${variant.flavorName}/${variant.buildType.name}")
+           it.doLast {
+                metaFDroid(outputDir)
             }
         }
     }
