@@ -256,25 +256,49 @@ public class IITC_FileManager {
             String text = mActivity.getString(R.string.install_dialog_msg);
             text = String.format(text, uri);
 
-            // create alert dialog
-            new AlertDialog.Builder(mActivity)
-                    .setTitle(mActivity.getString(R.string.install_dialog_top))
-                    .setMessage(Html.fromHtml(text))
-                    .setCancelable(true)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog, final int which) {
-                            copyPlugin(uri, invalidateHeaders);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog, final int which) {
-                            dialog.cancel();
-                        }
-                    })
-                    .create()
-                    .show();
+            final File pluginsDirectory = new File(PLUGINS_PATH);
+            if(pluginsDirectory.exists()) {
+
+                String  text2 = "Found old Plugin Folder!\nPlease delete first this folder:\n\n "+Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath()+ "/IITC_Mobile/ ";
+
+
+                // create alert dialog
+                new AlertDialog.Builder(mActivity)
+                        .setTitle("Error")
+                        .setMessage(Html.fromHtml(text2))
+                        .setCancelable(true)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(final DialogInterface dialog, final int which) {
+                                dialog.cancel();
+                            }
+                        })
+
+                        .create()
+                        .show();
+
+            }
+            else {
+                // create alert dialog
+                new AlertDialog.Builder(mActivity)
+                        .setTitle(mActivity.getString(R.string.install_dialog_top))
+                        .setMessage(Html.fromHtml(text))
+                        .setCancelable(true)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(final DialogInterface dialog, final int which) {
+                                copyPlugin(uri, invalidateHeaders);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(final DialogInterface dialog, final int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .create()
+                        .show();
+            }
         }
     }
 
@@ -299,13 +323,17 @@ public class IITC_FileManager {
                         fileName = getScriptInfo(isCopy).get("id") + ".user.js";
                     }
                     // create IITCm external plugins directory if it doesn't already exist
-                    final File pluginsDirectory = new File(PLUGINS_PATH);
-                    pluginsDirectory.mkdirs();
 
-                    // create in and out streams and copy plugin
-                    final File outFile = new File(pluginsDirectory, fileName);
-                    final OutputStream os = new FileOutputStream(outFile);
-                    IITC_FileManager.copyStream(is, os, true);
+
+                    final File pluginsDirectory = new File(PLUGINS_PATH);
+
+                        pluginsDirectory.mkdirs();
+
+                        // create in and out streams and copy plugin
+                        final File outFile = new File(pluginsDirectory, fileName);
+                        final OutputStream os = new FileOutputStream(outFile);
+                        IITC_FileManager.copyStream(is, os, true);
+
                 } catch (final IOException e) {
                     Log.w(e);
                 }
