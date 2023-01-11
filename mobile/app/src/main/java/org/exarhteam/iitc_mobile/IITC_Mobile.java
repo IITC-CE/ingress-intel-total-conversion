@@ -508,7 +508,7 @@ public class IITC_Mobile extends AppCompatActivity
             if (findViewById(R.id.imageLoading).getVisibility() == View.GONE) {
                 // enough idle...let's do some work
                 Log.d("resuming...reset idleTimer");
-                mIitcWebView.loadJS("(function(){if(3,,window.idleReset) window.idleReset();})();");
+                mIitcWebView.loadJS("(function(){if(window.idleReset) window.idleReset();})();");
             }
         }
 
