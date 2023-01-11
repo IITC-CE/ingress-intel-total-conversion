@@ -31,7 +31,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode = getVersionCodeTimeStamps()
-        versionName "0.40.1"
+        versionName "0.34.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -59,7 +59,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
-            versionNameSuffix "-test-px-$BUILD_DATE"
+            versionNameSuffix "-test-$BUILD_DATE"
             minifyEnabled false
             signingConfig signingConfigs.debug
         }
@@ -89,9 +89,8 @@ android {
     applicationVariants.all { variant ->
         variant.resValue  "string", "application_id", variant.applicationId
         variant.getAssembleProvider().configure() {
-            def outputDir = new File("${project.buildDir.absolutePath}/outputs/apk/${variant.flavorName}/${variant.buildType.name}")
-           it.doLast {
-                metaFDroid(outputDir)
+            it.doLast {
+                metaFDroid(variant.getPackageApplicationProvider().get().outputDirectory)
             }
         }
     }
@@ -99,7 +98,7 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation 'com.github.AppIntro:AppIntro:6.0.0'
     implementation 'com.akexorcist:localization:1.2.10'
     implementation 'org.apache.commons:commons-text:1.8'
