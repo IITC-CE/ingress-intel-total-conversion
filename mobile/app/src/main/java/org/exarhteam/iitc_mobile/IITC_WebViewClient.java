@@ -264,7 +264,6 @@ public class IITC_WebViewClient extends WebViewClient {
 
 
             return mIitc.getFileManager().getResponse(uri);
-        Log.i("File --> + " +uri);
 
         return super.shouldInterceptRequest(view, url);
     }
