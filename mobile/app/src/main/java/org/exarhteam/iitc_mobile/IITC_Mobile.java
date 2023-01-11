@@ -1278,8 +1278,8 @@ public class IITC_Mobile extends AppCompatActivity
                 mUserLocation.onRuntimePermissionsGranted();
             }
         }
+        // TODO NEEDED FOR TESTING NEW FILE PERMISSION SETTINGS. LOG WILL REMOVED IN PR IF ALL IS WORKING
         if (requestCode == 355) {
-
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted.
                 Log.i("FILE -- TRUE");
@@ -1288,6 +1288,8 @@ public class IITC_Mobile extends AppCompatActivity
                 Log.i("FILE -- FALSE");
             }
         }
+        // TODO END
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
