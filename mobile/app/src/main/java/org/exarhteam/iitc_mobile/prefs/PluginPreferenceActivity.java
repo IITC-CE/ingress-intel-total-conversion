@@ -350,7 +350,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         final Header newHeader = new Header();
         newHeader.title = title;
         newHeader.fragmentArguments = bundle;
-        newHeader.fragment = "org.exarhteam.iitc_mobile_px.fragments.PluginsFragment";
+        newHeader.fragment = "org.exarhteam.iitc_mobile.fragments.PluginsFragment";
         mHeaders.add(newHeader);
     }
 

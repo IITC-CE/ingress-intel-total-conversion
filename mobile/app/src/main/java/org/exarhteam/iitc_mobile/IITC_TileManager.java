@@ -33,7 +33,7 @@ public class IITC_TileManager {
 
         /*
          * now get the file path...example path:
-         * /storage/emulated/0/Android/data/org.exarhteam.iitc_mobile_px/files/mqcdn.com/tiles/1.0.0/map/18/137397/89580.jpg
+         * /storage/emulated/0/Android/data/org.exarhteam.iitc_mobile/files/mqcdn.com/tiles/1.0.0/map/18/137397/89580.jpg
          */
         String filePath = uri.getPath();
         String path = mIitc.getApplication().getFilesDir().toString() + "/" + hostId + filePath;
