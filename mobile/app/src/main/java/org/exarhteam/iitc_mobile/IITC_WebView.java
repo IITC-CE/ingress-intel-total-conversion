@@ -56,26 +56,20 @@ public class IITC_WebView extends WebView {
         mSettings.setDomStorageEnabled(true);
         mSettings.setAllowFileAccess(true);
         mSettings.setGeolocationEnabled(true);
-      //  mSettings.setAppCacheEnabled(true);
+      //   mSettings.setAppCacheEnabled(true);  ! is deprecated (new: .setCacheMode())
         mSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-      //  mSettings.setAppCachePath(getContext().getCacheDir().getAbsolutePath());
+      // mSettings.setAppCachePath(getContext().getCacheDir().getAbsolutePath()); ! removed in SDK 33 (https://developer.android.com/sdk/api_diff/33/changes)
         int zoom = Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1"));
         if (zoom != -1) {
             mSettings.setTextZoom(zoom);
         }
 
         // enable mixed content (http on https...needed for some map tiles) mode
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setWebContentsDebuggingEnabled(true);
-            mSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        }
+        setWebContentsDebuggingEnabled(true);
+        mSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setWebContentsDebuggingEnabled(true);
-            mJsInterface = new IITC_JSInterfaceKitkat(mIitc);
-        } else {
-            mJsInterface = new IITC_JSInterface(mIitc);
-        }
+        setWebContentsDebuggingEnabled(true);
+        mJsInterface = new IITC_JSInterfaceKitkat(mIitc);
 
         addJavascriptInterface(mJsInterface, "app");
 
@@ -98,7 +92,7 @@ public class IITC_WebView extends WebView {
                     // this mode is available since KitKat
                     // you can leave this mode by swiping down from the top of the screen. this does only work
                     // when the app is in total-fullscreen mode
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && (mFullscreenStatus & FS_SYSBAR) != 0) {
+                    if ((mFullscreenStatus & FS_SYSBAR) != 0) {
                         systemUiVisibility |= SYSTEM_UI_FLAG_IMMERSIVE;
                     }
                     setSystemUiVisibility(systemUiVisibility);
@@ -155,18 +149,6 @@ public class IITC_WebView extends WebView {
 
     @TargetApi(19)
     public void loadJS(final String js) {
-        boolean classicWebView = Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT;
-        if (!classicWebView) {
-            // some strange Android 4.4+ custom ROMs are using the classic webview
-            try {
-                evaluateJavascript(js, null);
-            } catch (final IllegalStateException e) {
-                Log.e(e);
-                Log.d("Classic WebView detected: use old injection method");
-                classicWebView = true;
-            }
-        }
-        if (classicWebView) {
             // if in edit text mode, don't load javascript otherwise the keyboard closes.
             final HitTestResult testResult = getHitTestResult();
             if (testResult != null && testResult.getType() == HitTestResult.EDIT_TEXT_TYPE) {
@@ -179,7 +161,6 @@ public class IITC_WebView extends WebView {
                 }
             }
             super.loadUrl("javascript:" + js);
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -266,7 +247,6 @@ public class IITC_WebView extends WebView {
         return mJsInterface;
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public boolean isConnectedToWifi() {
         final ConnectivityManager conMan = (ConnectivityManager) mIitc.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo wifi = conMan.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -276,9 +256,7 @@ public class IITC_WebView extends WebView {
         // ConnectivityManager.isActiveNetworkMeter returns if the currently used wifi-network
         // is ticked as mobile hotspot or not.
         // --> IITC_WebView.isConnectedToWifi should return 'false' if connected to mobile hotspot
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            if (conMan.isActiveNetworkMetered()) return false;
-        }
+        if (conMan.isActiveNetworkMetered()) return false;
 
         return (wifi.getState() == NetworkInfo.State.CONNECTED);
     }
