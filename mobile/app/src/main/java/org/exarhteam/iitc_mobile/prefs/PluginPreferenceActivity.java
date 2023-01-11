@@ -142,7 +142,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 if (mFileManager.checkWriteStoragePermissionGranted()) {
                     // create the chooser Intent
                     // TODO: find a better solution for the external User Plugins storage (Log will removed in the PR)
-                    Log.i("ABLAGE2--> "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/IITC_Mobile/");
+                    Log.i("ABLAGE2--> "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/IITC_Mobile/");
 
                     final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
 
