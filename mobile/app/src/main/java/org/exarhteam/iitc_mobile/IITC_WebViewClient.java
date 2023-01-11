@@ -97,7 +97,7 @@ public class IITC_WebViewClient extends WebViewClient {
                 if (plugin.startsWith(mIitcPath)) {
                     scripts.add("user-plugin" + DOMAIN + plugin);
                 } else {
-                    scripts.add("script" + DOMAIN + "/plugins/" + plugin);
+                    scripts.add("script" + DOMAIN + plugin);
                 }
             }
         }
