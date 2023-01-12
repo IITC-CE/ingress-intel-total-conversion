@@ -164,17 +164,13 @@ public class IITC_Mobile extends AppCompatActivity
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Should we show an explanation?
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (shouldShowRequestPermissionRationale(
-                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    // Explain to the user why we need to read the contacts
-                }
+            if (shouldShowRequestPermissionRationale(
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                // Explain to the user why we need to read the contacts
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        355);
-            }
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    355); // TODO maybe some changes needed
 
             // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
             // app-defined int constant that should be quite unique
@@ -407,10 +403,8 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         if (onCreate) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                CookieManager cookieManager = CookieManager.getInstance();
-                cookieManager.setAcceptThirdPartyCookies(mIitcWebView, true);
-            }
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptThirdPartyCookies(mIitcWebView, true);
             loadUrl(mIntelUrl);
         }
     }
@@ -1269,10 +1263,8 @@ public class IITC_Mobile extends AppCompatActivity
         if (requestCode == 355) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted.
-                Log.i("FILE -- TRUE");
             } else {
                 // User refused to grant permission.
-                Log.i("FILE -- FALSE");
             }
         }
         // TODO END
