@@ -171,7 +171,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -418,8 +418,8 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
                     case HEADER_TYPE_NORMAL:
                         view = mInflater.inflate(R.layout.preference_header_item, parent, false);
-                        holder.title = view.findViewById(R.id.plug_pref_title);
-                        holder.summary = view.findViewById(R.id.plug_pref_summary);
+                        holder.title = (TextView) view.findViewById(R.id.plug_pref_title);
+                        holder.summary = (TextView) view.findViewById(R.id.plug_pref_summary);
                         break;
                 }
                 view.setTag(holder);
