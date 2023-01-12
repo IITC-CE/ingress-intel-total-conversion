@@ -15,14 +15,13 @@ import org.exarhteam.iitc_mobile.compass.Compass;
 import org.exarhteam.iitc_mobile.compass.CompassListener;
 
 public class IITC_UserLocation implements CompassListener, LocationListener {
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
     public static final int REQ_PERMISSIONS_LOCATION = 0x0000FF01;
-
+    private static final int TWO_MINUTES = 1000 * 60 * 2;
     private final Compass mCompass;
-    private boolean mFollowing = false;
     private final IITC_Mobile mIitc;
-    private Location mLastLocation = null;
     private final LocationManager mLocationManager;
+    private boolean mFollowing = false;
+    private Location mLastLocation = null;
     private boolean mLocationRegistered = false;
     private int mMode = 0;
     private double mOrientation = 0;
@@ -60,7 +59,7 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
         }
 
         mIitc.getWebView().loadJS("if(window.plugin && window.plugin.userLocation)"
-                + "window.plugin.userLocation.onOrientationChange(" + String.valueOf(orientation) + ");");
+                + "window.plugin.userLocation.onOrientationChange(" + orientation + ");");
     }
 
     private void updateListeners() {
@@ -148,10 +147,7 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
             return true;
         } else if (isNewer && !isLessAccurate) {
             return true;
-        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-            return true;
-        }
-        return false;
+        } else return isNewer && !isSignificantlyLessAccurate && isFromSameProvider;
     }
 
     public boolean hasCurrentLocation() {

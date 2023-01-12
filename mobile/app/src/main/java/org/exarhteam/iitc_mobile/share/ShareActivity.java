@@ -30,6 +30,11 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
     private static final String TYPE_PERMALINK = "permalink";
     private static final String TYPE_PORTAL_LINK = "portal_link";
     private static final String TYPE_STRING = "string";
+    private IntentComparator mComparator;
+    private FragmentAdapter mFragmentAdapter;
+    private IntentGenerator mGenerator;
+    private SharedPreferences mSharedPrefs = null;
+    private ViewPager mViewPager;
 
     public static Intent forFile(final Context context, final File file, final String type) {
         final Uri uri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
@@ -43,7 +48,7 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
     }
 
     public static Intent forPosition(final Context context, final double lat, final double lng, final int zoom,
-            final String title, final boolean isPortal) {
+                                     final String title, final boolean isPortal) {
         return new Intent(context, ShareActivity.class)
                 .putExtra(EXTRA_TYPE, isPortal ? TYPE_PORTAL_LINK : TYPE_PERMALINK)
                 .putExtra("lat", lat)
@@ -58,12 +63,6 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
                 .putExtra(EXTRA_TYPE, TYPE_STRING)
                 .putExtra("shareString", str);
     }
-
-    private IntentComparator mComparator;
-    private FragmentAdapter mFragmentAdapter;
-    private IntentGenerator mGenerator;
-    private SharedPreferences mSharedPrefs = null;
-    private ViewPager mViewPager;
 
     private void addTab(final ArrayList<Intent> intents, final int label, final int icon) {
         final IntentListFragment fragment = new IntentListFragment();
@@ -158,7 +157,7 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
             return;
         }
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = findViewById(R.id.pager);
         mViewPager.setAdapter(mFragmentAdapter);
 
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

@@ -2,8 +2,8 @@ package org.exarhteam.iitc_mobile;
 
 public class IITC_DebugHistory {
     private int size = 0;
-    private int maxSize;
-    private String[] stackArray;
+    private final int maxSize;
+    private final String[] stackArray;
 
     IITC_DebugHistory(int arraySize) {
         maxSize = arraySize;

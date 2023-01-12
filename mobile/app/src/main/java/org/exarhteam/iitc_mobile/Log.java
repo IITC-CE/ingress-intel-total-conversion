@@ -15,21 +15,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Log {
-    private static final HashMap<MessageLevel, Integer> CONSOLE_MAPPING;
-    @SuppressLint("SimpleDateFormat")
-    private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("HH:mm:ss.SSS");
-    private static final List<Receiver> RECEIVERS = new LinkedList<Receiver>();
-    private static final Pattern URL_PATTERN;
-
     public static final String CONSOLE_TAG = "iitcm-console";
     public static final String DEFAULT_TAG = "iitcm";
-
     public static final int ASSERT = android.util.Log.ASSERT;
     public static final int DEBUG = android.util.Log.DEBUG;
     public static final int ERROR = android.util.Log.ERROR;
     public static final int INFO = android.util.Log.INFO;
     public static final int VERBOSE = android.util.Log.VERBOSE;
     public static final int WARN = android.util.Log.WARN;
+    private static final HashMap<MessageLevel, Integer> CONSOLE_MAPPING;
+    @SuppressLint("SimpleDateFormat")
+    private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("HH:mm:ss.SSS");
+    private static final List<Receiver> RECEIVERS = new LinkedList<Receiver>();
+    private static final Pattern URL_PATTERN;
 
     static {
         CONSOLE_MAPPING = new HashMap<MessageLevel, Integer>();
@@ -41,7 +39,12 @@ public final class Log {
 
         URL_PATTERN = Pattern.compile("^https?://([a-z.-]+)" + Pattern.quote(IITC_FileManager.DOMAIN) + "/(.*)$",
                 Pattern.CASE_INSENSITIVE);
-    };
+    }
+
+    private Log() {
+        // prevent instantiation
+        throw new UnsupportedOperationException();
+    }
 
     private static synchronized void log(final int priority, final String tag, final String msg, final Throwable tr) {
         final Date now = new Date();
@@ -250,9 +253,8 @@ public final class Log {
         w("Unexpected " + tr.getClass().getCanonicalName(), tr);
     }
 
-    private Log() {
-        // prevent instantiation
-        throw new UnsupportedOperationException();
+    public interface Receiver {
+        void handle(Message message);
     }
 
     public static class Message {
@@ -328,14 +330,10 @@ public final class Log {
                 if (msg == null || msg.isEmpty())
                     msg = sw.toString();
                 else
-                    msg += "\n" + sw.toString();
+                    msg += "\n" + sw;
             }
 
             return getDateString() + " " + priority + " " + getTag() + "\n" + msg;
         }
-    }
-
-    public static interface Receiver {
-        void handle(Message message);
     }
 }

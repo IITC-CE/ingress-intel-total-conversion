@@ -15,6 +15,7 @@ import org.exarhteam.iitc_mobile.share.ShareActivity;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 // provide communication between IITC script and android app
 public class IITC_JSInterface {
@@ -167,12 +168,11 @@ public class IITC_JSInterface {
                     // maximum for setProgress is 10,000
                     mIitc.setProgressBarIndeterminate(false);
                     mIitc.setProgress((int) Math.round(progress * 10000));
-                }
-                else {
+                } else {
                     mIitc.setProgressBarIndeterminate(true);
                     mIitc.setProgress(1);
                 }
-            } catch(NullPointerException e) {
+            } catch (NullPointerException e) {
                 // for some reason, setProgressBarIndeterminate throws a NullPointerException on some devices
                 e.printStackTrace();
                 mIitc.setProgress(10000); // hide the progress bar
@@ -198,7 +198,7 @@ public class IITC_JSInterface {
             outFile.getParentFile().mkdirs();
 
             final FileOutputStream outStream = new FileOutputStream(outFile);
-            outStream.write(content.getBytes("UTF-8"));
+            outStream.write(content.getBytes(StandardCharsets.UTF_8));
             outStream.close();
             Toast.makeText(mIitc, "File exported to " + outFile.getPath(), Toast.LENGTH_SHORT).show();
         } catch (final IOException e) {

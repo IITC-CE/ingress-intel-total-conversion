@@ -42,18 +42,23 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
     private final static int COPY_PLUGIN_REQUEST = 1;
     private static final int PERMISSION_REQUEST_CODE = 3;
-
-    private List<Header> mHeaders;
+    // user plugins can be initialized.
+    private static final TreeMap<String, ArrayList<PluginPreference>> sUserPlugins =
+            new TreeMap<String, ArrayList<PluginPreference>>();
     // we use a tree map to have a map with alphabetical order
     // don't initialize the asset plugin map, because it tells us if the settings are started the first time
     // and we have to parse plugins to build the preference screen
     private static TreeMap<String, ArrayList<PluginPreference>> sAssetPlugins = null;
-    // user plugins can be initialized.
-    private static final TreeMap<String, ArrayList<PluginPreference>> sUserPlugins =
-            new TreeMap<String, ArrayList<PluginPreference>>();
     private static int mDeletedPlugins = 0;
-
+    private List<Header> mHeaders;
     private IITC_FileManager mFileManager;
+
+    // called by Plugins Fragment
+    public static ArrayList<PluginPreference> getPluginPreference(final String key, final boolean userPlugin) {
+        if (userPlugin) return sUserPlugins.get(key);
+
+        return sAssetPlugins.get(key);
+    }
 
     @Override
     public void setListAdapter(final ListAdapter adapter) {
@@ -142,7 +147,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 if (mFileManager.checkWriteStoragePermissionGranted()) {
                     // create the chooser Intent
                     // TODO: find a better solution for the external User Plugins storage (Log will removed in the PR)
-                    Log.i("ABLAGE2--> "+ Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/IITC_Mobile/");
+                    Log.i("ABLAGE2--> " + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/IITC_Mobile/");
 
                     final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
 
@@ -166,7 +171,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -199,13 +204,6 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     @Override
     protected boolean isValidFragment(String fragmentName) {
         return PluginsFragment.class.getName().equals(fragmentName);
-    }
-
-    // called by Plugins Fragment
-    public static ArrayList<PluginPreference> getPluginPreference(final String key, final boolean userPlugin) {
-        if (userPlugin) return sUserPlugins.get(key);
-
-        return sAssetPlugins.get(key);
     }
 
     private String[] getAssetPlugins() {
@@ -314,7 +312,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         final PluginPreference plugin_pref = new PluginPreference(this);
         plugin_pref.setKey(plugin_key);
         plugin_pref.setTitle(plugin_name);
-        plugin_pref.setSummary(plugin_desc+"\n\n[v: "+plugin_version+" ]");
+        plugin_pref.setSummary(plugin_desc + "\n\n[v: " + plugin_version + " ]");
         plugin_pref.setDefaultValue(false);
         plugin_pref.setPersistent(true);
         final ArrayList<PluginPreference> list =
@@ -360,13 +358,14 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         static final int HEADER_TYPE_CATEGORY = 0;
         static final int HEADER_TYPE_NORMAL = 1;
         private static final int HEADER_TYPE_COUNT = HEADER_TYPE_NORMAL + 1;
-
-        private static class HeaderViewHolder {
-            TextView title;
-            TextView summary;
-        }
-
         private final LayoutInflater mInflater;
+
+        public HeaderAdapter(final Context context, final List<Header> objects) {
+            super(context, 0, objects);
+
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        }
 
         static int getHeaderType(final Header header) {
             if (header.fragment == null && header.intent == null) {
@@ -402,13 +401,6 @@ public class PluginPreferenceActivity extends PreferenceActivity {
             return true;
         }
 
-        public HeaderAdapter(final Context context, final List<Header> objects) {
-            super(context, 0, objects);
-
-            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        }
-
         @Override
         public View getView(final int position, final View convertView, final ViewGroup parent) {
             HeaderViewHolder holder;
@@ -426,8 +418,8 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
                     case HEADER_TYPE_NORMAL:
                         view = mInflater.inflate(R.layout.preference_header_item, parent, false);
-                        holder.title = (TextView) view.findViewById(R.id.plug_pref_title);
-                        holder.summary = (TextView) view.findViewById(R.id.plug_pref_summary);
+                        holder.title = view.findViewById(R.id.plug_pref_title);
+                        holder.summary = view.findViewById(R.id.plug_pref_summary);
                         break;
                 }
                 view.setTag(holder);
@@ -454,6 +446,11 @@ public class PluginPreferenceActivity extends PreferenceActivity {
             }
 
             return view;
+        }
+
+        private static class HeaderViewHolder {
+            TextView title;
+            TextView summary;
         }
     }
 }

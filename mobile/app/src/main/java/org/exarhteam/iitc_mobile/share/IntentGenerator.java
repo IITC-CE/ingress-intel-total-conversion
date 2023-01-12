@@ -36,6 +36,14 @@ public class IntentGenerator {
         }
     }
 
+    private final Context mContext;
+    private final PackageManager mPackageManager;
+
+    public IntentGenerator(final Context context) {
+        mContext = context;
+        mPackageManager = mContext.getPackageManager();
+    }
+
     public static String getTitle(final Intent intent) {
         String title = "";
         if (intent.hasExtra(EXTRA_FLAG_TITLE))
@@ -56,15 +64,6 @@ public class IntentGenerator {
 
     public static boolean isDefault(final Intent intent) {
         return intent.hasExtra(EXTRA_FLAG_IS_DEFAULT) && intent.getBooleanExtra(EXTRA_FLAG_IS_DEFAULT, false);
-    }
-
-    private final Context mContext;
-
-    private final PackageManager mPackageManager;
-
-    public IntentGenerator(final Context context) {
-        mContext = context;
-        mPackageManager = mContext.getPackageManager();
     }
 
     private boolean containsCopyIntent(final List<Intent> targets) {
@@ -151,11 +150,9 @@ public class IntentGenerator {
 
     /**
      * get a list of intents capable of sharing a plain text string
-     * 
-     * @param title
-     *            description of the shared string
-     * @param text
-     *            the string to be shared
+     *
+     * @param title description of the shared string
+     * @param text  the string to be shared
      */
     public ArrayList<Intent> getShareIntents(final String title, final String text) {
         final Intent intent = new Intent(Intent.ACTION_SEND)
@@ -178,11 +175,9 @@ public class IntentGenerator {
 
     /**
      * get a list of intents capable of sharing the given content
-     * 
-     * @param uri
-     *            URI of a file to share
-     * @param type
-     *            MIME type of the file
+     *
+     * @param uri  URI of a file to share
+     * @param type MIME type of the file
      */
     public ArrayList<Intent> getShareIntents(final Uri uri, final String type) {
         final Intent intent = new Intent(Intent.ACTION_SEND)

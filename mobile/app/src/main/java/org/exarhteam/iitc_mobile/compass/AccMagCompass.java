@@ -10,12 +10,12 @@ public class AccMagCompass extends Compass {
     private static final double SENSOR_DELAY_USER = 100 * 1e6; // 100 milliseconds
 
     private final Context mContext;
-    private long mLastUpdate = 0;
     private final SensorListener mListener = new SensorListener();
     private final float[] mOrientation = new float[3];
     private final float[] mRotationMatrix = new float[9];
     private final Sensor mSensorAcc, mSensorMag;
     private final SensorManager mSensorManager;
+    private long mLastUpdate = 0;
     private float[] mValuesAcc = null, mValuesMag = null;
 
     public AccMagCompass(final Context context) {

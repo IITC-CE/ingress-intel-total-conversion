@@ -20,83 +20,15 @@ import org.json.JSONObject;
 import java.util.Comparator;
 
 public class IITC_MapSettings implements OnItemSelectedListener, OnItemClickListener, OnItemLongClickListener {
-    private class HighlighterAdapter extends ArrayAdapter<String> {
-        private final HighlighterComparator mComparator = new HighlighterComparator();
-
-        private HighlighterAdapter(final int resource) {
-            super(mIitc, resource);
-            clear();
-        }
-
-        @Override
-        public void add(final String object) {
-            super.remove(object); // to avoid duplicates
-            super.add(object);
-            super.sort(mComparator);
-        }
-
-        @Override
-        public void clear() {
-            super.clear();
-            add("No Highlights");// Probably must be the same as window._no_highlighter
-        }
-    }
-
-    private class HighlighterComparator implements Comparator<String> {
-        @Override
-        public int compare(final String lhs, final String rhs) {
-            // Move "No Highlights" on top. Sort the rest alphabetically
-            if (lhs.equals("No Highlights")) {
-                return -1000;
-            } else if (rhs.equals("No Highlights")) {
-                return 1000;
-            } else {
-                return lhs.compareTo(rhs);
-            }
-        }
-    }
-
-    private class Layer {
-        boolean active;
-        int id;
-        String name;
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
-    private class LayerAdapter extends ArrayAdapter<Layer> {
-        public LayerAdapter(final int resource) {
-            super(mIitc, resource);
-        }
-
-        @Override
-        public View getView(final int position, final View convertView, final ViewGroup parent) {
-            final Layer item = getItem(position);
-            final View view = super.getView(position, convertView, parent);
-
-            if (view instanceof CheckedTextView) {
-                ((CheckedTextView) view).setChecked(item.active);
-            }
-            return view;
-        }
-    }
-
     private final IITC_Mobile mIitc;
-
     private final ArrayAdapter<String> mHighlighters;
     private final ArrayAdapter<Layer> mBaseLayers;
     private final ArrayAdapter<Layer> mOverlayLayers;
-
     private final Spinner mSpinnerBaseMap;
     private final Spinner mSpinnerHighlighter;
     private final ListView mListViewOverlayLayers;
-
     private String mActiveHighlighter;
     private int mActiveLayer;
-
     private boolean mLoading = true;
     private boolean mDisableListeners = false;
 
@@ -113,9 +45,9 @@ public class IITC_MapSettings implements OnItemSelectedListener, OnItemClickList
         final LayoutInflater inflater = (LayoutInflater) mIitc.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View header = inflater.inflate(R.layout.map_options_header, null);
 
-        mSpinnerHighlighter = (Spinner) header.findViewById(R.id.spinnerHighlighter);
-        mSpinnerBaseMap = (Spinner) header.findViewById(R.id.spinnerBaseLayer);
-        mListViewOverlayLayers = (ListView) mIitc.findViewById(R.id.right_drawer);
+        mSpinnerHighlighter = header.findViewById(R.id.spinnerHighlighter);
+        mSpinnerBaseMap = header.findViewById(R.id.spinnerBaseLayer);
+        mListViewOverlayLayers = mIitc.findViewById(R.id.right_drawer);
 
         mListViewOverlayLayers.addHeaderView(header);
 
@@ -164,8 +96,8 @@ public class IITC_MapSettings implements OnItemSelectedListener, OnItemClickList
         position--; // The ListView header counts as an item as well.
         mIitc.getWebView().loadUrl(
                 "javascript: " +
-                "var data = window.layerChooser._layers[" + mOverlayLayers.getItem(position).id + "];" +
-                "window.layerChooser._onLongClick(data);");
+                        "var data = window.layerChooser._layers[" + mOverlayLayers.getItem(position).id + "];" +
+                        "window.layerChooser._onLongClick(data);");
 
         return true;
     }
@@ -278,5 +210,69 @@ public class IITC_MapSettings implements OnItemSelectedListener, OnItemClickList
         mOverlayLayers.notifyDataSetChanged();
 
         mDisableListeners = false;
+    }
+
+    private class HighlighterAdapter extends ArrayAdapter<String> {
+        private final HighlighterComparator mComparator = new HighlighterComparator();
+
+        private HighlighterAdapter(final int resource) {
+            super(mIitc, resource);
+            clear();
+        }
+
+        @Override
+        public void add(final String object) {
+            super.remove(object); // to avoid duplicates
+            super.add(object);
+            super.sort(mComparator);
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            add("No Highlights");// Probably must be the same as window._no_highlighter
+        }
+    }
+
+    private class HighlighterComparator implements Comparator<String> {
+        @Override
+        public int compare(final String lhs, final String rhs) {
+            // Move "No Highlights" on top. Sort the rest alphabetically
+            if (lhs.equals("No Highlights")) {
+                return -1000;
+            } else if (rhs.equals("No Highlights")) {
+                return 1000;
+            } else {
+                return lhs.compareTo(rhs);
+            }
+        }
+    }
+
+    private class Layer {
+        boolean active;
+        int id;
+        String name;
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private class LayerAdapter extends ArrayAdapter<Layer> {
+        public LayerAdapter(final int resource) {
+            super(mIitc, resource);
+        }
+
+        @Override
+        public View getView(final int position, final View convertView, final ViewGroup parent) {
+            final Layer item = getItem(position);
+            final View view = super.getView(position, convertView, parent);
+
+            if (view instanceof CheckedTextView) {
+                ((CheckedTextView) view).setChecked(item.active);
+            }
+            return view;
+        }
     }
 }

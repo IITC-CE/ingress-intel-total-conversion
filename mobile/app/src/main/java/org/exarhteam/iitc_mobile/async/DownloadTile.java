@@ -40,7 +40,7 @@ public class DownloadTile extends AsyncTask<String, Void, Boolean> {
             if (urlLM < fileLM) return true;
             InputStream is = null;
             is = conn.getInputStream();
-            Log.d("writing to file: " + file.toString());
+            Log.d("writing to file: " + file);
             writeTileToFile(is, file);
         } catch (final IOException e) {
             return false;

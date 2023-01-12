@@ -88,7 +88,7 @@ public class IITC_JsDialogHelper {
         } else {
             final View view = LayoutInflater.from(context).inflate(
                     R.layout.js_prompt, null);
-            final EditText edit = ((EditText) view.findViewById(R.id.value));
+            final EditText edit = view.findViewById(R.id.value);
             edit.setText(mDefaultValue);
             builder.setPositiveButton(positiveTextId, new PositiveListener(edit));
             ((TextView) view.findViewById(R.id.message)).setText(mMessage);
@@ -98,6 +98,28 @@ public class IITC_JsDialogHelper {
             builder.setNegativeButton(negativeTextId, new CancelListener());
         }
         builder.show();
+    }
+
+    private String getJsDialogTitle(final Context context) {
+        String title = mUrl;
+        if (URLUtil.isDataUrl(mUrl)) {
+            // For data: urls, we just display 'JavaScript' similar to Chrome.
+            title = context.getString(R.string.js_dialog_title_default);
+        } else {
+            try {
+                final URL alertUrl = new URL(mUrl);
+                // For example: "The page at 'http://www.mit.edu' says:"
+                title = context.getString(R.string.js_dialog_title,
+                        alertUrl.getProtocol() + "://" + alertUrl.getHost());
+            } catch (final MalformedURLException ex) {
+                // do nothing. just use the url as the title
+            }
+        }
+        return title;
+    }
+
+    public boolean shouldInterrupt() {
+        return true;
     }
 
     private class CancelListener implements DialogInterface.OnCancelListener,
@@ -128,27 +150,5 @@ public class IITC_JsDialogHelper {
                 ((JsPromptResult) mResult).confirm(mEdit.getText().toString());
             }
         }
-    }
-
-    private String getJsDialogTitle(final Context context) {
-        String title = mUrl;
-        if (URLUtil.isDataUrl(mUrl)) {
-            // For data: urls, we just display 'JavaScript' similar to Chrome.
-            title = context.getString(R.string.js_dialog_title_default);
-        } else {
-            try {
-                final URL alertUrl = new URL(mUrl);
-                // For example: "The page at 'http://www.mit.edu' says:"
-                title = context.getString(R.string.js_dialog_title,
-                        alertUrl.getProtocol() + "://" + alertUrl.getHost());
-            } catch (final MalformedURLException ex) {
-                // do nothing. just use the url as the title
-            }
-        }
-        return title;
-    }
-
-    public boolean shouldInterrupt() {
-        return true;
     }
 }

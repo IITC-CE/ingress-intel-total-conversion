@@ -49,14 +49,14 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     private String mHighlighter = null;
 
     public IITC_NavigationHelper(final IITC_Mobile iitc, final ActionBar bar, Toolbar toolbar) {
-        super(iitc, (DrawerLayout) iitc.findViewById(R.id.drawer_layout),
+        super(iitc, iitc.findViewById(R.id.drawer_layout),
                 toolbar, R.string.drawer_open, R.string.drawer_close);
 
         mIitc = iitc;
         mActionBar = bar;
-        mDrawerLeft = (ListView) iitc.findViewById(R.id.left_drawer);
+        mDrawerLeft = iitc.findViewById(R.id.left_drawer);
         mDrawerRight = iitc.findViewById(R.id.right_drawer);
-        mDrawerLayout = (DrawerLayout) iitc.findViewById(R.id.drawer_layout);
+        mDrawerLayout = iitc.findViewById(R.id.drawer_layout);
         mDexRunning = iitc.isDexRunning();
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(iitc);
@@ -231,7 +231,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     }
 
     public void onPrefChanged() {
-        mDexDesktopMode = mPrefs.getBoolean( "pref_dex_desktop", true);
+        mDexDesktopMode = mPrefs.getBoolean("pref_dex_desktop", true);
         mDesktopMode = mPrefs.getBoolean("pref_force_desktop", false);
         updateViews();
     }
@@ -264,8 +264,48 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     public void switchTo(final Pane pane) {
         mPane = pane;
 
-        if (pane.equals(Pane.INFO)) mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_SHARING);
+        if (pane.equals(Pane.INFO))
+            mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_SHARING);
         updateViews();
+    }
+
+    public static class Pane {
+        public static final Pane ALL = new Pane("all", R.string.pane_all, R.drawable.ic_action_view_as_list);
+        public static final Pane FACTION = new Pane("faction", R.string.pane_faction, R.drawable.ic_action_cc_bcc);
+        public static final Pane ALERTS = new Pane("alerts", R.string.pane_alerts, R.drawable.ic_action_warning);
+        public static final Pane INFO = new Pane("info", R.string.pane_info, R.drawable.ic_action_about);
+        public static final Pane MAP = new Pane("map", R.string.pane_map, R.drawable.ic_map_white);
+
+        private final int icon;
+        public String label;
+        public int label_resource;
+        public String name;
+
+        public Pane(final String name, final int label_resource, final int icon) {
+            this.name = name;
+            this.label_resource = label_resource;
+            this.icon = icon;
+        }
+
+        public Pane(final String name, final String label, final int icon) {
+            this.name = name;
+            this.label = label;
+            this.icon = icon;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (o == null) return false;
+            if (o.getClass() != getClass()) return false;
+
+            final Pane pane = (Pane) o;
+            return name.equals(pane.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode();
+        }
     }
 
     private class NavigationAdapter extends ArrayAdapter<Pane> {
@@ -300,45 +340,6 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
             add(Pane.ALL);
             add(Pane.FACTION);
             add(Pane.ALERTS);
-        }
-    }
-
-    public static class Pane {
-        public static final Pane ALL = new Pane("all", R.string.pane_all, R.drawable.ic_action_view_as_list);
-        public static final Pane FACTION = new Pane("faction", R.string.pane_faction, R.drawable.ic_action_cc_bcc);
-        public static final Pane ALERTS = new Pane("alerts", R.string.pane_alerts, R.drawable.ic_action_warning);
-        public static final Pane INFO = new Pane("info", R.string.pane_info, R.drawable.ic_action_about);
-        public static final Pane MAP = new Pane("map", R.string.pane_map, R.drawable.ic_map_white);
-
-        private final int icon;
-        public String label;
-        public int label_resource;
-        public String name;
-
-        public Pane(final String name, final int label_resource, final int icon) {
-            this.name = name;
-            this.label_resource = label_resource;
-            this.icon = icon;
-        }
-        
-        public Pane(final String name, final String label, final int icon) {
-            this.name = name;
-            this.label = label;
-            this.icon = icon;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (o == null) return false;
-            if (o.getClass() != getClass()) return false;
-
-            final Pane pane = (Pane) o;
-            return name.equals(pane.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode();
         }
     }
 }

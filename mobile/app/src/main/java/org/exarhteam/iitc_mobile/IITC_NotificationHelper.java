@@ -49,7 +49,7 @@ public class IITC_NotificationHelper {
         }
 
         final View content = mActivity.getLayoutInflater().inflate(R.layout.dialog_notice, null);
-        final TextView message = (TextView) content.findViewById(R.id.tv_notice);
+        final TextView message = content.findViewById(R.id.tv_notice);
         message.setText(Html.fromHtml(text));
         message.setMovementMethod(LinkMovementMethod.getInstance());
 

@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.view.View;
-import android.widget.CheckBox;
-
-import androidx.appcompat.app.AlertDialog;
 
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
@@ -30,13 +27,12 @@ public class PluginsFragment extends PreferenceFragment {
         // alphabetical order
         getPreferenceScreen().setOrderingAsAdded(false);
 
-         Preference.OnPreferenceChangeListener myCheckboxListener = new Preference.OnPreferenceChangeListener() {
+        Preference.OnPreferenceChangeListener myCheckboxListener = new Preference.OnPreferenceChangeListener() {
 
             public boolean onPreferenceChange(Preference preference, Object newValue) {
 
 
-
-                Log.i("PREF CLICK -->" + preference.getKey()+" Status: "+Boolean.parseBoolean(newValue.toString()));
+                Log.i("PREF CLICK -->" + preference.getKey() + " Status: " + Boolean.parseBoolean(newValue.toString()));
                 deletplugin(Boolean.parseBoolean(newValue.toString()), preference, preference.getKey());
                 return true;
             }
@@ -51,14 +47,14 @@ public class PluginsFragment extends PreferenceFragment {
             // add plugin checkbox preferences
             for (PluginPreference pref : prefs) {
                 getPreferenceScreen().addPreference(pref);
-                if(pref.getKey().contains("/IITC_Mobile/plugins/")) {
+                if (pref.getKey().contains("/IITC_Mobile/plugins/")) {
                     pref.setOnPreferenceChangeListener(myCheckboxListener);
                 }
             }
 
             // set action bar stuff
             ActionBar bar = getActivity().getActionBar();
-            bar.setTitle(getString(R.string.pref_plugins)+": " + category);
+            bar.setTitle(getString(R.string.pref_plugins) + ": " + category);
             bar.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -105,7 +101,6 @@ public class PluginsFragment extends PreferenceFragment {
 
 
             dialog.show();
-
 
 
             Log.i("Status delet Plugin");

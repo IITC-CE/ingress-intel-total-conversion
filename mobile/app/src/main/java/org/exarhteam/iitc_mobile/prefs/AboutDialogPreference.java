@@ -8,8 +8,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import org.apache.commons.text.StringSubstitutor;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.exarhteam.iitc_mobile.R;
 
 import java.util.HashMap;

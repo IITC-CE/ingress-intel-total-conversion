@@ -4,17 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-
-
 import org.exarhteam.iitc_mobile.fragments.MainSettings;
 
-public class PreferenceActivity extends Activity{
-
-
-
-
-
-
+public class PreferenceActivity extends Activity {
 
 
     @Override

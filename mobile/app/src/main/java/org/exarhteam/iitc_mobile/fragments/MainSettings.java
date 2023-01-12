@@ -22,6 +22,47 @@ import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.prefs.AboutDialogPreference;
 
 public class MainSettings extends PreferenceFragment {
+    // Apply custom home button area click listener to close the PreferenceScreen
+    // because PreferenceScreens are dialogs which swallow
+    // events instead of passing to the activity
+    // Related Issue: https://code.google.com/p/android/issues/detail?id=4611
+    public static void initializeActionBar(final PreferenceScreen preferenceScreen) {
+        final Dialog dialog = preferenceScreen.getDialog();
+
+        if (dialog != null) {
+            if (dialog.getActionBar() != null)
+                dialog.getActionBar().setDisplayHomeAsUpEnabled(true);
+
+            final View homeBtn = dialog.findViewById(android.R.id.home);
+
+            if (homeBtn != null) {
+                final View.OnClickListener dismissDialogClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        dialog.dismiss();
+                    }
+                };
+
+                final ViewParent homeBtnContainer = homeBtn.getParent();
+
+                // The home button is an ImageView inside a FrameLayout
+                if (homeBtnContainer instanceof FrameLayout) {
+                    final ViewGroup containerParent = (ViewGroup) homeBtnContainer.getParent();
+
+                    if (containerParent instanceof LinearLayout) {
+                        // This view also contains the title text, set the whole view as clickable
+                        containerParent.setOnClickListener(dismissDialogClickListener);
+                    } else {
+                        // Just set it on the home button
+                        ((FrameLayout) homeBtnContainer).setOnClickListener(dismissDialogClickListener);
+                    }
+                } else {
+                    homeBtn.setOnClickListener(dismissDialogClickListener);
+                }
+            }
+        }
+    }
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,45 +122,5 @@ public class MainSettings extends PreferenceFragment {
             initializeActionBar((PreferenceScreen) preference);
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
-    }
-
-    // Apply custom home button area click listener to close the PreferenceScreen
-    // because PreferenceScreens are dialogs which swallow
-    // events instead of passing to the activity
-    // Related Issue: https://code.google.com/p/android/issues/detail?id=4611
-    public static void initializeActionBar(final PreferenceScreen preferenceScreen) {
-        final Dialog dialog = preferenceScreen.getDialog();
-
-        if (dialog != null) {
-            if (dialog.getActionBar() != null) dialog.getActionBar().setDisplayHomeAsUpEnabled(true);
-
-            final View homeBtn = dialog.findViewById(android.R.id.home);
-
-            if (homeBtn != null) {
-                final View.OnClickListener dismissDialogClickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        dialog.dismiss();
-                    }
-                };
-
-                final ViewParent homeBtnContainer = homeBtn.getParent();
-
-                // The home button is an ImageView inside a FrameLayout
-                if (homeBtnContainer instanceof FrameLayout) {
-                    final ViewGroup containerParent = (ViewGroup) homeBtnContainer.getParent();
-
-                    if (containerParent instanceof LinearLayout) {
-                        // This view also contains the title text, set the whole view as clickable
-                        ((LinearLayout) containerParent).setOnClickListener(dismissDialogClickListener);
-                    } else {
-                        // Just set it on the home button
-                        ((FrameLayout) homeBtnContainer).setOnClickListener(dismissDialogClickListener);
-                    }
-                } else {
-                    homeBtn.setOnClickListener(dismissDialogClickListener);
-                }
-            }
-        }
     }
 }

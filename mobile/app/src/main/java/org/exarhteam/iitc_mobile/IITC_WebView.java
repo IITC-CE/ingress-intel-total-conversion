@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -30,7 +29,8 @@ public class IITC_WebView extends WebView {
     public static final int FS_ACTIONBAR = (1 << 2);
     public static final int FS_STATUSBAR = (1 << 3);
     public static final int FS_NAVBAR = (1 << 4);
-
+    private final String mDesktopUserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0)" +
+            " Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
     private WebSettings mSettings;
     private IITC_WebViewClient mIitcWebViewClient;
     private IITC_WebChromeClient mIitcWebChromeClient;
@@ -40,10 +40,27 @@ public class IITC_WebView extends WebView {
     private int mFullscreenStatus = 0;
     private Runnable mNavHider;
     private boolean mDisableJs = false;
-    private final String mDesktopUserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0)" +
-            " Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
     private String mMobileUserAgent;
 
+
+    // constructors -------------------------------------------------
+    public IITC_WebView(final Context context) {
+        super(context);
+
+        iitc_init(context);
+    }
+
+    public IITC_WebView(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+
+        iitc_init(context);
+    }
+
+    public IITC_WebView(final Context context, final AttributeSet attrs, final int defStyle) {
+        super(context, attrs, defStyle);
+
+        iitc_init(context);
+    }
 
     // init web view
     private void iitc_init(final Context c) {
@@ -56,9 +73,9 @@ public class IITC_WebView extends WebView {
         mSettings.setDomStorageEnabled(true);
         mSettings.setAllowFileAccess(true);
         mSettings.setGeolocationEnabled(true);
-      //   mSettings.setAppCacheEnabled(true);  ! is deprecated (new: .setCacheMode())
+        //   mSettings.setAppCacheEnabled(true);  ! is deprecated (new: .setCacheMode())
         mSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-      // mSettings.setAppCachePath(getContext().getCacheDir().getAbsolutePath()); ! removed in SDK 33 (https://developer.android.com/sdk/api_diff/33/changes)
+        // mSettings.setAppCachePath(getContext().getCacheDir().getAbsolutePath()); ! removed in SDK 33 (https://developer.android.com/sdk/api_diff/33/changes)
         int zoom = Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1"));
         if (zoom != -1) {
             mSettings.setTextZoom(zoom);
@@ -106,25 +123,6 @@ public class IITC_WebView extends WebView {
         setWebViewClient(mIitcWebViewClient);
     }
 
-    // constructors -------------------------------------------------
-    public IITC_WebView(final Context context) {
-        super(context);
-
-        iitc_init(context);
-    }
-
-    public IITC_WebView(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-
-        iitc_init(context);
-    }
-
-    public IITC_WebView(final Context context, final AttributeSet attrs, final int defStyle) {
-        super(context, attrs, defStyle);
-
-        iitc_init(context);
-    }
-
     // ----------------------------------------------------------------
 
     @Override
@@ -149,18 +147,18 @@ public class IITC_WebView extends WebView {
 
     @TargetApi(19)
     public void loadJS(final String js) {
-            // if in edit text mode, don't load javascript otherwise the keyboard closes.
-            final HitTestResult testResult = getHitTestResult();
-            if (testResult != null && testResult.getType() == HitTestResult.EDIT_TEXT_TYPE) {
-                // let window.show(...) interrupt input
-                // window.show(...) is called if one of the action bar buttons
-                // is clicked
-                if (!js.startsWith("window.show(")) {
-                    Log.d("in insert mode. do not load script.");
-                    return;
-                }
+        // if in edit text mode, don't load javascript otherwise the keyboard closes.
+        final HitTestResult testResult = getHitTestResult();
+        if (testResult != null && testResult.getType() == HitTestResult.EDIT_TEXT_TYPE) {
+            // let window.show(...) interrupt input
+            // window.show(...) is called if one of the action bar buttons
+            // is clicked
+            if (!js.startsWith("window.show(")) {
+                Log.d("in insert mode. do not load script.");
+                return;
             }
-            super.loadUrl("javascript:" + js);
+        }
+        super.loadUrl("javascript:" + js);
     }
 
     @SuppressLint("ClickableViewAccessibility")

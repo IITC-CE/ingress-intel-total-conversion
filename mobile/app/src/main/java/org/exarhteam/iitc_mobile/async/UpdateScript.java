@@ -19,15 +19,10 @@ import okhttp3.Response;
 
 public class UpdateScript extends AsyncTask<String, Void, Boolean> {
 
-    public interface ScriptUpdatedFinishedCallback {
-        void scriptUpdateFinished(String scriptName, Boolean updated);
-    }
-
     private final ScriptUpdatedFinishedCallback mCallback;
-    private String mScriptName;
     private final boolean mForceSecureUpdates;
-
     private final OkHttpClient mClient;
+    private String mScriptName;
 
     public UpdateScript(final ScriptUpdatedFinishedCallback callback, final Boolean forceSecureUpdates) {
         mCallback = callback;
@@ -122,5 +117,9 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
     @Override
     protected void onPostExecute(final Boolean updated) {
         mCallback.scriptUpdateFinished(mScriptName, updated);
+    }
+
+    public interface ScriptUpdatedFinishedCallback {
+        void scriptUpdateFinished(String scriptName, Boolean updated);
     }
 }

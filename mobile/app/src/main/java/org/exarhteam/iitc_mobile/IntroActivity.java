@@ -1,4 +1,5 @@
 package org.exarhteam.iitc_mobile;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -12,17 +13,16 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
-import com.github.appintro.AppIntro;
-import org.exarhteam.iitc_mobile.fragments.IntroSlide;
-
-
 import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
 import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;
+import com.github.appintro.AppIntro;
+
+import org.exarhteam.iitc_mobile.fragments.IntroSlide;
 
 import java.util.Locale;
 
 public class IntroActivity extends AppIntro implements OnLocaleChangedListener {
-    private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
+    private final LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
 
     private IITC_Localization mLocalization;
     private SharedPreferences mSharedPrefs;
@@ -51,10 +51,12 @@ public class IntroActivity extends AppIntro implements OnLocaleChangedListener {
 
     // Just override method locale change event
     @Override
-    public void onBeforeLocaleChanged() { }
+    public void onBeforeLocaleChanged() {
+    }
 
     @Override
-    public void onAfterLocaleChanged() { }
+    public void onAfterLocaleChanged() {
+    }
 
     public final void setLanguage(String language) {
         localizationDelegate.setLanguage(this, language);
@@ -68,7 +70,9 @@ public class IntroActivity extends AppIntro implements OnLocaleChangedListener {
         return localizationDelegate.getLanguage(this);
     }
 
-    public void setRecommendedLocale() { setLanguage(mLocalization.getRecommendedLocale()); }
+    public void setRecommendedLocale() {
+        setLanguage(mLocalization.getRecommendedLocale());
+    }
 
     public void setEnglishLocale() {
         setLanguage(Locale.ENGLISH);
@@ -103,7 +107,6 @@ public class IntroActivity extends AppIntro implements OnLocaleChangedListener {
         addSlide(IntroSlide.newInstance(R.layout.intro_navigation));
         addSlide(IntroSlide.newInstance(R.layout.intro_layers));
         addSlide(IntroSlide.newInstance(R.layout.intro_plugins));
-
 
 
         setBarColor(ResourcesCompat.getColor(getResources(), R.color.iitc_blue_dark, null));

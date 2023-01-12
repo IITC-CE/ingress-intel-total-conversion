@@ -12,9 +12,9 @@ import java.net.URL;
 
 public class IITC_TileManager {
 
-    private final IITC_Mobile mIitc;
     private static final String TYPE = "image/*";
     private static final String ENCODING = null;
+    private final IITC_Mobile mIitc;
 
     IITC_TileManager(IITC_Mobile iitc) {
         mIitc = iitc;

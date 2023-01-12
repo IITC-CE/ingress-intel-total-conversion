@@ -25,46 +25,14 @@ import org.exarhteam.iitc_mobile.IITC_Mobile.ResponseHandler;
  * this class manages automatic login using the Google account stored on the device
  */
 public class IITC_DeviceAccountLogin implements AccountManagerCallback<Bundle>, ResponseHandler {
-    /**
-     * Adapter to show available accounts in a ListView. Accounts are read from mAccounts
-     */
-    private class AccountAdapter extends BaseAdapter {
-        @Override
-        public int getCount() {
-            return mAccounts.length;
-        }
-
-        @Override
-        public Account getItem(final int position) {
-            return mAccounts[position];
-        }
-
-        @Override
-        public long getItemId(final int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(final int position, final View convertView, final ViewGroup parent) {
-            final LayoutInflater inflater = mIitc.getLayoutInflater();
-            final View v = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-
-            final TextView tv = (TextView) v.findViewById(android.R.id.text1);
-            tv.setText(mAccounts[position].name);
-
-            return tv;
-        }
-    }
-
-    private Account mAccount;
     private final AccountAdapter mAccountAdapter;
     private final AccountManager mAccountManager;
-    private Account[] mAccounts;
     private final IITC_Mobile mIitc;
-    private String mAuthToken;
     private final AlertDialog mProgressbar;
     private final WebView mWebView;
-
+    private Account mAccount;
+    private Account[] mAccounts;
+    private String mAuthToken;
     /**
      * This listener is invoked when an item in the account list is selected.
      * (It is also used when the 'cancel' button is clicked, (in which case `index` is <0)
@@ -82,7 +50,7 @@ public class IITC_DeviceAccountLogin implements AccountManagerCallback<Bundle>, 
             };
 
     public IITC_DeviceAccountLogin(final IITC_Mobile iitc, final WebView webView,
-            final WebViewClient webViewClient) {
+                                   final WebViewClient webViewClient) {
         mIitc = iitc;
         mWebView = webView;
         mAccountManager = AccountManager.get(iitc);
@@ -192,5 +160,36 @@ public class IITC_DeviceAccountLogin implements AccountManagerCallback<Bundle>, 
         }
 
         displayAccountList();
+    }
+
+    /**
+     * Adapter to show available accounts in a ListView. Accounts are read from mAccounts
+     */
+    private class AccountAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return mAccounts.length;
+        }
+
+        @Override
+        public Account getItem(final int position) {
+            return mAccounts[position];
+        }
+
+        @Override
+        public long getItemId(final int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(final int position, final View convertView, final ViewGroup parent) {
+            final LayoutInflater inflater = mIitc.getLayoutInflater();
+            final View v = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+
+            final TextView tv = v.findViewById(android.R.id.text1);
+            tv.setText(mAccounts[position].name);
+
+            return tv;
+        }
     }
 }

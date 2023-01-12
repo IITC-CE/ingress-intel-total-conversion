@@ -1,5 +1,8 @@
 package org.exarhteam.iitc_mobile;
 
+import static android.webkit.WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+import static android.webkit.WebChromeClient.FileChooserParams.parseResult;
+
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Intent;
@@ -20,9 +23,6 @@ import androidx.annotation.RequiresApi;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import static android.webkit.WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-import static android.webkit.WebChromeClient.FileChooserParams.parseResult;
 
 /**
  * Created by cradle on 12/21/13.
@@ -85,24 +85,6 @@ public class IITC_WebChromeClient extends WebChromeClient {
         }
     }
 
-    private class FileRequestHandlerBelowLollipop implements IITC_Mobile.ResponseHandler {
-        FileRequestHandlerBelowLollipop(ValueCallback<Uri> filePathCallback) {
-            this.filePathCallback = filePathCallback;
-        }
-
-        ValueCallback<Uri> filePathCallback;
-
-        @Override
-        public void onActivityResult(final int resultCode, final Intent data) {
-            mIitc.deleteResponseHandler(this); // to enable garbage collection
-
-            final Uri uri = data.getData();
-            if (uri != null) {
-                this.filePathCallback.onReceiveValue(uri);
-            }
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private String[] convertToMimeTypes(String[] acceptTypes) {
         final Set<String> results = new HashSet<>();
@@ -153,8 +135,49 @@ public class IITC_WebChromeClient extends WebChromeClient {
         return true;
     }
 
+    @Override
+    public boolean onJsAlert(final WebView view, final String url, final String message, final JsResult result) {
+        return new IITC_JsDialogHelper(IITC_JsDialogHelper.ALERT, view, url, message, null, result).shouldInterrupt();
+    }
+
+    @Override
+    public boolean onJsBeforeUnload(final WebView view, final String url, final String message, final JsResult result) {
+        return new IITC_JsDialogHelper(IITC_JsDialogHelper.UNLOAD, view, url, message, null, result).shouldInterrupt();
+    }
+
+    @Override
+    public boolean onJsConfirm(final WebView view, final String url, final String message, final JsResult result) {
+        return new IITC_JsDialogHelper(IITC_JsDialogHelper.CONFIRM, view, url, message, null, result).shouldInterrupt();
+    }
+
+    @Override
+    public boolean onJsPrompt(final WebView view, final String url, final String message, final String defaultValue, final JsPromptResult result) {
+        return new IITC_JsDialogHelper(IITC_JsDialogHelper.PROMPT, view, url, message, defaultValue, result)
+                .shouldInterrupt();
+    }
+
+    private class FileRequestHandlerBelowLollipop implements IITC_Mobile.ResponseHandler {
+        ValueCallback<Uri> filePathCallback;
+
+        FileRequestHandlerBelowLollipop(ValueCallback<Uri> filePathCallback) {
+            this.filePathCallback = filePathCallback;
+        }
+
+        @Override
+        public void onActivityResult(final int resultCode, final Intent data) {
+            mIitc.deleteResponseHandler(this); // to enable garbage collection
+
+            final Uri uri = data.getData();
+            if (uri != null) {
+                this.filePathCallback.onReceiveValue(uri);
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class FileRequestHandler implements IITC_Mobile.ResponseHandler {
+        ValueCallback<Uri[]> filePathCallback;
+
         FileRequestHandler(ValueCallback<Uri[]> filePathCallback) {
             this.filePathCallback = filePathCallback;
         }
@@ -162,8 +185,6 @@ public class IITC_WebChromeClient extends WebChromeClient {
         public void cancel() {
             this.filePathCallback = null;
         }
-
-        ValueCallback<Uri[]> filePathCallback;
 
         @Override
         public void onActivityResult(final int resultCode, final Intent data) {
@@ -193,26 +214,5 @@ public class IITC_WebChromeClient extends WebChromeClient {
                 filePathCallback.onReceiveValue(uris);
             }
         }
-    }
-
-    @Override
-    public boolean onJsAlert(final WebView view, final String url, final String message, final JsResult result) {
-        return new IITC_JsDialogHelper(IITC_JsDialogHelper.ALERT, view, url, message, null, result).shouldInterrupt();
-    }
-
-    @Override
-    public boolean onJsBeforeUnload(final WebView view, final String url, final String message, final JsResult result) {
-        return new IITC_JsDialogHelper(IITC_JsDialogHelper.UNLOAD, view, url, message, null, result).shouldInterrupt();
-    }
-
-    @Override
-    public boolean onJsConfirm(final WebView view, final String url, final String message, final JsResult result) {
-        return new IITC_JsDialogHelper(IITC_JsDialogHelper.CONFIRM, view, url, message, null, result).shouldInterrupt();
-    }
-
-    @Override
-    public boolean onJsPrompt(final WebView view, final String url, final String message, final String defaultValue, final JsPromptResult result) {
-        return new IITC_JsDialogHelper(IITC_JsDialogHelper.PROMPT, view, url, message, defaultValue, result)
-                .shouldInterrupt();
     }
 }

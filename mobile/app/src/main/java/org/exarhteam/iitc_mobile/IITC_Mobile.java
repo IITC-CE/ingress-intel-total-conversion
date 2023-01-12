@@ -23,6 +23,7 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -42,25 +43,22 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-
-import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
-import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
+import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.exarhteam.iitc_mobile.prefs.PreferenceActivity;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,8 +78,19 @@ import java.util.regex.Pattern;
 public class IITC_Mobile extends AppCompatActivity
         implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnLocaleChangedListener {
     private static final String mIntelUrl = "https://intel.ingress.com/";
-
-    private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
+    private final Vector<ResponseHandler> mResponseHandlers = new Vector<ResponseHandler>();
+    private final Stack<String> mDialogStack = new Stack<String>();
+    // Used for custom back stack handling
+    private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            ((IITC_Mobile) context).installIitcUpdate();
+        }
+    };
+    public RecyclerView mLvDebug;
+    public FloatingActionButton debugScrollButton;
+    private final LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
     private SharedPreferences mSharedPrefs;
     private IITC_FileManager mFileManager;
     private IITC_WebView mIitcWebView;
@@ -89,26 +98,39 @@ public class IITC_Mobile extends AppCompatActivity
     private IITC_NavigationHelper mNavigationHelper;
     private IITC_MapSettings mMapSettings;
     private IITC_DeviceAccountLogin mLogin;
-    private final Vector<ResponseHandler> mResponseHandlers = new Vector<ResponseHandler>();
     private boolean mDexRunning = false;
     private boolean mDexDesktopMode = true;
     private boolean mDesktopMode = false;
     private Set<String> mAdvancedMenu;
     private MenuItem mSearchMenuItem;
     private View mImageLoading;
-    public RecyclerView mLvDebug;
     private View mLayoutDebug;
     private View mViewDebug;
     private LinearLayoutManager llm;
-    public FloatingActionButton debugScrollButton;
     private ImageButton mBtnToggleMap;
     private EditText mEditCommand;
     private boolean mDebugging = false;
     private boolean mReloadNeeded = false;
     private boolean mIsLoading = false;
+    // Setup receiver to detect if Samsung DeX mode has been changed
+    private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if ("android.app.action.ENTER_KNOX_DESKTOP_MODE".equals(action)) {
+                // Samsung DeX Mode has been entered
+                mDexRunning = true;
+                mNavigationHelper.onDexModeChanged(true);
+            } else if ("android.app.action.EXIT_KNOX_DESKTOP_MODE".equals(action)) {
+                // Samsung DeX mode has been exited
+                mDexRunning = false;
+                mNavigationHelper.onDexModeChanged(false);
+            }
+        }
+    };
     private boolean mShowMapInDebug = false;
     private boolean mPersistentZoom = false;
-    private final Stack<String> mDialogStack = new Stack<String>();
     private String mPermalink = null;
     private String mSearchTerm = "";
     private IntentFilter mDesktopFilter;
@@ -116,36 +138,8 @@ public class IITC_Mobile extends AppCompatActivity
     private int debugHistoryPosition = -1;
     private String debugInputStore = "";
     private Set<String> mInternalHostnames = new HashSet<>();
-
-    // Used for custom back stack handling
-    private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
     private Pane mCurrentPane = Pane.MAP;
     private boolean mBackButtonPressed = false;
-
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            ((IITC_Mobile) context).installIitcUpdate();
-        }
-    };
-
-    // Setup receiver to detect if Samsung DeX mode has been changed
-	private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
-		@Override
-    	public void onReceive(Context context, Intent intent) {
-        	String action = intent.getAction();
-
-        	if ("android.app.action.ENTER_KNOX_DESKTOP_MODE".equals(action)) {
-            	// Samsung DeX Mode has been entered
-            	mDexRunning = true;
-            	mNavigationHelper.onDexModeChanged(true);
-        	} else if ("android.app.action.EXIT_KNOX_DESKTOP_MODE".equals(action)) {
-            	// Samsung DeX mode has been exited
-            	mDexRunning = false;
-            	mNavigationHelper.onDexModeChanged(false);
-        	}
-    	}
-	};
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -154,15 +148,15 @@ public class IITC_Mobile extends AppCompatActivity
         Configuration config = getResources().getConfiguration();
         try {
             Class configClass = config.getClass();
-            if(configClass.getField("SEM_DESKTOP_MODE_ENABLED").getInt(configClass)
+            if (configClass.getField("SEM_DESKTOP_MODE_ENABLED").getInt(configClass)
                     == configClass.getField("semDesktopModeEnabled").getInt(config)) {
                 mDexRunning = true; // Samsung DeX mode enabled
             }
-        } catch(NoSuchFieldException e) {
+        } catch (NoSuchFieldException e) {
             //Handle the NoSuchFieldException
-        } catch(IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             //Handle the IllegalAccessException
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             //Handle the IllegalArgumentException
         }
 
@@ -185,7 +179,7 @@ public class IITC_Mobile extends AppCompatActivity
             // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
             // app-defined int constant that should be quite unique
 
-           // return;
+            // return;
         }
 
         // enable progress bar above action bar
@@ -200,12 +194,12 @@ public class IITC_Mobile extends AppCompatActivity
         debugScrollButton = findViewById(R.id.debugScrollButton);
 
         mImageLoading = findViewById(R.id.imageLoading);
-        mIitcWebView = (IITC_WebView) findViewById(R.id.iitc_webview);
+        mIitcWebView = findViewById(R.id.iitc_webview);
         mLayoutDebug = findViewById(R.id.layoutDebug);
-        mLvDebug = (RecyclerView) findViewById(R.id.lvDebug);
+        mLvDebug = findViewById(R.id.lvDebug);
         mViewDebug = findViewById(R.id.viewDebug);
-        mBtnToggleMap = (ImageButton) findViewById(R.id.btnToggleMapVisibility);
-        mEditCommand = (EditText) findViewById(R.id.editCommand);
+        mBtnToggleMap = findViewById(R.id.btnToggleMapVisibility);
+        mEditCommand = findViewById(R.id.editCommand);
         mEditCommand.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(final View v, final int keyCode, final KeyEvent event) {
@@ -274,7 +268,7 @@ public class IITC_Mobile extends AppCompatActivity
         mUserLocation.setLocationMode(Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0")));
 
         // compat actionbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.iitc_toolbar);
+        Toolbar toolbar = findViewById(R.id.iitc_toolbar);
         setSupportActionBar(toolbar);
 
         // pass ActionBar to helper because we deprecated getActionBar
@@ -309,7 +303,7 @@ public class IITC_Mobile extends AppCompatActivity
             mDesktopMode = sharedPreferences.getBoolean("pref_force_desktop", false);
             mNavigationHelper.onPrefChanged();
         } else if (key.equals("pref_dex_desktop")) {
-            mDexDesktopMode = sharedPreferences.getBoolean( "pref_dex_desktop", true);
+            mDexDesktopMode = sharedPreferences.getBoolean("pref_dex_desktop", true);
             mNavigationHelper.onPrefChanged();
         } else if (key.equals("pref_user_location_mode")) {
             final int mode = Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0"));
@@ -541,12 +535,16 @@ public class IITC_Mobile extends AppCompatActivity
 
     // Just override method locale change event
     @Override
-    public void onBeforeLocaleChanged() { }
+    public void onBeforeLocaleChanged() {
+    }
 
     @Override
-    public void onAfterLocaleChanged() { }
+    public void onAfterLocaleChanged() {
+    }
 
-    public final void setLanguage(String language) { localizationDelegate.setLanguage(this, language); }
+    public final void setLanguage(String language) {
+        localizationDelegate.setLanguage(this, language);
+    }
 
     public final Locale getCurrentLanguage() {
         return localizationDelegate.getLanguage(this);
@@ -739,7 +737,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         for (int i = 0; i < menu.size(); i++) {
             final MenuItem item = menu.getItem(i);
-            final boolean enabled = mAdvancedMenu.contains( getResources().getResourceEntryName(item.getItemId()) );
+            final boolean enabled = mAdvancedMenu.contains(getResources().getResourceEntryName(item.getItemId()));
 
             switch (item.getItemId()) {
                 case R.id.action_settings:
@@ -915,7 +913,7 @@ public class IITC_Mobile extends AppCompatActivity
      * called by IITC_WebViewClient when the Google login form is opened.
      */
     public void onReceivedLoginRequest(final IITC_WebViewClient client, final WebView view, final String realm,
-            final String account, final String args) {
+                                       final String account, final String args) {
         mLogin = new IITC_DeviceAccountLogin(this, view, client);
         mLogin.startLogin(realm, account, args);
     }
@@ -942,9 +940,9 @@ public class IITC_Mobile extends AppCompatActivity
     public void dialogOpened(final String id, final boolean open) {
         if (open) {
             Log.d("Dialog " + id + " added");
-	    if (!mDialogStack.contains(id)) {
+            if (!mDialogStack.contains(id)) {
                 mDialogStack.push(id);
-	    }
+            }
         } else {
             Log.d("Dialog " + id + " closed");
             mDialogStack.remove(id);
@@ -1028,7 +1026,7 @@ public class IITC_Mobile extends AppCompatActivity
                 "console.log('>>> ' + obj.code);" +
                 "try{result=eval(obj.code);}catch(e){if(e.stack) console.error(e.stack);throw e;}" +
                 "if(result!==undefined) console.log(result===null?null:result.toString());" +
-                "})(" + obj.toString() + ");";
+                "})(" + obj + ");";
 
         mIitcWebView.loadJS(js);
     }
@@ -1036,8 +1034,7 @@ public class IITC_Mobile extends AppCompatActivity
     /**
      * onClick handler for R.id.btnToggleMapVisibility, assigned in activity_main.xml
      */
-    public void onToggleMapVisibility(final View v)
-    {
+    public void onToggleMapVisibility(final View v) {
         mShowMapInDebug = !mShowMapInDebug;
         updateViews();
     }
@@ -1045,8 +1042,7 @@ public class IITC_Mobile extends AppCompatActivity
     /**
      * onClick handler for R.id.btnClearLog, assigned in activity_main.xml
      */
-    public void onClearLog(final View v)
-    {
+    public void onClearLog(final View v) {
         ((IITC_LogAdapter) mLvDebug.getAdapter()).clear();
     }
 
@@ -1057,9 +1053,8 @@ public class IITC_Mobile extends AppCompatActivity
     /**
      * onClick handler for R.id.btnDebugUp, assigned in activity_main.xml
      */
-    public void onDebugHistoryUp(final View v)
-    {
-        if (debugHistoryPosition >= debugHistory.getSize()-1) return;
+    public void onDebugHistoryUp(final View v) {
+        if (debugHistoryPosition >= debugHistory.getSize() - 1) return;
 
         if (debugHistoryPosition < 0) {
             debugInputStore = mEditCommand.getText().toString();
@@ -1073,8 +1068,7 @@ public class IITC_Mobile extends AppCompatActivity
     /**
      * onClick handler for R.id.btnDebugDown, assigned in activity_main.xml
      */
-    public void onDebugHistoryDown(final View v)
-    {
+    public void onDebugHistoryDown(final View v) {
         if (debugHistoryPosition < 0) return;
         debugHistoryPosition -= 1;
 
@@ -1106,16 +1100,14 @@ public class IITC_Mobile extends AppCompatActivity
     /**
      * onClick handler for R.id.btnDebugLeft, assigned in activity_main.xml
      */
-    public void onDebugCursorMoveRight(final View v)
-    {
+    public void onDebugCursorMoveRight(final View v) {
         mEditCommand.setSelection(debugCursorMove(true));
     }
 
     /**
      * onClick handler for R.id.btnDebugRight, assigned in activity_main.xml
      */
-    public void onDebugCursorMoveLeft(final View v)
-    {
+    public void onDebugCursorMoveLeft(final View v) {
         mEditCommand.setSelection(debugCursorMove(false));
     }
 
@@ -1163,7 +1155,6 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     /**
-     *
      * @deprecated ActionBar related stuff should be handled by IITC_NavigationHelper
      */
     @Deprecated
@@ -1192,10 +1183,6 @@ public class IITC_Mobile extends AppCompatActivity
         return mUserLocation;
     }
 
-    public interface ResponseHandler {
-        void onActivityResult(int resultCode, Intent data);
-    }
-
     public void setPermalink(final String href) {
         mPermalink = href;
     }
@@ -1208,12 +1195,12 @@ public class IITC_Mobile extends AppCompatActivity
         mIitcWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         // After switch to software render, we need to redraw the webview, but of all the ways I have worked only resizing.
         final ViewGroup.LayoutParams savedLayoutParams = mIitcWebView.getLayoutParams();
-        mIitcWebView.setLayoutParams(new LinearLayout.LayoutParams(mIitcWebView.getWidth()+10, LinearLayout.LayoutParams.FILL_PARENT));
+        mIitcWebView.setLayoutParams(new LinearLayout.LayoutParams(mIitcWebView.getWidth() + 10, LinearLayout.LayoutParams.FILL_PARENT));
         // This takes some time, so a timer is set.
         // After the screenshot is taken, the webview size and render type are returned to their original state.
 
         new Handler().postDelayed(() -> {
-            final Bitmap bitmap = Bitmap.createBitmap(mIitcWebView.getWidth(),mIitcWebView.getHeight(), Bitmap.Config.ARGB_8888);
+            final Bitmap bitmap = Bitmap.createBitmap(mIitcWebView.getWidth(), mIitcWebView.getHeight(), Bitmap.Config.ARGB_8888);
             mIitcWebView.draw(new Canvas(bitmap));
 
             try {
@@ -1240,11 +1227,11 @@ public class IITC_Mobile extends AppCompatActivity
     public NdefMessage createNdefMessage(final NfcEvent event) {
         NdefRecord[] records;
         if (mPermalink == null) { // no permalink yet, just provide AAR
-            records = new NdefRecord[] {
+            records = new NdefRecord[]{
                     NdefRecord.createApplicationRecord(getPackageName())
             };
         } else {
-            records = new NdefRecord[] {
+            records = new NdefRecord[]{
                     NdefRecord.createUri(mPermalink),
                     NdefRecord.createApplicationRecord(getPackageName())
             };
@@ -1295,6 +1282,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     /**
      * Add host name that should be opened in the internal webview.
+     *
      * @param hostname host name.
      */
     public void addInternalHostname(String hostname) {
@@ -1307,6 +1295,10 @@ public class IITC_Mobile extends AppCompatActivity
      */
     public boolean isInternalHostname(String hostname) {
         return mInternalHostnames.contains(hostname);
+    }
+
+    public interface ResponseHandler {
+        void onActivityResult(int resultCode, Intent data);
     }
 
 

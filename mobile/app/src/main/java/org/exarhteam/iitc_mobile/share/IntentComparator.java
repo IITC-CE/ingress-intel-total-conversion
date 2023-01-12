@@ -84,9 +84,7 @@ public class IntentComparator implements Comparator<Intent> {
         if (order != 0) return order;
 
         order = lComponent.getClassName().compareTo(rComponent.getClassName());
-        if (order != 0) return order;
-
-        return 0;
+        return order;
     }
 
     public void save() {
@@ -165,12 +163,10 @@ public class IntentComparator implements Comparator<Intent> {
             }
 
             if (packageName == null) {
-                if (c.packageName != null) return false;
+                return c.packageName == null;
             } else {
-                if (!packageName.equals(c.packageName)) return false;
+                return packageName.equals(c.packageName);
             }
-
-            return true;
         }
 
         @Override

@@ -34,9 +34,9 @@ public class IITC_WebViewClient extends WebViewClient {
                     .getBytes());
 
     private final IITC_Mobile mIitc;
-    private boolean mIitcInjected = false;
     private final String mIitcPath;
     private final IITC_TileManager mTileManager;
+    private boolean mIitcInjected = false;
 
     public IITC_WebViewClient(final IITC_Mobile iitc) {
         mIitc = iitc;
@@ -47,10 +47,10 @@ public class IITC_WebViewClient extends WebViewClient {
     @SuppressLint("InflateParams")
     // no other way for AlertDialog
     private Dialog createSignInDialog(final HttpAuthHandler handler, final String host, final String realm,
-            final String username, final String password) {
+                                      final String username, final String password) {
         final View v = mIitc.getLayoutInflater().inflate(R.layout.dialog_http_authentication, null);
-        final TextView tvUsername = (TextView) v.findViewById(R.id.username);
-        final TextView tvPassword = (TextView) v.findViewById(R.id.password);
+        final TextView tvUsername = v.findViewById(R.id.username);
+        final TextView tvPassword = v.findViewById(R.id.password);
         final String title = String.format(mIitc.getString(R.string.sign_in_to), host, realm);
 
         if (username != null)
@@ -119,7 +119,7 @@ public class IITC_WebViewClient extends WebViewClient {
 
     @Override
     public void onPageFinished(final WebView view, final String url) {
-        if(url.startsWith("https://intel.ingress.com")) {
+        if (url.startsWith("https://intel.ingress.com")) {
             if (mIitcInjected) return;
             Log.d("injecting iitc..");
             loadScripts((IITC_WebView) view);
@@ -130,7 +130,7 @@ public class IITC_WebViewClient extends WebViewClient {
 
     @Override
     public void onReceivedHttpAuthRequest(final WebView view, final HttpAuthHandler handler, final String host,
-            final String realm) {
+                                          final String realm) {
         String username = null;
         String password = null;
 
@@ -292,8 +292,8 @@ public class IITC_WebViewClient extends WebViewClient {
             return false;
         }
         if (uriHost.startsWith("accounts.google.") ||
-                 uriHost.startsWith("appengine.google.") ||
-                 uriHost.startsWith("accounts.youtube.")) {
+                uriHost.startsWith("appengine.google.") ||
+                uriHost.startsWith("accounts.youtube.")) {
             Log.d("Google login");
             return false;
         }

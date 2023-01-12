@@ -33,8 +33,12 @@ class IITC_Localization {
     }
 
     String getRecommendedLocale() {
-        if (appLanguages.contains(systemLocaleLong)) { return systemLocaleLong; }
-        if (appLanguages.contains(systemLocale)) { return systemLocale; }
+        if (appLanguages.contains(systemLocaleLong)) {
+            return systemLocaleLong;
+        }
+        if (appLanguages.contains(systemLocale)) {
+            return systemLocale;
+        }
         return Locale.ENGLISH.toString();
     }
 }

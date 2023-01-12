@@ -1,12 +1,13 @@
 package org.exarhteam.iitc_mobile.fragments;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.R;
@@ -48,10 +49,10 @@ public class IntroSlide extends Fragment {
         View btn = getView().findViewById(R.id.appintro_welcome_change_language);
         if (btn == null) return;
 
-        if (((IntroActivity)getActivity()).getCurrentLanguage().equals(Locale.ENGLISH)) {
+        if (((IntroActivity) getActivity()).getCurrentLanguage().equals(Locale.ENGLISH)) {
             btn.setVisibility(View.INVISIBLE);
         } else {
-            btn.setOnClickListener( (View v) -> ((IntroActivity)getActivity()).setEnglishLocale() );
+            btn.setOnClickListener((View v) -> ((IntroActivity) getActivity()).setEnglishLocale());
         }
     }
 }

@@ -49,7 +49,9 @@ public class CheckHttpResponse extends AsyncTask<String, Void, Boolean> {
                     }
                 });
                 // TODO: remove when google login issue is fixed
-                if (urls[0].contains("uberauth=WILL_NOT_SIGN_IN")) { return true; }
+                if (urls[0].contains("uberauth=WILL_NOT_SIGN_IN")) {
+                    return true;
+                }
             }
         } catch (final IOException e) {
             Log.w(e);

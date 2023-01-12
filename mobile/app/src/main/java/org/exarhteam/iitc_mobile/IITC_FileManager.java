@@ -66,6 +66,7 @@ public class IITC_FileManager {
     private final SharedPreferences mPrefs;
     // update interval is 2 days by default
     private long mUpdateInterval = 1000 * 60 * 60 * 24 * 7;
+
     public IITC_FileManager(final Activity activity) {
         mActivity = activity;
 
