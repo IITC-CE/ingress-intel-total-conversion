@@ -51,19 +51,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IITC_FileManager {
+    public static final String DOMAIN = ".iitcm.localhost";
     private static final int PERMISSION_REQUEST_CODE = 3;
-
     private static final WebResourceResponse EMPTY =
             new WebResourceResponse("text/plain", "UTF-8", new ByteArrayInputStream("".getBytes()));
     private static final String WRAPPER_NEW = "wrapper(info);";
     private static final String WRAPPER_OLD =
             "script.appendChild(document.createTextNode('('+ wrapper +')('+JSON.stringify(info)+');'));\n"
                     + "(document.body || document.head || document.documentElement).appendChild(script);";
-
+    public static String PLUGINS_PATH = null;
+    private final AssetManager mAssetManager;
+    private final Activity mActivity;
+    private final String mIitcPath;
+    private final SharedPreferences mPrefs;
     // update interval is 2 days by default
     private long mUpdateInterval = 1000 * 60 * 60 * 24 * 7;
+    public IITC_FileManager(final Activity activity) {
+        mActivity = activity;
 
-    public static final String DOMAIN = ".iitcm.localhost";
+        PLUGINS_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath()
+                + "/IITC_Mobile/plugins/";
+        mIitcPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/IITC_Mobile/";
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        mAssetManager = mActivity.getAssets();
+    }
 
     /**
      * copies the contents of a stream into another stream and (optionally) closes the output stream afterwards
@@ -136,22 +147,6 @@ public class IITC_FileManager {
         return os.toString();
     }
 
-    private final AssetManager mAssetManager;
-    private final Activity mActivity;
-    private final String mIitcPath;
-    private final SharedPreferences mPrefs;
-    public static String PLUGINS_PATH = null;
-
-    public IITC_FileManager(final Activity activity) {
-        mActivity = activity;
-
-        PLUGINS_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath()
-                + "/IITC_Mobile/plugins/";
-        mIitcPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/IITC_Mobile/";
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        mAssetManager = mActivity.getAssets();
-    }
-
     private InputStream getAssetFile(final String filename) throws IOException {
         if (mPrefs.getBoolean("pref_dev_checkbox", false)) {
             final File file = new File(mIitcPath + "dev/" + filename);
@@ -216,7 +211,7 @@ public class IITC_FileManager {
         final HashMap<String, String> info = getScriptInfo(content);
 
         final JSONObject jObject = new JSONObject(info);
-        final String gmInfo = "var GM_info={\"script\":" + jObject.toString() + "};\n";
+        final String gmInfo = "var GM_info={\"script\":" + jObject + "};\n";
 
         content = content.replace(WRAPPER_OLD, WRAPPER_NEW);
 
@@ -256,53 +251,32 @@ public class IITC_FileManager {
             String text = mActivity.getString(R.string.install_dialog_msg);
             text = String.format(text, uri);
 
-            final File pluginsDirectory = new File(PLUGINS_PATH);
-            if(pluginsDirectory.exists()) {
 
-                String  text2 = "Found old Plugin Folder!\nPlease delete first this folder:\n\n "+Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath()+ "/IITC_Mobile/ ";
+            // create alert dialog
+            new AlertDialog.Builder(mActivity)
+                    .setTitle(mActivity.getString(R.string.install_dialog_top))
+                    .setMessage(Html.fromHtml(text))
+                    .setCancelable(true)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int which) {
+                            copyPlugin(uri, invalidateHeaders);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .create()
+                    .show();
 
-
-                // create alert dialog
-                new AlertDialog.Builder(mActivity)
-                        .setTitle("Error")
-                        .setMessage(Html.fromHtml(text2))
-                        .setCancelable(true)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog, final int which) {
-                                dialog.cancel();
-                            }
-                        })
-
-                        .create()
-                        .show();
-
-            }
-            else {
-                // create alert dialog
-                new AlertDialog.Builder(mActivity)
-                        .setTitle(mActivity.getString(R.string.install_dialog_top))
-                        .setMessage(Html.fromHtml(text))
-                        .setCancelable(true)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog, final int which) {
-                                copyPlugin(uri, invalidateHeaders);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog, final int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .create()
-                        .show();
-            }
         }
     }
 
     private void copyPlugin(final Uri uri, final boolean invalidateHeaders) {
+        boolean plugin_exist = false;
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -326,6 +300,24 @@ public class IITC_FileManager {
 
 
                     final File pluginsDirectory = new File(PLUGINS_PATH);
+                    final File pluginsFileDirectory = new File(PLUGINS_PATH + "/" + fileName);
+                    if (pluginsFileDirectory.exists()) {
+
+
+                        if (pluginsFileDirectory.delete()) {
+                            System.out.println("file Deleted :" + pluginsFileDirectory);
+                            pluginsDirectory.mkdirs();
+
+                            // create in and out streams and copy plugin
+                            final File outFile = new File(pluginsDirectory, fileName);
+                            final OutputStream os = new FileOutputStream(outFile);
+                            IITC_FileManager.copyStream(is, os, true);
+                        } else {
+                            System.out.println("file not Deleted :" + pluginsFileDirectory);
+                        }
+
+
+                    } else {
 
                         pluginsDirectory.mkdirs();
 
@@ -333,6 +325,7 @@ public class IITC_FileManager {
                         final File outFile = new File(pluginsDirectory, fileName);
                         final OutputStream os = new FileOutputStream(outFile);
                         IITC_FileManager.copyStream(is, os, true);
+                    }
 
                 } catch (final IOException e) {
                     Log.w(e);
@@ -378,6 +371,23 @@ public class IITC_FileManager {
                 .commit();
     }
 
+    public void setUpdateInterval(final int interval) {
+        mUpdateInterval = 1000 * 60 * 60 * 24 * interval;
+    }
+
+    public boolean checkWriteStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT < 33) {
+            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                ActivityCompat.requestPermissions(mActivity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            return true;
+        }
+    }
+
     private class ScriptUpdatedCallback implements UpdateScript.ScriptUpdatedFinishedCallback {
         public void scriptUpdateFinished(String scriptName, Boolean updated) {
             if (!updated) {
@@ -405,27 +415,9 @@ public class IITC_FileManager {
         }
     }
 
-
-    public void setUpdateInterval(final int interval) {
-        mUpdateInterval = 1000 * 60 * 60 * 24 * interval;
-    }
-
-    public boolean checkWriteStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT < 33) {
-            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else {
-                ActivityCompat.requestPermissions(mActivity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-                return false;
-            }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            return true;
-        }
-    }
-
     private class FileRequest extends WebResourceResponse implements ResponseHandler, Runnable {
-        private Intent mData;
         private final String mFunctionName;
+        private Intent mData;
         private int mResultCode;
         private PipedOutputStream mStreamOut;
 
@@ -506,9 +498,9 @@ public class IITC_FileManager {
 
     @TargetApi(19)
     public class FileSaveRequest implements ResponseHandler, Runnable {
-        private Intent mData;
         private final IITC_Mobile mIitc;
         private final String mContent;
+        private Intent mData;
 
         public FileSaveRequest(final String filename, final String type, final String content) {
             final Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
