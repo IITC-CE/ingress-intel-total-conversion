@@ -1,7 +1,7 @@
 // @name           Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.7.0
+// @version        0.8.0
 // @description    Machina investigation tools
 
 /* exported setup --eslint */
