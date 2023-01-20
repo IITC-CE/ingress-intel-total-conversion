@@ -132,25 +132,25 @@ machinaTools.getLinkLength = function (link) {
 
 machinaTools.gatherMachinaPortalDetail = function (portalGuid, depth) {
   var portal = window.portals[portalGuid];
-  var linkGuids = getPortalLinks(portalGuid);
-
-  return {
-    guid: portalGuid,
-    depth: depth,
-    latlng: toLatLng(portal.options.data.latE6, portal.options.data.lngE6),
-    level: Math.max(portal.options.level, ...(portal.options.data.resonators || []).map((r) => r.level)),
-    name: portal.options.data.title,
-    children: linkGuids.out
-      .map((lGuid) => {
-        var l = window.links[lGuid];
-        return {
-          childGuid: l.options.data.dGuid,
-          linkTime: l.options.timestamp,
-          length: machinaTools.getLinkLength(l.options.data),
-        };
-      })
-      .sort((a, b) => a.linkTime - b.linkTime),
-  };
+  if (portal) {
+    return {
+      guid: portalGuid,
+      depth: depth,
+      latlng: toLatLng(portal.options.data.latE6, portal.options.data.lngE6),
+      level: Math.max(portal.options.level, ...(portal.options.data.resonators || []).map((r) => r.level)),
+      name: portal.options.data.title,
+      children: getPortalLinks(portalGuid)
+        .out.map((lGuid) => {
+          var l = window.links[lGuid];
+          return {
+            childGuid: l.options.data.dGuid,
+            linkTime: l.options.timestamp,
+            length: machinaTools.getLinkLength(l.options.data),
+          };
+        })
+        .sort((a, b) => a.linkTime - b.linkTime),
+    };
+  }
 };
 
 /**
@@ -177,14 +177,16 @@ machinaTools.gatherCluster = function (seed) {
 
     var processingQueue = [];
     while (curPortal) {
-      rcPortals[curPortal.guid] = machinaTools.gatherMachinaPortalDetail(curPortal.guid, curPortal.depth);
-
-      rcPortals[curPortal.guid].children.forEach((element) => {
-        processingQueue.push({
-          guid: element.childGuid,
-          depth: curPortal.depth + 1,
+      var machinaPortalDetail = machinaTools.gatherMachinaPortalDetail(curPortal.guid, curPortal.depth);
+      if (machinaPortalDetail) {
+        rcPortals[curPortal.guid] = machinaPortalDetail;
+        machinaPortalDetail.children.forEach((element) => {
+          processingQueue.push({
+            guid: element.childGuid,
+            depth: curPortal.depth + 1,
+          });
         });
-      });
+      }
 
       // Move on to the next portal on the list.
       curPortal = processingQueue.shift();
@@ -198,50 +200,60 @@ function getDisplayPortalName(portal) {
   return portal.name || '[Click to load...]';
 }
 
+function appendPortalLine(rc, portal) {
+  rc.append('Portal: ');
+  var portalName = getDisplayPortalName(portal);
+  var portalLink = $('<a>', {
+    title: portalName,
+    html: portalName,
+    click: window.zoomToAndShowPortal.bind(window, portal.guid, portal.latlng),
+  });
+  rc.append(portalLink);
+  rc.append(`(${portal.level}) [Depth: ${portal.depth}]`);
+  rc.append('<br/>');
+}
+
+function createChildListItem(parent, childData, childPortal) {
+  var childListItem = $('<li>');
+  childListItem.append(new Date(childData.linkTime).toUTCString());
+  childListItem.append(' link to ');
+  var childName = getDisplayPortalName(childPortal);
+  var childLink = $('<a>', {
+    title: childName,
+    html: childName,
+    click: window.zoomToAndShowPortal.bind(window, childData.childGuid, childPortal.latlng),
+  });
+  childListItem.append(childLink);
+
+  var lengthDescription;
+  if (childData.length < 100000) {
+    lengthDescription = digits(Math.round(childData.length)) + 'm';
+  } else {
+    lengthDescription = digits(Math.round(childData.length / 1000)) + 'km';
+  }
+
+  if (window.LINK_RANGE_MAC[parent.level] < childData.length) {
+    lengthDescription += ' (EXCEEDS EXPECTED MAX)';
+  }
+  childListItem.append(`(${childPortal.level}) - ${lengthDescription}`);
+  return childListItem;
+}
+
 machinaTools.clusterDisplayNode = function (clusterPortals) {
   var rc = $('<div>');
   for (var guid in clusterPortals) {
     var portal = clusterPortals[guid];
-    rc.append('Portal: ');
-    var portalName = getDisplayPortalName(portal);
-    var portalLink = $('<a>', {
-      title: portalName,
-      html: portalName,
-      click: window.zoomToAndShowPortal.bind(window, guid, portal.latlng),
-    });
-    rc.append(portalLink);
-    rc.append(`(${portal.level}) [Depth: ${portal.depth}]<br/>`);
+    appendPortalLine(rc, portal);
     if (portal.children.length > 0) {
       var childList = $('<ul>');
       rc.append(childList);
-      portal.children.forEach((child) => {
-        var childPortal = clusterPortals[child.childGuid];
+      portal.children.forEach((childData) => {
+        var childPortal = clusterPortals[childData.childGuid];
         if (childPortal !== undefined) {
-          var lengthDescription;
-          if (child.length < 100000) {
-            lengthDescription = digits(Math.round(child.length)) + 'm';
-          } else {
-            lengthDescription = digits(Math.round(child.length / 1000)) + 'km';
-          }
-
-          if (window.LINK_RANGE_MAC[portal.level] < child.length) {
-            lengthDescription += ' (EXCEEDS EXPECTED MAX)';
-          }
-          var childListItem = $('<li>');
-          childListItem.append(new Date(child.linkTime).toUTCString());
-          childListItem.append(' link to ');
-          var childName = getDisplayPortalName(childPortal);
-          var childLink = $('<a>', {
-            title: childName,
-            html: childName,
-            click: window.zoomToAndShowPortal.bind(window, child.childGuid, childPortal.latlng),
-          });
-          childListItem.append(childLink);
-          childListItem.append(`(${childPortal.level}) - ${lengthDescription}`);
-
+          var childListItem = createChildListItem(portal, childData, childPortal);
           childList.append(childListItem);
         } else {
-          rc.append($('<li>', { html: `${new Date(child.linkTime).toUTCString()} link to UNKNOWN` }));
+          childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
         }
       });
     } else {
@@ -297,7 +309,7 @@ machinaTools.onPortalDetailsUpdated = function () {
 
   portalData = portalDetail.get(window.selectedPortal);
 
-  if (portalData.team === 'M') {
+  if (portalData.team === window.TEAM_CODE_MAC) {
     var linkdetails = $('.linkdetails');
     linkdetails.append(createInfoLink('Find Parent', 'Find Machina Parent', () => window.plugin.machinaTools.goToParent(window.selectedPortal)));
     linkdetails.append(createInfoLink('Find Seed', 'Find Machina Seed', () => window.plugin.machinaTools.goToSeed(window.selectedPortal)));
@@ -383,7 +395,7 @@ machinaTools.removePortalExclusion = function (guid) {
  */
 machinaTools.portalAdded = function (data) {
   // Draw the circle if the team of the portal is Machina.
-  if (window.TEAM_NAMES[data.portal.options.team] === window.TEAM_NAME_MAC) {
+  if (data.portal.options.team === window.TEAM_MAC) {
     machinaTools.drawPortalExclusion(data.portal);
   }
 };
@@ -439,7 +451,7 @@ machinaTools.drawLinkExclusion = function (link) {
 };
 
 machinaTools.linkAdded = function (data) {
-  if (window.TEAM_NAMES[data.link.options.team] === window.TEAM_NAME_MAC) {
+  if (data.link.options.team === window.TEAM_MAC) {
     machinaTools.drawLinkExclusion(data.link);
   }
 };
@@ -491,14 +503,19 @@ function createAreaInfoDialogContent() {
 }
 
 function refreshDialogs(guid) {
-  if (guid && window.portals[guid] && window.TEAM_NAMES[window.portals[guid].options.team] === window.TEAM_NAME_MAC) {
+  if (guid && window.portals[guid] && window.portals[guid].options.team === window.TEAM_MAC) {
     var seed = machinaTools.findSeed(guid);
     if (seed && machinaTools._clusterDialogs[seed.guid]) {
       doDisplayClusterInfo(seed);
     }
   }
+
   if (machinaTools._conflictAreaInfoDialog) {
     machinaTools._conflictAreaInfoDialog.html(createAreaInfoDialogContent());
+  }
+
+  if (machinaTools._clustersInfoDialog) {
+    machinaTools._clustersInfoDialog.html(createClustersInfoDialog());
   }
 }
 
@@ -519,11 +536,11 @@ machinaTools.showConflictAreaInfoDialog = function () {
 
 machinaTools.loadConflictAreas = function () {
   Object.values(window.portals)
-    .filter((p) => window.TEAM_NAMES[p.options.team] === window.TEAM_NAME_MAC)
+    .filter((p) => p.options.team === window.TEAM_MAC)
     .forEach(machinaTools.drawPortalExclusion);
 
   Object.values(window.links)
-    .filter((l) => window.TEAM_NAMES[l.options.team] === window.TEAM_NAME_MAC)
+    .filter((l) => l.options.team === window.TEAM_MAC)
     .forEach(machinaTools.drawLinkExclusion);
 
   machinaTools.updateConflictArea();
@@ -542,6 +559,62 @@ machinaTools.mapDataRefreshEnd = function () {
   if (!machinaTools.recordZones) {
     machinaTools.resetConflictArea();
   }
+  refreshDialogs();
+};
+
+function appendChildrenList(appendTo, leaf, clusterPortals) {
+  if (leaf.children.length) {
+    var childList = $('<ul>');
+    appendTo.append(childList);
+    leaf.children.forEach((childData) => {
+      var childPortal = clusterPortals[childData.childGuid];
+      if (childPortal !== undefined) {
+        var childListItem = createChildListItem(leaf, childData, childPortal);
+        appendChildrenList(childListItem, childPortal, clusterPortals);
+        childList.append(childListItem);
+      } else {
+        childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
+      }
+    });
+  }
+}
+
+function createClustersInfoDialog() {
+  var html = $('<div>');
+  var seeds = [];
+  Object.values(window.portals)
+    .filter((p) => map.getBounds().contains(p.getLatLng()))
+    .filter((p) => p.options.team === window.TEAM_MAC)
+    .forEach((p) => {
+      var seedData = machinaTools.findSeed(p.options.guid);
+      if (!seeds.find((s) => s.guid === seedData.guid)) {
+        seeds.push(seedData);
+        var clusterPortals = machinaTools.gatherCluster(seedData);
+        var seed = clusterPortals[seedData.guid];
+        if (seed) {
+          appendPortalLine(html, seed);
+          appendChildrenList(html, seed, clusterPortals);
+        }
+      }
+    });
+
+  if (!html.children().length) {
+    html.append('No Clusters found.');
+  }
+  return html;
+}
+
+machinaTools.showClustersDialog = function () {
+  machinaTools._clustersInfoDialog = dialog({
+    html: createClustersInfoDialog(),
+    title: 'Visible Machina Clusters',
+    dialogClass: 'machina-tools',
+    id: 'visible-machina-clusters',
+    width: 'max-content',
+    closeCallback: () => {
+      delete machinaTools._clustersInfoDialog;
+    },
+  });
 };
 
 function setupLayers() {
@@ -582,6 +655,12 @@ function setupToolBoxLinks() {
     title: 'Conflict Area Info',
     click: machinaTools.showConflictAreaInfoDialog,
     html: 'Conflict Area Info',
+  }).appendTo(toolbox);
+
+  $('<a>', {
+    title: 'Display Visible Machina Clusters Info',
+    click: machinaTools.showClustersDialog,
+    html: 'Machina Clusters',
   }).appendTo(toolbox);
 }
 

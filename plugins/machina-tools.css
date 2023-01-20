@@ -27,3 +27,7 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
     cy: 15px;
     r: 9px;
 }
+
+.machina-tools.ui-dialog {
+    max-width: calc(100vw - 2px);
+}
