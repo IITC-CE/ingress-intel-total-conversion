@@ -318,6 +318,8 @@ machinaTools.onPortalDetailsUpdated = function () {
     // Add this portal's conflict zone to the conflict area
     machinaTools.drawPortalExclusion(window.portals[window.selectedPortal]);
   }
+
+  refreshDialogs(window.selectedPortal);
 };
 
 /**
@@ -328,14 +330,13 @@ machinaTools.zoomLevelHasPortals = function () {
   return window.getDataZoomTileParameters().hasPortals;
 };
 
-machinaTools.updateConflictArea = function (guid) {
+machinaTools.updateConflictArea = function () {
   if (machinaTools.conflictAreaLast) {
     machinaTools.conflictAreaLayer.removeLayer(machinaTools.conflictAreaLast);
   }
   machinaTools.conflictAreaLast = L.geoJson(machinaTools.conflictArea);
   machinaTools.conflictAreaLayer.addLayer(machinaTools.conflictAreaLast);
   machinaTools.conflictAreaLast.setStyle(machinaTools.optConflictZone);
-  refreshDialogs(guid);
 };
 
 machinaTools.addPortalCircle = function (guid, circle) {
@@ -355,7 +356,7 @@ machinaTools.drawExclusion = function (guid, level, latlng, placeholder) {
 
   var zone = new L.geodesicCircle(latlng, range, machinaTools.optConflictZone);
   machinaTools.addConflictZone(guid, zone);
-  machinaTools.updateConflictArea(guid);
+  machinaTools.updateConflictArea();
 };
 
 machinaTools.addConflictZone = function (guid, zone) {
