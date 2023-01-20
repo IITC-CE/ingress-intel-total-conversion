@@ -2,7 +2,7 @@
 // @author         Perringaiden
 // @category       Misc
 // @version        0.8.0
-// @description    Machina investigation tools
+// @description    Machina investigation tools - 2 new layers to see possible Machina spread and portal detail links to display Machina cluster information and to navigate to parent or seed Machina portal
 
 /* exported setup --eslint */
 /* global , digits, L, map, dialog, getPortalLinks, portalDetail, turf */
