@@ -311,15 +311,14 @@ machinaTools.onPortalDetailsUpdated = function () {
 
   if (portalData.team === window.TEAM_CODE_MAC) {
     var linkdetails = $('.linkdetails');
-    linkdetails.append(createInfoLink('Find Parent', 'Find Machina Parent', () => window.plugin.machinaTools.goToParent(window.selectedPortal)));
-    linkdetails.append(createInfoLink('Find Seed', 'Find Machina Seed', () => window.plugin.machinaTools.goToSeed(window.selectedPortal)));
-    linkdetails.append(createInfoLink('Cluster Details', 'Display Machina Cluster', () => window.plugin.machinaTools.displayCluster(window.selectedPortal)));
+    linkdetails.append(createInfoLink('Find Parent', 'Find Machina Parent', () => machinaTools.goToParent(window.selectedPortal)));
+    linkdetails.append(createInfoLink('Find Seed', 'Find Machina Seed', () => machinaTools.goToSeed(window.selectedPortal)));
+    linkdetails.append(createInfoLink('Cluster Details', 'Display Machina Cluster', () => machinaTools.displayCluster(window.selectedPortal)));
 
     // Add this portal's conflict zone to the conflict area
     machinaTools.drawPortalExclusion(window.portals[window.selectedPortal]);
+    refreshDialogs(window.selectedPortal);
   }
-
-  refreshDialogs(window.selectedPortal);
 };
 
 /**
@@ -331,11 +330,9 @@ machinaTools.zoomLevelHasPortals = function () {
 };
 
 machinaTools.updateConflictArea = function () {
-  if (machinaTools.conflictAreaLast) {
-    machinaTools.conflictAreaLayer.removeLayer(machinaTools.conflictAreaLast);
-  }
+  machinaTools.conflictLayer.clearLayers();
   machinaTools.conflictAreaLast = L.geoJson(machinaTools.conflictArea);
-  machinaTools.conflictAreaLayer.addLayer(machinaTools.conflictAreaLast);
+  machinaTools.conflictLayer.addLayer(machinaTools.conflictAreaLast);
   machinaTools.conflictAreaLast.setStyle(machinaTools.optConflictZone);
 };
 
@@ -350,7 +347,7 @@ machinaTools.drawExclusion = function (guid, level, latlng, placeholder) {
   var range = window.LINK_RANGE_MAC[level + 1];
 
   // add circles only when handling real portals
-  if (!placeholder) {
+  if (isDisplayLayerEnabled() && !placeholder) {
     machinaTools.addPortalCircle(guid, new L.Circle(latlng, range, machinaTools.optCircle));
   }
 
@@ -375,7 +372,9 @@ machinaTools.addConflictZone = function (guid, zone) {
 machinaTools.drawPortalExclusion = function (portal) {
   // Gather the location of the portal, and generate a 20m
   // radius red circle centered on the lat/lng of the portal.
-  machinaTools.drawExclusion(portal.options.guid, portal.options.level, portal.getLatLng());
+  if (portal.options.team === window.TEAM_MAC) {
+    machinaTools.drawExclusion(portal.options.guid, portal.options.level, portal.getLatLng());
+  }
 };
 
 /**
@@ -398,9 +397,7 @@ machinaTools.removePortalExclusion = function (guid) {
  */
 machinaTools.portalAdded = function (data) {
   // Draw the circle if the team of the portal is Machina.
-  if (data.portal.options.team === window.TEAM_MAC) {
-    machinaTools.drawPortalExclusion(data.portal);
-  }
+  machinaTools.drawPortalExclusion(data.portal);
 };
 
 /**
@@ -443,20 +440,20 @@ machinaTools.guessLevelByRange = function (linkLength) {
 };
 
 machinaTools.drawLinkExclusion = function (link) {
-  var linkData = link.options.data;
-  // add destination portal - 1 level
-  machinaTools.drawExclusion(linkData.dGuid, 1, machinaTools.getDLatLng(linkData), true);
+  if (link.options.team === window.TEAM_MAC) {
+    var linkData = link.options.data;
+    // add destination portal - 1 level
+    machinaTools.drawExclusion(linkData.dGuid, 1, machinaTools.getDLatLng(linkData), true);
 
-  // add origin portal - level based on link length
-  var linkLength = machinaTools.getLinkLength(linkData);
-  var level = machinaTools.guessLevelByRange(linkLength);
-  machinaTools.drawExclusion(linkData.oGuid, level, machinaTools.getOLatLng(linkData), true);
+    // add origin portal - level based on link length
+    var linkLength = machinaTools.getLinkLength(linkData);
+    var level = machinaTools.guessLevelByRange(linkLength);
+    machinaTools.drawExclusion(linkData.oGuid, level, machinaTools.getOLatLng(linkData), true);
+  }
 };
 
 machinaTools.linkAdded = function (data) {
-  if (data.link.options.team === window.TEAM_MAC) {
-    machinaTools.drawLinkExclusion(data.link);
-  }
+  machinaTools.drawLinkExclusion(data.link);
 };
 
 function humanFileSize(size) {
@@ -537,19 +534,18 @@ machinaTools.showConflictAreaInfoDialog = function () {
   });
 };
 
+function isDisplayLayerEnabled() {
+  return map.hasLayer(machinaTools.displayLayer);
+}
+
 function isConflictLayerEnabled() {
-  return map._layers[machinaTools.conflictLayer._leaflet_id];
+  return map.hasLayer(machinaTools.conflictLayer);
 }
 
 machinaTools.loadConflictAreas = function () {
-  if (isConflictLayerEnabled()) {
-    Object.values(window.portals)
-      .filter((p) => p.options.team === window.TEAM_MAC)
-      .forEach(machinaTools.drawPortalExclusion);
-
-    Object.values(window.links)
-      .filter((l) => l.options.team === window.TEAM_MAC)
-      .forEach(machinaTools.drawLinkExclusion);
+  if (isConflictLayerEnabled() || isDisplayLayerEnabled()) {
+    Object.values(window.portals).forEach(machinaTools.drawPortalExclusion);
+    Object.values(window.links).forEach(machinaTools.drawLinkExclusion);
 
     machinaTools.updateConflictArea();
   }
@@ -633,11 +629,10 @@ function setupLayers() {
 
   // This layer is added into the above layer, and removed from it when we zoom out too far.
   machinaTools.circleDisplayLayer = new L.LayerGroup();
-  machinaTools.conflictAreaLayer = new L.LayerGroup();
-
+  machinaTools.circleDisplayLayer.on('add', () => machinaTools.loadConflictAreas());
+  machinaTools.circleDisplayLayer.on('remove', () => machinaTools.circleDisplayLayer.clearLayers());
   // Initially add the circle display layer into base display layer.  We will trigger an assessment below.
   machinaTools.displayLayer.addLayer(machinaTools.circleDisplayLayer);
-  machinaTools.conflictLayer.addLayer(machinaTools.conflictAreaLayer);
 
   machinaTools.conflictLayer.on('add', () => {
     if (machinaTools.recordButton) {
@@ -666,8 +661,6 @@ function setupHooks() {
 
   // Add a hook to trigger the showOrHide method when the map finishes zooming or reloads.
   map.on('zoomend', machinaTools.showOrHideMachinaLevelUpRadius);
-  map.on('loading', machinaTools.showOrHideMachinaLevelUpRadius);
-  map.on('load', machinaTools.showOrHideMachinaLevelUpRadius);
 }
 
 function setupToolBoxLinks() {
