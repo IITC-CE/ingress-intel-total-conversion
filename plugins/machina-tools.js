@@ -577,18 +577,21 @@ function appendChildrenList(appendTo, leaf, clusterPortals) {
   });
   if (!leaf.children.length) {
     appendTo.addClass('empty');
+  } else {
+    leaf.children.forEach((childData) => {
+      appendTo.append(childList);
+      var childPortal = clusterPortals[childData.childGuid];
+      if (childPortal !== undefined) {
+        var childListItem = createChildListItem(leaf, childData, childPortal);
+        childListItem.css('border-left-color', `hsl(${Math.trunc((childData.linkTime / (60 * 60 * 1000)) % 360)},100%,50%)`);
+        childListItem.addClass('striped');
+        appendChildrenList(childListItem, childPortal, clusterPortals);
+        childList.append(childListItem);
+      } else {
+        childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
+      }
+    });
   }
-  leaf.children.forEach((childData) => {
-    appendTo.append(childList);
-    var childPortal = clusterPortals[childData.childGuid];
-    if (childPortal !== undefined) {
-      var childListItem = createChildListItem(leaf, childData, childPortal);
-      appendChildrenList(childListItem, childPortal, clusterPortals);
-      childList.append(childListItem);
-    } else {
-      childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
-    }
-  });
 }
 
 function createClustersInfoDialog() {

@@ -32,15 +32,8 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
     max-width: calc(100vw - 2px);
 }
 
-#dialog-visible-machina-clusters .collapsible {
-    padding-left: 1ch;
-    position: relative;
-}
-
 #dialog-visible-machina-clusters .collapsible:before {
     content: '\25BC';
-    position: absolute;
-    left: -1ch;
 }
 
 #dialog-visible-machina-clusters .collapsible.collapsed:before {
@@ -52,6 +45,8 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
     content: '\25AA';
 }
 
-#dialog-visible-machina-clusters .childrenList {
-    margin-left: 40px;
+#dialog-visible-machina-clusters .striped {
+    padding-left: 10px;
+    margin-left: 10px;
+    border-left: 5px solid;
 }
