@@ -206,7 +206,10 @@ function appendPortalLine(rc, portal) {
   var portalLink = $('<a>', {
     title: portalName,
     html: portalName,
-    click: window.zoomToAndShowPortal.bind(window, portal.guid, portal.latlng),
+    click: (e) => {
+      window.zoomToAndShowPortal(portal.guid, portal.latlng);
+      e.stopPropagation();
+    },
   });
   rc.append(portalLink);
   rc.append(`(${portal.level}) [Depth: ${portal.depth}]`);
@@ -214,14 +217,17 @@ function appendPortalLine(rc, portal) {
 }
 
 function createChildListItem(parent, childData, childPortal) {
-  var childListItem = $('<div>');
+  var childListItem = $('<li>');
   childListItem.append(new Date(childData.linkTime).toUTCString());
   childListItem.append(' link to ');
   var childName = getDisplayPortalName(childPortal);
   var childLink = $('<a>', {
     title: childName,
     html: childName,
-    click: window.zoomToAndShowPortal.bind(window, childData.childGuid, childPortal.latlng),
+    click: (e) => {
+      window.zoomToAndShowPortal(childData.childGuid, childPortal.latlng);
+      e.stopPropagation();
+    },
   });
   childListItem.append(childLink);
 

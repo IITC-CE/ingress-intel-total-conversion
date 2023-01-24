@@ -32,8 +32,15 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
     max-width: calc(100vw - 2px);
 }
 
+#dialog-visible-machina-clusters li {
+    list-style: none;
+}
+
 #dialog-visible-machina-clusters .collapsible:before {
     content: '\25BC';
+    width: 3ch;
+    display: inline-block;
+    text-align: center;
 }
 
 #dialog-visible-machina-clusters .collapsible.collapsed:before {
