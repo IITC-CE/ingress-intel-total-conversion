@@ -31,3 +31,27 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
 .machina-tools.ui-dialog {
     max-width: calc(100vw - 2px);
 }
+
+#dialog-visible-machina-clusters .collapsible {
+    padding-left: 1ch;
+    position: relative;
+}
+
+#dialog-visible-machina-clusters .collapsible:before {
+    content: '\25BC';
+    position: absolute;
+    left: -1ch;
+}
+
+#dialog-visible-machina-clusters .collapsible.collapsed:before {
+    content: '\25B6';
+}
+
+#dialog-visible-machina-clusters .collapsible.empty:before,
+#dialog-visible-machina-clusters .collapsible.collapsed.empty:before {
+    content: '\25AA';
+}
+
+#dialog-visible-machina-clusters .childrenList {
+    margin-left: 40px;
+}

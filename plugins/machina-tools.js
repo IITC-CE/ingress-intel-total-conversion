@@ -214,7 +214,7 @@ function appendPortalLine(rc, portal) {
 }
 
 function createChildListItem(parent, childData, childPortal) {
-  var childListItem = $('<li>');
+  var childListItem = $('<div>');
   childListItem.append(new Date(childData.linkTime).toUTCString());
   childListItem.append(' link to ');
   var childName = getDisplayPortalName(childPortal);
@@ -568,28 +568,34 @@ machinaTools.mapDataRefreshEnd = function () {
 };
 
 function appendChildrenList(appendTo, leaf, clusterPortals) {
-  if (leaf.children.length) {
-    var childList = $('<ul>');
-    appendTo.append(childList);
-    leaf.children.forEach((childData) => {
-      var childPortal = clusterPortals[childData.childGuid];
-      if (childPortal !== undefined) {
-        var childListItem = createChildListItem(leaf, childData, childPortal);
-        appendChildrenList(childListItem, childPortal, clusterPortals);
-        childList.append(childListItem);
-      } else {
-        childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
-      }
-    });
+  var childList = $('<div>', { class: 'childrenList' });
+  appendTo.addClass('collapsible');
+  appendTo.on('click', (e) => {
+    childList.slideToggle('slow');
+    appendTo.toggleClass('collapsed');
+    e.stopPropagation();
+  });
+  if (!leaf.children.length) {
+    appendTo.addClass('empty');
   }
+  leaf.children.forEach((childData) => {
+    appendTo.append(childList);
+    var childPortal = clusterPortals[childData.childGuid];
+    if (childPortal !== undefined) {
+      var childListItem = createChildListItem(leaf, childData, childPortal);
+      appendChildrenList(childListItem, childPortal, clusterPortals);
+      childList.append(childListItem);
+    } else {
+      childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
+    }
+  });
 }
 
 function createClustersInfoDialog() {
   var html = $('<div>');
   var seeds = [];
   Object.values(window.portals)
-    .filter((p) => map.getBounds().contains(p.getLatLng()))
-    .filter((p) => p.options.team === window.TEAM_MAC)
+    .filter((p) => map.getBounds().contains(p.getLatLng()) && p.options.team === window.TEAM_MAC)
     .forEach((p) => {
       var seedData = machinaTools.findSeed(p.options.guid);
       if (!seeds.find((s) => s.guid === seedData.guid)) {
@@ -597,8 +603,10 @@ function createClustersInfoDialog() {
         var clusterPortals = machinaTools.gatherCluster(seedData);
         var seed = clusterPortals[seedData.guid];
         if (seed) {
-          appendPortalLine(html, seed);
-          appendChildrenList(html, seed, clusterPortals);
+          var portalSection = $('<div>');
+          portalSection.appendTo(html);
+          appendPortalLine(portalSection, seed);
+          appendChildrenList(portalSection, seed, clusterPortals);
         }
       }
     });
