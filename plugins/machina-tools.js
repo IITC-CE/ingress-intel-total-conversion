@@ -2,7 +2,7 @@
 // @author         Perringaiden
 // @category       Misc
 // @version        0.8.0
-// @description    Machina investigation tools
+// @description    Machina investigation tools - 2 new layers to see possible Machina spread and portal detail links to display Machina cluster information and to navigate to parent or seed Machina portal
 
 /* exported setup --eslint */
 /* global , digits, L, map, dialog, getPortalLinks, portalDetail, turf */
@@ -132,25 +132,25 @@ machinaTools.getLinkLength = function (link) {
 
 machinaTools.gatherMachinaPortalDetail = function (portalGuid, depth) {
   var portal = window.portals[portalGuid];
-  var linkGuids = getPortalLinks(portalGuid);
-
-  return {
-    guid: portalGuid,
-    depth: depth,
-    latlng: toLatLng(portal.options.data.latE6, portal.options.data.lngE6),
-    level: Math.max(portal.options.level, ...(portal.options.data.resonators || []).map((r) => r.level)),
-    name: portal.options.data.title,
-    children: linkGuids.out
-      .map((lGuid) => {
-        var l = window.links[lGuid];
-        return {
-          childGuid: l.options.data.dGuid,
-          linkTime: l.options.timestamp,
-          length: machinaTools.getLinkLength(l.options.data),
-        };
-      })
-      .sort((a, b) => a.linkTime - b.linkTime),
-  };
+  if (portal) {
+    return {
+      guid: portalGuid,
+      depth: depth,
+      latlng: toLatLng(portal.options.data.latE6, portal.options.data.lngE6),
+      level: Math.max(portal.options.level, ...(portal.options.data.resonators || []).map((r) => r.level)),
+      name: portal.options.data.title,
+      children: getPortalLinks(portalGuid)
+        .out.map((lGuid) => {
+          var l = window.links[lGuid];
+          return {
+            childGuid: l.options.data.dGuid,
+            linkTime: l.options.timestamp,
+            length: machinaTools.getLinkLength(l.options.data),
+          };
+        })
+        .sort((a, b) => a.linkTime - b.linkTime),
+    };
+  }
 };
 
 /**
@@ -177,14 +177,16 @@ machinaTools.gatherCluster = function (seed) {
 
     var processingQueue = [];
     while (curPortal) {
-      rcPortals[curPortal.guid] = machinaTools.gatherMachinaPortalDetail(curPortal.guid, curPortal.depth);
-
-      rcPortals[curPortal.guid].children.forEach((element) => {
-        processingQueue.push({
-          guid: element.childGuid,
-          depth: curPortal.depth + 1,
+      var machinaPortalDetail = machinaTools.gatherMachinaPortalDetail(curPortal.guid, curPortal.depth);
+      if (machinaPortalDetail) {
+        rcPortals[curPortal.guid] = machinaPortalDetail;
+        machinaPortalDetail.children.forEach((element) => {
+          processingQueue.push({
+            guid: element.childGuid,
+            depth: curPortal.depth + 1,
+          });
         });
-      });
+      }
 
       // Move on to the next portal on the list.
       curPortal = processingQueue.shift();
@@ -198,50 +200,66 @@ function getDisplayPortalName(portal) {
   return portal.name || '[Click to load...]';
 }
 
+function appendPortalLine(rc, portal) {
+  rc.append('Portal: ');
+  var portalName = getDisplayPortalName(portal);
+  var portalLink = $('<a>', {
+    title: portalName,
+    html: portalName,
+    click: (e) => {
+      window.zoomToAndShowPortal(portal.guid, portal.latlng);
+      e.stopPropagation();
+    },
+  });
+  rc.append(portalLink);
+  rc.append(`(${portal.level}) [Depth: ${portal.depth}]`);
+  rc.append('<br/>');
+}
+
+function createChildListItem(parent, childData, childPortal) {
+  var childListItem = $('<li>');
+  childListItem.append(new Date(childData.linkTime).toUTCString());
+  childListItem.append(' link to ');
+  var childName = getDisplayPortalName(childPortal);
+  var childLink = $('<a>', {
+    title: childName,
+    html: childName,
+    click: (e) => {
+      window.zoomToAndShowPortal(childData.childGuid, childPortal.latlng);
+      e.stopPropagation();
+    },
+  });
+  childListItem.append(childLink);
+
+  var lengthDescription;
+  if (childData.length < 100000) {
+    lengthDescription = digits(Math.round(childData.length)) + 'm';
+  } else {
+    lengthDescription = digits(Math.round(childData.length / 1000)) + 'km';
+  }
+
+  if (window.LINK_RANGE_MAC[parent.level] < childData.length) {
+    lengthDescription += ' (EXCEEDS EXPECTED MAX)';
+  }
+  childListItem.append(`(${childPortal.level}) - ${lengthDescription}`);
+  return childListItem;
+}
+
 machinaTools.clusterDisplayNode = function (clusterPortals) {
   var rc = $('<div>');
   for (var guid in clusterPortals) {
     var portal = clusterPortals[guid];
-    rc.append('Portal: ');
-    var portalName = getDisplayPortalName(portal);
-    var portalLink = $('<a>', {
-      title: portalName,
-      html: portalName,
-      click: window.zoomToAndShowPortal.bind(window, guid, portal.latlng),
-    });
-    rc.append(portalLink);
-    rc.append(`(${portal.level}) [Depth: ${portal.depth}]<br/>`);
+    appendPortalLine(rc, portal);
     if (portal.children.length > 0) {
       var childList = $('<ul>');
       rc.append(childList);
-      portal.children.forEach((child) => {
-        var childPortal = clusterPortals[child.childGuid];
+      portal.children.forEach((childData) => {
+        var childPortal = clusterPortals[childData.childGuid];
         if (childPortal !== undefined) {
-          var lengthDescription;
-          if (child.length < 100000) {
-            lengthDescription = digits(Math.round(child.length)) + 'm';
-          } else {
-            lengthDescription = digits(Math.round(child.length / 1000)) + 'km';
-          }
-
-          if (window.LINK_RANGE_MAC[portal.level] < child.length) {
-            lengthDescription += ' (EXCEEDS EXPECTED MAX)';
-          }
-          var childListItem = $('<li>');
-          childListItem.append(new Date(child.linkTime).toUTCString());
-          childListItem.append(' link to ');
-          var childName = getDisplayPortalName(childPortal);
-          var childLink = $('<a>', {
-            title: childName,
-            html: childName,
-            click: window.zoomToAndShowPortal.bind(window, child.childGuid, childPortal.latlng),
-          });
-          childListItem.append(childLink);
-          childListItem.append(`(${childPortal.level}) - ${lengthDescription}`);
-
+          var childListItem = createChildListItem(portal, childData, childPortal);
           childList.append(childListItem);
         } else {
-          rc.append($('<li>', { html: `${new Date(child.linkTime).toUTCString()} link to UNKNOWN` }));
+          childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
         }
       });
     } else {
@@ -297,14 +315,15 @@ machinaTools.onPortalDetailsUpdated = function () {
 
   portalData = portalDetail.get(window.selectedPortal);
 
-  if (portalData.team === 'M') {
+  if (portalData.team === window.TEAM_CODE_MAC) {
     var linkdetails = $('.linkdetails');
-    linkdetails.append(createInfoLink('Find Parent', 'Find Machina Parent', () => window.plugin.machinaTools.goToParent(window.selectedPortal)));
-    linkdetails.append(createInfoLink('Find Seed', 'Find Machina Seed', () => window.plugin.machinaTools.goToSeed(window.selectedPortal)));
-    linkdetails.append(createInfoLink('Cluster Details', 'Display Machina Cluster', () => window.plugin.machinaTools.displayCluster(window.selectedPortal)));
+    linkdetails.append(createInfoLink('Find Parent', 'Find Machina Parent', () => machinaTools.goToParent(window.selectedPortal)));
+    linkdetails.append(createInfoLink('Find Seed', 'Find Machina Seed', () => machinaTools.goToSeed(window.selectedPortal)));
+    linkdetails.append(createInfoLink('Cluster Details', 'Display Machina Cluster', () => machinaTools.displayCluster(window.selectedPortal)));
 
     // Add this portal's conflict zone to the conflict area
     machinaTools.drawPortalExclusion(window.portals[window.selectedPortal]);
+    refreshDialogs(window.selectedPortal);
   }
 };
 
@@ -316,14 +335,11 @@ machinaTools.zoomLevelHasPortals = function () {
   return window.getDataZoomTileParameters().hasPortals;
 };
 
-machinaTools.updateConflictArea = function (guid) {
-  if (machinaTools.conflictAreaLast) {
-    machinaTools.conflictAreaLayer.removeLayer(machinaTools.conflictAreaLast);
-  }
+machinaTools.updateConflictArea = function () {
+  machinaTools.conflictLayer.clearLayers();
   machinaTools.conflictAreaLast = L.geoJson(machinaTools.conflictArea);
-  machinaTools.conflictAreaLayer.addLayer(machinaTools.conflictAreaLast);
+  machinaTools.conflictLayer.addLayer(machinaTools.conflictAreaLast);
   machinaTools.conflictAreaLast.setStyle(machinaTools.optConflictZone);
-  refreshDialogs(guid);
 };
 
 machinaTools.addPortalCircle = function (guid, circle) {
@@ -337,13 +353,15 @@ machinaTools.drawExclusion = function (guid, level, latlng, placeholder) {
   var range = window.LINK_RANGE_MAC[level + 1];
 
   // add circles only when handling real portals
-  if (!placeholder) {
+  if (isDisplayLayerEnabled() && !placeholder) {
     machinaTools.addPortalCircle(guid, new L.Circle(latlng, range, machinaTools.optCircle));
   }
 
-  var zone = new L.geodesicCircle(latlng, range, machinaTools.optConflictZone);
-  machinaTools.addConflictZone(guid, zone);
-  machinaTools.updateConflictArea(guid);
+  if (isConflictLayerEnabled()) {
+    var zone = new L.geodesicCircle(latlng, range, machinaTools.optConflictZone);
+    machinaTools.addConflictZone(guid, zone);
+    machinaTools.updateConflictArea();
+  }
 };
 
 machinaTools.addConflictZone = function (guid, zone) {
@@ -360,7 +378,9 @@ machinaTools.addConflictZone = function (guid, zone) {
 machinaTools.drawPortalExclusion = function (portal) {
   // Gather the location of the portal, and generate a 20m
   // radius red circle centered on the lat/lng of the portal.
-  machinaTools.drawExclusion(portal.options.guid, portal.options.level, portal.getLatLng());
+  if (portal.options.team === window.TEAM_MAC) {
+    machinaTools.drawExclusion(portal.options.guid, portal.options.level, portal.getLatLng());
+  }
 };
 
 /**
@@ -383,9 +403,7 @@ machinaTools.removePortalExclusion = function (guid) {
  */
 machinaTools.portalAdded = function (data) {
   // Draw the circle if the team of the portal is Machina.
-  if (window.TEAM_NAMES[data.portal.options.team] === window.TEAM_NAME_MAC) {
-    machinaTools.drawPortalExclusion(data.portal);
-  }
+  machinaTools.drawPortalExclusion(data.portal);
 };
 
 /**
@@ -428,20 +446,20 @@ machinaTools.guessLevelByRange = function (linkLength) {
 };
 
 machinaTools.drawLinkExclusion = function (link) {
-  var linkData = link.options.data;
-  // add destination portal - 1 level
-  machinaTools.drawExclusion(linkData.dGuid, 1, machinaTools.getDLatLng(linkData), true);
+  if (link.options.team === window.TEAM_MAC) {
+    var linkData = link.options.data;
+    // add destination portal - 1 level
+    machinaTools.drawExclusion(linkData.dGuid, 1, machinaTools.getDLatLng(linkData), true);
 
-  // add origin portal - level based on link length
-  var linkLength = machinaTools.getLinkLength(linkData);
-  var level = machinaTools.guessLevelByRange(linkLength);
-  machinaTools.drawExclusion(linkData.oGuid, level, machinaTools.getOLatLng(linkData), true);
+    // add origin portal - level based on link length
+    var linkLength = machinaTools.getLinkLength(linkData);
+    var level = machinaTools.guessLevelByRange(linkLength);
+    machinaTools.drawExclusion(linkData.oGuid, level, machinaTools.getOLatLng(linkData), true);
+  }
 };
 
 machinaTools.linkAdded = function (data) {
-  if (window.TEAM_NAMES[data.link.options.team] === window.TEAM_NAME_MAC) {
-    machinaTools.drawLinkExclusion(data.link);
-  }
+  machinaTools.drawLinkExclusion(data.link);
 };
 
 function humanFileSize(size) {
@@ -491,14 +509,19 @@ function createAreaInfoDialogContent() {
 }
 
 function refreshDialogs(guid) {
-  if (guid && window.portals[guid] && window.TEAM_NAMES[window.portals[guid].options.team] === window.TEAM_NAME_MAC) {
+  if (guid && window.portals[guid] && window.portals[guid].options.team === window.TEAM_MAC) {
     var seed = machinaTools.findSeed(guid);
     if (seed && machinaTools._clusterDialogs[seed.guid]) {
       doDisplayClusterInfo(seed);
     }
   }
+
   if (machinaTools._conflictAreaInfoDialog) {
     machinaTools._conflictAreaInfoDialog.html(createAreaInfoDialogContent());
+  }
+
+  if (machinaTools._clustersInfoDialog) {
+    machinaTools._clustersInfoDialog.html(createClustersInfoDialog());
   }
 }
 
@@ -517,16 +540,21 @@ machinaTools.showConflictAreaInfoDialog = function () {
   });
 };
 
+function isDisplayLayerEnabled() {
+  return map.hasLayer(machinaTools.displayLayer);
+}
+
+function isConflictLayerEnabled() {
+  return map.hasLayer(machinaTools.conflictLayer);
+}
+
 machinaTools.loadConflictAreas = function () {
-  Object.values(window.portals)
-    .filter((p) => window.TEAM_NAMES[p.options.team] === window.TEAM_NAME_MAC)
-    .forEach(machinaTools.drawPortalExclusion);
+  if (isConflictLayerEnabled() || isDisplayLayerEnabled()) {
+    Object.values(window.portals).forEach(machinaTools.drawPortalExclusion);
+    Object.values(window.links).forEach(machinaTools.drawLinkExclusion);
 
-  Object.values(window.links)
-    .filter((l) => window.TEAM_NAMES[l.options.team] === window.TEAM_NAME_MAC)
-    .forEach(machinaTools.drawLinkExclusion);
-
-  machinaTools.updateConflictArea();
+    machinaTools.updateConflictArea();
+  }
 };
 
 machinaTools.clearConflictArea = function () {
@@ -542,20 +570,98 @@ machinaTools.mapDataRefreshEnd = function () {
   if (!machinaTools.recordZones) {
     machinaTools.resetConflictArea();
   }
+  refreshDialogs();
+};
+
+function appendChildrenList(appendTo, leaf, clusterPortals) {
+  var childList = $('<div>', { class: 'childrenList' });
+  appendTo.addClass('collapsible');
+  appendTo.on('click', (e) => {
+    childList.slideToggle('slow');
+    appendTo.toggleClass('collapsed');
+    e.stopPropagation();
+  });
+  if (!leaf.children.length) {
+    appendTo.addClass('empty');
+  } else {
+    leaf.children.forEach((childData) => {
+      appendTo.append(childList);
+      var childPortal = clusterPortals[childData.childGuid];
+      if (childPortal !== undefined) {
+        var childListItem = createChildListItem(leaf, childData, childPortal);
+        childListItem.css('border-left-color', `hsl(${Math.trunc((childData.linkTime / (60 * 60 * 1000)) % 360)},100%,50%)`);
+        childListItem.addClass('striped');
+        appendChildrenList(childListItem, childPortal, clusterPortals);
+        childList.append(childListItem);
+      } else {
+        childList.append($('<li>', { html: `${new Date(childData.linkTime).toUTCString()} link to UNKNOWN` }));
+      }
+    });
+  }
+}
+
+function createClustersInfoDialog() {
+  var html = $('<div>');
+  var seeds = [];
+  Object.values(window.portals)
+    .filter((p) => map.getBounds().contains(p.getLatLng()) && p.options.team === window.TEAM_MAC)
+    .forEach((p) => {
+      var seedData = machinaTools.findSeed(p.options.guid);
+      if (!seeds.find((s) => s.guid === seedData.guid)) {
+        seeds.push(seedData);
+        var clusterPortals = machinaTools.gatherCluster(seedData);
+        var seed = clusterPortals[seedData.guid];
+        if (seed) {
+          var portalSection = $('<div>');
+          portalSection.appendTo(html);
+          appendPortalLine(portalSection, seed);
+          appendChildrenList(portalSection, seed, clusterPortals);
+        }
+      }
+    });
+
+  if (!html.children().length) {
+    html.append('No Clusters found.');
+  }
+  return html;
+}
+
+machinaTools.showClustersDialog = function () {
+  machinaTools._clustersInfoDialog = dialog({
+    html: createClustersInfoDialog(),
+    title: 'Visible Machina Clusters',
+    dialogClass: 'machina-tools',
+    id: 'visible-machina-clusters',
+    width: 'max-content',
+    closeCallback: () => {
+      delete machinaTools._clustersInfoDialog;
+    },
+  });
 };
 
 function setupLayers() {
-  // This layer is added to the layer chooser, to be toggled on/off, regardless of zoom.
+  // This layer is added to the layer chooser, to be toggled on/off
   machinaTools.displayLayer = new L.LayerGroup([], { minZoom: 15 });
   machinaTools.conflictLayer = new L.LayerGroup();
 
   // This layer is added into the above layer, and removed from it when we zoom out too far.
   machinaTools.circleDisplayLayer = new L.LayerGroup();
-  machinaTools.conflictAreaLayer = new L.LayerGroup();
-
+  machinaTools.circleDisplayLayer.on('add', () => machinaTools.loadConflictAreas());
+  machinaTools.circleDisplayLayer.on('remove', () => machinaTools.circleDisplayLayer.clearLayers());
   // Initially add the circle display layer into base display layer.  We will trigger an assessment below.
   machinaTools.displayLayer.addLayer(machinaTools.circleDisplayLayer);
-  machinaTools.conflictLayer.addLayer(machinaTools.conflictAreaLayer);
+
+  machinaTools.conflictLayer.on('add', () => {
+    if (machinaTools.recordButton) {
+      machinaTools.recordButton.addTo(window.map);
+    }
+    machinaTools.loadConflictAreas();
+  });
+
+  machinaTools.conflictLayer.on('remove', () => {
+    machinaTools.recordButton.remove();
+    machinaTools.clearConflictArea();
+  });
 
   // Add the base layer to the main window.
   window.layerChooser.addOverlay(machinaTools.displayLayer, 'Machina Level Up Link Radius', { default: false });
@@ -572,8 +678,6 @@ function setupHooks() {
 
   // Add a hook to trigger the showOrHide method when the map finishes zooming or reloads.
   map.on('zoomend', machinaTools.showOrHideMachinaLevelUpRadius);
-  map.on('loading', machinaTools.showOrHideMachinaLevelUpRadius);
-  map.on('load', machinaTools.showOrHideMachinaLevelUpRadius);
 }
 
 function setupToolBoxLinks() {
@@ -582,6 +686,12 @@ function setupToolBoxLinks() {
     title: 'Conflict Area Info',
     click: machinaTools.showConflictAreaInfoDialog,
     html: 'Conflict Area Info',
+  }).appendTo(toolbox);
+
+  $('<a>', {
+    title: 'Display Visible Machina Clusters Info',
+    click: machinaTools.showClustersDialog,
+    html: 'Machina Clusters',
   }).appendTo(toolbox);
 }
 
@@ -623,7 +733,10 @@ function setupControlButtons() {
       return container;
     },
   });
-  new RecordSwitch().addTo(window.map);
+  machinaTools.recordButton = new RecordSwitch();
+  if (isConflictLayerEnabled()) {
+    machinaTools.recordButton.addTo(window.map);
+  }
 }
 
 function setupCSS() {

@@ -27,3 +27,33 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
     cy: 15px;
     r: 9px;
 }
+
+.machina-tools.ui-dialog {
+    max-width: calc(100vw - 2px);
+}
+
+#dialog-visible-machina-clusters li {
+    list-style: none;
+}
+
+#dialog-visible-machina-clusters .collapsible:before {
+    content: '\25BC';
+    width: 3ch;
+    display: inline-block;
+    text-align: center;
+}
+
+#dialog-visible-machina-clusters .collapsible.collapsed:before {
+    content: '\25B6';
+}
+
+#dialog-visible-machina-clusters .collapsible.empty:before,
+#dialog-visible-machina-clusters .collapsible.collapsed.empty:before {
+    content: '\25AA';
+}
+
+#dialog-visible-machina-clusters .striped {
+    padding-left: 10px;
+    margin-left: 10px;
+    border-left: 5px solid;
+}
