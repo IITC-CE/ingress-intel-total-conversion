@@ -207,7 +207,7 @@ function appendPortalLine(rc, portal) {
     title: portalName,
     html: portalName,
     click: (e) => {
-      window.zoomToAndShowPortal(portal.guid, portal.latlng);
+      window.renderPortalDetails(portal.guid);
       e.stopPropagation();
     },
   });
@@ -225,7 +225,7 @@ function createChildListItem(parent, childData, childPortal) {
     title: childName,
     html: childName,
     click: (e) => {
-      window.zoomToAndShowPortal(childData.childGuid, childPortal.latlng);
+      window.renderPortalDetails(childData.childGuid);
       e.stopPropagation();
     },
   });
@@ -604,7 +604,7 @@ function createClustersInfoDialog() {
   var html = $('<div>');
   var seeds = [];
   Object.values(window.portals)
-    .filter((p) => map.getBounds().contains(p.getLatLng()) && p.options.team === window.TEAM_MAC)
+    .filter((p) => p.options.team === window.TEAM_MAC && map.getBounds().contains(p.getLatLng()))
     .forEach((p) => {
       var seedData = machinaTools.findSeed(p.options.guid);
       if (!seeds.find((s) => s.guid === seedData.guid)) {
