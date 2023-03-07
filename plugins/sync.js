@@ -4,6 +4,7 @@
 // @version        0.4.1
 // @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
+/* global gapi -- eslint */
 
 ////////////////////////////////////////////////////////////////////////
 // Notice for developers:
@@ -534,6 +535,8 @@ window.plugin.sync.Authorizer = function(options) {
   this.authorize = this.authorize.bind(this);
 };
 
+window.plugin.sync.Authorizer.prototype.API_KEY = 'AIzaSyBeVNFEHh35baf5y9miCjaw43L61BTeyhg';
+window.plugin.sync.Authorizer.prototype.DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
 window.plugin.sync.Authorizer.prototype.CLIENT_ID = '1099227387115-osrmhfh1i6dto7v7npk4dcpog1cnljtb.apps.googleusercontent.com';
 window.plugin.sync.Authorizer.prototype.SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
@@ -561,45 +564,41 @@ window.plugin.sync.Authorizer.prototype.authComplete = function() {
   }
 };
 
-window.plugin.sync.Authorizer.prototype.authorize = function() {
-  this.authorizing = true;
-  this.authorized = false;
-
-  const doAuth = prompt => gapi.auth2.authorize({
-    client_id: this.CLIENT_ID,
-    scope: this.SCOPES,
-    prompt,
-  }, response => {
-      if (response.error) {
-          if (response.error === 'user_logged_out' || response.error === 'immediate_failed') {
-              doAuth('select_account')
-          } else {
-            const error = (authResult && authResult.error) ? authResult.error : 'not authorized';
-
-            plugin.sync.logger.log('all', 'Authorization error: ' + error);
-
-            if (error === "idpiframe_initialization_failed") {
-              plugin.sync.logger.log('all', 'You need enable 3rd-party cookies in your browser or allow [*.]google.com');
-            }
-          }
-
-          this.authorizing = false;
-          this.authorized = false;
-
-          return;
-      }
-
-      this.authorizing = false;
-      this.authorized = true;
-
-      plugin.sync.logger.log('all', 'Authorized');
-
-      this.authComplete();
-  });
-
-  doAuth('none');
+window.plugin.sync.Authorizer.prototype.updateSigninStatus = function (self, isSignedIn) {
+  self.authorizing = false;
+  if (isSignedIn) {
+    self.authorized = true;
+    window.plugin.sync.logger.log('all', 'Authorized');
+    self.authComplete();
+  } else {
+    self.authorized = false;
+    window.plugin.sync.logger.log('all', 'Not authorized');
+    gapi.auth2.getAuthInstance().signIn();
+  }
 };
 
+window.plugin.sync.Authorizer.prototype.authorize = function () {
+  this.authorizing = true;
+  this.authorized = false;
+  const self = this;
+
+  gapi.client
+    .init({
+      apiKey: this.API_KEY,
+      discoveryDocs: this.DISCOVERY_DOCS,
+      client_id: this.CLIENT_ID,
+      scope: this.SCOPES,
+    })
+    .then(function () {
+      // Listen for sign-in state changes.
+      gapi.auth2.getAuthInstance().isSignedIn.listen((signedIn) => {
+        self.updateSigninStatus(self, signedIn);
+      });
+
+      // Handle the initial sign-in state.
+      self.updateSigninStatus(self, gapi.auth2.getAuthInstance().isSignedIn.get());
+    });
+};
 
 //// end Authorizer
 
