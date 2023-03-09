@@ -166,7 +166,7 @@ var IJToST = function(ij,order,offsets) {
 // note: rather then calculating the final integer hilbert position, we just return the list of quads
 // this ensures no precision issues whth large orders (S3 cell IDs use up to 30), and is more
 // convenient for pulling out the individual bits as needed later
-var pointToHilbertQuadList = function(x,y,order) {
+var pointToHilbertQuadList = function(face, x,y,order) {
   var hilbertMap = {
     'a': [ [0,'d'], [1,'a'], [3,'b'], [2,'a'] ],
     'b': [ [2,'b'], [1,'b'], [3,'a'], [0,'c'] ],
@@ -174,7 +174,7 @@ var pointToHilbertQuadList = function(x,y,order) {
     'd': [ [0,'a'], [3,'c'], [1,'d'], [2,'d'] ]  
   };
 
-  var currentSquare='a';
+  var currentSquare = face & 1 ? 'd' : 'a';
   var positions = [];
 
   for (var i=order-1; i>=0; i--) {
@@ -257,7 +257,7 @@ S2.S2Cell.prototype.getCornerLatLngs = function() {
 
 
 S2.S2Cell.prototype.getFaceAndQuads = function() {
-  var quads = pointToHilbertQuadList(this.ij[0], this.ij[1], this.level);
+  var quads = pointToHilbertQuadList(this.face, this.ij[0], this.ij[1], this.level);
 
   return [this.face,quads];
 };
