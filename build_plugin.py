@@ -79,6 +79,11 @@ def fill_meta(source, plugin_name, dist_path):
         for m in settings.match:
             append_line('match', m)
 
+    if settings.url_icon_base:
+        append_line('icon', settings.url_icon_base.format(plugin_name))
+    if settings.url_icon_64_base:
+        append_line('icon64', settings.url_icon_64_base.format(plugin_name))
+
     append_line('grant', 'none')
     meta.append('// ==/UserScript==\n')
     return '\n'.join(meta), is_main

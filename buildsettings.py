@@ -34,6 +34,11 @@ defaults = {  # common for all build targets
     'on_fail': lambda: print('\a'),    # function (or string for os.system)
     'on_success': lambda: print('Build succeeded'),
 
+    # Path to plugin icons. For example: `http://localhost/icons/{}.png`
+    'url_icon_base': None,
+    # The path to the icons of the plugins with the size of 64 pixels. For example: `http://localhost/icons/{}-64.png`
+    'url_icon_64_base': None,
+
     # other:
     # runtime settings set in settings.py also can be overriden
     # - 'build_source_dir'

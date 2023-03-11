@@ -45,7 +45,7 @@ def add_to_meta(meta, info, filename):
         'name': info['name'].replace('IITC plugin: ', ''),
     }
     # optional fields
-    for key in ('author', 'description', 'namespace', 'version'):
+    for key in ('author', 'description', 'namespace', 'version', 'icon', 'icon64'):
         value = info.get(key)
         if value:
             data[key] = value
