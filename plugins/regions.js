@@ -99,32 +99,7 @@ window.plugin.regions.search = function(query) {
   });
 }
 
-// rot and d2xy from Wikipedia
-window.plugin.regions.rot = function(n, x, y, rx, ry) {
-  if(ry == 0) {
-    if(rx == 1) {
-      x = n-1 - x;
-      y = n-1 - y;
-    }
-
-    return [y, x];
-  }
-  return [x, y];
-}
-window.plugin.regions.d2xy = function(n, d) {
-  var rx, ry, s, t = d, xy = [0, 0];
-  for(s=1; s<n; s*=2) {
-    rx = 1 & (t/2);
-    ry = 1 & (t ^ rx);
-    xy = window.plugin.regions.rot(s, xy[0], xy[1], rx, ry);
-    xy[0] += s * rx;
-    xy[1] += s * ry;
-    t /= 4;
-  }
-  return xy;
-}
-
-window.plugin.regions.getSearchResult = function(match) {
+window.plugin.regions.getSearchResult = function (match) {
   var faceId = window.plugin.regions.FACE_NAMES.indexOf(match[1]);
   var id1 = parseInt(match[2]);
   var codeWordId = window.plugin.regions.CODE_WORDS.indexOf(match[3]);
@@ -137,26 +112,22 @@ window.plugin.regions.getSearchResult = function(match) {
   // face is used as-is
 
   // id1 is the region 'i' value (first 4 bits), codeword is the 'j' value (first 4 bits)
-  var regionI = id1-1;
-  var regionJ = codeWordId;
+  var cell = S2.S2Cell.FromFaceIJ(faceId, [id1 - 1, codeWordId], 4);
 
-  var result = {}, level;
+  var result = {};
 
-  if(id2 === undefined) {
+  if (id2 === undefined) {
     result.description = 'Regional score cells (cluster of 16 cells)';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
-    level = 4;
+    result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
   } else {
     result.description = 'Regional score cell';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@');
-    level = 6;
+    result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@');
 
-    var xy = window.plugin.regions.d2xy(4, id2);
-    regionI = (regionI << 2) + xy[0];
-    regionJ = (regionJ << 2) + xy[1];
+    const [_, positions] = cell.getFaceAndQuads();
+    positions.push(Math.floor(id2 / 4), id2 % 4);
+    cell = S2.S2Cell.FromFacePosition(faceId, positions);
   }
 
-  var cell = S2.S2Cell.FromFaceIJ(faceId, [regionI, regionJ], level);
   var corners = cell.getCornerLatLngs();
 
   result.title = window.plugin.regions.regionName(cell);
