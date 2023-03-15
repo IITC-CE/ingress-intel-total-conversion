@@ -194,7 +194,34 @@ var pointToHilbertQuadList = function(face, x,y,order) {
   return positions;
 };
 
+  /**
+   * reverse of @see pointToHilbertQuadList
+   */
+  var hilbertQuadListToPoint = function (face, positions) {
+    const hilbertMapReverse = {
+      'a': [[0, 'd'], [1, 'a'], [3, 'a'], [2, 'b']],
+      'b': [[3, 'c'], [1, 'b'], [0, 'b'], [2, 'a']],
+      'c': [[3, 'b'], [2, 'c'], [0, 'c'], [1, 'd']],
+      'd': [[0, 'a'], [2, 'd'], [3, 'd'], [1, 'c']]
+    };
 
+    let currentSquare = face & 1 ? 'd' : 'a';
+    const level = positions.length;
+
+    let i = 0;
+    let j = 0;
+
+    positions.forEach(v => {
+      const t = hilbertMapReverse[currentSquare][v]
+      i <<= 1;
+      j <<= 1;
+      if (t[0] & 2) i |= 1;
+      if (t[0] & 1) j |= 1;
+      currentSquare = t[1];
+    });
+
+    return [i, j];
+  };
 
 
 // S2Cell class
@@ -223,6 +250,14 @@ S2.S2Cell.FromFaceIJ = function(face,ij,level) {
   return cell;
 };
 
+  /**
+     * Create cell by face and hilbertcurve position
+     * (this is like the original CellID construction)
+     */
+  S2.S2Cell.FromFacePosition = function (face, position) {
+    const ij = hilbertQuadListToPoint(face, position)
+    return S2.S2Cell.FromFaceIJ(face, ij, position.length);
+  };
 
 S2.S2Cell.prototype.toString = function() {
   return 'F'+this.face+'ij['+this.ij[0]+','+this.ij[1]+']@'+this.level;
