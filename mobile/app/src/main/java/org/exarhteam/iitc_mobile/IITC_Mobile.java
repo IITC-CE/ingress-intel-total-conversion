@@ -310,8 +310,6 @@ public class IITC_Mobile extends AppCompatActivity
             invalidateOptionsMenu();
             // no reload needed
             return;
-        } else if (key.equals("pref_fake_user_agent")) {
-            mIitcWebView.setUserAgent();
         } else if (key.equals("pref_last_plugin_update")) {
             final Long forceUpdate = sharedPreferences.getLong("pref_last_plugin_update", 0);
             if (forceUpdate == 0) mFileManager.updatePlugins(true);
