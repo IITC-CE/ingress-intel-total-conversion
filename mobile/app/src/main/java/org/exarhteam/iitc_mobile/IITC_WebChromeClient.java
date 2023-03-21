@@ -3,8 +3,11 @@ package org.exarhteam.iitc_mobile;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
@@ -30,9 +33,11 @@ import static android.webkit.WebChromeClient.FileChooserParams.parseResult;
 public class IITC_WebChromeClient extends WebChromeClient {
 
     private final IITC_Mobile mIitc;
+    private final SharedPreferences mSharedPrefs;
 
     IITC_WebChromeClient(final IITC_Mobile iitc) {
         mIitc = iitc;
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
     }
 
     /**
@@ -214,5 +219,22 @@ public class IITC_WebChromeClient extends WebChromeClient {
     public boolean onJsPrompt(final WebView view, final String url, final String message, final String defaultValue, final JsPromptResult result) {
         return new IITC_JsDialogHelper(IITC_JsDialogHelper.PROMPT, view, url, message, defaultValue, result)
                 .shouldInterrupt();
+    }
+
+    @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+        // Disallow automatic popup
+        if (!isUserGesture)
+            return false;
+
+        final boolean enablePopup = mSharedPrefs.getBoolean("pref_popup", false);
+        if (!enablePopup) return false;
+
+        IITC_WebViewPopup newWebView = new IITC_WebViewPopup(mIitc);
+        WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+        transport.setWebView(newWebView);
+        resultMsg.sendToTarget();
+
+        return true;
     }
 }

@@ -86,7 +86,6 @@ public class IITC_Mobile extends AppCompatActivity
     private IITC_UserLocation mUserLocation;
     private IITC_NavigationHelper mNavigationHelper;
     private IITC_MapSettings mMapSettings;
-    private IITC_DeviceAccountLogin mLogin;
     private final Vector<ResponseHandler> mResponseHandlers = new Vector<ResponseHandler>();
     private boolean mDexRunning = false;
     private boolean mDexDesktopMode = true;
@@ -311,8 +310,6 @@ public class IITC_Mobile extends AppCompatActivity
             invalidateOptionsMenu();
             // no reload needed
             return;
-        } else if (key.equals("pref_fake_user_agent")) {
-            mIitcWebView.setUserAgent();
         } else if (key.equals("pref_last_plugin_update")) {
             final Long forceUpdate = sharedPreferences.getLong("pref_last_plugin_update", 0);
             if (forceUpdate == 0) mFileManager.updatePlugins(true);
@@ -884,24 +881,6 @@ public class IITC_Mobile extends AppCompatActivity
         } catch (final ArrayIndexOutOfBoundsException e) {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    /**
-     * called by IITC_WebViewClient when the Google login form is opened.
-     */
-    public void onReceivedLoginRequest(final IITC_WebViewClient client, final WebView view, final String realm,
-            final String account, final String args) {
-        mLogin = new IITC_DeviceAccountLogin(this, view, client);
-        mLogin.startLogin(realm, account, args);
-    }
-
-    /**
-     * called after successful login
-     */
-    public void loginSucceeded() {
-        // garbage collection
-        mLogin = null;
-        setLoadingState(true);
     }
 
     // remove dialog and add it back again
