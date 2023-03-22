@@ -267,10 +267,12 @@ public class IITC_Mobile extends AppCompatActivity
         registerReceiver(mDesktopModeReceiver, mDesktopFilter);
 
         // Check for app updates
-        String buildType = BuildConfig.BUILD_TYPE;
-        int currentVersionCode = BuildConfig.VERSION_CODE;
-        UpdateChecker updateChecker = new UpdateChecker(this, buildType, currentVersionCode);
-        updateChecker.checkForUpdates();
+        if (BuildConfig.ENABLE_CHECK_APP_UPDATES) {
+            String buildType = BuildConfig.BUILD_TYPE;
+            int currentVersionCode = BuildConfig.VERSION_CODE;
+            UpdateChecker updateChecker = new UpdateChecker(this, buildType, currentVersionCode);
+            updateChecker.checkForUpdates();
+        }
 
         // receive downloadManagers downloadComplete intent
         // afterwards install iitc update

@@ -36,6 +36,9 @@ jobs:
               echo "ARCHIVE_DIR=release_archive" >> "$GITHUB_ENV"
           fi
 
+      - name: Set env ENABLE_CHECK_APP_UPDATES
+        run: echo "ENABLE_CHECK_APP_UPDATES=true" >> "$GITHUB_ENV"
+
       - name: Download localbuildsettings.py
         run: wget https://iitc.app/deploy/localbuildsettings.py
 
