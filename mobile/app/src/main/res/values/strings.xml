@@ -221,6 +221,10 @@
     <string name="pane_alerts">Alerts</string>
     <string name="pane_info">Info</string>
     <string name="pane_map">Map</string>
+    <string name="update_notifications_channel_name">Update notifications</string>
+    <string name="update_notifications_title">"New IITC Mobile version available"</string>
+    <string name="update_notifications_text">A new version %1$s is available. Tap to download.</string>
+    <string name="update_notifications_action_hide_forever">Hide forever</string>
     <string name="cradle_url" translatable="false">https://github.com/leCradle</string>
     <string name="fkloft_url" translatable="false">https://github.com/fkloft</string>
     <string name="giuseppe_lucido_url" translatable="false">http://be.net/giuseppelucido</string>
