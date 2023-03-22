@@ -48,9 +48,11 @@ public class IITC_WebView extends WebView {
         mIitc = (IITC_Mobile) c;
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
 
+        final boolean enablePopup = mSharedPrefs.getBoolean("pref_popup", false);
+
         mSettings = getSettings();
         mSettings.setJavaScriptEnabled(true);
-        mSettings.setSupportMultipleWindows(true);
+        mSettings.setSupportMultipleWindows(enablePopup);
         mSettings.setDomStorageEnabled(true);
         mSettings.setAllowFileAccess(true);
         mSettings.setGeolocationEnabled(true);
@@ -276,5 +278,9 @@ public class IITC_WebView extends WebView {
 
     public void disableJS(final boolean val) {
         mDisableJs = val;
+    }
+
+    public void setSupportPopup(final boolean val) {
+        mSettings.setSupportMultipleWindows(val);
     }
 }
