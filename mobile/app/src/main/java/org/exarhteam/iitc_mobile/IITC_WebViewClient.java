@@ -41,19 +41,11 @@ public class IITC_WebViewClient extends WebViewClient {
     private final IITC_TileManager mTileManager;
     private final SharedPreferences mSharedPrefs;
 
-    final String mDefaultUA;
-    final String mMobileUA;
-    final String mDesktopUA;
-
     public IITC_WebViewClient(final IITC_Mobile iitc) {
         mIitc = iitc;
         mTileManager = new IITC_TileManager(mIitc);
         mIitcPath = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
-
-        mDefaultUA = WebSettings.getDefaultUserAgent(mIitc);
-        mMobileUA = mDefaultUA.replace("; wv", "");
-        mDesktopUA = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
     }
 
     @SuppressLint("InflateParams")
@@ -277,24 +269,12 @@ public class IITC_WebViewClient extends WebViewClient {
         return super.shouldInterceptRequest(view, url);
     }
 
-    public String getUserAgentForHost(final String host) {
-        if (mSharedPrefs.getBoolean("pref_fake_user_agent", false))
-            return mDesktopUA;
-        if (host.equals("intel.ingress.com"))
-            return mMobileUA;
-        if (host.startsWith("google.") || host.contains(".google."))
-            return (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mMobileUA;
-        if (host.endsWith(".facebook.com") || host.equals("facebook.com"))
-            return mDesktopUA;
-        return null;
-    }
-
     public boolean setUserAgentForUrl(final WebView view, final String url) {
         final Uri uri = Uri.parse(url);
         final String uriHost = uri.getHost();
 
         final String currentUA = view.getSettings().getUserAgentString();
-        final String targetUA = getUserAgentForHost(uriHost);
+        final String targetUA = mIitc.getUserAgentForHostname(uriHost);
         if (targetUA == null || currentUA.equals(targetUA))
             return false;
         view.getSettings().setUserAgentString(targetUA);
@@ -320,7 +300,7 @@ public class IITC_WebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
         final Uri uri = Uri.parse(url);
-        if (uri.isHierarchical()) {
+        if (uri.isHierarchical() && mIitc.isAllowedHostname(uri.getHost())) {
             if (reloadWithUserAgent(view, url))
                 return true;
 

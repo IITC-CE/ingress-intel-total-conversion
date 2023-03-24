@@ -34,6 +34,7 @@ import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -68,7 +69,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
@@ -112,7 +115,11 @@ public class IITC_Mobile extends AppCompatActivity
     private IITC_DebugHistory debugHistory;
     private int debugHistoryPosition = -1;
     private String debugInputStore = "";
+    private Map<String, String> mAllowedHostnames = new HashMap<>();
     private Set<String> mInternalHostnames = new HashSet<>();
+
+    private String mIITCDefaultUA;
+    private final String mDesktopUA = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
 
     // Used for custom back stack handling
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
@@ -162,6 +169,16 @@ public class IITC_Mobile extends AppCompatActivity
         } catch(IllegalArgumentException e) {
             //Handle the IllegalArgumentException
         }
+
+        // Define webview user agent for known external hosts
+        final String defaultUA = WebSettings.getDefaultUserAgent(this);
+        final String mIITCDefaultUA = defaultUA.replace("; wv", "");
+        final String googleUA = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mIITCDefaultUA;
+
+        mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
+        mAllowedHostnames.put("google.com", googleUA);
+        mAllowedHostnames.put("youtube.com", googleUA);
+        mAllowedHostnames.put("facebook.com", mDesktopUA);
 
         // enable progress bar above action bar
         // must be called BEFORE calling parent method
@@ -325,6 +342,9 @@ public class IITC_Mobile extends AppCompatActivity
                 || key.equals("pref_external_storage")) {
             // no reload needed
             return;
+        } else if (key.equals("pref_popup")) {
+            final boolean enablePopup = mSharedPrefs.getBoolean("pref_popup", false);
+            mIitcWebView.setSupportPopup(enablePopup);
         }
 
         mReloadNeeded = true;
@@ -1249,5 +1269,32 @@ public class IITC_Mobile extends AppCompatActivity
      */
     public boolean isInternalHostname(String hostname) {
         return mInternalHostnames.contains(hostname);
+    }
+
+    /**
+     * @param hostname host name.
+     * @return <code>true</code> if a host name allowed to be load in IITC.
+     */
+    public boolean isAllowedHostname(String hostname) {
+        for (String key : mAllowedHostnames.keySet()) {
+            if (hostname.equals(key)) return true;
+            if (hostname.endsWith("." + key)) return true;
+        }
+        return isInternalHostname(hostname);
+    }
+
+    /**
+     * @param hostname host name.
+     * @return <code>user-agent string</code> if a host name allowed to be load in IITC.
+     */
+    public String getUserAgentForHostname(String hostname) {
+        if (mSharedPrefs.getBoolean("pref_fake_user_agent", false))
+            return mDesktopUA;
+        for (Map.Entry<String,String> e : mAllowedHostnames.entrySet()) {
+            final String key = e.getKey();
+            if (hostname.equals(key)) return e.getValue();
+            if (hostname.endsWith("." + key)) return e.getValue();
+        }
+        return null;
     }
 }

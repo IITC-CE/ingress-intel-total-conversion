@@ -5,10 +5,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -20,10 +18,6 @@ import android.webkit.WebViewClient;
 public class IITC_WebViewPopup extends WebView {
     private WebSettings mSettings;
     private IITC_Mobile mIitc;
-    
-    String mDefaultUA;
-    String mMobileUA;
-    String mDesktopUA;
 
     private Dialog mDialog;
 
@@ -37,12 +31,6 @@ public class IITC_WebViewPopup extends WebView {
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
 
-        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
-
-        mDefaultUA = WebSettings.getDefaultUserAgent(mIitc);
-        mMobileUA = mDefaultUA.replace("; wv", "");
-        mDesktopUA = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             setWebContentsDebuggingEnabled(true);
 
@@ -55,22 +43,12 @@ public class IITC_WebViewPopup extends WebView {
         });
         setWebViewClient(new WebViewClient() {
             // duplicate code from IITC_WebViewClient
-            private String getUserAgentForHost(final String host) {
-                if (sharedPrefs.getBoolean("pref_fake_user_agent", false))
-                    return mDesktopUA;
-                if (host.startsWith("google.") || host.contains(".google."))
-                    return (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mMobileUA;
-                if (host.endsWith(".facebook.com") || host.equals("facebook.com"))
-                    return mDesktopUA;
-                return null;
-            }
-
             private boolean reloadWithUserAgent(final WebView view, final String url) {
                 final Uri uri = Uri.parse(url);
                 final String uriHost = uri.getHost();
 
                 final String currentUA = view.getSettings().getUserAgentString();
-                final String targetUA = getUserAgentForHost(uriHost);
+                final String targetUA = mIitc.getUserAgentForHostname(uriHost);
                 if (targetUA == null || currentUA.equals(targetUA))
                     return false;
 
@@ -84,16 +62,12 @@ public class IITC_WebViewPopup extends WebView {
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
                 final Uri uri = Uri.parse(url);
-                if (uri.isHierarchical()) {
-                    if (reloadWithUserAgent(view, url)) {
-                        openDialogPopup();
-                        return true;
-                    }
-
+                if (uri.isHierarchical() && mIitc.isAllowedHostname(uri.getHost())) {
                     final String uriHost = uri.getHost();
                     final String uriPath = uri.getPath();
                     final String uriQuery = uri.getQueryParameter("q");
 
+                    // load intel into main view
                     if (uriHost.equals("intel.ingress.com")) {
                         Log.d("popup: intel link requested, reset app and load into main view" + url);
                         mIitc.reset();
@@ -102,6 +76,12 @@ public class IITC_WebViewPopup extends WebView {
                         mDialog.dismiss();
                         return true;
                     }
+
+                    if (reloadWithUserAgent(view, url)) {
+                        openDialogPopup();
+                        return true;
+                    }
+
                     if ((uriHost.startsWith("google.") || uriHost.contains(".google."))
                             && uriPath.equals("/url") && uriQuery != null) {
                         Log.d("popup: redirect to: " + uriQuery);
