@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -187,5 +188,13 @@
         <meta-data
             android:name="android.app.default_searchable"
             android:value="org.exarhteam.iitc_mobile.IITC_Mobile"/>
+
+        <receiver
+            android:name=".UpdateCheckerReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="HIDE_FOREVER" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

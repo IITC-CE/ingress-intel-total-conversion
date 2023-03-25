@@ -283,6 +283,14 @@ public class IITC_Mobile extends AppCompatActivity
         mDesktopFilter.addAction("UiModeManager.SEM_ACTION_EXIT_KNOX_DESKTOP_MODE");
         registerReceiver(mDesktopModeReceiver, mDesktopFilter);
 
+        // Check for app updates
+        if (BuildConfig.ENABLE_CHECK_APP_UPDATES) {
+            String buildType = BuildConfig.BUILD_TYPE;
+            int currentVersionCode = BuildConfig.VERSION_CODE;
+            UpdateChecker updateChecker = new UpdateChecker(this, buildType, currentVersionCode);
+            updateChecker.checkForUpdates();
+        }
+
         // receive downloadManagers downloadComplete intent
         // afterwards install iitc update
         registerReceiver(mBroadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));

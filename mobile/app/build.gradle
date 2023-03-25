@@ -63,6 +63,7 @@ android {
             versionNameSuffix "-test-$BUILD_DATE"
             minifyEnabled false
             signingConfig signingConfigs.debug
+            buildConfigField "boolean", "ENABLE_CHECK_APP_UPDATES", "false"
         }
         beta {
             applicationIdSuffix ".beta"
@@ -70,11 +71,13 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            buildConfigField "boolean", "ENABLE_CHECK_APP_UPDATES", System.getenv("ENABLE_CHECK_APP_UPDATES") == "true" ? "true" : "false"
         }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            buildConfigField "boolean", "ENABLE_CHECK_APP_UPDATES", System.getenv("ENABLE_CHECK_APP_UPDATES") == "true" ? "true" : "false"
         }
     }
 
