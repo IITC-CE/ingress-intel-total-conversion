@@ -1,7 +1,9 @@
 package org.exarhteam.iitc_mobile.prefs;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -9,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -155,6 +159,34 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     } catch (final ActivityNotFoundException e) {
                         Toast.makeText(this, getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
                     }
+                }
+            case R.id.menu_plugins_add_url:
+                if (mFileManager.checkWriteStoragePermissionGranted()) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.menu_plugins_add_url);
+
+                    final EditText input = new EditText(this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+                    builder.setView(input);
+
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            final String url = input.getText().toString();
+                            final Uri uri = Uri.parse(url);
+                            if (uri != null) {
+                                mFileManager.installPlugin(uri, true);
+                            }
+                        }
+                    });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
                 }
             default:
                 return super.onOptionsItemSelected(item);
