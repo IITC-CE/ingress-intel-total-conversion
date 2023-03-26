@@ -284,7 +284,8 @@ public class IITC_FileManager {
                     final String url = uri.toString();
                     InputStream is;
                     String fileName;
-                    if (uri.getScheme().contains("http")) {
+                    final String uriScheme = uri.getScheme();
+                    if (uriScheme != null && uriScheme.contains("http")) {
                         final URLConnection conn = new URL(url).openConnection();
                         is = conn.getInputStream();
                         fileName = uri.getLastPathSegment();
