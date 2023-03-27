@@ -9,4 +9,11 @@
         app:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_plugins_add"/>
 
+    <item
+        android:id="@+id/menu_plugins_add_url"
+        android:icon="@drawable/ic_action_web_site"
+        android:orderInCategory="10"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:title="@string/menu_plugins_add_url"/>
+
 </menu>
