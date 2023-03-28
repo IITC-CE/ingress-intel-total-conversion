@@ -15,18 +15,7 @@
     <string name="pref_misc_cat">その他</string>
     <string name="activity_share">共有…</string>
     <string name="drawer_close">ナビゲーションメニューを閉じる</string>
-    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; 
-\n&lt;p&gt;&lt;b&gt;ビルドバージョン：${build_version}&lt;/b&gt;&lt;br&gt;&lt;b&gt;IITCバージョン：${build_version}&lt;/b&gt; 
-\n&lt;p&gt;&lt;b&gt;${cradle_link}、${fkloft_link}および寄稿者&lt;/b&gt; 
-\n&lt;p&gt;&lt;b&gt;アイコン：${giuseppe_lucido_link}&lt;/b&gt; 
-\n&lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt;は、&lt;i&gt;Ingress Intel Total Conversion（IITC）&lt;/i&gt;ユーザースクリプトに最適化されたモバイルブラウザです。 
-\n&lt;h3&gt;コミュニティ：&lt;/h3&gt; 
-\n•新しいリリースとデスクトップバージョンについては、${website_link}にアクセスしてください。&lt;br&gt; 
-\n•${tg_iitc_news_link}アナウンスメント用のテレグラムチャンネル,${tg_iitc_group_link}テレグラムチャットに参加。&lt;br&gt; 
-\n•${reddit_iitc_link}Redditコミュニティ-助けを求め、他のユーザーと議論する場所。&lt;br&gt; 
-\n•問題を報告し、${bugtracker_link}で機能強化を提案してください。&lt;br&gt; 
-\n&lt;h3&gt;開発者：&lt;/h3&gt;${github_iitc_link}。 
-\n&lt;h3&gt;IITCライセンス：&lt;/h3&gt;${ISC_license_text}</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;ビルドバージョン：${build_version}&lt;/b&gt;&lt;br&gt;&lt;b&gt;IITCバージョン：${build_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;${cradle_link}、${fkloft_link}および寄稿者&lt;/b&gt; &lt;p&gt;&lt;b&gt;アイコン：${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt;は、&lt;i&gt;Ingress Intel Total Conversion（IITC）&lt;/i&gt;ユーザースクリプトに最適化されたモバイルブラウザです。 &lt;h3&gt;コミュニティ：&lt;/h3&gt; •新しいリリースとデスクトップバージョンについては、${website_link}にアクセスしてください。&lt;br&gt; •${tg_iitc_news_link}告知用のテレグラムチャンネル,${tg_iitc_group_link}テレグラムチャットに参加。&lt;br&gt; •${reddit_iitc_link}Redditコミュニティ-他のユーザーに助けを求めたり議論する場所。&lt;br&gt; •問題を報告し、${bugtracker_link}で機能強化を提案してください。&lt;br&gt; &lt;h3&gt;開発者：&lt;/h3&gt;${github_iitc_link} &lt;h3&gt;IITCライセンス：&lt;/h3&gt;${ISC_license_text}</string>
     <string name="version">バージョン表示</string>
     <string name="pref_ui_cat">UI</string>
     <string name="pref_plugins">IITCプラグイン</string>
@@ -34,7 +23,7 @@
     <string name="pref_plugins_sum">プラグインはIITCの動作を拡張/変更します。 デスクトップ版IITCにも使われているプラグインは、ほぼ全てこちらにもあります。</string>
     <string name="pref_user_zoom_sum">マルチタッチ可能な機種でも+/-ボタンを表示します。</string>
     <string name="pref_fullscreen_sum">全画面表示時に隠す項目を指定。 ※この状態でも、ナビゲーションドロワーからIITCmを操作できます</string>
-    <string name="notice_info">&lt;p&gt;ヒント：詳細画面を開く別のやり方: &lt;p&gt; • ポータルを1秒間押し続けます&lt;br&gt; • ステータスバーの左半分をタップします&lt;br&gt;</string>
+    <string name="notice_info">&lt;p&gt;ヒント:別の詳細画面の開き方: &lt;p&gt; • ポータルを1秒間押し続けます&lt;br&gt; • ステータスバーの左半分をタップします&lt;br&gt;</string>
     <string name="pref_tweaks_cat">その他の微調整</string>
     <string name="pref_user_location">ユーザーの位置を地図上に表示</string>
     <string name="pref_user_zoom">ズームコントロールを表示</string>
@@ -94,8 +83,8 @@
     <string name="intent_error">アドレスを開けませんでした</string>
     <string name="install_dialog_msg">&lt;p&gt;IITCmに以下のJavaScriptファイルをインストールしようとしています: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;注意:&lt;/b&gt; 外部のJavascriptには有害なコード(スパイウェアなど)が含まれる場合もあります! &lt;p&gt;続行しますか？</string>
     <string name="msg_take_screenshot">スクリーンショットを取得しています…</string>
-    <string name="notice_extplugins">&lt;p&gt;ヒント: &lt;p&gt;IITC Mobileは外部プラグインも読み込めます。 &lt;p&gt;右上の（+）アイコンをクリックして、プラグインを追加します。 プラグインのファイル名は「.user.js」で終わる必要があります。ファイルのコピー先は以下のとおりです: &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="notice_sharing">&lt;p&gt;&lt;em&gt;ポータルの共有&lt;/em&gt;では、次のことができます。&lt;p&gt;•ポータルリンクを他の人に送信する&lt;br&gt;•選択したポータルの位置を別のアプリで表示する&lt;br&gt;•Webブラウザでポータルリンクを開く&lt;br&gt;&lt;p&gt;ヒント：Googleマップ（またはインストールされているその他のナビアプリ）を選択すると、選択したポータルにすばやく移動できます。&lt;p&gt;これらのヒントは、&lt;em&gt;パーマリンク&lt;/em&gt;にも適用されます。</string>
+    <string name="notice_extplugins">&lt;p&gt;ヒント: &lt;p&gt;IITC Mobileは外部プラグインも読み込めます。 &lt;p&gt;右上の(+)アイコンをクリックして、プラグインを追加します。 プラグインのファイル名は「.user.js」で終わる必要があります。ファイルのコピー先は以下のとおりです: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="notice_sharing">&lt;p&gt;&lt;em&gt;ポータルの共有&lt;/em&gt;では、次のことができます。&lt;p&gt;•他の人にポータルリンクを送信する&lt;br&gt;•別のアプリで選択したポータルの位置を表示する&lt;br&gt;•Webブラウザでポータルリンクを開く&lt;br&gt;&lt;p&gt;ヒント:Googleマップ(またはインストールされているその他のナビアプリ)を選択すると、選択したポータルにすばやく移動できます。&lt;p&gt;これらのヒントは、&lt;em&gt;パーマリンク&lt;/em&gt;にも適用されます。</string>
     <string name="pref_fake_user_agent_sum">Intelサイトに対してデスクトップブラウザーであるように振る舞います。 ※デスクトップ版表示にしたい場合は、「デスクトップ版表示を強制する」設定を使用します</string>
     <string name="menu_layer_chooser">レイヤー選択</string>
     <string name="pref_update_plugins_interval">チェック間隔</string>
@@ -106,11 +95,11 @@
     <string name="pane_alerts">通知</string>
     <string name="pane_all">アクティビティ</string>
     <string name="plugins_permission_denied">許可がありません。プラグインを追加できません。</string>
-    <string name="appintro_plugins_description">さあIITC-CEを使い始めましょう
-\n
-\n 公式のIngressインテルマップと比べて優れているところは機能を拡張してくれる豊富なプラグインにあります
-\n
-\n 公式提供のプラグインや外部プラインを設定から追加できます</string>
+    <string name="appintro_plugins_description">さあIITC-CEを使い始めましょう 
+\n 
+\n 公式のIngressインテルマップと比べて優れているところは機能を拡張してくれる豊富なプラグインにあります。
+\n 
+\n公式や外部提供のプラグインを設定から追加できます。</string>
     <string name="file_browser_choose_file">ファイルを選ぶ</string>
     <string name="toast_press_twice_to_exit">2度押して終了</string>
     <string name="plugin_updated">プラグイン更新</string>
@@ -143,7 +132,7 @@
     <string name="pref_user_location_dont_show">位置情報を表示しない</string>
     <string name="appintro_location_description">IITC-CE Mobileはナビゲーションの為に位置情報へのアクセス権が必要です。
 \n
-\n心配しないでください、あなたの位置情報はどこへも送信されません。</string>
+\n心配は不要です、あなたの位置情報はどこへも送信されません。</string>
     <string name="appintro_location_title">位置情報権限</string>
     <string name="appintro_layers_title">レイヤー/ハイライト</string>
     <string name="plugins_permission_granted">許可されました。操作を繰り返してください。</string>
@@ -155,4 +144,6 @@
 \n Ingress Intel Total Conversion (IITC)は、公式インテルマップのアドオンとして動作します。
 \n
 \nIITCはハードウェアアクセラレータを活用して効率を上げ、多様なプラグインを使用して機能拡張する事で、インテルマップの作業を完全に変更します。</string>
+    <string name="show_appintro_screen_title">イントロ画面の表示</string>
+    <string name="pref_webview_zoom_defaultValue">初期値</string>
 </resources>
