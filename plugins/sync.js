@@ -1,7 +1,7 @@
 // @author         xelio
 // @name           Sync
 // @category       Misc
-// @version        0.4.1
+// @version        0.5.0
 // @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 /* global gapi -- eslint */
