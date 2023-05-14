@@ -169,7 +169,7 @@ window.plugin.playerTracker.processNewData = function(data) {
     });
 
     // skip unusable events
-    if(!plrname || !lat || !lng || !id || skipThisMessage) return true;
+    if (!plrname || !lat || !lng || !id || skipThisMessage || json[2].plext.team === 'NEUTRAL') return true;
 
     var newEvent = {
       latlngs: [[lat, lng]],
