@@ -151,7 +151,6 @@ window.plugin.playerTracker.processNewData = function(data) {
       plrteam,
       lat,
       lng,
-      id = null,
       name,
       address;
     var skipThisMessage = false;
@@ -182,9 +181,6 @@ window.plugin.playerTracker.processNewData = function(data) {
         lat = lat ? lat : markup[1].latE6/1E6;
         lng = lng ? lng : markup[1].lngE6/1E6;
 
-        // no GUID in the data any more - but we need some unique string. use the latE6,lngE6
-        id = markup[1].latE6+","+markup[1].lngE6;
-
         name = name ? name : markup[1].name;
         address = address ? address : markup[1].address;
         break;
@@ -192,13 +188,12 @@ window.plugin.playerTracker.processNewData = function(data) {
     });
 
     // skip unusable events
-    if (!plrname || !lat || !lng || !id || skipThisMessage || ![window.TEAM_RES, window.TEAM_ENL].includes(window.teamStringToId(plrteam))) {
+    if (!plrname || !lat || !lng || skipThisMessage || ![window.TEAM_RES, window.TEAM_ENL].includes(window.teamStringToId(plrteam))) {
       return true;
     }
 
     var newEvent = {
       latlngs: [[lat, lng]],
-      ids: [id],
       time: json[1],
       name: name,
       address: address
@@ -228,7 +223,6 @@ window.plugin.playerTracker.processNewData = function(data) {
     // this is multiple resos destroyed at the same time.
     if(evts[cmp].time === json[1]) {
       evts[cmp].latlngs.push([lat, lng]);
-      evts[cmp].ids.push(id);
       return true;
     }
 
