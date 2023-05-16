@@ -230,7 +230,6 @@ window.plugin.playerTracker.processNewData = function(data) {
     if(evts[cmp].time === json[1]) {
       evts[cmp].latlngs.push([lat, lng]);
       evts[cmp].ids.push(id);
-      plugin.playerTracker.stored[plrname].events = evts;
       return true;
     }
 
@@ -254,8 +253,6 @@ window.plugin.playerTracker.processNewData = function(data) {
       evts.splice(i, 0,  newEvent);
     }
 
-    // update player data
-    plugin.playerTracker.stored[plrname].events = evts;
   });
 }
 
