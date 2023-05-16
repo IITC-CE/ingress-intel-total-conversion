@@ -209,7 +209,6 @@ window.plugin.playerTracker.processNewData = function(data) {
     // short-path if this is a new player
     if(!playerData || playerData.events.length === 0) {
       plugin.playerTracker.stored[plrname] = {
-        nick: plrname,
         team: plrteam,
         events: [newEvent]
       };
@@ -314,7 +313,7 @@ window.plugin.playerTracker.drawData = function() {
     var ago = plugin.playerTracker.ago;
 
     // tooltip for marker - no HTML - and not shown on touchscreen devices
-    var tooltip = isTouchDev ? '' : (playerData.nick+', '+ago(last.time, now)+' ago');
+    var tooltip = isTouchDev ? '' : (plrname+', '+ago(last.time, now)+' ago');
 
     // popup for marker
     var popup = $('<div>')
@@ -322,7 +321,7 @@ window.plugin.playerTracker.drawData = function() {
     $('<span>')
       .addClass('nickname ' + (playerData.team === 'RESISTANCE' ? 'res' : 'enl'))
       .css('font-weight', 'bold')
-      .text(playerData.nick)
+      .text(plrname)
       .appendTo(popup);
 
     if(window.plugin.guessPlayerLevels !== undefined &&
@@ -496,7 +495,7 @@ window.plugin.playerTracker.findUser = function(nick) {
   nick = nick.toLowerCase();
   var foundPlayerData = false;
   $.each(plugin.playerTracker.stored, function(plrname, playerData) {
-    if (playerData.nick.toLowerCase() === nick) {
+    if (plrname.toLowerCase() === nick) {
       foundPlayerData = playerData;
       return false;
     }
