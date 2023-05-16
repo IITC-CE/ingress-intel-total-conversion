@@ -480,14 +480,6 @@ window.plugin.playerTracker.findUser = function(nick) {
   return foundPlayerData;
 }
 
-window.plugin.playerTracker.findUserPosition = function(nick) {
-  var data = window.plugin.playerTracker.findUser(nick);
-  if (!data) return false;
-
-  var last = data.events[data.events.length - 1];
-  return plugin.playerTracker.getLatLngFromEvent(last);
-}
-
 window.plugin.playerTracker.centerMapOnUser = function(nick) {
   var data = plugin.playerTracker.findUser(nick);
   if(!data) return false;
