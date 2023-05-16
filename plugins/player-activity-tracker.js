@@ -377,22 +377,6 @@ window.plugin.playerTracker.drawData = function() {
       }
     }
 
-    // calculate the closest portal to the player
-    var eventPortal = []
-    var closestPortal;
-    var mostPortals = 0;
-    $.each(last.ids, function(i, id) {
-      if(eventPortal[id]) {
-        eventPortal[id]++;
-      } else {
-        eventPortal[id] = 1;
-      }
-      if(eventPortal[id] > mostPortals) {
-        mostPortals = eventPortal[id];
-        closestPortal = id;
-      }
-    });
-
     // marker opacity
     var relOpacity = 1 - (now - last.time) / window.PLAYER_TRACKER_MAX_TIME
     var absOpacity = window.PLAYER_TRACKER_MIN_OPACITY + (1 - window.PLAYER_TRACKER_MIN_OPACITY) * relOpacity;
@@ -401,7 +385,7 @@ window.plugin.playerTracker.drawData = function() {
     var icon = playerData.team === 'RESISTANCE' ?  new plugin.playerTracker.iconRes() :  new plugin.playerTracker.iconEnl();
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
-    var m = L.marker(gllfe(last), {icon: icon, referenceToPortal: closestPortal, opacity: absOpacity, desc: popup[0], title: tooltip});
+    var m = L.marker(gllfe(last), {icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip});
     m.addEventListener('spiderfiedclick', plugin.playerTracker.onClickListener);
 
     // m.bindPopup(title);
