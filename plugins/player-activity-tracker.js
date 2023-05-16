@@ -296,7 +296,6 @@ window.plugin.playerTracker.drawData = function() {
 
     // gather line data and put them in buckets so we can color them by
     // their age
-    var playerLine = [];
     for(var i = 1; i < playerData.events.length; i++) {
       var p = playerData.events[i];
       var ageBucket = Math.min(parseInt((now - p.time) / split), 4-1);
