@@ -1,3 +1,5 @@
+/* global teamStringToId, TEAM_TO_CSS */
+
 window.chat = function() {};
 
 //WORK IN PROGRESS - NOT YET USED!!
@@ -356,13 +358,6 @@ window.chat.updateOldNewHash = function(newData, storageHash, isOlderMsgs, isAsc
   }
 };
 
-function team2id(team) {
-  if (team === 'RESISTANCE') return TEAM_RES;
-  if (team === 'ENLIGHTENED') return TEAM_ENL;
-  return TEAM_NONE;
-}
-
-
 window.chat.parseMsgData = function (data) {
   var categories = data[2].plext.categories;
   var isPublic = (categories & 1) === 1;
@@ -372,7 +367,7 @@ window.chat.parseMsgData = function (data) {
   var msgToPlayer = msgAlert && (isPublic || isSecure);
 
   var time = data[1];
-  var team = team2id(data[2].plext.team);
+  var team = window.teamStringToId(data[2].plext.team);
   var auto = data[2].plext.plextType !== 'PLAYER_GENERATED';
   var systemNarrowcast = data[2].plext.plextType === 'SYSTEM_NARROWCAST';
 
@@ -387,7 +382,7 @@ window.chat.parseMsgData = function (data) {
 
     case 'PLAYER': // automatically generated messages
       nick = ent[1].plain;
-        team = team2id(ent[1].team);
+      team = window.teamStringToId(ent[1].team);
       break;
 
     default:
