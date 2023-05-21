@@ -1,4 +1,4 @@
-/* global teamStringToId, TEAM_TO_CSS */
+/* global TEAM_TO_CSS */
 
 window.chat = function() {};
 
@@ -380,10 +380,10 @@ window.chat.parseMsgData = function (data) {
       nick = ent[1].plain.replace(/: $/, ''); // cut “: ” at end
       break;
 
-    case 'PLAYER': // automatically generated messages
-      nick = ent[1].plain;
-      team = window.teamStringToId(ent[1].team);
-      break;
+      case 'PLAYER': // automatically generated messages
+        nick = ent[1].plain;
+        team = window.teamStringToId(ent[1].team);
+        break;
 
     default:
       break;
