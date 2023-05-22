@@ -57,7 +57,7 @@ window.plugin.playerTracker.setup = function() {
     window.plugin.playerTracker.zoomListener();
   });
   window.plugin.playerTracker.zoomListener();
-  
+
   plugin.playerTracker.setupUserSearch();
 }
 
@@ -169,7 +169,9 @@ window.plugin.playerTracker.processNewData = function(data) {
     });
 
     // skip unusable events
-    if (!plrname || !lat || !lng || !id || skipThisMessage || json[2].plext.team === 'NEUTRAL') return true;
+    if (!plrname || !lat || !lng || !id || skipThisMessage || ![window.TEAM_RES, window.TEAM_ENL].includes(window.teamStringToId(json[2].plext.team))) {
+      return true;
+    }
 
     var newEvent = {
       latlngs: [[lat, lng]],

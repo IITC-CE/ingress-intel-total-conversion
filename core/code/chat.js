@@ -1,5 +1,3 @@
-/* global TEAM_TO_CSS */
-
 window.chat = function() {};
 
 //WORK IN PROGRESS - NOT YET USED!!
@@ -376,17 +374,17 @@ window.chat.parseMsgData = function (data) {
   var nick = '';
   markup.forEach(function(ent) {
     switch (ent[0]) {
-    case 'SENDER': // user generated messages
-      nick = ent[1].plain.replace(/: $/, ''); // cut “: ” at end
-      break;
+      case 'SENDER': // user generated messages
+        nick = ent[1].plain.replace(/: $/, ''); // cut “: ” at end
+        break;
 
       case 'PLAYER': // automatically generated messages
         nick = ent[1].plain;
         team = window.teamStringToId(ent[1].team);
         break;
 
-    default:
-      break;
+      default:
+        break;
     }
   });
 
@@ -459,8 +457,9 @@ window.chat.renderPortal = function (portal) {
 };
 
 window.chat.renderFactionEnt = function (faction) {
-  var name = faction.team === 'ENLIGHTENED' ? 'Enlightened' : 'Resistance';
-  var spanClass = faction.team === 'ENLIGHTENED' ? TEAM_TO_CSS[TEAM_ENL] : TEAM_TO_CSS[TEAM_RES];
+  var teamId = window.teamStringToId(faction.team);
+  var name = window.TEAM_NAMES[teamId];
+  var spanClass = window.TEAM_TO_CSS[teamId];
   return $('<div>').html($('<span>')
     .attr('class', spanClass)
     .text(name)).html();
@@ -547,8 +546,8 @@ window.chat.renderMsgRow = function(data) {
   var timeCell = chat.renderTimeCell(data.time, timeClass);
 
   var nickClasses = ['nickname'];
-  if (TEAM_TO_CSS[data.player.team]) {
-    nickClasses.push(TEAM_TO_CSS[data.player.team]);
+  if (window.TEAM_TO_CSS[data.player.team]) {
+    nickClasses.push(window.TEAM_TO_CSS[data.player.team]);
   }
   // highlight things said/done by the player in a unique colour
   // (similar to @player mentions from others in the chat text itself)
