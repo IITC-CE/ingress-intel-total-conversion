@@ -11,39 +11,50 @@
 if (typeof window.plugin !== 'function') window.plugin = function () {};
 
 // PLUGIN START ////////////////////////////////////////////////////////
-window.MACHINA_TRACKER_MAX_TIME = 8 * 60 * 60 * 1000;
-window.MACHINA_TRACKER_MIN_ZOOM = 9;
-window.MACHINA_TRACKER_MIN_OPACITY = 0.3;
-
 // use own namespace for plugin
 window.plugin.machinaTracker = function () {};
+var machinaTracker = window.plugin.machinaTracker;
 
-window.plugin.machinaTracker.setup = function () {
+machinaTracker.MACHINA_TRACKER_MAX_TIME = 8 * 60 * 60 * 1000;
+machinaTracker.MACHINA_TRACKER_MIN_ZOOM = 9;
+
+machinaTracker.events = [];
+
+machinaTracker.setup = () => {
+  $('<style>').prop('type', 'text/css').html('@include_string:machina-tracker.css@').appendTo('head');
+
   var iconImage = '@include_img:images/marker-machina.png@';
 
-  window.plugin.machinaTracker.icon = L.icon({
+  machinaTracker.icon = L.icon({
     iconUrl: iconImage,
     iconSize: [26, 32],
     iconAnchor: [12, 32],
   });
 
-  window.plugin.machinaTracker.drawnTraces = new L.LayerGroup();
-  window.addLayerGroup('Machina Tracker', window.plugin.machinaTracker.drawnTraces, true);
+  machinaTracker.popup = new L.Popup({ offset: L.point([1, -34]) });
+  machinaTracker.drawnTraces = new L.LayerGroup([], { minZoom: machinaTracker.MACHINA_TRACKER_MIN_ZOOM });
+  window.addLayerGroup('Machina Tracker', machinaTracker.drawnTraces, true);
 
-  window.addHook('publicChatDataAvailable', window.plugin.machinaTracker.handleData);
+  window.addHook('publicChatDataAvailable', machinaTracker.handleData);
 
-  window.map.on('zoomend', function () {
-    window.plugin.machinaTracker.zoomListener();
-  });
-  window.plugin.machinaTracker.zoomListener();
+  window.map.on('zoomend', machinaTracker.zoomListener);
+  machinaTracker.zoomListener();
 };
 
-window.plugin.machinaTracker.events = [];
+machinaTracker.onClickListener = (event) => {
+  var marker = event.target;
 
-window.plugin.machinaTracker.zoomListener = function () {
-  var ctrl = $('.leaflet-control-layers-selector + span:contains("Machina Tracker")').parent();
-  if (window.map.getZoom() < window.MACHINA_TRACKER_MIN_ZOOM) {
-    window.plugin.machinaTracker.drawnTraces.clearLayers();
+  if (marker.options.desc) {
+    machinaTracker.popup.setContent(marker.options.desc);
+    machinaTracker.popup.setLatLng(marker.getLatLng());
+    window.map.openPopup(machinaTracker.popup);
+  }
+};
+
+machinaTracker.zoomListener = function () {
+  var ctrl = $('.leaflet-control-layers-list span:contains("Machina Tracker")').parent('label');
+  if (window.map.getZoom() < machinaTracker.MACHINA_TRACKER_MIN_ZOOM) {
+    machinaTracker.drawnTraces.clearLayers();
     ctrl.addClass('disabled').attr('title', 'Zoom in to show those.');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
     window.chat.backgroundChannelData('plugin.machinaTracker', 'all', false); // disable this plugin's interest in 'all' COMM
@@ -54,140 +65,77 @@ window.plugin.machinaTracker.zoomListener = function () {
   }
 };
 
-window.plugin.machinaTracker.getLimit = function () {
-  return new Date().getTime() - window.MACHINA_TRACKER_MAX_TIME;
+machinaTracker.getLimit = function () {
+  return new Date().getTime() - machinaTracker.MACHINA_TRACKER_MAX_TIME;
 };
 
-window.plugin.machinaTracker.discardOldData = function () {
-  var limit = window.plugin.machinaTracker.getLimit();
-  var i;
-  var ev = window.plugin.machinaTracker.events;
-  for (i = 0; i < ev.length; i++) {
-    if (ev[i].time >= limit) break;
-  }
-  if (i === ev.length) {
-    window.plugin.machinaTracker.events = [];
-  } else if (i > 0) {
-    window.plugin.machinaTracker.events.splice(0, i);
-  }
+machinaTracker.discardOldData = function () {
+  var limit = machinaTracker.getLimit();
+  machinaTracker.events = machinaTracker.events.reduce((result, event) => {
+    event.to = event.to.filter((to) => to.time >= limit);
+    if (event.to.length) {
+      result.push(event);
+    }
+    return result;
+  }, []);
 };
 
-window.plugin.machinaTracker.eventHasLatLng = function (ev, lat, lng) {
-  var hasLatLng = false;
-  $.each(ev.latlngs, function (ind, ll) {
-    if (ll[0] === lat && ll[1] === lng) {
-      hasLatLng = true;
-      return false;
+machinaTracker.toLanLng = function (locationData) {
+  return L.latLng(locationData.latE6 / 1e6, locationData.lngE6 / 1e6);
+};
+
+machinaTracker.createEvent = function (json) {
+  var newEvent = { time: json[1] };
+  json[2].plext.markup.forEach((markup) => {
+    switch (markup[0]) {
+      case 'PLAYER':
+        newEvent.team = markup[1].team;
+        break;
+      case 'PORTAL':
+        if (!newEvent.from) {
+          newEvent.from = {
+            latLng: machinaTracker.toLanLng(markup[1]),
+            name: markup[1].name,
+          };
+        } else {
+          newEvent.to = [
+            {
+              latLng: machinaTracker.toLanLng(markup[1]),
+              name: markup[1].name,
+              time: json[1],
+            },
+          ];
+        }
+        break;
     }
   });
-  return hasLatLng;
+
+  return newEvent;
 };
 
-window.plugin.machinaTracker.processNewData = function (data) {
-  var limit = window.plugin.machinaTracker.getLimit();
-  $.each(data.result, function (ind, json) {
-    // skip old data
-    if (json[1] < limit) return true;
-
-    // find player and portal information
-    var plrname,
-      lat,
-      lng,
-      id = null,
-      name,
-      address;
-    var skipThisMessage = false;
-    $.each(json[2].plext.markup, function (ind, markup) {
-      switch (markup[0]) {
-        case 'PLAYER':
-          plrname = markup[1].plain;
-          break;
-        case 'PORTAL':
-          // link messages are “player linked X to Y” and the player is at
-          // X.
-          lat = lat ? lat : markup[1].latE6 / 1e6;
-          lng = lng ? lng : markup[1].lngE6 / 1e6;
-
-          // no GUID in the data any more - but we need some unique string. use the latE6,lngE6
-          id = markup[1].latE6 + ',' + markup[1].lngE6;
-
-          name = name ? name : markup[1].name;
-          address = address ? address : markup[1].address;
-          break;
+machinaTracker.processNewData = function (data) {
+  var limit = machinaTracker.getLimit();
+  data.result.forEach((json) => {
+    if (json[1] >= limit) {
+      var newEvent = machinaTracker.createEvent(json);
+      if (newEvent.from && newEvent.to && [window.TEAM_MAC, window.TEAM_NONE].includes(window.teamStringToId(newEvent.team))) {
+        var prevEvent = machinaTracker.events.find((e) => e.from.latLng.equals(newEvent.from.latLng));
+        if (!prevEvent) {
+          machinaTracker.events.push(newEvent);
+        } else {
+          var newTo = newEvent.to[0];
+          if (!prevEvent.to.some((to) => newTo.latLng.equals(to.latLng) && newTo.time === to.time)) {
+            prevEvent.to.push(newTo);
+            prevEvent.to.sort((a, b) => a.time - b.time);
+            prevEvent.time = prevEvent.to[0].time;
+          }
+        }
       }
-    });
-
-    // skip unusable events
-    if (!plrname || !lat || !lng || !id || skipThisMessage || window.teamStringToId(json[2].plext.team) !== window.TEAM_NONE) return true;
-
-    var newEvent = {
-      latlngs: [[lat, lng]],
-      ids: [id],
-      time: json[1],
-      name: name,
-      address: address,
-    };
-
-    // short-path if this is a new player
-    if (window.plugin.machinaTracker.events.length === 0) {
-      window.plugin.machinaTracker.events = [newEvent];
-      return true;
     }
-
-    var evts = window.plugin.machinaTracker.events;
-    // there’s some data already. Need to find correct place to insert.
-    var i;
-    for (i = 0; i < evts.length; i++) {
-      if (evts[i].time > json[1]) break;
-    }
-
-    var cmp = Math.max(i - 1, 0);
-
-    // so we have an event that happened at the same time. Most likely
-    // this is multiple resos destroyed at the same time.
-    if (evts[cmp].time === json[1]) {
-      evts[cmp].latlngs.push([lat, lng]);
-      evts[cmp].ids.push(id);
-      window.plugin.machinaTracker.events = evts;
-      return true;
-    }
-
-    // the time changed. Is the player still at the same location?
-
-    // assume this is an older event at the same location. Then we need
-    // to look at the next item in the event list. If this event is the
-    // newest one, there may not be a newer event so check for that. If
-    // it really is an older event at the same location, then skip it.
-    if (evts[cmp + 1] && window.plugin.machinaTracker.eventHasLatLng(evts[cmp + 1], lat, lng)) return true;
-
-    // if this event is newer, need to look at the previous one
-    var sameLocation = window.plugin.machinaTracker.eventHasLatLng(evts[cmp], lat, lng);
-
-    // if it’s the same location, just update the timestamp. Otherwise
-    // push as new event.
-    if (sameLocation) {
-      evts[cmp].time = json[1];
-    } else {
-      evts.splice(i, 0, newEvent);
-    }
-
-    // update player data
-    window.plugin.machinaTracker.events = evts;
   });
 };
 
-window.plugin.machinaTracker.getLatLngFromEvent = function (ev) {
-  var lats = 0;
-  var lngs = 0;
-  $.each(ev.latlngs, function (i, latlng) {
-    lats += latlng[0];
-    lngs += latlng[1];
-  });
-
-  return L.latLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
-};
-
-window.plugin.machinaTracker.ago = function (time, now) {
+machinaTracker.ago = function (time, now) {
   var s = (now - time) / 1000;
   var h = Math.floor(s / 3600);
   var m = Math.floor((s % 3600) / 60);
@@ -195,39 +143,70 @@ window.plugin.machinaTracker.ago = function (time, now) {
   if (h > 0) {
     returnVal = h + 'h' + returnVal;
   }
-  return returnVal;
+  return returnVal + ' ago';
 };
 
-window.plugin.machinaTracker.drawData = function () {
-  var gllfe = window.plugin.machinaTracker.getLatLngFromEvent;
-  var split = window.MACHINA_TRACKER_MAX_TIME / 4;
+machinaTracker.createPortalLink = function (portal) {
+  return $('<a>')
+    .addClass('text-overflow-ellipsis')
+    .text(portal.name)
+    .prop({
+      title: portal.name,
+      href: window.makePermalink(portal.latLng),
+    })
+    .click((event) => {
+      window.selectPortalByLatLng(portal.latLng);
+      event.preventDefault();
+      return false;
+    })
+    .dblclick((event) => {
+      window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
+      window.selectPortalByLatLng(portal.latLng);
+      event.preventDefault();
+      return false;
+    });
+};
+
+machinaTracker.drawData = function () {
+  var isTouchDev = window.isTouchDevice();
+
+  var split = machinaTracker.MACHINA_TRACKER_MAX_TIME / 4;
   var now = new Date().getTime();
 
-  for (var i = 0; i < window.plugin.machinaTracker.events.length; i++) {
-    var p = window.plugin.machinaTracker.events[i];
-    var ageBucket = Math.min(parseInt((now - p.time) / split), 4 - 1);
-    var position = gllfe(p);
+  machinaTracker.events.forEach((event) => {
+    var ageBucket = Math.min((now - event.time) / split, 3);
+    var position = event.from.latLng;
 
-    var title = window.plugin.machinaTracker.ago(p.time, now) + ' ago';
-    var icon = window.plugin.machinaTracker.icon;
+    var title = isTouchDev ? '' : machinaTracker.ago(event.time, now);
+    var icon = machinaTracker.icon;
     var opacity = 1 - 0.2 * ageBucket;
 
-    var m = L.marker(position, { icon, opacity, title });
-    // m.on('mouseout', function() { $(this._icon).tooltip('close'); });
+    var popup = $('<div>').addClass('plugin-machina-tracker-popup');
+    $('<div>').addClass('plugin-machina-tracker-popup-header').append(machinaTracker.createPortalLink(event.from)).appendTo(popup);
+
+    var linkList = $('<ul>').addClass('plugin-machina-tracker-link-list');
+    linkList.appendTo(popup);
+
+    event.to.forEach((to) => {
+      $('<li>').append(machinaTracker.createPortalLink(to)).append(' ').append(machinaTracker.ago(to.time, now)).appendTo(linkList);
+    });
+
+    var m = L.marker(position, { icon: icon, opacity: opacity, desc: popup[0], title: title });
+    m.addEventListener('spiderfiedclick', machinaTracker.onClickListener);
+
     window.registerMarkerForOMS(m);
-
-    m.addTo(window.plugin.machinaTracker.drawnTraces);
-  }
+    m.addTo(machinaTracker.drawnTraces);
+  });
 };
 
-window.plugin.machinaTracker.handleData = function (data) {
-  if (window.map.getZoom() < window.MACHINA_TRACKER_MIN_ZOOM) return;
+machinaTracker.handleData = function (data) {
+  if (window.map.getZoom() < machinaTracker.MACHINA_TRACKER_MIN_ZOOM) return;
 
-  window.plugin.machinaTracker.discardOldData();
-  window.plugin.machinaTracker.processNewData(data);
+  machinaTracker.discardOldData();
+  machinaTracker.processNewData(data);
 
-  window.plugin.machinaTracker.drawnTraces.clearLayers();
-  window.plugin.machinaTracker.drawData();
+  machinaTracker.drawnTraces.clearLayers();
+  machinaTracker.drawData();
 };
 
-var setup = window.plugin.machinaTracker.setup;
+var setup = machinaTracker.setup;
