@@ -1,0 +1,33 @@
+.plugin-machina-tracker-popup a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    -moz-text-decoration-style: dashed;
+    -webkit-text-decoration-style: dashed;
+}
+
+.plugin-machina-tracker-popup-header {
+    white-space: nowrap;
+}
+
+ul.plugin-machina-tracker-link-list {
+    list-style: none;
+    padding-left: 1em;
+}
+
+ul.plugin-machina-tracker-link-list li {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    white-space: nowrap;
+}
+
+ul.plugin-machina-tracker-link-list li a {
+    margin-right: 3px;
+}
+
+ul.plugin-machina-tracker-link-list li::before {
+    content: '↴';
+    position: absolute;
+    left: -1em;
+}
