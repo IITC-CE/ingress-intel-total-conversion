@@ -47,7 +47,7 @@ window.getPortalRange = function(d) {
   };
 
   range.range = range.boost * range.base;
-  range.isLinkable = d.resonators.filter((r) => !!r).length === 8;
+  range.isLinkable = d.resCount === 8;
 
   return range;
 }
