@@ -41,32 +41,21 @@ window.getCurrentPortalEnergy = function(d) {
 window.getPortalRange = function(d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
-
-  var resoMissing = false;
-  // currently we get a short resonator array when some are missing
-  if (d.resonators.length < 8) {
-    resoMissing = true;
-  }
-  // but in the past we used to always get an array of 8, but will 'null' objects for some entries. maybe that will return?
-  $.each(d.resonators, function(ind, reso) {
-    if(!reso) {
-      resoMissing = true;
-      return;
-    }
-  });
-
   var range = {
-    base: d.team === 'M' ? window.LINK_RANGE_MAC[d.level + 1] : 160 * Math.pow(window.getPortalLevel(d), 4),
-    boost: getLinkAmpRangeBoost(d)
+    base: window.teamStringToId(d.team) === window.TEAM_MAC ? window.LINK_RANGE_MAC[d.level + 1] : 160 * Math.pow(window.getPortalLevel(d), 4),
+    boost: window.getLinkAmpRangeBoost(d),
   };
 
   range.range = range.boost * range.base;
-  range.isLinkable = !resoMissing;
+  range.isLinkable = d.resCount === 8;
 
   return range;
 }
 
 window.getLinkAmpRangeBoost = function(d) {
+  if (window.teamStringToId(d.team) === window.TEAM_MAC) {
+    return 1.0;
+  }
   // additional range boost calculation
 
   // link amps scale: first is full, second a quarter, the last two an eighth
@@ -145,7 +134,7 @@ window.getAttackApGain = function(d,fieldCount,linkCount) {
 window.potentialPortalLevel = function(d) {
   var current_level = getPortalLevel(d);
   var potential_level = current_level;
-  
+
   if(PLAYER.team === d.team) {
     var resonators_on_portal = d.resonators;
     var resonator_levels = new Array();
@@ -158,13 +147,13 @@ window.potentialPortalLevel = function(d) {
       if(reso !== null && reso.owner === window.PLAYER.nickname) {
         player_resontators[reso.level]--;
       }
-      resonator_levels.push(reso === null ? 0 : reso.level);  
+      resonator_levels.push(reso === null ? 0 : reso.level);
     });
-    
+
     resonator_levels.sort(function(a, b) {
       return(a - b);
     });
-    
+
     // Max out portal
     var install_index = 0;
     for(var i=MAX_PORTAL_LEVEL;i>=1; i--) {
