@@ -1,7 +1,7 @@
 // @author         teo96
 // @name           Portals list
 // @category       Info
-// @version        0.4.1
+// @version        0.4.2
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
 // use own namespace for plugin
