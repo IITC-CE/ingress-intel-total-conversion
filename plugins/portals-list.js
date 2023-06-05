@@ -4,20 +4,33 @@
 // @version        0.4.1
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
-
+function abbreviate(label) {
+  return label
+    .replaceAll(/[^a-z]/gi, '')
+    .substring(0, 3)
+    .toLowerCase()
+    .capitalize();
+}
 // use own namespace for plugin
 window.plugin.portalslist = function() {};
+
+window.plugin.portalslist.FACTION_FILTERS = window.TEAM_NAMES;
+window.plugin.portalslist.FACTION_ABBREVS = window.plugin.portalslist.FACTION_FILTERS.map(abbreviate);
+window.plugin.portalslist.ALL_FACTION_FILTERS = ['All', ...window.plugin.portalslist.FACTION_FILTERS];
+window.plugin.portalslist.HISTORY_FILTERS = ['Visited', 'Captured', 'Scout Controlled'];
+window.plugin.portalslist.FILTERS = [...window.plugin.portalslist.ALL_FACTION_FILTERS, ...window.plugin.portalslist.HISTORY_FILTERS];
 
 window.plugin.portalslist.listPortals = [];
 window.plugin.portalslist.sortBy = 1; // second column: level
 window.plugin.portalslist.sortOrder = -1;
-window.plugin.portalslist.enlP = 0;
-window.plugin.portalslist.resP = 0;
-window.plugin.portalslist.neuP = 0;
-window.plugin.portalslist.macP = 0;
-window.plugin.portalslist.visitedP = 0;
-window.plugin.portalslist.capturedP = 0;
-window.plugin.portalslist.scoutControlledP = 0;
+
+function zeroCounts() {
+  return window.plugin.portalslist.FILTERS.reduce((prev, curr) => {
+    prev[curr] = 0;
+    return prev;
+  }, {});
+}
+window.plugin.portalslist.counts = zeroCounts();
 
 window.plugin.portalslist.filter = 0;
 
@@ -64,7 +77,7 @@ window.plugin.portalslist.fields = [
     title: "Team",
     value: function(portal) { return portal.options.team; },
     format: function(cell, portal, value) {
-      $(cell).text(['NEU', 'RES', 'ENL', 'UNK'][value]);
+      $(cell).text(window.plugin.portalslist.FACTION_ABBREVS[value]);
     }
   },
   {
@@ -196,22 +209,12 @@ window.plugin.portalslist.getPortals = function() {
 
     retval=true;
 
-    switch (portal.options.team) {
-      case window.TEAM_RES:
-        window.plugin.portalslist.resP++;
-        break;
-      case window.TEAM_ENL:
-        window.plugin.portalslist.enlP++;
-        break;
-      case window.TEAM_MAC:
-        window.plugin.portalslist.macP++;
-        break;
-      default:
-        window.plugin.portalslist.neuP++;
-    }
-    if (portal.options.data.history.visited) window.plugin.portalslist.visitedP++;
-    if (portal.options.data.history.captured) window.plugin.portalslist.capturedP++;
-    if (portal.options.data.history.scoutControlled) window.plugin.portalslist.scoutControlledP++;
+    var counts = window.plugin.portalslist.counts;
+    counts[window.plugin.portalslist.FACTION_FILTERS[portal.options.team]]++;
+
+    if (portal.options.data.history.visited) counts[window.plugin.portalslist.HISTORY_FILTERS[0]]++;
+    if (portal.options.data.history.captured) counts[window.plugin.portalslist.HISTORY_FILTERS[1]]++;
+    if (portal.options.data.history.scoutControlled) counts[window.plugin.portalslist.HISTORY_FILTERS[2]]++;
 
     // cache values and DOM nodes
     var obj = { portal: portal, values: [], sortValues: [] };
@@ -249,13 +252,7 @@ window.plugin.portalslist.displayPL = function() {
   // plugins (e.g. bookmarks) can insert fields before the standard ones - so we need to search for the 'level' column
   window.plugin.portalslist.sortBy = window.plugin.portalslist.fields.map(function(f){return f.title;}).indexOf('Level');
   window.plugin.portalslist.sortOrder = -1;
-  window.plugin.portalslist.enlP = 0;
-  window.plugin.portalslist.resP = 0;
-  window.plugin.portalslist.neuP = 0;
-  window.plugin.portalslist.macP = 0;
-  window.plugin.portalslist.visitedP = 0;
-  window.plugin.portalslist.capturedP = 0;
-  window.plugin.portalslist.scoutControlledP = 0;
+  window.plugin.portalslist.counts = zeroCounts();
   window.plugin.portalslist.filter = 0;
 
   if (window.plugin.portalslist.getPortals()) {
@@ -329,9 +326,10 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
 
   var length = window.plugin.portalslist.listPortals.length;
 
-  ['All', 'Neutral', 'Resistance', 'Enlightened', 'Unknown', 'Visited', 'Captured', 'Scout Controlled'].forEach((label, i) => {
+  window.plugin.portalslist.FILTERS.forEach((label, i) => {
     var cell = filters.appendChild(document.createElement('div'));
-    cell.className = 'name filter' + label.substr(0, 3);
+    var filterName = 'filter' + abbreviate(label);
+    cell.className = 'name ' + filterName;
     cell.textContent = label+':';
     cell.title = 'Show only '+label+' portals';
     $(cell).click(function() {
@@ -347,7 +345,7 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
     }
 
     cell = filters.appendChild(document.createElement('div'));
-    cell.className = 'count filter' + label.substr(0, 3);
+    cell.className = 'count ' + filterName;
 
     if (i == 0) {
       cell.textContent = length;
@@ -365,8 +363,8 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
         cell.classList.add('active');
       }
 
-      var name = ['neuP', 'resP', 'enlP', 'macP', 'visitedP', 'capturedP', 'scoutControlledP'][i - 1];
-      var count = window.plugin.portalslist[name];
+      var name = window.plugin.portalslist.FILTERS[i];
+      var count = window.plugin.portalslist.counts[name];
       cell.textContent = count + ' (' + Math.round(count/length*100) + '%)';
     }
   });
@@ -417,8 +415,9 @@ window.plugin.portalslist.portalTable = function(sortBy, sortOrder, filter, reve
   });
 
   container.append(`<div class="disclaimer">Click on portals table headers to sort by that column.
-Click on <b>All, Neutral, Resistance, Enlightened, Unknown</b> to only show portals owned by that faction or on the number behind the factions to show all but those portals.
-Click on <b>Visited, Captured or Scout Controlled</b> to only show portals the user has a history for or on the number to hide those.
+Click on <b>${window.plugin.portalslist.ALL_FACTION_FILTERS.join(', ')}</b> to only show portals owned by that faction
+ or on the number behind the factions to show all but those portals.
+Click on <b>${window.plugin.portalslist.HISTORY_FILTERS.join(', ')}</b> to only show portals the user has a history for or on the number to hide those.
 </div>`);
 
   return container;
