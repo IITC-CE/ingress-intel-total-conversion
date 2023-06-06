@@ -167,7 +167,7 @@ function createDefaultOverlays () {
     addLayers[window.TEAM_NAME_RES] = factionLayers[window.TEAM_RES];
   }
 
-  // and just put U̶͚̓̍N̴̖̈K̠͔̍͑̂͜N̞̥͋̀̉Ȯ̶̹͕̀W̶̢͚͑̚͝Ṉ̨̟̒̅ faction last
+  // and just put __MACHINA__ faction last
   delete addLayers[window.TEAM_NAME_MAC];
   addLayers[window.TEAM_NAME_MAC] = factionLayers[window.TEAM_MAC];
 
