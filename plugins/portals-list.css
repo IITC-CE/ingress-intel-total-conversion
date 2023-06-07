@@ -93,7 +93,7 @@
 #portalslist .filters .filterNeu,
 #portalslist .filters .filterEnl,
 #portalslist .filters .filterRes,
-#portalslist .filters .filterUnk {
+#portalslist .filters .filterMac {
   grid-row: 1;
 }
 
@@ -112,14 +112,14 @@
   #portalslist .filters .filterNeu.name,
   #portalslist .filters .filterRes.name,
   #portalslist .filters .filterEnl.name,
-  #portalslist .filters .filterUnk.name {
+  #portalslist .filters .filterMac.name {
     grid-column: 1;
   }
 
   #portalslist .filters .filterNeu.count,
   #portalslist .filters .filterRes.count,
   #portalslist .filters .filterEnl.count,
-  #portalslist .filters .filterUnk.count {
+  #portalslist .filters .filterMac.count {
     grid-column: 2;
   }
 
@@ -150,7 +150,7 @@
     grid-row: 3;
   }
 
-  #portalslist .filters .filterUnk {
+  #portalslist .filters .filterMac {
     grid-row: 4;
   }
 }
@@ -199,7 +199,7 @@
 }
 
 #portalslist table tr.mac td,
-#portalslist .filters .filterUnk {
+#portalslist .filters .filterMac {
   background-color: #a00;
 }
 
