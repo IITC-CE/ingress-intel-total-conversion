@@ -4,25 +4,16 @@
 // @version        0.4.1
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
+// use own namespace for plugin
+window.plugin.portalslist = function() {};
+
+
 function abbreviate(label) {
   return label
     .replaceAll(/[^a-z]/gi, '')
     .substring(0, 3)
-    .toLowerCase()
     .capitalize();
 }
-// use own namespace for plugin
-window.plugin.portalslist = function() {};
-
-window.plugin.portalslist.FACTION_FILTERS = window.TEAM_NAMES;
-window.plugin.portalslist.FACTION_ABBREVS = window.plugin.portalslist.FACTION_FILTERS.map(abbreviate);
-window.plugin.portalslist.ALL_FACTION_FILTERS = ['All', ...window.plugin.portalslist.FACTION_FILTERS];
-window.plugin.portalslist.HISTORY_FILTERS = ['Visited', 'Captured', 'Scout Controlled'];
-window.plugin.portalslist.FILTERS = [...window.plugin.portalslist.ALL_FACTION_FILTERS, ...window.plugin.portalslist.HISTORY_FILTERS];
-
-window.plugin.portalslist.listPortals = [];
-window.plugin.portalslist.sortBy = 1; // second column: level
-window.plugin.portalslist.sortOrder = -1;
 
 function zeroCounts() {
   return window.plugin.portalslist.FILTERS.reduce((prev, curr) => {
@@ -30,9 +21,6 @@ function zeroCounts() {
     return prev;
   }, {});
 }
-window.plugin.portalslist.counts = zeroCounts();
-
-window.plugin.portalslist.filter = 0;
 
 /*
  * plugins may add fields by appending their specifiation to the following list. The following members are supported:
@@ -455,6 +443,18 @@ window.plugin.portalslist.onPaneChanged = function(pane) {
 };
 
 var setup =  function() {
+  window.plugin.portalslist.FACTION_FILTERS = window.TEAM_NAMES;
+  window.plugin.portalslist.FACTION_ABBREVS = window.plugin.portalslist.FACTION_FILTERS.map(abbreviate);
+  window.plugin.portalslist.ALL_FACTION_FILTERS = ['All', ...window.plugin.portalslist.FACTION_FILTERS];
+  window.plugin.portalslist.HISTORY_FILTERS = ['Visited', 'Captured', 'Scout Controlled'];
+  window.plugin.portalslist.FILTERS = [...window.plugin.portalslist.ALL_FACTION_FILTERS, ...window.plugin.portalslist.HISTORY_FILTERS];
+
+  window.plugin.portalslist.listPortals = [];
+  window.plugin.portalslist.sortBy = 1; // second column: level
+  window.plugin.portalslist.sortOrder = -1;
+  window.plugin.portalslist.counts = zeroCounts();
+  window.plugin.portalslist.filter = 0;
+
   if (window.useAppPanes()) {
     app.addPane("plugin-portalslist", "Portals list", "ic_action_paste");
     addHook("paneChanged", window.plugin.portalslist.onPaneChanged);
