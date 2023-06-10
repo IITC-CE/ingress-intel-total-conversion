@@ -244,7 +244,13 @@ window.plugin.portalcounts.makeBar = function(portals, text, color, shift) {
   }
 
   $('<text>')
-    .html(text.substring(0, 3))
+    .html(
+      text
+        .replaceAll(/[^a-z]/gi, '')
+        .substring(0, 3)
+        .toLowerCase()
+        .capitalize()
+    )
     .attr({
       x: self.BAR_WIDTH * 0.5,
       y: self.BAR_TOP * 0.75,
