@@ -243,7 +243,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
 
   var ent = [
     guid,       //ent[0] = guid
-    0,          //ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
+    -1,         //ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
                 //ent[2] = an array with the entity data
     [ 'p',      //0 - a portal
       team,     //1 - team
@@ -259,6 +259,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
     var p = window.portals[guid];
     if (team != p.options.data.team || latE6 != p.options.data.latE6 || lngE6 != p.options.data.lngE6) {
       // team or location have changed - delete existing portal
+      log.log('removing outdated portal data and creating placeholder instead');
       this.deletePortalEntity(guid);
     }
   }
