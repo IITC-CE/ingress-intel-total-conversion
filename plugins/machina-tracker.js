@@ -4,8 +4,15 @@
 // @version        1.0.0
 // @description    Show locations of Machina activities
 
-/* exported setup --eslint */
+/* exported setup, changelog --eslint */
 /* global L */
+
+var changelog = [
+  {
+    version: '1.0.0',
+    changes: ['First version'],
+  },
+];
 
 // ensure plugin framework is there, even if iitc is not yet loaded
 if (typeof window.plugin !== 'function') window.plugin = function () {};
