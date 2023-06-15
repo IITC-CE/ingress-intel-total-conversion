@@ -1,11 +1,17 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.35.1
+// @version        0.35.2
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
 
 window.script_info = plugin_info;
+window.script_info.changelog = [
+  {
+    version: '0.35.2',
+    changes: ['Ability to define and display changelog'],
+  },
+];
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
 if (document.documentElement.getAttribute('itemscope') !== null) {

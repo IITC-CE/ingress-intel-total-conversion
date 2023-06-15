@@ -13,23 +13,22 @@ window.aboutIITC = function() {
 }
 
 function createDialogContent() {
-  var html = ''
-    + '<div><b>About IITC</b></div> '
-    + '<div>Ingress Intel Total Conversion</div> '
-    + '<hr>'
-    + '<div>'
-    + '  <a href="'+'@url_homepage@'+'" target="_blank">IITC Homepage</a> |'
-    + '  <a href="'+'@url_tg@'+'" target="_blank">Telegram channel</a><br />'
-    + '   On the script’s homepage you can:'
-    + '   <ul>'
-    + '     <li>Find Updates</li>'
-    + '     <li>Get Plugins</li>'
-    + '     <li>Report Bugs</li>'
-    + '     <li>Contribute!</li>'
-    + '   </ul>'
-    + '</div>'
-    + '<hr>'
-    + '<div>Version: ' + getIITCVersion() + '</div>';
+  var html = `<div><b>About IITC</b></div>
+              <div>Ingress Intel Total Conversion</div>
+              <hr>
+              <div>
+               <a href="@url_homepage@" target="_blank">IITC Homepage</a> |
+               <a href="@url_tg@" target="_blank">Telegram channel</a><br />
+               On the script’s homepage you can:
+               <ul>
+                 <li>Find Updates</li>
+                 <li>Get Plugins</li>
+                 <li>Report Bugs</li>
+                 <li>Contribute!</li>
+               </ul>
+              </div>
+              <hr>
+              <div>Version: ${getIITCVersion()} ${createChangelog(window.script_info)}</div>`;
 
   if (isShortOnLocalStorage()) {
     html += '<div class="warning">You are running low on LocalStorage memory.<br/>Please free some space to prevent data loss.</div>';
