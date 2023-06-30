@@ -4,6 +4,8 @@
 // @version        0.4.2
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync. Supports Multi-Project-Extension
 
+/* global L -- eslint */
+
 /* **********************************************************************
 
   HOOKS:
@@ -865,22 +867,20 @@ window.plugin.bookmarks.loadStorageBox = function() {
     var text = "You must select 2 or 3 portals!";
     var color = "red";
 
-    function formatDistance(distance) {
-      var text = digits(distance > 10000 ? (distance/1000).toFixed(2) + "km" : (Math.round(distance) + "m"));
-      return distance >= 200000
-        ? '<em title="Long distance link" class="help longdistance">'+text+'</em>'
-        : text;
-    }
+  function distanceElement(distance) {
+    var text = window.formatDistance(distance);
+    return distance >= 200000 ? '<em title="Long distance link" class="help longdistance">' + text + '</em>' : text;
+  }
 
     if(latlngs.length == 2) {
       var distance = L.latLng(latlngs[0]).distanceTo(latlngs[1]);
-      text = 'Distance between portals: ' + formatDistance(distance);
+    text = 'Distance between portals: ' + distanceElement(distance);
       color = "";
     } else if(latlngs.length == 3) {
       var longdistance = false;
       var distances = latlngs.map(function(ll1, i, latlngs) {
         var ll2 = latlngs[(i+1)%3];
-        return formatDistance(L.latLng(ll1).distanceTo(ll2));
+      return distanceElement(L.latLng(ll1).distanceTo(ll2));
       });
       text = 'Distances: ' + distances.join(", ");
       color = "";

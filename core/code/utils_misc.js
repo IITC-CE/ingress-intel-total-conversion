@@ -104,6 +104,9 @@ window.formatInterval = function(seconds,maxTerms) {
   return terms.join(' ');
 }
 
+window.formatDistance = function (distance) {
+  return window.digits(distance > 10000 ? (distance / 1000).toFixed(2) + 'km' : Math.round(distance) + 'm');
+};
 
 window.rangeLinkClick = function() {
   if(window.portalRangeIndicator)

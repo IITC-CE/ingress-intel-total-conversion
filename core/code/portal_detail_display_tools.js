@@ -33,7 +33,7 @@ window.getRangeText = function(d) {
     '<a onclick="window.rangeLinkClick()"' +
       (range.isLinkable ? '' : ' style="text-decoration:line-through;"') +
       '>' +
-      (range.range > 1000 ? Math.floor(range.range / 100) / 10 + ' km' : Math.floor(range.range) + ' m') +
+      window.formatDistance(range.range) +
       '</a>',
     title,
   ];
