@@ -28,15 +28,15 @@ window.getRangeText = function(d) {
 
   if(!range.isLinkable) title += '\nPortal is missing resonators,\nno new links can be made';
 
-  return ['range',
-      '<a onclick="window.rangeLinkClick()"'
-    + (range.isLinkable ? '' : ' style="text-decoration:line-through;"')
-    + '>'
-    + (range.range > 1000
-      ? Math.floor(range.range/1000) + ' km'
-      : Math.floor(range.range)      + ' m')
-    + '</a>',
-    title];
+  return [
+    'range',
+    '<a onclick="window.rangeLinkClick()"' +
+      (range.isLinkable ? '' : ' style="text-decoration:line-through;"') +
+      '>' +
+      (range.range > 1000 ? Math.floor(range.range / 100) / 10 + ' km' : Math.floor(range.range) + ' m') +
+      '</a>',
+    title,
+  ];
 }
 
 
