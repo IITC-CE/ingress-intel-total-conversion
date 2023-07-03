@@ -148,7 +148,7 @@
     <string name="pref_persistent_zoom_sum">Не изменять уровень масштабирования при включенном позиционировании</string>
     <string name="pref_webview_zoom">Масштаб WebView</string>
     <string name="pref_webview_zoom_defaultValue">Системные настройки</string>
-    <string name="pref_webview_zoom_sum">Масштаб встроенного WebView (требуется перезапуск)</string>
+    <string name="pref_webview_zoom_sum">Масштаб встроенного WebView</string>
     <string name="pref_popup">Включить всплывающие окна</string>
     <string name="pref_popup_sum">Разрешить плагинам использовать всплывающие окна. Это может быть полезно для плагинов, которые полагаются на стороннюю аутентификацию</string>
     <string name="update_notifications_channel_name">Обновить уведомления</string>

@@ -40,6 +40,7 @@ public class IITC_WebView extends WebView {
     private int mFullscreenStatus = 0;
     private Runnable mNavHider;
     private boolean mDisableJs = false;
+    private int defaultZoom;
 
 
     // init web view
@@ -48,21 +49,19 @@ public class IITC_WebView extends WebView {
         mIitc = (IITC_Mobile) c;
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
 
-        final boolean enablePopup = mSharedPrefs.getBoolean("pref_popup", false);
 
         mSettings = getSettings();
+        defaultZoom = mSettings.getTextZoom();
         mSettings.setJavaScriptEnabled(true);
-        mSettings.setSupportMultipleWindows(enablePopup);
         mSettings.setDomStorageEnabled(true);
         mSettings.setAllowFileAccess(true);
         mSettings.setGeolocationEnabled(true);
         mSettings.setAppCacheEnabled(true);
         mSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         mSettings.setAppCachePath(getContext().getCacheDir().getAbsolutePath());
-        int zoom = Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1"));
-        if (zoom != -1) {
-            mSettings.setTextZoom(zoom);
-        }
+
+        setSupportPopup(mSharedPrefs.getBoolean("pref_popup", false));
+        setWebViewZoom(Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1")));
 
         // enable mixed content (http on https...needed for some map tiles) mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -282,5 +281,13 @@ public class IITC_WebView extends WebView {
 
     public void setSupportPopup(final boolean val) {
         mSettings.setSupportMultipleWindows(val);
+    }
+
+    public void setWebViewZoom(int zoom) {
+        if (zoom != -1) {
+            mSettings.setTextZoom(zoom);
+        } else {
+            mSettings.setTextZoom(defaultZoom);
+        }
     }
 }

@@ -146,7 +146,7 @@
     <string name="pane_info">信息</string>
     <string name="pane_map">地图</string>
     <string name="file_browser_is_required">未找到文件选择器。请安装一个文件浏览器！</string>
-    <string name="pref_webview_zoom_sum">内部网页视图缩放（需要重新启动）</string>
+    <string name="pref_webview_zoom_sum">内部网页视图缩放</string>
     <string name="pref_webview_zoom">网页视图缩放</string>
     <string name="pref_webview_zoom_defaultValue">系统默认</string>
 </resources>
