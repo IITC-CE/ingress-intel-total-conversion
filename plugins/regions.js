@@ -4,6 +4,8 @@
 // @version        0.2.1
 // @description    Show the regional scoring cells grid on the map
 
+/* global S2 */
+
 
 // use own namespace for plugin
 window.plugin.regions = function() {};
@@ -123,6 +125,7 @@ window.plugin.regions.getSearchResult = function (match) {
     result.description = 'Regional score cell';
     result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@');
 
+    // eslint-disable-next-line no-unused-vars
     const [_, positions] = cell.getFaceAndQuads();
     positions.push(Math.floor(id2 / 4), id2 % 4);
     cell = S2.S2Cell.FromFacePosition(faceId, positions);
