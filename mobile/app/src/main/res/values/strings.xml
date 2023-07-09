@@ -135,7 +135,7 @@
     <string name="pref_update_plugins_interval_2_weeks">2 weeks</string>
     <string name="pref_webview_zoom">WebView Zoom</string>
     <string name="pref_webview_zoom_defaultValue">System default</string>
-    <string name="pref_webview_zoom_sum">Zoom for the internal WebView (requires restart)</string>
+    <string name="pref_webview_zoom_sum">Zoom for the internal WebView</string>
     <string name="menu_reload">Reload IITC</string>
     <string name="menu_toggle_fullscreen">Fullscreen</string>
     <string name="menu_layer_chooser">Layer Chooser</string>

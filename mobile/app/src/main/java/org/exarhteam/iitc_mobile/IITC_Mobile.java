@@ -353,6 +353,8 @@ public class IITC_Mobile extends AppCompatActivity
         } else if (key.equals("pref_popup")) {
             final boolean enablePopup = mSharedPrefs.getBoolean("pref_popup", false);
             mIitcWebView.setSupportPopup(enablePopup);
+        } else if (key.equals("pref_webview_zoom")) {
+            mIitcWebView.setWebViewZoom(Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1")));
         }
 
         mReloadNeeded = true;
