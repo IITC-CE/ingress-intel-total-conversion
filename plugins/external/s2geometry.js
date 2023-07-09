@@ -166,7 +166,7 @@ var IJToST = function(ij,order,offsets) {
 // note: rather then calculating the final integer hilbert position, we just return the list of quads
 // this ensures no precision issues whth large orders (S3 cell IDs use up to 30), and is more
 // convenient for pulling out the individual bits as needed later
-var pointToHilbertQuadList = function(x,y,order) {
+var pointToHilbertQuadList = function(face, x,y,order) {
   var hilbertMap = {
     'a': [ [0,'d'], [1,'a'], [3,'b'], [2,'a'] ],
     'b': [ [2,'b'], [1,'b'], [3,'a'], [0,'c'] ],
@@ -174,7 +174,7 @@ var pointToHilbertQuadList = function(x,y,order) {
     'd': [ [0,'a'], [3,'c'], [1,'d'], [2,'d'] ]  
   };
 
-  var currentSquare='a';
+  var currentSquare = face & 1 ? 'd' : 'a';
   var positions = [];
 
   for (var i=order-1; i>=0; i--) {
@@ -194,7 +194,34 @@ var pointToHilbertQuadList = function(x,y,order) {
   return positions;
 };
 
+  /**
+   * reverse of @see pointToHilbertQuadList
+   */
+  var hilbertQuadListToPoint = function (face, positions) {
+    const hilbertMapReverse = {
+      'a': [[0, 'd'], [1, 'a'], [3, 'a'], [2, 'b']],
+      'b': [[3, 'c'], [1, 'b'], [0, 'b'], [2, 'a']],
+      'c': [[3, 'b'], [2, 'c'], [0, 'c'], [1, 'd']],
+      'd': [[0, 'a'], [2, 'd'], [3, 'd'], [1, 'c']]
+    };
 
+    let currentSquare = face & 1 ? 'd' : 'a';
+    const level = positions.length;
+
+    let i = 0;
+    let j = 0;
+
+    positions.forEach(v => {
+      const t = hilbertMapReverse[currentSquare][v]
+      i <<= 1;
+      j <<= 1;
+      if (t[0] & 2) i |= 1;
+      if (t[0] & 1) j |= 1;
+      currentSquare = t[1];
+    });
+
+    return [i, j];
+  };
 
 
 // S2Cell class
@@ -223,6 +250,14 @@ S2.S2Cell.FromFaceIJ = function(face,ij,level) {
   return cell;
 };
 
+  /**
+     * Create cell by face and hilbertcurve position
+     * (this is like the original CellID construction)
+     */
+  S2.S2Cell.FromFacePosition = function (face, position) {
+    const ij = hilbertQuadListToPoint(face, position)
+    return S2.S2Cell.FromFaceIJ(face, ij, position.length);
+  };
 
 S2.S2Cell.prototype.toString = function() {
   return 'F'+this.face+'ij['+this.ij[0]+','+this.ij[1]+']@'+this.level;
@@ -257,7 +292,7 @@ S2.S2Cell.prototype.getCornerLatLngs = function() {
 
 
 S2.S2Cell.prototype.getFaceAndQuads = function() {
-  var quads = pointToHilbertQuadList(this.ij[0], this.ij[1], this.level);
+  var quads = pointToHilbertQuadList(this.face, this.ij[0], this.ij[1], this.level);
 
   return [this.face,quads];
 };

@@ -4,6 +4,8 @@
 // @version        0.2.1
 // @description    Show the regional scoring cells grid on the map
 
+/* global S2 */
+
 
 // use own namespace for plugin
 window.plugin.regions = function() {};
@@ -50,14 +52,7 @@ window.plugin.regions.CODE_WORDS = [
 window.plugin.regions.REGEXP = new RegExp('^(?:(?:(' + plugin.regions.FACE_NAMES.join('|') + ')-?)?((?:1[0-6])|(?:0?[1-9]))-?)?(' +
   plugin.regions.CODE_WORDS.join('|') + ')(?:-?((?:1[0-5])|(?:0?\\d)))?$', 'i');
 
-window.plugin.regions.regionName = function(cell) {
-  // ingress does some odd things with the naming. for some faces, the i and j coords are flipped when converting
-  // (and not only the names - but the full quad coords too!). easiest fix is to create a temporary cell with the coords
-  // swapped
-  if (cell.face == 1 || cell.face == 3 || cell.face == 5) {
-    cell = S2.S2Cell.FromFaceIJ ( cell.face, [cell.ij[1], cell.ij[0]], cell.level );
-  }
-
+window.plugin.regions.regionName = function (cell) {
   // first component of the name is the face
   var name = window.plugin.regions.FACE_NAMES[cell.face];
 
@@ -106,32 +101,7 @@ window.plugin.regions.search = function(query) {
   });
 }
 
-// rot and d2xy from Wikipedia
-window.plugin.regions.rot = function(n, x, y, rx, ry) {
-  if(ry == 0) {
-    if(rx == 1) {
-      x = n-1 - x;
-      y = n-1 - y;
-    }
-
-    return [y, x];
-  }
-  return [x, y];
-}
-window.plugin.regions.d2xy = function(n, d) {
-  var rx, ry, s, t = d, xy = [0, 0];
-  for(s=1; s<n; s*=2) {
-    rx = 1 & (t/2);
-    ry = 1 & (t ^ rx);
-    xy = window.plugin.regions.rot(s, xy[0], xy[1], rx, ry);
-    xy[0] += s * rx;
-    xy[1] += s * ry;
-    t /= 4;
-  }
-  return xy;
-}
-
-window.plugin.regions.getSearchResult = function(match) {
+window.plugin.regions.getSearchResult = function (match) {
   var faceId = window.plugin.regions.FACE_NAMES.indexOf(match[1]);
   var id1 = parseInt(match[2]);
   var codeWordId = window.plugin.regions.CODE_WORDS.indexOf(match[3]);
@@ -144,29 +114,22 @@ window.plugin.regions.getSearchResult = function(match) {
   // face is used as-is
 
   // id1 is the region 'i' value (first 4 bits), codeword is the 'j' value (first 4 bits)
-  var regionI = id1-1;
-  var regionJ = codeWordId;
+  var cell = S2.S2Cell.FromFaceIJ(faceId, [id1 - 1, codeWordId], 4);
 
-  var result = {}, level;
+  var result = {};
 
-  if(id2 === undefined) {
+  if (id2 === undefined) {
     result.description = 'Regional score cells (cluster of 16 cells)';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
-    level = 4;
+    result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
   } else {
     result.description = 'Regional score cell';
-    result.icon = 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-cell.svg@');
-    level = 6;
+    result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@');
 
-    var xy = window.plugin.regions.d2xy(4, id2);
-    regionI = (regionI << 2) + xy[0];
-    regionJ = (regionJ << 2) + xy[1];
+    // eslint-disable-next-line no-unused-vars
+    const [_, positions] = cell.getFaceAndQuads();
+    positions.push(Math.floor(id2 / 4), id2 % 4);
+    cell = S2.S2Cell.FromFacePosition(faceId, positions);
   }
-
-  // as in the name-construction above, for odd numbered faces, the I and J need swapping
-  var cell = (faceId % 2 == 1)
-    ? S2.S2Cell.FromFaceIJ(faceId, [regionJ,regionI], level)
-    : S2.S2Cell.FromFaceIJ(faceId, [regionI,regionJ], level);
 
   var corners = cell.getCornerLatLngs();
 
