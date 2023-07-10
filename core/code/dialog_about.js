@@ -13,23 +13,22 @@ window.aboutIITC = function() {
 }
 
 function createDialogContent() {
-  var html = ''
-    + '<div><b>About IITC</b></div> '
-    + '<div>Ingress Intel Total Conversion</div> '
-    + '<hr>'
-    + '<div>'
-    + '  <a href="'+'@url_homepage@'+'" target="_blank">IITC Homepage</a> |'
-    + '  <a href="'+'@url_tg@'+'" target="_blank">Telegram channel</a><br />'
-    + '   On the script’s homepage you can:'
-    + '   <ul>'
-    + '     <li>Find Updates</li>'
-    + '     <li>Get Plugins</li>'
-    + '     <li>Report Bugs</li>'
-    + '     <li>Contribute!</li>'
-    + '   </ul>'
-    + '</div>'
-    + '<hr>'
-    + '<div>Version: ' + getIITCVersion() + '</div>';
+  var html = `<div><b>About IITC</b></div>
+              <div>Ingress Intel Total Conversion</div>
+              <hr>
+              <div>
+               <a href="@url_homepage@" target="_blank">IITC Homepage</a> |
+               <a href="@url_tg@" target="_blank">Telegram channel</a><br />
+               On the script’s homepage you can:
+               <ul>
+                 <li>Find Updates</li>
+                 <li>Get Plugins</li>
+                 <li>Report Bugs</li>
+                 <li>Contribute!</li>
+               </ul>
+              </div>
+              <hr>
+              <div>Version: ${getIITCVersion()} ${createChangelog(window.script_info)}</div>`;
 
   if (isShortOnLocalStorage()) {
     html += '<div class="warning">You are running low on LocalStorage memory.<br/>Please free some space to prevent data loss.</div>';
@@ -75,6 +74,8 @@ function convertPluginInfo(info, index) {
   //   (atm: IITC-Mobile for iOS)
   var result = {
     build: info.buildName,
+    changelog: info.changelog,
+    id: info.pluginId,
     name: info.pluginId,
     date: info.dateTimeVersion,
     error: info.error,
@@ -103,8 +104,33 @@ function convertPluginInfo(info, index) {
   return result;
 }
 
+function createChangelog(plugin) {
+  var id = 'plugin-changelog-' + plugin.id;
+  return (
+    `<a onclick="$('#${id}').toggle()">changelog</a>` +
+    `<ul id="${id}" style="display: none;">` +
+    plugin.changelog
+      .map(function (logEntry) {
+        return (
+          '<li>' +
+          logEntry.version +
+          '<ul>' +
+          logEntry.changes
+            .map(function (change) {
+              return `<li>${change}</li>`;
+            })
+            .join('') +
+          '</ul></li>'
+        );
+      })
+      .join('') +
+    '</ul>'
+  );
+}
+
 function pluginInfoToString(p, extra) {
   var info = {
+    changelog: '',
     class: '',
     description: p.description || '',
     name: p.name,
@@ -120,7 +146,11 @@ function pluginInfoToString(p, extra) {
     info.description = p.error;
   }
 
-  return L.Util.template('<li class="{class}" title="{description}">{name}{verinfo}</li>', info);
+  if (p.changelog) {
+    info.changelog = createChangelog(p);
+  }
+
+  return L.Util.template('<li class="{class}" title="{description}">{name}{verinfo} {changelog}</li>', info);
 }
 
 

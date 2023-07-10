@@ -4,6 +4,14 @@
 // @version        0.12.2
 // @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.12.2',
+    changes: ['🐛 - Exclude __MACHINA__ actions'],
+  },
+];
 
 window.PLAYER_TRACKER_MAX_TIME = 3*60*60*1000; // in milliseconds
 window.PLAYER_TRACKER_MIN_ZOOM = 9;
