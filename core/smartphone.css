@@ -93,8 +93,28 @@ body {
   background-color: #ff0028 !important;
 }
 
+#playerstat {
+  height: initial;
+}
+
+#playerstat h2 {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+#playerstat h2 #name {
+  width: initial;
+}
+
+#playerstat h2 #stats {
+  white-space: nowrap;
+  overflow: initial;
+}
+
 #name #signout { /* no hover, always show signout button */
-  display: block;
+  display: inline-block;
+  position: initial;
 }
 
 #sidebar, #chatcontrols, #chat, #chatinput {

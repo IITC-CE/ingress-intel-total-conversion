@@ -502,7 +502,7 @@ h2 #stats {
   display: none; /* starts hidden */
 }
 #name:hover #signout {
-  display: block;
+  display: inline-block;
 }
 
 h2 sup, h2 sub {
