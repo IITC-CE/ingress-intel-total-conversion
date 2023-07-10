@@ -117,11 +117,6 @@ body {
   position: initial;
 }
 
-#gamestat span {
-  padding: 0 3px;
-  box-sizing: border-box;
-}
-
 #sidebar, #chatcontrols, #chat, #chatinput {
   background: transparent !important;
 }

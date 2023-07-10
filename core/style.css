@@ -524,6 +524,9 @@ h2 sup, h2 sub {
   cursor:help;
   height: 21px;
   line-height: 22px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  font-size: 1em;
 }
 
 #gamestat .res {
@@ -562,7 +565,7 @@ input[type="search"], input[type="url"] {
 #buttongeolocation {
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
   margin: 0;
   border: 0 none transparent;
   padding: 0 2px 0 0;
