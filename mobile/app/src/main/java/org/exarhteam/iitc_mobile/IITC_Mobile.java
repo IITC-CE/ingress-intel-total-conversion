@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -153,6 +154,11 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        // enable webview debug for debug builds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+                && 0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
 
         // get status of Samsung DeX Mode at creation
         Configuration config = getResources().getConfiguration();
