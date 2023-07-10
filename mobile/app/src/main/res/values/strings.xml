@@ -133,9 +133,9 @@
     <string name="pref_update_plugins_interval_2_days">2 days</string>
     <string name="pref_update_plugins_interval_1_week">1 week</string>
     <string name="pref_update_plugins_interval_2_weeks">2 weeks</string>
-    <string name="pref_webview_zoom">WebView Zoom</string>
+    <string name="pref_webview_zoom">Font size</string>
     <string name="pref_webview_zoom_defaultValue">System default</string>
-    <string name="pref_webview_zoom_sum">Zoom for the internal WebView</string>
+    <string name="pref_webview_zoom_sum">Affects font/text size in info panel, comm, popup windows, etc…</string>
     <string name="menu_reload">Reload IITC</string>
     <string name="menu_toggle_fullscreen">Fullscreen</string>
     <string name="menu_layer_chooser">Layer Chooser</string>
