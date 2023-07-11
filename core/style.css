@@ -513,17 +513,10 @@ h2 sup, h2 sub {
 
 
 /* gamestats */
-#gamestat {
-  height: 22px;
-}
-
 #gamestat span {
-  display: block;
-  float: left;
+  display: inline-block;
   font-weight: bold;
   cursor:help;
-  height: 21px;
-  line-height: 22px;
   padding: 0 3px;
   box-sizing: border-box;
 }
