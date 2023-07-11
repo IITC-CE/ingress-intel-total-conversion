@@ -107,6 +107,10 @@ body {
   width: initial;
 }
 
+#playerstat h2 #name .playername {
+  max-width: 60vw;
+}
+
 #playerstat h2 #stats {
   white-space: nowrap;
   overflow: initial;

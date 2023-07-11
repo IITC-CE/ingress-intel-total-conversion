@@ -475,13 +475,16 @@ h2 {
 
 h2 #name {
   font-weight: 300;
+  display: inline;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+h2 #name .playername {
+  max-width: 50%;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
-  vertical-align: top;
-  white-space: nowrap;
-  width: 205px;
-  position: relative;
 }
 
 h2 #stats {
@@ -493,13 +496,10 @@ h2 #stats {
 #signout {
   font-size: 12px;
   font-weight: normal;
-  line-height: 29px;
   padding: 0 4px;
-  position: absolute;
-  top: 0;
-  right: 0;
   background-color: rgba(8, 48, 78, 0.5);
   display: none; /* starts hidden */
+  vertical-align: text-top;
 }
 #name:hover #signout {
   display: inline-block;

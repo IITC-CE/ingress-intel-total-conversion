@@ -69,17 +69,18 @@ window.setupPlayerStat = function () {
         + '\nInvites:\t'+PLAYER.available_invites
         + '\n\nNote: your player stats can only be updated by a full reload (F5)';
 
-  $('#playerstat').html(''
-    + '<h2 title="'+t+'">'+level+'&nbsp;'
-    + '<div id="name">'
-    + '<span class="'+cls+'">'+PLAYER.nickname+'</span>'
-    + '<a href="https://intel.ingress.com/logout" id="signout">sign out</a>'
-    + '</div>'
-    + '<div id="stats">'
-    + '<sup>XM: '+xmRatio+'%</sup>'
-    + '<sub>' + (nextLvlAp > 0 ? 'level: '+lvlApProg+'%' : 'max level') + '</sub>'
-    + '</div>'
-    + '</h2>'
+  $('#playerstat').html(
+    `<h2 title="${t}">
+      ${level}
+      <div id="name">
+        <span class="playername ${cls}">${window.PLAYER.nickname}</span>
+        <a href="https://intel.ingress.com/logout" id="signout">sign out</a>
+      </div>
+      <div id="stats">
+        <sup>XM: ${xmRatio}%</sup>
+        <sub>${nextLvlAp > 0 ? 'level: ' + lvlApProg + '%' : 'max level'}</sub>
+      </div>
+    </h2>`
   );
 };
 
