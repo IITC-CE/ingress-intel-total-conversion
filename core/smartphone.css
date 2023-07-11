@@ -107,7 +107,8 @@ body {
   width: initial;
 }
 
-#playerstat h2 #name .playername {
+#playerstat h2 #name .playername,
+#playerstat h2 #name:hover .playername{
   max-width: 60vw;
 }
 

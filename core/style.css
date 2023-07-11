@@ -481,7 +481,7 @@ h2 #name {
 }
 
 h2 #name .playername {
-  max-width: 50%;
+  max-width: 70%;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -500,6 +500,9 @@ h2 #stats {
   background-color: rgba(8, 48, 78, 0.5);
   display: none; /* starts hidden */
   vertical-align: text-top;
+}
+#name:hover .playername {
+  max-width: 50%;
 }
 #name:hover #signout {
   display: inline-block;
