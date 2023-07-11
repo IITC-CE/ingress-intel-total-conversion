@@ -561,14 +561,14 @@ input[type="search"], input[type="url"] {
   margin: 0;
   border: 0 none transparent;
   padding: 0 2px 0 0;
-  height: 24px;
+  height: 100%;
   background-color: transparent;
 }
 #buttongeolocation:focus {
   outline: 1px dotted #ffce00;
 }
 #buttongeolocation img {
-  display: block;
+  vertical-align: middle;
 }
 #searchwrapper h3 {
   font-size: 1em;
