@@ -37,8 +37,8 @@ window.plugin.rawdata.showPortalData = function(guid) {
   var title = 'Raw portal data: ' + (data.title || '<no title>');
 
   var body = `<b>Portal GUID</b>: <code>${guid}</code><br />
-                     <b>Entity timestamp</b>: <code>${ts}</code> - ${window.unixTimeToDateTimeString(ts, true)}<br />
-                     <b>Portal map data</b>: <pre>${JSON.stringify(data, null, 2)}</pre>`;
+              <b>Entity timestamp</b>: <code>${ts}</code> - ${window.unixTimeToDateTimeString(ts, true)}<br />
+              <b>Portal map data</b>: <pre>${JSON.stringify(data, null, 2)}</pre>`;
 
   var details = portalDetail.get(guid);
   if (details) {

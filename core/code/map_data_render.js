@@ -464,7 +464,6 @@ window.Render.prototype.createLinkEntity = function (ent) {
   this.createPlaceholderPortalEntity(data.oGuid, data.oLatE6, data.oLngE6, data.team, data.timestamp);
   this.createPlaceholderPortalEntity(data.dGuid, data.dLatE6, data.dLngE6, data.team, data.timestamp);
 
-
   // check if entity already exists
   if (ent[0] in window.links) {
     var l = window.links[ent[0]];
