@@ -1,9 +1,17 @@
 // @author         jonatkins
 // @name           Debug: Raw portal JSON data
 // @category       Portal Info
-// @version        0.2.4
+// @version        0.2.5
 // @description    Developer debugging aid: Add a link to the portal details to show the raw data of a portal.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.2.5',
+    changes: ['Added human readable timestamp for portal links and fields'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.rawdata = function() {};
@@ -28,10 +36,9 @@ window.plugin.rawdata.showPortalData = function(guid) {
 
   var title = 'Raw portal data: ' + (data.title || '<no title>');
 
-  var body =
-    '<b>Portal GUID</b>: <code>'+guid+'</code><br />' +
-    '<b>Entity timestamp</b>: <code>'+ts+'</code> - '+window.unixTimeToDateTimeString(ts,true)+'<br />' + 
-    '<b>Portal map data:</b><pre>'+JSON.stringify(data,null,2)+'</pre>';
+  var body = `<b>Portal GUID</b>: <code>${guid}</code><br />
+                     <b>Entity timestamp</b>: <code>${ts}</code> - ${window.unixTimeToDateTimeString(ts, true)}<br />
+                     <b>Portal map data</b>: <pre>${JSON.stringify(data, null, 2)}</pre>`;
 
   var details = portalDetail.get(guid);
   if (details) {
@@ -45,7 +52,9 @@ window.plugin.rawdata.showPortalData = function(guid) {
   $.each(linkGuids.in.concat(linkGuids.out), function(i,lguid) {
     var l = window.links[lguid];
     var ld = l.options.data;
-    body += '<b>Link GUID</b>: <code>'+l.options.guid+'</code><br /><pre>'+JSON.stringify(ld,null,2)+'</pre>';
+    body += `<b>Link GUID</b>: <code>${l.options.guid}</code><br />
+             <b>Entity timestamp</b>: <code>${ld.timestamp}</code> - ${window.unixTimeToDateTimeString(ld.timestamp, true)}<br />
+             <pre>${JSON.stringify(ld, null, 2)}</pre>`;
     haslinks = true;
   });
 
@@ -57,7 +66,9 @@ window.plugin.rawdata.showPortalData = function(guid) {
   $.each(fieldGuids, function(i,fguid) {
     var f = window.fields[fguid];
     var fd = f.options.data;
-    body += '<b>Field guid</b>: <code>'+f.options.guid+'</code><br /><pre>'+JSON.stringify(fd,null,2)+'</pre>';
+    body += `<b>Field guid</b>: <code>${f.options.guid}</code><br />
+             <b>Entity timestamp</b>: <code>${fd.timestamp}</code> - ${window.unixTimeToDateTimeString(fd.timestamp, true)}<br />
+             <pre>${JSON.stringify(fd, null, 2)}</pre>`;
     hasfields = true;
   });
   if (!hasfields) body += '<p>No fields linked to this portal</p>';
