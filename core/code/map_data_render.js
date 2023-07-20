@@ -261,7 +261,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, l
   if (guid in window.portals) {
     var p = window.portals[guid];
     portalMoved = latE6 !== p.options.data.latE6 || lngE6 !== p.options.data.lngE6;
-    if (team !== p.options.data.team) {
+    if (team !== p.options.data.team && p.options.timestamp < timestamp) {
       // team - delete existing portal
       this.deletePortalEntity(guid);
     }
