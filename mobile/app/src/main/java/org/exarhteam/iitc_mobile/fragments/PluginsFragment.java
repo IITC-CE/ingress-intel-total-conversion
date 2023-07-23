@@ -47,6 +47,8 @@ public class PluginsFragment extends PreferenceFragment {
 
     private PluginPreference createPluginPreference(ArrayList<PluginInfo> prefs, PreferenceScreen preferenceScreen, PluginInfo pluginInfo) {
         final PluginPreference preference = new PluginPreference(getActivity());
+        preference.setDefaultValue(false);
+        preference.setPersistent(true);
         preference.setPluginInfo(pluginInfo);
 
         if (pluginInfo.isUserPlugin()) {

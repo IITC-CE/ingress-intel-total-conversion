@@ -137,7 +137,7 @@ public class IITC_FileManager {
     private final SharedPreferences mPrefs;
     public static final String IITC_PATH = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
     public static final String IITC_DEV_PATH = IITC_PATH + "dev/";
-    public static final String PLUGINS_PATH = IITC_PATH + "plugins/";
+    public static final String USER_PLUGINS_PATH = IITC_PATH + "plugins/";
 
     public IITC_FileManager(final Activity activity) {
         mActivity = activity;
@@ -292,7 +292,7 @@ public class IITC_FileManager {
                         fileName = getScriptInfo(isCopy).getId() + ".user.js";
                     }
                     // create IITCm external plugins directory if it doesn't already exist
-                    final File pluginsDirectory = new File(PLUGINS_PATH);
+                    final File pluginsDirectory = new File(USER_PLUGINS_PATH);
                     pluginsDirectory.mkdirs();
 
                     // create in and out streams and copy plugin
@@ -332,7 +332,7 @@ public class IITC_FileManager {
         for (final Map.Entry<String, ?> entry : all_prefs.entrySet()) {
             final String plugin = entry.getKey();
             if (plugin.endsWith(".user.js") && entry.getValue().toString().equals("true")) {
-                if (plugin.startsWith(PLUGINS_PATH)) {
+                if (plugin.startsWith(USER_PLUGINS_PATH)) {
                     new UpdateScript(new ScriptUpdatedCallback(), forceSecureUpdates).execute(plugin);
                 }
             }

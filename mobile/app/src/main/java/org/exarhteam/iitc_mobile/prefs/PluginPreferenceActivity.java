@@ -248,7 +248,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     }
 
     private File[] getUserPlugins() {
-        final File directory = new File(IITC_FileManager.PLUGINS_PATH);
+        final File directory = new File(IITC_FileManager.USER_PLUGINS_PATH);
         File[] files = directory.listFiles();
         if (files == null) {
             files = new File[0];
