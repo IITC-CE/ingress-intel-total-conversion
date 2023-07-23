@@ -262,4 +262,11 @@
     </string>
     <string name="iitc_ce_mobile" translatable="false">IITC-CE Mobile</string>
     <string name="continue_in_english" translatable="false">Continue in English</string>
+    <string name="menu_delete_plugin">Delete</string>
+    <string name="delete_plugin_question">Delete plugin \"%s\"?</string>
+    <string name="plugin_deleted">Plugin \"%s\" deleted</string>
+    <string name="button_confirm_description">Yes</string>
+    <string name="button_cancel_description">No</string>
+    <string name="menu_share_plugin_url">Share download URL</string>
+    <string name="menu_share_plugin_file">Share plugin file</string>
 </resources>

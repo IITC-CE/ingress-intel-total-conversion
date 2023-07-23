@@ -25,11 +25,13 @@ import java.util.ArrayList;
 
 public class ShareActivity extends FragmentActivity implements ActionBar.TabListener {
     private static final String EXTRA_TYPE = "share-type";
+    private static final String EXTRA_CONTENT_TYPE = "content-type";
     private static final int REQUEST_START_INTENT = 1;
     private static final String TYPE_FILE = "file";
     private static final String TYPE_PERMALINK = "permalink";
     private static final String TYPE_PORTAL_LINK = "portal_link";
     private static final String TYPE_STRING = "string";
+    private static final String TYPE_URL = "url";
 
     public static Intent forFile(final Context context, final File file, final String type) {
         final Uri uri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
@@ -51,6 +53,14 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
                 .putExtra("zoom", zoom)
                 .putExtra("title", title)
                 .putExtra("isPortal", isPortal);
+    }
+
+    public static Intent forUrl(final Context context, String title, final String url) {
+        return new Intent(context, ShareActivity.class)
+                .putExtra(EXTRA_TYPE, TYPE_URL)
+                .putExtra(EXTRA_CONTENT_TYPE, "text/x-uri")
+                .putExtra(Intent.EXTRA_TITLE, title)
+                .setData(Uri.parse(url));
     }
 
     public static Intent forString(final Context context, final String str) {
@@ -131,7 +141,7 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
 
             actionBar.setTitle(title);
 
-            addTab(mGenerator.getShareIntents(title, url),
+            addTab(mGenerator.getShareIntents(title, url, "text/plain"),
                     R.string.tab_share,
                     R.drawable.ic_action_share);
             addTab(mGenerator.getGeoIntents(title, ll, zoom),
@@ -144,13 +154,17 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
             final String title = getString(R.string.app_name);
             final String shareString = intent.getStringExtra("shareString");
 
-            addTab(mGenerator.getShareIntents(title, shareString), R.string.tab_share, R.drawable.ic_action_share);
+            addTab(mGenerator.getShareIntents(title, shareString, "text/plain"), R.string.tab_share, R.drawable.ic_action_share);
         } else if (TYPE_FILE.equals(type)) {
-
             final Uri uri = intent.getParcelableExtra("uri");
             final String mime = intent.getStringExtra("type");
 
             addTab(mGenerator.getShareIntents(uri, mime), R.string.tab_share, R.drawable.ic_action_share);
+        } else if (TYPE_URL.equals(type)) {
+            String title = intent.getStringExtra(Intent.EXTRA_TITLE);
+            String string = intent.getData().toString();
+            String contentType = intent.getStringExtra(EXTRA_CONTENT_TYPE);
+            addTab(mGenerator.getShareIntents(title, string, contentType), R.string.tab_share, R.drawable.ic_action_share);
         } else {
             Log.w("Unknown sharing type: " + type);
             setResult(RESULT_CANCELED);
