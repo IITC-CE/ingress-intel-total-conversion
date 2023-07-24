@@ -98,12 +98,7 @@ public class IITC_FileManager {
             header = js.substring(js.indexOf("==UserScript=="),
                     js.indexOf("==/UserScript=="));
         }
-        // add default values
-        info.setId("unknown");
-        info.setVersion("not found");
-        info.setName("unknown");
-        info.setDescription("");
-        info.setCategory("Misc");
+
         final BufferedReader reader = new BufferedReader(new StringReader(header));
         try {
             final Pattern p = Pattern.compile("^\\s*//\\s*@(\\S+)(.*)$");

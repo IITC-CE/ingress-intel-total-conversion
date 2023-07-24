@@ -17,6 +17,11 @@ public class PluginInfo extends HashMap<String, String> {
 
     public PluginInfo() {
         super();
+        this.setId("unknown");
+        this.setVersion("not found");
+        this.setName("unknown");
+        this.setDescription("");
+        this.setCategory("Misc");
     }
 
     public void setId(String id) {

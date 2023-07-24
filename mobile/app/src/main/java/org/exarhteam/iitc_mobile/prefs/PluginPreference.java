@@ -49,12 +49,14 @@ public class PluginPreference extends CheckBoxPreference {
             if (getPluginInfo().getDownloadURL() != null) {
                 addShareUrlMenuItem(menu, R.string.menu_share_plugin_download_url, getPluginInfo().getDownloadURL());
             }
-            if (getPluginInfo().getUpdateURL() != null) {
+            if ((getPluginInfo().getDownloadURL() == null && getPluginInfo().getUpdateURL() != null)
+                    || getPluginInfo().getUpdateURL() != null && !getPluginInfo().getDownloadURL().equals(getPluginInfo().getUpdateURL())
+            ) {
                 addShareUrlMenuItem(menu, R.string.menu_share_plugin_update_url, getPluginInfo().getUpdateURL());
             }
             MenuItem sharePluginMenu = menu.add(R.string.menu_share_plugin_file);
             sharePluginMenu.setOnMenuItemClickListener(item -> {
-                getContext().startActivity(ShareActivity.forFile(getContext(), new File(getPluginInfo().getKey()), "application/json"));
+                getContext().startActivity(ShareActivity.forFile(getContext(), new File(getPluginInfo().getKey()), "application/javascript"));
                 return true;
             });
             MenuItem deleteItem = menu.add(R.string.menu_delete_plugin);
