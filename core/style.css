@@ -475,13 +475,16 @@ h2 {
 
 h2 #name {
   font-weight: 300;
+  display: inline;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+h2 #name .playername {
+  max-width: 70%;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
-  vertical-align: top;
-  white-space: nowrap;
-  width: 205px;
-  position: relative;
 }
 
 h2 #stats {
@@ -493,16 +496,16 @@ h2 #stats {
 #signout {
   font-size: 12px;
   font-weight: normal;
-  line-height: 29px;
   padding: 0 4px;
-  position: absolute;
-  top: 0;
-  right: 0;
   background-color: rgba(8, 48, 78, 0.5);
   display: none; /* starts hidden */
+  vertical-align: text-top;
+}
+#name:hover .playername {
+  max-width: 50%;
 }
 #name:hover #signout {
-  display: block;
+  display: inline-block;
 }
 
 h2 sup, h2 sub {
@@ -513,22 +516,16 @@ h2 sup, h2 sub {
 
 
 /* gamestats */
-#gamestat {
-  height: 22px;
-}
-
 #gamestat span {
-  display: block;
-  float: left;
+  display: inline-block;
   font-weight: bold;
   cursor:help;
-  height: 21px;
-  line-height: 22px;
+  padding: 0 3px;
+  box-sizing: border-box;
 }
 
 #gamestat .res {
   background: #005684;
-  text-align: right;
 }
 
 #gamestat .enl {
@@ -563,18 +560,18 @@ input[type="search"], input[type="url"] {
 #buttongeolocation {
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
   margin: 0;
   border: 0 none transparent;
   padding: 0 2px 0 0;
-  height: 24px;
+  height: 100%;
   background-color: transparent;
 }
 #buttongeolocation:focus {
   outline: 1px dotted #ffce00;
 }
 #buttongeolocation img {
-  display: block;
+  vertical-align: middle;
 }
 #searchwrapper h3 {
   font-size: 1em;

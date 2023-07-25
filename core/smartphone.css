@@ -93,8 +93,36 @@ body {
   background-color: #ff0028 !important;
 }
 
+#playerstat {
+  height: initial;
+}
+
+#playerstat h2 {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 5px;
+}
+
+#playerstat h2 #name {
+  display: flex;
+  align-items: center;
+}
+
+#playerstat h2 #name .playername,
+#playerstat h2 #name:hover .playername{
+  max-width: 60vw;
+}
+
+#playerstat h2 #stats {
+  white-space: nowrap;
+  overflow: initial;
+}
+
 #name #signout { /* no hover, always show signout button */
-  display: block;
+  display: inline-block;
+  position: initial;
+  margin-left: 4px;
 }
 
 #sidebar, #chatcontrols, #chat, #chatinput {
@@ -106,9 +134,6 @@ body {
   margin-left: 5px !important;
 }
 
-#searchwrapper {
-  font-size: 1.2em;
-}
 #searchwrapper .ui-accordion-header {
   padding: 0.3em 0;
 }
@@ -186,10 +211,6 @@ body {
 
 #sidebar > * {
   width: 100%;
-}
-
-#playerstat {
-  margin-top: 5px;
 }
 
 #portaldetails {

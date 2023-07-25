@@ -17,11 +17,17 @@ window.updateGameScore = function(data) {
     var s = r+e;
     var rp = r/s*100, ep = e/s*100;
     r = digits(r), e = digits(e);
-    var rs = '<span class="res" style="width:'+rp+'%;">'+Math.round(rp)+'%&nbsp;</span>';
-    var es = '<span class="enl" style="width:'+ep+'%;">&nbsp;'+Math.round(ep)+'%</span>';
-    $('#gamestat').html(rs+es).one('click', function() { window.updateGameScore() });
+    var teamId = window.teamStringToId(window.PLAYER.team);
+    var rs = '<span class="res" style="width:' + rp + '%;text-align: ' + (teamId === window.TEAM_RES ? 'right' : 'left') + ';">' + Math.round(rp) + '%</span>';
+    var es = '<span class="enl" style="width:' + ep + '%;text-align: ' + (teamId === window.TEAM_ENL ? 'right' : 'left') + ';">' + Math.round(ep) + '%</span>';
+    var gamestatElement = $('#gamestat');
+    gamestatElement.html(teamId === window.TEAM_RES ? rs + es : es + rs).one('click', function () {
+      window.updateGameScore();
+    });
     // help cursor via “#gamestat span”
-    $('#gamestat').attr('title', 'Resistance:\t'+r+' MindUnits\nEnlightened:\t'+e+' MindUnits');
+    var resMu = 'Resistance:\t' + r + ' MindUnits';
+    var enlMu = 'Enlightened:\t' + e + ' MindUnits';
+    gamestatElement.attr('title', teamId === window.TEAM_RES ? resMu + '\n' + enlMu : enlMu + '\n' + resMu);
   } else if (data && data.error) {
     log.warn('game score failed to load: '+data.error);
   } else {
