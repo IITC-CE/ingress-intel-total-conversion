@@ -1,15 +1,28 @@
 // @author         johnd0e
 // @name           Hide portal levels
 // @category       Layer
-// @version        0.1.0
+// @version        0.1.1
 // @description    Replace all levels with single layerChooser's entry; reverting on longclick
 
+/* exported setup, changelog --eslint */
 
 // use own namespace for plugin
 var hideLevels = {};
 window.plugin.hideLevels = hideLevels;
 
+hideLevels.layerFilterRegexp = new RegExp(/Level \d* Portals/);
 hideLevels.initCollapsed = true;
+
+var changelog = [
+  {
+    version: '0.1.1',
+    changes: ['FIX: Hide only portal layers'],
+  },
+  {
+    version: '0.1.0',
+    changes: ['Initial version'],
+  },
+];
 
 function setup () {
   var ctrl = window.layerChooser;
@@ -17,7 +30,7 @@ function setup () {
   hideLevels.portals = L.layerGroup();
 
   var levels = ctrl._layers.filter(function (data) {
-    return data.overlay && data.name.endsWith(' Portals');
+    return data.overlay && (data.name === 'Unclaimed/Placeholder Portals' || data.name.match(hideLevels.layerFilterRegexp));
   });
   hideLevels.collapse = function (set) {
     var allDisabled = true;
