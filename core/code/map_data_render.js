@@ -244,14 +244,15 @@ window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, l
   timestamp = timestamp || 0;
 
   var ent = [
-    guid,       //ent[0] = guid
-    0,          //ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
-                //ent[2] = an array with the entity data
-    [ 'p',      //0 - a portal
-      team,     //1 - team
-      latE6,    //2 - lat
-      lngE6     //3 - lng
-    ]
+    guid, // ent[0] = guid
+    -1, // ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
+    // ent[2] = an array with the entity data
+    [
+      'p', // 0 - a portal
+      team, // 1 - team
+      latE6, // 2 - lat
+      lngE6, // 3 - lng
+    ],
   ];
 
   // placeholder portals don't have a useful timestamp value - so the standard code that checks for updated
