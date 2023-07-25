@@ -115,12 +115,12 @@ public class IntentGenerator {
         intent.removeExtra(EXTRA_FLAG_TITLE);
     }
 
-    public ArrayList<Intent> getBrowserIntents(final String title, final String url) {
+    public List<Intent> getBrowserIntents(final String title, final String url) {
         final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        return resolveTargets(intent);
+        return ensureCopyIntentPresent(intent, resolveTargets(intent));
     }
 
     public ArrayList<Intent> getGeoIntents(final String title, final String mLl, final int mZoom) {
@@ -158,15 +158,17 @@ public class IntentGenerator {
      *            the string to be shared
      * @param contentType
      */
-    public ArrayList<Intent> getShareIntents(final String title, final String text, String contentType) {
+    public List<Intent> getShareIntents(final String title, final String text, String contentType) {
         final Intent intent = new Intent(Intent.ACTION_SEND)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
                 .setType(contentType)
                 .putExtra(Intent.EXTRA_SUBJECT, title)
                 .putExtra(Intent.EXTRA_TEXT, text);
 
-        final ArrayList<Intent> targets = resolveTargets(intent);
+        return ensureCopyIntentPresent(intent, resolveTargets(intent));
+    }
 
+    private List<Intent> ensureCopyIntentPresent(Intent intent, List<Intent> targets) {
         if (!containsCopyIntent(targets)) {
             // add SendToClipboard intent in case Drive is not installed
             targets.add(new Intent(intent)

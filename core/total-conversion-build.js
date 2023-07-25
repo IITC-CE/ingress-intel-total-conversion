@@ -9,7 +9,12 @@ window.script_info = plugin_info;
 window.script_info.changelog = [
   {
     version: '0.36.0',
-    changes: ['Ability to define and display changelog', 'Improved info panel styling', 'Timestamp added to link and field data'],
+    changes: [
+      'Ability to define and display changelog',
+      'Improved info panel styling',
+      'Timestamp added to link and field data',
+      'Added scanner link to info panel',
+    ],
   },
 ];
 

@@ -10,7 +10,7 @@ window.resetScrollOnNewPortal = function() {
 };
 
 // to be ovewritten in app.js
-window.renderPortalUrl = function (lat, lng, title) {
+window.renderPortalUrl = function (lat, lng, title, guid) {
   var linkDetails = $('.linkdetails');
 
   // a permalink for the portal
@@ -19,6 +19,14 @@ window.renderPortalUrl = function (lat, lng, title) {
     title: 'Create a URL link to this portal'}
   ).text('Portal link');
   linkDetails.append($('<aside>').append(permaHtml));
+
+  var scannerLink = $('<a>')
+    .attr({
+      href: window.makePrimeLink(guid, lat, lng),
+      title: 'Link to this portal for Ingress Prime',
+    })
+    .text('Scanner link');
+  linkDetails.append($('<aside>').append(scannerLink));
 
   // and a map link popup dialog
   var mapHtml = $('<a>').attr({
@@ -217,7 +225,7 @@ window.getPortalMiscDetails = function(guid,d) {
 
     if (d.artifactBrief && d.artifactBrief.target && Object.keys(d.artifactBrief.target).length > 0) {
       var targets = Object.keys(d.artifactBrief.target);
-//currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s) 
+      // currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s)
        randDetails += '<div id="artifact_target">Target portal: '+targets.map(function(x) { return x.capitalize(); }).join(', ')+'</div>';
     }
 
