@@ -151,16 +151,17 @@ public class IntentGenerator {
 
     /**
      * get a list of intents capable of sharing a plain text string
-     * 
+     *
      * @param title
      *            description of the shared string
      * @param text
      *            the string to be shared
+     * @param contentType
      */
-    public ArrayList<Intent> getShareIntents(final String title, final String text) {
+    public ArrayList<Intent> getShareIntents(final String title, final String text, String contentType) {
         final Intent intent = new Intent(Intent.ACTION_SEND)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                .setType("text/plain")
+                .setType(contentType)
                 .putExtra(Intent.EXTRA_SUBJECT, title)
                 .putExtra(Intent.EXTRA_TEXT, text);
 
@@ -178,7 +179,7 @@ public class IntentGenerator {
 
     /**
      * get a list of intents capable of sharing the given content
-     * 
+     *
      * @param uri
      *            URI of a file to share
      * @param type

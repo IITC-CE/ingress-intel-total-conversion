@@ -11,11 +11,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 
 public class UpdateScript extends AsyncTask<String, Void, Boolean> {
 
@@ -41,11 +41,11 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             final String filePath = urls[0];
             // get local script meta information
             final String script = IITC_FileManager.readStream(new FileInputStream(new File(filePath)));
-            final HashMap<String, String> mScriptInfo = IITC_FileManager.getScriptInfo(script);
+            final PluginInfo mScriptInfo = IITC_FileManager.getScriptInfo(script);
 
-            mScriptName = mScriptInfo.get("name");
-            String updateURL = mScriptInfo.get("updateURL");
-            String downloadURL = mScriptInfo.get("downloadURL");
+            mScriptName = mScriptInfo.getName();
+            String updateURL = mScriptInfo.getUpdateURL();
+            String downloadURL = mScriptInfo.getDownloadURL();
             if (updateURL == null) updateURL = downloadURL;
             if (updateURL == null) return false;
             if (!isUpdateAllowed(updateURL)) return false;
@@ -54,13 +54,12 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             if (updateMetaScript == null) {
                 return false;
             }
-            final HashMap<String, String> updateInfo =
-                    IITC_FileManager.getScriptInfo(updateMetaScript);
+            final PluginInfo updateInfo = IITC_FileManager.getScriptInfo(updateMetaScript);
 
-            final String remote_version = updateInfo.get("version");
+            final String remote_version = updateInfo.getVersion();
 
             final File local_file = new File(filePath);
-            final String local_version = mScriptInfo.get("version");
+            final String local_version = mScriptInfo.getVersion();
 
             if (local_version.compareTo(remote_version) >= 0) return false;
 
@@ -70,8 +69,8 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             if (updateURL.equals(downloadURL)) {
                 updatedScript = updateMetaScript;
             } else {
-                if (updateInfo.get("downloadURL") != null) {
-                    downloadURL = updateInfo.get("downloadURL");
+                if (updateInfo.getDownloadURL() != null) {
+                    downloadURL = updateInfo.getDownloadURL();
                 }
 
                 if (!isUpdateAllowed(downloadURL)) return false;

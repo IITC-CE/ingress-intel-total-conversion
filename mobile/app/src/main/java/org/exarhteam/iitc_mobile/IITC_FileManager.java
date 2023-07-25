@@ -25,6 +25,7 @@ import androidx.core.app.ActivityCompat;
 
 import org.exarhteam.iitc_mobile.IITC_Mobile.ResponseHandler;
 import org.exarhteam.iitc_mobile.async.UpdateScript;
+import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.json.JSONObject;
 
@@ -44,7 +45,6 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -90,20 +90,15 @@ public class IITC_FileManager {
         }
     }
 
-    public static HashMap<String, String> getScriptInfo(final String js) {
-        final HashMap<String, String> map = new HashMap<String, String>();
+    public static PluginInfo getScriptInfo(final String js) {
+        final PluginInfo info = new PluginInfo();
         String header = "";
         // get metadata of javascript file
         if (js != null && js.contains("==UserScript==") && js.contains("==/UserScript==")) {
             header = js.substring(js.indexOf("==UserScript=="),
                     js.indexOf("==/UserScript=="));
         }
-        // add default values
-        map.put("id", "unknown");
-        map.put("version", "not found");
-        map.put("name", "unknown");
-        map.put("description", "");
-        map.put("category", "Misc");
+
         final BufferedReader reader = new BufferedReader(new StringReader(header));
         try {
             final Pattern p = Pattern.compile("^\\s*//\\s*@(\\S+)(.*)$");
@@ -111,17 +106,13 @@ public class IITC_FileManager {
             while ((headerLine = reader.readLine()) != null) {
                 final Matcher m = p.matcher(headerLine);
                 if (m.matches()) {
-                    map.put(m.group(1), m.group(2).trim());
+                    info.put(m.group(1), m.group(2).trim());
                 }
             }
         } catch (final IOException e) {
             Log.w(e);
         }
-        return map;
-    }
-
-    public static String readFile(final File file) throws IOException {
-        return readStream(new FileInputStream(file));
+        return info;
     }
 
     public static String readStream(final InputStream stream) {
@@ -138,26 +129,24 @@ public class IITC_FileManager {
 
     private final AssetManager mAssetManager;
     private final Activity mActivity;
-    private final String mIitcPath;
     private final SharedPreferences mPrefs;
-    public static final String PLUGINS_PATH = Environment.getExternalStorageDirectory().getPath()
-            + "/IITC_Mobile/plugins/";
+    public static final String IITC_PATH = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
+    public static final String IITC_DEV_PATH = IITC_PATH + "dev/";
+    public static final String USER_PLUGINS_PATH = IITC_PATH + "plugins/";
 
     public IITC_FileManager(final Activity activity) {
         mActivity = activity;
-        mIitcPath = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
         mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
         mAssetManager = mActivity.getAssets();
     }
 
-    private InputStream getAssetFile(final String filename) throws IOException {
+    public InputStream getAssetFile(final String filename) throws IOException {
         if (mPrefs.getBoolean("pref_dev_checkbox", false)) {
-            final File file = new File(mIitcPath + "dev/" + filename);
+            final File file = new File(IITC_DEV_PATH + filename);
             try {
                 return new FileInputStream(file);
             } catch (final FileNotFoundException e) {
-                mActivity.runOnUiThread(() -> Toast.makeText(mActivity, "File " + mIitcPath +
-                                "dev/" + filename + " not found. " +
+                mActivity.runOnUiThread(() -> Toast.makeText(mActivity, "File " + IITC_DEV_PATH + filename + " not found. " +
                                 "Disable developer mode or add iitc files to the dev folder.",
                         Toast.LENGTH_SHORT).show());
                 Log.w(e);
@@ -186,7 +175,7 @@ public class IITC_FileManager {
         return new WebResourceResponse("application/javascript", "UTF-8", data);
     }
 
-    private HashMap<String, String> getScriptInfo(final InputStream stream) {
+    private PluginInfo getScriptInfo(final InputStream stream) {
         return getScriptInfo(readStream(stream));
     }
 
@@ -211,7 +200,7 @@ public class IITC_FileManager {
 
     private InputStream prepareUserScript(final InputStream stream) {
         String content = readStream(stream);
-        final HashMap<String, String> info = getScriptInfo(content);
+        final PluginInfo info = getScriptInfo(content);
 
         final JSONObject jObject = new JSONObject(info);
         final String gmInfo = "var GM_info={\"script\":" + jObject.toString() + "};\n";
@@ -228,7 +217,7 @@ public class IITC_FileManager {
     public String getIITCVersion() throws IOException {
         final InputStream stream = getAssetFile("total-conversion-build.user.js");
 
-        return getScriptInfo(stream).get("version");
+        return getScriptInfo(stream).getVersion();
     }
 
     public WebResourceResponse getResponse(final Uri uri) {
@@ -295,10 +284,10 @@ public class IITC_FileManager {
                         // afterwards reading it again while copying
                         is = mActivity.getContentResolver().openInputStream(uri);
                         final InputStream isCopy = mActivity.getContentResolver().openInputStream(uri);
-                        fileName = getScriptInfo(isCopy).get("id") + ".user.js";
+                        fileName = getScriptInfo(isCopy).getId() + ".user.js";
                     }
                     // create IITCm external plugins directory if it doesn't already exist
-                    final File pluginsDirectory = new File(PLUGINS_PATH);
+                    final File pluginsDirectory = new File(USER_PLUGINS_PATH);
                     pluginsDirectory.mkdirs();
 
                     // create in and out streams and copy plugin
@@ -338,7 +327,7 @@ public class IITC_FileManager {
         for (final Map.Entry<String, ?> entry : all_prefs.entrySet()) {
             final String plugin = entry.getKey();
             if (plugin.endsWith(".user.js") && entry.getValue().toString().equals("true")) {
-                if (plugin.startsWith(PLUGINS_PATH)) {
+                if (plugin.startsWith(USER_PLUGINS_PATH)) {
                     new UpdateScript(new ScriptUpdatedCallback(), forceSecureUpdates).execute(plugin);
                 }
             }

@@ -23,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.exarhteam.iitc_mobile.IITC_FileManager;
 import org.exarhteam.iitc_mobile.IITC_NotificationHelper;
 import org.exarhteam.iitc_mobile.Log;
@@ -36,7 +35,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,10 +48,9 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     // we use a tree map to have a map with alphabetical order
     // don't initialize the asset plugin map, because it tells us if the settings are started the first time
     // and we have to parse plugins to build the preference screen
-    private static TreeMap<String, ArrayList<PluginPreference>> sAssetPlugins = null;
+    private static TreeMap<String, ArrayList<PluginInfo>> sAssetPlugins = null;
     // user plugins can be initialized.
-    private static final TreeMap<String, ArrayList<PluginPreference>> sUserPlugins =
-            new TreeMap<String, ArrayList<PluginPreference>>();
+    private static final TreeMap<String, ArrayList<PluginInfo>> sUserPlugins = new TreeMap<>();
     private static int mDeletedPlugins = 0;
 
     private IITC_FileManager mFileManager;
@@ -80,7 +77,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         // it is enough to parse the plugin only on first start.
         if (sAssetPlugins == null) {
             Log.d("opened plugin prefs the first time since app start -> parse plugins");
-            sAssetPlugins = new TreeMap<String, ArrayList<PluginPreference>>();
+            sAssetPlugins = new TreeMap<>();
             setUpPluginPreferenceScreen();
         } else {
             checkForNewPlugins();
@@ -169,7 +166,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
                     builder.setView(input);
 
-                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             final String url = input.getText().toString();
@@ -230,7 +227,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     }
 
     // called by Plugins Fragment
-    public static ArrayList<PluginPreference> getPluginPreference(final String key, final boolean userPlugin) {
+    public static ArrayList<PluginInfo> getPluginInfo(final String key, final boolean userPlugin) {
         if (userPlugin) return sUserPlugins.get(key);
 
         return sAssetPlugins.get(key);
@@ -251,7 +248,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     }
 
     private File[] getUserPlugins() {
-        final File directory = new File(IITC_FileManager.PLUGINS_PATH);
+        final File directory = new File(IITC_FileManager.USER_PLUGINS_PATH);
         File[] files = directory.listFiles();
         if (files == null) {
             files = new File[0];
@@ -263,10 +260,10 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         final File[] userPlugins = getUserPlugins();
         final String[] officialPlugins = getAssetPlugins();
         int numPlugins = 0;
-        for (final Map.Entry<String, ArrayList<PluginPreference>> entry : sUserPlugins.entrySet()) {
+        for (final Map.Entry<String, ArrayList<PluginInfo>> entry : sUserPlugins.entrySet()) {
             numPlugins += entry.getValue().size();
         }
-        for (final Map.Entry<String, ArrayList<PluginPreference>> entry : sAssetPlugins.entrySet()) {
+        for (final Map.Entry<String, ArrayList<PluginInfo>> entry : sAssetPlugins.entrySet()) {
             numPlugins += entry.getValue().size();
         }
         if ((userPlugins.length + officialPlugins.length) != (numPlugins + mDeletedPlugins)) {
@@ -308,14 +305,9 @@ public class PluginPreferenceActivity extends PreferenceActivity {
     void addPluginPreference(final String src, final String plugin_key, final boolean userPlugin) {
         // parse plugin name, description and category
         // we need default versions here otherwise iitcm may crash
-        final HashMap<String, String> info = IITC_FileManager.getScriptInfo(src);
-        String plugin_name = info.get("name");
-        final String plugin_cat = info.get("category");
-        final String plugin_desc = info.get("description");
-
-        // remove IITC plugin prefix from plugin_name
-        plugin_name = plugin_name.replace("IITC Plugin: ", "");
-        plugin_name = plugin_name.replace("IITC plugin: ", "");
+        final PluginInfo info = IITC_FileManager.getScriptInfo(src);
+        final String plugin_name = info.getName();
+        final String plugin_cat = info.getCategory();
 
         // do not add deleted or stock map plugins
         if (plugin_cat.equals("Deleted") || plugin_cat.equals("Stock")) {
@@ -327,26 +319,24 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         // first check if we need a new category
         if (userPlugin) {
             if (!sUserPlugins.containsKey(plugin_cat)) {
-                sUserPlugins.put(plugin_cat, new ArrayList<PluginPreference>());
+                sUserPlugins.put(plugin_cat, new ArrayList<>());
                 Log.d("create " + plugin_cat + " and add " + plugin_name);
             }
         } else {
             if (!sAssetPlugins.containsKey(plugin_cat)) {
-                sAssetPlugins.put(plugin_cat, new ArrayList<PluginPreference>());
+                sAssetPlugins.put(plugin_cat, new ArrayList<>());
                 Log.d("create " + plugin_cat + " and add " + plugin_name);
             }
         }
 
         // now build a new checkable preference for the plugin
-        final PluginPreference plugin_pref = new PluginPreference(this);
-        plugin_pref.setKey(plugin_key);
-        plugin_pref.setTitle(plugin_name);
-        plugin_pref.setSummary(plugin_desc);
-        plugin_pref.setDefaultValue(false);
-        plugin_pref.setPersistent(true);
-        final ArrayList<PluginPreference> list =
-                userPlugin ? sUserPlugins.get(plugin_cat) : sAssetPlugins.get(plugin_cat);
-        list.add(plugin_pref);
+        addPluginInfo(userPlugin ? sUserPlugins.get(plugin_cat) : sAssetPlugins.get(plugin_cat), plugin_key, info, userPlugin);
+    }
+
+    private void addPluginInfo(List<PluginInfo> list, String plugin_key, PluginInfo pluginInfo, boolean userPlugin) {
+        pluginInfo.setKey(plugin_key);
+        pluginInfo.setUserPlugin(userPlugin);
+        list.add(pluginInfo);
     }
 
     void addHeaders() {
@@ -354,15 +344,17 @@ public class PluginPreferenceActivity extends PreferenceActivity {
             final Header category = new Header();
             category.title = getString(R.string.plugins_user_plugins);
             mHeaders.add(category);
-            for (final Map.Entry<String, ArrayList<PluginPreference>> entry : sUserPlugins.entrySet()) {
-                addHeader(entry.getKey(), true);
+            for (final Map.Entry<String, ArrayList<PluginInfo>> entry : sUserPlugins.entrySet()) {
+                if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                    addHeader(entry.getKey(), true);
+                }
             }
         }
         if (sAssetPlugins.size() > 0) {
             final Header category = new Header();
             category.title = getString(R.string.plugins_official_plugins);
             mHeaders.add(category);
-            for (final Map.Entry<String, ArrayList<PluginPreference>> entry : sAssetPlugins.entrySet()) {
+            for (final Map.Entry<String, ArrayList<PluginInfo>> entry : sAssetPlugins.entrySet()) {
                 addHeader(entry.getKey(), false);
             }
         }
