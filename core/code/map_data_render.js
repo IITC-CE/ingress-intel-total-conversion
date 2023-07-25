@@ -233,23 +233,26 @@ window.Render.prototype.deleteFieldEntity = function(guid) {
 }
 
 
-window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE6,team) {
+window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, lngE6, team, timestamp) {
   // intel no longer returns portals at anything but the closest zoom
   // stock intel creates 'placeholder' portals from the data in links/fields - IITC needs to do the same
   // we only have the portal guid, lat/lng coords, and the faction - no other data
   // having the guid, at least, allows the portal details to be loaded once it's selected. however,
   // no highlighters, portal level numbers, portal names, useful counts of portals, etc are possible
 
+  // zero will mean any other source of portal data will have a higher timestamp
+  timestamp = timestamp || 0;
 
   var ent = [
-    guid,       //ent[0] = guid
-    0,          //ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
-                //ent[2] = an array with the entity data
-    [ 'p',      //0 - a portal
-      team,     //1 - team
-      latE6,    //2 - lat
-      lngE6     //3 - lng
-    ]
+    guid, // ent[0] = guid
+    -1, // ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
+    // ent[2] = an array with the entity data
+    [
+      'p', // 0 - a portal
+      team, // 1 - team
+      latE6, // 2 - lat
+      lngE6, // 3 - lng
+    ],
   ];
 
   // placeholder portals don't have a useful timestamp value - so the standard code that checks for updated
@@ -259,7 +262,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function(guid,latE6,lngE
   if (guid in window.portals) {
     var p = window.portals[guid];
     portalMoved = latE6 !== p.options.data.latE6 || lngE6 !== p.options.data.lngE6;
-    if (team !== p.options.data.team) {
+    if (team !== p.options.data.team && p.options.timestamp < timestamp) {
       // team - delete existing portal
       this.deletePortalEntity(guid);
     }
@@ -383,6 +386,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
 
   var data = {
 //    type: ent[2][0],
+    timestamp: ent[1],
     team: ent[2][1],
     points: ent[2][2].map(function(arr) { return {guid: arr[0], latE6: arr[1], lngE6: arr[2] }; })
   };
@@ -390,7 +394,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
   //create placeholder portals for field corners. we already do links, but there are the odd case where this is useful
   for (var i=0; i<3; i++) {
     var p=data.points[i];
-    this.createPlaceholderPortalEntity(p.guid, p.latE6, p.lngE6, data.team);
+    this.createPlaceholderPortalEntity(p.guid, p.latE6, p.lngE6, data.team, data.timestamp);
   }
 
   // check if entity already exists
@@ -423,7 +427,7 @@ window.Render.prototype.createFieldEntity = function(ent) {
     team: team,
     ent: ent,  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
     guid: ent[0],
-    timestamp: ent[1],
+    timestamp: data.timestamp,
     data: data,
   });
 
@@ -447,6 +451,7 @@ window.Render.prototype.createLinkEntity = function (ent) {
 
   var data = { // TODO add other properties and check correction direction
 //    type:   ent[2][0],
+    timestamp: ent[1],
     team:   ent[2][1],
     oGuid:  ent[2][2],
     oLatE6: ent[2][3],
@@ -457,9 +462,8 @@ window.Render.prototype.createLinkEntity = function (ent) {
   };
 
   // create placeholder entities for link start and end points (before checking if the link itself already exists
-  this.createPlaceholderPortalEntity(data.oGuid, data.oLatE6, data.oLngE6, data.team);
-  this.createPlaceholderPortalEntity(data.dGuid, data.dLatE6, data.dLngE6, data.team);
-
+  this.createPlaceholderPortalEntity(data.oGuid, data.oLatE6, data.oLngE6, data.team, data.timestamp);
+  this.createPlaceholderPortalEntity(data.dGuid, data.dLatE6, data.dLngE6, data.team, data.timestamp);
 
   // check if entity already exists
   if (ent[0] in window.links) {
