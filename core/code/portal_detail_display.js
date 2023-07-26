@@ -23,9 +23,14 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
   var scannerLink = $('<a>')
     .attr({
       href: window.makePrimeLink(guid, lat, lng),
-      title: 'Link to this portal for Ingress Prime',
+      title: 'Copy link to this portal for Ingress Prime',
     })
-    .text('Scanner link');
+    .click(function (event) {
+      navigator.clipboard.writeText(event.target.href);
+      event.stopPropagation();
+      return false;
+    })
+    .text('Copy scanner link');
   linkDetails.append($('<aside>').append(scannerLink));
 
   // and a map link popup dialog
