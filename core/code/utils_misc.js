@@ -300,6 +300,10 @@ window.pnpoly = function (polygon, point) {
   return !!inside;
 };
 
+window.makePrimeLink = function (guid, lat, lng) {
+  return `https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fportal%2F${guid}&apn=com.nianticproject.ingress&isi=576505181&ibi=com.google.ingress&ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181&ofl=https%3A%2F%2Fintel.ingress.com%2Fintel%3Fpll%3D${lat}%2C${lng}`;
+};
+
 // @function makePermalink(latlng?: LatLng, options?: Object): String
 // Makes the permalink for the portal with specified latlng, possibly including current map view.
 // Portal latlng can be omitted to create mapview-only permalink.

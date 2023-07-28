@@ -121,13 +121,15 @@ window.runOnAppBeforeBoot = function () {
   }
 
   if (app.intentPosLink) {
-    window.renderPortalUrl = function (lat, lng, title) {
+    window.renderPortalUrl = function (lat, lng, title, guid) {
       // one share link option - and the app provides an interface to share the URL,
       // share as a geo: intent (navigation via google maps), etc
 
-      var shareLink = $('<a>').text('Share portal').click(function () {
-        app.intentPosLink(lat, lng, window.map.getZoom(), title, true);
-      });
+      var shareLink = $('<a>')
+        .text('Share portal')
+        .click(function () {
+          window.app.intentPosLink(lat, lng, window.map.getZoom(), title, true, guid);
+        });
       $('.linkdetails').append($('<aside>').append(shareLink));
     };
   }

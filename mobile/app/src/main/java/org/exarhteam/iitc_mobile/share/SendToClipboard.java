@@ -16,6 +16,9 @@ public class SendToClipboard extends Activity {
         super.onCreate(savedInstanceState);
 
         String text = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+        if (text == null) {
+            text = getIntent().getData().toString();
+        }
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
