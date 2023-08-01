@@ -14,6 +14,7 @@ window.script_info.changelog = [
       'Improved info panel styling',
       'Timestamp added to link and field data',
       'Added scanner link to info panel',
+      'Sorted sidebar links',
     ],
   },
 ];
