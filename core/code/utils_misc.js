@@ -427,3 +427,22 @@ if (!Element.prototype.closest) {
     return null;
   };
 }
+
+var MutObserver = window.MutationObserver || window.WebKitMutationObserver;
+window.observeDOMChildren = function (obj, callback) {
+  if (!obj || obj.nodeType !== 1) return;
+
+  if (MutObserver) {
+    // define a new observer
+    var mutationObserver = new MutObserver(callback);
+
+    // have the observer observe for changes in children
+    mutationObserver.observe(obj, { childList: true, subtree: true });
+    return mutationObserver;
+  }
+
+  // browser support fallback
+  else if (window.addEventListener) {
+    obj.addEventListener('DOMNodeInserted', callback, false);
+  }
+};
