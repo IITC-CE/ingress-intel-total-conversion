@@ -1,11 +1,18 @@
 // @author         jonatkins
 // @name           Ingress scoring regions
 // @category       Layer
-// @version        0.2.1
+// @version        0.3.0
 // @description    Show the regional scoring cells grid on the map
 
 /* global S2 */
+/* exported setup, changelog --eslint */
 
+var changelog = [
+  {
+    version: '0.3.0',
+    changes: ['a fix in the hilbercurve calculation', 'fix region-search by enhance the cell-id'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.regions = function() {};
@@ -82,20 +89,20 @@ window.plugin.regions.search = function(query) {
     return string.match(window.plugin.regions.REGEXP);
   });
   if(!matches.every(function(match) { return match !== null; })) return;
-  
+
   var currentCell = window.plugin.regions.regionName(S2.S2Cell.FromLatLng(map.getCenter(), 6));
-  
+
   matches.forEach(function(match) {
     if(!match[1])
       match[1] = currentCell.substr(0, 2);
     else
       match[1] = match[1].toUpperCase();
-    
+
     if(!match[2])
       match[2] = currentCell.substr(2,2);
-    
+
     match[3] = match[3].toUpperCase();
-    
+
     var result = window.plugin.regions.getSearchResult(match);
     if(result) query.addResult(result);
   });

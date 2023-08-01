@@ -15,6 +15,7 @@ window.script_info.changelog = [
       'Timestamp added to link and field data',
       'Added scanner link to info panel',
       'Sorted sidebar links',
+      'Added window.formatDistance function for global use, which was previously in the bookmarks plugin',
     ],
   },
 ];
