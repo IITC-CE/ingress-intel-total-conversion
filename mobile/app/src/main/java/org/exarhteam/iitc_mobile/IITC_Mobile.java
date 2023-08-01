@@ -118,6 +118,7 @@ public class IITC_Mobile extends AppCompatActivity
     private String debugInputStore = "";
     private Map<String, String> mAllowedHostnames = new HashMap<>();
     private Set<String> mInternalHostnames = new HashSet<>();
+    private final Pattern mGoogleHostnamePattern = Pattern.compile("(^|\\.)google(\\.com|\\.co)?\\.\\w+$");
 
     private String mIITCDefaultUA;
     private final String mDesktopUA = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
@@ -1288,10 +1289,25 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     /**
+     * @param hostname host name
+     * @return <code>true</code> if host name is google.* or google.com?.* domain 
+     */
+    public boolean isGoogleHostname(String hostname) {
+        if (hostname.startsWith("google.") || hostname.contains(".google.")) {
+            return mGoogleHostnamePattern.matcher(hostname).find();
+        }
+        return false;
+    }
+
+    /**
      * @param hostname host name.
      * @return <code>true</code> if a host name allowed to be load in IITC.
      */
     public boolean isAllowedHostname(String hostname) {
+        // shortcut for .google.* hostnames
+        if (isGoogleHostname(hostname)) {
+            return true;
+        }
         for (String key : mAllowedHostnames.keySet()) {
             if (hostname.equals(key)) return true;
             if (hostname.endsWith("." + key)) return true;
@@ -1306,6 +1322,10 @@ public class IITC_Mobile extends AppCompatActivity
     public String getUserAgentForHostname(String hostname) {
         if (mSharedPrefs.getBoolean("pref_fake_user_agent", false))
             return mDesktopUA;
+        // shortcut for .google.* hostnames
+        if (isGoogleHostname(hostname)) {
+            hostname = "google.com";
+        }
         for (Map.Entry<String,String> e : mAllowedHostnames.entrySet()) {
             final String key = e.getKey();
             if (hostname.equals(key)) return e.getValue();
