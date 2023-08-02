@@ -146,4 +146,5 @@
 \n
 \nCertains plugins (par exemple <i>Liste des portails</i> et <i>Favoris</i>) apparaissent désormais dans le <i>Menu de navigation</i> pour un accès rapide.
 \nIls n\'apparaîtront plus dans le volet d\'information. </string>
+    <string name="update_notifications_title">Nouvelle version IITC mobile disponible</string>
 </resources>
