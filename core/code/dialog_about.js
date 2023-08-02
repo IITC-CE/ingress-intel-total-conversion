@@ -17,8 +17,8 @@ function createDialogContent() {
               <div>Ingress Intel Total Conversion</div>
               <hr>
               <div>
-               <a href="@url_homepage@" target="_blank">IITC Homepage</a> |
-               <a href="@url_tg@" target="_blank">Telegram channel</a><br />
+               <a href="${'@url_homepage@'}" target="_blank">IITC Homepage</a> |
+               <a href="${'@url_tg@'}" target="_blank">Telegram channel</a><br />
                On the script’s homepage you can:
                <ul>
                  <li>Find Updates</li>
