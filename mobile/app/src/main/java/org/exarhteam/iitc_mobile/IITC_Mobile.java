@@ -179,7 +179,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         // Define webview user agent for known external hosts
         final String defaultUA = WebSettings.getDefaultUserAgent(this);
-        final String mIITCDefaultUA = defaultUA.replace("; wv", "");
+        final String mIITCDefaultUA = sanitizeUserAgent(defaultUA);
         final String googleUA = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mIITCDefaultUA;
 
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
@@ -1332,5 +1332,29 @@ public class IITC_Mobile extends AppCompatActivity
             if (hostname.endsWith("." + key)) return e.getValue();
         }
         return null;
+    }
+
+    public String sanitizeUserAgent(String userAgent) {
+        // Hide webview postfix
+        // Remove the "; wv" postfix from the user agent to hide WebView usage and present as a regular browser.
+        userAgent = userAgent.replace("; wv", "");
+
+        // Regular expression to find the substring "Chrome/[N].0.0.0" where [N] is any number.
+        // For some reason, Google disallows authorization if the Chrome version ends in ".0.0.0"
+        String regex = "Chrome/(\\d+)\\.0\\.0\\.0";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(userAgent);
+        if (matcher.find()) {
+            // Extract the version number [N] from the found match.
+            String numberStr = matcher.group(1);
+            int number = Integer.parseInt(numberStr);
+
+            // Create the replacement string in the format "Chrome/[N].0.0.1".
+            String replacement = "Chrome/" + number + ".0.0.1";
+
+            // Replace the found match with the new version number in the user agent string.
+            userAgent = userAgent.replaceFirst(regex, replacement);
+        }
+        return userAgent;
     }
 }
