@@ -30,7 +30,7 @@ machinaTracker.events = [];
 machinaTracker.setup = () => {
   $('<style>').prop('type', 'text/css').html('@include_string:machina-tracker.css@').appendTo('head');
 
-  var iconImage = '@include_img:images/marker-machina.png@';
+  var iconImage = '@include_img:images/marker-machina.svg@';
 
   machinaTracker.icon = L.icon({
     iconUrl: iconImage,
