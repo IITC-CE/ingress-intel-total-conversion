@@ -48,7 +48,9 @@ public class IITC_WebViewPopup extends WebView {
                 final String uriHost = uri.getHost();
 
                 final String currentUA = view.getSettings().getUserAgentString();
+                Log.d("currentUA: "+currentUA);
                 final String targetUA = mIitc.getUserAgentForHostname(uriHost);
+                Log.d("targetUA: "+targetUA);
                 if (targetUA == null || currentUA.equals(targetUA))
                     return false;
 

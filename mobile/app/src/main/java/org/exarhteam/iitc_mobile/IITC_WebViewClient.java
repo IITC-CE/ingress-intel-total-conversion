@@ -274,7 +274,9 @@ public class IITC_WebViewClient extends WebViewClient {
         final String uriHost = uri.getHost();
 
         final String currentUA = view.getSettings().getUserAgentString();
+        Log.d("currentUA: "+currentUA);
         final String targetUA = mIitc.getUserAgentForHostname(uriHost);
+        Log.d("targetUA: "+targetUA);
         if (targetUA == null || currentUA.equals(targetUA))
             return false;
         view.getSettings().setUserAgentString(targetUA);
