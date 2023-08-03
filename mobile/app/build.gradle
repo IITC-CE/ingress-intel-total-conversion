@@ -32,7 +32,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 29
         versionCode = getVersionCodeTimeStamps()
-        versionName "0.35.1"
+        versionName "0.36.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
