@@ -157,6 +157,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                         Toast.makeText(this, getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
                     }
                 }
+                return true;
             case R.id.menu_plugins_add_url:
                 if (mFileManager.checkWriteStoragePermissionGranted()) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -185,6 +186,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
                     builder.show();
                 }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
