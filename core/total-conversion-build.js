@@ -8,6 +8,10 @@
 window.script_info = plugin_info;
 window.script_info.changelog = [
   {
+    version: '0.36.1',
+    changes: ['Revert sorted sidebar links'],
+  },
+  {
     version: '0.36.0',
     changes: [
       'Ability to define and display changelog',
