@@ -205,29 +205,6 @@ function prepPluginsToLoad () {
   };
 }
 
-function setupToolboxSort() {
-  var toolboxElement = $('#toolbox')[0];
-
-  function sortToolbox() {
-    var children = Array.prototype.slice.call(toolboxElement.children);
-    var sortedChildren = children.slice().sort(function (x, y) {
-      return x.innerText.localeCompare(y.innerText);
-    });
-    if (
-      sortedChildren.some(function (item, index) {
-        return item !== children[index];
-      })
-    ) {
-      sortedChildren.forEach(function (child) {
-        toolboxElement.removeChild(child);
-        toolboxElement.appendChild(child);
-      });
-    }
-  }
-  sortToolbox();
-  window.observeDOMChildren(toolboxElement, sortToolbox);
-}
-
 function boot() {
   log.log('loading done, booting. Built: '+'@build_date@');
   if (window.deviceID) {
@@ -267,8 +244,6 @@ function boot() {
 
   window.iitcLoaded = true;
   window.runHooks('iitcLoaded');
-
-  setupToolboxSort();
 }
 
 try {
