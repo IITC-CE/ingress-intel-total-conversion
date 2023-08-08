@@ -32,11 +32,13 @@ machinaTracker.setup = () => {
 
   var iconImage = '@include_img:images/marker-machina.svg@';
 
-  machinaTracker.icon = L.icon({
-    iconUrl: iconImage,
-    iconSize: [26, 32],
-    iconAnchor: [12, 32],
-  });
+  machinaTracker.icon = new (L.Icon.Default.extend({
+    options: {
+      iconUrl: iconImage,
+      iconSize: [26, 32],
+      iconAnchor: [12, 32],
+    },
+  }))();
 
   machinaTracker.popup = new L.Popup({ offset: L.point([1, -34]) });
   machinaTracker.drawnTraces = new L.LayerGroup([], { minZoom: machinaTracker.MACHINA_TRACKER_MIN_ZOOM });
