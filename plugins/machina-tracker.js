@@ -37,6 +37,7 @@ machinaTracker.setup = () => {
       iconUrl: iconImage,
       iconSize: [26, 32],
       iconAnchor: [12, 32],
+      shadowAnchor: [12, 41],
     },
   }))();
 
