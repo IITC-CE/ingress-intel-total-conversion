@@ -10,14 +10,13 @@
 // use own namespace for plugin
 var linkShowDirection = {};
 window.plugin.linkShowDirection = linkShowDirection;
-var styles = {};
-linkShowDirection.styles = styles;
+linkShowDirection.timer = 0;
 
 var ANIMATE_UPDATE_TIME = 1000; // 1000ms = 1s
 
 // Hack:
 // 100000 - a large enough number to be the equivalent of 100%, which is not supported Leaflet when displaying with canvas
-styles = {
+linkShowDirection.styles = {
   'Disabled': [null],
   'Static *': [
     '30,5,15,5,15,5,2,5,2,5,2,5,2,5,30,0',
@@ -47,7 +46,7 @@ var activeStyle = '';
 
 
 function animateLinks () {
-  var frames = styles[activeStyle];
+  var frames = linkShowDirection.styles[activeStyle];
   if (!frames) frames = [null];
 
   if (!moving) {
@@ -67,10 +66,10 @@ function animateLinks () {
   // this would mean the user has no chance to interact with IITC
   // to prevent this, create a short timer that then sets the timer for the next frame. if the browser is slow to render,
   // the short timer should fire later, at which point the desired ANIMATE_UPDATE_TIME timer is started
-  clearTimeout(timer);
-  var timer = setTimeout(function() {
-    clearTimeout(timer);
-    timer = setTimeout(
+  clearTimeout(linkShowDirection.timer);
+  linkShowDirection.timer = setTimeout(function() {
+    clearTimeout(linkShowDirection.timer);
+    linkShowDirection.timer = setTimeout(
       animateLinks,
       ANIMATE_UPDATE_TIME);
   }, 10);
