@@ -44,7 +44,6 @@ var activeFrame = 0;
 var moving = false;
 var activeStyle = '';
 
-
 function animateLinks () {
   var frames = linkShowDirection.styles[activeStyle];
   if (!frames) frames = [null];
@@ -67,7 +66,7 @@ function animateLinks () {
   // to prevent this, create a short timer that then sets the timer for the next frame. if the browser is slow to render,
   // the short timer should fire later, at which point the desired ANIMATE_UPDATE_TIME timer is started
   clearTimeout(linkShowDirection.timer);
-  linkShowDirection.timer = setTimeout(function() {
+  linkShowDirection.timer = setTimeout(function () {
     clearTimeout(linkShowDirection.timer);
     linkShowDirection.timer = setTimeout(
       animateLinks,
@@ -76,7 +75,7 @@ function animateLinks () {
 }
 
 function addAllLinkStyles () {
-  $.each(links,function(guid,link) { addLinkStyle(link); });
+  $.each(links, function(guid,link) { addLinkStyle(link); });
 
   if (window.plugin.drawTools && localStorage['plugin-linkshowdirection-drawtools'] === 'true') {
     window.plugin.drawTools.drawnItems.eachLayer(function(layer) {
@@ -175,3 +174,4 @@ function setup () {
   map.on('movestart', function() { moving = true; });
   map.on('moveend', function() { moving = false; });
 }
+

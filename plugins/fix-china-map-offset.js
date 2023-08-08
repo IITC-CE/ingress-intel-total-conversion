@@ -4,7 +4,6 @@
 // @version        0.3.1
 // @description    Show correct maps for China user by applying offset tweaks.
 
-
 /* exported setup --eslint */
 /* global L */
 // use own namespace for plugin
@@ -17,7 +16,6 @@ window.plugin.fixChinaMapOffset = fixChinaMapOffset;
 // to any map that has custom TileLayer option `needFixChinaOffset: true`.
 //
 // Example: basemap-gaode.user.js
-
 
 // Before understanding how this plugin works, you should know 3 points:
 //
