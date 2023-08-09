@@ -205,27 +205,27 @@ function prepPluginsToLoad () {
   };
 }
 
-function setupToolboxSort() {
-  var toolboxElement = $('#toolbox')[0];
-
-  function sortToolbox() {
-    var children = Array.prototype.slice.call(toolboxElement.children);
-    var sortedChildren = children.slice().sort(function (x, y) {
-      return x.innerText.localeCompare(y.innerText);
+var toolboxElement;
+window.sortToolbox = function () {
+  var children = Array.prototype.slice.call(toolboxElement.children);
+  var sortedChildren = children.slice().sort(function (x, y) {
+    return x.innerText.localeCompare(y.innerText);
+  });
+  if (
+    sortedChildren.some(function (item, index) {
+      return item !== children[index];
+    })
+  ) {
+    sortedChildren.forEach(function (child) {
+      toolboxElement.removeChild(child);
+      toolboxElement.appendChild(child);
     });
-    if (
-      sortedChildren.some(function (item, index) {
-        return item !== children[index];
-      })
-    ) {
-      sortedChildren.forEach(function (child) {
-        toolboxElement.removeChild(child);
-        toolboxElement.appendChild(child);
-      });
-    }
   }
-  sortToolbox();
-  window.observeDOMChildren(toolboxElement, sortToolbox);
+}
+function setupToolboxSort() {
+  toolboxElement = $('#toolbox')[0];
+  window.setTimeout( ()=> window.sortToolbox(), 1000);
+//  window.observeDOMChildren(toolboxElement, sortToolbox);
 }
 
 function boot() {
