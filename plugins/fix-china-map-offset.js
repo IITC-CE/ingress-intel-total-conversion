@@ -65,7 +65,8 @@ window.plugin.fixChinaMapOffset = fixChinaMapOffset;
 // https://github.com/Artoria2e5/PRCoords
 // (more info: https://github.com/iitc-project/ingress-intel-total-conversion/pull/1188)
 
-var insane_is_in_china = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/misc/insane_is_in_china.js
+// adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/misc/insane_is_in_china.js
+var insane_is_in_china = (function () {
 /* eslint-disable */
   'use strict';
 
@@ -164,12 +165,13 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
   }
 
   return { isInChina: isInChina };
-/* eslint-enable */
+  /* eslint-enable */
 })();
 
 fixChinaMapOffset.isInChina = insane_is_in_china.isInChina;
 
-var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
+// adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
+var PRCoords = (function () {
 /* eslint-disable */
   'use strict';
 
@@ -212,7 +214,7 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
   }
 
   return { wgs_gcj: wgs_gcj };
-/* eslint-enable */
+  /* eslint-enable */
 })();
 
 fixChinaMapOffset.wgs_gcj = PRCoords.wgs_gcj;
@@ -221,12 +223,14 @@ fixChinaMapOffset.wgs_gcj = PRCoords.wgs_gcj;
 var fixChinaOffset = {
   _inChina: false,
 
-  _inChinaLastChecked: [0,0],
+  _inChinaLastChecked: [0, 0],
 
   _inChinaValidRadius: 100000,
 
   _isInChina: function (latlng) {
-    if (latlng._notChina) { return false; } // do not check twice same latlng
+    if (latlng._notChina) {
+      return false;
+    } // do not check twice same latlng
 
     if (latlng.distanceTo(this._inChinaLastChecked) > this._inChinaValidRadius) {
       // recheck only when beyond of specified radius, otherwise keep last known value
@@ -238,10 +242,12 @@ var fixChinaOffset = {
   },
 
   _fixChinaOffset: function (latlng) {
-    if (!this.options.needFixChinaOffset) { return latlng; }
-    if (!latlng._gcj) { // do not calculate twice same latlng
-      latlng._gcj = this._isInChina(latlng) &&
-        fixChinaMapOffset.wgs_gcj(latlng);
+    if (!this.options.needFixChinaOffset) {
+      return latlng;
+    }
+    // do not calculate twice same latlng
+    if (!latlng._gcj) {
+      latlng._gcj = this._isInChina(latlng) && fixChinaMapOffset.wgs_gcj(latlng);
     }
     return latlng._gcj || latlng;
   },
@@ -254,11 +260,11 @@ var fixChinaOffset = {
   _setZoomTransform: function (level, center, zoom) {
     center = this._fixChinaOffset(center);
     return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
-  }
+  },
 };
 
 // redefine L.GridLayer.GoogleMutant methods
-function fixGoogleMutant (_update, style) {
+function fixGoogleMutant(_update, style) {
   return function (wgs) {
     wgs = wgs || this._map.getCenter();
     _update.call(this, wgs);
@@ -268,8 +274,7 @@ function fixGoogleMutant (_update, style) {
         wgs._gcj = wgs._gcj || fixChinaMapOffset.wgs_gcj(wgs);
         if (o.type === 'hybrid') {
           var zoom = this._map.getZoom();
-          var offset = this._map.project(wgs, zoom)
-            .subtract(this._map.project(wgs._gcj, zoom));
+          var offset = this._map.project(wgs, zoom).subtract(this._map.project(wgs._gcj, zoom));
           style.transform = L.Util.template('translate3d({x}px, {y}px, 0px)', offset);
         } else {
           this._mutant.setCenter(wgs._gcj);
@@ -279,7 +284,7 @@ function fixGoogleMutant (_update, style) {
   };
 }
 
-function setup () {
+function setup() {
   // add support of `needFixChinaOffset` property to any TileLayer
   L.TileLayer.include(fixChinaOffset);
 
@@ -287,7 +292,7 @@ function setup () {
   var styleEl = document.createElement('style');
   var css = document.body.appendChild(styleEl).sheet;
   var cssrule = css.cssRules[css.insertRule('.google-mutant .leaflet-tile img:nth-child(2) {}')];
-
+  // prettier-ignore
   L.GridLayer.GoogleMutant
     .mergeOptions({className: 'google-mutant'})
     .include(fixChinaOffset)
