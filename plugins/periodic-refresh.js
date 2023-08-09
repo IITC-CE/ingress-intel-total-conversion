@@ -18,5 +18,5 @@ function wakeup() {
 }
 
 function setup() {
-  setInterval(wakeup, periodicRefresh.refreshMinutes*60*1000 );
+  setInterval(wakeup, periodicRefresh.refreshMinutes * 60 * 1000);
 }
