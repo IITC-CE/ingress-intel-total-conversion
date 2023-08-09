@@ -19,9 +19,5 @@
         "eqeqeq": "error",
         "spaced-comment": "error",
         "no-unused-expressions": "error",
-        "linebreak-style": [
-          "error",
-          "windows"
-        ]
     }
 }
