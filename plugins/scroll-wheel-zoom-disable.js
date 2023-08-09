@@ -6,7 +6,7 @@
 
 /* exported setup --eslint */
 
-function setup () {
+function setup() {
   window.map.scrollWheelZoom.disable();
 }
 
