@@ -223,7 +223,6 @@ window.sortToolbox = function () {
   }
 }
 function setupToolboxSort() {
-  toolboxElement = $('#toolbox')[0];
   window.setTimeout( ()=> window.sortToolbox(), 1000);
 //  window.observeDOMChildren(toolboxElement, sortToolbox);
 }
