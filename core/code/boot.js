@@ -206,7 +206,7 @@ function prepPluginsToLoad () {
 }
 
 window.sortToolbox = function () {
-  var toolboxElement = document.getElementById('toolbox') ;
+  var toolboxElement = document.getElementById('toolbox');
   var children = Array.prototype.slice.call(toolboxElement.children);
   var sortedChildren = children.slice().sort(function (x, y) {
     return x.innerText.localeCompare(y.innerText);
@@ -221,10 +221,10 @@ window.sortToolbox = function () {
       toolboxElement.appendChild(child);
     });
   }
-}
+};
+
 function setupToolboxSort() {
   window.setTimeout(window.sortToolbox, 1000);
-//  window.observeDOMChildren(toolboxElement, sortToolbox);
 }
 
 function boot() {
