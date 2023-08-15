@@ -12,6 +12,12 @@
     <style name="AppPrefTheme" parent="android:Theme.Material.Light.DarkActionBar">
         <item name="android:colorPrimary">@color/iitc_blue</item>
         <item name="android:colorPrimaryDark">@color/iitc_blue</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabMaterial</item>
+    </style>
+
+    <style name="ActionBarTabMaterial">
+        <item name="android:paddingStart">4dip</item>
+        <item name="android:paddingEnd">4dip</item>
     </style>
 
 </resources>
