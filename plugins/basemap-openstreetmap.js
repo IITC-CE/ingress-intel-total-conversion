@@ -20,7 +20,7 @@ mapOpenStreetMap.addLayer = function () {
   };
 
   var layers = {
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png': 'OpenStreetMap',
+    'https://tile.openstreetmap.org/{z}/{x}/{y}.png': 'OpenStreetMap',
     'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png': 'Humanitarian',
   };
 
