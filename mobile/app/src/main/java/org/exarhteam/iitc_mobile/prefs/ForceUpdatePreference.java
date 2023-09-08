@@ -28,7 +28,7 @@ public class ForceUpdatePreference extends Preference {
                         PreferenceManager.getDefaultSharedPreferences(getContext())
                                 .edit()
                                 .putLong("pref_last_plugin_update", 0)
-                                .commit();
+                                .apply();
                         dialog.cancel();
                     }
                 })

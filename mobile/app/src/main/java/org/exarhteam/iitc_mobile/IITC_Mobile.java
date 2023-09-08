@@ -179,7 +179,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         // Define webview user agent for known external hosts
         final String defaultUA = WebSettings.getDefaultUserAgent(this);
-        final String mIITCDefaultUA = sanitizeUserAgent(defaultUA);
+        mIITCDefaultUA = sanitizeUserAgent(defaultUA);
         final String googleUA = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mIITCDefaultUA;
 
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
@@ -821,6 +821,7 @@ public class IITC_Mobile extends AppCompatActivity
                 return true;
             case R.id.action_settings: // start settings activity
                 final Intent intent = new Intent(this, PreferenceActivity.class);
+                intent.putExtra("iitc_userAgent", mIITCDefaultUA);
                 try {
                     intent.putExtra("iitc_version", mFileManager.getIITCVersion());
                 } catch (final IOException e) {
@@ -1290,7 +1291,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     /**
      * @param hostname host name
-     * @return <code>true</code> if host name is google.* or google.com?.* domain 
+     * @return <code>true</code> if host name is google.* or google.com?.* domain
      */
     public boolean isGoogleHostname(String hostname) {
         if (hostname.startsWith("google.") || hostname.contains(".google.")) {

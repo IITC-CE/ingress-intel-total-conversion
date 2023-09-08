@@ -271,4 +271,11 @@
     <string name="menu_share_plugin_download_url">Share download URL</string>
     <string name="menu_share_plugin_update_url">Share update URL</string>
     <string name="menu_share_plugin_file">Share plugin file</string>
+    <string name="pref_debug_info">Debug info</string>
+    <string name="pref_debug_info_sum">Show information important for solving issues with IITC Mobile</string>
+    <string name="debug_info_dialog_title">Debug info</string>
+    <string name="debug_info_dialog_share_btn">Share</string>
+    <string name="debug_info_dialog_copy_btn">Copy</string>
+    <string name="ok">OK</string>
+    <string name="debug_info_dialog_text">Manufacturer: %s\nModel: %s\nAndroid version: %d\nAndroid version release: %s\nIITC Mobile version: %s (%s)\nIITC Version: %s\nUser Agent: %s</string>
 </resources>

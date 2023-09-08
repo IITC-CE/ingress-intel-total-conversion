@@ -20,6 +20,7 @@ import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.prefs.AboutDialogPreference;
+import org.exarhteam.iitc_mobile.prefs.ShareDebugInfoPreference;
 
 public class MainSettings extends PreferenceFragment {
     @Override
@@ -30,6 +31,7 @@ public class MainSettings extends PreferenceFragment {
 
         // set versions
         final String iitcVersion = getArguments().getString("iitc_version");
+        final String userAgent = getArguments().getString("iitc_userAgent");
 
         String buildVersion = "unknown";
 
@@ -54,6 +56,10 @@ public class MainSettings extends PreferenceFragment {
             (getActivity()).recreate();
             return true;
         });
+
+        final ShareDebugInfoPreference prefShareDebug = (ShareDebugInfoPreference) findPreference("pref_debug_info");
+        prefShareDebug.setVersions(iitcVersion, buildVersion);
+        prefShareDebug.setUserAgent(userAgent);
 
         final AboutDialogPreference pref_about = (AboutDialogPreference) findPreference("pref_about");
         pref_about.setVersions(iitcVersion, buildVersion);
