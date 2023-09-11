@@ -57,7 +57,16 @@ public class ShareDebugInfoPreference extends Preference {
         String model = Build.MODEL;
         int version = Build.VERSION.SDK_INT;
         String versionRelease = Build.VERSION.RELEASE;
-        return getContext().getString(R.string.debug_info_dialog_text, manufacturer, model, version, versionRelease, buildVersion, BuildConfig.BUILD_TYPE, iitcVersion, userAgent);
+
+        return getContext().getString(R.string.debug_info_dialog_text, manufacturer, model, version, versionRelease, buildVersion, BuildConfig.BUILD_TYPE, iitcVersion, userAgent, getBooleanDescription("pref_fake_user_agent", false), getBooleanDescription("pref_popup", true));
+    }
+
+    private String getBooleanDescription(String prefPopup, boolean defaultValue) {
+        boolean value = getSharedPreferences().getBoolean(prefPopup, defaultValue);
+        if (value) {
+            return getContext().getString(R.string.pref_enabled);
+        }
+        return getContext().getString(R.string.pref_disabled);
     }
 
     public void setVersions(String iitcVersion, String buildVersion) {
