@@ -2,14 +2,17 @@ package org.exarhteam.iitc_mobile.prefs;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import org.exarhteam.iitc_mobile.BuildConfig;
+import org.exarhteam.iitc_mobile.IITC_FileManager;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.share.SendToClipboard;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
@@ -58,7 +61,18 @@ public class ShareDebugInfoPreference extends Preference {
         int version = Build.VERSION.SDK_INT;
         String versionRelease = Build.VERSION.RELEASE;
 
-        return getContext().getString(R.string.debug_info_dialog_text, manufacturer, model, version, versionRelease, buildVersion, BuildConfig.BUILD_TYPE, iitcVersion, userAgent, getBooleanDescription("pref_fake_user_agent", false), getBooleanDescription("pref_popup", true));
+        return getContext().getString(R.string.debug_info_dialog_text, manufacturer, model, version, versionRelease, buildVersion, BuildConfig.BUILD_TYPE, iitcVersion, userAgent, getBooleanDescription("pref_fake_user_agent", false), getBooleanDescription("pref_popup", true), getUserPluginCount());
+    }
+
+    private int getUserPluginCount() {
+        int count = 0;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        for (String s : preferences.getAll().keySet()) {
+            if (s.startsWith(IITC_FileManager.USER_PLUGINS_PATH) && preferences.getBoolean(s, false)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private String getBooleanDescription(String prefPopup, boolean defaultValue) {

@@ -180,16 +180,20 @@ public class IITC_FileManager {
     }
 
     private WebResourceResponse getUserPlugin(final Uri uri) {
-        if (!mPrefs.getBoolean(uri.getPath(), false)) {
-            Log.e("Attempted to inject user script that is not enabled by user: " + uri.getPath());
+        String pluginPath = uri.getPath();
+        if (!mPrefs.getBoolean(pluginPath, false)) {
+            Log.e("Attempted to inject user script that is not enabled by user: " + pluginPath);
             return EMPTY;
         }
 
         InputStream stream;
         try {
-            stream = new FileInputStream(new File(uri.getPath()));
+            stream = new FileInputStream(pluginPath);
         } catch (final IOException e) {
-            Log.w(e);
+            Log.w("Could not load plugin file: " + pluginPath, e);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.remove(pluginPath);
+            editor.apply();
             return EMPTY;
         }
 
