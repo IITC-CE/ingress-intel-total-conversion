@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import org.exarhteam.iitc_mobile.share.ShareActivity;
 public class ShareDebugInfoPreference extends Preference {
     private String iitcVersion;
     private String buildVersion;
+    private String originalUserAgent;
     private String userAgent;
 
     public ShareDebugInfoPreference(Context context, AttributeSet attrs) {
@@ -33,10 +35,7 @@ public class ShareDebugInfoPreference extends Preference {
         LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View dialogView = layoutInflater.inflate(R.layout.debug_info_dialog, null);
 
-        TextView dialogTextView = dialogView.findViewById(R.id.dialogText);
-
-        String dialogText = getDialogText();
-        dialogTextView.setText(dialogText);
+        dialogView.<TextView>findViewById(R.id.debug_info_dialog_text).setText(Html.fromHtml(createDialogText()));
 
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle(R.string.debug_info_dialog_title)
@@ -44,10 +43,10 @@ public class ShareDebugInfoPreference extends Preference {
                 .create();
 
         Button shareBtn = dialogView.findViewById(R.id.btnShare);
-        shareBtn.setOnClickListener(v -> v.getContext().startActivity(ShareActivity.forString(v.getContext(), dialogText)));
+        shareBtn.setOnClickListener(v -> v.getContext().startActivity(ShareActivity.forString(v.getContext(), getDialogText(dialogView))));
 
         Button copyBtn = dialogView.findViewById(R.id.btnCopy);
-        copyBtn.setOnClickListener(v -> v.getContext().startActivity(SendToClipboard.clipboard(v.getContext(), dialogText)));
+        copyBtn.setOnClickListener(v -> v.getContext().startActivity(SendToClipboard.clipboard(v.getContext(), getDialogText(dialogView))));
 
         Button okBtn = dialogView.findViewById(R.id.btnOk);
         okBtn.setOnClickListener(v -> dialog.cancel());
@@ -55,13 +54,17 @@ public class ShareDebugInfoPreference extends Preference {
         dialog.show();
     }
 
-    private String getDialogText() {
+    private String createDialogText() {
         String manufacturer = Build.MANUFACTURER;
         String model = Build.MODEL;
         int version = Build.VERSION.SDK_INT;
         String versionRelease = Build.VERSION.RELEASE;
 
-        return getContext().getString(R.string.debug_info_dialog_text, manufacturer, model, version, versionRelease, buildVersion, BuildConfig.BUILD_TYPE, iitcVersion, userAgent, getBooleanDescription("pref_fake_user_agent", false), getBooleanDescription("pref_popup", true), getUserPluginCount());
+        return getContext().getString(R.string.debug_info_dialog_text, manufacturer, model, version, versionRelease, buildVersion, BuildConfig.BUILD_TYPE, iitcVersion, originalUserAgent, userAgent, getBooleanDescription("pref_fake_user_agent", false), getBooleanDescription("pref_popup", true), getUserPluginCount());
+    }
+
+    private String getDialogText(View dialogView) {
+        return dialogView.<TextView>findViewById(R.id.debug_info_dialog_text).getText().toString();
     }
 
     private int getUserPluginCount() {
@@ -88,7 +91,8 @@ public class ShareDebugInfoPreference extends Preference {
         this.buildVersion = buildVersion;
     }
 
-    public void setUserAgent(String userAgent) {
+    public void setUserAgents(String originalUserAgent, String userAgent) {
+        this.originalUserAgent = originalUserAgent;
         this.userAgent = userAgent;
     }
 }

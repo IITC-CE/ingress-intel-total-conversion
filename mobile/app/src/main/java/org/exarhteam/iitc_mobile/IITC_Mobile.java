@@ -121,6 +121,7 @@ public class IITC_Mobile extends AppCompatActivity
     private final Pattern mGoogleHostnamePattern = Pattern.compile("(^|\\.)google(\\.com|\\.co)?\\.\\w+$");
 
     private String mIITCDefaultUA;
+    private String mIITCOriginalUA;
     private final String mDesktopUA = "Mozilla/5.0 (X11; Linux x86_64; rv:17.0) Gecko/20130810 Firefox/17.0 Iceweasel/17.0.8";
 
     // Used for custom back stack handling
@@ -178,8 +179,8 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         // Define webview user agent for known external hosts
-        final String defaultUA = WebSettings.getDefaultUserAgent(this);
-        mIITCDefaultUA = sanitizeUserAgent(defaultUA);
+        mIITCOriginalUA = WebSettings.getDefaultUserAgent(this);
+        mIITCDefaultUA = sanitizeUserAgent(mIITCOriginalUA);
         final String googleUA = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mIITCDefaultUA;
 
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
@@ -822,6 +823,7 @@ public class IITC_Mobile extends AppCompatActivity
             case R.id.action_settings: // start settings activity
                 final Intent intent = new Intent(this, PreferenceActivity.class);
                 intent.putExtra("iitc_userAgent", mIITCDefaultUA);
+                intent.putExtra("iitc_originalUserAgent", mIITCOriginalUA);
                 try {
                     intent.putExtra("iitc_version", mFileManager.getIITCVersion());
                 } catch (final IOException e) {

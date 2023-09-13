@@ -279,5 +279,19 @@
     <string name="ok">OK</string>
     <string name="pref_enabled">enabled</string>
     <string name="pref_disabled">disabled</string>
-    <string name="debug_info_dialog_text">Manufacturer: %s\nModel: %s\nAndroid version: %d\nAndroid version release: %s\nIITC Mobile version: %s (%s)\nIITC Version: %s\nDefault User Agent: %s\nFake user agent: %s\nPopup: %s\nActive user plugins: %d</string>
+    <string name="debug_info_dialog_text">
+        <![CDATA[
+        <b>Manufacturer:</b> %s<br/>
+        <b>Model:</b> %s<br/>
+        <b>Android version:</b> %d<br/>
+        <b>Android version release:</b> %s<br/>
+        <b>IITC Mobile version:</b> %s (%s)<br/>
+        <b>IITC Version:</b> %s<br/>
+        <b>System User Agent:</b> %s<br/>
+        <b>Default IITC User Agent:</b> %s<br/>
+        <b>Fake user agent:</b> %s<br/>
+        <b>Popup:</b> %s<br/>
+        <b>Active user plugins:</b> %d<br/>
+        ]]>
+    </string>
 </resources>

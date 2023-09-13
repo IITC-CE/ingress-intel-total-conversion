@@ -31,6 +31,7 @@ public class MainSettings extends PreferenceFragment {
 
         // set versions
         final String iitcVersion = getArguments().getString("iitc_version");
+        final String originalUserAgent = getArguments().getString("iitc_originalUserAgent");
         final String userAgent = getArguments().getString("iitc_userAgent");
 
         String buildVersion = "unknown";
@@ -59,7 +60,7 @@ public class MainSettings extends PreferenceFragment {
 
         final ShareDebugInfoPreference prefShareDebug = (ShareDebugInfoPreference) findPreference("pref_debug_info");
         prefShareDebug.setVersions(iitcVersion, buildVersion);
-        prefShareDebug.setUserAgent(userAgent);
+        prefShareDebug.setUserAgents(originalUserAgent, userAgent);
 
         final AboutDialogPreference pref_about = (AboutDialogPreference) findPreference("pref_about");
         pref_about.setVersions(iitcVersion, buildVersion);
