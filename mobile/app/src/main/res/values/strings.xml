@@ -294,4 +294,6 @@
         <b>Active user plugins:</b> %d<br/>
         ]]>
     </string>
+    <string name="pref_check_for_updates">Update check</string>
+    <string name="pref_check_for_updates_summary">Check for updates on startup</string>
 </resources>
