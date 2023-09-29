@@ -165,6 +165,10 @@
                 android:key="pref_about"
                 android:title="@string/pref_about_title"/>
         </PreferenceScreen>
+        <org.exarhteam.iitc_mobile.prefs.ShareDebugInfoPreference
+                android:key="pref_debug_info"
+                android:title="@string/pref_debug_info"
+                android:summary="@string/pref_debug_info_sum"/>
     </PreferenceCategory>
 
 </PreferenceScreen>
