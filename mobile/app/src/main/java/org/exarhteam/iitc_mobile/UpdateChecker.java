@@ -7,9 +7,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import androidx.core.app.NotificationCompat;
 import java.io.IOException;
 import okhttp3.OkHttpClient;
@@ -17,9 +17,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class UpdateChecker {
+
     private final Context context;
     private final String buildType;
     private final int currentVersionCode;
+    private final SharedPreferences preferences;
+
     private static final String SHARED_PREFS = "UpdateCheckerPrefs";
     private static final String HIDE_FOREVER = "HideForever";
 
@@ -27,6 +30,7 @@ public class UpdateChecker {
         this.context = context;
         this.buildType = buildType;
         this.currentVersionCode = currentVersionCode;
+        this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void checkForUpdates() {
@@ -34,10 +38,7 @@ public class UpdateChecker {
             return;
         }
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        boolean hideForever = sharedPreferences.getBoolean(HIDE_FOREVER, false);
-
-        if (!hideForever) {
+        if (!migratePreferences() && preferences.getBoolean("pref_check_for_updates", true)) {
             new Thread(() -> {
                 try {
                     OkHttpClient client = new OkHttpClient();
@@ -60,6 +61,23 @@ public class UpdateChecker {
                 }
             }).start();
         }
+    }
+
+    //XXX: migration of previous settings - can be removed some time later
+    private boolean migratePreferences() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        Object hideForever = sharedPreferences.getAll().get(HIDE_FOREVER);
+        if (hideForever != null && (boolean) hideForever) {
+            SharedPreferences.Editor oldPrefsEditor = sharedPreferences.edit();
+            oldPrefsEditor.remove(HIDE_FOREVER);
+            oldPrefsEditor.apply();
+
+            SharedPreferences.Editor newPrefsEditor = preferences.edit();
+            newPrefsEditor.putBoolean("pref_check_for_updates", false);
+            newPrefsEditor.apply();
+            return true;
+        }
+        return false;
     }
 
     private int extractVersionCode(String responseBody) {

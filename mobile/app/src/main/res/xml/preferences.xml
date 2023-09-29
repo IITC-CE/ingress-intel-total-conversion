@@ -83,6 +83,12 @@
     <PreferenceCategory
         android:key="pref_mics"
         android:title="@string/pref_misc_cat">
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_check_for_updates"
+                android:title="@string/pref_check_for_updates"
+                android:summary="@string/pref_check_for_updates_summary"
+            />
         <PreferenceScreen
             android:key="pref_developer_screen"
             android:persistent="false"
