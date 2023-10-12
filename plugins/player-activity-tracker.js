@@ -153,6 +153,8 @@ window.plugin.playerTracker.processNewData = function(data) {
         // portal the player is at, so ignore it.
         if(markup[1].plain.indexOf('destroyed the Link') !== -1
           || markup[1].plain.indexOf('destroyed a Control Field') !== -1
+          // COMM messages changed a bit, keep old rules ↑ in case of rollback
+          || markup[1].plain.indexOf('destroyed the') !== -1
           || markup[1].plain.indexOf('Your Link') !== -1) {
           skipThisMessage = true;
           return false;
