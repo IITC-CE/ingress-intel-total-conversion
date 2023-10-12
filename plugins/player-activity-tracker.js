@@ -143,7 +143,13 @@ window.plugin.playerTracker.processNewData = function(data) {
     if(json[1] < limit) return true;
 
     // find player and portal information
-    var plrname, lat, lng, id=null, name, address;
+    var plrname,
+      plrteam,
+      lat,
+      lng,
+      id = null,
+      name,
+      address;
     var skipThisMessage = false;
     $.each(json[2].plext.markup, function(ind, markup) {
       switch(markup[0]) {
@@ -162,6 +168,7 @@ window.plugin.playerTracker.processNewData = function(data) {
         break;
       case 'PLAYER':
         plrname = markup[1].plain;
+        plrteam = markup[1].team;
         break;
       case 'PORTAL':
         // link messages are “player linked X to Y” and the player is at
@@ -179,7 +186,7 @@ window.plugin.playerTracker.processNewData = function(data) {
     });
 
     // skip unusable events
-    if (!plrname || !lat || !lng || !id || skipThisMessage || ![window.TEAM_RES, window.TEAM_ENL].includes(window.teamStringToId(json[2].plext.team))) {
+    if (!plrname || !lat || !lng || !id || skipThisMessage || ![window.TEAM_RES, window.TEAM_ENL].includes(plrteam)) {
       return true;
     }
 
@@ -197,7 +204,7 @@ window.plugin.playerTracker.processNewData = function(data) {
     if(!playerData || playerData.events.length === 0) {
       plugin.playerTracker.stored[plrname] = {
         nick: plrname,
-        team: json[2].plext.team,
+        team: plrteam,
         events: [newEvent]
       };
       return true;
