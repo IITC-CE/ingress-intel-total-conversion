@@ -170,7 +170,7 @@ window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
   $('#chatfaction').data('needsClearing', null);
 
   var old = chat._faction.oldestGUID;
-  chat.writeDataToHash(data, chat._faction, false, olderMsgs, ascendingTimestampOrder);
+  chat.writeDataToHash(data, chat._faction, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._faction.oldestGUID;
 
   runHooks('factionChatDataAvailable', {raw: data, result: data.result, processed: chat._faction.data});
@@ -223,7 +223,7 @@ window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
   $('#chatall').data('needsClearing', null);
 
   var old = chat._public.oldestGUID;
-  chat.writeDataToHash(data, chat._public, undefined, olderMsgs, ascendingTimestampOrder);   //NOTE: isPublic passed as undefined - this is the 'all' channel, so not really public or private
+  chat.writeDataToHash(data, chat._public, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._public.oldestGUID;
 
   runHooks('publicChatDataAvailable', {raw: data, result: data.result, processed: chat._public.data});
@@ -273,7 +273,7 @@ window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
   if(data.result.length === 0) return;
 
   var old = chat._alerts.oldestTimestamp;
-  chat.writeDataToHash(data, chat._alerts, undefined, olderMsgs, ascendingTimestampOrder); //NOTE: isPublic passed as undefined - it's nether public or private!
+  chat.writeDataToHash(data, chat._alerts, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
 
   // hook for alerts - API change planned here for next refactor
@@ -392,7 +392,7 @@ window.chat.parseMsgData = function (data) {
   };
 };
 
-window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
+window.chat.writeDataToHash = function(newData, storageHash, isOlderMsgs, isAscendingOrder) {
   window.chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
   newData.result.forEach(function(json) {
