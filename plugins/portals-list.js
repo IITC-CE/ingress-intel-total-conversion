@@ -4,6 +4,8 @@
 // @version        0.4.2
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
+/* global plugin -- eslint */
+
 // use own namespace for plugin
 window.plugin.portalslist = function() {};
 
@@ -466,24 +468,21 @@ var setup =  function() {
     .prop("type", "text/css")
     .html('@include_string:portals-list.css@')
     .appendTo("head");
-
-}
-
+};
 
 // given counts of resonators, links and fields, calculate the available AP
 // doesn't take account AP for resonator upgrades or AP for adding mods
 window.plugin.portalslist.portalApGainMaths = function (resCount, linkCount, fieldCount) {
-
-  var deployAp = (8 - resCount) * DEPLOY_RESONATOR;
-  if (resCount == 0) deployAp += CAPTURE_PORTAL;
-  if (resCount != 8) deployAp += COMPLETION_BONUS;
+  var deployAp = (8 - resCount) * window.DEPLOY_RESONATOR;
+  if (resCount === 0) deployAp += window.CAPTURE_PORTAL;
+  if (resCount !== 8) deployAp += window.COMPLETION_BONUS;
   // there could also be AP for upgrading existing resonators, and for deploying mods - but we don't have data for that
   var friendlyAp = deployAp;
 
-  var destroyResoAp = resCount * DESTROY_RESONATOR;
-  var destroyLinkAp = linkCount * DESTROY_LINK;
-  var destroyFieldAp = fieldCount * DESTROY_FIELD;
-  var captureAp = CAPTURE_PORTAL + 8 * DEPLOY_RESONATOR + COMPLETION_BONUS;
+  var destroyResoAp = resCount * window.DESTROY_RESONATOR;
+  var destroyLinkAp = linkCount * window.DESTROY_LINK;
+  var destroyFieldAp = fieldCount * window.DESTROY_FIELD;
+  var captureAp = window.CAPTURE_PORTAL + 8 * window.DEPLOY_RESONATOR + window.COMPLETION_BONUS;
   var destroyAp = destroyResoAp + destroyLinkAp + destroyFieldAp;
   var enemyAp = destroyAp + captureAp;
 
