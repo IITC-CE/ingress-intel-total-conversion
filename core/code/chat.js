@@ -1,4 +1,5 @@
-window.chat = function() {};
+window.chat = function () {};
+var chat = window.chat;
 
 
 window.chat.handleTabCompletion = function() {
@@ -392,7 +393,7 @@ window.chat.parseMsgData = function (data) {
   };
 };
 
-window.chat.writeDataToHash = function(newData, storageHash, isOlderMsgs, isAscendingOrder) {
+window.chat.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAscendingOrder) {
   window.chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
   newData.result.forEach(function(json) {
