@@ -773,9 +773,6 @@ window.chat.chooseTab = function(tab) {
 
       chat.renderAlerts(false);
       break;
-
-    default:
-      throw new Error('chat.chooser was asked to handle unknown button: ' + tt);
   }
 }
 
@@ -908,7 +905,6 @@ window.chat.setupPosting = function() {
         }
       } catch (e) {
         log.error(e);
-        //if (e.stack) { console.error(e.stack); }
       }
     });
   }
