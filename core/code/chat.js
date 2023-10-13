@@ -371,16 +371,19 @@ window.chat.parseMsgData = function (data) {
 
   var markup = data[2].plext.markup;
 
-  var nick = '';
+  var player = {
+    name: '',
+    team: team,
+  };
   markup.forEach(function(ent) {
     switch (ent[0]) {
       case 'SENDER': // user generated messages
-        nick = ent[1].plain.replace(/: $/, ''); // cut “: ” at end
+        player.name = ent[1].plain.replace(/: $/, ''); // cut “: ” at end
         break;
 
       case 'PLAYER': // automatically generated messages
-        nick = ent[1].plain;
-        team = window.teamStringToId(ent[1].team);
+        player.name = ent[1].plain;
+        player.team = window.teamStringToId(ent[1].team);
         break;
 
       default:
@@ -398,10 +401,8 @@ window.chat.parseMsgData = function (data) {
     type: data[2].plext.plextType,
     narrowcast: systemNarrowcast,
     auto: auto,
-    player: {
-      name: nick,
-      team: team,
-    },
+    team: team,
+    player: player,
     markup: markup,
   };
 };
