@@ -5,6 +5,7 @@
 // @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
 /* exported setup, changelog --eslint */
+/* global L -- eslint */
 
 var changelog = [
   {
@@ -306,7 +307,7 @@ window.plugin.playerTracker.drawData = function() {
     var ago = plugin.playerTracker.ago;
 
     // tooltip for marker - no HTML - and not shown on touchscreen devices
-    var tooltip = isTouchDev ? '' : (plrname+', '+ago(last.time, now)+' ago');
+    var tooltip = isTouchDev ? '' : plrname + ', ' + ago(last.time, now) + ' ago';
 
     // popup for marker
     var popup = $('<div>')
@@ -379,7 +380,7 @@ window.plugin.playerTracker.drawData = function() {
     var icon = playerData.team === 'RESISTANCE' ?  new plugin.playerTracker.iconRes() :  new plugin.playerTracker.iconEnl();
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
-    var m = L.marker(gllfe(last), {icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip});
+    var m = L.marker(gllfe(last), { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
     m.addEventListener('spiderfiedclick', plugin.playerTracker.onClickListener);
 
     // m.bindPopup(title);

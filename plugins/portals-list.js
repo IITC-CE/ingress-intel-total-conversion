@@ -492,6 +492,6 @@ window.plugin.portalslist.portalApGainMaths = function (resCount, linkCount, fie
     enemyAp: enemyAp,
     destroyAp: destroyAp,
     destroyResoAp: destroyResoAp,
-    captureAp: captureAp
-  }
-}
+    captureAp: captureAp,
+  };
+};
