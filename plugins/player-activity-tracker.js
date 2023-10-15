@@ -153,23 +153,25 @@ window.plugin.playerTracker.processNewData = function(data) {
     var skipThisMessage = false;
     $.each(json[2].plext.markup, function(ind, markup) {
       switch(markup[0]) {
-      case 'TEXT':
-        // Destroy link and field messages depend on where the link or
-        // field was originally created. Therefore it’s not clear which
-        // portal the player is at, so ignore it.
-        if(markup[1].plain.indexOf('destroyed the Link') !== -1
-          || markup[1].plain.indexOf('destroyed a Control Field') !== -1
-          // COMM messages changed a bit, keep old rules ↑ in case of rollback
-          || markup[1].plain.indexOf('destroyed the') !== -1
-          || markup[1].plain.indexOf('Your Link') !== -1) {
-          skipThisMessage = true;
-          return false;
-        }
-        break;
-      case 'PLAYER':
-        plrname = markup[1].plain;
-        plrteam = markup[1].team;
-        break;
+        case 'TEXT':
+          // Destroy link and field messages depend on where the link or
+          // field was originally created. Therefore it’s not clear which
+          // portal the player is at, so ignore it.
+          if (
+            markup[1].plain.indexOf('destroyed the Link') !== -1 ||
+            markup[1].plain.indexOf('destroyed a Control Field') !== -1 ||
+            // COMM messages changed a bit, keep old rules ↑ in case of rollback
+            markup[1].plain.indexOf('destroyed the') !== -1 ||
+            markup[1].plain.indexOf('Your Link') !== -1
+          ) {
+            skipThisMessage = true;
+            return false;
+          }
+          break;
+        case 'PLAYER':
+          plrname = markup[1].plain;
+          plrteam = markup[1].team;
+          break;
       case 'PORTAL':
         // link messages are “player linked X to Y” and the player is at
         // X.
