@@ -138,7 +138,7 @@ comm.parseMsgData = function (data) {
  * @param {boolean} isOlderMsgs - Whether the new data contains older messages.
  * @param {boolean} isAscendingOrder - Whether the new data is in ascending order.
  */
-comm.writeDataToHash = function (newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
+comm.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAscendingOrder) {
   comm.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
   newData.result.forEach(function (json) {
@@ -199,11 +199,10 @@ comm._oldBBox = null;
  *
  * @function comm.genPostData
  * @param {string} channel - The chat channel.
- * @param {Object} storageHash - Storage hash for the chat.
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
  * @returns {Object} The generated post data.
  */
-comm.genPostData = function (channel, _, getOlderMsgs) {
+comm.genPostData = function (channel, getOlderMsgs) {
   if (typeof channel !== 'string') {
     throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
   }
@@ -293,7 +292,7 @@ comm.requestChannel = function (channel, getOlderMsgs, isRetry) {
   comm._requestRunning[channel] = true;
   $("#chatcontrols a[data-channel='" + channel + "']").addClass('loading');
 
-  var d = comm.genPostData(channel, comm._channels[channel], getOlderMsgs);
+  var d = comm.genPostData(channel, getOlderMsgs);
   window.postAjax(
     'getPlexts',
     d,
@@ -336,7 +335,7 @@ comm.handleChannel = function (channel, data, olderMsgs, ascendingTimestampOrder
   $('#chat' + channel).data('needsClearing', null);
 
   var old = comm._channels[channel].oldestGUID;
-  comm.writeDataToHash(data, comm._channels[channel], false, olderMsgs, ascendingTimestampOrder);
+  comm.writeDataToHash(data, comm._channels[channel], olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== comm._channels[channel].oldestGUID;
 
   var hook = channel + 'ChatDataAvailable';
