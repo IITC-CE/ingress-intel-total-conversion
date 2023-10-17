@@ -1,12 +1,16 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.36.1
+// @version        0.37.0
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.37.0',
+    changes: ['Keep COMM message team in parsed data as player.team may differ from team'],
+  },
   {
     version: '0.36.1',
     changes: ['Revert sorted sidebar links'],

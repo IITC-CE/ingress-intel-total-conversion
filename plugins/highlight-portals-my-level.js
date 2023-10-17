@@ -1,11 +1,18 @@
 // @author         vita10gy
 // @name           Highlight portals by my level
 // @category       Highlighter
-// @version        0.2.0
+// @version        0.2.1
 // @description    Use the portal fill color to denote if the portal is either at and above, or at and below your level.
 
-/* exported setup --eslint */
+/* exported setup, changelog --eslint */
 /* global PLAYER */
+
+var changelog = [
+  {
+    version: '0.2.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 function belowMyLevel (data) {
   colorLevel(true,data);

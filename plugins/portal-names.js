@@ -1,9 +1,17 @@
 // @author         ZasoGD
 // @name           Portal Names
 // @category       Layer
-// @version        0.2.1
+// @version        0.2.2
 // @description    Show portal names on the map.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.2.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.portalNames = function() {};
@@ -103,7 +111,7 @@ window.plugin.portalNames.updatePortalLabels = function() {
       if (!buckets[b]) buckets[b] = {};
       buckets[b][guid] = true;
     }
-  }  
+  }
 
   var coveredPortals = {};
 
@@ -117,11 +125,11 @@ window.plugin.portalNames.updatePortalLabels = function() {
                 point.subtract([window.plugin.portalNames.NAME_WIDTH,0]),
                 point.add([window.plugin.portalNames.NAME_WIDTH,window.plugin.portalNames.NAME_HEIGHT])
       );
-  
+
       for (var otherGuid in bucketGuids) {
         if (guid != otherGuid) {
           var otherPoint = portalPoints[otherGuid];
-  
+
           if (largeBounds.contains(otherPoint)) {
             // another portal is within the rectangle for this one's name - so no name for this one
             coveredPortals[guid] = true;

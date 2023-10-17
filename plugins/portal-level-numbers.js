@@ -1,9 +1,17 @@
 // @author         rongou
 // @name           Portal Level Numbers
 // @category       Layer
-// @version        0.2.1
+// @version        0.2.2
 // @description    Show portal level numbers on map.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.2.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.portalLevelNumbers = function() {

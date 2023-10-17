@@ -1,9 +1,17 @@
 // @author         johtata
 // @name           Ornament icons basic
 // @category       Layer
-// @version        0.1.0
+// @version        0.1.1
 // @description    Add own icons and names for ornaments
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 /**********************
 // Added as part of the Ingress #Helios in 2014, ornaments

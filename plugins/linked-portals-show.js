@@ -1,9 +1,17 @@
 // @author         fstopienski
 // @name           Linked portals
 // @category       Portal Info
-// @version        0.4.0
+// @version        0.4.1
 // @description    Try to show the linked portals (image, name and link direction) in portal detail view and jump to linked portal on click.  Some details may not be available if the linked portal is not in the current view.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.4.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var showLinkedPortal = {};

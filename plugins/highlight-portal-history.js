@@ -1,11 +1,19 @@
 // @author         Johtaja
 // @name           Highlight portals based on history
 // @category       Highlighter
-// @version        0.3.0
+// @version        0.3.1
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
-/* exported setup --eslint */
+/* exported setup, changelog --eslint */
 /* global L */
+
+var changelog = [
+  {
+    version: '0.3.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
+
 // use own namespace for plugin
 var portalsHistory = {};
 window.plugin.portalHighlighterPortalsHistory = portalsHistory;

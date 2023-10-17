@@ -1,9 +1,17 @@
 // @author         breunigs
 // @name           Scale bar
 // @category       Controls
-// @version        0.1.1
+// @version        0.1.2
 // @description    Show scale bar on the map.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var scaleBar = {};

@@ -1,8 +1,17 @@
 // @author         ZasoGD
 // @name           Multi Projects Extension
 // @category       Controls
-// @version        0.1.1
+// @version        0.1.2
 // @description    Create separated projects in some plugins.
+
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 //
 // How to implement MPE in your plugin: https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/Multi-Projects-Extension

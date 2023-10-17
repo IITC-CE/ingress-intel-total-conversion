@@ -1,9 +1,17 @@
 // @author         Hollow011
 // @name           Available AP statistics
 // @category       Info
-// @version        0.4.2
+// @version        0.4.3
 // @description    Displays the per-team AP gains available in the current view.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.4.3',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.compAPStats = function() {};
@@ -51,7 +59,7 @@ window.plugin.compAPStats.update = function (hasFinished) {
     window.plugin.compAPStats.updateNoPortals(hasFinished);
     return;
   }
-  
+
   var result = window.plugin.compAPStats.compAPStats();
   var loading = hasFinished ? '' : 'Loading...';
 

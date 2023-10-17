@@ -1,9 +1,17 @@
 // @author         ZasoGD
 // @name           Zaprange
 // @category       Layer
-// @version        0.1.5
+// @version        0.1.6
 // @description    Shows the maximum range of attack by the portals.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.6',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
   // use own namespace for plugin
   window.plugin.zaprange = function() {};

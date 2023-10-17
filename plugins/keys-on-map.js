@@ -1,9 +1,17 @@
 // @author         xelio
 // @name           Keys on map
 // @category       Layer
-// @version        0.3.1
+// @version        0.3.2
 // @description    Show the manually entered key counts from the 'keys' plugin on the map.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.3.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.keysOnMap = function() {};

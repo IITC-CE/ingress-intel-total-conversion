@@ -1,9 +1,17 @@
 // @author         boombuler
 // @name           Tidy Links
 // @category       Draw
-// @version        0.6.0
+// @version        0.6.1
 // @description    Calculate how to link the portals to create a reasonably tidy set of links/fields. Enable from the layer chooser. (former `Max Links`)
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.6.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var tidyLinks = {};

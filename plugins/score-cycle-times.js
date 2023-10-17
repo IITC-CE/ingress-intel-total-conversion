@@ -1,9 +1,17 @@
 // @author         jonatkins
 // @name           Scoring cycle / checkpoint times
 // @category       Info
-// @version        0.2.0
+// @version        0.2.1
 // @description    Show the times used for the septicycle and checkpoints for regional scoreboards.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.2.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var scoreCycleTimes = {};
