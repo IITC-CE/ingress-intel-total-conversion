@@ -1,11 +1,19 @@
 ﻿// @author         johnd0e
 // @name           Gaode (高德地图) / AutoNavi map
 // @category       Map Tiles
-// @version        0.1.1
+// @version        0.1.2
 // @description    Map layers from AutoNavi / Gaode (高德地图)
 
-/* exported setup --eslint */
+/* exported setup, changelog --eslint */
 /* global L, layerChooser */
+
+var changelog = [
+  {
+    version: '0.1.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
+
 // use own namespace for plugin
 var mapGaode = {};
 

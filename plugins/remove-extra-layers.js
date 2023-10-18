@@ -1,9 +1,17 @@
 // @author         johnd0e
 // @name           Remove extra layers
 // @category       Layer
-// @version        0.1.0
+// @version        0.1.1
 // @description    Remove 'Artifacts', 'Beacons' and 'Frackers' from layerChooser (still keeping them on map)
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var removeExtraLayers = {};

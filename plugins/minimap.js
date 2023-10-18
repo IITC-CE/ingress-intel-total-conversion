@@ -1,9 +1,17 @@
 // @author         johnd0e
 // @name           Mini map
 // @category       Controls
-// @version        0.4.1
+// @version        0.4.2
 // @description    Show a mini map on the corner of the map.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.4.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var miniMap = {};

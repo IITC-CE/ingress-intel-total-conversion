@@ -1,8 +1,17 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.3.0
+// @version        0.3.1
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
+
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.3.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 var MissionOrder = {
   Sequential: 1,

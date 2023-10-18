@@ -1,9 +1,18 @@
 // @author         xelio
 // @name           Keys
 // @category       Misc
-// @version        0.4.0
+// @version        0.4.1
 // @description    Allow manual entry of key counts for each portal. Use the 'keys-on-map' plugin to show the numbers on the map, and 'sync' to share between multiple browsers or desktop/mobile.
 
+/* exported setup, changelog --eslint */
+/* global plugin */
+
+var changelog = [
+  {
+    version: '0.4.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.keys = function() {};
@@ -95,7 +104,7 @@ window.plugin.keys.registerFieldForSyncing = function() {
 window.plugin.keys.syncCallback = function(pluginName, fieldName, e, fullUpdated) {
   if(fieldName === 'keys') {
     plugin.keys.storeLocal(plugin.keys.KEY);
-    // All data is replaced if other client update the data during this client offline, 
+    // All data is replaced if other client update the data during this client offline,
     // fire 'pluginKeysRefreshAll' to notify a full update
     if(fullUpdated) {
       plugin.keys.updateDisplayCount();
@@ -138,9 +147,7 @@ window.plugin.keys.storeLocal = function(mapping) {
 window.plugin.keys.loadLocal = function(mapping) {
   var objectJSON = localStorage[mapping.key];
   if(!objectJSON) return;
-  plugin.keys[mapping.field] = mapping.convertFunc 
-                          ? mapping.convertFunc(JSON.parse(objectJSON))
-                          : JSON.parse(objectJSON);
+  plugin.keys[mapping.field] = mapping.convertFunc ? mapping.convertFunc(JSON.parse(objectJSON)) : JSON.parse(objectJSON);
 }
 
 // For backward compatibility, will change to use loadLocal after a few version

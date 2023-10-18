@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           OpenStreetMap.org map
 // @category       Map Tiles
-// @version        0.1.2
+// @version        0.1.4
 // @description    Add the native OpenStreetMap.org map tiles as an optional layer.
 
 /* exported setup, changelog --eslint */
@@ -12,6 +12,10 @@ var mapOpenStreetMap = {};
 window.plugin.mapOpenStreetMap = mapOpenStreetMap;
 
 var changelog = [
+  {
+    version: '0.1.4',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
   {
     version: '0.1.3',
     changes: ['Update OSM tile provider', 'Add CyclOSM tiles', 'Expose config'],

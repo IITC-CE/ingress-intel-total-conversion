@@ -1,9 +1,17 @@
 // @author         jonatkins
 // @name           Done links
 // @category       Draw
-// @version        0.1.1
+// @version        0.1.2
 // @description    A companion to the Cross Links plugin. Highlights any links that match existing draw-tools line/polygon edges
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 window.plugin.doneLinks = function() {};
 

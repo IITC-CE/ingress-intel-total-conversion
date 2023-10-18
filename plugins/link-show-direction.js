@@ -1,9 +1,17 @@
 // @author         jonatkins
 // @name           Direction of links on map
 // @category       Tweaks
-// @version        0.2.1
+// @version        0.2.2
 // @description    Show the direction of links on the map by adding short dashes to the line at the origin portal.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.2.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.linkShowDirection = function() {};
@@ -131,7 +139,7 @@ window.plugin.linkShowDirection.showDialog = function() {
 
     input.addEventListener('click', function() {
       localStorage['plugin-linkshowdirection-drawtools'] = input.checked.toString();
-      
+
       if(input.checked)
         window.plugin.linkShowDirection.animateLinks();
       else

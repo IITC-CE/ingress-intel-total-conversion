@@ -1,9 +1,17 @@
 // @author         xelio
 // @name           Reso energy % in portal details
 // @category       Portal Info
-// @version        0.1.2
+// @version        0.1.3
 // @description    Show resonator energy percentage on resonator energy bar in portal details panel.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.3',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.resoEnergyPctInPortalDetail = function() {};

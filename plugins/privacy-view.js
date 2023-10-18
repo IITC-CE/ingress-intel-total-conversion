@@ -1,9 +1,17 @@
 // @author         johnd0e
 // @name           Privacy view on Intel
 // @category       Misc
-// @version        1.1.0
+// @version        1.1.1
 // @description    Hide info from intel which shouldn't leak to players of the other faction.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '1.1.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var privacyView = {};

@@ -1,11 +1,19 @@
 // @author         vita10gy
 // @name           Highlight portals missing resonators
 // @category       Highlighter
-// @version        0.2.1
+// @version        0.2.2
 // @description    Use the portal fill color to denote if the portal is missing resonators.
 
-/* exported setup --eslint */
+/* exported setup, changelog --eslint */
 /* global L, TEAM_NONE */
+
+var changelog = [
+  {
+    version: '0.2.2',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
+
 // use own namespace for plugin
 var highlightMissingResonators = {};
 window.plugin.highlightMissingResonators = highlightMissingResonators;

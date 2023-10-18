@@ -1,12 +1,16 @@
 // @author         breunigs
 // @name           Player activity tracker
 // @category       Layer
-// @version        0.12.2
+// @version        0.12.3
 // @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.12.3',
+    changes: ['Update for new COMM messages'],
+  },
   {
     version: '0.12.2',
     changes: ['🐛 - Exclude __MACHINA__ actions'],

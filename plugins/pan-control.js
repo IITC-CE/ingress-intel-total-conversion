@@ -1,9 +1,17 @@
 // @author         fragger
 // @name           Pan control
 // @category       Controls
-// @version        0.2.2
+// @version        0.2.3
 // @description    Show a panning control on the map.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.2.3',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 var panControl = {};

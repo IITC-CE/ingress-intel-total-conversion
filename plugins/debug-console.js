@@ -1,8 +1,17 @@
 // @author         jaiperdu
 // @name           Debug console tab
 // @category       Debug
-// @version        0.1.0
+// @version        0.1.1
 // @description    Add a debug console tab
+
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 var debugTab = {};
 

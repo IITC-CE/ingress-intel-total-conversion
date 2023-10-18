@@ -1,9 +1,17 @@
 // @author         breunigs
 // @name           Player level guess
 // @category       Info
-// @version        0.5.7
+// @version        0.5.8
 // @description    Try to determine player levels from the data available in the current view.
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.5.8',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.guessPlayerLevels = function() {};

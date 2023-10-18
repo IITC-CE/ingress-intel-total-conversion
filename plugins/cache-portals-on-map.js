@@ -1,9 +1,17 @@
 // @author         jonatkins
 // @name           Cache viewed portals on map
 // @category       Cache
-// @version        0.1.0
+// @version        0.1.1
 // @description    Cache the details of recently viewed portals and use this to populate the map when possible
 
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.1.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.cachePortalDetailsOnMap = function() {};

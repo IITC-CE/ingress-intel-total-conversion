@@ -1,11 +1,18 @@
 // @author         vita10gy
 // @name           Highlight portal weakness
 // @category       Highlighter
-// @version        0.8.0
+// @version        0.8.1
 // @description    Use the fill color of the portals to denote if the portal is weak. Stronger red indicates recharge required, missing resonators, or both.
 
-/* exported setup --eslint */
+/* exported setup, changelog --eslint */
 /* global TEAM_NONE */
+
+var changelog = [
+  {
+    version: '0.8.1',
+    changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
+  },
+];
 
 function weaknessHighlight (data) {
 
