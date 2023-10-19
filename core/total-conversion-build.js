@@ -28,6 +28,7 @@ window.script_info.changelog = [
       'Added scanner link to info panel',
       'Sorted sidebar links',
       'Added window.formatDistance function for global use, which was previously in the bookmarks plugin',
+      'Function marked deprecated: portalApGainMaths, getPortalApGain, potentialPortalLevel, findPortalLatLng',
     ],
   },
 ];
