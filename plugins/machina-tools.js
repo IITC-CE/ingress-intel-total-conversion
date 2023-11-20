@@ -252,6 +252,31 @@ function createChildListItem(parent, childData, childPortal) {
   return childListItem;
 }
 
+function getLinkLengths(clusterPortals, initialValue = Array(9).fill(0)) {
+  return Object.values(clusterPortals)
+    .filter((p) => !!p.children)
+    .reduce((previousValue, currentValue) => {
+      previousValue[currentValue.level] = Math.max(previousValue[currentValue.level], ...currentValue.children.map((c) => c.length));
+      return previousValue;
+    }, initialValue);
+}
+
+function renderLinkLen(len, i) {
+  var lenElement = $('<div>', { class: 'machina-link-length' }).text(`L${i}: ${window.formatDistance(len)}`);
+  var maxRange = window.LINK_RANGE_MAC[i];
+  if (len > maxRange) {
+    lenElement.addClass('exceeded');
+    lenElement.prop('title', 'Link length exceeded expected range - ' + window.formatDistance(maxRange));
+  } else {
+    lenElement.prop('title', window.formatDistance(maxRange));
+  }
+  return lenElement;
+}
+
+machinaTools.linkMaxLengthsHtml = function (linkLengths) {
+  return $('<div>', { class: 'machina-link-lengths' }).append(linkLengths.map(renderLinkLen));
+};
+
 machinaTools.clusterDisplayNode = function (clusterPortals) {
   var rc = $('<div>');
   for (var guid in clusterPortals) {
@@ -283,6 +308,7 @@ function doDisplayClusterInfo(seed) {
   if (seed) {
     guid = seed.guid;
     var cluster = machinaTools.gatherCluster(seed);
+    html.append(machinaTools.linkMaxLengthsHtml(getLinkLengths(cluster)));
     html.append(machinaTools.clusterDisplayNode(cluster));
     html.append('<br/><pre>' + JSON.stringify(cluster, null, 4) + '</pre>');
   } else {
@@ -610,24 +636,29 @@ function appendChildrenList(appendTo, leaf, clusterPortals) {
 function createClustersInfoDialog() {
   var html = $('<div>');
   var seeds = [];
-  Object.values(window.portals)
+  var linkLengths;
+  var htmlLines = Object.values(window.portals)
     .filter((p) => p.options.team === window.TEAM_MAC && map.getBounds().contains(p.getLatLng()))
-    .forEach((p) => {
+    .map((p) => {
       var seedData = machinaTools.findSeed(p.options.guid);
       if (!seeds.find((s) => s.guid === seedData.guid)) {
         seeds.push(seedData);
         var clusterPortals = machinaTools.gatherCluster(seedData);
+        linkLengths = getLinkLengths(clusterPortals, linkLengths);
         var seed = clusterPortals[seedData.guid];
         if (seed) {
           var portalSection = $('<div>');
-          portalSection.appendTo(html);
           appendPortalLine(portalSection, seed);
           appendChildrenList(portalSection, seed, clusterPortals);
+          return portalSection;
         }
       }
-    });
-
-  if (!html.children().length) {
+    })
+    .filter((v) => !!v);
+  if (htmlLines.length && linkLengths.length) {
+    html.append(machinaTools.linkMaxLengthsHtml(linkLengths));
+    html.append(htmlLines);
+  } else {
     html.append('No Clusters found.');
   }
   return html;

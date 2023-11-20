@@ -57,3 +57,18 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
     margin-left: 10px;
     border-left: 5px solid;
 }
+
+.machina-link-lengths {
+    display: flex;
+    justify-content: space-between;
+}
+
+.machina-link-length {
+    border: 1px solid;
+    padding: 2px 5px;
+    margin: 5px 0;
+}
+
+.machina-link-length.exceeded {
+    background-color: #800;
+}
