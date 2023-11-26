@@ -61,14 +61,44 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
 .machina-link-lengths {
     display: flex;
     justify-content: space-between;
+    margin: 5px 0;
 }
 
 .machina-link-length {
     border: 1px solid;
     padding: 2px 5px;
-    margin: 5px 0;
 }
 
 .machina-link-length.exceeded {
     background-color: #800;
+}
+
+#machina-links-overlay-drag-handle {
+    position: absolute !important;
+    z-index: 1000;
+    margin: 0;
+    background-color: rgba(8, 48, 78, 0.9);
+    color: #ffce00;
+}
+
+#machina-links-overlay-drag-handle .warning {
+    position: absolute;
+    top: -0.5em;
+    right: -0.5em;
+    font-size: 10px;
+}
+
+#machina-links-overlay-drag-handle.mobile {
+    position: relative !important;
+    z-index: auto;
+    margin-right: 10px;
+}
+
+.machina-link-lengths.mobile {
+    flex-direction: column;
+}
+
+#machina-links-overlay-drag-handle.mobile .warning {
+    left: -0.5em;
+    right: auto;
 }
