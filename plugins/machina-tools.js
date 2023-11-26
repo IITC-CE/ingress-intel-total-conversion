@@ -718,7 +718,6 @@ machinaTools.refreshLinkLengths = function () {
         }
         return previousValue;
       }, machinaTools._maxLinks);
-    // TODO: remove 0 element and display warning in case it's bigger than 0
     var html = machinaTools.linkMaxLengthsHtml(machinaTools._maxLinks.slice(1), 1);
     html.prop('id', 'machina-links-overlay-drag-handle');
     if (machinaTools._maxLinks[0] > 0) {
