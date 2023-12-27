@@ -710,7 +710,7 @@ machinaTools.refreshLinkLengths = function () {
       .filter((l) => l.options.team === window.TEAM_MAC && map.getBounds().contains(L.latLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6)))
       .reduce((previousValue, link) => {
         var origin = window.portals[link.options.data.oGuid];
-        if (origin) {
+        if (origin && origin.options.data.resCount === 8) {
           var level = origin.options.level;
           var points = link.getLatLngs();
           var linkLength = points[0].distanceTo(points[1]);
