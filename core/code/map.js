@@ -110,6 +110,9 @@ function createDefaultBaseMapLayers () {
   var trafficMutant = L.gridLayer.googleMutant({type: 'roadmap'});
   trafficMutant.addGoogleLayer('TrafficLayer');
   baseLayers['Google Roads + Traffic'] = trafficMutant;
+  var transitMutant = L.gridLayer.googleMutant({ type: 'roadmap' });
+  transitMutant.addGoogleLayer('TransitLayer');
+  baseLayers['Google Roads + Transit'] = transitMutant;
   baseLayers['Google Satellite'] = L.gridLayer.googleMutant({type: 'satellite'});
   baseLayers['Google Hybrid'] = L.gridLayer.googleMutant({type: 'hybrid'});
   baseLayers['Google Terrain'] = L.gridLayer.googleMutant({type: 'terrain'});
