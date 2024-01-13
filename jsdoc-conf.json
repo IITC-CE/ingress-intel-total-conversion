@@ -1,0 +1,27 @@
+{
+  "plugins": ["plugins/markdown"],
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": false
+  },
+  "source": {
+    "include": ["core"],
+    "exclude": ["core/external"],
+    "includePattern": ".(jsx|js|ts|tsx)$"
+  },
+  "templates": {
+    "name": "IITC-CE",
+    "footerText": "Ingress Intel Total Conversion (Community Edition)",
+    "logo": {
+      "height": "0",
+      "link": "https://github.com/IITC-CE/ingress-intel-total-conversion"
+    }
+  },
+  "opts": {
+    "encoding": "utf8",
+    "private": true,
+    "recurse": true,
+    "template": "node_modules/tui-jsdoc-template",
+    "package": "package.json"
+  }
+}

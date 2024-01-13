@@ -1,4 +1,10 @@
 /* global log,L -- eslint */
+
+/**
+ * @file This file provides functions for working with maps.
+ * @module map
+ */
+
 function setupCRS () {
 
   // use the earth radius value from s2 geometry library
@@ -70,6 +76,14 @@ function getPosition () {
   }
 }
 
+/**
+ * Initializes and returns a collection of default basemap layers. The function creates a set of base layers
+ * including CartoDB (both dark and light themes), and various Google Maps layers (Default Ingress Map, Roads,
+ * Roads with Traffic, Satellite, Hybrid, and Terrain).
+ *
+ * @returns {Object.<String, Object>} An object containing different basemap layers ready to be added to a map. Each property of the
+ *                   object is a named map layer, with its value being the corresponding Leaflet tile layer object.
+ */
 function createDefaultBaseMapLayers () {
   var baseLayers = {};
 
@@ -194,6 +208,23 @@ window.mapOptions = {
     : true // default
 };
 
+/**
+ * Initializes the Leaflet map and configures various map layers and event listeners.
+ * This function is responsible for setting up the base map,
+ * including the default basemap tiles (CartoDB, Default Ingress Map, Google Maps),
+ * and configuring the map's properties such as center, zoom, bounds, and renderer options.
+ * It also clears the 'Loading, please wait' message from the map container.
+ *
+ * Important functionalities:
+ * - Adds dummy divs to Leaflet control areas to accommodate IITC UI elements.
+ * - Creates and adds base layers and overlays to the map.
+ * - Configures event listeners for map movements, including aborting pending requests and refreshing map data.
+ * - Manages cookies for map position and zoom level.
+ * - Handles the 'iitcLoaded' hook to set the initial map view and evaluate URL parameters for portal selection.
+ *
+ * @function
+ * @name setupMap
+ */
 window.setupMap = function () {
   setupCRS();
 

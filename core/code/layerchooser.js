@@ -1,15 +1,18 @@
-/*
- * @class LayerChooser
- * @aka window.LayerChooser
- * @inherits L.Controls.Layers
- *
- * Provides 'persistence' of layers display state between sessions.
- *
- * Also some additional methods provided, see below.
- */
-
 'use strict';
 
+/**
+ * @file This file provides functions for working with the layers.
+ * @module layerchooser
+ */
+
+/**
+ * @class LayerChooser
+ * @extends L.Control.Layers
+ *
+ * Represents a control for selecting layers on the map. It extends the Leaflet's L.Control.Layers class.
+ * This control not only manages layer visibility but also provides persistence of layer display states between sessions.
+ * The class has been enhanced with additional options and methods for more flexible layer management.
+ */
 var LayerChooser = L.Control.Layers.extend({
   options: {
     // @option sortLayers: Boolean = true
@@ -248,9 +251,18 @@ var LayerChooser = L.Control.Layers.extend({
     return data && data.layer;
   },
 
-  // @method showLayer(layer: Layer|String|Number, display?: Boolean): this
-  // Switches layer's display state to given value (true by default).
-  // Layer can be specified also by it's name in the control.
+  /**
+   * Shows or hides a specified basemap or overlay layer. The layer can be specified by its ID, name, or layer object.
+   * If the display parameter is not provided, the layer will be shown by default.
+   * When showing a base layer, it ensures that no other base layers are displayed at the same time.
+   *
+   * @method showLayer
+   * @memberof LayerChooser
+   * @param {L.Layer|String|Number} layer - The layer to show or hide. This can be a Leaflet layer object,
+   *                                        a layer name, or a layer ID.
+   * @param {Boolean} [display=true] - Pass `false` to hide the layer, or `true`/omit to show it.
+   * @returns {LayerChooser} Returns the `LayerChooser` instance for chaining.
+   */
   showLayer: function (layer, display) {
     var data = this._layers[layer]; // layer is index, private use only
     if (!data) {
@@ -391,7 +403,20 @@ var LayerChooser = L.Control.Layers.extend({
     return str.replace(/(<([^>]+)>)/gi, ''); // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
   },
 
-  // !!deprecated
+  /**
+   * Retrieves the current state of base and overlay layers managed by this control.
+   * This method is deprecated and should be used with caution.
+   *
+   * The method returns an object with two properties: 'baseLayers' and 'overlayLayers'.
+   * Each array contains objects representing the respective layers with properties: 'layerId', 'name', and 'active'.
+   * 'layerId' is an internal identifier for the layer, 'name' is the layer's name, and 'active' is a boolean indicating
+   * if the layer is currently active on the map.
+   *
+   * @method getLayers
+   * @memberof LayerChooser
+   * @deprecated
+   * @returns {{overlayLayers: Array, baseLayers: Array}} An object containing arrays of base and overlay layers.
+   */
   getLayers: function () {
     var baseLayers = [];
     var overlayLayers = [];

@@ -1,3 +1,8 @@
+/**
+ * @file This file provides functions for working with the sidebar.
+ * @module sidebar
+ */
+
 window.setupSidebar = function() {
   window.setupStyles();
   setupIcons();
@@ -8,7 +13,13 @@ window.setupSidebar = function() {
   $('#sidebar').show();
 };
 
-// to be overrided in smartphone.js
+/**
+ * Adds IITC's CSS to `<head>`.
+ * This function is overwritten in smartphone.js
+ *
+ * @function
+ * @name setupStyles
+ */
 window.setupStyles = function () {
   $('head').append('<style>' +
     [ '#largepreview.enl img { border:2px solid '+COLORS[TEAM_ENL]+'; } ',
@@ -36,9 +47,14 @@ function setupIcons () {
     '</svg>'].join('\\n')).appendTo('body');
 }
 
-// renders player details into the website. Since the player info is
-// included as inline script in the original site, the data is static
-// and cannot be updated.
+/**
+ * Renders player details into the website. Since the player info is
+ * included as inline script in the original site, the data is static
+ * and cannot be updated.
+ *
+ * @function
+ * @name setupPlayerStat
+ */
 window.setupPlayerStat = function () {
   // stock site updated to supply the actual player level, AP requirements and XM capacity values
   var level = PLAYER.verified_level;
@@ -84,6 +100,9 @@ window.setupPlayerStat = function () {
   );
 };
 
+/**
+ * Sets up the sidebar toggle button.
+ */
 function setupSidebarToggle () {
   $('#sidebartoggle').on('click', function() {
     var toggle = $('#sidebartoggle');
@@ -104,6 +123,11 @@ function setupSidebarToggle () {
   });
 }
 
+/**
+ * Sets up event listeners for the large portal image view. This dialog is displayed
+ * when a user clicks on the portal photo in the sidebar. It creates a new image
+ * preview inside a dialog box.
+ */
 function setupLargeImagePreview  () {
   $('#portaldetails').on('click', '.imgpreview', function (e) {
     var img = this.querySelector('img');

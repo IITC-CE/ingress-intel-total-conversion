@@ -1,10 +1,26 @@
-// SETUP /////////////////////////////////////////////////////////////
-// these functions set up specific areas after the boot function
-// created a basic framework. All of these functions should only ever
-// be run once.
-
 /* global L, dialog -- eslint */
 
+/**
+ * @file These functions set up specific areas after the boot function created a basic framework.
+ *       All of these functions should only ever be run once.
+ * @module boot
+ */
+
+/**
+ * Initializes tooltips for a specified element or the entire document if no element is provided.
+ * This function sets up jQuery UI tooltips with customized behavior. It ensures that only one tooltip
+ * is visible at a time by closing others when a new one opens. The content of the tooltip is derived
+ * from the 'title' attribute of the HTML element and is processed by the `convertTextToTableMagic` function.
+ *
+ * Additionally, this function sets up a one-time event handler (if not already set) on the document
+ * to remove tooltips when clicked. This is controlled by the `tooltipClearerHasBeenSetup` flag to prevent
+ * multiple bindings of the event handler.
+ *
+ * @function
+ * @name setupTooltips
+ * @param {jQuery|HTMLElement} [element=document] - The jQuery or DOM element to which the tooltips will be attached.
+ *                                                  If not provided, the document itself is used.
+ */
 window.setupTooltips = function (element) {
   element = element || $(document);
   element.tooltip({
@@ -205,6 +221,9 @@ function prepPluginsToLoad () {
   };
 }
 
+/**
+ * Main boot function. This also boots the plugins using the plugin API.
+ */
 function boot() {
   log.log('loading done, booting. Built: '+'@build_date@');
   if (window.deviceID) {
