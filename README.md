@@ -43,7 +43,7 @@ and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/
 
 - **[IITC-Mobile for iOS]**: 3rd-party application, developed by [_Yangkun Zhang_](https://github.com/HubertZhang).
 
-[iitc.app]: https://github.com/IITC-CE/website
+[website-repo]: https://github.com/IITC-CE/website
 [IITC-Button]: https://github.com/IITC-CE/IITC-Button
 [IITC Mobile]: https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/IITC-Mobile-(Android-app)
 [IITC-Mobile for iOS]: https://github.com/HubertZhang/IITC-Mobile
