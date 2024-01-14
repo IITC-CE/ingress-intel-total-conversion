@@ -35,7 +35,7 @@ and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/
 
 ## Related projects
 
-- **[iitc.app](https://iitc.app)**: IITC-CE homepage, template developed [here](https://github.com/IITC-CE/website).
+- **https://iitc.app**: IITC-CE homepage, template developed [here][website-repo].
 
 - **[IITC-Button]**: browser extension, the easiest (though not sole) way to use IITC on desktop.
 
