@@ -1,8 +1,19 @@
+/**
+ * @file Contains functions related to updating and displaying the current MindUnit scores in the game.
+ * The MindUnit scores represent the current global score for each faction in Ingress.
+ * @module game_status
+ */
 
-// GAME STATUS ///////////////////////////////////////////////////////
-// MindUnit display
-
-
+/**
+ * Updates the game score displayed on the map.
+ * This function queries the current global MindUnit score for each faction from the Ingress servers
+ * and updates the display. The scores are displayed in a percentage format, showing the dominance of each faction.
+ * If the data isn't available, this function attempts to fetch it from the server.
+ *
+ * @function updateGameScore
+ * @param {Object} [data] - The game score data retrieved from the Ingress servers.
+ *                          If not provided, the function will make a server request to fetch the data.
+ */
 window.updateGameScore = function(data) {
   if(!data) {
     // move the postAjax call onto a very short timer. this way, if it throws an exception, it won't prevent IITC booting
