@@ -1,52 +1,42 @@
-// DIALOGS /////////////////////////////////////////////////////////
-// Inspired by TES III: Morrowind. Long live House Telvanni. ///////
-////////////////////////////////////////////////////////////////////
+/**
+ * @file Dialogs inspired by TES III: Morrowind. Long live House Telvanni.
+ * @module dialog
+ */
 
-/* The global ID of onscreen dialogs.
- * Starts at 0.
+/**
+ * The global ID of onscreen dialogs. Starts at 0.
+ * @type {number}
+ * @memberof module:dialog
  */
 window.DIALOG_ID = 0;
 
-/* All onscreen dialogs, keyed by their ID.
- */
-window.DIALOGS = {};
-
-/* The number of dialogs on screen.
- */
-window.DIALOG_COUNT = 0;
-
-/* The dialog that has focus.
- */
-window.DIALOG_FOCUS = null;
-
-/* Controls how quickly the slide toggle animation
- * should play for dialog collapsing and expanding.
- */
-window.DIALOG_SLIDE_DURATION = 100;
-
-/* Creates a dialog and puts it onscreen. Takes one argument: options, a JS object.
- * == Common options
- * (text|html): The text or HTML to display in the dialog. Text is auto-converted to HTML.
- * title: The dialog's title.
- * modal: Whether to open a modal dialog. Implies draggable=false; dialogClass='ui-dialog-modal'.
- *        Please note that modal dialogs hijack the entire screen and should only be used in very
- *        specific cases. (If IITC is running on mobile, modal will always be true).
- * id:   A unique ID for this dialog. If a dialog with id `id' is already open and dialog() is called
- *       again, it will be automatically closed.
+/**
+ * Creates a dialog and puts it onscreen with various options and callbacks.
  *
- * == Callbacks
- * closeCallback: A callback to run on close. Takes no arguments.
- * collapseCallback: A callback to run on dialog collapse.  Takes no arguments.
- * expandCallback:   A callback to run on dialog expansion. Takes no arguments.
- * collapseExpandCallback: A callback to run on both collapse and expand (overrides collapseCallback
- *                         and expandCallback, takes a boolean argument `collapsing' - true if collapsing;
- *                         false if expanding)
- * focusCallback: A callback to run when the dialog gains focus.
- * blurCallback:  A callback to run when the dialog loses focus.
+ * @function dialog
+ * @param {Object} options - Configuration options for the dialog.
+ * @param {(string|HTMLElement)} [options.text] - The text or HTML to display in the dialog.
+ *                                                Text is auto-converted to HTML.
+ * @param {string} [options.title] - The dialog's title.
+ * @param {boolean} [options.modal=false] - Whether to open a modal dialog. Implies draggable=false;
+ *                                          dialogClass='ui-dialog-modal'. Note that modal dialogs hijack
+ *                                          the entire screen and should only be used in specific cases.
+ *                                          If IITC is running on mobile, modal will always be true.
+ * @param {string} [options.id] - A unique ID for this dialog. If a dialog with this ID is already open,
+ *                                it will be automatically closed.
+ * @param {Function} [options.closeCallback] - A callback to run on close.
+ * @param {Function} [options.collapseCallback] - A callback to run on dialog collapse.
+ * @param {Function} [options.expandCallback] - A callback to run on dialog expansion.
+ * @param {Function} [options.collapseExpandCallback] - A callback to run on both collapse and expand.
+ *                                                      Overrides collapseCallback and expandCallback.
+ *                                                      Receives a boolean argument `collapsing`.
+ * @param {Function} [options.focusCallback] - A callback to run when the dialog gains focus.
+ * @param {Function} [options.blurCallback] - A callback to run when the dialog loses focus.
+ * @returns {jQuery} The jQuery object representing the created dialog.
  *
- * See http://docs.jquery.com/UI/API/1.8/Dialog for a list of all the options. If you previously
- * applied a class to your dialog after creating it with alert(), dialogClass may be particularly
- * useful.
+ * @see {@link http://docs.jquery.com/UI/API/1.8/Dialog} for a list of all jQuery UI Dialog options.
+ * If you previously applied a class to your dialog after creating it with alert(),
+ * dialogClass may be particularly useful.
  */
 window.dialog = function(options) {
   // Override for smartphones. Preserve default behavior and create a modal dialog.
@@ -254,8 +244,17 @@ window.dialog = function(options) {
   return dialog;
 }
 
-/* Creates an alert dialog with default settings.
- * If you want more configurability, use window.dialog instead.
+/**
+ * Creates an alert dialog with default settings. This function is a simplified wrapper around `window.dialog`.
+ * It provides a quick way to create basic alert dialogs with optional HTML content and a close callback.
+ *
+ * @function alert
+ * @param {string} text - The text or HTML content to display in the alert dialog.
+ * @param {boolean} [isHTML=false] - Specifies whether the `text` parameter should be treated as HTML.
+ *                                   If `true`, the `text` will be inserted as HTML, otherwise as plain text.
+ * @param {Function} [closeCallback] - A callback function to be executed when the alert dialog is closed.
+ *
+ * @returns {jQuery} The jQuery object representing the created alert dialog.
  */
 window.alert = function(text, isHTML, closeCallback) {
   var obj = {closeCallback: closeCallback};
