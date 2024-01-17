@@ -1,15 +1,20 @@
-// MAP DATA REQUEST CALCULATORS //////////////////////////////////////
-// Ingress Intel splits up requests for map data (portals, links,
-// fields) into tiles. To get data for the current viewport (i.e. what
-// is currently visible) it first calculates which tiles intersect.
-// For all those tiles, it then calculates the lat/lng bounds of that
-// tile and a quadkey. Both the bounds and the quadkey are “somewhat”
-// required to get complete data.
-//
-// Conversion functions courtesy of
-// http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+/**
+ * @file Contains functions for calculating map data request parameters and converting between lat/lng and map tiles.
+ * Ingress Intel splits up requests for map data (portals, links, fields) into tiles.
+ * To get data for the current viewport (i.e. what is currently visible) it first calculates which tiles intersect.
+ * For all those tiles, it then calculates the lat/lng bounds of that tile and a quadkey.
+ * Both the bounds and the quadkey are “somewhat” required to get complete data.
+ * Conversion functions courtesy of
+ * [wiki.openstreetmap.org/wiki/Slippy_map_tilenames](http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
+ * @module map_data_calc_tools
+ */
 
-
+/**
+ * Sets up the data tile parameters used for map data requests. This function initializes the TILE_PARAMS
+ * global object with default values or values detected from the stock Intel map.
+ *
+ * @function setupDataTileParams
+ */
 window.setupDataTileParams = function() {
   // default values - used to fall back to if we can't detect those used in stock intel
   var DEFAULT_ZOOM_TO_TILES_PER_EDGE = [1,1,1,40,40,80,80,320,1000,2000,2000,4000,8000,16000,16000,32000];
@@ -58,7 +63,14 @@ window.setupDataTileParams = function() {
 
 }
 
-
+/**
+ * Gets the map zoom tile parameters for a specific zoom level. It calculates the tile level, number of tiles per edge,
+ * minimum link length, and whether portals are available at the specified zoom level.
+ *
+ * @function getMapZoomTileParameters
+ * @param {number} zoom - The map zoom level.
+ * @returns {Object} An object containing tile parameters for the given zoom level.
+ */
 window.getMapZoomTileParameters = function (zoom) {
   var maxTilesPerEdge = window.TILE_PARAMS.TILES_PER_EDGE[window.TILE_PARAMS.TILES_PER_EDGE.length - 1];
 
@@ -77,7 +89,14 @@ window.getDataZoomTileParameters = function(zoom) {
   return tileParams = getMapZoomTileParameters(dataZoom);
 }
 
-
+/**
+ * Determines the data zoom level for a given map zoom level. This function adjusts the zoom level for
+ * data requests based on various factors to optimize caching performance and server load.
+ *
+ * @function getDataZoomForMapZoom
+ * @param {number} zoom - The current map zoom level.
+ * @returns {number} The adjusted zoom level for data requests.
+ */
 window.getDataZoomForMapZoom = function(zoom) {
   // we can fetch data at a zoom level different to the map zoom.
 
@@ -113,7 +132,6 @@ window.getDataZoomForMapZoom = function(zoom) {
 
   return zoom;
 }
-
 
 window.lngToTile = function(lng, params) {
   return Math.floor((lng + 180) / 360 * params.tilesPerEdge);
