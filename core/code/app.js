@@ -1,8 +1,25 @@
 /* global android, app -- eslint */
 
+/**
+ * @file This file contains the main JavaScript code for the app, including utility functions,
+ *       app-specific behaviors, and integration with the Android environment.
+ * @module app
+ */
+
+/**
+ * Global flag indicating whether the app is running as a standalone app or within a browser.
+ * @type {boolean}
+ * @memberof module:app
+ */
 var isApp = typeof app !== 'undefined' || typeof android !== 'undefined';
 window.isApp = isApp;
 
+/**
+ * Determines whether to use the interface for mobile devices depending on the application environment and device type.
+ *
+ * @function useAppPanes
+ * @returns {boolean} Returns true if app panes should be used, false otherwise.
+ */
 window.useAppPanes = function () {
   // isSmartphone is important to disable panes in desktop mode
   return isApp && app.addPane && window.isSmartphone();
@@ -24,7 +41,17 @@ if (isApp) {
   };
 }
 
-function debounce (callback, time) { // https://gist.github.com/nmsdvid/8807205#gistcomment-2641356
+/**
+ * Returns a function, that, as long as it continues to be invoked, will not be triggered.
+ * The function will be called after it stops being called for N milliseconds.
+ * source: https://gist.github.com/nmsdvid/8807205#gistcomment-2641356
+ *
+ * @function debounce
+ * @param {Function} callback - The function to debounce.
+ * @param {number} time - The debounce time in milliseconds.
+ * @returns {Function} Returns a debounced version of the given function.
+ */
+function debounce(callback, time) {
   var timeout;
   return function () {
     var context = this;
