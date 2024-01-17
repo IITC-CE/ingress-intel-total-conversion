@@ -1,13 +1,19 @@
+/**
+ * @file This file provides functions for sending AJAX requests to the Ingress API.
+ * @module send_request
+ */
 
-// posts AJAX request to Ingress API.
-// action: last part of the actual URL, the rpc/dashboard. is
-//         added automatically
-// data: JSON data to post. method will be derived automatically from
-//       action, but may be overridden. Expects to be given Hash.
-//       Strings are not supported.
-// success: method to call on success. See jQuery API docs for avail-
-//          able arguments: http://api.jquery.com/jQuery.ajax/
-// error: see above. Additionally it is logged if the request failed.
+/**
+ * Sends an AJAX POST request to the Ingress API.
+ *
+ * @function postAjax
+ * @param {string} action - The last part of the URL, automatically appended to the Ingress API endpoint.
+ * @param {Object} data - JSON data to post. The method is derived automatically from action but may be overridden.
+ *                        Expects to be given a Hash. Strings are not supported.
+ * @param {Function} successCallback - Function to call on success. See jQuery API docs for available arguments.
+ * @param {Function} errorCallback - Function to call on error. Additionally, it is logged if the request failed.
+ * @returns {jqXHR} The jQuery wrapped XMLHttpRequest object.
+ */
 window.postAjax = function(action, data, successCallback, errorCallback) {
   // state management functions... perhaps should be outside of this func?
 
@@ -85,10 +91,15 @@ window.postAjax = function(action, data, successCallback, errorCallback) {
   return result;
 }
 
-
+/**
+ * Displays a dialog prompt to the user when the IITC version is out of date.
+ * Blocks all requests while the dialog is open.
+ *
+ * @function outOfDateUserPrompt
+ */
 window.outOfDateUserPrompt = function()
 {
-  // we block all requests while the dialog is open. 
+  // we block all requests while the dialog is open.
   if (!window.blockOutOfDateRequests) {
     window.blockOutOfDateRequests = true;
 
