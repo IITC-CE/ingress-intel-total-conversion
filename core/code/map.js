@@ -1,4 +1,4 @@
-/* global log,L -- eslint */
+/* global log, L, IITC, PLAYER -- eslint */
 
 /**
  * @file This file provides functions for working with maps.
@@ -39,6 +39,16 @@ function setupCRS () {
   });
 }
 
+/**
+ * Normalizes latitude, longitude, and zoom values. Ensures that the values are valid numbers, providing
+ * defaults if necessary.
+ *
+ * @function normLL
+ * @param {number|string} lat - Latitude value or string that can be converted to a number.
+ * @param {number|string} lng - Longitude value or string that can be converted to a number.
+ * @param {number|string} zoom - Zoom level value or string that can be converted to a number.
+ * @returns {Object} An object containing normalized center (latitude and longitude) and zoom level.
+ */
 function normLL (lat, lng, zoom) {
   return {
     center: [
@@ -49,7 +59,13 @@ function normLL (lat, lng, zoom) {
   };
 }
 
-// retrieves the last shown position from URL or from a cookie
+/**
+ * Retrieves the last known map position from the URL parameters or cookies.
+ * Prioritizes URL parameters over cookies. Extracts and normalizes the latitude, longitude, and zoom level.
+ *
+ * @function getPosition
+ * @returns {Object} An object containing the map's position and zoom level, or undefined if not found.
+ */
 function getPosition () {
   var url = window.getURLParam;
 
@@ -134,6 +150,13 @@ function createDefaultBaseMapLayers () {
   return baseLayers;
 }
 
+/**
+ * Creates and returns the default overlay layers for the map.
+ * Sets up various overlay layers including portals, links, fields, and faction-specific layers.
+ *
+ * @function createDefaultOverlays
+ * @returns {Object.<String, L.LayerGroup>} An object containing overlay layers for portals, links, fields, and factions
+ */
 function createDefaultOverlays() {
   /* eslint-disable dot-notation  */
 
@@ -222,8 +245,7 @@ window.mapOptions = {
  * - Manages cookies for map position and zoom level.
  * - Handles the 'iitcLoaded' hook to set the initial map view and evaluate URL parameters for portal selection.
  *
- * @function
- * @name setupMap
+ * @function setupMap
  */
 window.setupMap = function () {
   setupCRS();
@@ -379,5 +401,3 @@ window.setupMap = function () {
   };
   */
 };
-
-/* global IITC, PLAYER */
