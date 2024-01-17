@@ -16,8 +16,7 @@
  * to remove tooltips when clicked. This is controlled by the `tooltipClearerHasBeenSetup` flag to prevent
  * multiple bindings of the event handler.
  *
- * @function
- * @name setupTooltips
+ * @function setupTooltips
  * @param {jQuery|HTMLElement} [element=document] - The jQuery or DOM element to which the tooltips will be attached.
  *                                                  If not provided, the document itself is used.
  */
@@ -43,6 +42,10 @@ window.setupTooltips = function (element) {
   }
 };
 
+/**
+ * Initializes Ingress markers with custom icons.
+ * @function setupIngressMarkers
+ */
 function setupIngressMarkers () {
   L.Icon.Default.mergeOptions({
     iconUrl: '@include_img:images/marker-ingress.png@',
@@ -87,6 +90,10 @@ function setupIngressMarkers () {
   };
 }
 
+/**
+ * Checks if the IITC is being run on the official Intel URL. If not, it displays a warning dialog.
+ * @function checkingIntelURL
+ */
 function checkingIntelURL() {
   if (window.location.hostname !== 'intel.ingress.com' && localStorage['pass-checking-intel-url'] !== 'true') {
     dialog({
@@ -106,12 +113,13 @@ function checkingIntelURL() {
   }
 }
 
-/*
-OMS doesn't cancel the original click event, so the topmost marker will get a click event while spiderfying.
-Also, OMS only supports a global callback for all managed markers. Therefore, we will use a custom event that gets fired
-for each marker.
-*/
-
+/**
+ * Sets up the OverlappingMarkerSpiderfier (OMS) library for handling overlapping markers on the map.
+ * OMS doesn't cancel the original click event, so the topmost marker will get a click event while spiderfying.
+ * Also, OMS only supports a global callback for all managed markers. Therefore, we will use a custom event that gets fired
+ * for each marker.
+ * @function setupOMS
+ */
 window.setupOMS = function() {
   window.oms = new OverlappingMarkerSpiderfier(map, {
     keepSpiderfied: true,
@@ -136,6 +144,11 @@ window.setupOMS = function() {
   }, false);
 };
 
+/**
+ * Registers a marker with the OverlappingMarkerSpiderfier to manage its click events.
+ * @function registerMarkerForOMS
+ * @param {L.Marker} marker - The Leaflet marker to be managed by OMS.
+ */
 window.registerMarkerForOMS = function (marker) {
   marker.on('add', function () {
     window.oms.addMarker(marker);
@@ -150,6 +163,11 @@ window.registerMarkerForOMS = function (marker) {
 
 // BOOTING ///////////////////////////////////////////////////////////
 
+/**
+ * Prepares plugins to load by sorting them based on their specified priority.
+ * @function prepPluginsToLoad
+ * @returns {Function} A loader function that loads plugins up to a specified priority.
+ */
 function prepPluginsToLoad () {
 
   var priorities = {
@@ -222,7 +240,9 @@ function prepPluginsToLoad () {
 }
 
 /**
- * Main boot function. This also boots the plugins using the plugin API.
+ * The main boot function that initializes IITC. It is responsible for setting up the map,
+ * loading plugins, and initializing various components of IITC.
+ * @function boot
  */
 function boot() {
   log.log('loading done, booting. Built: '+'@build_date@');
