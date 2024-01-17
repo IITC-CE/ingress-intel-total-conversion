@@ -1,9 +1,7 @@
-// MAP DATA REQUEST ///////////////////////////////////////////////////
-// class to request the map data tiles from the Ingress servers
-// and then pass it on to the render class for display purposes
-// Uses the map data cache class to reduce network requests
-
-
+/**
+ * Class for managing map data requests from the Ingress servers, caching the data, and passing it to the renderer.
+ * @class MapDataRequest
+ */
 window.MapDataRequest = function() {
   this.cache = new DataCache();
   this.render = new Render();
@@ -80,7 +78,12 @@ window.MapDataRequest = function() {
 
 }
 
-
+/**
+ * Starts the data request process, setting up hooks and callbacks.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.start = function() {
   var savedContext = this;
 
@@ -99,7 +102,12 @@ window.MapDataRequest.prototype.start = function() {
   this.cache && this.cache.startExpireInterval (15);
 }
 
-
+/**
+ * Callback for map movement start. Pauses the rendering and data requests.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.mapMoveStart = function() {
   log.log('refresh map movestart');
 
@@ -108,6 +116,12 @@ window.MapDataRequest.prototype.mapMoveStart = function() {
   this.pauseRenderQueue(true);
 }
 
+/**
+ * Handles map movement end. Determines whether new data needs to be fetched based on map bounds and zoom level.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.mapMoveEnd = function () {
   var bounds = clampLatLngBounds(map.getBounds());
 
@@ -132,6 +146,12 @@ window.MapDataRequest.prototype.mapMoveEnd = function () {
   this.refreshOnTimeout(this.MOVE_REFRESH);
 }
 
+/**
+ * Resumes data fetching and rendering after being idle.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.idleResume = function() {
   // if we have no timer set and there are no active requests, refresh has gone idle and the timer needs restarting
 
@@ -143,7 +163,12 @@ window.MapDataRequest.prototype.idleResume = function() {
   }
 }
 
-
+/**
+ * Clears the current data refresh timeout.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.clearTimeout = function() {
 
   if (this.timer) {
@@ -153,6 +178,13 @@ window.MapDataRequest.prototype.clearTimeout = function() {
   }
 }
 
+/**
+ * Sets a timeout to refresh the map data.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {number} seconds - Time in seconds to wait before refreshing the map data.
+ */
 window.MapDataRequest.prototype.refreshOnTimeout = function(seconds) {
   this.clearTimeout();
 
@@ -167,18 +199,38 @@ window.MapDataRequest.prototype.refreshOnTimeout = function(seconds) {
   this.timerExpectedTimeoutTime = new Date().getTime() + seconds*1000;
 }
 
-
+/**
+ * Sets the current status of the map data request, including a short description, long description, and progress.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {string} short - Short description of the current status.
+ * @param {string} long - Long description of the current status.
+ * @param {number} progress - Progress indicator, typically represented as a percentage.
+ */
 window.MapDataRequest.prototype.setStatus = function(short,long,progress) {
   this.status = { short: short, long: long, progress: progress };
   window.renderUpdateStatus();
 }
 
-
+/**
+ * Gets the current status of the map data request, including short description, long description, and progress.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @returns {Object} An object containing the current status of the map data request.
+ */
 window.MapDataRequest.prototype.getStatus = function() {
   return this.status;
 };
 
-
+/**
+ * Initiates the map data refresh process. This includes resetting necessary properties,
+ * preparing requests for map data, and handling cached data.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.refresh = function() {
 
   // if we're idle, don't refresh
@@ -331,6 +383,13 @@ window.MapDataRequest.prototype.refresh = function() {
   }
 }
 
+/**
+ * Delays the processing of the request queue for fetching map data tiles. The delay is specified in seconds.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {number} seconds - The delay in seconds before starting to process the request queue.
+ */
 window.MapDataRequest.prototype.delayProcessRequestQueue = function (seconds) {
   if (this.timer === undefined) {
     var _this = this;
@@ -343,7 +402,13 @@ window.MapDataRequest.prototype.delayProcessRequestQueue = function (seconds) {
   }
 }
 
-
+/**
+ * Processes the request queue for fetching map data tiles. Manages the number of simultaneous tile requests,
+ * tile error handling, and updates the request status.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.processRequestQueue = function () {
   // if nothing left in the queue, finish
   if (Object.keys(this.queuedTiles).length == 0) {
@@ -409,7 +474,14 @@ window.MapDataRequest.prototype.processRequestQueue = function () {
   this.setStatus ('loading', longText, progress);
 }
 
-
+/**
+ * Sends requests for a group of tiles to the server.
+ * Updates the debugTiles state and manages the count of active requests.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {Array} tiles - An array of tile identifiers to request.
+ */
 window.MapDataRequest.prototype.sendTileRequest = function(tiles) {
 
   var tilesList = [];
@@ -435,12 +507,21 @@ window.MapDataRequest.prototype.sendTileRequest = function(tiles) {
   var savedThis = this;
 
   // NOTE: don't add the request with window.request.add, as we don't want the abort handling to apply to map data any more
-  window.postAjax('getEntities', data, 
+  window.postAjax('getEntities', data,
     function(data, textStatus, jqXHR) { savedThis.handleResponse (data, tiles, true); },  // request successful callback
     function() { savedThis.handleResponse (undefined, tiles, false); }  // request failed callback
   );
 }
 
+/**
+ * Re-queues a tile for data fetching in case of an error or timeouts.
+ * Handles retry limits and uses stale data if available.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {string} id - The tile identifier.
+ * @param {boolean} error - Flag indicating whether the tile fetch encountered an error.
+ */
 window.MapDataRequest.prototype.requeueTile = function(id, error) {
   if (id in this.queuedTiles) {
     // tile is currently wanted...
@@ -484,7 +565,16 @@ window.MapDataRequest.prototype.requeueTile = function(id, error) {
   } // else the tile wasn't currently wanted (an old non-cancelled request) - ignore
 }
 
-
+/**
+ * Handles the response from the server for tile data requests.
+ * Processes success and error cases, manages retries for failed tiles, and updates the render queue with new data.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {Object} data - The response data from the server.
+ * @param {Array} tiles - The array of requested tile identifiers.
+ * @param {boolean} success - Flag indicating if the request was successful.
+ */
 window.MapDataRequest.prototype.handleResponse = function (data, tiles, success) {
 
   this.activeRequestCount -= 1;
@@ -625,7 +715,12 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   this.delayProcessRequestQueue(nextQueueDelay);
 }
 
-
+/**
+ * Resets the render queue, clearing existing queued render tasks and stopping any active timer.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.resetRenderQueue = function() {
   this.renderQueue = [];
 
@@ -633,10 +728,18 @@ window.MapDataRequest.prototype.resetRenderQueue = function() {
     clearTimeout(this.renderQueueTimer);
     this.renderQueueTimer = undefined;
   }
-  this.renderQueuePaused = false;  
+  this.renderQueuePaused = false;
 }
 
-
+/**
+ * Pushes a tile to the render queue for processing. The queue is processed to render entities on the map.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {string} id - The identifier of the tile.
+ * @param {Object} data - Data associated with the tile, including game entity GUIDs and entities.
+ * @param {string} status - The status of the tile, such as 'render-queue'.
+ */
 window.MapDataRequest.prototype.pushRenderQueue = function (id, data, status) {
   this.debugTiles.setState(id,'render-queue');
   this.renderQueue.push({
@@ -651,6 +754,13 @@ window.MapDataRequest.prototype.pushRenderQueue = function (id, data, status) {
   }
 }
 
+/**
+ * Starts a timer to process the render queue after a specified delay.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {number} delay - The delay in seconds before processing the render queue.
+ */
 window.MapDataRequest.prototype.startQueueTimer = function(delay) {
   if (this.renderQueueTimer === undefined) {
     var _this = this;
@@ -660,6 +770,13 @@ window.MapDataRequest.prototype.startQueueTimer = function(delay) {
   }
 }
 
+/**
+ * Pauses or resumes the render queue processing. When paused, the queue timer is cleared.
+ *
+ * @function
+ * @memberof MapDataRequest
+ * @param {boolean} pause - Flag indicating whether to pause (true) or resume (false) the render queue processing.
+ */
 window.MapDataRequest.prototype.pauseRenderQueue = function(pause) {
   this.renderQueuePaused = pause;
   if (pause) {
@@ -674,6 +791,14 @@ window.MapDataRequest.prototype.pauseRenderQueue = function(pause) {
   }
 }
 
+/**
+ * Processes the render queue, rendering entities on the map.
+ * This function handles both the rendering of new entities and the deletion of old ones.
+ * It ensures that the quantity of entities processed per cycle does not exceed a set limit.
+ *
+ * @function
+ * @memberof MapDataRequest
+ */
 window.MapDataRequest.prototype.processRenderQueue = function() {
   var drawEntityLimit = this.RENDER_BATCH_SIZE;
 
