@@ -1,0 +1,32 @@
+name: GitHub pages
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths-ignore:
+      - '!.github/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build
+        uses: andstor/jsdoc-action@v1
+        with:
+          source_dir: ./core
+          output_dir: ./out
+          config_file: jsdoc-conf.json
+          template: tui-jsdoc-template
+          front_page: README.md
+
+      - name: Deploy
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: ./out
