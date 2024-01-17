@@ -1,8 +1,16 @@
-/// PORTAL DATA TOOLS ///////////////////////////////////////////////////
-// misc functions to get portal info
+/**
+ * @file Contain misc functions to get portal info
+ * @module portal_data
+ */
 
-// search through the links data for all that link from or to a portal. returns an object with separate lists of in
-// and out links. may or may not be as accurate as the portal details, depending on how much data the API returns
+/**
+ * Search through the links data for all that link from and to a portal. Returns an object with separate lists of in
+ * and out links. May or may not be as accurate as the portal details, depending on how much data the API returns.
+ *
+ * @function getPortalLinks
+ * @param {string} guid - The GUID of the portal to search for links.
+ * @returns {Object} An object containing arrays of incoming ('in') and outgoing ('out') link GUIDs.
+ */
 window.getPortalLinks = function(guid) {
 
   var links = { in: [], out: [] };
@@ -21,13 +29,25 @@ window.getPortalLinks = function(guid) {
   return links;
 }
 
+/**
+ * Counts the total number of links (both incoming and outgoing) for a specified portal.
+ *
+ * @function getPortalLinksCount
+ * @param {string} guid - The GUID of the portal.
+ * @returns {number} The total number of links for the portal.
+ */
 window.getPortalLinksCount = function(guid) {
   var links = getPortalLinks(guid);
   return links.in.length+links.out.length;
 }
 
-
-// search through the fields for all that reference a portal
+/**
+ * Searches through the fields for all fields that reference a specified portal.
+ *
+ * @function getPortalFields
+ * @param {string} guid - The GUID of the portal to search for fields.
+ * @returns {Array} An array containing the GUIDs of fields associated with the portal.
+ */
 window.getPortalFields = function(guid) {
   var fields = [];
 
@@ -45,6 +65,13 @@ window.getPortalFields = function(guid) {
   return fields;
 }
 
+/**
+ * Counts the total number of fields associated with a specified portal.
+ *
+ * @function getPortalFieldsCount
+ * @param {string} guid - The GUID of the portal.
+ * @returns {number} The total number of fields associated with the portal.
+ */
 window.getPortalFieldsCount = function(guid) {
   var fields = getPortalFields(guid);
   return fields.length;
@@ -57,6 +84,16 @@ window.getPortalFieldsCount = function(guid) {
   var GC_LIMIT = 15000; // run garbage collector when cache has more that 5000 items
   var GC_KEEP = 10000; // keep the 4000 most recent items
 
+  /**
+   * Finds a portal GUID by its position. Searches through currently rendered portals, fields, and links.
+   * If the portal is not found in the current render, it checks a cache of recently seen portals.
+   *
+   * @function
+   * @name findPortalGuidByPositionE6
+   * @param {number} latE6 - The latitude in E6 format.
+   * @param {number} lngE6 - The longitude in E6 format.
+   * @returns {string|null} The GUID of the portal at the specified location, or null if not found.
+   */
   window.findPortalGuidByPositionE6 = function(latE6, lngE6) {
     var item = cache[latE6+","+lngE6];
     if(item) return item[0];
@@ -87,6 +124,15 @@ window.getPortalFieldsCount = function(guid) {
     return null;
   };
 
+  /**
+   * Pushes a portal GUID and its position into a cache.
+   *
+   * @function
+   * @name pushPortalGuidPositionCache
+   * @param {string} guid - The GUID of the portal.
+   * @param {number} latE6 - The latitude in E6 format.
+   * @param {number} lngE6 - The longitude in E6 format.
+   */
   window.pushPortalGuidPositionCache = function(guid, latE6, lngE6) {
     cache[latE6+","+lngE6] = [guid, Date.now()];
     cache_level += 1;
