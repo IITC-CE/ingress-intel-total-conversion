@@ -1,5 +1,15 @@
 /* global script_info, app, log, L */
+/**
+ * @file This file contains functions related to the 'About IITC' dialog.
+ * @module dialog_about
+ */
 
+/**
+ * Displays the 'About IITC' dialog.
+ * This dialog includes the IITC version, a list of loaded plugins, and other relevant information.
+ *
+ * @function
+ */
 window.aboutIITC = function() {
   var html = createDialogContent();
 
@@ -12,6 +22,12 @@ window.aboutIITC = function() {
   });
 }
 
+/**
+ * Creates the content for the 'About IITC' dialog.
+ *
+ * @function
+ * @returns {string} HTML content for the about dialog.
+ */
 function createDialogContent() {
   var html = `<div><b>About IITC</b></div>
               <div>Ingress Intel Total Conversion</div>
@@ -46,7 +62,12 @@ function createDialogContent() {
   return html;
 }
 
-
+/**
+ * Retrieves a list of plugins currently loaded in IITC. The list includes plugin names, versions, and descriptions.
+ *
+ * @function
+ * @returns {string} Formatted list of plugins in HTML.
+ */
 function getPlugins() {
   var pluginsInfo = window.bootPlugins.info;
 
@@ -65,6 +86,14 @@ function getPlugins() {
   return plugins;
 }
 
+/**
+ * Converts plugin information into a structured object for easier processing.
+ *
+ * @function
+ * @param {Object} info - The plugin information object.
+ * @param {number} index - The index of the plugin in the array.
+ * @returns {Object} Structured plugin information.
+ */
 function convertPluginInfo(info, index) {
   // Plugins metadata come from 2 sources:
   // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
@@ -104,6 +133,13 @@ function convertPluginInfo(info, index) {
   return result;
 }
 
+/**
+ * Creates a changelog section for a given plugin.
+ *
+ * @function
+ * @param {Object} plugin - The plugin for which to create the changelog.
+ * @returns {string} HTML string representing the changelog.
+ */
 function createChangelog(plugin) {
   var id = 'plugin-changelog-' + plugin.id;
   return (
@@ -128,6 +164,14 @@ function createChangelog(plugin) {
   );
 }
 
+/**
+ * Converts plugin information into a string format suitable for display in the 'About IITC' dialog.
+ *
+ * @function
+ * @param {Object} p - The plugin information object.
+ * @param {string} extra - Additional version information.
+ * @returns {string} Formatted plugin information string.
+ */
 function pluginInfoToString(p, extra) {
   var info = {
     changelog: '',
@@ -153,24 +197,51 @@ function pluginInfoToString(p, extra) {
   return L.Util.template('<li class="{class}" title="{description}">{name}{verinfo} {changelog}</li>', info);
 }
 
-
+/**
+ * Checks if a given plugin is a standard plugin based on the build name and date.
+ * Standard plugins are those that match the build and date of the main IITC script.
+ *
+ * @function
+ * @param {Object} plugin - The plugin object to check.
+ * @returns {boolean} True if the plugin is standard, false otherwise.
+ */
 function isStandardPlugin(plugin) {
   return (plugin.build === script_info.buildName && plugin.date === script_info.dateTimeVersion);
 }
 
-
+/**
+ * Retrieves the IITC version string.
+ *
+ * @function
+ * @returns {string} The IITC version string.
+ */
 function getIITCVersion() {
   var iitc = script_info;
   return (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
 }
 
-
+/**
+ * Extracts the additional version information from the IITC script version.
+ *
+ * @function
+ * @returns {string} The additional version information, if any.
+ */
 function getIITCVersionAddition() {
   var extra = script_info.script && script_info.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
   return extra && extra[1];
 }
 
-
+/**
+ * Formats version information for plugins and the main script.
+ * If an 'extra' parameter is provided and matches the end of the version string, it is removed.
+ * This is used to cut off a common timestamp appended to versions.
+ * The function also prepares a tooltip showing the build number and date, if available.
+ *
+ * @function formatVerInfo
+ * @param {Object} p - The plugin or script object containing version information.
+ * @param {string} [extra] - An optional extra string to be removed from the version information.
+ * @returns {string} Formatted version string with optional HTML tooltip.
+ */
 function formatVerInfo(p, extra) {
   if (p.version && extra) {
     var cutPos = p.version.length - extra.length;
@@ -194,7 +265,14 @@ function formatVerInfo(p, extra) {
   return '';
 }
 
-
+/**
+ * Checks if the browser's local storage is running short on available space.
+ * This function tries to write a specific amount of data to the local storage and captures any errors.
+ * If an error occurs, it is an indication that the local storage has limited free space left.
+ *
+ * @function
+ * @returns {boolean} Returns `true` if the local storage is running short on space, otherwise `false`.
+ */
 function isShortOnLocalStorage() {
   var MINIMUM_FREE_SPACE = 100000;
   try {
