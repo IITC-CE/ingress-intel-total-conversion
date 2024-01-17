@@ -1,30 +1,55 @@
-/// PORTAL DETAIL //////////////////////////////////////
-// code to retrieve the new portal detail data from the servers
-
-// NOTE: the API for portal detailed information is NOT FINAL
-// this is a temporary measure to get things working again after a major change to the intel map
-// API. expect things to change here
-
+/**
+ * @file Provides functionality to handle portal details, including caching and server requests.
+ * @namespace window.portalDetail
+ */
 
 var cache;
 var requestQueue = {};
 
 window.portalDetail = function() {};
 
+/**
+ * Sets up the portal detail handler, initializing the cache.
+ *
+ * @function window.portalDetail.setup
+ */
 window.portalDetail.setup = function() {
   cache = new DataCache();
 
   cache.startExpireInterval(20);
 }
 
+/**
+ * Retrieves portal details from cache by GUID.
+ *
+ * @function window.portalDetail.get
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @returns Cached portal details if available.
+ */
 window.portalDetail.get = function(guid) {
   return cache.get(guid);
 }
 
+/**
+ * Stores portal details in the cache.
+ *
+ * @function window.portalDetail.store
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @param {object} dict - The portal detail data.
+ * @param {number} freshtime - Optional freshness time for cache.
+ * @returns Result of cache storage operation.
+ */
 window.portalDetail.store = function (guid, dict, freshtime) {
   return cache.store(guid, dict, freshtime);
 };
 
+/**
+ * Checks if portal details are fresh in the cache.
+ *
+ * @function window.portalDetail.isFresh
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @returns {boolean} True if details are fresh, false otherwise.
+ */
 window.portalDetail.isFresh = function(guid) {
   return cache.isFresh(guid);
 }
@@ -72,6 +97,14 @@ var doRequest = function(deferred, guid) {
   );
 }
 
+/**
+ * Requests detailed information for a specific portal. If the information is not already being requested,
+ * it initiates a new request. Returns a promise that resolves with the portal details.
+ *
+ * @function window.portalDetail.request
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @returns {Promise} A promise that resolves with the portal details upon successful retrieval or rejection on failure.
+ */
 window.portalDetail.request = function(guid) {
   if (!requestQueue[guid]) {
     var deferred = $.Deferred();
