@@ -1,51 +1,86 @@
-// ORNAMENTS ///////////////////////////////////////////////////////
-
-// Added as part of the Ingress #Helios in 2014, ornaments
-// are additional image overlays for portals.
-// currently there are 6 known types of ornaments: ap$x$suffix
-// - cluster portals (without suffix)
-// - volatile portals (_v)
-// - meeting points (_start)
-// - finish points (_end)
-//
-// Beacons and Frackers were introduced at the launch of the Ingress
-// ingame store on November 1st, 2015
-// - Beacons (pe$TAG - $NAME) ie: 'peNIA - NIANTIC'
-// - Frackers ('peFRACK')
-// (there are 7 different colors for each of them)
-//
-// Ornament IDs are dynamic. NIANTIC might change them at any time without prior notice.
-// New ornamnent IDs found on the map will be recorded and saved to knownOrnaments from
-// which the Ornaments dialog will be filled with checked checkboxes.
-// To exclude a set of ornaments, even if they have not yet shown up on the map, the user
-// can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
-// future IDs. example: "ap" to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)
-
 /* global L, dialog, log */
 
+/**
+ * @namespace window.ornaments
+ * @description Manages the overlay of additional images (ornaments) on portals, such as beacons, frackers,
+ * and anomaly markers.
+ *
+ * Added as part of the Ingress #Helios in 2014, ornaments are additional image overlays for portals.
+ * currently there are 6 known types of ornaments: `ap$x$suffix`
+ * - `cluster portals` (without suffix)
+ * - `volatile portals` (_v)
+ * - `meeting points` (_start)
+ * - `finish points` (_end)
+ *
+ * Beacons and Frackers were introduced at the launch of the Ingress ingame store on November 1st, 2015
+ * - `Beacons` (pe$TAG - $NAME) ie: `peNIA - NIANTIC`
+ * - `Frackers` ('peFRACK')
+ * (there are 7 different colors for each of them)
+ *
+ * Ornament IDs are dynamic. NIANTIC might change them at any time without prior notice.
+ * New ornamnent IDs found on the map will be recorded and saved to knownOrnaments from
+ * which the Ornaments dialog will be filled with checked checkboxes.
+ * To exclude a set of ornaments, even if they have not yet shown up on the map, the user
+ * can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
+ * future IDs. example: "ap" to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)
+ */
 window.ornaments = {
-
+  /**
+   * Default size for ornament.
+   * @constant
+   * @type {number}
+   */
   OVERLAY_SIZE: 60,
+
+  /**
+   * Default opacity for ornament.
+   * @constant
+   * @type {number}
+   */
   OVERLAY_OPACITY: 0.6,
-  // The icon object holds optional definitions for the ornaments an beacons. The object shall
-  // be filled from a plugin
-  // 'ornamentID' : {
-  //   name: 'meaningful name',     // shows up in dialog
-  //   layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
-  //                                // ornament will be in "Ornaments"
-  //   url: 'url',                  // from which the image will be taken, optional,
-  //                                // 84x84px is default, if not set, stock images will be
-  //                                // used
-  //   offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
-  //                                // dx (vertical)and dy )horizontal.
-  //                                // [0, 0.5] to place right above the portal.
-  //                                // default is [0, 0] to center
-  //   opacity: 0..1                // optional, default is 0.6
-  // }
+
+  /**
+   * Object holding optional definitions for ornaments and beacons.
+   * The icon object holds optional definitions for the ornaments an beacons. The object shall
+   * be filled from a plugin
+   * ```
+   * 'ornamentID' : {
+   *   name: 'meaningful name',     // shows up in dialog
+   *   layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
+   *                                // ornament will be in "Ornaments"
+   *   url: 'url',                  // from which the image will be taken, optional,
+   *                                // 84x84px is default, if not set, stock images will be
+   *                                // used
+   *   offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
+   *                                // dx (vertical)and dy )horizontal.
+   *                                // [0, 0.5] to place right above the portal.
+   *                                // default is [0, 0] to center
+   *   opacity: 0..1                // optional, default is 0.6
+   * }
+   * ```
+   *
+   * @property {object} icon - The icon object for ornaments and beacons.
+   */
   icon:{},
+
+  /**
+   * List of ornaments to be excluded.
+   * @property {string[]} excludedOrnaments - Patterns to be excluded from display.
+   */
   excludedOrnaments: [],
+
+  /**
+   * List of known ornaments.
+   * @property {object} knownOrnaments - Object tracking known ornaments.
+   */
   knownOrnaments: {},
 
+  /**
+   * Sets up the ornament layer and necessary event handlers.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   setup: function () {
     this._portals = {};
     this.layerGroup = L.layerGroup;
@@ -70,11 +105,26 @@ window.ornaments = {
       click: window.ornaments.ornamentsOpt})
       .appendTo('#toolbox');
   },
+
+  /**
+   * Creates a new layer for a given ornament ID.
+   *
+   * @function
+   * @memberof window.ornaments
+   * @param {string} layerID - The ID for the new layer.
+   */
   createLayer: function (layerID) {
     window.ornaments.layers[layerID] = window.ornaments.layerGroup();
     window.layerChooser.addOverlay(window.ornaments.layers[layerID], layerID);
   },
 
+  /**
+   * Adds ornament overlays to the specified portal.
+   *
+   * @function
+   * @memberof window.ornaments
+   * @param {object} portal - The portal to which ornaments are added.
+   */
   addPortal: function (portal) {
     this.removePortal(portal);
     var ornaments = portal.options.data.ornaments;
@@ -138,6 +188,13 @@ window.ornaments = {
     }
   },
 
+  /**
+   * Removes ornament overlays from the specified portal.
+   *
+   * @function
+   * @memberof window.ornaments
+   * @param {object} portal - The portal from which ornaments are removed.
+   */
   removePortal: function (portal) {
     var guid = portal.options.guid;
     if (this._portals[guid]) {
@@ -147,11 +204,24 @@ window.ornaments = {
       delete this._portals[guid];
     }
   },
+
+  /**
+   * Initializes known ornaments.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   initOrnaments: function () {
     this.knownOrnaments = {};
     this.save();
   },
 
+  /**
+   * Loads ornament data from localStorage.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   load: function () {
     var dataStr;
     try {
@@ -174,18 +244,35 @@ window.ornaments = {
 
   },
 
+  /**
+   * Saves the current ornament configuration to localStorage.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   save: function () {
     localStorage['excludedOrnaments'] = JSON.stringify(this.excludedOrnaments);
     localStorage['knownOrnaments'] = JSON.stringify(this.knownOrnaments);
   },
 
-  // reload: addPortal also calls removePortal
+  /**
+   * Reloads all ornaments on the map.
+   * @function
+   * @memberof window.ornaments
+   */
   reload: function () {
+    // reload: addPortal also calls removePortal
     for (var guid in window.ornaments._portals) {
       window.ornaments.addPortal(window.portals[guid]);
     }
   },
 
+  /**
+   * Processes input data for managing ornaments.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   processInput: function () {
     window.ornaments.excludedOrnaments = $('#ornaments_E').val().split(/[\s,]+/);
     window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) { return ornamentCode !== ''; });
@@ -196,6 +283,13 @@ window.ornaments = {
     }
   },
 
+  /**
+   * Generates a list of ornaments for display in the options dialog.
+   *
+   * @function
+   * @memberof window.ornaments
+   * @returns {string} HTML string representing the list of ornaments.
+   */
   ornamentsList: function() {
     var text ='';
     var sortedIDs = Object.keys(window.ornaments.knownOrnaments).sort();
@@ -215,10 +309,22 @@ window.ornaments = {
     return text;
   },
 
+  /**
+   * Replaces the content of the ornaments list in the dialog.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   replaceOL: function () {
     document.getElementById('ornamentsList').innerHTML = window.ornaments.ornamentsList();
   },
 
+  /**
+   * Handles changes in ornament options and updates the map accordingly.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   onChangeHandler: function () {
     window.ornaments.processInput();
     window.ornaments.replaceOL();
@@ -226,6 +332,12 @@ window.ornaments = {
     window.ornaments.reload();
   },
 
+  /**
+   * Opens the dialog for ornament options, allowing users to manage ornament visibility.
+   *
+   * @function
+   * @memberof window.ornaments
+   */
   ornamentsOpt: function () {
     var excludedIDs = window.ornaments.excludedOrnaments.join(',');
     var html = '<div class="ornamentsOpts">'
