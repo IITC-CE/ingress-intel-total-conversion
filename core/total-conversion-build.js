@@ -40,6 +40,11 @@ window.script_info.changelog = [
 ];
 
 /**
+ * PLAYER
+ * @namespace player
+ */
+
+/**
  * window.PLAYER
  * Represents the current player's status in the game. This object is defined by stock and is static,
  * meaning it requires a page reload to update. The PLAYER object stores various pieces of information
@@ -61,6 +66,7 @@ window.script_info.changelog = [
  * @property {number} level - Backwards compatibility property, equivalent to `verified_level`. Added by IITC.
  *
  * @typedef {Object} PLAYER
+ * @memberof player
  */
 
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
@@ -639,6 +645,11 @@ window.links = {};
  * @memberof storage_variables
  */
 window.fields = {};
+
+/**
+ * @class L
+ * @description Root class for all Leaflet-related functionalities, extended with custom methods and properties.
+ */
 
 // plugin framework. Plugins may load earlier than iitc, so don’t
 // overwrite data
