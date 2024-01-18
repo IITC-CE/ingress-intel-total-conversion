@@ -22,6 +22,7 @@ window.plugin.machinaTools = machinaTools;
 // removing specific circles from layers.  Keyed by GUID.
 machinaTools.portalCircles = {}; // usual circles
 machinaTools._clusterDialogs = {}; // cluster dialogs
+machinaTools._maxLinks = Array(9).fill(0);
 machinaTools.optConflictZone = {
   color: 'red',
   opacity: 0.7,
@@ -252,6 +253,32 @@ function createChildListItem(parent, childData, childPortal) {
   return childListItem;
 }
 
+function getLinkLengths(clusterPortals, initialValue = Array(9).fill(0)) {
+  return Object.values(clusterPortals)
+    .filter((p) => !!p.children)
+    .reduce((previousValue, currentValue) => {
+      previousValue[currentValue.level] = Math.max(previousValue[currentValue.level], ...currentValue.children.map((c) => c.length));
+      return previousValue;
+    }, initialValue);
+}
+
+function renderLinkLen(len, i, offset) {
+  var index = i + offset;
+  var lenElement = $('<div>', { class: 'machina-link-length' }).text(`L${index}: ${window.formatDistance(len)}`);
+  var maxRange = window.LINK_RANGE_MAC[index];
+  if (len > maxRange) {
+    lenElement.addClass('exceeded');
+    lenElement.prop('title', 'Link length exceeded expected range - ' + window.formatDistance(maxRange));
+  } else {
+    lenElement.prop('title', window.formatDistance(maxRange));
+  }
+  return lenElement;
+}
+
+machinaTools.linkMaxLengthsHtml = function (linkLengths, offset = 0) {
+  return $('<div>', { class: 'machina-link-lengths' }).append(linkLengths.map((elem, index) => renderLinkLen(elem, index, offset)));
+};
+
 machinaTools.clusterDisplayNode = function (clusterPortals) {
   var rc = $('<div>');
   for (var guid in clusterPortals) {
@@ -283,6 +310,7 @@ function doDisplayClusterInfo(seed) {
   if (seed) {
     guid = seed.guid;
     var cluster = machinaTools.gatherCluster(seed);
+    html.append(machinaTools.linkMaxLengthsHtml(getLinkLengths(cluster)));
     html.append(machinaTools.clusterDisplayNode(cluster));
     html.append('<br/><pre>' + JSON.stringify(cluster, null, 4) + '</pre>');
   } else {
@@ -421,24 +449,29 @@ machinaTools.portalRemoved = function (data) {
   machinaTools.removePortalExclusion(data.portal.options.guid);
 };
 
+function toggleLayerChooser(name, enable) {
+  if (enable) {
+    $(`.leaflet-control-layers-list span:contains("${name}")`).parent('label').removeClass('disabled').attr('title', '');
+  } else {
+    $(`.leaflet-control-layers-list span:contains("${name}")`).parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+  }
+}
+
 /**
  * Hides or shows the circle display layer as requested.
  */
-machinaTools.showOrHideMachinaLevelUpRadius = function () {
+machinaTools.zoomEnded = function () {
   if (machinaTools.zoomLevelHasPortals()) {
     // Add the circle layer back to the display layer if necessary, and remove the disabled mark.
     if (!machinaTools.displayLayer.hasLayer(machinaTools.circleDisplayLayer)) {
       machinaTools.displayLayer.addLayer(machinaTools.circleDisplayLayer);
-      $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")').parent('label').removeClass('disabled').attr('title', '');
+      toggleLayerChooser('Machina Level Up Link Radius', true);
     }
   } else {
     // Remove the circle layer from the display layer if necessary, and add the disabled mark.
     if (machinaTools.displayLayer.hasLayer(machinaTools.circleDisplayLayer)) {
       machinaTools.displayLayer.removeLayer(machinaTools.circleDisplayLayer);
-      $('.leaflet-control-layers-list span:contains("Machina Level Up Link Radius")')
-        .parent('label')
-        .addClass('disabled')
-        .attr('title', 'Zoom in to show those.');
+      toggleLayerChooser('Machina Level Up Link Radius', false);
     }
   }
 };
@@ -530,6 +563,8 @@ function refreshDialogs(guid) {
   if (machinaTools._clustersInfoDialog) {
     machinaTools._clustersInfoDialog.html(createClustersInfoDialog());
   }
+
+  machinaTools.refreshLinkLengths();
 }
 
 machinaTools.showConflictAreaInfoDialog = function () {
@@ -610,24 +645,29 @@ function appendChildrenList(appendTo, leaf, clusterPortals) {
 function createClustersInfoDialog() {
   var html = $('<div>');
   var seeds = [];
-  Object.values(window.portals)
+  var linkLengths;
+  var htmlLines = Object.values(window.portals)
     .filter((p) => p.options.team === window.TEAM_MAC && map.getBounds().contains(p.getLatLng()))
-    .forEach((p) => {
+    .map((p) => {
       var seedData = machinaTools.findSeed(p.options.guid);
       if (!seeds.find((s) => s.guid === seedData.guid)) {
         seeds.push(seedData);
         var clusterPortals = machinaTools.gatherCluster(seedData);
+        linkLengths = getLinkLengths(clusterPortals, linkLengths);
         var seed = clusterPortals[seedData.guid];
         if (seed) {
           var portalSection = $('<div>');
-          portalSection.appendTo(html);
           appendPortalLine(portalSection, seed);
           appendChildrenList(portalSection, seed, clusterPortals);
+          return portalSection;
         }
       }
-    });
-
-  if (!html.children().length) {
+    })
+    .filter((v) => !!v);
+  if (htmlLines.length && linkLengths.length) {
+    html.append(machinaTools.linkMaxLengthsHtml(linkLengths));
+    html.append(htmlLines);
+  } else {
     html.append('No Clusters found.');
   }
   return html;
@@ -646,10 +686,74 @@ machinaTools.showClustersDialog = function () {
   });
 };
 
+function saveLinkBoxPosition(pos) {
+  window.localStorage['MACHINA_MAX_LINKS_BOX_POSITION'] = JSON.stringify(pos);
+}
+
+function loadLinkBoxPosition() {
+  var storedPosition = window.localStorage['MACHINA_MAX_LINKS_BOX_POSITION'];
+  var parsedData = {};
+  if (storedPosition) {
+    parsedData = JSON.parse(storedPosition);
+  }
+  return {
+    top: parsedData.top || 100,
+    left: parsedData.left || 100,
+  };
+}
+
+machinaTools.refreshLinkLengths = function () {
+  if (map.hasLayer(machinaTools.linkLengthsLayer)) {
+    machinaTools.removeLinkLengths();
+    machinaTools._maxLinks[0] = 0;
+    machinaTools._maxLinks = Object.values(window.links)
+      .filter((l) => l.options.team === window.TEAM_MAC && map.getBounds().contains(L.latLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6)))
+      .reduce((previousValue, link) => {
+        var origin = window.portals[link.options.data.oGuid];
+        if (origin && origin.options.data.resCount === 8) {
+          var level = origin.options.level;
+          var points = link.getLatLngs();
+          var linkLength = points[0].distanceTo(points[1]);
+          previousValue[level] = Math.max(previousValue[level], linkLength);
+        }
+        return previousValue;
+      }, machinaTools._maxLinks);
+    var html = machinaTools.linkMaxLengthsHtml(machinaTools._maxLinks.slice(1), 1);
+    html.prop('id', 'machina-links-overlay-drag-handle');
+    if (machinaTools._maxLinks[0] > 0) {
+      $('<div>', { class: 'warning', title: 'Data incomplete - some origin portals not loaded' }).text('🔴').appendTo(html);
+    }
+
+    if (window.isSmartphone()) {
+      html.addClass('mobile');
+      var LinksView = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd: () => html[0],
+      });
+      var ctrl = new LinksView();
+      ctrl.addTo(window.map);
+    } else {
+      $('body').append(html);
+      var boxPosition = loadLinkBoxPosition();
+      html.css({ top: boxPosition.top, left: boxPosition.left });
+      html.draggable({
+        stop: (event, ui) => {
+          saveLinkBoxPosition(ui.position);
+        },
+      });
+    }
+  }
+};
+
+machinaTools.removeLinkLengths = function () {
+  $('#machina-links-overlay-drag-handle').remove();
+};
+
 function setupLayers() {
   // This layer is added to the layer chooser, to be toggled on/off
   machinaTools.displayLayer = new L.LayerGroup([], { minZoom: 15 });
   machinaTools.conflictLayer = new L.LayerGroup();
+  machinaTools.linkLengthsLayer = new L.LayerGroup([]);
 
   // This layer is added into the above layer, and removed from it when we zoom out too far.
   machinaTools.circleDisplayLayer = new L.LayerGroup();
@@ -670,9 +774,13 @@ function setupLayers() {
     machinaTools.clearConflictArea();
   });
 
+  machinaTools.linkLengthsLayer.on('add', machinaTools.refreshLinkLengths);
+  machinaTools.linkLengthsLayer.on('remove', machinaTools.removeLinkLengths);
+
   // Add the base layer to the main window.
   window.layerChooser.addOverlay(machinaTools.displayLayer, 'Machina Level Up Link Radius', { default: false });
   window.layerChooser.addOverlay(machinaTools.conflictLayer, 'Machina Conflict Area', { default: false });
+  window.layerChooser.addOverlay(machinaTools.linkLengthsLayer, 'Machina Longest Links', { default: false });
 }
 
 function setupHooks() {
@@ -684,7 +792,7 @@ function setupHooks() {
   window.addHook('mapDataRefreshEnd', machinaTools.mapDataRefreshEnd);
 
   // Add a hook to trigger the showOrHide method when the map finishes zooming or reloads.
-  map.on('zoomend', machinaTools.showOrHideMachinaLevelUpRadius);
+  map.on('zoomend', machinaTools.zoomEnded);
 }
 
 function setupToolBoxLinks() {
