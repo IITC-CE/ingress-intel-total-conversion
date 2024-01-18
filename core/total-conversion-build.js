@@ -8,6 +8,10 @@
 window.script_info = plugin_info;
 window.script_info.changelog = [
   {
+    version: '0.38.0',
+    changes: ['Function marked deprecated: portalApGainMaths, getPortalApGain, potentialPortalLevel, findPortalLatLng'],
+  },
+  {
     version: '0.37.1',
     changes: ['New machina ranges according to latest research - https://linktr.ee/machina.research'],
   },

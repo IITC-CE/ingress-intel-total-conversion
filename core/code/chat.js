@@ -1,19 +1,5 @@
-window.chat = function() {};
-
-//WORK IN PROGRESS - NOT YET USED!!
-window.chat.commTabs = [
-// channel: the COMM channel ('tab' parameter in server requests)
-// name: visible name
-// inputPrompt: string for the input prompt
-// inputColor: (optional) color for input
-// sendMessage: (optional) function to send the message (to override the default of sendPlext)
-// globalBounds: (optional) if true, always use global latLng bounds
-  {channel:'all', name:'All', inputPrompt: 'broadcast:', inputColor:'#f66'},
-  {channel:'faction', name:'Aaction', inputPrompt: 'tell faction:'},
-  {channel:'alerts', name:'Alerts', inputPrompt: 'tell Jarvis:', inputColor: '#666', globalBounds: true, sendMessage: function() {
-    alert("Jarvis: A strange game. The only winning move is not to play. How about a nice game of chess?\n(You can't chat to the 'alerts' channel!)");
-  }},
-];
+window.chat = function () {};
+var chat = window.chat;
 
 
 window.chat.handleTabCompletion = function() {
@@ -185,7 +171,7 @@ window.chat.handleFaction = function(data, olderMsgs, ascendingTimestampOrder) {
   $('#chatfaction').data('needsClearing', null);
 
   var old = chat._faction.oldestGUID;
-  chat.writeDataToHash(data, chat._faction, false, olderMsgs, ascendingTimestampOrder);
+  chat.writeDataToHash(data, chat._faction, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._faction.oldestGUID;
 
   runHooks('factionChatDataAvailable', {raw: data, result: data.result, processed: chat._faction.data});
@@ -238,7 +224,7 @@ window.chat.handlePublic = function(data, olderMsgs, ascendingTimestampOrder) {
   $('#chatall').data('needsClearing', null);
 
   var old = chat._public.oldestGUID;
-  chat.writeDataToHash(data, chat._public, undefined, olderMsgs, ascendingTimestampOrder);   //NOTE: isPublic passed as undefined - this is the 'all' channel, so not really public or private
+  chat.writeDataToHash(data, chat._public, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._public.oldestGUID;
 
   runHooks('publicChatDataAvailable', {raw: data, result: data.result, processed: chat._public.data});
@@ -288,7 +274,7 @@ window.chat.handleAlerts = function(data, olderMsgs, ascendingTimestampOrder) {
   if(data.result.length === 0) return;
 
   var old = chat._alerts.oldestTimestamp;
-  chat.writeDataToHash(data, chat._alerts, undefined, olderMsgs, ascendingTimestampOrder); //NOTE: isPublic passed as undefined - it's nether public or private!
+  chat.writeDataToHash(data, chat._alerts, olderMsgs, ascendingTimestampOrder);
   var oldMsgsWereAdded = old !== chat._alerts.oldestTimestamp;
 
   // hook for alerts - API change planned here for next refactor
@@ -407,7 +393,7 @@ window.chat.parseMsgData = function (data) {
   };
 };
 
-window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, isOlderMsgs, isAscendingOrder) {
+window.chat.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAscendingOrder) {
   window.chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
   newData.result.forEach(function(json) {
@@ -788,9 +774,6 @@ window.chat.chooseTab = function(tab) {
 
       chat.renderAlerts(false);
       break;
-
-    default:
-      throw new Error('chat.chooser was asked to handle unknown button: ' + tt);
   }
 }
 
@@ -923,7 +906,6 @@ window.chat.setupPosting = function() {
         }
       } catch (e) {
         log.error(e);
-        //if (e.stack) { console.error(e.stack); }
       }
     });
   }
