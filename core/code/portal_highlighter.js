@@ -73,7 +73,7 @@ window.updatePortalHighlighterControl = function() {
     $("#portal_highlight_select").append($("<option>").attr('value',_no_highlighter).text(_no_highlighter));
     var h_names = Object.keys(_highlighters).sort();
 
-    $.each(h_names, function(i, name) {
+    $.each(h_names, function (i, name) {
       $("#portal_highlight_select").append($("<option>").attr('value',name).text(name));
     });
 
@@ -115,7 +115,6 @@ window.changePortalHighlights = function(name) {
  * @param {Object} p - The portal object to be highlighted.
  */
 window.highlightPortal = function(p) {
-
   if(_highlighters !== null && _highlighters[_current_highlighter] !== undefined) {
     _highlighters[_current_highlighter].highlight({portal: p});
   }

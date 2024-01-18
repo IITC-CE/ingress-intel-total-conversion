@@ -536,7 +536,7 @@ window.chat.parseMsgData = function (data) {
  * @param {boolean} isOlderMsgs - Whether the new data contains older messages.
  * @param {boolean} isAscendingOrder - Whether the new data is in ascending order.
  */
-window.chat.writeDataToHash = function(newData, storageHash, isOlderMsgs, isAscendingOrder) {
+window.chat.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAscendingOrder) {
   window.chat.updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
   newData.result.forEach(function(json) {
