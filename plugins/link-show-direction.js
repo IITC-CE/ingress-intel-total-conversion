@@ -1,12 +1,16 @@
 // @author         jonatkins
 // @name           Direction of links on map
 // @category       Tweaks
-// @version        0.2.2
+// @version        0.2.3
 // @description    Show the direction of links on the map by adding short dashes to the line at the origin portal.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.2.3',
+    changes: ['Default value for link show direction mode was set to Static near origin'],
+  },
   {
     version: '0.2.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
@@ -161,11 +165,12 @@ window.plugin.linkShowDirection.setup  = function() {
 
   addHook('linkAdded', function(data) { window.plugin.linkShowDirection.addLinkStyle(data.link); });
 
+  const default_mode = 'Static near origin';
   try {
-    window.plugin.linkShowDirection.mode = localStorage['plugin-linkshowdirection-mode'];
-  } catch(e) {
+    window.plugin.linkShowDirection.mode = localStorage['plugin-linkshowdirection-mode'] || default_mode;
+  } catch (e) {
     console.warn(e);
-    window.plugin.linkShowDirection.mode = 'Disabled';
+    window.plugin.linkShowDirection.mode = default_mode;
   }
 
   window.plugin.linkShowDirection.animateLinks();
