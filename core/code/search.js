@@ -402,8 +402,7 @@ addHook('search', function(query) {
 });
 
 // search for guid
-window.search.addResult = function (query, data) {
-  const guid = data.guid;
+window.search.addGuidResult = function (query, data, guid) {
   const teams = ['NEU', 'RES', 'ENL'];
   const team = window.teamStringToId(data.team);
   query.addResult({
@@ -422,8 +421,8 @@ window.search.addResult = function (query, data) {
       if (event.type === 'dblclick') {
         window.zoomToAndShowPortal(guid, result.position);
       } else if (window.portals[guid]) {
-        if (!window.map.getBounds().contains(result.position))
-          window.map.setView(result.position);
+        if (!map.getBounds().contains(result.position))
+          map.setView(result.position);
         window.renderPortalDetails(guid);
       } else {
         window.selectPortalByLatLng(result.position);
@@ -439,10 +438,10 @@ addHook('search', function (query) {
   if (res) {
     const guid = res[0];
     const data = window.portalDetail.get(guid);
-    if (data) window.search.addResult(query, data);
+    if (data) window.search.addGuidResult(query, data, guid);
     else {
       window.portalDetail.request(guid).then(function (data) {
-        window.search.addResult(query, data);
+        window.search.addGuidResult(query, data, guid);
       });
     }
   }
