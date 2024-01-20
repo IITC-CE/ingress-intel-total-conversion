@@ -278,11 +278,11 @@ addHook('search', function(query) {
         position: portal.getLatLng(),
         icon: 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-portal.svg@'.replace(/%COLOR%/g, color)),
         onSelected: function(result, event) {
-          if(event.type == 'dblclick') {
-            zoomToAndShowPortal(guid, portal.getLatLng());
+          if (event.type === 'dblclick') {
+            window.zoomToAndShowPortal(guid, portal.getLatLng());
           } else if(window.portals[guid]) {
             if(!map.getBounds().contains(result.position)) map.setView(result.position);
-            renderPortalDetails(guid);
+            window.renderPortalDetails(guid);
           } else {
             window.selectPortalByLatLng(portal.getLatLng());
           }
@@ -297,7 +297,7 @@ addHook('search', function(query) {
 // search for locations
 // TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
 addHook('search', function(query) {
-var locations = query.term.replaceAll(/%2[cC]/, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
+var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   var added = {};
   if(!locations) return;
   locations.forEach(function(location) {
