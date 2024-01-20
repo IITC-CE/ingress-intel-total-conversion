@@ -116,7 +116,7 @@ window.search.Query.prototype.addResult = function(result) {
       .append($('<em>')
         .append(result.description));
   }
-  
+
 };
 
 window.search.Query.prototype.resultLayer = function(result) {
@@ -359,7 +359,7 @@ addHook('search', function(query) {
     data.forEach(function(item) {
       if(resultMap[item.place_id]) { return; } // duplicate
       resultMap[item.place_id] = true;
-      
+
       var result = {
         title: item.display_name,
         description: 'Type: ' + item.type,
@@ -393,11 +393,11 @@ addHook('search', function(query) {
       query.addResult(result);
     });
   }
-  
+
   // Bounded search allows amenity-only searches (e.g. "amenity=toilet") via special phrases
   // http://wiki.openstreetmap.org/wiki/Nominatim/Special_Phrases/EN
   var bounded = '&bounded=1';
-  
+
   $.getJSON(NOMINATIM + encodeURIComponent(query.term) + viewbox + bounded, onQueryResult.bind(null, true));
 });
 
