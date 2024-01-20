@@ -297,7 +297,7 @@ addHook('search', function(query) {
 // search for locations
 // TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
 addHook('search', function(query) {
-  var locations = query.term.replaceAll('%2C',',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
+var locations = query.term.replaceAll(/%2[cC]/,',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   var added = {};
   if(!locations) return;
   locations.forEach(function(location) {
@@ -438,11 +438,11 @@ addHook('search', function (query) {
   const res = query.term.match(guid_re);
   if (res) {
     const guid = res[0];
-    const data = portalDetail.get(guid);
+    const data = window.portalDetail.get(guid);
     if (data) window.search.addResult(query, data);
     else {
-      portalDetail.request(guid).then(function (data) {
-        addResult(query, data);
+      window.portalDetail.request(guid).then(function (data) {
+        window.search.addResult(query, data);
       });
     }
   }
