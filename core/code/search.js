@@ -297,7 +297,7 @@ addHook('search', function(query) {
 // search for locations
 // TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
 addHook('search', function(query) {
-var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
+  var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   var added = {};
   if(!locations) return;
   locations.forEach(function(location) {
