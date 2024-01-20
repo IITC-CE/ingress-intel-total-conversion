@@ -432,16 +432,18 @@ window.chat.writeDataToHash = function(newData, storageHash, isPublicChannel, is
 //
 
 window.chat.renderText = function (text) {
+  let content;
+
   if (text.team) {
-    var teamId = window.teamStringToId(text.team);
-    if (teamId === TEAM_NONE) teamId = TEAM_MAC;
-    var spanClass = window.TEAM_TO_CSS[teamId];
-    return $('<div>')
-      .append($('<span>', { class: spanClass, text: text.plain }))
-      .html();
+    let teamId = window.teamStringToId(text.team);
+    if (teamId === window.TEAM_NONE) teamId = window.TEAM_MAC;
+    const spanClass = window.TEAM_TO_CSS[teamId];
+    content = $('<div>').append($('<span>', { class: spanClass, text: text.plain }));
+  } else {
+    content = $('<div>').text(text.plain);
   }
 
-  return $('<div>').text(text.plain).html().autoLink();
+  return content.html().autoLink();
 };
 
 // Override portal names that are used over and over, such as 'US Post Office'
@@ -511,8 +513,6 @@ window.chat.renderMarkupEntity = function (ent) {
 window.chat.renderMarkup = function (markup) {
   var msg = '';
 
-  transformMessage(markup);
-
   markup.forEach(function (ent, ind) {
     switch (ent[0]) {
     case 'SENDER':
@@ -534,27 +534,32 @@ window.chat.renderMarkup = function (markup) {
 };
 
 function transformMessage(markup) {
-  // Collapse <faction> + "Link"/"Field". example: "Agent <player> destroyed the <faction> Link ..."
-  if (markup.length > 4) {
-    if (markup[3][0] === 'FACTION' && markup[4][0] === 'TEXT' && (markup[4][1].plain === ' Link ' || markup[4][1].plain === ' Control Field @')) {
-      markup[4][1].team = markup[3][1].team;
-      markup.splice(3, 1);
+  // Make a copy of the markup array to avoid modifying the original input
+  let newMarkup = JSON.parse(JSON.stringify(markup));
+
+  // Collapse <faction> + "Link"/"Field". Example: "Agent <player> destroyed the <faction> Link ..."
+  if (newMarkup.length > 4) {
+    if (newMarkup[3][0] === 'FACTION' && newMarkup[4][0] === 'TEXT' && (newMarkup[4][1].plain === ' Link ' || newMarkup[4][1].plain === ' Control Field @')) {
+      newMarkup[4][1].team = newMarkup[3][1].team;
+      newMarkup.splice(3, 1);
     }
   }
 
-  // skip "Agent <player>"  at beginning
-  if (markup.length > 1) {
-    if (markup[0][0] === 'TEXT' && markup[0][1].plain === 'Agent ' && markup[1][0] === 'PLAYER') {
-      markup.splice(0, 2);
+  // Skip "Agent <player>" at the beginning
+  if (newMarkup.length > 1) {
+    if (newMarkup[0][0] === 'TEXT' && newMarkup[0][1].plain === 'Agent ' && newMarkup[1][0] === 'PLAYER') {
+      newMarkup.splice(0, 2);
     }
   }
 
-  // skip "<faction> agent <player>" at beginning
-  if (markup.length > 2) {
-    if (markup[0][0] === 'FACTION' && markup[1][0] === 'TEXT' && markup[1][1].plain === ' agent ' && markup[2][0] === 'PLAYER') {
-      markup.splice(0, 3);
+  // Skip "<faction> agent <player>" at the beginning
+  if (newMarkup.length > 2) {
+    if (newMarkup[0][0] === 'FACTION' && newMarkup[1][0] === 'TEXT' && newMarkup[1][1].plain === ' agent ' && newMarkup[2][0] === 'PLAYER') {
+      newMarkup.splice(0, 3);
     }
   }
+
+  return newMarkup;
 }
 
 window.chat.renderTimeCell = function (time, classNames) {
@@ -592,7 +597,8 @@ window.chat.renderMsgRow = function(data) {
   }
   var nickCell = chat.renderNickCell(data.player.name, nickClasses.join(' '));
 
-  var msg = chat.renderMarkup(data.markup);
+  const markup = transformMessage(data.markup);
+  var msg = chat.renderMarkup(markup);
   var msgClass = data.narrowcast ? 'system_narrowcast' : '';
   var msgCell = chat.renderMsgCell(msg, msgClass);
 
