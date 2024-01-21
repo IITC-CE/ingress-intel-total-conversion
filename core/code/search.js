@@ -286,7 +286,7 @@ window.search.addSearchResult = function (query, data, guid) {
 };
 
 // search for portals
-window.addHook('search', function(query) {
+window.addHook('search', function (query) {
   var term = query.term.toLowerCase();
 
   $.each(portals, function(guid, portal) {
@@ -302,7 +302,7 @@ window.addHook('search', function(query) {
 
 // search for locations
 // TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
-window.addHook('search', function(query) {
+window.addHook('search', function (query) {
   var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   var added = {};
   if(!locations) return;
@@ -336,7 +336,7 @@ window.addHook('search', function(query) {
 
 
 // search on OpenStreetMap
-window.addHook('search', function(query) {
+window.addHook('search', function (query) {
   if(!query.confirmed) return;
 
   // Viewbox search orders results so they're closer to the viewbox
