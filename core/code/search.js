@@ -261,7 +261,7 @@ window.search.setup = function() {
 };
 
 
-function addSearchResult(query, data, guid) {
+window.search.addSearchResult = function(query, data, guid) {
   var team = window.teamStringToId(data.team);
   var color = team === window.TEAM_NONE ? '#CCC' : window.COLORS[team];
   var latLng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
@@ -295,7 +295,7 @@ addHook('search', function(query) {
     if(!data.title) return;
 
     if(data.title.toLowerCase().indexOf(term) !== -1) {
-      addSearchResult(query, data, guid);
+      window.search.addSearchResult(query, data, guid);
     }
   });
 });
@@ -415,10 +415,10 @@ addHook('search', function (query) {
   if (res) {
     const guid = res[0];
     const data = window.portalDetail.get(guid);
-    if (data) addSearchResult(query, data, guid);
+    if (data) window.search.addSearchResult(query, data, guid);
     else {
       window.portalDetail.request(guid).then(function (data) {
-        addSearchResult(query, data, guid);
+        window.search.addSearchResult(query, data, guid);
       });
     }
   }
