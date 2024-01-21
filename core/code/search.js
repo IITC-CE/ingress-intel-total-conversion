@@ -260,8 +260,7 @@ window.search.setup = function() {
   });
 };
 
-
-window.search.addSearchResult = function(query, data, guid) {
+window.search.addSearchResult = function (query, data, guid) {
   var team = window.teamStringToId(data.team);
   var color = team === window.TEAM_NONE ? '#CCC' : window.COLORS[team];
   var latLng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
@@ -284,7 +283,7 @@ window.search.addSearchResult = function(query, data, guid) {
       return true; // prevent default behavior
     },
   });
-}
+};
 
 // search for portals
 addHook('search', function(query) {
