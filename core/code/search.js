@@ -25,7 +25,7 @@ addHook('search', function(query) {});
   selected or the search was cancelled by the user).
 */
 
-/* global L -- eslint */
+/* global L, addHook -- eslint */
 
 window.search = {
   lastSearch: null,
@@ -118,7 +118,6 @@ window.search.Query.prototype.addResult = function(result) {
       .append($('<em>')
         .append(result.description));
   }
-
 };
 
 window.search.Query.prototype.resultLayer = function(result) {
@@ -409,6 +408,7 @@ addHook('search', function(query) {
   $.getJSON(NOMINATIM + encodeURIComponent(query.term) + viewbox + bounded, onQueryResult.bind(null, true));
 });
 
+// search on guid
 addHook('search', function (query) {
   const guid_re = /[0-9a-f]{32}\.[0-9a-f]{2}/;
   const res = query.term.match(guid_re);
