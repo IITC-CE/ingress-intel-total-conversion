@@ -3,7 +3,7 @@
 
 /*
 you can implement your own result provider by listing to the search hook:
-addHook('search', function(query) {});
+window.addHook('search', function(query) {});
 
 `query` is an object with the following members:
 - `term` is the term for which the user has searched
@@ -25,7 +25,7 @@ addHook('search', function(query) {});
   selected or the search was cancelled by the user).
 */
 
-/* global L, addHook -- eslint */
+/* global L -- eslint */
 
 window.search = {
   lastSearch: null,
@@ -286,7 +286,7 @@ window.search.addSearchResult = function (query, data, guid) {
 };
 
 // search for portals
-addHook('search', function(query) {
+window.addHook('search', function(query) {
   var term = query.term.toLowerCase();
 
   $.each(portals, function(guid, portal) {
@@ -302,7 +302,7 @@ addHook('search', function(query) {
 
 // search for locations
 // TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
-addHook('search', function(query) {
+window.addHook('search', function(query) {
   var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   var added = {};
   if(!locations) return;
@@ -336,7 +336,7 @@ addHook('search', function(query) {
 
 
 // search on OpenStreetMap
-addHook('search', function(query) {
+window.addHook('search', function(query) {
   if(!query.confirmed) return;
 
   // Viewbox search orders results so they're closer to the viewbox
@@ -408,7 +408,7 @@ addHook('search', function(query) {
 });
 
 // search on guid
-addHook('search', function (query) {
+window.addHook('search', function (query) {
   const guid_re = /[0-9a-f]{32}\.[0-9a-f]{2}/;
   const res = query.term.match(guid_re);
   if (res) {
