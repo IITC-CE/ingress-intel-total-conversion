@@ -3,7 +3,7 @@
 
 /*
 you can implement your own result provider by listing to the search hook:
-addHook('search', function(query) {});
+window.addHook('search', function(query) {});
 
 `query` is an object with the following members:
 - `term` is the term for which the user has searched
@@ -24,6 +24,8 @@ addHook('search', function(query) {});
 - `onRemove(result)`: a handler to be called when the result is removed from the map (because another result has been
   selected or the search was cancelled by the user).
 */
+
+/* global L -- eslint */
 
 window.search = {
   lastSearch: null,
@@ -116,7 +118,6 @@ window.search.Query.prototype.addResult = function(result) {
       .append($('<em>')
         .append(result.description));
   }
-  
 };
 
 window.search.Query.prototype.resultLayer = function(result) {
@@ -259,36 +260,41 @@ window.search.setup = function() {
   });
 };
 
+window.search.addSearchResult = function (query, data, guid) {
+  var team = window.teamStringToId(data.team);
+  var color = team === window.TEAM_NONE ? '#CCC' : window.COLORS[team];
+  var latLng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
+  query.addResult({
+    title: data.title,
+    description: window.TEAM_SHORTNAMES[team] + ', L' + data.level + ', ' + data.health + '%, ' + data.resCount + ' Resonators',
+    position: latLng,
+    icon: 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-portal.svg@'.replace(/%COLOR%/g, color)),
+    onSelected: function (result, event) {
+      if (event.type === 'dblclick') {
+        window.zoomToAndShowPortal(guid, latLng);
+      } else if (window.portals[guid]) {
+        if (!window.map.getBounds().contains(result.position)) {
+          window.map.setView(result.position);
+        }
+        window.renderPortalDetails(guid);
+      } else {
+        window.selectPortalByLatLng(latLng);
+      }
+      return true; // prevent default behavior
+    },
+  });
+};
 
 // search for portals
-addHook('search', function(query) {
+window.addHook('search', function (query) {
   var term = query.term.toLowerCase();
-  var teams = ['NEU','RES','ENL'];
 
   $.each(portals, function(guid, portal) {
     var data = portal.options.data;
     if(!data.title) return;
 
     if(data.title.toLowerCase().indexOf(term) !== -1) {
-      var team = portal.options.team;
-      var color = team==TEAM_NONE ? '#CCC' : COLORS[team];
-      query.addResult({
-        title: data.title,
-        description: teams[team] + ', L' + data.level + ', ' + data.health + '%, ' + data.resCount + ' Resonators',
-        position: portal.getLatLng(),
-        icon: 'data:image/svg+xml;base64,'+btoa('@include_string:images/icon-portal.svg@'.replace(/%COLOR%/g, color)),
-        onSelected: function(result, event) {
-          if(event.type == 'dblclick') {
-            zoomToAndShowPortal(guid, portal.getLatLng());
-          } else if(window.portals[guid]) {
-            if(!map.getBounds().contains(result.position)) map.setView(result.position);
-            renderPortalDetails(guid);
-          } else {
-            window.selectPortalByLatLng(portal.getLatLng());
-          }
-          return true; // prevent default behavior
-        },
-      });
+      window.search.addSearchResult(query, data, guid);
     }
   });
 });
@@ -296,8 +302,8 @@ addHook('search', function(query) {
 
 // search for locations
 // TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
-addHook('search', function(query) {
-  var locations = query.term.match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
+window.addHook('search', function (query) {
+  var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   var added = {};
   if(!locations) return;
   locations.forEach(function(location) {
@@ -330,7 +336,7 @@ addHook('search', function(query) {
 
 
 // search on OpenStreetMap
-addHook('search', function(query) {
+window.addHook('search', function (query) {
   if(!query.confirmed) return;
 
   // Viewbox search orders results so they're closer to the viewbox
@@ -359,7 +365,7 @@ addHook('search', function(query) {
     data.forEach(function(item) {
       if(resultMap[item.place_id]) { return; } // duplicate
       resultMap[item.place_id] = true;
-      
+
       var result = {
         title: item.display_name,
         description: 'Type: ' + item.type,
@@ -393,11 +399,26 @@ addHook('search', function(query) {
       query.addResult(result);
     });
   }
-  
+
   // Bounded search allows amenity-only searches (e.g. "amenity=toilet") via special phrases
   // http://wiki.openstreetmap.org/wiki/Nominatim/Special_Phrases/EN
   var bounded = '&bounded=1';
-  
+
   $.getJSON(NOMINATIM + encodeURIComponent(query.term) + viewbox + bounded, onQueryResult.bind(null, true));
 });
 
+// search on guid
+window.addHook('search', function (query) {
+  const guid_re = /[0-9a-f]{32}\.[0-9a-f]{2}/;
+  const res = query.term.match(guid_re);
+  if (res) {
+    const guid = res[0];
+    const data = window.portalDetail.get(guid);
+    if (data) window.search.addSearchResult(query, data, guid);
+    else {
+      window.portalDetail.request(guid).then(function (data) {
+        window.search.addSearchResult(query, data, guid);
+      });
+    }
+  }
+});
