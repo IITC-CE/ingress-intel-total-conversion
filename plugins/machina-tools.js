@@ -5,7 +5,7 @@
 // @description    Machina investigation tools - 2 new layers to see possible Machina spread and portal detail links to display Machina cluster information and to navigate to parent or seed Machina portal
 
 /* exported setup, changelog --eslint */
-/* global , digits, L, map, dialog, getPortalLinks, portalDetail, turf */
+/* global , digits, L, map, dialog, getPortalLinks, portalDetail, turf, IITC */
 
 var changelog = [
   {
@@ -796,18 +796,16 @@ function setupHooks() {
 }
 
 function setupToolBoxLinks() {
-  let toolbox = $('#toolbox');
-  $('<a>', {
+  IITC.toolbox.addButton({
+    label: 'Conflict Area Info',
     title: 'Conflict Area Info',
-    click: machinaTools.showConflictAreaInfoDialog,
-    html: 'Conflict Area Info',
-  }).appendTo(toolbox);
-
-  $('<a>', {
+    action: machinaTools.showConflictAreaInfoDialog,
+  });
+  IITC.toolbox.addButton({
+    label: 'Machina Clusters',
     title: 'Display Visible Machina Clusters Info',
-    click: machinaTools.showClustersDialog,
-    html: 'Machina Clusters',
-  }).appendTo(toolbox);
+    action: machinaTools.showClustersDialog,
+  });
 }
 
 function setupControlButtons() {

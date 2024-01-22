@@ -1,3 +1,5 @@
+/* global IITC -- eslint */
+
 /**
  * @file This file contains the code for displaying and handling the regional scoreboard.
  * @module region_scoreboard
@@ -478,14 +480,12 @@ window.RegionScoreboardSetup = (function() {
         }
       });
     } else {
-      $('<a>')
-        .html('Region scores')
-        .attr({
-          id: 'scoreboard',
-          title: 'View regional scoreboard'
-        })
-        .click(showDialog)
-        .appendTo('#toolbox');
+      IITC.toolbox.addButton({
+        id: 'scoreboard',
+        label: 'Region scores',
+        title: 'View regional scoreboard',
+        action: showDialog,
+      });
     }
   }
 }());

@@ -4,6 +4,7 @@
 // @version        0.1.1
 // @description    **WORK IN PROGRESS** Check for updates for IITC and plugins against http://iitc.jonatkins.com/. Can also report status messages for known IITC issues.
 
+/* global IITC -- eslint */
 
 // use own namespace for plugin
 window.plugin.updateCheck = function() {};
@@ -291,7 +292,11 @@ window.plugin.updateCheck.open = function() {
 
 
 window.plugin.updateCheck.setup  = function() {
-  $('#toolbox').append(' <a onclick="window.plugin.updateCheck.open()" title="Check for IITC updates">Update check</a>');
+  IITC.toolbox.addButton({
+    label: 'Update check',
+    title: 'Check for IITC updates',
+    action: window.plugin.updateCheck.open,
+  });
 };
 
 var setup =  window.plugin.updateCheck.setup;

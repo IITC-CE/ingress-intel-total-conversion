@@ -1,4 +1,4 @@
-/* global L, dialog, log */
+/* global L, dialog, log, IITC */
 
 /**
  * @namespace window.ornaments
@@ -97,13 +97,13 @@ window.ornaments = {
     window.layerChooser.addOverlay(this.layers['Ornaments'], 'Ornaments');
     window.layerChooser.addOverlay(this.layers['Excluded ornaments'], 'Excluded ornaments', {default: false});
 
-    $('<a>', {
-      text:'Ornaments Opt',
+    IITC.toolbox.addButton({
       id: 'ornaments-toolbox-link',
+      label: 'Ornaments Opt',
       title: 'Edit ornament exclusions',
       accesskey: 'o',
-      click: window.ornaments.ornamentsOpt})
-      .appendTo('#toolbox');
+      action: window.ornaments.ornamentsOpt,
+    });
   },
 
   /**

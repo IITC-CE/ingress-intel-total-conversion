@@ -4,7 +4,7 @@
 // @version        0.4.3
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync. Supports Multi-Project-Extension
 
-/* global L -- eslint */
+/* global L, IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
@@ -1225,8 +1225,6 @@ window.plugin.bookmarks.loadStorageBox = function() {
 
     plugin.bookmarks.htmlDisabledMessage = '<div title="Your browser do not support localStorage">Plugin Bookmarks disabled*.</div>';
     plugin.bookmarks.htmlStar = '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><span></span></a>';
-    plugin.bookmarks.htmlCalldrawBox = '<a onclick="window.plugin.bookmarks.dialogDrawer();return false;" accesskey="q" title="Draw lines/triangles between bookmarked portals [q]">Auto draw</a>';
-    plugin.bookmarks.htmlCallSetBox = '<a onclick="window.plugin.bookmarks.manualOpt();return false;">Bookmarks Opt</a>';
     plugin.bookmarks.htmlMoveBtn = '<a id="bookmarksMove" class="btn" onclick="window.plugin.bookmarks.moveMode();return false;">Show/Hide "Move" button</a>'
 
     var actions = '';
@@ -1323,7 +1321,16 @@ window.plugin.bookmarks.initMPE = function(){
         app.addPane("plugin-bookmarks", "Bookmarks", "ic_action_star");
       window.addHook('paneChanged', window.plugin.bookmarks.onPaneChanged);
     }
-    $('#toolbox').append(window.plugin.bookmarks.htmlCallSetBox+window.plugin.bookmarks.htmlCalldrawBox);
+  IITC.toolbox.addButton({
+    label: 'Bookmarks Opt',
+    action: window.plugin.bookmarks.manualOpt,
+  });
+  IITC.toolbox.addButton({
+    label: 'Auto draw',
+    title: 'Draw lines/triangles between bookmarked portals [q]',
+    action: window.plugin.bookmarks.dialogDrawer,
+    accesskey: 'q',
+  });
 
     if(window.plugin.bookmarks.isSmart) {
 //      $('#bookmarksBox.mobile #topBar').prepend(window.plugin.bookmarks.htmlCallSetBox+window.plugin.bookmarks.htmlCalldrawBox); // wonk in progress

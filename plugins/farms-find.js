@@ -4,6 +4,7 @@
 // @version        1.4.2
 // @description    Show farms by minimum level
 
+/* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
@@ -46,21 +47,19 @@ var changelog = [
 window.plugin.farmFind = function() {};
 
 window.plugin.farmFind.getNearbyPortalCount = function(portal){
-    
     var circle = new google.maps.Circle();
     var center = new google.maps.LatLng(portal.getLatLng().lat, portal.getLatLng().lng);
     circle.setCenter(center);
     circle.setRadius(window.plugin.farmFind.Radius);
 
-    
     var nearby8Portals = 0;
-    
+
     $.each(window.portals, function(i, otherPortal) {
         var thisPortal = new google.maps.LatLng(otherPortal.getLatLng().lat, otherPortal.getLatLng().lng);
       	 if (circle.getBounds().contains(thisPortal))
              if (otherPortal.options.level >= window.plugin.farmFind.minLevel) nearby8Portals++;
     });
-    //console.log(nearby8Portals);         
+  // console.log(nearby8Portals);
     return nearby8Portals;
 };
 
@@ -69,7 +68,6 @@ window.plugin.farmFind.checkPortals = function(){
     window.plugin.farmFind.levelLayerGroup.clearLayers();
     //console.log(window.portals.length);
 	$.each(window.portals, function(i, portal) {
-        
 		if (window.plugin.farmFind.getNearbyPortalCount(portal) > window.plugin.farmFind.minNearby)
         {
          	//console.log("Farm identified");
@@ -88,9 +86,9 @@ window.plugin.farmFind.checkPortals = function(){
             //console.log(alreadyInFarm);
          	if (thisPortal in farms[x]) alreadyInFarm = true;
         }
-        
+
         //console.log("Portal " + i + " already in farm: " + alreadyInFarm);
-        
+
         if (!alreadyInFarm)
         {
             var portalsInFarm = [];
@@ -103,7 +101,7 @@ window.plugin.farmFind.checkPortals = function(){
             {
                 //console.log("Checking distance from portal " + p);
                 var portalLoc = new google.maps.LatLng(possibleFarmPortals[p].getLatLng().lat, possibleFarmPortals[p].getLatLng().lng);
-                
+
                 var farmIndex = 0;
              	if (circle.getBounds().contains(portalLoc) && possibleFarmPortals[p] != thisPortal)
                 {
@@ -120,12 +118,9 @@ window.plugin.farmFind.checkPortals = function(){
                         		farmIndex = x;
                         	}
                         }
-         				
-                       
         			}
-                    
                     //console.log("Already in another farm: " + alreadyInAnotherFarm);
-                    
+
                     if (alreadyInAnotherFarm == false)
                     {
                         //console.log("Farm " + (farms.length + 1) + " adding portal " + p);
@@ -138,13 +133,13 @@ window.plugin.farmFind.checkPortals = function(){
                         {
                          	   farms[farmIndex].push(portalsInFarm[prt]);
                         }
-                        
+
                         //console.log("Farm " + (farmIndex + 1) + " now has " + farms[farmIndex].length + " portals");
                         p = 6000;
                     }
                 }
             }
-            
+
             if (!alreadyInAnotherFarm)
             {
                 farms.push(portalsInFarm);
@@ -152,29 +147,22 @@ window.plugin.farmFind.checkPortals = function(){
             };
         }
     }
-    
+
     //console.log(farms.length);
-    for (i = 0; i < farms.length; i++)
-    {
-        farms[i] = findUnique(farms[i]);
-        console.log("Farm " + (i+1) + ": " + farms[i].length + " portals");
-        
-    }
+  for (let i = 0; i < farms.length; i++) {
+    farms[i] = findUnique(farms[i]);
+    console.log('Farm ' + (i + 1) + ': ' + farms[i].length + ' portals');
+  }
     //console.log(farms);
-    
-    
-    
+
     window.plugin.farmFind.drawnItems = new L.FeatureGroup();
-    
-    
+
     for (farm = 0; farm < farms.length; farm++)
     {
     	window.plugin.farmFind.drawCircle(farms[farm]);
     }
-    
-    
 };
-    
+
     findUnique = function(farm) {
         var unique = [];
         for(p = 0; p < farm.length; p++)
@@ -190,10 +178,10 @@ window.plugin.farmFind.checkPortals = function(){
             if (!found)
                 unique.push(farm[p]);
         }
-        
+
         return unique;
 }
-    
+
 window.plugin.farmFind.drawCircle = function(farm)
 {
 	var latArray = [];
@@ -209,7 +197,7 @@ window.plugin.farmFind.drawCircle = function(farm)
             countArray[level] = 0;
         countArray[level]++;
     }
-    
+
     console.log(countArray);
     var popupMsg = "Portal Count<br>";
     for (i = 1; i < 9; i++)
@@ -217,12 +205,12 @@ window.plugin.farmFind.drawCircle = function(farm)
      	if (countArray[i] != null)
             popupMsg += "Level " + i + ": " + countArray[i] + "<br>";
     }
-	
+
 	var north = Math.max.apply(null, lngArray);
 	var south = Math.min.apply(null, lngArray);
 	var east = Math.max.apply(null, latArray);
 	var west = Math.min.apply(null, latArray);
-	
+
 	var center = new google.maps.LatLng(((east + west) / 2), ((north + south) / 2));
 	//console.log(center);
     //console.log("Find Radius");
@@ -233,17 +221,16 @@ window.plugin.farmFind.drawCircle = function(farm)
 		if (temp > radius)
 			radius = temp;
 	}
-    
+
     //console.log(radius);
 	//((20 - map._zoom) * 1000) / map._zoom
-    
+
 	var latlng = new L.LatLng(center.lat(), center.lng());
     //console.log("latlng: " + latlng);
     var optCircle = {color:'red',opacity:0.7,fill:true,fillColor:'red',fillOpacity:0.7,weight:15,interactive:true};
     var circle = new L.Circle(latlng, radius, optCircle);
     circle.bindPopup(popupMsg);
-    
-    
+
     circle.on('mouseover', function(e) {
    		circle.bringToBack();
 	});
@@ -253,42 +240,41 @@ window.plugin.farmFind.drawCircle = function(farm)
     //console.log("circle: " + circle);
     circle.addTo(window.plugin.farmFind.levelLayerGroup);
 };
-    
+
     google.maps.LatLng.prototype.distanceFrom = function(newLatLng) {
-        
    // setup our variables
    var lat1 = this.lat();
    var radianLat1 = lat1 * ( Math.PI  / 180 );
-        
+
    var lng1 = this.lng();
    var radianLng1 = lng1 * ( Math.PI  / 180 );
-        
+
    var lat2 = newLatLng.lat;
    var radianLat2 = lat2 * ( Math.PI  / 180 );
-        
+
    var lng2 = newLatLng.lng;
    var radianLng2 = lng2 * ( Math.PI  / 180 );
-        
+
    // sort out the radius, MILES or KM?
    var earth_radius = 6378.1; // (km = 6378.1) OR (miles = 3959) - radius of the earth
- 
+
    // sort our the differences
    var diffLat =  ( radianLat1 - radianLat2 );
    var diffLng =  ( radianLng1 - radianLng2 );
    // put on a wave (hey the earth is round after all)
    var sinLat = Math.sin( diffLat / 2  );
-   var sinLng = Math.sin( diffLng / 2  ); 
- 
+  var sinLng = Math.sin(diffLng / 2);
+
    // maths - borrowed from http://www.opensourceconnections.com/wp-content/uploads/2009/02/clientsidehaversinecalculation.html
    var a = Math.pow(sinLat, 2.0) + Math.cos(radianLat1) * Math.cos(radianLat2) * Math.pow(sinLng, 2.0);
- 
+
    // work out the distance
    var distance = earth_radius * 2 * Math.asin(Math.min(1, Math.sqrt(a)));
- 	
+
    // return the distance
    return distance * 1000;
 };
-    
+
     window.plugin.farmFind.setupCSS = function() {
         $('<style>').prop('type', 'text/css').html(''
             + '#farm_level_select {'
@@ -318,10 +304,11 @@ window.plugin.farmFind.changeLevel = function()
     var myselect = document.getElementById("farm_level_select");
    	var level = myselect.options[myselect.selectedIndex].value;
     window.plugin.farmFind.minLevel = level;
-    var button = document.getElementById("findFarmClick");
-    button.title = 'Check portals in view for L' + window.plugin.farmFind.minLevel + ' farms';
-    button.innerHTML = 'L' + window.plugin.farmFind.minLevel + ' Farms';
-    
+  IITC.toolbox.updateButton('findFarmClick', {
+    label: 'L' + window.plugin.farmFind.minLevel + ' Farms',
+    title: 'Check portals in view for L' + window.plugin.farmFind.minLevel + ' farms',
+    action: window.plugin.farmFind.checkPortals,
+  });
 };
 
 var setup =  function() {
@@ -332,7 +319,12 @@ var setup =  function() {
         window.plugin.farmFind.setupSmartCSS();
     }
     window.plugin.farmFind.Radius = 500;
-    $('#toolbox').append(' <a onclick="window.plugin.farmFind.checkPortals()" id="findFarmClick" title="Check portals in view for L' + window.plugin.farmFind.minLevel + ' farms">L' + window.plugin.farmFind.minLevel + ' Farms</a>');
+  IITC.toolbox.addButton({
+    id: 'findFarmClick',
+    label: 'L' + window.plugin.farmFind.minLevel + ' Farms',
+    title: 'Check portals in view for L' + window.plugin.farmFind.minLevel + ' farms',
+    action: window.plugin.farmFind.checkPortals,
+  });
     possibleFarmPortals = [];
     window.plugin.farmFind.levelLayerGroup = new L.LayerGroup();
 	$('body').append('<select onchange="window.plugin.farmFind.changeLevel()" id="farm_level_select"><option value=1>Farm level 1</option><option value=2>Farm level 2</option><option value=3>Farm level 3</option><option value=4>Farm level 4</option><option value=5>Farm level 5</option><option value=6>Farm level 6</option><option value=7>Farm level 7</option><option value=8>Farm level 8</option></select>');

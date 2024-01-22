@@ -1,3 +1,5 @@
+/* global IITC -- eslint */
+
 /**
  * @file Provides functions related to Ingress artifacts, including setup, data request, and processing functions.
  * Added as part of the ingress #13magnus in november 2013, artifacts
@@ -35,14 +37,12 @@ window.artifact.setup = function() {
   artifact._layer = new L.LayerGroup();
   window.layerChooser.addOverlay(artifact._layer, 'Artifacts');
 
-  $('<a>')
-    .html('Artifacts')
-    .attr({
-      id: 'artifacts-toolbox-link',
-      title: 'Show artifact portal list'
-    })
-    .click(window.artifact.showArtifactList)
-    .appendTo('#toolbox');
+  IITC.toolbox.addButton({
+    id: 'artifacts-toolbox-link',
+    label: 'Artifacts',
+    title: 'Show artifact portal list',
+    action: window.artifact.showArtifactList,
+  });
 }
 
 /**

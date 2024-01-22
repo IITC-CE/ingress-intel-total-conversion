@@ -4,7 +4,7 @@
 // @version        0.4.2
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
-/* global plugin -- eslint */
+/* global IITC, plugin -- eslint */
 
 // use own namespace for plugin
 window.plugin.portalslist = function() {};
@@ -461,7 +461,12 @@ var setup =  function() {
     app.addPane("plugin-portalslist", "Portals list", "ic_action_paste");
     addHook("paneChanged", window.plugin.portalslist.onPaneChanged);
   } else {
-    $('#toolbox').append('<a onclick="window.plugin.portalslist.displayPL()" title="Display a list of portals in the current view [t]" accesskey="t">Portals list</a>');
+    IITC.toolbox.addButton({
+      label: 'Portals list',
+      title: 'Display a list of portals in the current view [t]',
+      action: window.plugin.portalslist.displayPL,
+      accesskey: 't',
+    });
   }
 
   $("<style>")
