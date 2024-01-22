@@ -150,6 +150,7 @@ window.plugin.farmFind.checkPortals = function(){
 
     //console.log(farms.length);
   for (let i = 0; i < farms.length; i++) {
+    // eslint-disable-next-line no-undef
     farms[i] = findUnique(farms[i]);
     console.log('Farm ' + (i + 1) + ': ' + farms[i].length + ' portals');
   }
