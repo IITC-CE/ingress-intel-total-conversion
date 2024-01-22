@@ -189,6 +189,7 @@ window.TEAM_TO_CSS = ['none', 'res', 'enl', 'mac'];
 window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened', '__MACHINA__'];
 window.TEAM_CODES = ['N', 'R', 'E', 'M'];
 window.TEAM_CODENAMES = ['NEUTRAL', 'RESISTANCE', 'ENLIGHTENED', 'MACHINA'];
+window.TEAM_SHORTNAMES = ['NEU', 'RES', 'ENL', 'MAC'];
 
 window.TEAM_NAME_NONE = window.TEAM_NAMES[window.TEAM_NONE];
 window.TEAM_NAME_RES = window.TEAM_NAMES[window.TEAM_RES];
