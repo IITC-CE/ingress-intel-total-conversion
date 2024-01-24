@@ -157,4 +157,13 @@ window.runOnSmartphonesAfterBoot = function() {
   // make buttons in action bar flexible
   var l = $('#chatcontrols a:visible');
   l.css('width', 100/l.length + '%');
+
+  if (window.useAppPanes()) {
+    window.addMobilePane('info', null, null, function () {
+      return $('#scrollwrapper').show();
+    });
+    window.addMobilePane('all', null, null, window.chat.show);
+    window.addMobilePane('faction', null, null, window.chat.show);
+    window.addMobilePane('alerts', null, null, window.chat.show);
+  }
 }

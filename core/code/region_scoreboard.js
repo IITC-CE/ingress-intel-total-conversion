@@ -451,13 +451,9 @@ window.RegionScoreboardSetup = (function() {
 
   return function setup() {
     if (window.useAppPanes()) {
-      app.addPane('regionScoreboard', 'Region scores', 'ic_action_view_as_list');
-      addHook('paneChanged', function (pane) {
-        if (pane === 'regionScoreboard') {
-          showDialog();
-        } else if (mainDialog) {
-          mainDialog.remove();
-        }
+      window.addMobilePane('regionScoreboard', 'Region scores', 'ic_action_view_as_list', function () {
+        showDialog();
+        return mainDialog;
       });
     } else {
       $('<a>')
