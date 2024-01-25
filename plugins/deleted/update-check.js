@@ -291,7 +291,7 @@ window.plugin.updateCheck.open = function() {
 
 
 
-window.plugin.updateCheck.setup  = function() {
+window.plugin.updateCheck.setup = function () {
   IITC.toolbox.addButton({
     label: 'Update check',
     title: 'Check for IITC updates',

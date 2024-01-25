@@ -28,8 +28,6 @@ IITC.toolbox = {
    * Adds a button to the toolbox.
    *
    * @param {ButtonArgs} buttonArgs - The arguments for the button.
-   * @param {Object} options - Optional. An object containing additional options.
-   * @param {boolean} [options.legacy=false] - If true, prepend 'legacy-' to the id.
    * @returns {string|null} The ID of the added button or null if required parameters are missing.
    *
    * @example
@@ -44,7 +42,7 @@ IITC.toolbox = {
    *   action: () => alert('Clicked!')
    * });
    */
-  addButton(buttonArgs, options = { legacy: false }) {
+  addButton(buttonArgs) {
     if (!buttonArgs.label) {
       console.warn('Required parameter "label" are missing.');
       return null;
@@ -56,10 +54,6 @@ IITC.toolbox = {
     }
 
     let id = buttonArgs.id || `toolbox-btn-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-    if (options.legacy) {
-      id = 'legacy-' + id;
-    }
-
     this.buttons[id] = buttonArgs;
 
     this._renderButton(id);
@@ -73,18 +67,12 @@ IITC.toolbox = {
    *
    * @param {string} buttonId - The ID of the button to update.
    * @param {ButtonArgs} newButtonArgs - The new arguments for the button.
-   * @param {Object} options - Optional. An object containing additional options.
-   * @param {boolean} [options.legacy=false] - If true, prepend 'legacy-' to the id.
    * @returns {boolean} True if the button is successfully updated, false otherwise.
    *
    * @example
    * const isUpdated = IITC.toolbox.updateButton(buttonId, { label: 'Updated Button', action: () => console.log('New Action') });
    */
-  updateButton(buttonId, newButtonArgs, options = { legacy: false }) {
-    if (options.legacy) {
-      buttonId = 'legacy-' + buttonId;
-    }
-
+  updateButton(buttonId, newButtonArgs) {
     if (this.buttons[buttonId]) {
       Object.assign(this.buttons[buttonId], newButtonArgs);
       this._renderButton(buttonId);
@@ -219,10 +207,11 @@ IITC.toolbox = {
         };
 
         // Update an existing button or add a new one
+        buttonArgs['id'] = `legacy-toolbox-btn-${buttonArgs.id || buttonArgs.label}`;
         if (this.buttons[buttonArgs.id]) {
-          this.updateButton(buttonArgs.id, buttonArgs, { legacy: true });
+          this.updateButton(buttonArgs.id, buttonArgs);
         } else {
-          this.addButton(buttonArgs, { legacy: true });
+          this.addButton(buttonArgs);
         }
       }
     };

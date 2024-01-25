@@ -161,7 +161,7 @@ window.plugin.linkShowDirection.showDialog = function() {
   });
 };
 
-window.plugin.linkShowDirection.setup  = function() {
+window.plugin.linkShowDirection.setup = function () {
   IITC.toolbox.addButton({
     label: 'LinkDirection Opt',
     action: window.plugin.linkShowDirection.showDialog,
