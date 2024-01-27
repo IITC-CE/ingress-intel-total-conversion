@@ -419,11 +419,22 @@ window.chat.writeDataToHash = function (newData, storageHash, isOlderMsgs, isAsc
 //
 
 window.chat.renderText = function (text) {
-  return $('<div>').text(text.plain).html().autoLink();
+  let content;
+
+  if (text.team) {
+    let teamId = window.teamStringToId(text.team);
+    if (teamId === window.TEAM_NONE) teamId = window.TEAM_MAC;
+    const spanClass = window.TEAM_TO_CSS[teamId];
+    content = $('<div>').append($('<span>', { class: spanClass, text: text.plain }));
+  } else {
+    content = $('<div>').text(text.plain);
+  }
+
+  return content.html().autoLink();
 };
 
 // Override portal names that are used over and over, such as 'US Post Office'
-window.chat.getChatPortalName = function(markup) {
+window.chat.getChatPortalName = function (markup) {
   var name = markup.name;
   if (name === 'US Post Office') {
     var address = markup.address.split(',');
@@ -436,11 +447,7 @@ window.chat.renderPortal = function (portal) {
   var lat = portal.latE6/1E6, lng = portal.lngE6/1E6;
   var perma = window.makePermalink([lat,lng]);
   var js = 'window.selectPortalByLatLng('+lat+', '+lng+');return false';
-  return '<a onclick="'+js+'"'
-    + ' title="'+portal.address+'"'
-    + ' href="'+perma+'" class="help">'
-    + window.chat.getChatPortalName(portal)
-    + '</a>';
+  return '<a onclick="' + js + '"' + ' title="' + portal.address + '"' + ' href="' + perma + '" class="help">' + window.chat.getChatPortalName(portal) + '</a>';
 };
 
 window.chat.renderFactionEnt = function (faction) {
@@ -488,48 +495,75 @@ window.chat.renderMarkupEntity = function (ent) {
 
 window.chat.renderMarkup = function (markup) {
   var msg = '';
-  markup.forEach(function(ent, ind) {
+
+  markup.forEach(function (ent, ind) {
     switch (ent[0]) {
-    case 'SENDER':
-    case 'SECURE':
-      // skip as already handled
-      break;
+      case 'SENDER':
+      case 'SECURE':
+        // skip as already handled
+        break;
 
-    case 'PLAYER': // automatically generated messages
-      if (ind > 0) msg += chat.renderMarkupEntity(ent); // don’t repeat nick directly
-      break;
+      case 'PLAYER': // automatically generated messages
+        if (ind > 0) msg += chat.renderMarkupEntity(ent); // don’t repeat nick directly
+        break;
 
-    default:
-      // add other enitities whatever the type
-      msg += chat.renderMarkupEntity(ent);
-      break;
+      default:
+        // add other enitities whatever the type
+        msg += chat.renderMarkupEntity(ent);
+        break;
     }
   });
   return msg;
 };
 
-window.chat.renderTimeCell = function(time, classNames) {
-  var ta = unixTimeToHHmm(time);
-  var tb = unixTimeToDateTimeString(time, true);
+function transformMessage(markup) {
+  // Make a copy of the markup array to avoid modifying the original input
+  let newMarkup = JSON.parse(JSON.stringify(markup));
+
+  // Collapse <faction> + "Link"/"Field". Example: "Agent <player> destroyed the <faction> Link ..."
+  if (newMarkup.length > 4) {
+    if (newMarkup[3][0] === 'FACTION' && newMarkup[4][0] === 'TEXT' && (newMarkup[4][1].plain === ' Link ' || newMarkup[4][1].plain === ' Control Field @')) {
+      newMarkup[4][1].team = newMarkup[3][1].team;
+      newMarkup.splice(3, 1);
+    }
+  }
+
+  // Skip "Agent <player>" at the beginning
+  if (newMarkup.length > 1) {
+    if (newMarkup[0][0] === 'TEXT' && newMarkup[0][1].plain === 'Agent ' && newMarkup[1][0] === 'PLAYER') {
+      newMarkup.splice(0, 2);
+    }
+  }
+
+  // Skip "<faction> agent <player>" at the beginning
+  if (newMarkup.length > 2) {
+    if (newMarkup[0][0] === 'FACTION' && newMarkup[1][0] === 'TEXT' && newMarkup[1][1].plain === ' agent ' && newMarkup[2][0] === 'PLAYER') {
+      newMarkup.splice(0, 3);
+    }
+  }
+
+  return newMarkup;
+}
+
+window.chat.renderTimeCell = function (time, classNames) {
+  const ta = window.unixTimeToHHmm(time);
+  let tb = window.unixTimeToDateTimeString(time, true);
   // add <small> tags around the milliseconds
-  tb = (tb.slice(0,19)+'<small class="milliseconds">'+tb.slice(19)+'</small>')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
-  return '<td><time class="' + classNames + '" title="'+tb+'" data-timestamp="'+time+'">'+ta+'</time></td>';
+  tb = (tb.slice(0, 19) + '<small class="milliseconds">' + tb.slice(19) + '</small>').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return '<td><time class="' + classNames + '" title="' + tb + '" data-timestamp="' + time + '">' + ta + '</time></td>';
 };
 
-window.chat.renderNickCell = function(nick, classNames) {
-  var i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
-  return '<td>'+i[0]+'<mark class="' + classNames + '">'+ nick+'</mark>'+i[1]+'</td>';
+window.chat.renderNickCell = function (nick, classNames) {
+  const i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
+  return '<td>' + i[0] + '<mark class="' + classNames + '">' + nick + '</mark>' + i[1] + '</td>';
 };
 
-window.chat.renderMsgCell = function(msg, classNames) {
-  return '<td class="' + classNames + '">'+msg+'</td>';
+window.chat.renderMsgCell = function (msg, classNames) {
+  return '<td class="' + classNames + '">' + msg + '</td>';
 };
 
-window.chat.renderMsgRow = function(data) {
-  var timeClass = (data.msgToPlayer) ? 'pl_nudge_date' : '';
+window.chat.renderMsgRow = function (data) {
+  var timeClass = data.msgToPlayer ? 'pl_nudge_date' : '';
   var timeCell = chat.renderTimeCell(data.time, timeClass);
 
   var nickClasses = ['nickname'];
@@ -543,7 +577,8 @@ window.chat.renderMsgRow = function(data) {
   }
   var nickCell = chat.renderNickCell(data.player.name, nickClasses.join(' '));
 
-  var msg = chat.renderMarkup(data.markup);
+  const markup = transformMessage(data.markup);
+  var msg = chat.renderMarkup(markup);
   var msgClass = data.narrowcast ? 'system_narrowcast' : '';
   var msgCell = chat.renderMsgCell(msg, msgClass);
 
