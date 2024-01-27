@@ -1,0 +1,705 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: code/utils_misc.js | IITC-CE</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="; height: 0">
+        
+            <a href="https://github.com/IITC-CE/ingress-intel-total-conversion" rel="noopener noreferrer" target="_blank">
+                <img src="img/toast-ui.png" width="100%" height="100%">
+            </a>
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">IITC-CE</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-_deprecated.html">_deprecated</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:_deprecated_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-_deprecated.html#~findPortalLatLng">findPortalLatLng</a></li><li><a href="module-_deprecated.html#~findPortalLatLng">findPortalLatLng</a></li><li><a href="module-_deprecated.html#~getPortalApGain">getPortalApGain</a></li><li><a href="module-_deprecated.html#~getPortalApGain">getPortalApGain</a></li><li><a href="module-_deprecated.html#~portalApGainMaths">portalApGainMaths</a></li><li><a href="module-_deprecated.html#~portalApGainMaths">portalApGainMaths</a></li><li><a href="module-_deprecated.html#~potentialPortalLevel">potentialPortalLevel</a></li><li><a href="module-_deprecated.html#~potentialPortalLevel">potentialPortalLevel</a></li></ul></div></li><li><a href="module-app.html">app</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:app_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-app.html#.isApp">isApp</a></li><li><a href="module-app.html#.isApp">isApp</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-app.html#~debounce">debounce</a></li><li><a href="module-app.html#~debounce">debounce</a></li><li><a href="module-app.html#~useAppPanes">useAppPanes</a></li><li><a href="module-app.html#~useAppPanes">useAppPanes</a></li></ul></div></li><li><a href="module-boot.html">boot</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:boot_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-boot.html#~boot">boot</a></li><li><a href="module-boot.html#~boot">boot</a></li><li><a href="module-boot.html#~checkingIntelURL">checkingIntelURL</a></li><li><a href="module-boot.html#~checkingIntelURL">checkingIntelURL</a></li><li><a href="module-boot.html#~prepPluginsToLoad">prepPluginsToLoad</a></li><li><a href="module-boot.html#~prepPluginsToLoad">prepPluginsToLoad</a></li><li><a href="module-boot.html#~registerMarkerForOMS">registerMarkerForOMS</a></li><li><a href="module-boot.html#~registerMarkerForOMS">registerMarkerForOMS</a></li><li><a href="module-boot.html#~setupIngressMarkers">setupIngressMarkers</a></li><li><a href="module-boot.html#~setupIngressMarkers">setupIngressMarkers</a></li><li><a href="module-boot.html#~setupOMS">setupOMS</a></li><li><a href="module-boot.html#~setupOMS">setupOMS</a></li><li><a href="module-boot.html#~setupTooltips">setupTooltips</a></li><li><a href="module-boot.html#~setupTooltips">setupTooltips</a></li></ul></div></li><li><a href="module-dialog.html">dialog</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:dialog_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-dialog.html#.window.DIALOG_ID">window.DIALOG_ID</a></li><li><a href="module-dialog.html#.window.DIALOG_ID">window.DIALOG_ID</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-dialog.html#~alert">alert</a></li><li><a href="module-dialog.html#~alert">alert</a></li><li><a href="module-dialog.html#~dialog">dialog</a></li><li><a href="module-dialog.html#~dialog">dialog</a></li></ul></div></li><li><a href="module-dialog_about.html">dialog_about</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:dialog_about_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-dialog_about.html#~convertPluginInfo">convertPluginInfo</a></li><li><a href="module-dialog_about.html#~convertPluginInfo">convertPluginInfo</a></li><li><a href="module-dialog_about.html#~createChangelog">createChangelog</a></li><li><a href="module-dialog_about.html#~createChangelog">createChangelog</a></li><li><a href="module-dialog_about.html#~createDialogContent">createDialogContent</a></li><li><a href="module-dialog_about.html#~createDialogContent">createDialogContent</a></li><li><a href="module-dialog_about.html#~formatVerInfo">formatVerInfo</a></li><li><a href="module-dialog_about.html#~formatVerInfo">formatVerInfo</a></li><li><a href="module-dialog_about.html#~getIITCVersion">getIITCVersion</a></li><li><a href="module-dialog_about.html#~getIITCVersion">getIITCVersion</a></li><li><a href="module-dialog_about.html#~getIITCVersionAddition">getIITCVersionAddition</a></li><li><a href="module-dialog_about.html#~getIITCVersionAddition">getIITCVersionAddition</a></li><li><a href="module-dialog_about.html#~getPlugins">getPlugins</a></li><li><a href="module-dialog_about.html#~getPlugins">getPlugins</a></li><li><a href="module-dialog_about.html#~isShortOnLocalStorage">isShortOnLocalStorage</a></li><li><a href="module-dialog_about.html#~isShortOnLocalStorage">isShortOnLocalStorage</a></li><li><a href="module-dialog_about.html#~isStandardPlugin">isStandardPlugin</a></li><li><a href="module-dialog_about.html#~isStandardPlugin">isStandardPlugin</a></li><li><a href="module-dialog_about.html#~pluginInfoToString">pluginInfoToString</a></li><li><a href="module-dialog_about.html#~pluginInfoToString">pluginInfoToString</a></li></ul></div></li><li><a href="module-entity_decode.html">entity_decode</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:entity_decode_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-entity_decode.html#~corePortalData">corePortalData</a></li><li><a href="module-entity_decode.html#~corePortalData">corePortalData</a></li><li><a href="module-entity_decode.html#~detailsPortalData">detailsPortalData</a></li><li><a href="module-entity_decode.html#~detailsPortalData">detailsPortalData</a></li><li><a href="module-entity_decode.html#~extendedPortalData">extendedPortalData</a></li><li><a href="module-entity_decode.html#~extendedPortalData">extendedPortalData</a></li><li><a href="module-entity_decode.html#~parseArtifactBrief">parseArtifactBrief</a></li><li><a href="module-entity_decode.html#~parseArtifactBrief">parseArtifactBrief</a></li><li><a href="module-entity_decode.html#~parseArtifactDetail">parseArtifactDetail</a></li><li><a href="module-entity_decode.html#~parseArtifactDetail">parseArtifactDetail</a></li><li><a href="module-entity_decode.html#~parseHistoryDetail">parseHistoryDetail</a></li><li><a href="module-entity_decode.html#~parseHistoryDetail">parseHistoryDetail</a></li><li><a href="module-entity_decode.html#~parseMod">parseMod</a></li><li><a href="module-entity_decode.html#~parseMod">parseMod</a></li><li><a href="module-entity_decode.html#~parseResonator">parseResonator</a></li><li><a href="module-entity_decode.html#~parseResonator">parseResonator</a></li><li><a href="module-entity_decode.html#~summaryPortalData">summaryPortalData</a></li><li><a href="module-entity_decode.html#~summaryPortalData">summaryPortalData</a></li></ul></div></li><li><a href="module-entity_info.html">entity_info</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:entity_info_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-entity_info.html#~getTeam">getTeam</a></li><li><a href="module-entity_info.html#~getTeam">getTeam</a></li><li><a href="module-entity_info.html#~teamStringToId">teamStringToId</a></li><li><a href="module-entity_info.html#~teamStringToId">teamStringToId</a></li></ul></div></li><li><a href="module-extract_niantic_parameters.html">extract_niantic_parameters</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:extract_niantic_parameters_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-extract_niantic_parameters.html#~extractFromStock">extractFromStock</a></li><li><a href="module-extract_niantic_parameters.html#~extractFromStock">extractFromStock</a></li></ul></div></li><li><a href="module-game_status.html">game_status</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:game_status_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-game_status.html#~updateGameScore">updateGameScore</a></li><li><a href="module-game_status.html#~updateGameScore">updateGameScore</a></li></ul></div></li><li><a href="module-hooks.html">hooks</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:hooks_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-hooks.html#~addHook">addHook</a></li><li><a href="module-hooks.html#~addHook">addHook</a></li><li><a href="module-hooks.html#~removeHook">removeHook</a></li><li><a href="module-hooks.html#~removeHook">removeHook</a></li><li><a href="module-hooks.html#~runHooks">runHooks</a></li><li><a href="module-hooks.html#~runHooks">runHooks</a></li></ul></div></li><li><a href="module-idle.html">idle</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:idle_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-idle.html#~idleTime">idleTime</a></li><li><a href="module-idle.html#~idleTime">idleTime</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-idle.html#~addResumeFunction">addResumeFunction</a></li><li><a href="module-idle.html#~addResumeFunction">addResumeFunction</a></li><li><a href="module-idle.html#~idleReset">idleReset</a></li><li><a href="module-idle.html#~idleReset">idleReset</a></li><li><a href="module-idle.html#~idleSet">idleSet</a></li><li><a href="module-idle.html#~idleSet">idleSet</a></li><li><a href="module-idle.html#~isIdle">isIdle</a></li><li><a href="module-idle.html#~isIdle">isIdle</a></li><li><a href="module-idle.html#~setupIdle">setupIdle</a></li><li><a href="module-idle.html#~setupIdle">setupIdle</a></li></ul></div></li><li><a href="module-map.html">map</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:map_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-map.html#~createDefaultBaseMapLayers">createDefaultBaseMapLayers</a></li><li><a href="module-map.html#~createDefaultBaseMapLayers">createDefaultBaseMapLayers</a></li><li><a href="module-map.html#~createDefaultOverlays">createDefaultOverlays</a></li><li><a href="module-map.html#~createDefaultOverlays">createDefaultOverlays</a></li><li><a href="module-map.html#~getPosition">getPosition</a></li><li><a href="module-map.html#~getPosition">getPosition</a></li><li><a href="module-map.html#~normLL">normLL</a></li><li><a href="module-map.html#~normLL">normLL</a></li><li><a href="module-map.html#~setupMap">setupMap</a></li><li><a href="module-map.html#~setupMap">setupMap</a></li></ul></div></li><li><a href="module-map_data_calc_tools.html">map_data_calc_tools</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:map_data_calc_tools_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-map_data_calc_tools.html#~getDataZoomForMapZoom">getDataZoomForMapZoom</a></li><li><a href="module-map_data_calc_tools.html#~getDataZoomForMapZoom">getDataZoomForMapZoom</a></li><li><a href="module-map_data_calc_tools.html#~getMapZoomTileParameters">getMapZoomTileParameters</a></li><li><a href="module-map_data_calc_tools.html#~getMapZoomTileParameters">getMapZoomTileParameters</a></li><li><a href="module-map_data_calc_tools.html#~setupDataTileParams">setupDataTileParams</a></li><li><a href="module-map_data_calc_tools.html#~setupDataTileParams">setupDataTileParams</a></li></ul></div></li><li><a href="module-panes.html">panes</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:panes_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-panes.html#~currentPane">currentPane</a></li><li><a href="module-panes.html#~currentPane">currentPane</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-panes.html#~hideall">hideall</a></li><li><a href="module-panes.html#~hideall">hideall</a></li><li><a href="module-panes.html#~show">show</a></li><li><a href="module-panes.html#~show">show</a></li></ul></div></li><li><a href="module-player_names.html">player_names</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:player_names_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-player_names.html#~isSystemPlayer">isSystemPlayer</a></li><li><a href="module-player_names.html#~isSystemPlayer">isSystemPlayer</a></li></ul></div></li><li><a href="module-portal_data.html">portal_data</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:portal_data_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-portal_data.html#~findPortalGuidByPositionE6">findPortalGuidByPositionE6</a></li><li><a href="module-portal_data.html#~findPortalGuidByPositionE6">findPortalGuidByPositionE6</a></li><li><a href="module-portal_data.html#~getPortalFields">getPortalFields</a></li><li><a href="module-portal_data.html#~getPortalFields">getPortalFields</a></li><li><a href="module-portal_data.html#~getPortalFieldsCount">getPortalFieldsCount</a></li><li><a href="module-portal_data.html#~getPortalFieldsCount">getPortalFieldsCount</a></li><li><a href="module-portal_data.html#~getPortalLinks">getPortalLinks</a></li><li><a href="module-portal_data.html#~getPortalLinks">getPortalLinks</a></li><li><a href="module-portal_data.html#~getPortalLinksCount">getPortalLinksCount</a></li><li><a href="module-portal_data.html#~getPortalLinksCount">getPortalLinksCount</a></li><li><a href="module-portal_data.html#~pushPortalGuidPositionCache">pushPortalGuidPositionCache</a></li><li><a href="module-portal_data.html#~pushPortalGuidPositionCache">pushPortalGuidPositionCache</a></li></ul></div></li><li><a href="module-portal_detail_display.html">portal_detail_display</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:portal_detail_display_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-portal_detail_display.html#~getPortalMiscDetails">getPortalMiscDetails</a></li><li><a href="module-portal_detail_display.html#~getPortalMiscDetails">getPortalMiscDetails</a></li><li><a href="module-portal_detail_display.html#~renderPortalDetails">renderPortalDetails</a></li><li><a href="module-portal_detail_display.html#~renderPortalDetails">renderPortalDetails</a></li><li><a href="module-portal_detail_display.html#~renderPortalUrl">renderPortalUrl</a></li><li><a href="module-portal_detail_display.html#~renderPortalUrl">renderPortalUrl</a></li><li><a href="module-portal_detail_display.html#~resetScrollOnNewPortal">resetScrollOnNewPortal</a></li><li><a href="module-portal_detail_display.html#~resetScrollOnNewPortal">resetScrollOnNewPortal</a></li><li><a href="module-portal_detail_display.html#~selectPortal">selectPortal</a></li><li><a href="module-portal_detail_display.html#~selectPortal">selectPortal</a></li><li><a href="module-portal_detail_display.html#~setPortalIndicators">setPortalIndicators</a></li><li><a href="module-portal_detail_display.html#~setPortalIndicators">setPortalIndicators</a></li></ul></div></li><li><a href="module-portal_detail_display_tools.html">portal_detail_display_tools</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:portal_detail_display_tools_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-portal_detail_display_tools.html#~getAttackApGainText">getAttackApGainText</a></li><li><a href="module-portal_detail_display_tools.html#~getAttackApGainText">getAttackApGainText</a></li><li><a href="module-portal_detail_display_tools.html#~getEnergyText">getEnergyText</a></li><li><a href="module-portal_detail_display_tools.html#~getEnergyText">getEnergyText</a></li><li><a href="module-portal_detail_display_tools.html#~getHackDetailsText">getHackDetailsText</a></li><li><a href="module-portal_detail_display_tools.html#~getHackDetailsText">getHackDetailsText</a></li><li><a href="module-portal_detail_display_tools.html#~getMitigationText">getMitigationText</a></li><li><a href="module-portal_detail_display_tools.html#~getMitigationText">getMitigationText</a></li><li><a href="module-portal_detail_display_tools.html#~getModDetails">getModDetails</a></li><li><a href="module-portal_detail_display_tools.html#~getModDetails">getModDetails</a></li><li><a href="module-portal_detail_display_tools.html#~getPortalHistoryDetails">getPortalHistoryDetails</a></li><li><a href="module-portal_detail_display_tools.html#~getPortalHistoryDetails">getPortalHistoryDetails</a></li><li><a href="module-portal_detail_display_tools.html#~getRangeText">getRangeText</a></li><li><a href="module-portal_detail_display_tools.html#~getRangeText">getRangeText</a></li><li><a href="module-portal_detail_display_tools.html#~getResonatorDetails">getResonatorDetails</a></li><li><a href="module-portal_detail_display_tools.html#~getResonatorDetails">getResonatorDetails</a></li><li><a href="module-portal_detail_display_tools.html#~renderResonatorDetails">renderResonatorDetails</a></li><li><a href="module-portal_detail_display_tools.html#~renderResonatorDetails">renderResonatorDetails</a></li></ul></div></li><li><a href="module-portal_highlighter.html">portal_highlighter</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:portal_highlighter_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-portal_highlighter.html#~addPortalHighlighter">addPortalHighlighter</a></li><li><a href="module-portal_highlighter.html#~addPortalHighlighter">addPortalHighlighter</a></li><li><a href="module-portal_highlighter.html#~changePortalHighlights">changePortalHighlights</a></li><li><a href="module-portal_highlighter.html#~changePortalHighlights">changePortalHighlights</a></li><li><a href="module-portal_highlighter.html#~highlightPortal">highlightPortal</a></li><li><a href="module-portal_highlighter.html#~highlightPortal">highlightPortal</a></li><li><a href="module-portal_highlighter.html#~resetHighlightedPortals">resetHighlightedPortals</a></li><li><a href="module-portal_highlighter.html#~resetHighlightedPortals">resetHighlightedPortals</a></li><li><a href="module-portal_highlighter.html#~updatePortalHighlighterControl">updatePortalHighlighterControl</a></li><li><a href="module-portal_highlighter.html#~updatePortalHighlighterControl">updatePortalHighlighterControl</a></li></ul></div></li><li><a href="module-portal_info.html">portal_info</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:portal_info_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-portal_info.html#~fixPortalImageUrl">fixPortalImageUrl</a></li><li><a href="module-portal_info.html#~fixPortalImageUrl">fixPortalImageUrl</a></li><li><a href="module-portal_info.html#~getAttackApGain">getAttackApGain</a></li><li><a href="module-portal_info.html#~getAttackApGain">getAttackApGain</a></li><li><a href="module-portal_info.html#~getCurrentPortalEnergy">getCurrentPortalEnergy</a></li><li><a href="module-portal_info.html#~getCurrentPortalEnergy">getCurrentPortalEnergy</a></li><li><a href="module-portal_info.html#~getLinkAmpRangeBoost">getLinkAmpRangeBoost</a></li><li><a href="module-portal_info.html#~getLinkAmpRangeBoost">getLinkAmpRangeBoost</a></li><li><a href="module-portal_info.html#~getMaxOutgoingLinks">getMaxOutgoingLinks</a></li><li><a href="module-portal_info.html#~getMaxOutgoingLinks">getMaxOutgoingLinks</a></li><li><a href="module-portal_info.html#~getPortalAttackValues">getPortalAttackValues</a></li><li><a href="module-portal_info.html#~getPortalAttackValues">getPortalAttackValues</a></li><li><a href="module-portal_info.html#~getPortalHackDetails">getPortalHackDetails</a></li><li><a href="module-portal_info.html#~getPortalHackDetails">getPortalHackDetails</a></li><li><a href="module-portal_info.html#~getPortalLevel">getPortalLevel</a></li><li><a href="module-portal_info.html#~getPortalLevel">getPortalLevel</a></li><li><a href="module-portal_info.html#~getPortalLinkDefenseBoost">getPortalLinkDefenseBoost</a></li><li><a href="module-portal_info.html#~getPortalLinkDefenseBoost">getPortalLinkDefenseBoost</a></li><li><a href="module-portal_info.html#~getPortalLinksMitigation">getPortalLinksMitigation</a></li><li><a href="module-portal_info.html#~getPortalLinksMitigation">getPortalLinksMitigation</a></li><li><a href="module-portal_info.html#~getPortalMitigationDetails">getPortalMitigationDetails</a></li><li><a href="module-portal_info.html#~getPortalMitigationDetails">getPortalMitigationDetails</a></li><li><a href="module-portal_info.html#~getPortalModsByType">getPortalModsByType</a></li><li><a href="module-portal_info.html#~getPortalModsByType">getPortalModsByType</a></li><li><a href="module-portal_info.html#~getPortalRange">getPortalRange</a></li><li><a href="module-portal_info.html#~getPortalRange">getPortalRange</a></li><li><a href="module-portal_info.html#~getPortalShieldMitigation">getPortalShieldMitigation</a></li><li><a href="module-portal_info.html#~getPortalShieldMitigation">getPortalShieldMitigation</a></li><li><a href="module-portal_info.html#~getPortalSummaryData">getPortalSummaryData</a></li><li><a href="module-portal_info.html#~getPortalSummaryData">getPortalSummaryData</a></li><li><a href="module-portal_info.html#~getTotalPortalEnergy">getTotalPortalEnergy</a></li><li><a href="module-portal_info.html#~getTotalPortalEnergy">getTotalPortalEnergy</a></li></ul></div></li><li><a href="module-portal_marker.html">portal_marker</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:portal_marker_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-portal_marker.html#~createMarker">createMarker</a></li><li><a href="module-portal_marker.html#~createMarker">createMarker</a></li><li><a href="module-portal_marker.html#~getMarkerStyleOptions">getMarkerStyleOptions</a></li><li><a href="module-portal_marker.html#~getMarkerStyleOptions">getMarkerStyleOptions</a></li><li><a href="module-portal_marker.html#~portalMarkerScale">portalMarkerScale</a></li><li><a href="module-portal_marker.html#~portalMarkerScale">portalMarkerScale</a></li><li><a href="module-portal_marker.html#~setMarkerStyle">setMarkerStyle</a></li><li><a href="module-portal_marker.html#~setMarkerStyle">setMarkerStyle</a></li></ul></div></li><li><a href="module-redeeming.html">redeeming</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:redeeming_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-redeeming.html#~REDEEM_SHORT_NAMES">REDEEM_SHORT_NAMES</a></li><li><a href="module-redeeming.html#~REDEEM_SHORT_NAMES">REDEEM_SHORT_NAMES</a></li><li><a href="module-redeeming.html#~REDEEM_STATUSES">REDEEM_STATUSES</a></li><li><a href="module-redeeming.html#~REDEEM_STATUSES">REDEEM_STATUSES</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-redeeming.html#~formatPasscodeLong">formatPasscodeLong</a></li><li><a href="module-redeeming.html#~formatPasscodeLong">formatPasscodeLong</a></li><li><a href="module-redeeming.html#~formatPasscodeShort">formatPasscodeShort</a></li><li><a href="module-redeeming.html#~formatPasscodeShort">formatPasscodeShort</a></li><li><a href="module-redeeming.html#~handleRedeemResponse">handleRedeemResponse</a></li><li><a href="module-redeeming.html#~handleRedeemResponse">handleRedeemResponse</a></li><li><a href="module-redeeming.html#~setupRedeem">setupRedeem</a></li><li><a href="module-redeeming.html#~setupRedeem">setupRedeem</a></li></ul></div></li><li><a href="module-region_scoreboard.html">region_scoreboard</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:region_scoreboard_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-region_scoreboard.html#~HistoryChart">HistoryChart</a></li><li><a href="module-region_scoreboard.html#~HistoryChart">HistoryChart</a></li><li><a href="module-region_scoreboard.html#~RegionScoreboardSetup">RegionScoreboardSetup</a></li><li><a href="module-region_scoreboard.html#~RegionScoreboardSetup">RegionScoreboardSetup</a></li></ul></div></li><li><a href="module-request_handling.html">request_handling</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:request_handling_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-request_handling.html#~startRefreshTimeout">startRefreshTimeout</a></li><li><a href="module-request_handling.html#~startRefreshTimeout">startRefreshTimeout</a></li></ul></div></li><li><a href="module-send_request.html">send_request</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:send_request_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-send_request.html#~outOfDateUserPrompt">outOfDateUserPrompt</a></li><li><a href="module-send_request.html#~outOfDateUserPrompt">outOfDateUserPrompt</a></li><li><a href="module-send_request.html#~postAjax">postAjax</a></li><li><a href="module-send_request.html#~postAjax">postAjax</a></li></ul></div></li><li><a href="module-sidebar.html">sidebar</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:sidebar_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-sidebar.html#~setPermaLink">setPermaLink</a></li><li><a href="module-sidebar.html#~setPermaLink">setPermaLink</a></li><li><a href="module-sidebar.html#~setupAddons">setupAddons</a></li><li><a href="module-sidebar.html#~setupAddons">setupAddons</a></li><li><a href="module-sidebar.html#~setupIcons">setupIcons</a></li><li><a href="module-sidebar.html#~setupIcons">setupIcons</a></li><li><a href="module-sidebar.html#~setupLargeImagePreview">setupLargeImagePreview</a></li><li><a href="module-sidebar.html#~setupLargeImagePreview">setupLargeImagePreview</a></li><li><a href="module-sidebar.html#~setupPlayerStat">setupPlayerStat</a></li><li><a href="module-sidebar.html#~setupPlayerStat">setupPlayerStat</a></li><li><a href="module-sidebar.html#~setupSidebar">setupSidebar</a></li><li><a href="module-sidebar.html#~setupSidebar">setupSidebar</a></li><li><a href="module-sidebar.html#~setupSidebarToggle">setupSidebarToggle</a></li><li><a href="module-sidebar.html#~setupSidebarToggle">setupSidebarToggle</a></li><li><a href="module-sidebar.html#~setupStyles">setupStyles</a></li><li><a href="module-sidebar.html#~setupStyles">setupStyles</a></li></ul></div></li><li><a href="module-smartphone.html">smartphone</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:smartphone_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-smartphone.html#~isSmartphone">isSmartphone</a></li><li><a href="module-smartphone.html#~isSmartphone">isSmartphone</a></li><li><a href="module-smartphone.html#~runOnSmartphonesAfterBoot">runOnSmartphonesAfterBoot</a></li><li><a href="module-smartphone.html#~runOnSmartphonesAfterBoot">runOnSmartphonesAfterBoot</a></li><li><a href="module-smartphone.html#~runOnSmartphonesBeforeBoot">runOnSmartphonesBeforeBoot</a></li><li><a href="module-smartphone.html#~runOnSmartphonesBeforeBoot">runOnSmartphonesBeforeBoot</a></li><li><a href="module-smartphone.html#~smartphone">smartphone</a></li><li><a href="module-smartphone.html#~smartphone">smartphone</a></li><li><a href="module-smartphone.html#~smartphoneInfo">smartphoneInfo</a></li><li><a href="module-smartphone.html#~smartphoneInfo">smartphoneInfo</a></li></ul></div></li><li><a href="module-status_bar.html">status_bar</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:status_bar_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-status_bar.html#~renderUpdateStatus">renderUpdateStatus</a></li><li><a href="module-status_bar.html#~renderUpdateStatus">renderUpdateStatus</a></li></ul></div></li><li><a href="module-utils_file.html">utils_file</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:utils_file_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-utils_file.html#~saveAs">saveAs</a></li><li><a href="module-utils_file.html#~saveAs">saveAs</a></li><li><a href="module-utils_file.html#~saveFile">saveFile</a></li><li><a href="module-utils_file.html#~saveFile">saveFile</a></li></ul></div></li><li><a href="module-utils_misc.html">utils_misc</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:utils_misc_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-utils_misc.html#~clamp">clamp</a></li><li><a href="module-utils_misc.html#~clamp">clamp</a></li><li><a href="module-utils_misc.html#~clampLatLng">clampLatLng</a></li><li><a href="module-utils_misc.html#~clampLatLng">clampLatLng</a></li><li><a href="module-utils_misc.html#~clampLatLngBounds">clampLatLngBounds</a></li><li><a href="module-utils_misc.html#~clampLatLngBounds">clampLatLngBounds</a></li><li><a href="module-utils_misc.html#~convertTextToTableMagic">convertTextToTableMagic</a></li><li><a href="module-utils_misc.html#~convertTextToTableMagic">convertTextToTableMagic</a></li><li><a href="module-utils_misc.html#~digits">digits</a></li><li><a href="module-utils_misc.html#~digits">digits</a></li><li><a href="module-utils_misc.html#~eraseCookie">eraseCookie</a></li><li><a href="module-utils_misc.html#~eraseCookie">eraseCookie</a></li><li><a href="module-utils_misc.html#~escapeHtmlSpecialChars">escapeHtmlSpecialChars</a></li><li><a href="module-utils_misc.html#~escapeHtmlSpecialChars">escapeHtmlSpecialChars</a></li><li><a href="module-utils_misc.html#~escapeJavascriptString">escapeJavascriptString</a></li><li><a href="module-utils_misc.html#~escapeJavascriptString">escapeJavascriptString</a></li><li><a href="module-utils_misc.html#~formatDistance">formatDistance</a></li><li><a href="module-utils_misc.html#~formatDistance">formatDistance</a></li><li><a href="module-utils_misc.html#~formatInterval">formatInterval</a></li><li><a href="module-utils_misc.html#~formatInterval">formatInterval</a></li><li><a href="module-utils_misc.html#~getURLParam">getURLParam</a></li><li><a href="module-utils_misc.html#~getURLParam">getURLParam</a></li><li><a href="module-utils_misc.html#~isTouchDevice">isTouchDevice</a></li><li><a href="module-utils_misc.html#~isTouchDevice">isTouchDevice</a></li><li><a href="module-utils_misc.html#~makePrimeLink">makePrimeLink</a></li><li><a href="module-utils_misc.html#~makePrimeLink">makePrimeLink</a></li><li><a href="module-utils_misc.html#~prettyEnergy">prettyEnergy</a></li><li><a href="module-utils_misc.html#~prettyEnergy">prettyEnergy</a></li><li><a href="module-utils_misc.html#~rangeLinkClick">rangeLinkClick</a></li><li><a href="module-utils_misc.html#~rangeLinkClick">rangeLinkClick</a></li><li><a href="module-utils_misc.html#~readCookie">readCookie</a></li><li><a href="module-utils_misc.html#~readCookie">readCookie</a></li><li><a href="module-utils_misc.html#~scrollBottom">scrollBottom</a></li><li><a href="module-utils_misc.html#~scrollBottom">scrollBottom</a></li><li><a href="module-utils_misc.html#~selectPortalByLatLng">selectPortalByLatLng</a></li><li><a href="module-utils_misc.html#~selectPortalByLatLng">selectPortalByLatLng</a></li><li><a href="module-utils_misc.html#~showPortalPosLinks">showPortalPosLinks</a></li><li><a href="module-utils_misc.html#~showPortalPosLinks">showPortalPosLinks</a></li><li><a href="module-utils_misc.html#~uniqueArray">uniqueArray</a></li><li><a href="module-utils_misc.html#~uniqueArray">uniqueArray</a></li><li><a href="module-utils_misc.html#~unixTimeToDateTimeString">unixTimeToDateTimeString</a></li><li><a href="module-utils_misc.html#~unixTimeToDateTimeString">unixTimeToDateTimeString</a></li><li><a href="module-utils_misc.html#~unixTimeToHHmm">unixTimeToHHmm</a></li><li><a href="module-utils_misc.html#~unixTimeToHHmm">unixTimeToHHmm</a></li><li><a href="module-utils_misc.html#~unixTimeToString">unixTimeToString</a></li><li><a href="module-utils_misc.html#~unixTimeToString">unixTimeToString</a></li><li><a href="module-utils_misc.html#~writeCookie">writeCookie</a></li><li><a href="module-utils_misc.html#~writeCookie">writeCookie</a></li><li><a href="module-utils_misc.html#~zeroPad">zeroPad</a></li><li><a href="module-utils_misc.html#~zeroPad">zeroPad</a></li><li><a href="module-utils_misc.html#~zoomToAndShowPortal">zoomToAndShowPortal</a></li><li><a href="module-utils_misc.html#~zoomToAndShowPortal">zoomToAndShowPortal</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="DataCache.html">DataCache</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="DataCache_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="DataCache.html#.window.DataCache#get">window.DataCache#get</a></li><li><a href="DataCache.html#.window.DataCache#get">window.DataCache#get</a></li><li><a href="DataCache.html#.window.DataCache#getTime">window.DataCache#getTime</a></li><li><a href="DataCache.html#.window.DataCache#getTime">window.DataCache#getTime</a></li><li><a href="DataCache.html#.window.DataCache#isFresh">window.DataCache#isFresh</a></li><li><a href="DataCache.html#.window.DataCache#isFresh">window.DataCache#isFresh</a></li><li><a href="DataCache.html#.window.DataCache#remove">window.DataCache#remove</a></li><li><a href="DataCache.html#.window.DataCache#remove">window.DataCache#remove</a></li><li><a href="DataCache.html#.window.DataCache#startExpireInterval">window.DataCache#startExpireInterval</a></li><li><a href="DataCache.html#.window.DataCache#startExpireInterval">window.DataCache#startExpireInterval</a></li><li><a href="DataCache.html#.window.DataCache#store">window.DataCache#store</a></li><li><a href="DataCache.html#.window.DataCache#store">window.DataCache#store</a></li></ul></div></li><li><a href="IITC.filters.FilterLayer.html">FilterLayer</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.filters.FilterLayer_sub"></div></li><li><a href="L.html">L</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="L.html#.fileListLoader">fileListLoader</a></li><li><a href="L.html#.fileListLoader">fileListLoader</a></li><li><a href="L.html#.fileReader">fileReader</a></li><li><a href="L.html#.fileReader">fileReader</a></li></ul></div></li><li><a href="L.FileListLoader.html">FileListLoader</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L.FileListLoader_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="L.FileListLoader.html#.loadFiles">loadFiles</a></li><li><a href="L.FileListLoader.html#.loadFiles">loadFiles</a></li></ul></div></li><li><a href="L.FileReader.html">FileReader</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L.FileReader_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="L.FileReader.html#.loadFile">loadFile</a></li><li><a href="L.FileReader.html#.loadFile">loadFile</a></li><li><a href="L.FileReader.html#.read">read</a></li><li><a href="L.FileReader.html#.read">read</a></li></ul></div></li><li><a href="L.LayerChooser.html">LayerChooser</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L.LayerChooser_sub"></div></li><li><a href="MapDataRequest.html">MapDataRequest</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="MapDataRequest_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="MapDataRequest.html#.window.MapDataRequest#clearTimeout">window.MapDataRequest#clearTimeout</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#clearTimeout">window.MapDataRequest#clearTimeout</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#delayProcessRequestQueue">window.MapDataRequest#delayProcessRequestQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#delayProcessRequestQueue">window.MapDataRequest#delayProcessRequestQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#getStatus">window.MapDataRequest#getStatus</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#getStatus">window.MapDataRequest#getStatus</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#handleResponse">window.MapDataRequest#handleResponse</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#handleResponse">window.MapDataRequest#handleResponse</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#idleResume">window.MapDataRequest#idleResume</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#idleResume">window.MapDataRequest#idleResume</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#mapMoveEnd">window.MapDataRequest#mapMoveEnd</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#mapMoveEnd">window.MapDataRequest#mapMoveEnd</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#mapMoveStart">window.MapDataRequest#mapMoveStart</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#mapMoveStart">window.MapDataRequest#mapMoveStart</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#pauseRenderQueue">window.MapDataRequest#pauseRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#pauseRenderQueue">window.MapDataRequest#pauseRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#processRenderQueue">window.MapDataRequest#processRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#processRenderQueue">window.MapDataRequest#processRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#processRequestQueue">window.MapDataRequest#processRequestQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#processRequestQueue">window.MapDataRequest#processRequestQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#pushRenderQueue">window.MapDataRequest#pushRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#pushRenderQueue">window.MapDataRequest#pushRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#refresh">window.MapDataRequest#refresh</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#refresh">window.MapDataRequest#refresh</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#refreshOnTimeout">window.MapDataRequest#refreshOnTimeout</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#refreshOnTimeout">window.MapDataRequest#refreshOnTimeout</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#requeueTile">window.MapDataRequest#requeueTile</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#requeueTile">window.MapDataRequest#requeueTile</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#resetRenderQueue">window.MapDataRequest#resetRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#resetRenderQueue">window.MapDataRequest#resetRenderQueue</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#sendTileRequest">window.MapDataRequest#sendTileRequest</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#sendTileRequest">window.MapDataRequest#sendTileRequest</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#setStatus">window.MapDataRequest#setStatus</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#setStatus">window.MapDataRequest#setStatus</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#start">window.MapDataRequest#start</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#start">window.MapDataRequest#start</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#startQueueTimer">window.MapDataRequest#startQueueTimer</a></li><li><a href="MapDataRequest.html#.window.MapDataRequest#startQueueTimer">window.MapDataRequest#startQueueTimer</a></li></ul></div></li><li><a href="module-region_scoreboard-RegionScore.html">RegionScore</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:region_scoreboard~RegionScore_sub"></div></li><li><a href="Render.html">Render</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Render_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Render.html#.window.Render#addPortalToMapLayer">window.Render#addPortalToMapLayer</a></li><li><a href="Render.html#.window.Render#addPortalToMapLayer">window.Render#addPortalToMapLayer</a></li><li><a href="Render.html#.window.Render#bringPortalsToFront">window.Render#bringPortalsToFront</a></li><li><a href="Render.html#.window.Render#bringPortalsToFront">window.Render#bringPortalsToFront</a></li><li><a href="Render.html#.window.Render#clearFieldsOutsideBounds">window.Render#clearFieldsOutsideBounds</a></li><li><a href="Render.html#.window.Render#clearFieldsOutsideBounds">window.Render#clearFieldsOutsideBounds</a></li><li><a href="Render.html#.window.Render#clearLinksOutsideBounds">window.Render#clearLinksOutsideBounds</a></li><li><a href="Render.html#.window.Render#clearLinksOutsideBounds">window.Render#clearLinksOutsideBounds</a></li><li><a href="Render.html#.window.Render#clearPortalsOutsideBounds">window.Render#clearPortalsOutsideBounds</a></li><li><a href="Render.html#.window.Render#clearPortalsOutsideBounds">window.Render#clearPortalsOutsideBounds</a></li><li><a href="Render.html#.window.Render#createFieldEntity">window.Render#createFieldEntity</a></li><li><a href="Render.html#.window.Render#createFieldEntity">window.Render#createFieldEntity</a></li><li><a href="Render.html#.window.Render#createLinkEntity">window.Render#createLinkEntity</a></li><li><a href="Render.html#.window.Render#createLinkEntity">window.Render#createLinkEntity</a></li><li><a href="Render.html#.window.Render#createPlaceholderPortalEntity">window.Render#createPlaceholderPortalEntity</a></li><li><a href="Render.html#.window.Render#createPlaceholderPortalEntity">window.Render#createPlaceholderPortalEntity</a></li><li><a href="Render.html#.window.Render#createPortalEntity">window.Render#createPortalEntity</a></li><li><a href="Render.html#.window.Render#createPortalEntity">window.Render#createPortalEntity</a></li><li><a href="Render.html#.window.Render#deleteEntity">window.Render#deleteEntity</a></li><li><a href="Render.html#.window.Render#deleteEntity">window.Render#deleteEntity</a></li><li><a href="Render.html#.window.Render#deleteFieldEntity">window.Render#deleteFieldEntity</a></li><li><a href="Render.html#.window.Render#deleteFieldEntity">window.Render#deleteFieldEntity</a></li><li><a href="Render.html#.window.Render#deleteLinkEntity">window.Render#deleteLinkEntity</a></li><li><a href="Render.html#.window.Render#deleteLinkEntity">window.Render#deleteLinkEntity</a></li><li><a href="Render.html#.window.Render#deletePortalEntity">window.Render#deletePortalEntity</a></li><li><a href="Render.html#.window.Render#deletePortalEntity">window.Render#deletePortalEntity</a></li><li><a href="Render.html#.window.Render#endRenderPass">window.Render#endRenderPass</a></li><li><a href="Render.html#.window.Render#endRenderPass">window.Render#endRenderPass</a></li><li><a href="Render.html#.window.Render#processDeletedGameEntityGuids">window.Render#processDeletedGameEntityGuids</a></li><li><a href="Render.html#.window.Render#processDeletedGameEntityGuids">window.Render#processDeletedGameEntityGuids</a></li><li><a href="Render.html#.window.Render#processGameEntities">window.Render#processGameEntities</a></li><li><a href="Render.html#.window.Render#processGameEntities">window.Render#processGameEntities</a></li><li><a href="Render.html#.window.Render#processTileData">window.Render#processTileData</a></li><li><a href="Render.html#.window.Render#processTileData">window.Render#processTileData</a></li><li><a href="Render.html#.window.Render#removePortalFromMapLayer">window.Render#removePortalFromMapLayer</a></li><li><a href="Render.html#.window.Render#removePortalFromMapLayer">window.Render#removePortalFromMapLayer</a></li><li><a href="Render.html#.window.Render#rescalePortalMarkers">window.Render#rescalePortalMarkers</a></li><li><a href="Render.html#.window.Render#rescalePortalMarkers">window.Render#rescalePortalMarkers</a></li><li><a href="Render.html#.window.Render#startRenderPass">window.Render#startRenderPass</a></li><li><a href="Render.html#.window.Render#startRenderPass">window.Render#startRenderPass</a></li></ul></div></li><li><a href="RenderDebugTiles.html">RenderDebugTiles</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="RenderDebugTiles_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#create">window.RenderDebugTiles#create</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#create">window.RenderDebugTiles#create</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#reset">window.RenderDebugTiles#reset</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#reset">window.RenderDebugTiles#reset</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#runClearPass">window.RenderDebugTiles#runClearPass</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#runClearPass">window.RenderDebugTiles#runClearPass</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#setColour">window.RenderDebugTiles#setColour</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#setColour">window.RenderDebugTiles#setColour</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#setState">window.RenderDebugTiles#setState</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#setState">window.RenderDebugTiles#setState</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#startTimer">window.RenderDebugTiles#startTimer</a></li><li><a href="RenderDebugTiles.html#.window.RenderDebugTiles#startTimer">window.RenderDebugTiles#startTimer</a></li></ul></div></li><li><a href="window.search.Query.html">Query</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.search.Query_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.search.Query.html#addResult">addResult</a></li><li><a href="window.search.Query.html#addResult">addResult</a></li><li><a href="window.search.Query.html#hide">hide</a></li><li><a href="window.search.Query.html#hide">hide</a></li><li><a href="window.search.Query.html#init">init</a></li><li><a href="window.search.Query.html#init">init</a></li><li><a href="window.search.Query.html#onResultHoverEnd">onResultHoverEnd</a></li><li><a href="window.search.Query.html#onResultHoverEnd">onResultHoverEnd</a></li><li><a href="window.search.Query.html#onResultHoverStart">onResultHoverStart</a></li><li><a href="window.search.Query.html#onResultHoverStart">onResultHoverStart</a></li><li><a href="window.search.Query.html#onResultSelected">onResultSelected</a></li><li><a href="window.search.Query.html#onResultSelected">onResultSelected</a></li><li><a href="window.search.Query.html#removeHoverResult">removeHoverResult</a></li><li><a href="window.search.Query.html#removeHoverResult">removeHoverResult</a></li><li><a href="window.search.Query.html#removeSelectedResult">removeSelectedResult</a></li><li><a href="window.search.Query.html#removeSelectedResult">removeSelectedResult</a></li><li><a href="window.search.Query.html#resultLayer">resultLayer</a></li><li><a href="window.search.Query.html#resultLayer">resultLayer</a></li><li><a href="window.search.Query.html#show">show</a></li><li><a href="window.search.Query.html#show">show</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Namespaces</h3><ul><li><a href="config_options.html">config_options</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="config_options_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="config_options.html#.window.ACCESS_INDICATOR_COLOR">window.ACCESS_INDICATOR_COLOR</a></li><li><a href="config_options.html#.window.ACCESS_INDICATOR_COLOR">window.ACCESS_INDICATOR_COLOR</a></li><li><a href="config_options.html#.window.CHAT_REQUEST_SCROLL_TOP">window.CHAT_REQUEST_SCROLL_TOP</a></li><li><a href="config_options.html#.window.CHAT_REQUEST_SCROLL_TOP">window.CHAT_REQUEST_SCROLL_TOP</a></li><li><a href="config_options.html#.window.CHAT_SHRINKED">window.CHAT_SHRINKED</a></li><li><a href="config_options.html#.window.CHAT_SHRINKED">window.CHAT_SHRINKED</a></li><li><a href="config_options.html#.window.COLOR_SELECTED_PORTAL">window.COLOR_SELECTED_PORTAL</a></li><li><a href="config_options.html#.window.COLOR_SELECTED_PORTAL">window.COLOR_SELECTED_PORTAL</a></li><li><a href="config_options.html#.window.COLORS">window.COLORS</a></li><li><a href="config_options.html#.window.COLORS">window.COLORS</a></li><li><a href="config_options.html#.window.COLORS_LVL">window.COLORS_LVL</a></li><li><a href="config_options.html#.window.COLORS_LVL">window.COLORS_LVL</a></li><li><a href="config_options.html#.window.COLORS_MOD">window.COLORS_MOD</a></li><li><a href="config_options.html#.window.COLORS_MOD">window.COLORS_MOD</a></li><li><a href="config_options.html#.window.DEFAULT_PORTAL_IMG">window.DEFAULT_PORTAL_IMG</a></li><li><a href="config_options.html#.window.DEFAULT_PORTAL_IMG">window.DEFAULT_PORTAL_IMG</a></li><li><a href="config_options.html#.window.DEFAULT_ZOOM">window.DEFAULT_ZOOM</a></li><li><a href="config_options.html#.window.DEFAULT_ZOOM">window.DEFAULT_ZOOM</a></li><li><a href="config_options.html#.window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH">window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH</a></li><li><a href="config_options.html#.window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH">window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH</a></li><li><a href="config_options.html#.window.MAX_IDLE_TIME">window.MAX_IDLE_TIME</a></li><li><a href="config_options.html#.window.MAX_IDLE_TIME">window.MAX_IDLE_TIME</a></li><li><a href="config_options.html#.window.MIN_ZOOM">window.MIN_ZOOM</a></li><li><a href="config_options.html#.window.MIN_ZOOM">window.MIN_ZOOM</a></li><li><a href="config_options.html#.window.MINIMUM_OVERRIDE_REFRESH">window.MINIMUM_OVERRIDE_REFRESH</a></li><li><a href="config_options.html#.window.MINIMUM_OVERRIDE_REFRESH">window.MINIMUM_OVERRIDE_REFRESH</a></li><li><a href="config_options.html#.window.NOMINATIM">window.NOMINATIM</a></li><li><a href="config_options.html#.window.NOMINATIM">window.NOMINATIM</a></li><li><a href="config_options.html#.window.ON_MOVE_REFRESH">window.ON_MOVE_REFRESH</a></li><li><a href="config_options.html#.window.ON_MOVE_REFRESH">window.ON_MOVE_REFRESH</a></li><li><a href="config_options.html#.window.RANGE_INDICATOR_COLOR">window.RANGE_INDICATOR_COLOR</a></li><li><a href="config_options.html#.window.RANGE_INDICATOR_COLOR">window.RANGE_INDICATOR_COLOR</a></li><li><a href="config_options.html#.window.REFRESH">window.REFRESH</a></li><li><a href="config_options.html#.window.REFRESH">window.REFRESH</a></li><li><a href="config_options.html#.window.REFRESH_GAME_SCORE">window.REFRESH_GAME_SCORE</a></li><li><a href="config_options.html#.window.REFRESH_GAME_SCORE">window.REFRESH_GAME_SCORE</a></li><li><a href="config_options.html#.window.SIDEBAR_WIDTH">window.SIDEBAR_WIDTH</a></li><li><a href="config_options.html#.window.SIDEBAR_WIDTH">window.SIDEBAR_WIDTH</a></li><li><a href="config_options.html#.window.ZOOM_LEVEL_ADJ">window.ZOOM_LEVEL_ADJ</a></li><li><a href="config_options.html#.window.ZOOM_LEVEL_ADJ">window.ZOOM_LEVEL_ADJ</a></li></ul></div></li><li><a href="IITC.filters.html">IITC.filters</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.filters_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.filters.html#._filters">_filters</a></li><li><a href="IITC.filters.html#._filters">_filters</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.filters.html#.filterEntities">filterEntities</a></li><li><a href="IITC.filters.html#.filterEntities">filterEntities</a></li><li><a href="IITC.filters.html#.filterField">filterField</a></li><li><a href="IITC.filters.html#.filterField">filterField</a></li><li><a href="IITC.filters.html#.filterLink">filterLink</a></li><li><a href="IITC.filters.html#.filterLink">filterLink</a></li><li><a href="IITC.filters.html#.filterPortal">filterPortal</a></li><li><a href="IITC.filters.html#.filterPortal">filterPortal</a></li><li><a href="IITC.filters.html#.has">has</a></li><li><a href="IITC.filters.html#.has">has</a></li><li><a href="IITC.filters.html#.remove">remove</a></li><li><a href="IITC.filters.html#.remove">remove</a></li><li><a href="IITC.filters.html#.set">set</a></li><li><a href="IITC.filters.html#.set">set</a></li><li><a href="IITC.filters.html#.testFilter">testFilter</a></li><li><a href="IITC.filters.html#.testFilter">testFilter</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="IITC.filters.html#.FilterDesc">FilterDesc</a></li><li><a href="IITC.filters.html#.FilterDesc">FilterDesc</a></li><li><a href="IITC.filters.html#.FilterPredicate">FilterPredicate</a></li><li><a href="IITC.filters.html#.FilterPredicate">FilterPredicate</a></li></ul></div></li><li><a href="ingress_constants.html">ingress_constants</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="ingress_constants_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="ingress_constants.html#.window.BASE_HACK_COOLDOWN">window.BASE_HACK_COOLDOWN</a></li><li><a href="ingress_constants.html#.window.BASE_HACK_COOLDOWN">window.BASE_HACK_COOLDOWN</a></li><li><a href="ingress_constants.html#.window.BASE_HACK_COUNT">window.BASE_HACK_COUNT</a></li><li><a href="ingress_constants.html#.window.BASE_HACK_COUNT">window.BASE_HACK_COUNT</a></li><li><a href="ingress_constants.html#.window.CAPTURE_PORTAL">window.CAPTURE_PORTAL</a></li><li><a href="ingress_constants.html#.window.CAPTURE_PORTAL">window.CAPTURE_PORTAL</a></li><li><a href="ingress_constants.html#.window.COMPLETION_BONUS">window.COMPLETION_BONUS</a></li><li><a href="ingress_constants.html#.window.COMPLETION_BONUS">window.COMPLETION_BONUS</a></li><li><a href="ingress_constants.html#.window.DEPLOY_RESONATOR">window.DEPLOY_RESONATOR</a></li><li><a href="ingress_constants.html#.window.DEPLOY_RESONATOR">window.DEPLOY_RESONATOR</a></li><li><a href="ingress_constants.html#.window.DESTROY_FIELD">window.DESTROY_FIELD</a></li><li><a href="ingress_constants.html#.window.DESTROY_FIELD">window.DESTROY_FIELD</a></li><li><a href="ingress_constants.html#.window.DESTROY_LINK">window.DESTROY_LINK</a></li><li><a href="ingress_constants.html#.window.DESTROY_LINK">window.DESTROY_LINK</a></li><li><a href="ingress_constants.html#.window.DESTROY_RESONATOR">window.DESTROY_RESONATOR</a></li><li><a href="ingress_constants.html#.window.DESTROY_RESONATOR">window.DESTROY_RESONATOR</a></li><li><a href="ingress_constants.html#.window.HACK_RANGE">window.HACK_RANGE</a></li><li><a href="ingress_constants.html#.window.HACK_RANGE">window.HACK_RANGE</a></li><li><a href="ingress_constants.html#.window.LINK_RANGE_MAC">window.LINK_RANGE_MAC</a></li><li><a href="ingress_constants.html#.window.LINK_RANGE_MAC">window.LINK_RANGE_MAC</a></li><li><a href="ingress_constants.html#.window.MAX_PORTAL_LEVEL">window.MAX_PORTAL_LEVEL</a></li><li><a href="ingress_constants.html#.window.MAX_PORTAL_LEVEL">window.MAX_PORTAL_LEVEL</a></li><li><a href="ingress_constants.html#.window.MAX_RESO_PER_PLAYER">window.MAX_RESO_PER_PLAYER</a></li><li><a href="ingress_constants.html#.window.MAX_RESO_PER_PLAYER">window.MAX_RESO_PER_PLAYER</a></li><li><a href="ingress_constants.html#.window.OCTANTS">window.OCTANTS</a></li><li><a href="ingress_constants.html#.window.OCTANTS">window.OCTANTS</a></li><li><a href="ingress_constants.html#.window.OCTANTS_ARROW">window.OCTANTS_ARROW</a></li><li><a href="ingress_constants.html#.window.OCTANTS_ARROW">window.OCTANTS_ARROW</a></li><li><a href="ingress_constants.html#.window.RESO_NRG">window.RESO_NRG</a></li><li><a href="ingress_constants.html#.window.RESO_NRG">window.RESO_NRG</a></li><li><a href="ingress_constants.html#.window.UPGRADE_ANOTHERS_RESONATOR">window.UPGRADE_ANOTHERS_RESONATOR</a></li><li><a href="ingress_constants.html#.window.UPGRADE_ANOTHERS_RESONATOR">window.UPGRADE_ANOTHERS_RESONATOR</a></li></ul></div></li><li><a href="other_constants.html">other_constants</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="other_constants_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="other_constants.html#.window.TEAM_CODE_ENL">window.TEAM_CODE_ENL</a></li><li><a href="other_constants.html#.window.TEAM_CODE_ENL">window.TEAM_CODE_ENL</a></li><li><a href="other_constants.html#.window.TEAM_CODE_MAC">window.TEAM_CODE_MAC</a></li><li><a href="other_constants.html#.window.TEAM_CODE_MAC">window.TEAM_CODE_MAC</a></li><li><a href="other_constants.html#.window.TEAM_CODE_NONE">window.TEAM_CODE_NONE</a></li><li><a href="other_constants.html#.window.TEAM_CODE_NONE">window.TEAM_CODE_NONE</a></li><li><a href="other_constants.html#.window.TEAM_CODE_RES">window.TEAM_CODE_RES</a></li><li><a href="other_constants.html#.window.TEAM_CODE_RES">window.TEAM_CODE_RES</a></li><li><a href="other_constants.html#.window.TEAM_CODENAMES">window.TEAM_CODENAMES</a></li><li><a href="other_constants.html#.window.TEAM_CODENAMES">window.TEAM_CODENAMES</a></li><li><a href="other_constants.html#.window.TEAM_CODES">window.TEAM_CODES</a></li><li><a href="other_constants.html#.window.TEAM_CODES">window.TEAM_CODES</a></li><li><a href="other_constants.html#.window.TEAM_ENL">window.TEAM_ENL</a></li><li><a href="other_constants.html#.window.TEAM_ENL">window.TEAM_ENL</a></li><li><a href="other_constants.html#.window.TEAM_MAC">window.TEAM_MAC</a></li><li><a href="other_constants.html#.window.TEAM_MAC">window.TEAM_MAC</a></li><li><a href="other_constants.html#.window.TEAM_NAME_ENL">window.TEAM_NAME_ENL</a></li><li><a href="other_constants.html#.window.TEAM_NAME_ENL">window.TEAM_NAME_ENL</a></li><li><a href="other_constants.html#.window.TEAM_NAME_MAC">window.TEAM_NAME_MAC</a></li><li><a href="other_constants.html#.window.TEAM_NAME_MAC">window.TEAM_NAME_MAC</a></li><li><a href="other_constants.html#.window.TEAM_NAME_NONE">window.TEAM_NAME_NONE</a></li><li><a href="other_constants.html#.window.TEAM_NAME_NONE">window.TEAM_NAME_NONE</a></li><li><a href="other_constants.html#.window.TEAM_NAME_RES">window.TEAM_NAME_RES</a></li><li><a href="other_constants.html#.window.TEAM_NAME_RES">window.TEAM_NAME_RES</a></li><li><a href="other_constants.html#.window.TEAM_NAMES">window.TEAM_NAMES</a></li><li><a href="other_constants.html#.window.TEAM_NAMES">window.TEAM_NAMES</a></li><li><a href="other_constants.html#.window.TEAM_NONE">window.TEAM_NONE</a></li><li><a href="other_constants.html#.window.TEAM_NONE">window.TEAM_NONE</a></li><li><a href="other_constants.html#.window.TEAM_RES">window.TEAM_RES</a></li><li><a href="other_constants.html#.window.TEAM_RES">window.TEAM_RES</a></li><li><a href="other_constants.html#.window.TEAM_TO_CSS">window.TEAM_TO_CSS</a></li><li><a href="other_constants.html#.window.TEAM_TO_CSS">window.TEAM_TO_CSS</a></li></ul></div></li><li><a href="player.html">player</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="player_sub"><div class="member-type">Typedef</div><ul class="inner"><li><a href="player.html#.PLAYER">PLAYER</a></li><li><a href="player.html#.PLAYER">PLAYER</a></li></ul></div></li><li><a href="storage_variables.html">storage_variables</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="storage_variables_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="storage_variables.html#.window.fields">window.fields</a></li><li><a href="storage_variables.html#.window.fields">window.fields</a></li><li><a href="storage_variables.html#.window.links">window.links</a></li><li><a href="storage_variables.html#.window.links">window.links</a></li><li><a href="storage_variables.html#.window.portalAccessIndicator">window.portalAccessIndicator</a></li><li><a href="storage_variables.html#.window.portalAccessIndicator">window.portalAccessIndicator</a></li><li><a href="storage_variables.html#.window.portalRangeIndicator">window.portalRangeIndicator</a></li><li><a href="storage_variables.html#.window.portalRangeIndicator">window.portalRangeIndicator</a></li><li><a href="storage_variables.html#.window.portals">window.portals</a></li><li><a href="storage_variables.html#.window.portals">window.portals</a></li><li><a href="storage_variables.html#.window.refreshTimeout">window.refreshTimeout</a></li><li><a href="storage_variables.html#.window.refreshTimeout">window.refreshTimeout</a></li><li><a href="storage_variables.html#.window.selectedPortal">window.selectedPortal</a></li><li><a href="storage_variables.html#.window.selectedPortal">window.selectedPortal</a></li><li><a href="storage_variables.html#.window.urlPortal">window.urlPortal</a></li><li><a href="storage_variables.html#.window.urlPortal">window.urlPortal</a></li><li><a href="storage_variables.html#.window.urlPortalLL">window.urlPortalLL</a></li><li><a href="storage_variables.html#.window.urlPortalLL">window.urlPortalLL</a></li></ul></div></li><li><a href="window.artifact.html">window.artifact</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.artifact_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.artifact.html#.clearData">clearData</a></li><li><a href="window.artifact.html#.clearData">clearData</a></li><li><a href="window.artifact.html#.getArtifactEntities">getArtifactEntities</a></li><li><a href="window.artifact.html#.getArtifactEntities">getArtifactEntities</a></li><li><a href="window.artifact.html#.getArtifactTypes">getArtifactTypes</a></li><li><a href="window.artifact.html#.getArtifactTypes">getArtifactTypes</a></li><li><a href="window.artifact.html#.getInterestingPortals">getInterestingPortals</a></li><li><a href="window.artifact.html#.getInterestingPortals">getInterestingPortals</a></li><li><a href="window.artifact.html#.getPortalData">getPortalData</a></li><li><a href="window.artifact.html#.getPortalData">getPortalData</a></li><li><a href="window.artifact.html#.handleFailure">handleFailure</a></li><li><a href="window.artifact.html#.handleFailure">handleFailure</a></li><li><a href="window.artifact.html#.handleSuccess">handleSuccess</a></li><li><a href="window.artifact.html#.handleSuccess">handleSuccess</a></li><li><a href="window.artifact.html#.idleResume">idleResume</a></li><li><a href="window.artifact.html#.idleResume">idleResume</a></li><li><a href="window.artifact.html#.isArtifact">isArtifact</a></li><li><a href="window.artifact.html#.isArtifact">isArtifact</a></li><li><a href="window.artifact.html#.isInterestingPortal">isInterestingPortal</a></li><li><a href="window.artifact.html#.isInterestingPortal">isInterestingPortal</a></li><li><a href="window.artifact.html#.processData">processData</a></li><li><a href="window.artifact.html#.processData">processData</a></li><li><a href="window.artifact.html#.processResult">processResult</a></li><li><a href="window.artifact.html#.processResult">processResult</a></li><li><a href="window.artifact.html#.requestData">requestData</a></li><li><a href="window.artifact.html#.requestData">requestData</a></li><li><a href="window.artifact.html#.setup">setup</a></li><li><a href="window.artifact.html#.setup">setup</a></li><li><a href="window.artifact.html#.showArtifactList">showArtifactList</a></li><li><a href="window.artifact.html#.showArtifactList">showArtifactList</a></li><li><a href="window.artifact.html#.updateLayer">updateLayer</a></li><li><a href="window.artifact.html#.updateLayer">updateLayer</a></li></ul></div></li><li><a href="window.chat.html">window.chat</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.chat_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="window.chat.html#._alerts">_alerts</a></li><li><a href="window.chat.html#._alerts">_alerts</a></li><li><a href="window.chat.html#._faction">_faction</a></li><li><a href="window.chat.html#._faction">_faction</a></li><li><a href="window.chat.html#._public">_public</a></li><li><a href="window.chat.html#._public">_public</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="window.chat.html#.addNickname">addNickname</a></li><li><a href="window.chat.html#.addNickname">addNickname</a></li><li><a href="window.chat.html#.backgroundChannelData">backgroundChannelData</a></li><li><a href="window.chat.html#.backgroundChannelData">backgroundChannelData</a></li><li><a href="window.chat.html#.chooser">chooser</a></li><li><a href="window.chat.html#.chooser">chooser</a></li><li><a href="window.chat.html#.chooseTab">chooseTab</a></li><li><a href="window.chat.html#.chooseTab">chooseTab</a></li><li><a href="window.chat.html#.genPostData">genPostData</a></li><li><a href="window.chat.html#.genPostData">genPostData</a></li><li><a href="window.chat.html#.getActive">getActive</a></li><li><a href="window.chat.html#.getActive">getActive</a></li><li><a href="window.chat.html#.getChatPortalName">getChatPortalName</a></li><li><a href="window.chat.html#.getChatPortalName">getChatPortalName</a></li><li><a href="window.chat.html#.handleAlerts">handleAlerts</a></li><li><a href="window.chat.html#.handleAlerts">handleAlerts</a></li><li><a href="window.chat.html#.handleFaction">handleFaction</a></li><li><a href="window.chat.html#.handleFaction">handleFaction</a></li><li><a href="window.chat.html#.handlePublic">handlePublic</a></li><li><a href="window.chat.html#.handlePublic">handlePublic</a></li><li><a href="window.chat.html#.handleTabCompletion">handleTabCompletion</a></li><li><a href="window.chat.html#.handleTabCompletion">handleTabCompletion</a></li><li><a href="window.chat.html#.keepScrollPosition">keepScrollPosition</a></li><li><a href="window.chat.html#.keepScrollPosition">keepScrollPosition</a></li><li><a href="window.chat.html#.needMoreMessages">needMoreMessages</a></li><li><a href="window.chat.html#.needMoreMessages">needMoreMessages</a></li><li><a href="window.chat.html#.nicknameClicked">nicknameClicked</a></li><li><a href="window.chat.html#.nicknameClicked">nicknameClicked</a></li><li><a href="window.chat.html#.parseMsgData">parseMsgData</a></li><li><a href="window.chat.html#.parseMsgData">parseMsgData</a></li><li><a href="window.chat.html#.postMsg">postMsg</a></li><li><a href="window.chat.html#.postMsg">postMsg</a></li><li><a href="window.chat.html#.renderAlerts">renderAlerts</a></li><li><a href="window.chat.html#.renderAlerts">renderAlerts</a></li><li><a href="window.chat.html#.renderData">renderData</a></li><li><a href="window.chat.html#.renderData">renderData</a></li><li><a href="window.chat.html#.renderDivider">renderDivider</a></li><li><a href="window.chat.html#.renderDivider">renderDivider</a></li><li><a href="window.chat.html#.renderFaction">renderFaction</a></li><li><a href="window.chat.html#.renderFaction">renderFaction</a></li><li><a href="window.chat.html#.renderFactionEnt">renderFactionEnt</a></li><li><a href="window.chat.html#.renderFactionEnt">renderFactionEnt</a></li><li><a href="window.chat.html#.renderMarkup">renderMarkup</a></li><li><a href="window.chat.html#.renderMarkup">renderMarkup</a></li><li><a href="window.chat.html#.renderMarkupEntity">renderMarkupEntity</a></li><li><a href="window.chat.html#.renderMarkupEntity">renderMarkupEntity</a></li><li><a href="window.chat.html#.renderMsg">renderMsg</a></li><li><a href="window.chat.html#.renderMsg">renderMsg</a></li><li><a href="window.chat.html#.renderMsgCell">renderMsgCell</a></li><li><a href="window.chat.html#.renderMsgCell">renderMsgCell</a></li><li><a href="window.chat.html#.renderMsgRow">renderMsgRow</a></li><li><a href="window.chat.html#.renderMsgRow">renderMsgRow</a></li><li><a href="window.chat.html#.renderNickCell">renderNickCell</a></li><li><a href="window.chat.html#.renderNickCell">renderNickCell</a></li><li><a href="window.chat.html#.renderPlayer">renderPlayer</a></li><li><a href="window.chat.html#.renderPlayer">renderPlayer</a></li><li><a href="window.chat.html#.renderPortal">renderPortal</a></li><li><a href="window.chat.html#.renderPortal">renderPortal</a></li><li><a href="window.chat.html#.renderPublic">renderPublic</a></li><li><a href="window.chat.html#.renderPublic">renderPublic</a></li><li><a href="window.chat.html#.renderText">renderText</a></li><li><a href="window.chat.html#.renderText">renderText</a></li><li><a href="window.chat.html#.renderTimeCell">renderTimeCell</a></li><li><a href="window.chat.html#.renderTimeCell">renderTimeCell</a></li><li><a href="window.chat.html#.request">request</a></li><li><a href="window.chat.html#.request">request</a></li><li><a href="window.chat.html#.requestAlerts">requestAlerts</a></li><li><a href="window.chat.html#.requestAlerts">requestAlerts</a></li><li><a href="window.chat.html#.requestFaction">requestFaction</a></li><li><a href="window.chat.html#.requestFaction">requestFaction</a></li><li><a href="window.chat.html#.requestPublic">requestPublic</a></li><li><a href="window.chat.html#.requestPublic">requestPublic</a></li><li><a href="window.chat.html#.setup">setup</a></li><li><a href="window.chat.html#.setup">setup</a></li><li><a href="window.chat.html#.setupPosting">setupPosting</a></li><li><a href="window.chat.html#.setupPosting">setupPosting</a></li><li><a href="window.chat.html#.setupTime">setupTime</a></li><li><a href="window.chat.html#.setupTime">setupTime</a></li><li><a href="window.chat.html#.show">show</a></li><li><a href="window.chat.html#.show">show</a></li><li><a href="window.chat.html#.tabToChannel">tabToChannel</a></li><li><a href="window.chat.html#.tabToChannel">tabToChannel</a></li><li><a href="window.chat.html#.toggle">toggle</a></li><li><a href="window.chat.html#.toggle">toggle</a></li><li><a href="window.chat.html#.updateOldNewHash">updateOldNewHash</a></li><li><a href="window.chat.html#.updateOldNewHash">updateOldNewHash</a></li><li><a href="window.chat.html#.writeDataToHash">writeDataToHash</a></li><li><a href="window.chat.html#.writeDataToHash">writeDataToHash</a></li></ul></div></li><li><a href="window.decodeArray.html">window.decodeArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.decodeArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.decodeArray.html#.portal">portal</a></li><li><a href="window.decodeArray.html#.portal">portal</a></li></ul></div></li><li><a href="window.ornaments.html">window.ornaments</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.ornaments_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="window.ornaments.html#.excludedOrnaments">excludedOrnaments</a></li><li><a href="window.ornaments.html#.excludedOrnaments">excludedOrnaments</a></li><li><a href="window.ornaments.html#.icon">icon</a></li><li><a href="window.ornaments.html#.icon">icon</a></li><li><a href="window.ornaments.html#.knownOrnaments">knownOrnaments</a></li><li><a href="window.ornaments.html#.knownOrnaments">knownOrnaments</a></li><li><a href="window.ornaments.html#.OVERLAY_OPACITY">OVERLAY_OPACITY</a></li><li><a href="window.ornaments.html#.OVERLAY_OPACITY">OVERLAY_OPACITY</a></li><li><a href="window.ornaments.html#.OVERLAY_SIZE">OVERLAY_SIZE</a></li><li><a href="window.ornaments.html#.OVERLAY_SIZE">OVERLAY_SIZE</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="window.ornaments.html#.addPortal">addPortal</a></li><li><a href="window.ornaments.html#.addPortal">addPortal</a></li><li><a href="window.ornaments.html#.createLayer">createLayer</a></li><li><a href="window.ornaments.html#.createLayer">createLayer</a></li><li><a href="window.ornaments.html#.initOrnaments">initOrnaments</a></li><li><a href="window.ornaments.html#.initOrnaments">initOrnaments</a></li><li><a href="window.ornaments.html#.load">load</a></li><li><a href="window.ornaments.html#.load">load</a></li><li><a href="window.ornaments.html#.onChangeHandler">onChangeHandler</a></li><li><a href="window.ornaments.html#.onChangeHandler">onChangeHandler</a></li><li><a href="window.ornaments.html#.ornamentsList">ornamentsList</a></li><li><a href="window.ornaments.html#.ornamentsList">ornamentsList</a></li><li><a href="window.ornaments.html#.ornamentsOpt">ornamentsOpt</a></li><li><a href="window.ornaments.html#.ornamentsOpt">ornamentsOpt</a></li><li><a href="window.ornaments.html#.processInput">processInput</a></li><li><a href="window.ornaments.html#.processInput">processInput</a></li><li><a href="window.ornaments.html#.reload">reload</a></li><li><a href="window.ornaments.html#.reload">reload</a></li><li><a href="window.ornaments.html#.removePortal">removePortal</a></li><li><a href="window.ornaments.html#.removePortal">removePortal</a></li><li><a href="window.ornaments.html#.replaceOL">replaceOL</a></li><li><a href="window.ornaments.html#.replaceOL">replaceOL</a></li><li><a href="window.ornaments.html#.save">save</a></li><li><a href="window.ornaments.html#.save">save</a></li><li><a href="window.ornaments.html#.setup">setup</a></li><li><a href="window.ornaments.html#.setup">setup</a></li></ul></div></li><li><a href="window.portalDetail.html">window.portalDetail</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.portalDetail_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.portalDetail.html#.get">get</a></li><li><a href="window.portalDetail.html#.get">get</a></li><li><a href="window.portalDetail.html#.isFresh">isFresh</a></li><li><a href="window.portalDetail.html#.isFresh">isFresh</a></li><li><a href="window.portalDetail.html#.request">request</a></li><li><a href="window.portalDetail.html#.request">request</a></li><li><a href="window.portalDetail.html#.setup">setup</a></li><li><a href="window.portalDetail.html#.setup">setup</a></li><li><a href="window.portalDetail.html#.store">store</a></li><li><a href="window.portalDetail.html#.store">store</a></li></ul></div></li><li><a href="window.requests.html">window.requests</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.requests_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.requests.html#._callOnRefreshFunctions">_callOnRefreshFunctions</a></li><li><a href="window.requests.html#._callOnRefreshFunctions">_callOnRefreshFunctions</a></li><li><a href="window.requests.html#.abort">abort</a></li><li><a href="window.requests.html#.abort">abort</a></li><li><a href="window.requests.html#.add">add</a></li><li><a href="window.requests.html#.add">add</a></li><li><a href="window.requests.html#.addRefreshFunction">addRefreshFunction</a></li><li><a href="window.requests.html#.addRefreshFunction">addRefreshFunction</a></li><li><a href="window.requests.html#.remove">remove</a></li><li><a href="window.requests.html#.remove">remove</a></li></ul></div></li><li><a href="window.search.html">window.search</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.search_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.search.html#.addSearchResult">addSearchResult</a></li><li><a href="window.search.html#.addSearchResult">addSearchResult</a></li><li><a href="window.search.html#.doSearch">doSearch</a></li><li><a href="window.search.html#.doSearch">doSearch</a></li><li><a href="window.search.html#.setup">setup</a></li><li><a href="window.search.html#.setup">setup</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Global</h3><ul><li><a href="global.html#transformMessage">transformMessage</a></li></ul></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Misc utils
+ *
+ * @module utils_misc
+ */
+
+/**
+ * Retrieves a parameter from the URL query string.
+ *
+ * @function getURLParam
+ * @param {string} param - The name of the parameter to retrieve.
+ * @returns {string} The value of the parameter, or an empty string if not found.
+ */
+window.getURLParam = function(param) {
+  var items = window.location.search.substr(1).split('&amp;');
+  if (items == "") return "";
+
+  for (var i=0; i&lt;items.length; i++) {
+    var item = items[i].split('=');
+
+    if (item[0] == param) {
+      var val = item.length==1 ? '' : decodeURIComponent (item[1].replace(/\+/g,' '));
+      return val;
+    }
+  }
+
+  return '';
+}
+
+/**
+ * Reads a cookie by name.
+ * @see http://stackoverflow.com/a/5639455/1684530
+ *
+ * @function readCookie
+ * @param {string} name - The name of the cookie to read.
+ * @returns {string} The value of the cookie, or undefined if not found.
+ */
+window.readCookie = function(name){
+  var C, i, c = document.cookie.split('; ');
+  var cookies = {};
+  for(i=c.length-1; i>=0; i--){
+    C = c[i].split('=');
+    cookies[C[0]] = unescape(C[1]);
+  }
+  return cookies[name];
+}
+
+/**
+ * Writes a cookie with a specified name and value.
+ *
+ * @function writeCookie
+ * @param {string} name - The name of the cookie.
+ * @param {string} val - The value of the cookie.
+ */
+window.writeCookie = function(name, val) {
+  var d = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = name + "=" + val + '; expires='+d+'; path=/';
+}
+
+/**
+ * Erases a cookie with a specified name.
+ *
+ * @function eraseCookie
+ * @param {string} name - The name of the cookie to erase.
+ */
+window.eraseCookie = function(name) {
+  document.cookie = name + '=; expires=Thu, 1 Jan 1970 00:00:00 GMT; path=/';
+}
+
+/**
+ * Adds thousand separators to a given number.
+ * @see http://stackoverflow.com/a/1990590/1684530
+ *
+ * @function digits
+ * @param {number} d - The number to format.
+ * @returns {string} The formatted number with thousand separators.
+ */
+window.digits = function(d) {
+  // U+2009 - Thin Space. Recommended for use as a thousands separator...
+  // https://en.wikipedia.org/wiki/Space_(punctuation)#Table_of_spaces
+  return (d+"").replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1&amp;#8201;");
+}
+
+/**
+ * Pads a number with zeros up to a specified length.
+ *
+ * @function zeroPad
+ * @param {number} number - The number to pad.
+ * @param {number} pad - The desired length of the output string.
+ * @returns {string} The padded number as a string.
+ */
+window.zeroPad = function(number,pad) {
+  number = number.toString();
+  var zeros = pad - number.length;
+  return Array(zeros>0?zeros+1:0).join("0") + number;
+}
+
+/**
+ * Converts a UNIX timestamp to a human-readable string.
+ * If the timestamp is from today, returns the time (HH:mm:ss format); otherwise, returns the date (YYYY-MM-DD).
+ *
+ * @function unixTimeToString
+ * @param {number} time - The UNIX timestamp to convert.
+ * @param {boolean} [full] - If true, returns both date and time.
+ * @returns {string|null} The formatted date and/or time.
+ */
+window.unixTimeToString = function(time, full) {
+  if(!time) return null;
+  var d = new Date(typeof time === 'string' ? parseInt(time) : time);
+  var time = d.toLocaleTimeString();
+//  var time = zeroPad(d.getHours(),2)+':'+zeroPad(d.getMinutes(),2)+':'+zeroPad(d.getSeconds(),2);
+  var date = d.getFullYear()+'-'+zeroPad(d.getMonth()+1,2)+'-'+zeroPad(d.getDate(),2);
+  if(typeof full !== 'undefined' &amp;&amp; full) return date + ' ' + time;
+  if(d.toDateString() == new Date().toDateString())
+    return time;
+  else
+    return date;
+}
+
+/**
+ * Converts a UNIX timestamp to a precise date and time string in the local timezone.
+ * Formatted in ISO-style YYYY-MM-DD hh:mm:ss.mmm - but using local timezone
+ *
+ * @function unixTimeToDateTimeString
+ * @param {number} time - The UNIX timestamp to convert.
+ * @param {boolean} [millisecond] - Whether to include millisecond precision.
+ * @returns {string|null} The formatted date and time string.
+ */
+window.unixTimeToDateTimeString = function(time, millisecond) {
+  if(!time) return null;
+  var d = new Date(typeof time === 'string' ? parseInt(time) : time);
+  return d.getFullYear()+'-'+zeroPad(d.getMonth()+1,2)+'-'+zeroPad(d.getDate(),2)
+    +' '+zeroPad(d.getHours(),2)+':'+zeroPad(d.getMinutes(),2)+':'+zeroPad(d.getSeconds(),2)+(millisecond?'.'+zeroPad(d.getMilliseconds(),3):'');
+}
+
+/**
+ * Converts a UNIX timestamp to a time string formatted as HH:mm.
+ *
+ * @function unixTimeToHHmm
+ * @param {number|string} time - The UNIX timestamp to convert.
+ * @returns {string|null} Formatted time as HH:mm.
+ */
+window.unixTimeToHHmm = function(time) {
+  if(!time) return null;
+  var d = new Date(typeof time === 'string' ? parseInt(time) : time);
+  var h = '' + d.getHours(); h = h.length === 1 ? '0' + h : h;
+  var s = '' + d.getMinutes(); s = s.length === 1 ? '0' + s : s;
+  return  h + ':' + s;
+}
+
+/**
+ * Formats an interval of time given in seconds into a human-readable string.
+ *
+ * @function formatInterval
+ * @param {number} seconds - The interval in seconds.
+ * @param {number} [maxTerms] - The maximum number of time units to include.
+ * @returns {string} The formatted time interval.
+ */
+window.formatInterval = function(seconds,maxTerms) {
+
+  var d = Math.floor(seconds / 86400);
+  var h = Math.floor((seconds % 86400) / 3600);
+  var m = Math.floor((seconds % 3600) / 60);
+  var s = seconds % 60;
+
+  var terms = [];
+  if (d > 0) terms.push(d+'d');
+  if (h > 0) terms.push(h+'h');
+  if (m > 0) terms.push(m+'m');
+  if (s > 0 || terms.length==0) terms.push(s+'s');
+
+  if (maxTerms) terms = terms.slice(0,maxTerms);
+
+  return terms.join(' ');
+}
+
+/**
+ * Formats a distance in meters, converting to kilometers if the distance is over 10,000 meters.
+ *
+ * @function formatDistance
+ * @param {number} distance - The distance in meters.
+ * @returns {string} The formatted distance.
+ */
+window.formatDistance = function (distance) {
+  return window.digits(distance > 10000 ? (distance / 1000).toFixed(2) + 'km' : Math.round(distance) + 'm');
+};
+
+/**
+ * Changes the coordinates and map scale to show the range for portal links.
+ *
+ * @function rangeLinkClick
+ */
+window.rangeLinkClick = function() {
+  if(window.portalRangeIndicator)
+    window.map.fitBounds(window.portalRangeIndicator.getBounds());
+  if(window.isSmartphone())
+    window.show('map');
+}
+
+/**
+ * Displays a dialog with links to show the specified location on various map services.
+ *
+ * @function showPortalPosLinks
+ * @param {number} lat - Latitude of the location.
+ * @param {number} lng - Longitude of the location.
+ * @param {string} name - Name of the location.
+ */
+window.showPortalPosLinks = function(lat, lng, name) {
+  var encoded_name = encodeURIComponent(name);
+  var qrcode = '&lt;div id="qrcode">&lt;/div>';
+  var script = '&lt;script>$(\'#qrcode\').qrcode({text:\'GEO:'+lat+','+lng+'\'});&lt;/script>';
+  var gmaps = '&lt;a href="https://maps.google.com/maps?ll='+lat+','+lng+'&amp;q='+lat+','+lng+'%20('+encoded_name+')">Google Maps&lt;/a>';
+  var bingmaps = '&lt;a href="https://www.bing.com/maps/?v=2&amp;cp='+lat+'~'+lng+'&amp;lvl=16&amp;sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps&lt;/a>';
+  var osm = '&lt;a href="https://www.openstreetmap.org/?mlat='+lat+'&amp;mlon='+lng+'&amp;zoom=16">OpenStreetMap&lt;/a>';
+  var latLng = '&lt;span>' + lat + ',' + lng +'&lt;/span>';
+  dialog({
+    html: '&lt;div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '&lt;br />' + latLng + '&lt;/div>',
+    title: name,
+    id: 'poslinks'
+  });
+}
+
+/**
+ * Checks if the device is a touch-enabled device.
+ *
+ * @function isTouchDevice
+ * @returns {boolean} True if the device is touch-enabled, otherwise false.
+ */
+window.isTouchDevice = function() {
+  return 'ontouchstart' in window // works on most browsers
+      || 'onmsgesturechange' in window; // works on ie10
+};
+
+// !!deprecated
+// to be ovewritten in app.js
+window.androidCopy = function(text) {
+  return true; // i.e. execute other actions
+}
+
+/**
+ * Calculates the number of pixels left to scroll down before reaching the bottom of an element.
+ *
+ * @function scrollBottom
+ * @param {string|jQuery} elm - The element to calculate the scroll bottom for.
+ * @returns {number} The number of pixels from the bottom.
+ */
+window.scrollBottom = function(elm) {
+  if(typeof elm === 'string') elm = $(elm);
+  return elm.get(0).scrollHeight - elm.innerHeight() - elm.scrollTop();
+}
+
+/**
+ * Zooms the map to a specific portal and shows its details if available.
+ *
+ * @function zoomToAndShowPortal
+ * @param {string} guid - The globally unique identifier of the portal.
+ * @param {L.LatLng} latlng - The latitude and longitude of the portal.
+ */
+window.zoomToAndShowPortal = function(guid, latlng) {
+  map.setView(latlng, DEFAULT_ZOOM);
+  // if the data is available, render it immediately. Otherwise defer
+  // until it becomes available.
+  if(window.portals[guid])
+    renderPortalDetails(guid);
+  else
+    urlPortal = guid;
+}
+
+/**
+ * Selects a portal by its latitude and longitude.
+ *
+ * @function selectPortalByLatLng
+ * @param {number|Array|L.LatLng} lat - The latitude of the portal
+ *                                      or an array or L.LatLng object containing both latitude and longitude.
+ * @param {number} [lng] - The longitude of the portal.
+ */
+window.selectPortalByLatLng = function(lat, lng) {
+  if(lng === undefined &amp;&amp; lat instanceof Array) {
+    lng = lat[1];
+    lat = lat[0];
+  } else if(lng === undefined &amp;&amp; lat instanceof L.LatLng) {
+    lng = lat.lng;
+    lat = lat.lat;
+  }
+  for(var guid in window.portals) {
+    var latlng = window.portals[guid].getLatLng();
+    if(latlng.lat == lat &amp;&amp; latlng.lng == lng) {
+      renderPortalDetails(guid);
+      return;
+    }
+  }
+
+  // not currently visible
+  urlPortalLL = [lat, lng];
+  map.setView(urlPortalLL, DEFAULT_ZOOM);
+};
+
+/**
+ * Escapes special characters in a string for use in JavaScript.
+ * (for strings passed as parameters to html onclick="..." for example)
+ *
+ * @function escapeJavascriptString
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string.
+ */
+window.escapeJavascriptString = function(str) {
+  return (str+'').replace(/[\\"']/g,'\\$&amp;');
+}
+
+/**
+ * Escapes HTML special characters in a string.
+ *
+ * @function escapeHtmlSpecialChars
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string.
+ */
+window.escapeHtmlSpecialChars = function(str) {
+  var div = document.createElement('div');
+  var text = document.createTextNode(str);
+  div.appendChild(text);
+  return div.innerHTML;
+}
+
+/**
+ * Formats energy of portal.
+ *
+ * @function prettyEnergy
+ * @param {number} nrg - The energy value to format.
+ * @returns {string} The formatted energy value.
+ */
+window.prettyEnergy = function(nrg) {
+  return nrg> 1000 ? Math.round(nrg/1000) + ' k': nrg;
+}
+
+/**
+ * Converts a list of items into a unique array, removing duplicates.
+ *
+ * @function uniqueArray
+ * @param {Array} arr - The array to process.
+ * @returns {Array} A new array containing only unique elements.
+ */
+window.uniqueArray = function(arr) {
+  return $.grep(arr, function(v, i) {
+    return $.inArray(v, arr) === i;
+  });
+}
+
+/**
+ * Generates a four-column HTML table from an array of data blocks.
+ *
+ * @param {Array} blocks - Array of data blocks, where each block is an array with details for one row.
+ * @returns {string} HTML string representing the constructed table.
+ */
+window.genFourColumnTable = function(blocks) {
+  var t = $.map(blocks, function(detail, index) {
+    if(!detail) return '';
+    var title = detail[2] ? ' title="'+escapeHtmlSpecialChars(detail[2]) + '"' : '';
+    if(index % 2 === 0)
+      return '&lt;tr>&lt;td'+title+'>'+detail[1]+'&lt;/td>&lt;th'+title+'>'+detail[0]+'&lt;/th>';
+    else
+      return '    &lt;th'+title+'>'+detail[0]+'&lt;/th>&lt;td'+title+'>'+detail[1]+'&lt;/td>&lt;/tr>';
+  }).join('');
+  if(t.length % 2 === 1) t + '&lt;td>&lt;/td>&lt;td>&lt;/td>&lt;/tr>';
+  return t;
+}
+
+/**
+ * Converts text with newlines (`\n`) and tabs (`\t`) into an HTML table.
+ *
+ * @function convertTextToTableMagic
+ * @param {string} text - The text to convert.
+ * @returns {string} The resulting HTML table.
+ */
+window.convertTextToTableMagic = function(text) {
+  // check if it should be converted to a table
+  if(!text.match(/\t/)) return text.replace(/\n/g, '&lt;br>');
+
+  var data = [];
+  var columnCount = 0;
+
+  // parse data
+  var rows = text.split('\n');
+  $.each(rows, function(i, row) {
+    data[i] = row.split('\t');
+    if(data[i].length > columnCount) columnCount = data[i].length;
+  });
+
+  // build the table
+  var table = '&lt;table>';
+  $.each(data, function(i, row) {
+    table += '&lt;tr>';
+    $.each(data[i], function(k, cell) {
+      var attributes = '';
+      if(k === 0 &amp;&amp; data[i].length &lt; columnCount) {
+        attributes = ' colspan="'+(columnCount - data[i].length + 1)+'"';
+      }
+      table += '&lt;td'+attributes+'>'+cell+'&lt;/td>';
+    });
+    table += '&lt;/tr>';
+  });
+  table += '&lt;/table>';
+  return table;
+}
+
+/**
+ * Clamps a given value between a minimum and maximum value.
+ *
+ * @private
+ * @function clamp
+ * @param {number} n - The value to clamp.
+ * @param {number} max - The maximum allowed value.
+ * @param {number} min - The minimum allowed value.
+ * @returns {number} The clamped value.
+ */
+function clamp(n, max, min) {
+  if (n === 0) return 0;
+  return n > 0 ? Math.min(n, max) : Math.max(n, min);
+}
+
+var MAX_LATITUDE = 85.051128; // L.Projection.SphericalMercator.MAX_LATITUDE
+
+/**
+ * Clamps a latitude and longitude to the maximum and minimum valid values.
+ *
+ * @function clampLatLng
+ * @param {L.LatLng} latlng - The latitude and longitude to clamp.
+ * @returns {Array&lt;number>} The clamped latitude and longitude.
+ */
+window.clampLatLng = function (latlng) {
+  // Ingress accepts requests only for this range
+  return [
+    clamp(latlng.lat, MAX_LATITUDE, -MAX_LATITUDE),
+    clamp(latlng.lng, 179.999999, -180)
+  ];
+}
+
+/**
+ * Clamps a latitude and longitude bounds to the maximum and minimum valid values.
+ *
+ * @function clampLatLngBounds
+ * @param {L.LatLngBounds} bounds - The bounds to clamp.
+ * @returns {L.LatLngBounds} The clamped bounds.
+ */
+window.clampLatLngBounds = function (bounds) {
+  var SW = bounds.getSouthWest(), NE = bounds.getNorthEast();
+  return L.latLngBounds(clampLatLng(SW), clampLatLng(NE));
+}
+
+/*
+pnpoly Copyright (c) 1970-2003, Wm. Randolph Franklin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+
+  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+     disclaimers.
+  2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other
+     materials provided with the distribution.
+  3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without
+     specific prior written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+/**
+ * Determines if a point is inside a polygon.
+ *
+ * @param {Array&lt;L.LatLng>} polygon - The vertices of the polygon.
+ * @param {L.LatLng} point - The point to test.
+ * @returns {boolean} True if the point is inside the polygon, false otherwise.
+ */
+window.pnpoly = function (polygon, point) {
+  var inside = 0;
+  // j records previous value. Also handles wrapping around.
+  for (var i = 0, j = polygon.length - 1; i &lt; polygon.length; j = i++) {
+    inside ^= polygon[i].y > point.y !== polygon[j].y > point.y &amp;&amp;
+              point.x - polygon[i].x &lt; (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y);
+  }
+  // Let's make js as magical as C. Yay.
+  return !!inside;
+};
+
+/**
+ * Creates a link to open a specific portal in Ingress Prime.
+ *
+ * @function makePrimeLink
+ * @param {string} guid - The globally unique identifier of the portal.
+ * @param {number} lat - The latitude of the portal.
+ * @param {number} lng - The longitude of the portal.
+ * @returns {string} The Ingress Prime link for the portal
+ */
+window.makePrimeLink = function (guid, lat, lng) {
+  return `https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fportal%2F${guid}&amp;apn=com.nianticproject.ingress&amp;isi=576505181&amp;ibi=com.google.ingress&amp;ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181&amp;ofl=https%3A%2F%2Fintel.ingress.com%2Fintel%3Fpll%3D${lat}%2C${lng}`;
+};
+
+/**
+ * Generates a permalink URL based on the specified latitude and longitude and additional options.
+ *
+ * @param {L.LatLng} [latlng] - The latitude and longitude for the permalink.
+ *                              Can be omitted to create mapview-only permalink.
+ * @param {Object} [options] - Additional options for permalink generation.
+ * @param {boolean} [options.includeMapView] - Include current map view in the permalink.
+ * @param {boolean} [options.fullURL] - Generate a fully qualified URL (default: relative link).
+ * @returns {string} The generated permalink URL.
+ */
+window.makePermalink = function (latlng, options) {
+  options = options || {};
+
+  function round (l) { // ensures that lat,lng are with same precision as in stock intel permalinks
+    return Math.floor(l*1e6)/1e6;
+  }
+  var args = [];
+  if (!latlng || options.includeMapView) {
+    var c = window.map.getCenter();
+    args.push(
+      'll='+[round(c.lat),round(c.lng)].join(','),
+      'z='+window.map.getZoom()
+    );
+  }
+  if (latlng) {
+    if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
+    args.push('pll='+latlng.join(','));
+  }
+  var url = '';
+  if (options.fullURL) {
+    url += new URL(document.baseURI).origin;
+  }
+  url += '/';
+  return url + '?' + args.join('&amp;');
+};
+
+Object.defineProperty(String.prototype, 'capitalize', {
+  value: function() {
+    return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+  }
+});
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith#polyfill
+if (!String.prototype.startsWith) {
+  Object.defineProperty(String.prototype, 'startsWith', {
+    value: function(search, rawPos) {
+      var pos = rawPos > 0 ? rawPos|0 : 0;
+      return this.substring(pos, pos + search.length) === search;
+    }
+  });
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc#polyfill
+// (required for KitKat support)
+if (!Math.trunc) {
+  Math.trunc = function (v) {
+    return v &lt; 0 ? Math.ceil(v) : Math.floor(v);
+  };
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#polyfill
+// https://tc39.github.io/ecma262/#sec-array.prototype.find
+if (!Array.prototype.find) {
+  Object.defineProperty(Array.prototype, 'find', {
+    value: function(predicate) {
+      // 1. Let O be ? ToObject(this value).
+      if (this == null) {
+        throw TypeError('"this" is null or not defined');
+      }
+
+      var o = Object(this);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+      if (typeof predicate !== 'function') {
+        throw TypeError('predicate must be a function');
+      }
+
+      // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+      var thisArg = arguments[1];
+
+      // 5. Let k be 0.
+      var k = 0;
+
+      // 6. Repeat, while k &lt; len
+      while (k &lt; len) {
+        // a. Let Pk be ! ToString(k).
+        // b. Let kValue be ? Get(O, Pk).
+        // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+        // d. If testResult is true, return kValue.
+        var kValue = o[k];
+        if (predicate.call(thisArg, kValue, k, o)) {
+          return kValue;
+        }
+        // e. Increase k by 1.
+        k++;
+      }
+
+      // 7. Return undefined.
+      return undefined;
+    },
+    configurable: true,
+    writable: true
+  });
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#polyfill
+if (!Element.prototype.matches) {
+  Element.prototype.matches =
+    Element.prototype.msMatchesSelector ||
+    Element.prototype.webkitMatchesSelector;
+}
+
+if (!Element.prototype.closest) {
+  Element.prototype.closest = function(s) {
+    var el = this;
+
+    do {
+      if (Element.prototype.matches.call(el, s)) return el;
+      el = el.parentElement || el.parentNode;
+    } while (el !== null &amp;&amp; el.nodeType === 1);
+    return null;
+  };
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="; height: 0">
+    <div class="footer-text">Ingress Intel Total Conversion (Community Edition)</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>
