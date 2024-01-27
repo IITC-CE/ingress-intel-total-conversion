@@ -1,7 +1,14 @@
-// PORTAL DETAILS MAIN ///////////////////////////////////////////////
-// main code block that renders the portal details in the sidebar and
-// methods that highlight the portal in the map view.
+/**
+ * @file Main code block that renders the portal details in the sidebar and
+ * methods that highlight the portal in the map view.
+ * @module portal_detail_display
+ */
 
+/**
+ * Resets the scroll position of the sidebar when a new portal is selected.
+ *
+ * @function resetScrollOnNewPortal
+ */
 window.resetScrollOnNewPortal = function() {
   if (selectedPortal !== window.renderPortalDetails.lastVisible) {
     // another portal selected so scroll position become irrelevant to new portal details
@@ -9,7 +16,17 @@ window.resetScrollOnNewPortal = function() {
   }
 };
 
-// to be ovewritten in app.js
+/**
+ * Generates and displays URLs related to the portal.
+ * This includes a permalink for the portal, a link for Ingress Prime, and links to alternative maps.
+ * Function is overwritten in `app.js`
+ *
+ * @function renderPortalUrl
+ * @param {number} lat - The latitude of the portal.
+ * @param {number} lng - The longitude of the portal.
+ * @param {string} title - The title of the portal.
+ * @param {string} guid - The GUID of the portal.
+ */
 window.renderPortalUrl = function (lat, lng, title, guid) {
   var linkDetails = $('.linkdetails');
 
@@ -40,6 +57,12 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
   linkDetails.append($('<aside>').append(mapHtml));
 };
 
+/**
+ * Renders the details of a portal in the sidebar.
+ *
+ * @function renderPortalDetails
+ * @param {string} guid - The globally unique identifier of the portal to display details for.
+ */
 window.renderPortalDetails = function(guid) {
   selectPortal(window.portals[guid] ? guid : null);
   if ($('#sidebar').is(':visible')) {
@@ -165,6 +188,14 @@ window.renderPortalDetails = function(guid) {
   }
 }
 
+/**
+ * Gets miscellaneous details for a specified portal.
+ *
+ * @function getPortalMiscDetails
+ * @param {string} guid - The GUID of the portal.
+ * @param {Object} d - The portal detail object containing various properties of the portal.
+ * @returns {string} HTML string representing the miscellaneous details of the portal.
+ */
 window.getPortalMiscDetails = function(guid,d) {
 
   var randDetails;
@@ -244,9 +275,13 @@ window.getPortalMiscDetails = function(guid,d) {
   return randDetails;
 }
 
-
-// draws link-range and hack-range circles around the portal with the
-// given details. Clear them if parameter 'd' is null.
+/**
+ * The function adds circles indicating the hack range and link range of the portal.
+ * If the portal object are null, the indicators are removed.
+ *
+ * @function setPortalIndicators
+ * @param {Object} p - The portal object for which to set the indicators.
+ */
 window.setPortalIndicators = function(p) {
 
   if(portalRangeIndicator) map.removeLayer(portalRangeIndicator);
@@ -283,10 +318,13 @@ window.setPortalIndicators = function(p) {
 
 }
 
-// highlights portal with given GUID. Automatically clears highlights
-// on old selection. Returns false if the selected portal changed.
-// Returns true if it's still the same portal that just needs an
-// update.
+/**
+ * Highlights the selected portal on the map and clears the highlight from the previously selected portal.
+ *
+ * @function selectPortal
+ * @param {string} guid - The GUID of the portal to select.
+ * @returns {boolean} True if the same portal is re-selected (just an update), false if a different portal is selected.
+ */
 window.selectPortal = function(guid) {
   var update = selectedPortal === guid;
   var oldPortalGuid = selectedPortal;

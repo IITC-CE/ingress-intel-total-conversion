@@ -1,6 +1,15 @@
-// IDLE HANDLING /////////////////////////////////////////////////////
+/**
+ * @file Contains functions and logic to handle the idle state of the user.
+ * @module idle
+ */
 
-window.idleTime = 0; // in seconds
+/**
+ * Total time of user inactivity in seconds.
+ *
+ * @name idleTime
+ * @type {number}
+ */
+window.idleTime = 0;
 window._idleTimeLimit = MAX_IDLE_TIME;
 
 var IDLE_POLL_TIME = 10;
@@ -20,6 +29,11 @@ var idlePoll = function() {
 
 setInterval(idlePoll, IDLE_POLL_TIME*1000);
 
+/**
+ * Resets the idle timer. This function is called when the user becomes active after being idle.
+ *
+ * @function idleReset
+ */
 window.idleReset = function () {
   // update immediately when the user comes back
   if(isIdle()) {
@@ -33,6 +47,11 @@ window.idleReset = function () {
   window._idleTimeLimit = MAX_IDLE_TIME;
 };
 
+/**
+ * Sets the idle state immediately, regardless of the actual idle time.
+ *
+ * @function idleSet
+ */
 window.idleSet = function() {
   var wasIdle = isIdle();
 
@@ -59,20 +78,34 @@ var idleMouseMove = function(e) {
   }
 }
 
+/**
+ * Initializes the idle handling setup, attaching necessary event listeners.
+ *
+ * @function setupIdle
+ */
 window.setupIdle = function() {
   $('body').keypress(idleReset);
   $('body').mousemove(idleMouseMove);
 }
 
-
+/**
+ * Checks if the user is currently idle.
+ *
+ * @function isIdle
+ * @returns {boolean} True if the user is idle, false otherwise.
+ */
 window.isIdle = function() {
   return window.idleTime >= window._idleTimeLimit;
 }
 
 window._onResumeFunctions = [];
 
-// add your function here if you want to be notified when the user
-// resumes from being idle
+/**
+ * Registers a function to be called when the user resumes from being idle.
+ *
+ * @function addResumeFunction
+ * @param {Function} f The function to be executed on resume.
+ */
 window.addResumeFunction = function(f) {
   window._onResumeFunctions.push(f);
 }

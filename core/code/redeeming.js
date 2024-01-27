@@ -1,6 +1,15 @@
-// REDEEMING ///////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////
+/**
+ * @file This file contains functions related to the handling of passcode redeeming in Ingress.
+ * @module redeeming
+ */
 
+/**
+ * Provides a scale factor for short names of various Ingress items used in passcode rewards.
+ *
+ * @constant
+ * @name REDEEM_SHORT_NAMES
+ * @type {Object}
+ */
 window.REDEEM_SHORT_NAMES = {
   'portal shield':'S',
   'force amp':'FA',
@@ -16,14 +25,26 @@ window.REDEEM_SHORT_NAMES = {
   'ultra strike':'US',
 }
 
-/* These are HTTP status codes returned by the redemption API.
- * TODO: Move to another file? Use more generally across IITC?
+/**
+ * HTTP status codes and corresponding messages returned by the redemption API.
+ *
+ * @constant
+ * @name REDEEM_STATUSES
+ * @type {Object}
  */
 window.REDEEM_STATUSES = {
   429: 'You have been rate-limited by the server. Wait a bit and try again.',
   500: 'Internal server error'
 };
 
+/**
+ * Handles the response from the passcode redeeming API.
+ *
+ * @function handleRedeemResponse
+ * @param {Object} data - The data returned by the API.
+ * @param {string} textStatus - The status of the response.
+ * @param {jqXHR} jqXHR - The jQuery wrapped XMLHttpRequest object.
+ */
 window.handleRedeemResponse = function(data, textStatus, jqXHR) {
   var passcode = jqXHR.passcode;
 
@@ -82,6 +103,13 @@ window.handleRedeemResponse = function(data, textStatus, jqXHR) {
   });
 };
 
+/**
+ * Formats passcode reward data into a long, detailed html string.
+ *
+ * @function formatPasscodeLong
+ * @param {Object} data - The reward data.
+ * @returns {string} Formatted string representing the detailed rewards.
+ */
 window.formatPasscodeLong = function(data) {
   var html = '<p><strong>Passcode confirmed. Acquired items:</strong></p><ul class="redeemReward">';
 
@@ -116,6 +144,13 @@ window.formatPasscodeLong = function(data) {
   return html;
 }
 
+/**
+ * Formats passcode reward data into a short, concise html string.
+ *
+ * @function formatPasscodeShort
+ * @param {Object} data - The reward data.
+ * @returns {string} Formatted string representing the concise rewards.
+ */
 window.formatPasscodeShort = function(data) {
 
   if(data.other) {
@@ -163,6 +198,11 @@ window.formatPasscodeShort = function(data) {
   return '<p class="redeemReward">' + awards.join(', ') + '</p>'
 }
 
+/**
+ * Sets up the redeem functionality, binding to UI elements.
+ *
+ * @function setupRedeem
+ */
 window.setupRedeem = function() {
   $("#redeem").keypress(function(e) {
     if((e.keyCode ? e.keyCode : e.which) !== 13) return;

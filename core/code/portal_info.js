@@ -1,9 +1,16 @@
-// PORTAL DETAILS TOOLS //////////////////////////////////////////////
-// hand any of these functions the details-hash of a portal, and they
-// will return useful, but raw data.
+/**
+ * @file This file contains functions that handle the extraction and computation of raw data
+ * from portal details for various purposes.
+ * @module portal_info
+ */
 
-// returns a float. Displayed portal level is always rounded down from
-// that value.
+/**
+ * Calculates the displayed level of a portal, which is always rounded down from the actual float value.
+ *
+ * @function getPortalLevel
+ * @param {Object} d - The portal detail object containing resonator information.
+ * @returns {number} The calculated portal level.
+ */
 window.getPortalLevel = function(d) {
   var lvl = 0;
   var hasReso = false;
@@ -15,6 +22,13 @@ window.getPortalLevel = function(d) {
   return hasReso ? Math.max(1, lvl/8) : 0;
 }
 
+/**
+ * Calculates the total energy capacity of a portal based on its resonators.
+ *
+ * @function getTotalPortalEnergy
+ * @param {Object} d - The portal detail object containing resonator information.
+ * @returns {number} The total energy capacity of the portal.
+ */
 window.getTotalPortalEnergy = function(d) {
   var nrg = 0;
   $.each(d.resonators, function(ind, reso) {
@@ -29,6 +43,13 @@ window.getTotalPortalEnergy = function(d) {
 // For backwards compatibility
 window.getPortalEnergy = window.getTotalPortalEnergy;
 
+/**
+ * Calculates the current energy of a portal based on its resonators.
+ *
+ * @function getCurrentPortalEnergy
+ * @param {Object} d - The portal detail object containing resonator information.
+ * @returns {number} The current energy of the portal.
+ */
 window.getCurrentPortalEnergy = function(d) {
   var nrg = 0;
   $.each(d.resonators, function(ind, reso) {
@@ -38,6 +59,15 @@ window.getCurrentPortalEnergy = function(d) {
   return nrg;
 }
 
+/**
+ * Calculates the range of a portal for creating links. The range depends on portal level and any installed Link Amps.
+ *
+ * @function getPortalRange
+ * @param {Object} d - The portal detail object containing details about the team and resonators.
+ * @returns {Object} An object containing the base range (`base`), boost multiplier (`boost`),
+ *                   total range after applying the boost (`range`),
+ *                   and a boolean indicating if the portal is linkable (`isLinkable`).
+ */
 window.getPortalRange = function(d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
@@ -52,6 +82,13 @@ window.getPortalRange = function(d) {
   return range;
 }
 
+/**
+ * Calculates the boost in link range provided by installed Link Amps.
+ *
+ * @function getLinkAmpRangeBoost
+ * @param {Object} d - The portal detail object containing mod information.
+ * @returns {number} The total boost factor for the link range.
+ */
 window.getLinkAmpRangeBoost = function(d) {
   if (window.teamStringToId(d.team) === window.TEAM_MAC) {
     return 1.0;
@@ -75,7 +112,15 @@ window.getLinkAmpRangeBoost = function(d) {
   return (linkAmps.length > 0) ? boost : 1.0;
 }
 
-
+/**
+ * Calculates the potential AP gain from attacking a portal.
+ *
+ * @function getAttackApGain
+ * @param {Object} d - The portal detail object containing resonator and ownership information.
+ * @param {number} fieldCount - The number of fields attached to the portal.
+ * @param {number} linkCount - The number of links attached to the portal.
+ * @returns {Object} An object detailing various components of AP gain, including totals for friendly and enemy factions.
+ */
 window.getAttackApGain = function(d,fieldCount,linkCount) {
   if (!fieldCount) fieldCount = 0;
 
@@ -130,7 +175,13 @@ window.getAttackApGain = function(d,fieldCount,linkCount) {
   };
 }
 
-
+/**
+ * Corrects the portal image URL to match the current protocol (http/https).
+ *
+ * @function fixPortalImageUrl
+ * @param {string} url - The original image URL.
+ * @returns {string} The corrected image URL.
+ */
 window.fixPortalImageUrl = function (url) {
   if (url) {
     if (window.location.protocol === 'https:') {
@@ -143,7 +194,14 @@ window.fixPortalImageUrl = function (url) {
 
 }
 
-
+/**
+ * Returns a list of portal mods filtered by a specific type.
+ *
+ * @function getPortalModsByType
+ * @param {Object} d - The portal detail object containing mod information.
+ * @param {string} type - The type of mods to filter (e.g., 'RES_SHIELD', 'LINK_AMPLIFIER').
+ * @returns {Array} An array of mods matching the specified type.
+ */
 window.getPortalModsByType = function(d, type) {
   var mods = [];
 
@@ -172,8 +230,13 @@ window.getPortalModsByType = function(d, type) {
   return mods;
 }
 
-
-
+/**
+ * Calculates the total mitigation provided by shields installed on a portal.
+ *
+ * @function getPortalShieldMitigation
+ * @param {Object} d - The portal detail object containing mod information.
+ * @returns {number} The total mitigation value from all shields installed on the portal.
+ */
 window.getPortalShieldMitigation = function(d) {
   var shields = getPortalModsByType(d, 'RES_SHIELD');
 
@@ -185,6 +248,13 @@ window.getPortalShieldMitigation = function(d) {
   return mitigation;
 }
 
+/**
+ * Calculates the link defense boost provided by installed Ultra Link Amps.
+ *
+ * @function getPortalLinkDefenseBoost
+ * @param {Object} d - The portal detail object containing mod information.
+ * @returns {number} The total link defense boost factor.
+ */
 window.getPortalLinkDefenseBoost = function(d) {
   var ultraLinkAmps = getPortalModsByType(d, 'ULTRA_LINK_AMP');
 
@@ -197,11 +267,26 @@ window.getPortalLinkDefenseBoost = function(d) {
   return Math.round(10 * linkDefenseBoost) / 10;
 }
 
+/**
+ * Calculates the additional mitigation provided by links attached to a portal.
+ *
+ * @function getPortalLinksMitigation
+ * @param {number} linkCount - The number of links attached to the portal.
+ * @returns {number} The additional mitigation value provided by the links.
+ */
 window.getPortalLinksMitigation = function(linkCount) {
   var mitigation = Math.round(400/9*Math.atan(linkCount/Math.E));
   return mitigation;
 }
 
+/**
+ * Calculates detailed mitigation information for a portal, including contributions from shields and links.
+ *
+ * @function getPortalMitigationDetails
+ * @param {Object} d - The portal detail object containing mod and resonator information.
+ * @param {number} linkCount - The number of links attached to the portal.
+ * @returns {Object} An object detailing various components of mitigation.
+ */
 window.getPortalMitigationDetails = function(d,linkCount) {
   var linkDefenseBoost = getPortalLinkDefenseBoost(d);
 
@@ -220,6 +305,13 @@ window.getPortalMitigationDetails = function(d,linkCount) {
   return mitigation;
 }
 
+/**
+ * Calculates the maximum number of outgoing links that can be created from a portal.
+ *
+ * @function getMaxOutgoingLinks
+ * @param {Object} d - The portal detail object containing mod information.
+ * @returns {number} The maximum number of outgoing links.
+ */
 window.getMaxOutgoingLinks = function(d) {
   var linkAmps = getPortalModsByType(d, 'ULTRA_LINK_AMP');
 
@@ -232,6 +324,13 @@ window.getMaxOutgoingLinks = function(d) {
   return links;
 };
 
+/**
+ * Calculates hack-related details of a portal, such as hack cooldown and burnout time.
+ *
+ * @function getPortalHackDetails
+ * @param {Object} d - The portal detail object containing mod information.
+ * @returns {Object} An object containing hack-related details like cooldown time, hack count, and burnout time.
+ */
 window.getPortalHackDetails = function(d) {
 
   var heatsinks = getPortalModsByType(d, 'HEATSINK');
@@ -257,7 +356,13 @@ window.getPortalHackDetails = function(d) {
   return {cooldown: cooldownTime, hacks: hackCount, burnout: cooldownTime*(hackCount-1)};
 }
 
-// given a detailed portal structure, return summary portal data, as seen in the map tile data
+/**
+ * Converts detailed portal information into a summary format similar to that seen in the map tile data.
+ *
+ * @function getPortalSummaryData
+ * @param {Object} d - The detailed portal data.
+ * @returns {Object} A summary of the portal data, including level, title, image, resonator count, health, and team.
+ */
 window.getPortalSummaryData = function(d) {
 
   // NOTE: the summary data reports unclaimed portals as level 1 - not zero as elsewhere in IITC
@@ -287,6 +392,13 @@ window.getPortalSummaryData = function(d) {
   };
 }
 
+/**
+ * Calculates various attack values of a portal, including hit bonus, force amplifier, and attack frequency.
+ *
+ * @function getPortalAttackValues
+ * @param {Object} d - The portal detail object containing mod information.
+ * @returns {Object} An object containing attack values such as hit bonus, force amplifier, and attack frequency.
+ */
 window.getPortalAttackValues = function(d) {
   var forceamps = getPortalModsByType(d, 'FORCE_AMP');
   var turrets = getPortalModsByType(d, 'TURRET');

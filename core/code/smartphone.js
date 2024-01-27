@@ -1,3 +1,16 @@
+/**
+ * @file This file provides functions and utilities specifically for the smartphone layout of IITC.
+ * @module smartphone
+ */
+
+/**
+ * Determines if the user's device is a smartphone.
+ * Note it should not detect tablets because their display is large enough to use the desktop version.
+ * The stock intel site allows forcing mobile/full sites with a vp=m or vp=f parameter. This function supports the same.
+ *
+ * @function isSmartphone
+ * @returns {boolean} True if the user's device is a smartphone, false otherwise.
+ */
 window.isSmartphone = function() {
   // this check is also used in main.js. Note it should not detect
   // tablets because their display is large enough to use the desktop
@@ -15,8 +28,21 @@ window.isSmartphone = function() {
   || navigator.userAgent.match(/iPhone|iPad|iPod/i);
 }
 
+/**
+ * Placeholder for smartphone specific manipulations.
+ * This function does not implement any logic by itself.
+ *
+ * @function smartphone
+ */
 window.smartphone = function() {};
 
+/**
+ * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
+ * This includes adding smartphone-specific stylesheets
+ * and modifying some of the setup functions for mobile compatibility.
+ *
+ * @function runOnSmartphonesBeforeBoot
+ */
 window.runOnSmartphonesBeforeBoot = function() {
   if(!isSmartphone()) return;
   log.warn('running smartphone pre boot stuff');
@@ -68,6 +94,13 @@ window.runOnSmartphonesBeforeBoot = function() {
   });
 }
 
+/**
+ * Updates the mobile information bar with portal details when a portal is selected.
+ * This function is hooked to the 'portalSelected' event and is specific to the smartphone layout.
+ *
+ * @function smartphoneInfo
+ * @param {Object} data - The data object containing details about the selected portal.
+ */
 window.smartphoneInfo = function(data) {
   var guid = data.selectedPortalGuid;
   if(!window.portals[guid]) return;
@@ -131,6 +164,13 @@ window.smartphoneInfo = function(data) {
   $('#mobileinfo').html(t);
 }
 
+/**
+ * Performs setup tasks for IITC on smartphones after the IITC boot process.
+ * This includes initializing mobile info display, adjusting UI elements for mobile compatibility,
+ * and setting event handlers for mobile-specific interactions.
+ *
+ * @function runOnSmartphonesAfterBoot
+ */
 window.runOnSmartphonesAfterBoot = function() {
   if(!isSmartphone()) return;
   log.warn('running smartphone post boot stuff');

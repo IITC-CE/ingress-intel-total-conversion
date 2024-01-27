@@ -1,27 +1,29 @@
-/*
- * @class LayerChooser
- * @aka window.LayerChooser
- * @inherits L.Controls.Layers
- *
- * Provides 'persistence' of layers display state between sessions.
- *
- * Also some additional methods provided, see below.
- */
-
 'use strict';
 
+/**
+ * Represents a control for selecting layers on the map. It extends the Leaflet's L.Control.Layers class.
+ * This control not only manages layer visibility but also provides persistence of layer display states between sessions.
+ * The class has been enhanced with additional options and methods for more flexible layer management.
+ *
+ * @memberof L
+ * @class LayerChooser
+ * @extends L.Control.Layers
+ */
 var LayerChooser = L.Control.Layers.extend({
   options: {
-    // @option sortLayers: Boolean = true
-    // Ensures stable sort order (based on initial), while still providing ability
-    // to enforce specific order with `addBaseLayer`/`addOverlay`
-    // `sortPriority` option.
+    /**
+     * @property {Boolean} sortLayers=true - Ensures stable sort order (based on initial), while still providing
+     *                                       ability to enforce specific order with `addBaseLayer`/`addOverlay`
+     *                                       `sortPriority` option.
+     */
     sortLayers: true,
 
-    // @option sortFunction: Function = *
-    // A [compare function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
-    // that will be used for sorting the layers, when `sortLayers` is `true`.
-    // The function receives objects with the layers's data.
+    /**
+     * @property {Function} sortFunction - A compare function that will be used for sorting the layers,
+     *                                     when `sortLayers` is `true`. The function receives objects with
+     *                                     the layer's data.
+     * @see https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+     */
     sortFunction: function (A, B) {
       var a = A.sortPriority;
       var b = B.sortPriority;
@@ -29,6 +31,15 @@ var LayerChooser = L.Control.Layers.extend({
     }
   },
 
+  /**
+   * Initializes a new instance of the LayerChooser control.
+   *
+   * @memberof LayerChooser
+   * @method
+   * @param {L.Layer[]} baseLayers - Array of base layers to include in the chooser.
+   * @param {L.Layer[]} overlays - Array of overlay layers to include in the chooser.
+   * @param {Object} [options] - Additional options for the LayerChooser control.
+   */
   initialize: function (baseLayers, overlays, options) {
     this._overlayStatus = {};
     var layersJSON = localStorage['ingress.intelmap.layergroupdisplayed'];
@@ -134,50 +145,54 @@ var LayerChooser = L.Control.Layers.extend({
     return labelEl;
   },
 
-  // @miniclass LayersEntry options (LayerChooser)
-  // @aka layersEntry options
-
-  // @option persistent: Boolean = true
-  // * When `false` - baselayer's status is not tracked.
-
-  // @option sortPriority: Number = *
-  // Enforces specific order in control, lower value means layer's upper position.
-  // If not specified - the value will be assigned implicitly in increasing manner.
-
-  // @method addBaseLayer(layer: Layer, name: String, options?: LayersEntry options): this
-  // Adds a base layer (radio button entry) with the given name to the control.
+  /**
+   * Adds a base layer (radio button entry) with the given name to the control.
+   *
+   * @memberof LayerChooser
+   * @param {L.Layer} layer - The layer to be added.
+   * @param {String} name - The name of the layer.
+   * @param {Object} [options] - Additional options for the layer entry.
+   * @param {Boolean} [options.persistent=true] - When set to `false`, the base layer's status is not tracked.
+   * @param {Number} [options.sortPriority] - Enforces a specific order in the control. Lower value means
+   *                                          higher position in the list. If not specified, the value
+   *                                          will be assigned implicitly in an increasing manner.
+   * @returns {LayerChooser} Returns the `LayerChooser` instance for chaining.
+   */
   addBaseLayer: function (layer, name, options) {
     this._addLayer(layer, name, false, options);
     return (this._map) ? this._update() : this;
   },
 
-  // @miniclass AddOverlay options (LayerChooser)
-  // @aka addOverlay options
-  // @inherits LayersEntry options
-
-  // @option persistent: Boolean = true
-  // * When `true` (or not specified) - adds overlay to the map as well,
-  //   if it's last state was active.
-  //   If no record exists then value specified in `default` option is used.
-  // * When `false` - overlay status is not tracked, `default` option is honored too.
-
-  // @option default: Boolean = true
-  // Default state of overlay (used only when no record about previous state found).
-
-  // @option enable: Boolean
-  // Enforce specified state ignoring previously saved.
-
-  // @method addOverlay(layer: L.Layer, name: String, options?: AddOverlay options): this
-  // Adds an overlay (checkbox entry) with the given name to the control.
+  /**
+   * Adds an overlay (checkbox entry) with the given name to the control.
+   *
+   * @memberof LayerChooser
+   * @param {L.Layer} layer - The overlay layer to be added.
+   * @param {String} name - The name of the overlay.
+   * @param {Object} [options] - Additional options for the overlay entry.
+   * @param {Boolean} [options.persistent=true] - When `true` (or not specified), the overlay is added to the map
+   *                                              if its last state was active. If no previous state is recorded,
+   *                                              the value specified in the `default` option is used.
+   *                                              When `false`, the overlay status is not tracked,
+   *                                              but the `default` option is still honored.
+   * @param {Boolean} [options.default=true] - The default state of the overlay, used only when no record
+   *                                           of the previous state is found.
+   * @param {Boolean} [options.enable] - If set, enforces the specified state, ignoring any previously saved state.
+   * @returns {LayerChooser} Returns the `LayerChooser` instance for chaining.
+   */
   addOverlay: function (layer, name, options) {
     this._addLayer(layer, name, true, options);
     return (this._map) ? this._update() : this;
   },
 
-  // @method removeLayer(layer: Layer|String, options?: Object): this
-  // Removes the given layer from the control.
-  // Either layer object or it's name in the control must be specified.
-  // Layer is removed from the map as well, except `.keepOnMap` option is true.
+  /**
+   * Removes the given layer from the control.
+   *
+   * @memberof LayerChooser
+   * @param {L.Layer|String} layer - The layer to be removed, either as a Leaflet layer object or its name.
+   * @param {Object} [options] - Additional options, including `keepOnMap` to keep the layer on the map.
+   * @returns {LayerChooser} Returns the `LayerChooser` instance for chaining.
+   */
   removeLayer: function (layer, options) {
     layer = this.getLayer(layer);
     var data = this.layerInfo(layer);
@@ -232,6 +247,14 @@ var LayerChooser = L.Control.Layers.extend({
   // Info is internal data object with following properties:
   // `layer`, `name`, `label`, `overlay`, `sortPriority`, `persistent`, `default`,
   // `labelEl`, `inputEl`, `statusTracking`.
+  /**
+   * Retrieves layer info by its name in the control, or by the layer object itself, or its label HTML element.
+   *
+   * @memberof LayerChooser
+   * @param {String|L.Layer|HTMLElement} layer - The name, layer object, or label element of the layer.
+   * @returns {Object} Layer info object with following properties: `layer`, `name`, `label`, `overlay`, `sortPriority`,
+   *                   `persistent`, `default`, `labelEl`, `inputEl`, `statusTracking`.
+   */
   layerInfo: function (layer) {
     var fn = layer instanceof L.Layer ? this.__byLayer
       : layer instanceof HTMLElement ? this.__byLabelEl
@@ -239,18 +262,30 @@ var LayerChooser = L.Control.Layers.extend({
     return this._layers.find(fn, layer);
   },
 
-  // @method getLayer(name: String|Layer): Layer
-  // Returns layer by it's name in the control, or by layer object itself,
-  // or label html element.
-  // The latter can be used to ensure the layer is in layerChooser.
+  /**
+   * Returns the Leaflet layer object based on its name in the control, or the layer object itself,
+   * or its label HTML element. The latter can be used to ensure the layer is in layerChooser.
+   *
+   * @memberof LayerChooser
+   * @param {String|L.Layer|HTMLElement} layer - The name, layer object, or label element of the layer.
+   * @returns {L.Layer} The corresponding Leaflet layer object.
+   */
   getLayer: function (layer) {
     var data = this.layerInfo(layer);
     return data && data.layer;
   },
 
-  // @method showLayer(layer: Layer|String|Number, display?: Boolean): this
-  // Switches layer's display state to given value (true by default).
-  // Layer can be specified also by it's name in the control.
+  /**
+   * Shows or hides a specified basemap or overlay layer. The layer can be specified by its ID, name, or layer object.
+   * If the display parameter is not provided, the layer will be shown by default.
+   * When showing a base layer, it ensures that no other base layers are displayed at the same time.
+   *
+   * @memberof LayerChooser
+   * @param {L.Layer|String|Number} layer - The layer to show or hide. This can be a Leaflet layer object,
+   *                                        a layer name, or a layer ID.
+   * @param {Boolean} [display=true] - Pass `false` to hide the layer, or `true`/omit to show it.
+   * @returns {LayerChooser} Returns the `LayerChooser` instance for chaining.
+   */
   showLayer: function (layer, display) {
     var data = this._layers[layer]; // layer is index, private use only
     if (!data) {
@@ -279,9 +314,14 @@ var LayerChooser = L.Control.Layers.extend({
     return this;
   },
 
-  // @method setLabel(layer: String|Layer, label?: String): this
-  // Sets layers label to specified label text (html),
-  // or resets it to original name when label is not specified.
+  /**
+   * Sets the label of a layer in the control.
+   *
+   * @memberof LayerChooser
+   * @param {String|L.Layer} layer - The name or layer object.
+   * @param {String} [label] - The label text (HTML allowed) to set. Resets to original name if not provided.
+   * @returns {LayerChooser} Returns the `LayerChooser` instance for chaining.
+   */
   setLabel: function (layer, label) {
     var data = this.layerInfo(layer);
     if (!data) {
@@ -391,7 +431,19 @@ var LayerChooser = L.Control.Layers.extend({
     return str.replace(/(<([^>]+)>)/gi, ''); // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
   },
 
-  // !!deprecated
+  /**
+   * Retrieves the current state of base and overlay layers managed by this control.
+   * This method is deprecated and should be used with caution.
+   *
+   * The method returns an object with two properties: 'baseLayers' and 'overlayLayers'.
+   * Each array contains objects representing the respective layers with properties: 'layerId', 'name', and 'active'.
+   * 'layerId' is an internal identifier for the layer, 'name' is the layer's name, and 'active' is a boolean indicating
+   * if the layer is currently active on the map.
+   *
+   * @memberof LayerChooser
+   * @deprecated
+   * @returns {{overlayLayers: Array, baseLayers: Array}} An object containing arrays of base and overlay layers.
+   */
   getLayers: function () {
     var baseLayers = [];
     var overlayLayers = [];

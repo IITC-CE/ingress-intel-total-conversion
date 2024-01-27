@@ -1,9 +1,27 @@
+/**
+ * @file This file contains the code for displaying and handling the regional scoreboard.
+ * @module region_scoreboard
+ */
+
+/**
+ * Sets up and manages the main dialog for the regional scoreboard.
+ *
+ * @function RegionScoreboardSetup
+ * @returns {Function} A setup function to initialize the scoreboard.
+ */
 window.RegionScoreboardSetup = (function() {
 
   var mainDialog;
   var regionScore;
   var timer;
 
+  /**
+   * Constructs a RegionScore object from server results. Contains methods to process and retrieve score data.
+   *
+   * @class
+   * @name RegionScore
+   * @param {Object} serverResult - The data returned from the server for regional scores.
+   */
   function RegionScore(serverResult) {
     this.ori_data = serverResult;
     this.topAgents = serverResult.topAgents;
@@ -472,7 +490,14 @@ window.RegionScoreboardSetup = (function() {
   }
 }());
 
-
+/**
+ * Creates an SVG-based history chart for regional scores.
+ *
+ * @function HistoryChart
+ * @param {RegionScore} _regionScore - The RegionScore object containing score data.
+ * @param {boolean} logscale - Whether to use logarithmic scale for the chart.
+ * @returns {string} An SVG string representing the history chart.
+ */
 var HistoryChart = (function() {
   var regionScore;
   var scaleFct;

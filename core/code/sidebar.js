@@ -1,3 +1,13 @@
+/**
+ * @file This file provides functions for working with the sidebar.
+ * @module sidebar
+ */
+
+/**
+ * Sets up the sidebar, including player stats, toggle button, large image preview, etc.
+ *
+ * @function setupSidebar
+ */
 window.setupSidebar = function() {
   window.setupStyles();
   setupIcons();
@@ -8,7 +18,12 @@ window.setupSidebar = function() {
   $('#sidebar').show();
 };
 
-// to be overrided in smartphone.js
+/**
+ * Function to append IITC's custom CSS styles to the `<head>` element.
+ * Overwritten in smartphone.js.
+ *
+ * @function setupStyles
+ */
 window.setupStyles = function () {
   $('head').append('<style>' +
     [ '#largepreview.enl img { border:2px solid '+COLORS[TEAM_ENL]+'; } ',
@@ -25,6 +40,11 @@ window.setupStyles = function () {
     + '</style>');
 };
 
+/**
+ * Sets up custom icons by appending SVG definitions to the DOM.
+ *
+ * @function setupIcons
+ */
 function setupIcons () {
   $(['<svg>',
       // Material Icons
@@ -36,9 +56,13 @@ function setupIcons () {
     '</svg>'].join('\\n')).appendTo('body');
 }
 
-// renders player details into the website. Since the player info is
-// included as inline script in the original site, the data is static
-// and cannot be updated.
+/**
+ * Renders player details into the website. Since the player info is
+ * included as inline script in the original site, the data is static
+ * and cannot be updated.
+ *
+ * @function setupPlayerStat
+ */
 window.setupPlayerStat = function () {
   // stock site updated to supply the actual player level, AP requirements and XM capacity values
   var level = PLAYER.verified_level;
@@ -84,6 +108,11 @@ window.setupPlayerStat = function () {
   );
 };
 
+/**
+ * Initializes the sidebar toggle functionality.
+ *
+ * @function setupSidebarToggle
+ */
 function setupSidebarToggle () {
   $('#sidebartoggle').on('click', function() {
     var toggle = $('#sidebartoggle');
@@ -104,6 +133,13 @@ function setupSidebarToggle () {
   });
 }
 
+/**
+ * Sets up event listeners for the large portal image view. This dialog is displayed
+ * when a user clicks on the portal photo in the sidebar. It creates a new image
+ * preview inside a dialog box.
+ *
+ * @function setupLargeImagePreview
+ */
 function setupLargeImagePreview  () {
   $('#portaldetails').on('click', '.imgpreview', function (e) {
     var img = this.querySelector('img');
@@ -130,10 +166,20 @@ function setupLargeImagePreview  () {
 
 // fixed Addons ****************************************************************
 
+/**
+ * Updates the permalink href attribute on mouseover and click events.
+ *
+ * @function setPermaLink
+ */
 function setPermaLink () {
   this.href = window.makePermalink(null, true);
 }
 
+/**
+ * Sets up additional elements in the sidebar, such as permalink and about dialog.
+ *
+ * @function setupAddons
+ */
 function setupAddons () {
   $('<a>')
     .html('Permalink')

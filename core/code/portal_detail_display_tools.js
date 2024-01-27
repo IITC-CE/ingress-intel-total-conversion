@@ -1,7 +1,16 @@
-// PORTAL DETAILS DISPLAY ////////////////////////////////////////////
-// hand any of these functions the details-hash of a portal, and they
-// will return pretty, displayable HTML or parts thereof.
+/**
+ * @file Hand any of these functions the details-hash of a portal, and they
+ * will return pretty, displayable HTML or parts thereof.
+ * @module portal_detail_display_tools
+ */
 
+/**
+ * Provides historical details about a portal including visitation, capture, and scout control status.
+ *
+ * @function getPortalHistoryDetails
+ * @param {Object} d - The portal detail object containing the history properties.
+ * @returns {string} HTML string representing the historical details of the portal.
+ */
 window.getPortalHistoryDetails = function (d) {
   if (!d.history) {
     return '<div id="historydetails" class="missing">History missing</div>';
@@ -18,7 +27,13 @@ window.getPortalHistoryDetails = function (d) {
   + '</div>', classParts);
 }
 
-// returns displayable text+link about portal range
+/**
+ * Returns displayable text and link about portal range including base range, link amp boost, and total range.
+ *
+ * @function getRangeText
+ * @param {Object} d - The portal detail object containing range information.
+ * @returns {Array} An array containing the range label, HTML content, and a tooltip title.
+ */
 window.getRangeText = function(d) {
   var range = getPortalRange(d);
 
@@ -39,8 +54,13 @@ window.getRangeText = function(d) {
   ];
 }
 
-
-// given portal details, returns html code to display mod details.
+/**
+ * Given portal details, returns HTML code to display mod details.
+ *
+ * @function getModDetails
+ * @param {Object} d - The portal detail object containing mod information.
+ * @returns {string} HTML string representing the mod details of the portal.
+ */
 window.getModDetails = function(d) {
   var mods = [];
   var modsTitle = [];
@@ -112,6 +132,13 @@ window.getModDetails = function(d) {
   return t;
 }
 
+/**
+ * Generates text representing the current and total energy of a portal.
+ *
+ * @function getEnergyText
+ * @param {Object} d - The portal detail object containing energy information.
+ * @returns {Array} An array containing the energy label, formatted energy values, and a tooltip title.
+ */
 window.getEnergyText = function(d) {
   var currentNrg = getCurrentPortalEnergy(d);
   var totalNrg = getTotalPortalEnergy(d);
@@ -120,7 +147,13 @@ window.getEnergyText = function(d) {
   return ['energy', fill, title];
 }
 
-
+/**
+ * Generates HTML details for resonators deployed on a portal.
+ *
+ * @function getResonatorDetails
+ * @param {Object} d - The portal detail object containing resonator information.
+ * @returns {string} HTML string representing the resonator details of the portal.
+ */
 window.getResonatorDetails = function(d) {
   var resoDetails = [];
   // octant=slot: 0=E, 1=NE, 2=N, 3=NW, 4=W, 5=SW, 6=S, SE=7
@@ -163,10 +196,17 @@ window.getResonatorDetails = function(d) {
 
 }
 
-// helper function that renders the HTML for a given resonator. Does
-// not work with raw details-hash. Needs digested infos instead:
-// slot: which slot this resonator occupies. Starts with 0 (east) and
-// rotates clockwise. So, last one is 7 (southeast).
+/**
+ * Helper function that renders the HTML for a given resonator.
+ *
+ * @function renderResonatorDetails
+ * @param {number} slot - The slot number where the resonator is deployed. Starts with 0 (east) and rotates clockwise.
+ *                        So, last one is 7 (southeast).
+ * @param {number} level - The level of the resonator.
+ * @param {number} nrg - The energy of the resonator.
+ * @param {string|null} nick - The nickname of the owner of the resonator, or null if not applicable.
+ * @returns {Array} An array containing the HTML content of the resonator and the owner's nickname.
+ */
 window.renderResonatorDetails = function(slot, level, nrg, nick) {
   if(OCTANTS[slot] === 'N')
     var className = 'meter north';
@@ -196,7 +236,15 @@ window.renderResonatorDetails = function(slot, level, nrg, nick) {
   return [meter, nick || ''];
 }
 
-// calculate AP gain from destroying portal and then capturing it by deploying resonators
+/**
+ * Calculates the AP gain from destroying and then capturing a portal by deploying resonators.
+ *
+ * @function getAttackApGainText
+ * @param {Object} d - The portal detail object containing portal information.
+ * @param {number} fieldCount - The number of fields linked to the portal.
+ * @param {number} linkCount - The number of links connected to the portal.
+ * @returns {Array} An array containing the label 'AP Gain', total AP gain, and a breakdown tooltip.
+ */
 window.getAttackApGainText = function(d,fieldCount,linkCount) {
   var breakdown = getAttackApGain(d,fieldCount,linkCount);
   var totalGain = breakdown.enemyAp;
@@ -216,7 +264,13 @@ window.getAttackApGainText = function(d,fieldCount,linkCount) {
   return ['AP Gain', digits(totalGain), t];
 }
 
-
+/**
+ * Provides details about the hack count and cooldown time of a portal.
+ *
+ * @function getHackDetailsText
+ * @param {Object} d - The portal detail object containing hack information.
+ * @returns {Array} An array containing the label 'hacks', short hack info, and a detailed tooltip.
+ */
 window.getHackDetailsText = function(d) {
   var hackDetails = getPortalHackDetails(d);
 
@@ -230,7 +284,14 @@ window.getHackDetailsText = function(d) {
   return ['hacks', shortHackInfo, title];
 }
 
-
+/**
+ * Generates text representing the total mitigation provided by shields and links on a portal.
+ *
+ * @function getMitigationText
+ * @param {Object} d - The portal detail object containing mitigation information.
+ * @param {number} linkCount - The number of links connected to the portal.
+ * @returns {Array} An array containing the label 'shielding', short mitigation info, and a detailed tooltip.
+ */
 window.getMitigationText = function(d,linkCount) {
   var mitigationDetails = getPortalMitigationDetails(d,linkCount);
 

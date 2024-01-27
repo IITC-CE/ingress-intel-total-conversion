@@ -39,6 +39,36 @@ window.script_info.changelog = [
   },
 ];
 
+/**
+ * PLAYER
+ * @namespace player
+ */
+
+/**
+ * window.PLAYER
+ * Represents the current player's status in the game. This object is defined by stock and is static,
+ * meaning it requires a page reload to update. The PLAYER object stores various pieces of information
+ * about the player, which are detailed below.
+ *
+ * Additional properties (`nickMatcher` and `level`) added by IITC in {@link sidebar.setupPlayerStat}
+ *
+ * @property {string} ap - The amount of AP (Access Points) the player currently has.
+ * @property {number} available_invites - The number of invitations the player can send.
+ * @property {number} energy - The amount of XM (Exotic Matter) the player currently holds.
+ * @property {number} min_ap_for_current_level - The AP required for the player's current level, used for tracking level progress.
+ * @property {number} min_ap_for_next_level - The AP required for the next level, used for tracking level progress.
+ * @property {string} nickname - The agent name of the player.
+ * @property {string} team - The faction of the player, which can be either "ENLIGHTENED" or "RESISTANCE".
+ * @property {number} verified_level - Current player level.
+ *
+ * Additional properties
+ * @property {RegExp} nickMatcher - A regular expression used to match the player's agent name in chat. Added by IITC.
+ * @property {number} level - Backwards compatibility property, equivalent to `verified_level`. Added by IITC.
+ *
+ * @typedef {Object} PLAYER
+ * @memberof player
+ */
+
 // REPLACE ORIG SITE ///////////////////////////////////////////////////
 if (document.documentElement.getAttribute('itemscope') !== null) {
   throw new Error('Ingress Intel Website is down, not a userscript issue.');
@@ -126,100 +156,500 @@ document.body.innerHTML = ''
   + '<div id="play_button"></div>'
   + '<div id="header"><div id="nav"></div></div>';
 
-// CONFIG OPTIONS ////////////////////////////////////////////////////
-window.REFRESH = 30; // refresh view every 30s (base time)
-window.ZOOM_LEVEL_ADJ = 5; // add 5 seconds per zoom level
-window.ON_MOVE_REFRESH = 2.5;  //refresh time to use after a movement event
-window.MINIMUM_OVERRIDE_REFRESH = 10; //limit on refresh time since previous refresh, limiting repeated move refresh rate
-window.REFRESH_GAME_SCORE = 15*60; // refresh game score every 15 minutes
-window.MAX_IDLE_TIME = 15*60; // stop updating map after 15min idling
+/* ****************************************************************************************************************** */
+
+/**
+ * CONFIG OPTIONS
+ * @namespace config_options
+ */
+
+/**
+ * Controls how often the map should refresh, in seconds, default 30.
+ * @type {number}
+ * @memberof config_options
+ */
+window.REFRESH = 30;
+
+/**
+ * Controls the extra refresh delay per zoom level, in seconds, default 5.
+ * @type {number}
+ * @memberof config_options
+ */
+window.ZOOM_LEVEL_ADJ = 5;
+
+/**
+ * Wait this long before refreshing the view after the map has been moved, in seconds, default 2.5
+ * @type {number}
+ * @memberof config_options
+ */
+window.ON_MOVE_REFRESH = 2.5;
+
+/**
+ * Limit on refresh time since previous refresh, limiting repeated move refresh rate, in seconds, default 10
+ * @type {number}
+ * @memberof config_options
+ */
+window.MINIMUM_OVERRIDE_REFRESH = 10;
+
+/**
+ * Controls how long to wait between refreshing the global score, in seconds, default 15*60 (15 mins)
+ * @type {number}
+ * @memberof config_options
+ */
+window.REFRESH_GAME_SCORE = 15 * 60;
+
+/**
+ * The maximum idle time in seconds before the map stops updating, in seconds, default 15*60 (15 mins)
+ * @type {number}
+ * @memberof config_options
+ */
+window.MAX_IDLE_TIME = 15 * 60;
+
+/**
+ * How much space to leave for scrollbars, in pixels, default 20.
+ * @type {number}
+ * @memberof config_options
+ */
 window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH = 20;
+
+/**
+ * How wide should the sidebar be, in pixels, default 300.
+ * @type {number}
+ * @memberof config_options
+ */
 window.SIDEBAR_WIDTH = 300;
 
-// how many pixels to the top before requesting new data
+/**
+ * Controls requesting chat data based on the pixel distance from the line currently in view
+ * and the top of history, in pixels, default 200
+ * @type {number}
+ * @memberof config_options
+ */
 window.CHAT_REQUEST_SCROLL_TOP = 200;
+
+/**
+ * Controls height of chat when chat is collapsed, in pixels, default 60
+ * @type {number}
+ * @memberof config_options
+ */
 window.CHAT_SHRINKED = 60;
 
+/**
+ * What colour should the selected portal be, string(css hex code), default ‘#f0f’ (hot pink)
+ * @type {string}
+ * @memberof config_options
+ */
 window.COLOR_SELECTED_PORTAL = '#f0f';
-window.COLORS = ['#FF6600', '#0088FF', '#03DC03', '#FF0028']; // none, res, enl, mac
+
+/**
+ * Defines the color values associated with different teams, used in various elements such as portals, player names, etc.
+ * The colors are represented in a CSS hex code format.
+ * The array format represents: [none, res, enl, mac].
+ * @type {string[]}
+ * @memberof config_options
+ */
+window.COLORS = ['#FF6600', '#0088FF', '#03DC03', '#FF0028'];
+
+/**
+ * Colour values for levels, consistent with Ingress, with index 0 being white for neutral portals.
+ * @type {string[]}
+ * @memberof config_options
+ */
 window.COLORS_LVL = ['#000', '#FECE5A', '#FFA630', '#FF7315', '#E40000', '#FD2992', '#EB26CD', '#C124E0', '#9627F4'];
+
+/**
+ * Colour values for displaying mods, consistent with Ingress. Very Rare also used for AXA shields and Ultra Links.
+ * @type {object}
+ * @property {string} VERY_RARE=#b08cff
+ * @property {string} RARE=#73a8ff
+ * @property {string} COMMON=#8cffbf
+ * @memberof config_options
+ */
 window.COLORS_MOD = { VERY_RARE: '#b08cff', RARE: '#73a8ff', COMMON: '#8cffbf' };
 
-// circles around a selected portal that show from where you can hack
-// it and how far the portal reaches (i.e. how far links may be made
-// from this portal)
+/**
+ * What colour should the hacking range circle be (the small circle that appears around a selected portal,
+ * marking a ~40 metre radius), string(css colour value), default ‘orange’
+ * @type {string}
+ * @memberof config_options
+ */
 window.ACCESS_INDICATOR_COLOR = 'orange';
+
+/**
+ * What colour should the linkable range circle be, string(css colour value), default ‘red’
+ * @type {string}
+ * @memberof config_options
+ */
 window.RANGE_INDICATOR_COLOR = 'red';
 
-// min zoom for intel map - should match that used by stock intel
+/**
+ * Min zoom for intel map - should match that used by stock intel, default 3
+ * @type {number}
+ * @memberof config_options
+ */
 window.MIN_ZOOM = 3;
 
-// used when zoom level is not specified explicitly (must contain all the portals)
+/**
+ * Used when zoom level is not specified explicitly (must contain all the portals)
+ * @type {number}
+ * @memberof config_options
+ */
 window.DEFAULT_ZOOM = 15;
 
+/**
+ * URL of the default image for the portal
+ * @type {string}
+ * @memberof config_options
+ */
 window.DEFAULT_PORTAL_IMG = '//commondatastorage.googleapis.com/ingress.com/img/default-portal-image.png';
-// window.NOMINATIM = '//open.mapquestapi.com/nominatim/v1/search.php?format=json&polygon_geojson=1&q=';
+
+/**
+ * URL to call the Nominatim geocoder service, string.
+ * @type {string}
+ * @memberof config_options
+ */
 window.NOMINATIM = '//nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&q=';
 
-// INGRESS CONSTANTS /////////////////////////////////////////////////
-// http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
+/* ****************************************************************************************************************** */
+
+/**
+ * INGRESS CONSTANTS
+ * http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
+ * @namespace ingress_constants
+ */
+
+/**
+ * Resonator energy per level, 1-based array, XM
+ * @type {number[]}
+ * @const
+ * @memberof ingress_constants
+ */
 window.RESO_NRG = [0, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000];
-window.HACK_RANGE = 40; // in meters, max. distance from portal to be able to access it
+
+/**
+ * Maximum radius around a portal from which the portal is hackable, metres.
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.HACK_RANGE = 40;
+
+/**
+ * The maximum radius around the portal from which the Machine can link
+ * @type {number[]}
+ * @const
+ * @memberof ingress_constants
+ */
 window.LINK_RANGE_MAC = [0, 200, 250, 350, 400, 500, 600, 700, 1000, 1000]; // in meters
+
+/**
+ * Resonator octant cardinal directions
+ * @type {string[]}
+ * @const
+ * @memberof ingress_constants
+ */
 window.OCTANTS = ['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'];
+
+/**
+ * Resonator octant arrows
+ * @type {string[]}
+ * @const
+ * @memberof ingress_constants
+ */
 window.OCTANTS_ARROW = ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'];
-window.DESTROY_RESONATOR = 75; //AP for destroying portal
-window.DESTROY_LINK = 187; //AP for destroying link
-window.DESTROY_FIELD = 750; //AP for destroying field
-window.CAPTURE_PORTAL = 500; //AP for capturing a portal
-window.DEPLOY_RESONATOR = 125; //AP for deploying a resonator
-window.COMPLETION_BONUS = 250; //AP for deploying all resonators on portal
-window.UPGRADE_ANOTHERS_RESONATOR = 65; //AP for upgrading another's resonator
+
+/**
+ * AP for destroying portal
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.DESTROY_RESONATOR = 75;
+
+/**
+ * AP for destroying link
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.DESTROY_LINK = 187;
+
+/**
+ * AP for destroying field
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.DESTROY_FIELD = 750;
+
+/**
+ * AP for capturing a portal
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.CAPTURE_PORTAL = 500;
+
+/**
+ * AP for deploying a resonator
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.DEPLOY_RESONATOR = 125;
+
+/**
+ * AP for deploying all resonators on portal
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.COMPLETION_BONUS = 250;
+
+/**
+ * AP for upgrading another's resonator
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
+window.UPGRADE_ANOTHERS_RESONATOR = 65;
+
+/**
+ * Maximum portal level.
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
 window.MAX_PORTAL_LEVEL = 8;
+
+/**
+ * How many resonators of a given level can one deploy; 1-based array where the index is the resonator level.
+ * @type {number[]}
+ * @const
+ * @memberof ingress_constants
+ */
 window.MAX_RESO_PER_PLAYER = [0, 8, 4, 4, 4, 2, 2, 1, 1];
+
+/**
+ * The base value of how long you need to wait between portal hacks, in seconds.
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
 window.BASE_HACK_COOLDOWN = 300; // 5 mins - 300 seconds
+
+/**
+ * Base value, how many times at most you can hack the portal.
+ * @type {number}
+ * @const
+ * @memberof ingress_constants
+ */
 window.BASE_HACK_COUNT = 4;
 
-// OTHER MORE-OR-LESS CONSTANTS //////////////////////////////////////
+/* ****************************************************************************************************************** */
+
+/**
+ * OTHER MORE-OR-LESS CONSTANTS
+ * @namespace other_constants
+ */
+
+/**
+ * @type {number}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_NONE = 0;
+
+/**
+ * @type {number}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_RES = 1;
+
+/**
+ * @type {number}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_ENL = 2;
+
+/**
+ * @type {number}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_MAC = 3;
+
+/**
+ * @type {string[]}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_TO_CSS = ['none', 'res', 'enl', 'mac'];
+
+/**
+ * @type {string[]}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_NAMES = ['Neutral', 'Resistance', 'Enlightened', '__MACHINA__'];
+
+/**
+ * @type {string[]}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_CODES = ['N', 'R', 'E', 'M'];
+
+/**
+ * @type {string[]}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_CODENAMES = ['NEUTRAL', 'RESISTANCE', 'ENLIGHTENED', 'MACHINA'];
 window.TEAM_SHORTNAMES = ['NEU', 'RES', 'ENL', 'MAC'];
 
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_NAME_NONE = window.TEAM_NAMES[window.TEAM_NONE];
+
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_NAME_RES = window.TEAM_NAMES[window.TEAM_RES];
+
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_NAME_ENL = window.TEAM_NAMES[window.TEAM_ENL];
+
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_NAME_MAC = window.TEAM_NAMES[window.TEAM_MAC];
 
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_CODE_NONE = window.TEAM_CODES[window.TEAM_NONE];
+
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_CODE_RES = window.TEAM_CODES[window.TEAM_RES];
+
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_CODE_ENL = window.TEAM_CODES[window.TEAM_ENL];
+
+/**
+ * @type {string}
+ * @const
+ * @memberof other_constants
+ */
 window.TEAM_CODE_MAC = window.TEAM_CODES[window.TEAM_MAC];
 
-// STORAGE ///////////////////////////////////////////////////////////
-// global variables used for storage. Most likely READ ONLY. Proper
-// way would be to encapsulate them in an anonymous function and write
-// getters/setters, but if you are careful enough, this works.
+/* ****************************************************************************************************************** */
+
+/**
+ * Global variables used for storage. Most likely READ ONLY. Proper ay would be to encapsulate them in an anonymous
+ * function and write getters/setters, but if you are careful enough, this works.
+ * @namespace storage_variables
+ */
+
+/**
+ * Stores the id of the timeout that kicks off the next refresh (ie value returned by ``setTimeout()``)
+ * @type {number|undefined}
+ * @memberof storage_variables
+ */
 window.refreshTimeout = undefined;
+
+/**
+ * Portal GUID if the original URL had it.
+ * @type {string|null}
+ * @memberof storage_variables
+ */
 window.urlPortal = null;
+
+/**
+ * Portal lng/lat if the orignial URL had it.
+ * @type {object|null}
+ * @memberof storage_variables
+ */
 window.urlPortalLL = null;
+
+/**
+ * Stores the GUID of the selected portal, or is `null` if there is none.
+ * @type {string|null}
+ * @memberof storage_variables
+ */
 window.selectedPortal = null;
+
+/**
+ * Reference to the linking range indicator of the selected portal. This is a Leaflet layer.
+ * @type {object|null}
+ * @memberof storage_variables
+ */
 window.portalRangeIndicator = null;
+
+/**
+ * Reference to the hacking range indicator of the selected portal. This is a Leaflet layer.
+ * @type {object|null}
+ * @memberof storage_variables
+ */
 window.portalAccessIndicator = null;
 
 // var portalsLayers, linksLayer, fieldsLayer;
 var portalsFactionLayers, linksFactionLayers, fieldsFactionLayers;
 
-// contain references to all entities loaded from the server. If render limits are hit,
-// not all may be added to the leaflet layers
+/**
+ * References to Leaflet objects representing portals, indexed by entity ID.
+ * This object stores the mapping in the format `{ id1: feature1, ... }`.
+ * Note: While these are Leaflet objects, not all may be added to the map due to render limits.
+ * @type {Object.<string, object>}
+ * @memberof storage_variables
+ */
 window.portals = {};
+
+/**
+ * References to Leaflet objects representing links, indexed by entity ID.
+ * This object stores the mapping in the format `{ id1: feature1, ... }`.
+ * Note: While these are Leaflet objects, not all may be added to the map due to render limits.
+ * @type {Object.<string, object>}
+ * @memberof storage_variables
+ */
 window.links = {};
+
+/**
+ * References to Leaflet objects representing fields, indexed by entity ID.
+ * This object stores the mapping in the format `{ id1: feature1, ... }`.
+ * Note: While these are Leaflet objects, not all may be added to the map due to render limits.
+ * @type {Object.<string, object>}
+ * @memberof storage_variables
+ */
 window.fields = {};
+
+/**
+ * @class L
+ * @description Root class for all Leaflet-related functionalities, extended with custom methods and properties.
+ */
 
 // plugin framework. Plugins may load earlier than iitc, so don’t
 // overwrite data

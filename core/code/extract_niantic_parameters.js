@@ -1,6 +1,16 @@
-// as of 2014-08-14, Niantic have returned to minifying the javascript. This means we no longer get the nemesis object
-// and it's various member objects, functions, etc.
-// so we need to extract some essential parameters from the code for IITC to use
+/**
+ * Extract essential parameters and functions from the Ingress Intel site's minified JavaScript.
+ * Necessary due to Niantic's minification and obfuscation of their Intel Map code.
+ *
+ * @module extract_niantic_parameters
+ */
+
+/**
+ * Main function to extract required parameters from the Ingress Intel site's JavaScript.
+ * Throws an error and shows a dialog if it fails to find the necessary parameters.
+ *
+ * @function extractFromStock
+ */
 
 window.extractFromStock = function() {
   window.niantic_params = {}

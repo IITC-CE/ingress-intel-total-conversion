@@ -1,13 +1,23 @@
-/**
- * functions that are not use by IITC itself
- * and won't most likely not receive any updated
- */
 /* global L -- eslint */
 
 /**
+ * @file This file contains functions that are not use by IITC itself
+ * and won't most likely not receive any updated
+ * @module _deprecated
+ */
+
+/**
+ * Calculates the potential AP gain for capturing or destroying a portal, based on the number of resonators,
+ * links, and fields. It does not account for AP gained from resonator upgrades or mod deployment.
+ *
  * @deprecated
- *  given counts of resonators, links and fields, calculate the available AP
- *  doesn't take account AP for resonator upgrades or AP for adding mods
+ * @function portalApGainMaths
+ * @param {number} resCount - The number of resonators on the portal.
+ * @param {number} linkCount - The number of links connected to the portal.
+ * @param {number} fieldCount - The number of fields using the portal as a vertex.
+ * @returns {Object} An object containing detailed AP gain values for various actions such as deploying resonators,
+ *                   destroying resonators, creating fields, destroying links, capturing the portal, and total
+ *                   AP for destroying and capturing.
  */
 window.portalApGainMaths = function (resCount, linkCount, fieldCount) {
   var deployAp = (8 - resCount) * window.DEPLOY_RESONATOR;
@@ -33,9 +43,13 @@ window.portalApGainMaths = function (resCount, linkCount, fieldCount) {
 };
 
 /**
+ * Estimates the AP gain from a portal, based only on summary data from portals, links, and fields.
+ * Not entirely accurate - but available for all portals on the screen
+ *
  * @deprecated
- * get the AP gains from a portal, based only on the brief summary data from portals, links and fields
- * not entirely accurate - but available for all portals on the screen
+ * @function getPortalApGain
+ * @param {string} guid - The GUID of the portal.
+ * @returns {Object|undefined} An object containing various AP gain values, or undefined if the portal is not found.
  */
 window.getPortalApGain = function (guid) {
   var p = window.portals[guid];
@@ -53,8 +67,12 @@ window.getPortalApGain = function (guid) {
 };
 
 /**
+ * Calculates the potential level a player can upgrade a portal to.
+ *
  * @deprecated
- * This function will return the potential level a player can upgrade it to
+ * @function potentialPortalLevel
+ * @param {Object} d - The portal detail object containing resonator and ownership information.
+ * @returns {number} The potential level to which the player can upgrade the portal.
  */
 window.potentialPortalLevel = function (d) {
   var current_level = window.getPortalLevel(d);
@@ -100,9 +118,13 @@ window.potentialPortalLevel = function (d) {
 };
 
 /**
+ * Finds the latitude and longitude for a portal using all available data sources.
+ * This includes the list of portals, cached portal details, and information from links and fields.
+ *
  * @deprecated
- * find the lat/lon for a portal, using any and all available data
- * (we have the list of portals, the cached portal details, plus links and fields as sources of portal locations)
+ * @function findPortalLatLng
+ * @param {string} guid - The GUID of the portal.
+ * @returns {L.LatLng|undefined} The LatLng location of the portal, or undefined if not found.
  */
 window.findPortalLatLng = function (guid) {
   if (window.portals[guid]) {

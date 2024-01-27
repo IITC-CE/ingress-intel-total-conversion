@@ -1,16 +1,24 @@
-// ARTIFACT ///////////////////////////////////////////////////////
-
-// added as part of the ingress #13magnus in november 2013, artifacts
-// are additional game elements overlayed on the intel map
-// currently there are only jarvis-related entities
-// - shards: move between portals (along links) each hour. more than one can be at a portal
-// - targets: specific portals - one per team
-// the artifact data includes details for the specific portals, so can be useful
-// 2014-02-06: intel site updates hint at new 'amar artifacts', likely following the same system as above
-
+/**
+ * @file Provides functions related to Ingress artifacts, including setup, data request, and processing functions.
+ * Added as part of the ingress #13magnus in november 2013, artifacts
+ * are additional game elements overlayed on the intel map
+ *
+ * currently there are only jarvis-related entities
+ * - `shards`: move between portals (along links) each hour. more than one can be at a portal.
+ * - `targets`: specific portals - one per team.
+ *
+ * The artifact data includes details for the specific portals, so can be useful.
+ * 2014-02-06: intel site updates hint at new 'amar artifacts', likely following the same system as above
+ *
+ * @namespace window.artifact
+ */
 
 window.artifact = function() {}
 
+/**
+ * Sets up artifact data fetching, layer creation, and UI elements.
+ * @function window.artifact.setup
+ */
 window.artifact.setup = function() {
   artifact.REFRESH_JITTER = 2*60;  // 2 minute random period so not all users refresh at once
   artifact.REFRESH_SUCCESS = 60*60;  // 60 minutes on success
@@ -37,6 +45,10 @@ window.artifact.setup = function() {
     .appendTo('#toolbox');
 }
 
+/**
+ * Requests artifact data from the server. If the map is in idle mode, sets a flag instead of sending a request.
+ * @function window.artifact.requestData
+ */
 window.artifact.requestData = function() {
   if (isIdle()) {
     artifact.idle = true;
@@ -45,6 +57,10 @@ window.artifact.requestData = function() {
   }
 }
 
+/**
+ * Resumes artifact data requests when coming out of idle mode.
+ * @function window.artifact.idleResume
+ */
 window.artifact.idleResume = function() {
   if (artifact.idle) {
     artifact.idle = false;
@@ -52,6 +68,11 @@ window.artifact.idleResume = function() {
   }
 }
 
+/**
+ * Handles successful artifact data response from the server.
+ * @function window.artifact.handleSuccess
+ * @param {Object} data - Artifact data received from the server.
+ */
 window.artifact.handleSuccess = function(data) {
   artifact.processData (data);
 
@@ -62,13 +83,22 @@ window.artifact.handleSuccess = function(data) {
   setTimeout (artifact.requestData, nextTime - now);
 }
 
+/**
+ * Handles failure in artifact data request. Schedules a new request after a short delay.
+ * @function window.artifact.handleFailure
+ * @param {Object} data - Response data from the failed request.
+ */
 window.artifact.handleFailure = function(data) {
   // no useful data on failure - do nothing
 
   setTimeout (artifact.requestData, artifact.REFRESH_FAILURE*1000);
 }
 
-
+/**
+ * Processes artifact data. Clears previous data, processes new results, runs hooks, and updates the artifact layer.
+ * @function window.artifact.processData
+ * @param {Object} data - Artifact data to process.
+ */
 window.artifact.processData = function(data) {
 
   if (data.error || !data.result) {
@@ -87,7 +117,10 @@ window.artifact.processData = function(data) {
 
 }
 
-
+/**
+ * Clears all stored artifact data.
+ * @function window.artifact.clearData
+ */
 window.artifact.clearData = function() {
   artifact.portalInfo = {};
   artifact.artifactTypes = {};
@@ -95,14 +128,18 @@ window.artifact.clearData = function() {
   artifact.entities = [];
 }
 
-
+/**
+ * Processes the results from artifact portal data. Extracts and stores portal data for each artifact type.
+ * @function window.artifact.processResult
+ * @param {Object} portals - The artifact portal data.
+ */
 window.artifact.processResult = function (portals) {
   // portals is an object, keyed from the portal GUID, containing the portal entity array
 
   for (var guid in portals) {
     var ent = portals[guid];
     var data = decodeArray.portal(ent, 'summary');
-    
+
     if (!data.artifactBrief) {
       // 2/12/2017 - Shard removed from a portal leaves it in artifact results but has no artifactBrief
       continue;
@@ -142,33 +179,68 @@ window.artifact.processResult = function (portals) {
 
 }
 
+/**
+ * Returns the types of artifacts currently known.
+ * @function window.artifact.getArtifactTypes
+ * @returns {Array} An array of artifact type strings.
+ */
 window.artifact.getArtifactTypes = function() {
   return Object.keys(artifact.artifactTypes);
 }
 
+/**
+ * Determines if a given type is a knowable artifact.
+ * @function window.artifact.isArtifact
+ * @param {string} type - The type to check.
+ * @returns {boolean} True if the type is an artifact, false otherwise.
+ */
 window.artifact.isArtifact = function(type) {
   return type in artifact.artifactTypes;
 }
 
-// used to render portals that would otherwise be below the visible level
+/**
+ * Used to render portals that would otherwise be below the visible level.
+ * @function window.artifact.getArtifactEntities
+ * @returns {Array} An array of artifact entities.
+ */
 window.artifact.getArtifactEntities = function() {
   return artifact.entities;
 }
 
+/**
+ * Gets the portals that are relevant to the artifacts.
+ * @function window.artifact.getInterestingPortals
+ * @returns {Array} An array of portal GUIDs.
+ */
 window.artifact.getInterestingPortals = function() {
   return Object.keys(artifact.portalInfo);
 }
 
-// quick test for portal being relevant to artifacts - of any type
+/**
+ * Quickly checks if a portal is relevant to any type of artifacts.
+ * @function window.artifact.isInterestingPortal
+ * @param {string} guid - The GUID of the portal to check.
+ * @returns {boolean} True if the portal is involved in artifacts, false otherwise.
+ */
 window.artifact.isInterestingPortal = function(guid) {
   return guid in artifact.portalInfo;
 }
 
-// get the artifact data for a specified artifact id (e.g. 'jarvis'), if it exists - otherwise returns something 'false'y
+/**
+ * Retrieves the artifact data for a specified artifact id (e.g. 'jarvis'), if available.
+ * @function window.artifact.getPortalData
+ * @param {string} guid - The GUID of the portal.
+ * @param {string} artifactId - The ID of the artifact type.
+ * @returns {Object|false} Artifact data for the specified portal and type, or undefined if not available.
+ */
 window.artifact.getPortalData = function(guid,artifactId) {
   return artifact.portalInfo[guid] && artifact.portalInfo[guid][artifactId];
 }
 
+/**
+ * Updates the artifact layer on the map based on the current artifact data.
+ * @function window.artifact.updateLayer
+ */
 window.artifact.updateLayer = function() {
   artifact._layer.clearLayers();
 
@@ -221,7 +293,10 @@ window.artifact.updateLayer = function() {
 
 }
 
-
+/**
+ * Displays a dialog listing all portals involved with artifacts, organized by artifact types.
+ * @function window.artifact.showArtifactList
+ */
 window.artifact.showArtifactList = function() {
   var html = '';
 

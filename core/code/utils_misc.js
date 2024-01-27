@@ -1,6 +1,16 @@
-// UTILS + MISC  ///////////////////////////////////////////////////////
+/**
+ * @file Misc utils
+ *
+ * @module utils_misc
+ */
 
-// retrieves parameter from the URL?query=string.
+/**
+ * Retrieves a parameter from the URL query string.
+ *
+ * @function getURLParam
+ * @param {string} param - The name of the parameter to retrieve.
+ * @returns {string} The value of the parameter, or an empty string if not found.
+ */
 window.getURLParam = function(param) {
   var items = window.location.search.substr(1).split('&');
   if (items == "") return "";
@@ -17,8 +27,14 @@ window.getURLParam = function(param) {
   return '';
 }
 
-// read cookie by name.
-// http://stackoverflow.com/a/5639455/1684530 by cwolves
+/**
+ * Reads a cookie by name.
+ * @see http://stackoverflow.com/a/5639455/1684530
+ *
+ * @function readCookie
+ * @param {string} name - The name of the cookie to read.
+ * @returns {string} The value of the cookie, or undefined if not found.
+ */
 window.readCookie = function(name){
   var C, i, c = document.cookie.split('; ');
   var cookies = {};
@@ -29,33 +45,65 @@ window.readCookie = function(name){
   return cookies[name];
 }
 
+/**
+ * Writes a cookie with a specified name and value.
+ *
+ * @function writeCookie
+ * @param {string} name - The name of the cookie.
+ * @param {string} val - The value of the cookie.
+ */
 window.writeCookie = function(name, val) {
   var d = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
   document.cookie = name + "=" + val + '; expires='+d+'; path=/';
 }
 
+/**
+ * Erases a cookie with a specified name.
+ *
+ * @function eraseCookie
+ * @param {string} name - The name of the cookie to erase.
+ */
 window.eraseCookie = function(name) {
   document.cookie = name + '=; expires=Thu, 1 Jan 1970 00:00:00 GMT; path=/';
 }
 
-// add thousand separators to given number.
-// http://stackoverflow.com/a/1990590/1684530 by Doug Neiner.
+/**
+ * Adds thousand separators to a given number.
+ * @see http://stackoverflow.com/a/1990590/1684530
+ *
+ * @function digits
+ * @param {number} d - The number to format.
+ * @returns {string} The formatted number with thousand separators.
+ */
 window.digits = function(d) {
   // U+2009 - Thin Space. Recommended for use as a thousands separator...
   // https://en.wikipedia.org/wiki/Space_(punctuation)#Table_of_spaces
   return (d+"").replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1&#8201;");
 }
 
-
+/**
+ * Pads a number with zeros up to a specified length.
+ *
+ * @function zeroPad
+ * @param {number} number - The number to pad.
+ * @param {number} pad - The desired length of the output string.
+ * @returns {string} The padded number as a string.
+ */
 window.zeroPad = function(number,pad) {
   number = number.toString();
   var zeros = pad - number.length;
   return Array(zeros>0?zeros+1:0).join("0") + number;
 }
 
-
-// converts javascript timestamps to HH:mm:ss format if it was today;
-// otherwise it returns YYYY-MM-DD
+/**
+ * Converts a UNIX timestamp to a human-readable string.
+ * If the timestamp is from today, returns the time (HH:mm:ss format); otherwise, returns the date (YYYY-MM-DD).
+ *
+ * @function unixTimeToString
+ * @param {number} time - The UNIX timestamp to convert.
+ * @param {boolean} [full] - If true, returns both date and time.
+ * @returns {string|null} The formatted date and/or time.
+ */
 window.unixTimeToString = function(time, full) {
   if(!time) return null;
   var d = new Date(typeof time === 'string' ? parseInt(time) : time);
@@ -69,8 +117,15 @@ window.unixTimeToString = function(time, full) {
     return date;
 }
 
-// converts a javascript time to a precise date and time (optionally with millisecond precision)
-// formatted in ISO-style YYYY-MM-DD hh:mm:ss.mmm - but using local timezone
+/**
+ * Converts a UNIX timestamp to a precise date and time string in the local timezone.
+ * Formatted in ISO-style YYYY-MM-DD hh:mm:ss.mmm - but using local timezone
+ *
+ * @function unixTimeToDateTimeString
+ * @param {number} time - The UNIX timestamp to convert.
+ * @param {boolean} [millisecond] - Whether to include millisecond precision.
+ * @returns {string|null} The formatted date and time string.
+ */
 window.unixTimeToDateTimeString = function(time, millisecond) {
   if(!time) return null;
   var d = new Date(typeof time === 'string' ? parseInt(time) : time);
@@ -78,6 +133,13 @@ window.unixTimeToDateTimeString = function(time, millisecond) {
     +' '+zeroPad(d.getHours(),2)+':'+zeroPad(d.getMinutes(),2)+':'+zeroPad(d.getSeconds(),2)+(millisecond?'.'+zeroPad(d.getMilliseconds(),3):'');
 }
 
+/**
+ * Converts a UNIX timestamp to a time string formatted as HH:mm.
+ *
+ * @function unixTimeToHHmm
+ * @param {number|string} time - The UNIX timestamp to convert.
+ * @returns {string|null} Formatted time as HH:mm.
+ */
 window.unixTimeToHHmm = function(time) {
   if(!time) return null;
   var d = new Date(typeof time === 'string' ? parseInt(time) : time);
@@ -86,6 +148,14 @@ window.unixTimeToHHmm = function(time) {
   return  h + ':' + s;
 }
 
+/**
+ * Formats an interval of time given in seconds into a human-readable string.
+ *
+ * @function formatInterval
+ * @param {number} seconds - The interval in seconds.
+ * @param {number} [maxTerms] - The maximum number of time units to include.
+ * @returns {string} The formatted time interval.
+ */
 window.formatInterval = function(seconds,maxTerms) {
 
   var d = Math.floor(seconds / 86400);
@@ -104,10 +174,22 @@ window.formatInterval = function(seconds,maxTerms) {
   return terms.join(' ');
 }
 
+/**
+ * Formats a distance in meters, converting to kilometers if the distance is over 10,000 meters.
+ *
+ * @function formatDistance
+ * @param {number} distance - The distance in meters.
+ * @returns {string} The formatted distance.
+ */
 window.formatDistance = function (distance) {
   return window.digits(distance > 10000 ? (distance / 1000).toFixed(2) + 'km' : Math.round(distance) + 'm');
 };
 
+/**
+ * Changes the coordinates and map scale to show the range for portal links.
+ *
+ * @function rangeLinkClick
+ */
 window.rangeLinkClick = function() {
   if(window.portalRangeIndicator)
     window.map.fitBounds(window.portalRangeIndicator.getBounds());
@@ -115,6 +197,14 @@ window.rangeLinkClick = function() {
     window.show('map');
 }
 
+/**
+ * Displays a dialog with links to show the specified location on various map services.
+ *
+ * @function showPortalPosLinks
+ * @param {number} lat - Latitude of the location.
+ * @param {number} lng - Longitude of the location.
+ * @param {string} name - Name of the location.
+ */
 window.showPortalPosLinks = function(lat, lng, name) {
   var encoded_name = encodeURIComponent(name);
   var qrcode = '<div id="qrcode"></div>';
@@ -130,6 +220,12 @@ window.showPortalPosLinks = function(lat, lng, name) {
   });
 }
 
+/**
+ * Checks if the device is a touch-enabled device.
+ *
+ * @function isTouchDevice
+ * @returns {boolean} True if the device is touch-enabled, otherwise false.
+ */
 window.isTouchDevice = function() {
   return 'ontouchstart' in window // works on most browsers
       || 'onmsgesturechange' in window; // works on ie10
@@ -141,13 +237,25 @@ window.androidCopy = function(text) {
   return true; // i.e. execute other actions
 }
 
-// returns number of pixels left to scroll down before reaching the
-// bottom. Works similar to the native scrollTop function.
+/**
+ * Calculates the number of pixels left to scroll down before reaching the bottom of an element.
+ *
+ * @function scrollBottom
+ * @param {string|jQuery} elm - The element to calculate the scroll bottom for.
+ * @returns {number} The number of pixels from the bottom.
+ */
 window.scrollBottom = function(elm) {
   if(typeof elm === 'string') elm = $(elm);
   return elm.get(0).scrollHeight - elm.innerHeight() - elm.scrollTop();
 }
 
+/**
+ * Zooms the map to a specific portal and shows its details if available.
+ *
+ * @function zoomToAndShowPortal
+ * @param {string} guid - The globally unique identifier of the portal.
+ * @param {L.LatLng} latlng - The latitude and longitude of the portal.
+ */
 window.zoomToAndShowPortal = function(guid, latlng) {
   map.setView(latlng, DEFAULT_ZOOM);
   // if the data is available, render it immediately. Otherwise defer
@@ -158,6 +266,14 @@ window.zoomToAndShowPortal = function(guid, latlng) {
     urlPortal = guid;
 }
 
+/**
+ * Selects a portal by its latitude and longitude.
+ *
+ * @function selectPortalByLatLng
+ * @param {number|Array|L.LatLng} lat - The latitude of the portal
+ *                                      or an array or L.LatLng object containing both latitude and longitude.
+ * @param {number} [lng] - The longitude of the portal.
+ */
 window.selectPortalByLatLng = function(lat, lng) {
   if(lng === undefined && lat instanceof Array) {
     lng = lat[1];
@@ -179,13 +295,25 @@ window.selectPortalByLatLng = function(lat, lng) {
   map.setView(urlPortalLL, DEFAULT_ZOOM);
 };
 
-// escape a javascript string, so quotes and backslashes are escaped with a backslash
-// (for strings passed as parameters to html onclick="..." for example)
+/**
+ * Escapes special characters in a string for use in JavaScript.
+ * (for strings passed as parameters to html onclick="..." for example)
+ *
+ * @function escapeJavascriptString
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string.
+ */
 window.escapeJavascriptString = function(str) {
   return (str+'').replace(/[\\"']/g,'\\$&');
 }
 
-//escape special characters, such as tags
+/**
+ * Escapes HTML special characters in a string.
+ *
+ * @function escapeHtmlSpecialChars
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string.
+ */
 window.escapeHtmlSpecialChars = function(str) {
   var div = document.createElement('div');
   var text = document.createTextNode(str);
@@ -193,16 +321,36 @@ window.escapeHtmlSpecialChars = function(str) {
   return div.innerHTML;
 }
 
+/**
+ * Formats energy of portal.
+ *
+ * @function prettyEnergy
+ * @param {number} nrg - The energy value to format.
+ * @returns {string} The formatted energy value.
+ */
 window.prettyEnergy = function(nrg) {
   return nrg> 1000 ? Math.round(nrg/1000) + ' k': nrg;
 }
 
+/**
+ * Converts a list of items into a unique array, removing duplicates.
+ *
+ * @function uniqueArray
+ * @param {Array} arr - The array to process.
+ * @returns {Array} A new array containing only unique elements.
+ */
 window.uniqueArray = function(arr) {
   return $.grep(arr, function(v, i) {
     return $.inArray(v, arr) === i;
   });
 }
 
+/**
+ * Generates a four-column HTML table from an array of data blocks.
+ *
+ * @param {Array} blocks - Array of data blocks, where each block is an array with details for one row.
+ * @returns {string} HTML string representing the constructed table.
+ */
 window.genFourColumnTable = function(blocks) {
   var t = $.map(blocks, function(detail, index) {
     if(!detail) return '';
@@ -216,9 +364,13 @@ window.genFourColumnTable = function(blocks) {
   return t;
 }
 
-
-// converts given text with newlines (\n) and tabs (\t) to a HTML
-// table automatically.
+/**
+ * Converts text with newlines (`\n`) and tabs (`\t`) into an HTML table.
+ *
+ * @function convertTextToTableMagic
+ * @param {string} text - The text to convert.
+ * @returns {string} The resulting HTML table.
+ */
 window.convertTextToTableMagic = function(text) {
   // check if it should be converted to a table
   if(!text.match(/\t/)) return text.replace(/\n/g, '<br>');
@@ -250,12 +402,30 @@ window.convertTextToTableMagic = function(text) {
   return table;
 }
 
+/**
+ * Clamps a given value between a minimum and maximum value.
+ *
+ * @private
+ * @function clamp
+ * @param {number} n - The value to clamp.
+ * @param {number} max - The maximum allowed value.
+ * @param {number} min - The minimum allowed value.
+ * @returns {number} The clamped value.
+ */
 function clamp(n, max, min) {
   if (n === 0) return 0;
   return n > 0 ? Math.min(n, max) : Math.max(n, min);
 }
 
 var MAX_LATITUDE = 85.051128; // L.Projection.SphericalMercator.MAX_LATITUDE
+
+/**
+ * Clamps a latitude and longitude to the maximum and minimum valid values.
+ *
+ * @function clampLatLng
+ * @param {L.LatLng} latlng - The latitude and longitude to clamp.
+ * @returns {Array<number>} The clamped latitude and longitude.
+ */
 window.clampLatLng = function (latlng) {
   // Ingress accepts requests only for this range
   return [
@@ -264,6 +434,13 @@ window.clampLatLng = function (latlng) {
   ];
 }
 
+/**
+ * Clamps a latitude and longitude bounds to the maximum and minimum valid values.
+ *
+ * @function clampLatLngBounds
+ * @param {L.LatLngBounds} bounds - The bounds to clamp.
+ * @returns {L.LatLngBounds} The clamped bounds.
+ */
 window.clampLatLngBounds = function (bounds) {
   var SW = bounds.getSouthWest(), NE = bounds.getNorthEast();
   return L.latLngBounds(clampLatLng(SW), clampLatLng(NE));
@@ -289,6 +466,13 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+/**
+ * Determines if a point is inside a polygon.
+ *
+ * @param {Array<L.LatLng>} polygon - The vertices of the polygon.
+ * @param {L.LatLng} point - The point to test.
+ * @returns {boolean} True if the point is inside the polygon, false otherwise.
+ */
 window.pnpoly = function (polygon, point) {
   var inside = 0;
   // j records previous value. Also handles wrapping around.
@@ -300,17 +484,29 @@ window.pnpoly = function (polygon, point) {
   return !!inside;
 };
 
+/**
+ * Creates a link to open a specific portal in Ingress Prime.
+ *
+ * @function makePrimeLink
+ * @param {string} guid - The globally unique identifier of the portal.
+ * @param {number} lat - The latitude of the portal.
+ * @param {number} lng - The longitude of the portal.
+ * @returns {string} The Ingress Prime link for the portal
+ */
 window.makePrimeLink = function (guid, lat, lng) {
   return `https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fportal%2F${guid}&apn=com.nianticproject.ingress&isi=576505181&ibi=com.google.ingress&ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181&ofl=https%3A%2F%2Fintel.ingress.com%2Fintel%3Fpll%3D${lat}%2C${lng}`;
 };
 
-// @function makePermalink(latlng?: LatLng, options?: Object): String
-// Makes the permalink for the portal with specified latlng, possibly including current map view.
-// Portal latlng can be omitted to create mapview-only permalink.
-// @option: includeMapView: Boolean = null
-// Use to add zoom level and latlng of current map center.
-// @option: fullURL: Boolean = null
-// Use to make absolute fully qualified URL (default: relative link).
+/**
+ * Generates a permalink URL based on the specified latitude and longitude and additional options.
+ *
+ * @param {L.LatLng} [latlng] - The latitude and longitude for the permalink.
+ *                              Can be omitted to create mapview-only permalink.
+ * @param {Object} [options] - Additional options for permalink generation.
+ * @param {boolean} [options.includeMapView] - Include current map view in the permalink.
+ * @param {boolean} [options.fullURL] - Generate a fully qualified URL (default: relative link).
+ * @returns {string} The generated permalink URL.
+ */
 window.makePermalink = function (latlng, options) {
   options = options || {};
 

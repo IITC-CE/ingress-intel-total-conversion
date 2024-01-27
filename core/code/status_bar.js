@@ -1,9 +1,17 @@
-// STATUS BAR ///////////////////////////////////////
+/**
+ * @file This file handles the rendering and updating of the status bar in IITC.
+ * @module status_bar
+ */
 
-// gives user feedback about pending operations. Draws current status
-// to website. Updates info in layer chooser.
 window.renderUpdateStatusTimer_ = undefined;
 
+/**
+ * Renders the status bar. This function updates the status bar with information about the current
+ * zoom level (portal levels and link lengths), map data loading progress, and any pending requests or failed requests.
+ * It schedules the update to the next event loop to improve performance and ensure smoother rendering.
+ *
+ * @function renderUpdateStatus
+ */
 window.renderUpdateStatus = function() {
   var progress = 1;
 
