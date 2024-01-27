@@ -712,7 +712,7 @@ window.chat.renderMarkup = function (markup) {
 /**
  * Transforms a given markup array into an older, more straightforward format for easier understanding.
  *
- * @function transformMessage
+ * @function window.chat.transformMessage
  * @param {Array} markup - An array representing the markup to be transformed.
  * @returns {Array} The transformed markup array with a simplified structure.
  */
