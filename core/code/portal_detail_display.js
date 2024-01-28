@@ -179,7 +179,7 @@ window.renderPortalDetails = function(guid) {
       historyDetails
     );
 
-  window.renderPortalUrl(lat, lng, title);
+  window.renderPortalUrl(lat, lng, title, guid);
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?
