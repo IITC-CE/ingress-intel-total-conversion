@@ -59,7 +59,12 @@ function setup() {
       accesskey: '9',
     });
   } else {
-    $('<a id="privacytoggle" accesskey="9">').onclick(privacyView.toggle).attr('title', '[9]').prependTo('#chatcontrols');
+    $('<a id="privacytoggle" accesskey="9">')
+      .click(function () {
+        window.plugin.privacyView.toggle();
+      })
+      .attr('title', '[9]')
+      .prependTo('#chatcontrols');
   }
 
   if (privacyView.activate) {

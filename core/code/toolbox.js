@@ -123,12 +123,12 @@ IITC.toolbox = {
     buttonElement.textContent = buttonData.label;
     buttonElement.onclick = buttonData.action;
 
-    if (buttonData.class) buttonElement.className = buttonData.class;
-    if (buttonData.title) buttonElement.title = buttonData.title;
-    if (buttonData.access_key) buttonElement.accessKey = buttonData.access_key;
-    if (buttonData.mouseover) buttonElement.mouseover = buttonData.mouseover;
+    if (typeof buttonData.title === 'string') buttonElement.title = buttonData.title;
+    if (typeof buttonData.class === 'string') buttonElement.className = buttonData.class;
+    if (typeof buttonData.access_key === 'string') buttonElement.accessKey = buttonData.access_key;
+    if (typeof buttonData.mouseover === 'string') buttonElement.mouseover = buttonData.mouseover;
 
-    if (buttonData.icon) {
+    if (typeof buttonData.icon === 'string') {
       const iconHTML = `<i class="fa ${buttonData.icon}"></i>`;
       buttonElement.innerHTML = iconHTML + buttonElement.innerHTML;
     }

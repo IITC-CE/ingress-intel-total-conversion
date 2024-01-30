@@ -1163,7 +1163,7 @@ window.plugin.missions = {
     $('<style>').prop('type', 'text/css').html('@include_string:missions.css@').appendTo('head');
     IITC.toolbox.addButton({
       label: 'Missions in view',
-      action: this.missions.openTopMissions,
+      action: () => window.plugin.missions.openTopMissions(),
     });
 
 		if (window.useAppPanes()) {
