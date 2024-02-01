@@ -437,6 +437,21 @@ chat.setupTabs = function () {
   };
 
   chat.getChatPortalName = comm.getChatPortalName;
+
+  /**
+   * Renders data from the data-hash to the element defined by the given ID.
+   *
+   * @function chat.renderData
+   * @param {Object} data - Chat data to be rendered.
+   * @param {string} element - ID of the DOM element to render the chat into.
+   * @param {boolean} likelyWereOldMsgs - Flag indicating if older messages are likely to have been added.
+   * @param {Array} sortedGuids - Sorted array of GUIDs representing the order of messages.
+   * @memberof window.chat
+   * @type {Object}
+   */
+  chat.renderData = function (data, element, likelyWereOldMsgs, sortedGuids) {
+    return comm.renderData(data, element, likelyWereOldMsgs, sortedGuids);
+  };
 };
 
 /**
