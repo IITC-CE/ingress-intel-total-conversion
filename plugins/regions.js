@@ -68,6 +68,11 @@ window.plugin.regions.regionName = function (cell) {
     var regionI = cell.ij[0] >> (cell.level-4);
     var regionJ = cell.ij[1] >> (cell.level-4);
 
+    // for Odd faces Nia swaps id & codename
+    if (cell.face & 1) {
+      [regionI, regionJ] = [regionJ, regionI];
+    }
+
     name += zeroPad(regionI+1,2)+'-'+window.plugin.regions.CODE_WORDS[regionJ];
   }
 
@@ -110,18 +115,20 @@ window.plugin.regions.search = function(query) {
 
 window.plugin.regions.getSearchResult = function (match) {
   var faceId = window.plugin.regions.FACE_NAMES.indexOf(match[1]);
-  var id1 = parseInt(match[2]);
+  var id1 = parseInt(match[2]) - 1;
   var codeWordId = window.plugin.regions.CODE_WORDS.indexOf(match[3]);
   var id2 = match[4] === undefined ? undefined : parseInt(match[4]);
 
-  if(faceId === -1 || id1 < 1 && id1 > 16 || codeWordId === -1 || id2 < 0 || id2 > 15) return;
+  if (faceId === -1 || id1 < 0 || id1 > 15 || codeWordId === -1 || id2 < 0 || id2 > 15) return;
 
-  // looks good. now we need the face/i/j values for this cell
+  // for Odd faces Nia swaps id & codename
+  if (faceId & 1) {
+    [id1, codeWordId] = [codeWordId, id1];
+  }
 
-  // face is used as-is
-
+  // looks good. now we need the face/i/j values for this cell face is used as-is
   // id1 is the region 'i' value (first 4 bits), codeword is the 'j' value (first 4 bits)
-  var cell = S2.S2Cell.FromFaceIJ(faceId, [id1 - 1, codeWordId], 4);
+  var cell = S2.S2Cell.FromFaceIJ(faceId, [id1, codeWordId], 4);
 
   var result = {};
 
