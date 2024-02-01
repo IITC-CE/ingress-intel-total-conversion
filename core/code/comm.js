@@ -1,15 +1,16 @@
 /**
  * @file Namespace for comm-related functionalities.
- * @namespace window.comm
+ *
+ * @memberof IITC
+ * @namespace comm
  */
-
 var comm = {};
-window.comm = comm;
+IITC.comm = comm;
 
 /**
  * Holds data related to each intel channel.
  *
- * @memberof window.comm
+ * @memberof comm
  * @type {Object}
  */
 comm._channels = {};
@@ -18,7 +19,7 @@ comm._channels = {};
  * Initialize the channel data.
  *
  * @function comm.initChannelData
- * @returns {string} The channel object.
+ * @param {string} The channel object.
  */
 comm.initChannelData = function (channel) {
   // preserve channel object
@@ -739,6 +740,9 @@ comm.renderData = function (data, element, likelyWereOldMsgs, sortedGuids) {
   }
 };
 
+/**
+ * @type {ChannelDescription[]}
+ */
 comm.channels = [
   {
     id: 'all',
@@ -777,4 +781,4 @@ for (const channel of comm.channels) {
   comm.initChannelData(channel);
 }
 
-/* global log, map, chat */
+/* global log, map, chat, IITC */

@@ -1,10 +1,10 @@
 /**
  * @file Namespace for chat-related functionalities.
- * @namespace window.chat
+ *
+ * @namespace chat
  */
-
-window.chat = function () {};
-var chat = window.chat;
+var chat = function () {};
+window.chat = chat;
 
 //
 // common
@@ -56,26 +56,45 @@ chat.nicknameClicked = function (event, nickname) {
 // you can add channels from another source provider (message relay, logging from plugins...)
 
 /**
+ * @typedef ChannelDescription - Hold channel description
+ *
+ * See comm.js for examples
+ * @type {object}
+ * @property {string} id - uniq id, matches 'tab' parameter for server requests
+ * @property {string} name - visible name
+ * @property {string} [inputPrompt] - (optional) string for the input prompt
+ * @property {string} inputClass - (optional) class to apply to #chatinput
+ * @property {ChannelSendMessageFn} [sendMessage] - (optional) function to send the message
+ *                                                             first argument is `id`
+ * @property {ChannelRequestFn} [request]
+ *           - (optional) function to call to request new message, first argument is `id`, second is when trigger from scrolling to top
+ * @property {ChannelRenderFn} [render] - (optional) function to render channel content
+ * @property {string} [localBounds] - (optional) if true, reset on view change
+ *
+ * @typedef ChannelSendMessageFn
+ * @type {function}
+ * @param {string} id
+ * @param {string} message
+ *
+ * @typedef ChannelRequestFn
+ * @type {function}
+ * @param {string} id
+ * @param {boolean} getOlderMsgs
+ * @param {boolean} isRetry
+ *
+ * @typedef ChannelRenderFn
+ * @type {function}
+ * @param {string} id
+ * @param {boolean} oldMsgsWereAdded
+ */
+
+/**
  * Holds channels infos.
  *
- * @memberof window.chat
- * @type {Object}
+ * @memberof chat
+ * @type {ChannelDescription[]}
  */
-chat.channels = [
-  // id: uniq id, matches 'tab' parameter for server requests
-  // name: visible name
-  // inputPrompt: (optional) string for the input prompt
-  // inputClass: (optional) class to apply to #chatinput
-  // sendMessage(id, msg): (optional) function to send the message
-  //              first argument is `id`
-  // request(id, getOlderMsgs, isRetry): (optional) function to call
-  //          to request new message, first argument is `id`, second is true
-  //          when trigger from scrolling to top
-  // render(id, oldMsgsWereAdded): (optional) function to render channel content
-  // localBounds: (optional) if true, reset on view change
-  //
-  // See comm.js for examples
-];
+chat.channels = [];
 
 /**
  * Gets the name of the active chat tab.
@@ -92,7 +111,7 @@ chat.getActive = function () {
  *
  * @function chat.getChannelDesc
  * @param {string} tab - The name of the chat tab.
- * @returns {string} The corresponding channel name ('faction', 'alerts', or 'all').
+ * @returns {ChannelDescription} The corresponding channel name ('faction', 'alerts', or 'all').
  */
 chat.getChannelDesc = function (tab) {
   var channelObject = null;
@@ -100,28 +119,6 @@ chat.getChannelDesc = function (tab) {
     if (entry.id === tab) channelObject = entry;
   });
   return channelObject;
-};
-
-/**
- * Toggles the chat window between expanded and collapsed states.
- * When expanded, the chat window covers a larger area of the screen.
- * This function also ensures that the chat is scrolled to the bottom when collapsed.
- *
- * @function chat.toggle
- */
-chat.toggle = function () {
-  var c = $('#chat, #chatcontrols');
-  if (c.hasClass('expand')) {
-    c.removeClass('expand');
-    var div = $('#chat > div:visible');
-    div.data('ignoreNextScroll', true);
-    div.scrollTop(99999999); // scroll to bottom
-    $('.leaflet-control').removeClass('chat-expand');
-  } else {
-    c.addClass('expand');
-    $('.leaflet-control').addClass('chat-expand');
-    chat.needMoreMessages();
-  }
 };
 
 /**
@@ -245,6 +242,28 @@ chat.chooseTab = function (tab) {
 };
 
 /**
+ * Toggles the chat window between expanded and collapsed states.
+ * When expanded, the chat window covers a larger area of the screen.
+ * This function also ensures that the chat is scrolled to the bottom when collapsed.
+ *
+ * @function chat.toggle
+ */
+chat.toggle = function () {
+  var c = $('#chat, #chatcontrols');
+  if (c.hasClass('expand')) {
+    c.removeClass('expand');
+    var div = $('#chat > div:visible');
+    div.data('ignoreNextScroll', true);
+    div.scrollTop(99999999); // scroll to bottom
+    $('.leaflet-control').removeClass('chat-expand');
+  } else {
+    c.addClass('expand');
+    $('.leaflet-control').addClass('chat-expand');
+    chat.needMoreMessages();
+  }
+};
+
+/**
  * Displays the chat interface and activates a specified chat tab.
  *
  * @function chat.show
@@ -303,10 +322,12 @@ chat.keepScrollPosition = function (box, scrollBefore, isOldMsgs) {
   }
 };
 
-//
-// comm tab api
-//
-
+/**
+ * Create and insert into the DOM/Mobile app the channel tab
+ *
+ * @function createChannelTab
+ * @param {ChannelDescription} channelDesc - channel description
+ */
 function createChannelTab(channelDesc) {
   var chatControls = $('#chatcontrols');
   var chatDiv = $('#chat');
@@ -328,12 +349,20 @@ function createChannelTab(channelDesc) {
   if (window.useAndroidPanes()) {
     // exlude hard coded panes
     if (channelDesc.id !== 'all' && channelDesc.id !== 'faction' && channelDesc.id !== 'alerts') {
-      android.addPane(channelDesc.id, channelDesc.name, 'ic_action_view_as_list');
+      app.addPane(channelDesc.id, channelDesc.name, 'ic_action_view_as_list');
     }
   }
 }
 
 var isTabsSetup = false;
+/**
+ * Add to the channel list a new channel description
+ *
+ * If tabs are already created, a tab is created for this channel as well
+ *
+ * @function chat.addChannel
+ * @param {ChannelDescription} channelDesc - channel description
+ */
 chat.addChannel = function (channelDesc) {
   // deny reserved name
   if (channelDesc.id === 'info' || channelDesc.id === 'map') {
@@ -357,11 +386,17 @@ chat.addChannel = function (channelDesc) {
 // setup
 //
 
+/**
+ * Sets up all channels starting from intel COMM
+ *
+ * @function chat.setupTabs
+ * @param {ChannelDescription} channelDesc - channel description
+ */
 chat.setupTabs = function () {
   isTabsSetup = true;
 
   // insert at the begining the comm channels
-  chat.channels.splice(0, 0, ...comm.channels);
+  chat.channels.splice(0, 0, ...IITC.comm.channels);
 
   chat.channels.forEach(function (entry, i) {
     entry.index = i + 1;
@@ -369,9 +404,9 @@ chat.setupTabs = function () {
   });
 
   // legacy compatibility
-  chat._public = comm._channels.all;
-  chat._faction = comm._channels.faction;
-  chat._alerts = comm._channels.alerts;
+  chat._public = IITC.comm._channels.all;
+  chat._faction = IITC.comm._channels.faction;
+  chat._alerts = IITC.comm._channels.alerts;
 
   /**
    * Initiates a request for public chat data.
@@ -381,7 +416,7 @@ chat.setupTabs = function () {
    * @param {boolean} [isRetry=false] - Whether the request is a retry.
    */
   chat.requestPublic = function (getOlderMsgs, isRetry) {
-    return comm.requestChannel('all', getOlderMsgs, isRetry);
+    return IITC.comm.requestChannel('all', getOlderMsgs, isRetry);
   };
 
   /**
@@ -392,7 +427,7 @@ chat.setupTabs = function () {
    * @param {boolean} [isRetry=false] - Flag to indicate if this is a retry attempt.
    */
   chat.requestFaction = function (getOlderMsgs, isRetry) {
-    return comm.requestChannel('faction', getOlderMsgs, isRetry);
+    return IITC.comm.requestChannel('faction', getOlderMsgs, isRetry);
   };
 
   /**
@@ -403,7 +438,7 @@ chat.setupTabs = function () {
    * @param {boolean} [isRetry=false] - Whether the request is a retry.
    */
   chat.requestAlerts = function (getOlderMsgs, isRetry) {
-    return comm.requestChannel('alerts', getOlderMsgs, isRetry);
+    return IITC.comm.requestChannel('alerts', getOlderMsgs, isRetry);
   };
 
   /**
@@ -413,7 +448,7 @@ chat.setupTabs = function () {
    * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
    */
   chat.renderPublic = function (oldMsgsWereAdded) {
-    return comm.renderChannel('all', oldMsgsWereAdded);
+    return IITC.comm.renderChannel('all', oldMsgsWereAdded);
   };
 
   /**
@@ -423,7 +458,7 @@ chat.setupTabs = function () {
    * @param {boolean} oldMsgsWereAdded - Indicates if old messages were added in the current rendering.
    */
   chat.renderFaction = function (oldMsgsWereAdded) {
-    return comm.renderChannel('faction', oldMsgsWereAdded);
+    return IITC.comm.renderChannel('faction', oldMsgsWereAdded);
   };
 
   /**
@@ -433,10 +468,10 @@ chat.setupTabs = function () {
    * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
    */
   chat.renderAlerts = function (oldMsgsWereAdded) {
-    return comm.renderChannel('allerts', oldMsgsWereAdded);
+    return IITC.comm.renderChannel('allerts', oldMsgsWereAdded);
   };
 
-  chat.getChatPortalName = comm.getChatPortalName;
+  chat.getChatPortalName = IITC.comm.getChatPortalName;
 
   /**
    * Renders data from the data-hash to the element defined by the given ID.
@@ -450,7 +485,7 @@ chat.setupTabs = function () {
    * @type {Object}
    */
   chat.renderData = function (data, element, likelyWereOldMsgs, sortedGuids) {
-    return comm.renderData(data, element, likelyWereOldMsgs, sortedGuids);
+    return IITC.comm.renderData(data, element, likelyWereOldMsgs, sortedGuids);
   };
 };
 
@@ -605,4 +640,4 @@ chat.setupPosting = function () {
   });
 };
 
-/* global log, PLAYER, L, comm, android */
+/* global log, PLAYER, L, IITC, app */
