@@ -4,6 +4,7 @@
 // @category       Info
 // @description    Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
 
+/* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
@@ -166,11 +167,11 @@ function setup () {
       }
     });
   } else {
-    $('<a>')
-      .html('Scoreboard')
-      .attr('title','Display a dynamic scoreboard in the current view')
-      .click(displayScoreboard)
-      .appendTo('#toolbox');
+    IITC.toolbox.addButton({
+      label: 'Scoreboard',
+      title: 'Display a dynamic scoreboard in the current view',
+      action: displayScoreboard,
+    });
   }
 
   $('<style>').html('\

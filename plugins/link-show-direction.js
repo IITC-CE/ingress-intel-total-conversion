@@ -4,6 +4,7 @@
 // @version        0.2.3
 // @description    Show the direction of links on the map by adding short dashes to the line at the origin portal.
 
+/* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
@@ -160,8 +161,11 @@ window.plugin.linkShowDirection.showDialog = function() {
   });
 };
 
-window.plugin.linkShowDirection.setup  = function() {
-  $('#toolbox').append(' <a onclick="window.plugin.linkShowDirection.showDialog()">LinkDirection Opt</a>');
+window.plugin.linkShowDirection.setup = function () {
+  IITC.toolbox.addButton({
+    label: 'LinkDirection Opt',
+    action: window.plugin.linkShowDirection.showDialog,
+  });
 
   addHook('linkAdded', function(data) { window.plugin.linkShowDirection.addLinkStyle(data.link); });
 

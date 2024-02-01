@@ -4,6 +4,7 @@
 // @version        0.10.1
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
+/* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
@@ -732,7 +733,12 @@ window.plugin.drawTools.boot = function() {
   });
 
   //add options menu
-  $('#toolbox').append('<a onclick="window.plugin.drawTools.manualOpt();return false;" accesskey="x" title="[x]">DrawTools Opt</a>');
+  IITC.toolbox.addButton({
+    label: 'DrawTools Opt',
+    title: '[x]',
+    action: window.plugin.drawTools.manualOpt,
+    accesskey: 'x',
+  });
 
   $('head').append('<style>' +
         '.drawtoolsSetbox > a { display:block; color:#ffce00; border:1px solid #ffce00; padding:3px 0; margin:10px auto; width:80%; text-align:center; background:rgba(8,48,78,.9); }'+

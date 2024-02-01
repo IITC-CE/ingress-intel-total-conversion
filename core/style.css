@@ -840,10 +840,14 @@ h3.title {
 }
 
 #toolbox {
+  display: none;
+}
+
+#toolbox, #toolbox_component {
   text-align: left;    /* centre didn't look as nice here as it did above in .linkdetails */
 }
 
-#toolbox > a {
+#toolbox > a, #toolbox_component > a {
   margin-left: 5px;
   margin-right: 5px;
   white-space: nowrap;
@@ -1274,6 +1278,10 @@ table.artifact .portal {
   color: #FFCE00;
   margin: 8px;
   text-align: center;
+}
+
+.cursor_help {
+  cursor: help;
 }
 
 /* region scores */

@@ -238,7 +238,7 @@ body {
   border: 2px outset #20A8B1;
 }
 
-#toolbox > a {
+#toolbox > a, #toolbox_component > a {
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;

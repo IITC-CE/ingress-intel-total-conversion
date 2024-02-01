@@ -1,3 +1,5 @@
+/* global IITC -- eslint */
+
 /**
  * @file This file provides functions for working with the sidebar.
  * @module sidebar
@@ -181,24 +183,20 @@ function setPermaLink () {
  * @function setupAddons
  */
 function setupAddons () {
-  $('<a>')
-    .html('Permalink')
-    .attr({
-      id: 'permalink',
-      title: 'URL link to this map view'
-    })
-    .on({
-      mouseover: setPermaLink,
-      click: setPermaLink
-    })
-    .appendTo('#toolbox');
+  IITC.toolbox.addButton({
+    id: 'permalink',
+    label: 'Permalink',
+    title: 'URL link to this map view',
+    action: setPermaLink,
+    mouseover: setPermaLink,
+  });
 
-  $('<a>')
-    .html('About IITC')
-    .attr('id', 'about-iitc')
-    .css('cursor', 'help')
-    .click(aboutIITC)
-    .appendTo('#toolbox');
+  IITC.toolbox.addButton({
+    id: 'about-iitc',
+    label: 'About IITC',
+    action: window.aboutIITC,
+    class: 'cursor_help',
+  });
 
   window.artifact.setup();
 
