@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/dialog_about.js | IITC-CE</title>
+    <title>Namespace: toolbox | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -45,299 +43,4296 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* global script_info, app, log, L */
-/**
- * @file This file contains functions related to the 'About IITC' dialog.
- * @module dialog_about
- */
+        <h2>toolbox</h2>
+        
+    
+</header>
 
-/**
- * Displays the 'About IITC' dialog.
- * This dialog includes the IITC version, a list of loaded plugins, and other relevant information.
- *
- * @function
- */
-window.aboutIITC = function() {
-  var html = createDialogContent();
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>Toolbox API</p></div>
+            
 
-  dialog({
-    title: 'IITC ' + getIITCVersion(),
-    id: 'iitc-about',
-    html: html,
-    width: 'auto',
-    dialogClass: 'ui-dialog-aboutIITC'
-  });
-}
+            
 
-/**
- * Creates the content for the 'About IITC' dialog.
- *
- * @function
- * @returns {string} HTML content for the about dialog.
- */
-function createDialogContent() {
-  var html = `&lt;div>&lt;b>About IITC&lt;/b>&lt;/div>
-              &lt;div>Ingress Intel Total Conversion&lt;/div>
-              &lt;hr>
-              &lt;div>
-               &lt;a href="${'@url_homepage@'}" target="_blank">IITC Homepage&lt;/a> |
-               &lt;a href="${'@url_tg@'}" target="_blank">Telegram channel&lt;/a>&lt;br />
-               On the script’s homepage you can:
-               &lt;ul>
-                 &lt;li>Find Updates&lt;/li>
-                 &lt;li>Get Plugins&lt;/li>
-                 &lt;li>Report Bugs&lt;/li>
-                 &lt;li>Contribute!&lt;/li>
-               &lt;/ul>
-              &lt;/div>
-              &lt;hr>
-              &lt;div>Version: ${getIITCVersion()} ${createChangelog(window.script_info)}&lt;/div>`;
 
-  if (isShortOnLocalStorage()) {
-    html += '&lt;div class="warning">You are running low on LocalStorage memory.&lt;br/>Please free some space to prevent data loss.&lt;/div>';
-  }
+<dl class="details">
 
-  if (window.isApp &amp;&amp; app.getVersionName) {
-    html += '&lt;div>IITC Mobile ' + app.getVersionName() + '&lt;/div>';
-  }
+    
 
-  var plugins = getPlugins();
-  if (plugins) {
-    html += '&lt;div>&lt;p>Plugins:&lt;/p>&lt;ul>' + plugins + '&lt;/ul>&lt;/div>';
-  }
+    
 
-  return html;
-}
+    
 
-/**
- * Retrieves a list of plugins currently loaded in IITC. The list includes plugin names, versions, and descriptions.
- *
- * @function
- * @returns {string} Formatted list of plugins in HTML.
- */
-function getPlugins() {
-  var pluginsInfo = window.bootPlugins.info;
+    
 
-  while (window.bootPlugins[0]) {
-    var plugin = window.bootPlugins.shift();
-    pluginsInfo.push(plugin.info || {});
-  }
+    
 
-  var extra = getIITCVersionAddition();
+    
 
-  var plugins = pluginsInfo.map(convertPluginInfo)
-    .sort(function (a, b) { return a.name > b.name ? 1 : -1; })
-    .map(function (p) { return pluginInfoToString(p, extra); })
-    .join('\n');
+    
 
-  return plugins;
-}
+    
 
-/**
- * Converts plugin information into a structured object for easier processing.
- *
- * @function
- * @param {Object} info - The plugin information object.
- * @param {number} index - The index of the plugin in the array.
- * @returns {Object} Structured plugin information.
- */
-function convertPluginInfo(info, index) {
-  // Plugins metadata come from 2 sources:
-  // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
-  //   (only standard plugins)
-  // - script.name/version/description: from GM_info object, passed to wrapper
-  //   `script` may be not available if userscript manager does not provede GM_info
-  //   (atm: IITC-Mobile for iOS)
-  var result = {
-    build: info.buildName,
-    changelog: info.changelog,
-    id: info.pluginId,
-    name: info.pluginId,
-    date: info.dateTimeVersion,
-    error: info.error,
-    version: undefined,
-    description: undefined
-  };
+    
 
-  var script = info.script;
-  if (script) {
-    if (typeof script.name === 'string') {
-      result.name = script.name.replace(/^IITC[\s-]+plugin:\s+/i, ''); // cut non-informative name part
-    }
-    result.version = script.version;
-    result.description = script.description;
-  }
+    
 
-  if (!result.name) {
-    if (script_info.script) { // check if GM_info is available
-      result.name = '[unknown plugin: index ' + index + ']';
-      result.description = "this plugin does not have proper wrapper; report to it's author";
-    } else { // userscript manager fault
-      result.name = '[3rd-party plugin: index ' + index + ']';
-    }
-  }
+    
 
-  return result;
-}
+    
 
-/**
- * Creates a changelog section for a given plugin.
- *
- * @function
- * @param {Object} plugin - The plugin for which to create the changelog.
- * @returns {string} HTML string representing the changelog.
- */
-function createChangelog(plugin) {
-  var id = 'plugin-changelog-' + plugin.id;
-  return (
-    `&lt;a onclick="$('#${id}').toggle()">changelog&lt;/a>` +
-    `&lt;ul id="${id}" style="display: none;">` +
-    plugin.changelog
-      .map(function (logEntry) {
-        return (
-          '&lt;li>' +
-          logEntry.version +
-          '&lt;ul>' +
-          logEntry.changes
-            .map(function (change) {
-              return `&lt;li>${change}&lt;/li>`;
-            })
-            .join('') +
-          '&lt;/ul>&lt;/li>'
-        );
-      })
-      .join('') +
-    '&lt;/ul>'
-  );
-}
+    
 
-/**
- * Converts plugin information into a string format suitable for display in the 'About IITC' dialog.
- *
- * @function
- * @param {Object} p - The plugin information object.
- * @param {string} extra - Additional version information.
- * @returns {string} Formatted plugin information string.
- */
-function pluginInfoToString(p, extra) {
-  var info = {
-    changelog: '',
-    class: '',
-    description: p.description || '',
-    name: p.name,
-    verinfo: formatVerInfo(p, extra)
-  };
+    
 
-  if (isStandardPlugin(p)) {
-    info.class += 'plugin-is-standard';
-  }
+    
+</dl>
 
-  if (p.error) {
-    info.class += ' plugin-error';
-    info.description = p.error;
-  }
 
-  if (p.changelog) {
-    info.changelog = createChangelog(p);
-  }
+            
+        
+        </div>
+    
 
-  return L.Util.template('&lt;li class="{class}" title="{description}">{name}{verinfo} {changelog}&lt;/li>', info);
-}
+    
 
-/**
- * Checks if a given plugin is a standard plugin based on the build name and date.
- * Standard plugins are those that match the build and date of the main IITC script.
- *
- * @function
- * @param {Object} plugin - The plugin object to check.
- * @returns {boolean} True if the plugin is standard, false otherwise.
- */
-function isStandardPlugin(plugin) {
-  return (plugin.build === script_info.buildName &amp;&amp; plugin.date === script_info.dateTimeVersion);
-}
+    
 
-/**
- * Retrieves the IITC version string.
- *
- * @function
- * @returns {string} The IITC version string.
- */
-function getIITCVersion() {
-  var iitc = script_info;
-  return (iitc.script &amp;&amp; iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
-}
+    
 
-/**
- * Extracts the additional version information from the IITC script version.
- *
- * @function
- * @returns {string} The additional version information, if any.
- */
-function getIITCVersionAddition() {
-  var extra = script_info.script &amp;&amp; script_info.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
-  return extra &amp;&amp; extra[1];
-}
+    
 
-/**
- * Formats version information for plugins and the main script.
- * If an 'extra' parameter is provided and matches the end of the version string, it is removed.
- * This is used to cut off a common timestamp appended to versions.
- * The function also prepares a tooltip showing the build number and date, if available.
- *
- * @function formatVerInfo
- * @param {Object} p - The plugin or script object containing version information.
- * @param {string} [extra] - An optional extra string to be removed from the version information.
- * @returns {string} Formatted version string with optional HTML tooltip.
- */
-function formatVerInfo(p, extra) {
-  if (p.version &amp;&amp; extra) {
-    var cutPos = p.version.length - extra.length;
-    // cut extra version component (timestamp) if it is equal to main script's one
-    if (p.version.substring(cutPos) === extra) {
-      p.version = p.version.substring(0,cutPos);
-    }
-  }
+    
 
-  p.version = p.version || p.date;
-  if (p.version) {
-    var tooltip = [];
-    if (p.build) { tooltip.push('[' + p.build + ']'); }
-    if (p.date &amp;&amp; p.date !== p.version) { tooltip.push(p.date); }
-    return L.Util.template(' - &lt;code{title}>{version}&lt;/code>', {
-      title: tooltip[0] ? ' title="' + tooltip.join(' ') + '"' : '',
-      version: p.version
-    });
-  }
+    
 
-  return '';
-}
+    
 
-/**
- * Checks if the browser's local storage is running short on available space.
- * This function tries to write a specific amount of data to the local storage and captures any errors.
- * If an error occurs, it is an indication that the local storage has limited free space left.
- *
- * @function
- * @returns {boolean} Returns `true` if the local storage is running short on space, otherwise `false`.
- */
-function isShortOnLocalStorage() {
-  var MINIMUM_FREE_SPACE = 100000;
-  try {
-    localStorage.setItem('_MEM_CHECK_', '#'.repeat(MINIMUM_FREE_SPACE));
-  } catch (e) {
-    log.error('out of localstorage space', e);
-    return true;
-  }
+    
+        <h3 class="subsection-title">Methods</h3>
 
-  localStorage.removeItem('_MEM_CHECK_');
-  return false;
-}
-</code></pre>
-        </article>
-    </section>
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id="._applySort">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_applySort<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line147">line 147</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to apply sorting to the buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._applySort">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_applySort<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line147">line 147</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to apply sorting to the buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._renderButton">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_renderButton<span class="signature">(buttonId)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line117">line 117</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to render a button.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to render.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._renderButton">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_renderButton<span class="signature">(buttonId)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line117">line 117</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to render a button.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to render.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._syncWithLegacyToolbox">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_syncWithLegacyToolbox<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line180">line 180</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to synchronize the toolbox with the legacy toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._syncWithLegacyToolbox">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_syncWithLegacyToolbox<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line180">line 180</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to synchronize the toolbox with the legacy toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".addButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>addButton<span class="signature">(buttonArgs)</span><span class="type-signature"> &rarr; {string|null}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line45">line 45</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds a button to the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+
+
+- <p>The ID of the added button or null if required parameters are missing.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'AboutIITC',
+  action: window.AboutIITC
+});</code></pre>
+
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'Test Button',
+  action: () => alert('Clicked!')
+});</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".addButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>addButton<span class="signature">(buttonArgs)</span><span class="type-signature"> &rarr; {string|null}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line45">line 45</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds a button to the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+
+
+- <p>The ID of the added button or null if required parameters are missing.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'AboutIITC',
+  action: window.AboutIITC
+});</code></pre>
+
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'Test Button',
+  action: () => alert('Clicked!')
+});</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".removeButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>removeButton<span class="signature">(buttonId)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line96">line 96</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a button from the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to remove.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully removed, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isRemoved = IITC.toolbox.removeButton(buttonId);</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".removeButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>removeButton<span class="signature">(buttonId)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line96">line 96</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a button from the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to remove.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully removed, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isRemoved = IITC.toolbox.removeButton(buttonId);</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setSortMethod">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setSortMethod<span class="signature">(sortMethod)</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line169">line 169</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets the sorting method for the toolbox buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sortMethod</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The sorting method to be used.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>IITC.toolbox.setSortMethod((a, b) => a.label.localeCompare(b.label));</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setSortMethod">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setSortMethod<span class="signature">(sortMethod)</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line169">line 169</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets the sorting method for the toolbox buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sortMethod</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The sorting method to be used.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>IITC.toolbox.setSortMethod((a, b) => a.label.localeCompare(b.label));</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".updateButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>updateButton<span class="signature">(buttonId, newButtonArgs)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line75">line 75</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates an existing button in the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to update.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newButtonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The new arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully updated, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isUpdated = IITC.toolbox.updateButton(buttonId, { label: 'Updated Button', action: () => console.log('New Action') });</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".updateButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>updateButton<span class="signature">(buttonId, newButtonArgs)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line75">line 75</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates an existing button in the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to update.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newButtonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The new arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully updated, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isUpdated = IITC.toolbox.updateButton(buttonId, { label: 'Updated Button', action: () => console.log('New Action') });</code></pre>
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>toolbox</h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>Toolbox API</p></div>
+            
+
+            
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id="._applySort">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_applySort<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line147">line 147</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to apply sorting to the buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._applySort">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_applySort<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line147">line 147</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to apply sorting to the buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._renderButton">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_renderButton<span class="signature">(buttonId)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line117">line 117</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to render a button.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to render.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._renderButton">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_renderButton<span class="signature">(buttonId)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line117">line 117</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to render a button.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to render.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._syncWithLegacyToolbox">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_syncWithLegacyToolbox<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line180">line 180</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to synchronize the toolbox with the legacy toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="._syncWithLegacyToolbox">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_syncWithLegacyToolbox<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line180">line 180</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Internal method to synchronize the toolbox with the legacy toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".addButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>addButton<span class="signature">(buttonArgs)</span><span class="type-signature"> &rarr; {string|null}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line45">line 45</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds a button to the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+
+
+- <p>The ID of the added button or null if required parameters are missing.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'AboutIITC',
+  action: window.AboutIITC
+});</code></pre>
+
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'Test Button',
+  action: () => alert('Clicked!')
+});</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".addButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>addButton<span class="signature">(buttonArgs)</span><span class="type-signature"> &rarr; {string|null}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line45">line 45</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds a button to the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+
+
+- <p>The ID of the added button or null if required parameters are missing.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'AboutIITC',
+  action: window.AboutIITC
+});</code></pre>
+
+    <pre class="prettyprint"><code>const buttonId = IITC.toolbox.addButton({
+  label: 'Test Button',
+  action: () => alert('Clicked!')
+});</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".removeButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>removeButton<span class="signature">(buttonId)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line96">line 96</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a button from the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to remove.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully removed, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isRemoved = IITC.toolbox.removeButton(buttonId);</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".removeButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>removeButton<span class="signature">(buttonId)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line96">line 96</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a button from the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to remove.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully removed, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isRemoved = IITC.toolbox.removeButton(buttonId);</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setSortMethod">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setSortMethod<span class="signature">(sortMethod)</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line169">line 169</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets the sorting method for the toolbox buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sortMethod</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The sorting method to be used.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>IITC.toolbox.setSortMethod((a, b) => a.label.localeCompare(b.label));</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setSortMethod">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setSortMethod<span class="signature">(sortMethod)</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line169">line 169</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets the sorting method for the toolbox buttons.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sortMethod</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The sorting method to be used.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>IITC.toolbox.setSortMethod((a, b) => a.label.localeCompare(b.label));</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".updateButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>updateButton<span class="signature">(buttonId, newButtonArgs)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line75">line 75</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates an existing button in the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to update.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newButtonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The new arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully updated, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isUpdated = IITC.toolbox.updateButton(buttonId, { label: 'Updated Button', action: () => console.log('New Action') });</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".updateButton">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>updateButton<span class="signature">(buttonId, newButtonArgs)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_toolbox.js.html">code/toolbox.js</a></code>,
+                <code><a href="code_toolbox.js.html#line75">line 75</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Updates an existing button in the toolbox.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>buttonId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The ID of the button to update.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newButtonArgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ButtonArgs">ButtonArgs</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The new arguments for the button.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the button is successfully updated, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>const isUpdated = IITC.toolbox.updateButton(buttonId, { label: 'Updated Button', action: () => console.log('New Action') });</code></pre>
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -354,7 +4349,7 @@ function isShortOnLocalStorage() {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'IITC.toolbox_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

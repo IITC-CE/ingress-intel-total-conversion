@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/dialog_about.js | IITC-CE</title>
+    <title>Source: code/toolbox.js | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,293 +48,245 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* global script_info, app, log, L */
-/**
- * @file This file contains functions related to the 'About IITC' dialog.
- * @module dialog_about
- */
+            <pre class="prettyprint source linenums"><code>/* global IITC */
 
 /**
- * Displays the 'About IITC' dialog.
- * This dialog includes the IITC version, a list of loaded plugins, and other relevant information.
+ * Toolbox API
  *
- * @function
+ * @memberof IITC
+ * @namespace toolbox
  */
-window.aboutIITC = function() {
-  var html = createDialogContent();
-
-  dialog({
-    title: 'IITC ' + getIITCVersion(),
-    id: 'iitc-about',
-    html: html,
-    width: 'auto',
-    dialogClass: 'ui-dialog-aboutIITC'
-  });
-}
 
 /**
- * Creates the content for the 'About IITC' dialog.
- *
- * @function
- * @returns {string} HTML content for the about dialog.
+ * @typedef {Object} ButtonArgs
+ * @property {string} [id] - Optional. The ID of the button.
+ * @property {string|undefined} label - The label text of the button.
+ * @property {Function|undefined} action - The onclick action for the button.
+ * @property {string|null} [class] - Optional. The class(es) for the button.
+ * @property {string|null} [title] - Optional. The title (tooltip) for the button.
+ * @property {string|null} [access_key] - Optional. The access key for the button.
+ * @property {Function|null} [mouseover] - Optional. The mouseover event for the button.
+ * @property {string|null} [icon] - Optional. Icon name from FontAwesome for the button.
  */
-function createDialogContent() {
-  var html = `&lt;div>&lt;b>About IITC&lt;/b>&lt;/div>
-              &lt;div>Ingress Intel Total Conversion&lt;/div>
-              &lt;hr>
-              &lt;div>
-               &lt;a href="${'@url_homepage@'}" target="_blank">IITC Homepage&lt;/a> |
-               &lt;a href="${'@url_tg@'}" target="_blank">Telegram channel&lt;/a>&lt;br />
-               On the script’s homepage you can:
-               &lt;ul>
-                 &lt;li>Find Updates&lt;/li>
-                 &lt;li>Get Plugins&lt;/li>
-                 &lt;li>Report Bugs&lt;/li>
-                 &lt;li>Contribute!&lt;/li>
-               &lt;/ul>
-              &lt;/div>
-              &lt;hr>
-              &lt;div>Version: ${getIITCVersion()} ${createChangelog(window.script_info)}&lt;/div>`;
 
-  if (isShortOnLocalStorage()) {
-    html += '&lt;div class="warning">You are running low on LocalStorage memory.&lt;br/>Please free some space to prevent data loss.&lt;/div>';
-  }
+IITC.toolbox = {
+  buttons: {},
+  _defaultSortMethod: (a, b) => a.label.localeCompare(b.label),
+  sortMethod: (...args) => IITC.toolbox._defaultSortMethod(...args),
 
-  if (window.isApp &amp;&amp; app.getVersionName) {
-    html += '&lt;div>IITC Mobile ' + app.getVersionName() + '&lt;/div>';
-  }
-
-  var plugins = getPlugins();
-  if (plugins) {
-    html += '&lt;div>&lt;p>Plugins:&lt;/p>&lt;ul>' + plugins + '&lt;/ul>&lt;/div>';
-  }
-
-  return html;
-}
-
-/**
- * Retrieves a list of plugins currently loaded in IITC. The list includes plugin names, versions, and descriptions.
- *
- * @function
- * @returns {string} Formatted list of plugins in HTML.
- */
-function getPlugins() {
-  var pluginsInfo = window.bootPlugins.info;
-
-  while (window.bootPlugins[0]) {
-    var plugin = window.bootPlugins.shift();
-    pluginsInfo.push(plugin.info || {});
-  }
-
-  var extra = getIITCVersionAddition();
-
-  var plugins = pluginsInfo.map(convertPluginInfo)
-    .sort(function (a, b) { return a.name > b.name ? 1 : -1; })
-    .map(function (p) { return pluginInfoToString(p, extra); })
-    .join('\n');
-
-  return plugins;
-}
-
-/**
- * Converts plugin information into a structured object for easier processing.
- *
- * @function
- * @param {Object} info - The plugin information object.
- * @param {number} index - The index of the plugin in the array.
- * @returns {Object} Structured plugin information.
- */
-function convertPluginInfo(info, index) {
-  // Plugins metadata come from 2 sources:
-  // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
-  //   (only standard plugins)
-  // - script.name/version/description: from GM_info object, passed to wrapper
-  //   `script` may be not available if userscript manager does not provede GM_info
-  //   (atm: IITC-Mobile for iOS)
-  var result = {
-    build: info.buildName,
-    changelog: info.changelog,
-    id: info.pluginId,
-    name: info.pluginId,
-    date: info.dateTimeVersion,
-    error: info.error,
-    version: undefined,
-    description: undefined
-  };
-
-  var script = info.script;
-  if (script) {
-    if (typeof script.name === 'string') {
-      result.name = script.name.replace(/^IITC[\s-]+plugin:\s+/i, ''); // cut non-informative name part
+  /**
+   * Adds a button to the toolbox.
+   *
+   * @param {ButtonArgs} buttonArgs - The arguments for the button.
+   * @returns {string|null} The ID of the added button or null if required parameters are missing.
+   *
+   * @example
+   * const buttonId = IITC.toolbox.addButton({
+   *   label: 'AboutIITC',
+   *   action: window.AboutIITC
+   * });
+   *
+   * @example
+   * const buttonId = IITC.toolbox.addButton({
+   *   label: 'Test Button',
+   *   action: () => alert('Clicked!')
+   * });
+   */
+  addButton(buttonArgs) {
+    if (!buttonArgs.label) {
+      console.warn('Required parameter "label" are missing.');
+      return null;
     }
-    result.version = script.version;
-    result.description = script.description;
-  }
 
-  if (!result.name) {
-    if (script_info.script) { // check if GM_info is available
-      result.name = '[unknown plugin: index ' + index + ']';
-      result.description = "this plugin does not have proper wrapper; report to it's author";
-    } else { // userscript manager fault
-      result.name = '[3rd-party plugin: index ' + index + ']';
+    if (!buttonArgs.action) {
+      console.warn('Required parameter "action" are missing.');
+      return null;
     }
-  }
 
-  return result;
-}
+    let id = buttonArgs.id || `toolbox-btn-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+    this.buttons[id] = buttonArgs;
 
-/**
- * Creates a changelog section for a given plugin.
- *
- * @function
- * @param {Object} plugin - The plugin for which to create the changelog.
- * @returns {string} HTML string representing the changelog.
- */
-function createChangelog(plugin) {
-  var id = 'plugin-changelog-' + plugin.id;
-  return (
-    `&lt;a onclick="$('#${id}').toggle()">changelog&lt;/a>` +
-    `&lt;ul id="${id}" style="display: none;">` +
-    plugin.changelog
-      .map(function (logEntry) {
-        return (
-          '&lt;li>' +
-          logEntry.version +
-          '&lt;ul>' +
-          logEntry.changes
-            .map(function (change) {
-              return `&lt;li>${change}&lt;/li>`;
-            })
-            .join('') +
-          '&lt;/ul>&lt;/li>'
-        );
-      })
-      .join('') +
-    '&lt;/ul>'
-  );
-}
+    this._renderButton(id);
+    this._applySort();
 
-/**
- * Converts plugin information into a string format suitable for display in the 'About IITC' dialog.
- *
- * @function
- * @param {Object} p - The plugin information object.
- * @param {string} extra - Additional version information.
- * @returns {string} Formatted plugin information string.
- */
-function pluginInfoToString(p, extra) {
-  var info = {
-    changelog: '',
-    class: '',
-    description: p.description || '',
-    name: p.name,
-    verinfo: formatVerInfo(p, extra)
-  };
+    return id;
+  },
 
-  if (isStandardPlugin(p)) {
-    info.class += 'plugin-is-standard';
-  }
-
-  if (p.error) {
-    info.class += ' plugin-error';
-    info.description = p.error;
-  }
-
-  if (p.changelog) {
-    info.changelog = createChangelog(p);
-  }
-
-  return L.Util.template('&lt;li class="{class}" title="{description}">{name}{verinfo} {changelog}&lt;/li>', info);
-}
-
-/**
- * Checks if a given plugin is a standard plugin based on the build name and date.
- * Standard plugins are those that match the build and date of the main IITC script.
- *
- * @function
- * @param {Object} plugin - The plugin object to check.
- * @returns {boolean} True if the plugin is standard, false otherwise.
- */
-function isStandardPlugin(plugin) {
-  return (plugin.build === script_info.buildName &amp;&amp; plugin.date === script_info.dateTimeVersion);
-}
-
-/**
- * Retrieves the IITC version string.
- *
- * @function
- * @returns {string} The IITC version string.
- */
-function getIITCVersion() {
-  var iitc = script_info;
-  return (iitc.script &amp;&amp; iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
-}
-
-/**
- * Extracts the additional version information from the IITC script version.
- *
- * @function
- * @returns {string} The additional version information, if any.
- */
-function getIITCVersionAddition() {
-  var extra = script_info.script &amp;&amp; script_info.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
-  return extra &amp;&amp; extra[1];
-}
-
-/**
- * Formats version information for plugins and the main script.
- * If an 'extra' parameter is provided and matches the end of the version string, it is removed.
- * This is used to cut off a common timestamp appended to versions.
- * The function also prepares a tooltip showing the build number and date, if available.
- *
- * @function formatVerInfo
- * @param {Object} p - The plugin or script object containing version information.
- * @param {string} [extra] - An optional extra string to be removed from the version information.
- * @returns {string} Formatted version string with optional HTML tooltip.
- */
-function formatVerInfo(p, extra) {
-  if (p.version &amp;&amp; extra) {
-    var cutPos = p.version.length - extra.length;
-    // cut extra version component (timestamp) if it is equal to main script's one
-    if (p.version.substring(cutPos) === extra) {
-      p.version = p.version.substring(0,cutPos);
+  /**
+   * Updates an existing button in the toolbox.
+   *
+   * @param {string} buttonId - The ID of the button to update.
+   * @param {ButtonArgs} newButtonArgs - The new arguments for the button.
+   * @returns {boolean} True if the button is successfully updated, false otherwise.
+   *
+   * @example
+   * const isUpdated = IITC.toolbox.updateButton(buttonId, { label: 'Updated Button', action: () => console.log('New Action') });
+   */
+  updateButton(buttonId, newButtonArgs) {
+    if (this.buttons[buttonId]) {
+      Object.assign(this.buttons[buttonId], newButtonArgs);
+      this._renderButton(buttonId);
+      this._applySort();
+      return true;
+    } else {
+      console.warn(`Button with ID ${buttonId} not found.`);
+      return false;
     }
-  }
+  },
 
-  p.version = p.version || p.date;
-  if (p.version) {
-    var tooltip = [];
-    if (p.build) { tooltip.push('[' + p.build + ']'); }
-    if (p.date &amp;&amp; p.date !== p.version) { tooltip.push(p.date); }
-    return L.Util.template(' - &lt;code{title}>{version}&lt;/code>', {
-      title: tooltip[0] ? ' title="' + tooltip.join(' ') + '"' : '',
-      version: p.version
+  /**
+   * Removes a button from the toolbox.
+   *
+   * @param {string} buttonId - The ID of the button to remove.
+   * @returns {boolean} True if the button is successfully removed, false otherwise.
+   *
+   * @example
+   * const isRemoved = IITC.toolbox.removeButton(buttonId);
+   */
+  removeButton(buttonId) {
+    if (this.buttons[buttonId]) {
+      delete this.buttons[buttonId];
+      const buttonElement = document.getElementById(buttonId);
+      if (buttonElement) {
+        buttonElement.remove();
+      }
+      this._applySort();
+      return true;
+    } else {
+      console.warn(`Button with ID ${buttonId} not found for removal.`);
+      return false;
+    }
+  },
+
+  /**
+   * Internal method to render a button.
+   *
+   * @private
+   * @param {string} buttonId - The ID of the button to render.
+   */
+  _renderButton(buttonId) {
+    const buttonData = this.buttons[buttonId];
+    if (!buttonData) return; // The button with the given ID was not found
+
+    let buttonElement = document.getElementById(buttonId) || document.createElement('a');
+    buttonElement.id = buttonId;
+    buttonElement.textContent = buttonData.label;
+    buttonElement.onclick = buttonData.action;
+
+    if (typeof buttonData.title === 'string') buttonElement.title = buttonData.title;
+    if (typeof buttonData.class === 'string') buttonElement.className = buttonData.class;
+    if (typeof buttonData.access_key === 'string') buttonElement.accessKey = buttonData.access_key;
+    if (typeof buttonData.mouseover === 'string') buttonElement.mouseover = buttonData.mouseover;
+
+    if (typeof buttonData.icon === 'string') {
+      const iconHTML = `&lt;i class="fa ${buttonData.icon}">&lt;/i>`;
+      buttonElement.innerHTML = iconHTML + buttonElement.innerHTML;
+    }
+
+    const toolbox_component = document.querySelector('#toolbox_component');
+    if (!document.getElementById(buttonId)) {
+      toolbox_component.appendChild(buttonElement);
+    }
+  },
+
+  /**
+   * Internal method to apply sorting to the buttons.
+   *
+   * @private
+   */
+  _applySort() {
+    const toolbox_component = document.querySelector('#toolbox_component');
+    const buttonElements = Array.from(toolbox_component.children);
+
+    try {
+      buttonElements.sort((a, b) => this.sortMethod(this.buttons[a.id], this.buttons[b.id]));
+    } catch (e) {
+      console.error('Sorting function produced error', e);
+      buttonElements.sort((a, b) => this._defaultSortMethod(this.buttons[a.id], this.buttons[b.id]));
+    }
+    buttonElements.forEach((buttonElement) => toolbox_component.appendChild(buttonElement));
+  },
+
+  /**
+   * Sets the sorting method for the toolbox buttons.
+   *
+   * @param {Function} sortMethod - The sorting method to be used.
+   * @returns {void}
+   *
+   * @example
+   * IITC.toolbox.setSortMethod((a, b) => a.label.localeCompare(b.label));
+   */
+  setSortMethod(sortMethod) {
+    this.sortMethod = sortMethod;
+    this._applySort();
+  },
+
+  /**
+   * Internal method to synchronize the toolbox with the legacy toolbox.
+   *
+   * @private
+   * @returns {void}
+   */
+  _syncWithLegacyToolbox() {
+    // Select the old toolbox element
+    const oldToolbox = document.querySelector('#toolbox');
+
+    // Function to process an individual button
+    const processButton = (node) => {
+      // Check if the node is an 'A' tag (anchor/link, which represents a button)
+      if (node.tagName === 'A') {
+        let iconClass = null;
+        // Find an icon element within the button, if it exists
+        const iconElement = node.querySelector('i.fa');
+        if (iconElement) {
+          // Extract the icon class
+          const iconClasses = Array.from(iconElement.classList).filter((cls) => cls.startsWith('fa-'));
+          if (iconClasses.length > 0) iconClass = iconClasses[0];
+        }
+
+        // Prepare the button arguments for either updating or adding the button
+        const buttonArgs = {
+          id: node.id,
+          label: node.textContent.trim(),
+          action: () => node.click(),
+          class: node.className,
+          title: node.title,
+          access_key: node.accessKey,
+          mouseover: node.mouseover,
+          icon: iconClass,
+        };
+
+        // Update an existing button or add a new one
+        buttonArgs['id'] = `legacy-toolbox-btn-${buttonArgs.id || buttonArgs.label}`;
+        if (this.buttons[buttonArgs.id]) {
+          this.updateButton(buttonArgs.id, buttonArgs);
+        } else {
+          this.addButton(buttonArgs);
+        }
+      }
+    };
+
+    // Initialize for existing buttons in the toolbox
+    oldToolbox.querySelectorAll('a').forEach(processButton);
+
+    // Mutation observer to watch for changes in the toolbox
+    const observer = new MutationObserver((mutations) => {
+      // Iterate through mutations
+      mutations.forEach((mutation) => {
+        // Process each added node and attribute changes
+        mutation.addedNodes.forEach(processButton);
+        if (mutation.type === 'attributes') {
+          processButton(mutation.target);
+        }
+      });
     });
-  }
 
-  return '';
-}
+    // Start observing the toolbox for changes
+    observer.observe(oldToolbox, { childList: true, subtree: true, attributes: true });
+  },
+};
 
-/**
- * Checks if the browser's local storage is running short on available space.
- * This function tries to write a specific amount of data to the local storage and captures any errors.
- * If an error occurs, it is an indication that the local storage has limited free space left.
- *
- * @function
- * @returns {boolean} Returns `true` if the local storage is running short on space, otherwise `false`.
- */
-function isShortOnLocalStorage() {
-  var MINIMUM_FREE_SPACE = 100000;
-  try {
-    localStorage.setItem('_MEM_CHECK_', '#'.repeat(MINIMUM_FREE_SPACE));
-  } catch (e) {
-    log.error('out of localstorage space', e);
-    return true;
-  }
-
-  localStorage.removeItem('_MEM_CHECK_');
-  return false;
-}
+IITC.toolbox._syncWithLegacyToolbox();
 </code></pre>
         </article>
     </section>
