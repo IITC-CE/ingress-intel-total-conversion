@@ -56,43 +56,43 @@ chat.nicknameClicked = function (event, nickname) {
 // you can add channels from another source provider (message relay, logging from plugins...)
 
 /**
- * @typedef ChannelDescription - Hold channel description
+ * Hold channel description
  *
  * See comm.js for examples
- * @type {object}
+ * @typedef {Object} chat.ChannelDescription
  * @property {string} id - uniq id, matches 'tab' parameter for server requests
  * @property {string} name - visible name
  * @property {string} [inputPrompt] - (optional) string for the input prompt
- * @property {string} inputClass - (optional) class to apply to #chatinput
- * @property {ChannelSendMessageFn} [sendMessage] - (optional) function to send the message
- *                                                             first argument is `id`
- * @property {ChannelRequestFn} [request]
- *           - (optional) function to call to request new message, first argument is `id`, second is when trigger from scrolling to top
- * @property {ChannelRenderFn} [render] - (optional) function to render channel content
- * @property {string} [localBounds] - (optional) if true, reset on view change
- *
- * @typedef ChannelSendMessageFn
- * @type {function}
- * @param {string} id
- * @param {string} message
- *
- * @typedef ChannelRequestFn
- * @type {function}
- * @param {string} id
- * @param {boolean} getOlderMsgs
+ * @property {string} [inputClass] - (optional) class to apply to #chatinput
+ * @property {chat.ChannelSendMessageFn} [sendMessage] - (optional) function to send the message
+ * @property {chat.ChannelRequestFn} [request] - (optional) function to call to request new message
+ * @property {chat.ChannelRenderFn} [render] - (optional) function to render channel content,, called on tab change
+ * @property {boolean} [localBounds] - (optional) if true, reset on view change
+ */
+/**
+ * @callback chat.ChannelSendMessageFn
+ * @param {string} id - channel id
+ * @param {string} message - input message
+ * @returns {void}
+ */
+/**
+ * @callback chat.ChannelRequestFn
+ * @param {string} id - channel id
+ * @param {boolean} getOlderMsgs - true if request data from a scroll to top
  * @param {boolean} isRetry
- *
- * @typedef ChannelRenderFn
- * @type {function}
- * @param {string} id
- * @param {boolean} oldMsgsWereAdded
+ * @returns {void}
+ */
+/**
+ * @callback chat.ChannelRenderFn
+ * @param {string} id - channel id
+ * @param {boolean} oldMsgsWereAdded - true if data has been added at the top (to preserve scroll position)
+ * @returns {void}
  */
 
 /**
  * Holds channels infos.
  *
- * @memberof chat
- * @type {ChannelDescription[]}
+ * @type {chat.ChannelDescription[]}
  */
 chat.channels = [];
 
@@ -111,7 +111,7 @@ chat.getActive = function () {
  *
  * @function chat.getChannelDesc
  * @param {string} tab - The name of the chat tab.
- * @returns {ChannelDescription} The corresponding channel name ('faction', 'alerts', or 'all').
+ * @returns {chat.ChannelDescription} The corresponding channel name ('faction', 'alerts', or 'all').
  */
 chat.getChannelDesc = function (tab) {
   var channelObject = null;
@@ -326,7 +326,9 @@ chat.keepScrollPosition = function (box, scrollBefore, isOldMsgs) {
  * Create and insert into the DOM/Mobile app the channel tab
  *
  * @function createChannelTab
- * @param {ChannelDescription} channelDesc - channel description
+ * @memberof chat
+ * @param {chat.ChannelDescription} channelDesc - channel description
+ * @static
  */
 function createChannelTab(channelDesc) {
   var chatControls = $('#chatcontrols');
@@ -361,7 +363,7 @@ var isTabsSetup = false;
  * If tabs are already created, a tab is created for this channel as well
  *
  * @function chat.addChannel
- * @param {ChannelDescription} channelDesc - channel description
+ * @param {chat.ChannelDescription} channelDesc - channel description
  */
 chat.addChannel = function (channelDesc) {
   // deny reserved name
@@ -390,7 +392,7 @@ chat.addChannel = function (channelDesc) {
  * Sets up all channels starting from intel COMM
  *
  * @function chat.setupTabs
- * @param {ChannelDescription} channelDesc - channel description
+ * @param {chat.ChannelDescription} channelDesc - channel description
  */
 chat.setupTabs = function () {
   isTabsSetup = true;

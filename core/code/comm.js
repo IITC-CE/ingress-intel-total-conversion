@@ -524,7 +524,7 @@ comm.renderMarkup = function (markup) {
  * @param {Array} markup - An array representing the markup to be transformed.
  * @returns {Array} The transformed markup array with a simplified structure.
  */
-function transformMessage(markup) {
+comm.transformMessage = function (markup) {
   // Make a copy of the markup array to avoid modifying the original input
   let newMarkup = JSON.parse(JSON.stringify(markup));
 
@@ -551,7 +551,7 @@ function transformMessage(markup) {
   }
 
   return newMarkup;
-}
+};
 
 /**
  * Renders a cell in the chat table to display the time a message was sent.
@@ -619,7 +619,7 @@ comm.renderMsgRow = function (data) {
   }
   var nickCell = comm.renderNickCell(data.player.name, nickClasses.join(' '));
 
-  const markup = transformMessage(data.markup);
+  const markup = comm.transformMessage(data.markup);
   var msg = comm.renderMarkup(markup);
   var msgClass = data.narrowcast ? 'system_narrowcast' : '';
   var msgCell = comm.renderMsgCell(msg, msgClass);
@@ -741,7 +741,7 @@ comm.renderData = function (data, element, likelyWereOldMsgs, sortedGuids) {
 };
 
 /**
- * @type {ChannelDescription[]}
+ * @type {chat.ChannelDescription[]}
  */
 comm.channels = [
   {
