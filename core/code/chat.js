@@ -406,9 +406,9 @@ chat.setupTabs = function () {
   });
 
   // legacy compatibility
-  chat._public = IITC.comm._channels.all;
-  chat._faction = IITC.comm._channels.faction;
-  chat._alerts = IITC.comm._channels.alerts;
+  chat._public = IITC.comm._channelsData.all;
+  chat._faction = IITC.comm._channelsData.faction;
+  chat._alerts = IITC.comm._channelsData.alerts;
 
   /**
    * Initiates a request for public chat data.

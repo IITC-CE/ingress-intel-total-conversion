@@ -57,7 +57,6 @@ window.requests.abort = function () {
 
   window.activeRequests = [];
   window.failedRequestCount = 0;
-  window.chat._requestRunning = {};
 
   renderUpdateStatus();
 }
