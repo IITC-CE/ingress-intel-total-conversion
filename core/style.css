@@ -332,10 +332,6 @@ em {
   color: #bbb;
 }
 
-#chatinput.debug mark {
-  color: #bbb;
-}
-
 #chat td, #chatinput td {
   font-size: 13px;
   vertical-align: top;

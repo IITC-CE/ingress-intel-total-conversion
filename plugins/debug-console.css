@@ -23,3 +23,7 @@
     white-space: pre-line;
     word-break: break-all;
 }
+
+#chatinput.debug mark {
+    color: #bbb;
+}

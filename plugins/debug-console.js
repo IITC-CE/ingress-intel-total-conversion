@@ -9,6 +9,10 @@
 
 var changelog = [
   {
+    version: '0.2.0',
+    changes: ['Use channel new API', 'Handle multiline messages'],
+  },
+  {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
   },
@@ -159,7 +163,7 @@ function setup() {
   debugTab.create();
   overwriteNative();
 
-  $('<style>').prop('type', 'text/css').html('@include_string:debug-console.css@').appendTo('head');
+  $('<style>').prop('type', 'text/css').text('@include_string:debug-console.css@').appendTo('head');
 
   // emulate old API
   window.debug = function () {};
