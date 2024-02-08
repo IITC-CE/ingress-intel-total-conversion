@@ -35,6 +35,7 @@ machinaTracker.setup = () => {
   machinaTracker.icon = new (L.Icon.Default.extend({
     options: {
       iconUrl: iconImage,
+      iconRetinaUrl: iconImage,
       iconSize: [26, 32],
       iconAnchor: [12, 32],
       shadowAnchor: [12, 41],
