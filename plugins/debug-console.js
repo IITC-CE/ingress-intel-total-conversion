@@ -5,6 +5,7 @@
 // @description    Add a debug console tab
 
 /* exported setup, changelog --eslint */
+/* global L */
 
 var changelog = [
   {
@@ -27,7 +28,7 @@ debugTab.create = function () {
     sendMessage: function (_, msg) {
       var result;
       try {
-        result = eval(msg);
+        result = eval('(' + msg + ')');
       } catch (e) {
         if (e.stack) {
           console.error(e.stack);
@@ -35,24 +36,14 @@ debugTab.create = function () {
         throw e; // to trigger native error message
       }
       if (result !== undefined) {
-        console.error(result.toString());
+        console.log(result);
       }
-      return result;
     },
   });
 };
 
 debugTab.renderLine = function (errorType, args) {
   args = Array.prototype.slice.call(args);
-  var color = '#eee';
-  switch (errorType) {
-    case 'error':
-      color = '#FF424D';
-      break;
-    case 'warning':
-      color = '#FFDE42';
-      break;
-  }
   var text = [];
   args.forEach(function (v) {
     if (typeof v !== 'string' && typeof v !== 'number') {
@@ -73,13 +64,36 @@ debugTab.renderLine = function (errorType, args) {
     text.push(v);
   });
   text = text.join(' ');
+
+  // Time
+  var time = document.createElement('time');
   var d = new Date();
-  var ta = d.toLocaleTimeString(); // print line instead maybe?
-  var tb = d.toLocaleString();
-  var t = '<time title="' + tb + '" data-timestamp="' + d.getTime() + '">' + ta + '</time>';
-  var s = 'style="color:' + color + '"';
-  var l = '<tr><td>' + t + '</td><td><mark ' + s + '>' + errorType + '</mark></td><td>' + text + '</td></tr>';
-  $('#chatdebug table').append(l);
+  time.textContent = d.toLocaleTimeString();
+  time.title = d.toLocaleString();
+  time.dataset.timestamp = d.getTime();
+
+  // Type
+  var type = document.createElement('mark');
+  type.textContent = errorType;
+  type.className = errorType;
+
+  // Text
+  var pre = document.createElement('pre');
+  pre.textContent = text;
+
+  // Check if the last message is visible
+  var debugContainer = document.getElementById('chatdebug');
+  var isAtBottom = debugContainer.scrollTop >= debugContainer.scrollTopMax;
+
+  // Insert Row
+  var table = document.querySelector('#chatdebug table');
+  var row = table.insertRow();
+  row.insertCell().append(time);
+  row.insertCell().append(type);
+  row.insertCell().append(pre);
+
+  // Auto-scroll to bottom
+  if (isAtBottom) debugContainer.scrollTo(0, debugContainer.scrollTopMax);
 };
 
 debugTab.console = {};
@@ -99,6 +113,10 @@ debugTab.console.debug = function () {
   debugTab.renderLine('debug', arguments);
 };
 
+debugTab.console.info = function () {
+  debugTab.renderLine('info', arguments);
+};
+
 function overwriteNative() {
   var nativeConsole = window.console;
   window.console = L.extend({}, window.console);
@@ -116,6 +134,7 @@ function overwriteNative() {
   overwrite('warn');
   overwrite('error');
   overwrite('debug');
+  overwrite('info');
 }
 
 // Old API utils
@@ -140,9 +159,7 @@ function setup() {
   debugTab.create();
   overwriteNative();
 
-  $('<style>')
-    .text('#chat #chatdebug td:nth-child(-n+2) { \n  width: 51px\n' + '}\n#chat #chatdebug td:nth-child(3) {\n  font-family: monospace\n}')
-    .appendTo('head');
+  $('<style>').prop('type', 'text/css').html('@include_string:debug-console.css@').appendTo('head');
 
   // emulate old API
   window.debug = function () {};

@@ -1,0 +1,25 @@
+#chat #chatdebug td:nth-child(-n+2) {
+    width: 51px
+}
+
+#chat #chatdebug td:nth-child(3) {
+    font-family: monospace
+}
+
+#chatdebug td mark {
+    color: #eee
+}
+
+#chatdebug td mark.error {
+    color: #FF424D
+}
+
+#chatdebug td mark.warning {
+    color: #FFDE42
+}
+
+#chatdebug td pre {
+    display: inline;
+    white-space: pre-line;
+    word-break: break-all;
+}
