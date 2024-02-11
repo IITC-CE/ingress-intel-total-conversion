@@ -561,15 +561,17 @@ function renderMarkup(markup) {
 }
 
 /**
- * Transforms a given markup array into an older, more straightforward format for easier understanding.
+ * Transforms a the markup array into an older, more straightforward format for easier understanding.
+ *
+ * May be used to build an entirely new markup to be rendered without altering the original one.
  *
  * @function IITC.comm.transformMessage
- * @param {Array} markup - An array representing the markup to be transformed.
+ * @param {Object} data - The data for the message, including time, player, and message content.
  * @returns {Array} The transformed markup array with a simplified structure.
  */
-function transformMessage(markup) {
+function transformMessage(data) {
   // Make a copy of the markup array to avoid modifying the original input
-  let newMarkup = JSON.parse(JSON.stringify(markup));
+  let newMarkup = JSON.parse(JSON.stringify(data.markup));
 
   // Collapse <faction> + "Link"/"Field". Example: "Agent <player> destroyed the <faction> Link ..."
   if (newMarkup.length > 4) {
@@ -662,7 +664,7 @@ function renderMsgRow(data) {
   }
   var nickCell = IITC.comm.renderNickCell(data.player.name, nickClasses.join(' '));
 
-  const markup = IITC.comm.transformMessage(data.markup);
+  const markup = IITC.comm.transformMessage(data);
   var msg = IITC.comm.renderMarkup(markup);
   var msgClass = data.narrowcast ? 'system_narrowcast' : '';
   var msgCell = IITC.comm.renderMsgCell(msg, msgClass);
