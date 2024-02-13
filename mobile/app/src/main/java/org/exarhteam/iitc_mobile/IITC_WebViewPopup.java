@@ -96,8 +96,14 @@ public class IITC_WebViewPopup extends WebView {
                     }
                     if (uriHost.startsWith("accounts.google.") ||
                             uriHost.startsWith("appengine.google.") ||
-                            uriHost.startsWith("accounts.youtube.")) {
+                            uriHost.startsWith("accounts.youtube.") ||
+                            uriHost.startsWith("myaccount.google.")) {
                         Log.d("popup: Google login");
+                        openDialogPopup();
+                        return false;
+                    }
+                    if (uriHost.startsWith("signin.nianticlabs.")) {
+                        Log.d("popup: Niantic login");
                         openDialogPopup();
                         return false;
                     }

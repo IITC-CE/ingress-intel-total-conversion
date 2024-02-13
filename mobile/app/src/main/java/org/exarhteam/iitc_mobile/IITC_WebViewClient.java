@@ -326,8 +326,13 @@ public class IITC_WebViewClient extends WebViewClient {
             }
             if (uriHost.startsWith("accounts.google.") ||
                     uriHost.startsWith("appengine.google.") ||
-                    uriHost.startsWith("accounts.youtube.")) {
+                    uriHost.startsWith("accounts.youtube.") ||
+                    uriHost.startsWith("myaccount.google.")) {
                 Log.d("Google login");
+                return false;
+            }
+            if (uriHost.startsWith("signin.nianticlabs.")) {
+                Log.d("Niantic login");
                 return false;
             }
             if (mIitc.isInternalHostname(uriHost)) {
