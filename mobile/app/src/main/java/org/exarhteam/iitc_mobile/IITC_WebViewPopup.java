@@ -151,9 +151,28 @@ public class IITC_WebViewPopup extends WebView {
 
     private void openDialogPopup() {
         if (mDialog.isShowing()) return;
+
+        // Retrieve display metrics from the context
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+
+        // Calculate 80% of screen height and 90% of width
+        int height = (int) (displayMetrics.heightPixels * 0.8);
+        int width = (int) (displayMetrics.widthPixels * 0.9);
+
+        // Apply the calculated height and width to the dialog
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(mDialog.getWindow().getAttributes());
+        layoutParams.height = height;
+        layoutParams.width = width;
+
         mDialog.show();
-        mDialog.getWindow().clearFlags(
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+
+        // Apply the layout parameters to the dialog window
+        mDialog.getWindow().setAttributes(layoutParams);
+
+        // Existing flags for dialog window
+        mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
 
     // constructors -------------------------------------------------
