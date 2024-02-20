@@ -13,6 +13,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.util.DisplayMetrics;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class IITC_WebViewPopup extends WebView {
@@ -100,6 +101,11 @@ public class IITC_WebViewPopup extends WebView {
                             uriHost.startsWith("myaccount.google.") ||
                             uriHost.startsWith("gds.google.")) {
                         Log.d("popup: Google login");
+                        openDialogPopup();
+                        return false;
+                    }
+                    if (uriHost.equals("appleid.apple.com")) {
+                        Log.d("popup: AppleID login");
                         openDialogPopup();
                         return false;
                     }
