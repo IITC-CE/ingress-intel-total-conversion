@@ -144,11 +144,6 @@
                     android:key="pref_fake_user_agent"
                     android:summary="@string/pref_fake_user_agent_sum"
                     android:title="@string/pref_fake_user_agent"/>
-                <CheckBoxPreference
-                    android:defaultValue="true"
-                    android:key="pref_popup"
-                    android:summary="@string/pref_popup_sum"
-                    android:title="@string/pref_popup"/>
             </PreferenceCategory>
         </PreferenceScreen>
         <PreferenceScreen
