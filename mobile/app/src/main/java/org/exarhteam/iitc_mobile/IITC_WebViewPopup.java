@@ -90,7 +90,7 @@ public class IITC_WebViewPopup extends WebView {
                         return shouldOverrideUrlLoading(view, uriQuery);
                     }
                     if (uriHost.endsWith("facebook.com")
-                            && (uriPath.contains("oauth") || uriPath.equals("/login.php") || uriPath.equals("/checkpoint/")
+                            && (uriPath.contains("oauth") || uriPath.startsWith("/login") || uriPath.equals("/checkpoint/")
                             || uriPath.equals("/cookie/consent_prompt/"))) {
                         Log.d("popup: Facebook login");
                         openDialogPopup();
