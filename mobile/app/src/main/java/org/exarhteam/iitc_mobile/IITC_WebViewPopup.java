@@ -13,6 +13,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.view.ViewGroup;
 import android.util.DisplayMetrics;
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -152,26 +153,38 @@ public class IITC_WebViewPopup extends WebView {
     private void openDialogPopup() {
         if (mDialog.isShowing()) return;
 
-        // Retrieve display metrics from the context
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+        // Set the dialog content view to match parent's height and width
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        );
+        mDialog.getWindow().setContentView(this, params);
 
-        // Calculate 80% of screen height and 90% of width
-        int height = (int) (displayMetrics.heightPixels * 0.8);
-        int width = (int) (displayMetrics.widthPixels * 0.9);
-
-        // Apply the calculated height and width to the dialog
+        // Set horizontal and vertical margins
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         layoutParams.copyFrom(mDialog.getWindow().getAttributes());
-        layoutParams.height = height;
-        layoutParams.width = width;
+
+        // Set width and height to match_parent
+        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+
+        // Calculate the margin size
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+        float widthMargin = displayMetrics.widthPixels * 0.05f;
+        float heightMargin = displayMetrics.heightPixels * 0.05f;
+
+        // Convert pixels to dp to use as margin
+        float density = displayMetrics.density;
+        int marginWidthDp = (int) (widthMargin / density);
+        int marginHeightDp = (int) (heightMargin / density);
+
+        layoutParams.horizontalMargin = marginWidthDp;
+        layoutParams.verticalMargin = marginHeightDp;
 
         mDialog.show();
 
-        // Apply the layout parameters to the dialog window
         mDialog.getWindow().setAttributes(layoutParams);
-
-        // Existing flags for dialog window
         mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
 
