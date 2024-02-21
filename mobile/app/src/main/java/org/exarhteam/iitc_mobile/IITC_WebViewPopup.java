@@ -61,6 +61,31 @@ public class IITC_WebViewPopup extends WebView {
                 return true;
             }
 
+            private String categorizeUriHostAndPath(String uriHost, String uriPath) {
+                if (uriHost.endsWith("facebook.com")
+                        && (uriPath.contains("oauth") || uriPath.startsWith("/login") || uriPath.equals("/checkpoint/")
+                        || uriPath.equals("/cookie/consent_prompt/"))) {
+                    return "Facebook";
+                }
+                if (uriHost.startsWith("accounts.google.") ||
+                    uriHost.startsWith("appengine.google.") ||
+                    uriHost.startsWith("accounts.youtube.") ||
+                    uriHost.startsWith("myaccount.google.") ||
+                    uriHost.startsWith("gds.google.")) {
+                    return "Google";
+                }
+                if (uriHost.equals("appleid.apple.com")) {
+                    return "AppleID";
+                }
+                if (uriHost.startsWith("signin.nianticlabs.")) {
+                    return "Niantic";
+                }
+                if (mIitc.isInternalHostname(uriHost)) {
+                    return "InternalHost";
+                }
+                return "Unknown";
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
                 final Uri uri = Uri.parse(url);
@@ -89,34 +114,10 @@ public class IITC_WebViewPopup extends WebView {
                         Log.d("popup: redirect to: " + uriQuery);
                         return shouldOverrideUrlLoading(view, uriQuery);
                     }
-                    if (uriHost.endsWith("facebook.com")
-                            && (uriPath.contains("oauth") || uriPath.startsWith("/login") || uriPath.equals("/checkpoint/")
-                            || uriPath.equals("/cookie/consent_prompt/"))) {
-                        Log.d("popup: Facebook login");
-                        openDialogPopup();
-                        return false;
-                    }
-                    if (uriHost.startsWith("accounts.google.") ||
-                            uriHost.startsWith("appengine.google.") ||
-                            uriHost.startsWith("accounts.youtube.") ||
-                            uriHost.startsWith("myaccount.google.") ||
-                            uriHost.startsWith("gds.google.")) {
-                        Log.d("popup: Google login");
-                        openDialogPopup();
-                        return false;
-                    }
-                    if (uriHost.equals("appleid.apple.com")) {
-                        Log.d("popup: AppleID login");
-                        openDialogPopup();
-                        return false;
-                    }
-                    if (uriHost.startsWith("signin.nianticlabs.")) {
-                        Log.d("popup: Niantic login");
-                        openDialogPopup();
-                        return false;
-                    }
-                    if (mIitc.isInternalHostname(uriHost)) {
-                        Log.d("popup: internal host");
+
+                    String authCategory = categorizeUriHostAndPath(uriHost, uriPath);
+                    if (!authCategory.equals("Unknown")) {
+                        Log.d("popup: " + authCategory + " login");
                         openDialogPopup();
                         return false;
                     }
