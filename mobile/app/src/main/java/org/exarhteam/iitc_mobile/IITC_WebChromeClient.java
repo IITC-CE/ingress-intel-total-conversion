@@ -227,9 +227,6 @@ public class IITC_WebChromeClient extends WebChromeClient {
         if (!isUserGesture)
             return false;
 
-        final boolean enablePopup = mSharedPrefs.getBoolean("pref_popup", false);
-        if (!enablePopup) return false;
-
         IITC_WebViewPopup newWebView = new IITC_WebViewPopup(mIitc);
         WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
         transport.setWebView(newWebView);
