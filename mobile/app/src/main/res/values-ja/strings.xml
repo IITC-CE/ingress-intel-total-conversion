@@ -100,15 +100,15 @@
 \n 公式のIngressインテルマップと比べて優れているところは機能を拡張してくれる豊富なプラグインにあります。
 \n 
 \n公式や外部提供のプラグインを設定から追加できます。</string>
-    <string name="file_browser_choose_file">ファイルを選ぶ</string>
+    <string name="file_browser_choose_file">ファイルを選択</string>
     <string name="toast_press_twice_to_exit">2度押して終了</string>
     <string name="plugin_updated">プラグイン更新</string>
     <string name="pane_info">情報</string>
     <string name="pref_language">言語</string>
     <string name="pref_hide_fullscreen_status_bar">IITC ステータスバー</string>
     <string name="pref_update_plugins_interval_2_days">2日</string>
-    <string name="pref_update_plugins_interval_1_week">1週</string>
-    <string name="pref_update_plugins_interval_2_weeks">2週</string>
+    <string name="pref_update_plugins_interval_1_week">1週間</string>
+    <string name="pref_update_plugins_interval_2_weeks">2週間</string>
     <string name="bugtracker">バグトラッカー</string>
     <string name="iitc_website">IITC ウェブサイト</string>
     <string name="appintro_navigation_description"> 画面の左端からスワイプ（またはメニューアイコンをクリック）すると、<i>ナビゲーションドロワー</i>が表示されます。
@@ -127,7 +127,7 @@
 \n
 \n両デバイスの後ろと後ろを合わせてスクリーンをタップするとマップを相手デバイスに送信できます。</string>
     <string name="appintro_nfc_title">NFC権限</string>
-    <string name="pref_user_location_show_position_and_orientation">マップに位置と向きを表示</string>
+    <string name="pref_user_location_show_position_and_orientation">ユーザーの位置と方向を地図上に表示</string>
     <string name="pref_user_location_show_position">位置情報をマップに表示する</string>
     <string name="pref_user_location_dont_show">位置情報を表示しない</string>
     <string name="appintro_location_description">IITC-CE Mobileはナビゲーションの為に位置情報へのアクセス権が必要です。
@@ -146,4 +146,21 @@
 \nIITCはハードウェアアクセラレータを活用して効率を上げ、多様なプラグインを使用して機能拡張する事で、インテルマップの作業を完全に変更します。</string>
     <string name="show_appintro_screen_title">イントロ画面の表示</string>
     <string name="pref_webview_zoom_defaultValue">初期値</string>
+    <string name="menu_delete_plugin">削除</string>
+    <string name="delete_plugin_question">\"%s\"プラグインを削除しますか？</string>
+    <string name="button_confirm_description">はい</string>
+    <string name="button_cancel_description">いいえ</string>
+    <string name="menu_share_plugin_download_url">ダウンロードURLを共有する</string>
+    <string name="menu_share_plugin_update_url">更新URLを共有</string>
+    <string name="menu_share_plugin_file">プラグインファイルを共有</string>
+    <string name="update_notifications_text">新バージョン%1$sが利用可能ですぅ。ダウンロードするにはタップ。</string>
+    <string name="tab_prime">Ingress</string>
+    <string name="plugin_deleted">\"%s\"プラグインは削除されました</string>
+    <string name="pref_webview_zoom">フォントサイズ</string>
+    <string name="pref_webview_zoom_sum">情報パネル、COMM、ポップアップウィンドウなどのフォントとテキストサイズに影響を与えます</string>
+    <string name="menu_plugins_add_url">URLでプラグインを追加</string>
+    <string name="file_browser_is_required">ファイルを選択するアクティビティが見つかりませんでした。お好みのファイルブラウザをインストールしてください！</string>
+    <string name="update_notifications_channel_name">更新通知</string>
+    <string name="update_notifications_title">新しいIITC Mobileが利用可能</string>
+    <string name="update_notifications_action_hide_forever">永久に隠す</string>
 </resources>

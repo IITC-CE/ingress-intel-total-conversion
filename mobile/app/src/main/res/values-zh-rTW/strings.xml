@@ -38,7 +38,7 @@
 \n
 \n 部份插件（例如 <i>portals list</i> 及 <i>bookmarks</i>）會直接出現在<i>導覽列</i>以供快速存取。
 \n 而這些插件將不會列於 info pane內。 </string>
-    <string name="toggle_map">切換顯示地圖</string>
+    <string name="toggle_map">切換地圖類型</string>
     <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;版本：${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC 版本：${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;作者：${cradle_link}, ${fkloft_link} 及其他貢獻者&lt;/b&gt; &lt;p&gt;&lt;b&gt;圖標設計：${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC 行動版&lt;/b&gt; 是 &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; 使用者腳本 針對行動裝置優化的使用介面。 &lt;h3&gt;社群資訊：&lt;/h3&gt; • 請造訪 ${website_link} 以取得更新以及電腦版。&lt;br&gt; • 加入 Telegram 頻道 ${tg_iitc_news_link} 以接收更多資訊，您也可以加入聊天室：${tg_iitc_group_link}。&lt;br&gt; • 加入 Reddit 社群 ${reddit_iitc_link} ——您可以盡情發問並與其他使用者討論。&lt;br&gt; • 請在此回報問題或是提出建議：${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Developers:&lt;/h3&gt; ${github_iitc_link} on Github. &lt;h3&gt;IITC Licence:&lt;/h3&gt; ${ISC_license_text}</string>
     <string name="notice_info">&lt;p&gt;小提示：開啟資訊欄的更多方式： &lt;p&gt; • 長按 portal 一秒&lt;br&gt; • 點擊狀態列的左半部&lt;br&gt;</string>
     <string name="notice_extplugins">&lt;p&gt;小提示：&lt;p&gt;IITC 行動版也可以載入外部插件！&lt;p&gt;欲添加外部插件，請點選右上角的 (+) 圖示，插件檔案之檔名應以 \'.user.js\' 為結尾，並被複製至&lt;b&gt;%1$s&lt;/b&gt;</string>

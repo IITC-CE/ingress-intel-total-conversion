@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="install_dialog_msg">&lt;p&gt;IITCm ได้รับการร้องขอให้ติดตั้งไฟล์จาวาสคริปต์ต่อไปนี้: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;ระวัง:&lt;/b&gt; จาวาสคริปต์จากแหล่งภายนอก อาจมีรหัสที่เป็นอันตราย (สปายแวร์ ฯลฯ )! &lt;p&gt;คุณแน่ใจหรือว่าต้องการดำเนินการต่อ\?</string>
-    <string name="install_dialog_top">ติดตั้งปลั๊กอินภายนอกหรือไม่</string>
+    <string name="install_dialog_top">ติดตั้งปลั๊กอินจากภายนอกหรือไม่\?</string>
     <string name="pref_plugins_sum">ปลั๊กอินขยาย/แก้ไขประสบการณ์ IITC ปลั๊กอินส่วนใหญ่ที่รู้จักจาก IITC สำหรับเดสก์ทอป สามารถค้นหาได้ที่นี่</string>
     <string name="tab_browser">Intel</string>
     <string name="label_overlay_layers">เลเยอร์ซ้อนทับ</string>
@@ -146,4 +146,21 @@
     <string name="pref_language">ภาษา</string>
     <string name="iitc_website">เว็บไซต์ IITC</string>
     <string name="bugtracker">ตัวติดตามข้อผิดพลาด</string>
+    <string name="plugin_deleted">ลบปลั๊กอิน \"%s\" แล้ว</string>
+    <string name="button_confirm_description">ไช่</string>
+    <string name="button_cancel_description">ไม่</string>
+    <string name="menu_share_plugin_update_url">แชร์ลิงค์อัปเดต</string>
+    <string name="menu_share_plugin_file">แชร์ไฟล์ปลั๊กอิน</string>
+    <string name="update_notifications_text">เวอร์ชันใหม่ %1$s มาแล้ว แตะเพื่อดาวน์โหลด</string>
+    <string name="tab_prime">อินเกรส</string>
+    <string name="menu_delete_plugin">ลบ</string>
+    <string name="delete_plugin_question">ต้องการลบปลั๊กอิน \"%s\" หรือไม่\?</string>
+    <string name="menu_share_plugin_download_url">แชร์ลิงค์ดาวน์โหลด</string>
+    <string name="pref_webview_zoom">ขนาดตัวอักษร</string>
+    <string name="pref_webview_zoom_defaultValue">ค่าพื้นฐานของระบบ</string>
+    <string name="pref_webview_zoom_sum">ส่งผลต่อขนาดตัวอักษร/ข้อความในแผงข้อมูล การสื่อสาร หน้าต่างป๊อปอัป บลาบลาบลา.…</string>
+    <string name="menu_plugins_add_url">เพิ่มปลั๊กอินด้วยลิงค์ URL</string>
+    <string name="update_notifications_channel_name">อัปเดตการแจ้งเตือน</string>
+    <string name="update_notifications_title">IITC Mobile เวอร์ชันใหม่มาแล้ว</string>
+    <string name="update_notifications_action_hide_forever">ซ่อนถาวร</string>
 </resources>

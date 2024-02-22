@@ -137,4 +137,14 @@
     <string name="pref_hide_fullscreen_status_bar">Barra di Stato IITC</string>
     <string name="pref_hide_fullscreen_action_bar">Barra Azioni IITC</string>
     <string name="pref_hide_fullscreen_notification_bar">Barra Notifiche di Sistema</string>
+    <string name="pref_user_location_dont_show">Non mostrare la posizione utente</string>
+    <string name="appintro_navigation_description"> Scorri dal bordo sinistro del tuo schermo (oppure cliccla sull\'icona menu) per richiamare il <i>Navigation Drawer</i>.
+\nCliccare sull\'icona indietro per tornare alla mappa.
+\n
+\nAlcuniplugins (ad esempio \u0020<i>portals list</i> e <i>bookmarks</i>) ora compaiono su <i>Navigation Drawer</i> per un accesso veloce.
+\nNon appaiono più nel pannello informativo. </string>
+    <string name="pref_webview_zoom">Grandezza font</string>
+    <string name="pref_webview_zoom_defaultValue">Default di sistema</string>
+    <string name="pref_webview_zoom_sum">Influisce sulla grandezza di font/testi nel pannello delle informazioni, comm, finestre popup, etc…</string>
+    <string name="menu_plugins_add_url">Aggiungi plugin tramite URL</string>
 </resources>

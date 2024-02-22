@@ -146,7 +146,21 @@
     <string name="pane_info">信息</string>
     <string name="pane_map">地图</string>
     <string name="file_browser_is_required">未找到文件选择器。请安装一个文件浏览器！</string>
-    <string name="pref_webview_zoom_sum">内部网页视图缩放</string>
-    <string name="pref_webview_zoom">网页视图缩放</string>
+    <string name="pref_webview_zoom_sum">影响信息面板、聊天窗口、弹窗等界面中的字体大小…</string>
+    <string name="pref_webview_zoom">字体大小</string>
     <string name="pref_webview_zoom_defaultValue">系统默认</string>
+    <string name="menu_delete_plugin">删除</string>
+    <string name="delete_plugin_question">确认删除插件\"%s\"？</string>
+    <string name="plugin_deleted">插件\"%s\"已经删除</string>
+    <string name="button_confirm_description">是</string>
+    <string name="button_cancel_description">否</string>
+    <string name="menu_share_plugin_download_url">分享下载链接</string>
+    <string name="menu_share_plugin_update_url">分享更新链接</string>
+    <string name="menu_share_plugin_file">分享插件文件</string>
+    <string name="menu_plugins_add_url">通过URL添加插件</string>
+    <string name="update_notifications_title">有新版本的IITC Mobile可用</string>
+    <string name="tab_prime">Ingress</string>
+    <string name="update_notifications_channel_name">更新通知</string>
+    <string name="update_notifications_text">一个新版本的%1$s可用。点击下载。</string>
+    <string name="update_notifications_action_hide_forever">永远隐藏</string>
 </resources>

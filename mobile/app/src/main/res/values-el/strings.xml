@@ -90,4 +90,6 @@
     <string name="notice_info">&lt;p&gt; Συμβουλή: Εναλλακτικοί τρόποι για να ανοίξετε την οθόνη πληροφοριών: &lt;p&gt; • Πατήστε και κρατήστε μια πύλη για ένα δευτερόλεπτο &lt;br&gt; • Πατήστε στο αριστερό ήμισυ της γραμμής κατάστασης &lt;br&gt;</string>
     <string name="iitc_website">Ιστοσελίδα IITC</string>
     <string name="bugtracker">εντοπιστής σφαλμάτων</string>
+    <string name="pref_language">Γλώσσα</string>
+    <string name="pref_hide_fullscreen_notification_bar">Γραμμή ειδοποιήσεων συστήματος</string>
 </resources>
