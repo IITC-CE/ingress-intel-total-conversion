@@ -1,13 +1,17 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.10.1
+// @version        0.10.2
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.10.2',
+    changes: ['IITC.toolbox API is used to create plugin buttons'],
+  },
   {
     version: '0.10.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

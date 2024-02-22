@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Ingress scoring regions
 // @category       Layer
-// @version        0.3.0
+// @version        0.3.1
 // @description    Show the regional scoring cells grid on the map
 
 /* global S2 */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.3.1',
+    changes: ['fixed region names'],
+  },
   {
     version: '0.3.0',
     changes: ['a fix in the hilbercurve calculation', 'fix region-search by enhance the cell-id'],

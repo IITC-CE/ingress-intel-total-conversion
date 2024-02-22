@@ -10,7 +10,7 @@
 var changelog = [
   {
     version: '0.2.3',
-    changes: ['Default value for link show direction mode was set to Static near origin'],
+    changes: ['Default value for link show direction mode was set to Static near origin', 'IITC.toolbox API is used to create plugin buttons'],
   },
   {
     version: '0.2.2',

@@ -1,13 +1,17 @@
 // @author         949
 // @name           Find farms on map
 // @category       Layer
-// @version        1.4.2
+// @version        1.4.3
 // @description    Show farms by minimum level
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '1.4.3',
+    changes: ['IITC.toolbox API is used to create plugin buttons'],
+  },
   {
     version: '1.4.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
