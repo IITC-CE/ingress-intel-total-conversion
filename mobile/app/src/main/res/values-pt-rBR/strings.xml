@@ -153,8 +153,6 @@
     <string name="button_cancel_description">Não</string>
     <string name="menu_share_plugin_download_url">Compartilhar a URL de download</string>
     <string name="menu_share_plugin_file">Compartilhar arquivo de plugin</string>
-    <string name="pref_popup">Ativar pop-up da Web</string>
-    <string name="pref_popup_sum">Permita que os plugins usem popups na visualização Web principal. Pode ser útil para plugins que dependem de autenticação de terceiros</string>
     <string name="menu_delete_plugin">Excluir</string>
     <string name="menu_share_plugin_update_url">Compartilhar a URL de atualização</string>
     <string name="pref_webview_zoom">Tamanho da fonte</string>
@@ -165,4 +163,15 @@
     <string name="update_notifications_title">Nova versão do IITC Mobile disponível</string>
     <string name="update_notifications_text">Uma nova versão %1$s está disponível. Toque para fazer o download.</string>
     <string name="update_notifications_action_hide_forever">Ocultar para sempre</string>
+    <string name="debug_info_dialog_title">Informações de depuração</string>
+    <string name="debug_info_dialog_share_btn">Compartilhar</string>
+    <string name="debug_info_dialog_copy_btn">Copiar</string>
+    <string name="ok">OK</string>
+    <string name="pref_enabled">Habilitado</string>
+    <string name="pref_disabled">Desabilitado</string>
+    <string name="pref_check_for_updates">Verificação de atualização</string>
+    <string name="pref_check_for_updates_summary">Verifique se há atualizações ao iniciar o App</string>
+    <string name="pref_debug_info">Informações de depuração</string>
+    <string name="pref_debug_info_sum">Mostra informações importantes para resolver problemas com IITC Mobile</string>
+    <string name="debug_info_dialog_text"><b>Fabricante:</b> %s<br/> <b>Modelo:</b> %s<br/> <b>Versão do Android:</b> %d<br/> <b>Versão de lançamento:</b> %s<br/> <b>Versão do IITC Mobile:</b> %s (%s)<br/> <b>Versão do IITC:</b> %s<br/> <b>Agente de usuário do sistema:</b> %s<br/> <b>Agente de usuário padrão do IITC:</b> %s<br/> <b>Agente de usuário falso:</b> %s<br/> <b>Plugins de usuário ativos:</b> %d<br/></string>
 </resources>
