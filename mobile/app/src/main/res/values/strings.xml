@@ -277,7 +277,7 @@
     <string name="ok">OK</string>
     <string name="pref_enabled">enabled</string>
     <string name="pref_disabled">disabled</string>
-    <string name="debug_info_dialog_text">
+    <string name="debug_info_dialog_text" translatable="false">
         <![CDATA[
         <b>Manufacturer:</b> %s<br/>
         <b>Model:</b> %s<br/>
