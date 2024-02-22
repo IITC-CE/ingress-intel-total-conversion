@@ -187,6 +187,7 @@ public class IITC_Mobile extends AppCompatActivity
         mAllowedHostnames.put("google.com", googleUA);
         mAllowedHostnames.put("youtube.com", googleUA);
         mAllowedHostnames.put("facebook.com", mDesktopUA);
+        mAllowedHostnames.put("appleid.apple.com", mIITCDefaultUA);
         mAllowedHostnames.put("signin.nianticlabs.com", mIITCDefaultUA);
 
         // enable progress bar above action bar
