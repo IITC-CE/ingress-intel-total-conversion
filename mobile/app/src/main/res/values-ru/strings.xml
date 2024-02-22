@@ -149,8 +149,6 @@
     <string name="pref_webview_zoom">Масштаб WebView</string>
     <string name="pref_webview_zoom_defaultValue">Системные настройки</string>
     <string name="pref_webview_zoom_sum">Масштаб встроенного WebView</string>
-    <string name="pref_popup">Включить всплывающие окна</string>
-    <string name="pref_popup_sum">Разрешить плагинам использовать всплывающие окна. Это может быть полезно для плагинов, которые полагаются на стороннюю аутентификацию</string>
     <string name="update_notifications_channel_name">Обновить уведомления</string>
     <string name="update_notifications_text">Доступна новая версия %1$s. Нажмите для установки.</string>
     <string name="menu_plugins_add_url">Добавить плагины по URL</string>
