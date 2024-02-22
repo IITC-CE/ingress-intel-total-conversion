@@ -173,5 +173,4 @@
     <string name="pref_check_for_updates_summary">Verifique se há atualizações ao iniciar o App</string>
     <string name="pref_debug_info">Informações de depuração</string>
     <string name="pref_debug_info_sum">Mostra informações importantes para resolver problemas com IITC Mobile</string>
-    <string name="debug_info_dialog_text"><b>Fabricante:</b> %s<br/> <b>Modelo:</b> %s<br/> <b>Versão do Android:</b> %d<br/> <b>Versão de lançamento:</b> %s<br/> <b>Versão do IITC Mobile:</b> %s (%s)<br/> <b>Versão do IITC:</b> %s<br/> <b>Agente de usuário do sistema:</b> %s<br/> <b>Agente de usuário padrão do IITC:</b> %s<br/> <b>Agente de usuário falso:</b> %s<br/> <b>Plugins de usuário ativos:</b> %d<br/></string>
 </resources>

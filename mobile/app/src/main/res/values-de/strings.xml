@@ -169,5 +169,4 @@
     <string name="pref_webview_zoom">Schriftgröße</string>
     <string name="delete_plugin_question">Plugin \"%s\" löschen\?</string>
     <string name="pref_debug_info_sum">Informationen anzeigen, die für die Lösung von Problemen mit IITC Mobile wichtig sind</string>
-    <string name="debug_info_dialog_text"><b>Manufacturer:</b> %s<br/> <b>Model:</b> %s<br/> <b>Android version:</b> %d<br/> <b>Android version release:</b> %s<br/> <b>IITC Mobile version:</b> %s (%s)<br/> <b>IITC Version:</b> %s<br/> <b>System User Agent:</b> %s<br/> <b>Default IITC User Agent:</b> %s<br/> <b>Fake user agent:</b> %s<br/> \u0020<b>Active user plugins:</b> %d<br/></string>
 </resources>
