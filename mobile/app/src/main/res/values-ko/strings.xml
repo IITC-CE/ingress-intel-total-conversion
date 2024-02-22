@@ -13,7 +13,7 @@
     <string name="activity_settings">IITC Mobile 설정</string>
     <string name="debug_run">실행</string>
     <string name="clear_log">로그 지우기</string>
-    <string name="pref_external_storage_sum">재시작이 필요합니다! 캐시를 SD카드애 저장합니다. 외장 저장소가 마운트되어있어야 합니다.</string>
+    <string name="pref_external_storage_sum">재시작이 필요합니다! 캐시를 SD카드 저장합니다. 외장 저장소가 설치되어있어야 합니다.</string>
     <string name="pref_persistent_zoom">부드러운 확대/축소</string>
     <string name="install_dialog_msg">&lt;p&gt;IITC모바일에 다음 외부 플러그인을 설치합니다: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;주의:&lt;/b&gt; 외부 소스의 자바스크립트에는 유해 코드가 포함될 수 있습니다 (스파이웨어 등)! &lt;p&gt;계속하시겠습니까\?</string>
     <string name="label_overlay_layers">오버레이 레이어</string>
@@ -84,4 +84,83 @@
     <string name="bugtracker">버그트래커</string>
     <string name="pref_enable_dev_mode_sum">활성화된 경우 모든 IITC 소스는 안드로이드 기기의 외부 저장소에서 로드됩니다. $IITC_folder/build/mobile/ 에서 /sdcard/IITC_Mobile/dev/로 모든 소스를 복사해 주십시오.</string>
     <string name="iitc_website">IITC 홈페이지</string>
+    <string name="update_notifications_title">새로운 IITC 모바일 버전 사용 가능</string>
+    <string name="update_notifications_text">새 버전 %1$s를 사용할 수 있습니다. 다운로드하려면 누르세요.</string>
+    <string name="update_notifications_action_hide_forever">영구적으로 숨기기</string>
+    <string name="tab_prime">Ingress</string>
+    <string name="menu_delete_plugin">삭제</string>
+    <string name="plugin_deleted">\"%s\" 플러그인이 삭제됨</string>
+    <string name="menu_share_plugin_update_url">업데이트 URL 공유</string>
+    <string name="menu_share_plugin_file">플러그인 파일 공유</string>
+    <string name="notice_info">&lt;p&gt;힌트: 정보 화면을 여는 다른 방법: &lt;p&gt; • 포탈을 1초간 길게 누릅니다.&lt;br&gt; • 상태 표시줄의 좌측 절반을 탭합니다.&lt;br&gt;</string>
+    <string name="pref_language">언어</string>
+    <string name="pref_hide_fullscreen_notification_bar">시스템 알림 표시줄</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC 액션 바</string>
+    <string name="appintro_location_title">위치 권한</string>
+    <string name="appintro_location_description">IITC-CE 모바일은 손쉬운 탐색을 위해 사용자 위치 액세스 권한이 필요합니다.
+\n
+\n 하지만 걱정하지 마세요. 당사는 사용자의 위치에 대한 데이터를 어디에도 전송하지 않습니다.</string>
+    <string name="appintro_nfc_description">두 장치 모두 NFC를 지원하는 경우 현재 포털 링크/퍼머링크를 다른 장치로 빠르게 전송할 수 있습니다.
+\n
+\n 두 장치를 나란히 맞대고 화면을 탭하면 지도를 다른 장치로 전송할 수 있습니다.</string>
+    <string name="appintro_navigation_description"> 화면 왼쪽 가장자리에서 스와이프(또는 메뉴 아이콘 클릭)하여 <i>탐색 창</i>을 불러옵니다.
+\n 지도로 돌아가려면 뒤로 아이콘을 클릭하세요.
+\n
+\n 이제 일부 플러그인(예: <i>포탈 목록</i> 및 <i>북마크</i>)이 <i>탐색 창</i>에 표시되어 빠르게 액세스할 수 있습니다.
+\n 더 이상 정보 창에 표시되지 않습니다. </string>
+    <string name="file_browser_is_required">파일을 선택할 수 있는 앱이 없습니다. 다른 파일 탐색기를 설치 해주세요!</string>
+    <string name="toast_press_twice_to_exit">종료하려면 두 번 누르세요</string>
+    <string name="pref_plugins">IITC 플러그인</string>
+    <string name="pane_map">지도</string>
+    <string name="delete_plugin_question">정말로 \"%s\" 플러그인을 삭제하시겠습니까\?</string>
+    <string name="button_confirm_description">예</string>
+    <string name="button_cancel_description">아니오</string>
+    <string name="menu_share_plugin_download_url">다운로드 URL 공유</string>
+    <string name="plugin_updated">업데이트된 플러그인</string>
+    <string name="pane_all">전체</string>
+    <string name="pane_faction">진영</string>
+    <string name="pane_alerts">알림</string>
+    <string name="pane_info">정보</string>
+    <string name="update_notifications_channel_name">업데이트 알림</string>
+    <string name="pref_tweaks_cat">트윅</string>
+    <string name="pref_plugins_sum">플러그인은 IITC 환경을 확장/수정합니다. 데스크톱 IITC에서 알려진 대부분의 플러그인은 여기에서 찾을 수 있습니다.</string>
+    <string name="notice_sharing">&lt;p&gt;&lt;em&gt;포탈 공유&lt;/em&gt;를 사용하면 다음을 수행할 수 있습니다. &lt;p&gt; • 다른 사람에게 포탈 링크 보내기&lt;br&gt; • 다른 앱에서 선택한 포탈의 위치 보기&lt;br&gt; • 웹 브라우저에서 포탈 링크 열기 &lt;br&gt; &lt;p&gt;힌트: Google 지도(또는 기타 설치된 내비게이션 소프트웨어)를 선택하면 선택한 포탈로 빠르게 이동할 수 있습니다. &lt;p&gt;이 힌트는 &lt;em&gt;고유 링크&lt;/em&gt;에도 적용됩니다.</string>
+    <string name="notice_extplugins">&lt;p&gt;힌트: &lt;p&gt;IITC 모바일은 외부 플러그인도 로드할 수 있습니다! &lt;p&gt;오른쪽 상단의 (+) 아이콘을 클릭하여 추가하세요. 플러그인 파일은 \'.user.js\'로 끝나야 하며 &lt;b&gt;%1$s&lt;/b&gt;에 복사됩니다&lt;/b&gt;</string>
+    <string name="pref_webview_zoom">글꼴 크기</string>
+    <string name="pref_webview_zoom_defaultValue">시스템 기본값</string>
+    <string name="pref_webview_zoom_sum">정보 패널, 커뮤니케이션, 팝업 창 등의 글꼴/텍스트 크기에 영향을 미칩니다…</string>
+    <string name="appintro_welcome_description">Ingress 플레이어에 없어서는 안 될 도우미의 모바일 버전입니다.
+\n
+\n Ingress 인텔 토탈 컨버전(IITC)은 공식 인텔 Ingress 맵의 오버레이로 작동하는 애드온입니다.
+\n
+\n IITC는 맵 작업 방식을 완전히 바꾸고 하드웨어 가속을 적용하여 효율성을 크게 높이며 다양한 플러그인 사용을 통해 기능을 확장합니다.</string>
+    <string name="appintro_nfc_title">NFC 권한</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC 상태 바</string>
+    <string name="pref_hide_fullscreen_navigation_bar">시스템 탐색 표시줄</string>
+    <string name="pref_user_location_dont_show">사용자 위치 표시 안 함</string>
+    <string name="pref_user_location_show_position">지도에서 사용자 위치 표시</string>
+    <string name="pref_user_location_show_position_and_orientation">지도에서 사용자 위치 및 방향 표시</string>
+    <string name="pref_update_plugins_interval_disable">비활성화</string>
+    <string name="pref_update_plugins_interval_1_day">1 일</string>
+    <string name="pref_update_plugins_interval_2_days">2 일</string>
+    <string name="pref_update_plugins_interval_1_week">1 주</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 주</string>
+    <string name="menu_plugins_add_url">URL로 플러그인 추가</string>
+    <string name="appintro_navigation_title">네비게이션</string>
+    <string name="appintro_layers_title">레이어/강조</string>
+    <string name="appintro_layers_description"> 화면 오른쪽 가장자리에서 스와이프하거나 액션바에서 레이어 선택 아이콘을 클릭하여 <i>레이어 그리기</i>를 불러옵니다.
+\n
+\n 여기에서 온라인 지도 서비스를 변경하거나 지도에서 필요한 요소의 표시를 활성화/비활성화할 수 있습니다. </string>
+    <string name="appintro_plugins_title">플러그인</string>
+    <string name="appintro_plugins_description">지금 바로 IITC-CE 사용을 시작할 수 있습니다.
+\n
+\n 그러나 공식 인텔 인그레스 맵에 비해 가장 큰 장점은 기능을 확장하는 플러그인이 풍부하다는 것입니다.
+\n
+\n 설정에서 공식 또는 외부 플러그인을 추가할 수 있습니다.</string>
+    <string name="show_appintro_screen_title">소개 화면 표시</string>
+    <string name="plugins_permission_denied">권한이 거부되었습니다. 플러그인을 추가할 수 없습니다.</string>
+    <string name="plugins_permission_granted">권한이 부여되었습니다. 작업을 반복해 주세요.</string>
+    <string name="file_browser_choose_file">파일 선택</string>
+    <string name="plugins_user_plugins">유저 플러그인</string>
+    <string name="plugins_official_plugins">공식 플러그인</string>
 </resources>
