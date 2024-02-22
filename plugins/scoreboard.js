@@ -1,6 +1,6 @@
 // @author         Costaspap
 // @name           Localized scoreboard
-// @version        0.3.3
+// @version        0.3.4
 // @category       Info
 // @description    Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
 
@@ -8,6 +8,10 @@
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.3.4',
+    changes: ['IITC.toolbox API is used to create plugin buttons'],
+  },
   {
     version: '0.3.3',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

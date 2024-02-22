@@ -1,13 +1,17 @@
 // @author         breunigs
 // @name           Player level guess
 // @category       Info
-// @version        0.5.8
+// @version        0.5.9
 // @description    Try to determine player levels from the data available in the current view.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.5.9',
+    changes: ['IITC.toolbox API is used to create plugin buttons'],
+  },
   {
     version: '0.5.8',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

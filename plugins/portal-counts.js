@@ -1,10 +1,18 @@
 // @author         yenky
 // @name           Portal count
 // @category       Info
-// @version        0.2.3
+// @version        0.2.4
 // @description    Display a list of all localized portals by level and faction.
 
 /* global IITC -- eslint */
+/* exported setup, changelog --eslint */
+
+var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['IITC.toolbox API is used to create plugin buttons'],
+  },
+];
 
 // use own namespace for plugin
 window.plugin.portalcounts = {

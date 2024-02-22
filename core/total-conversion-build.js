@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.37.1
+// @version        0.38.0
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -12,7 +12,14 @@ window.script_info = plugin_info;
 window.script_info.changelog = [
   {
     version: '0.38.0',
-    changes: ['Function marked deprecated: portalApGainMaths, getPortalApGain, potentialPortalLevel, findPortalLatLng'],
+    changes: [
+      'Function marked deprecated: portalApGainMaths, getPortalApGain, potentialPortalLevel, findPortalLatLng',
+      'Added Filters API (`IITC.filters`)',
+      'Added Toolbox API (`IITC.toolbox`)',
+      'Added Google Maps Roads+Transit map',
+      'Added the ability to search using a scanner link or GUID',
+      'Added conversion of new comm messages to the old style',
+    ],
   },
   {
     version: '0.37.1',
