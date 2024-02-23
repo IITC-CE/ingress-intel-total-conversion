@@ -90,12 +90,7 @@ public class IITC_WebViewPopup extends WebView {
                         return shouldOverrideUrlLoading(view, uriQuery);
                     }
 
-                    if (isFacebookAuth(uriHost, uriPath)
-                            || isGoogleAuth(uriHost)
-                            || isAppleAuth(uriHost)
-                            || isNianticAuth(uriHost)
-                            || isInternalHostname(uriHost)
-                    ) {
+                    if (mIitc.isInternalHostname(uriHost) || LoginUrlChecker.isLoginUrl(uri)) {
                         Log.d("Opening popup: " + uri);
                         openDialogPopup();
                         return false;
@@ -130,32 +125,6 @@ public class IITC_WebViewPopup extends WebView {
         });
     }
 
-    private boolean isInternalHostname(String uriHost) {
-        return mIitc.isInternalHostname(uriHost);
-    }
-
-    private boolean isNianticAuth(String uriHost) {
-        return uriHost.startsWith("signin.nianticlabs.");
-    }
-
-    private boolean isAppleAuth(String uriHost) {
-        return uriHost.equals("appleid.apple.com");
-    }
-
-    private boolean isGoogleAuth(String uriHost) {
-        return uriHost.startsWith("accounts.google.") ||
-                uriHost.startsWith("appengine.google.") ||
-                uriHost.startsWith("accounts.youtube.") ||
-                uriHost.startsWith("myaccount.google.") ||
-                uriHost.startsWith("gds.google.");
-    }
-
-    private boolean isFacebookAuth(String uriHost, String uriPath) {
-        return uriHost.endsWith("facebook.com")
-                && (uriPath.contains("oauth") || uriPath.startsWith("/login") || uriPath.equals("/checkpoint/")
-                || uriPath.equals("/cookie/consent_prompt/"));
-    }
-
     private void openDialogPopup() {
         if (mDialog.isShowing()) return;
 
@@ -173,13 +142,25 @@ public class IITC_WebViewPopup extends WebView {
         // Set width and height to match_parent
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.horizontalMargin = 0.1f;
-        layoutParams.verticalMargin = 0.2f;
 
-        mDialog.show();
+        // Calculate the margin size
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+        float widthMargin = displayMetrics.widthPixels * 5f;
+        float heightMargin = displayMetrics.heightPixels * 0.01f;
+
+        // Convert pixels to dp to use as margin
+        float density = displayMetrics.density;
+        int marginWidthDp = (int) (widthMargin / density);
+        int marginHeightDp = (int) (heightMargin / density);
+
+        layoutParams.horizontalMargin = marginWidthDp;
+        layoutParams.verticalMargin = marginHeightDp;
 
         mDialog.getWindow().setAttributes(layoutParams);
         mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+
+        mDialog.show();
     }
 
     // constructors -------------------------------------------------
