@@ -61,31 +61,6 @@ public class IITC_WebViewPopup extends WebView {
                 return true;
             }
 
-            private String categorizeUriHostAndPath(String uriHost, String uriPath) {
-                if (uriHost.endsWith("facebook.com")
-                        && (uriPath.contains("oauth") || uriPath.startsWith("/login") || uriPath.equals("/checkpoint/")
-                        || uriPath.equals("/cookie/consent_prompt/"))) {
-                    return "Facebook";
-                }
-                if (uriHost.startsWith("accounts.google.") ||
-                    uriHost.startsWith("appengine.google.") ||
-                    uriHost.startsWith("accounts.youtube.") ||
-                    uriHost.startsWith("myaccount.google.") ||
-                    uriHost.startsWith("gds.google.")) {
-                    return "Google";
-                }
-                if (uriHost.equals("appleid.apple.com")) {
-                    return "AppleID";
-                }
-                if (uriHost.startsWith("signin.nianticlabs.")) {
-                    return "Niantic";
-                }
-                if (mIitc.isInternalHostname(uriHost)) {
-                    return "InternalHost";
-                }
-                return "Unknown";
-            }
-
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
                 final Uri uri = Uri.parse(url);
@@ -115,9 +90,8 @@ public class IITC_WebViewPopup extends WebView {
                         return shouldOverrideUrlLoading(view, uriQuery);
                     }
 
-                    String authCategory = categorizeUriHostAndPath(uriHost, uriPath);
-                    if (!authCategory.equals("Unknown")) {
-                        Log.d("popup: " + authCategory + " login");
+                    if (mIitc.isInternalHostname(uriHost) || LoginUrlChecker.isLoginUrl(uri)) {
+                        Log.d("Opening popup: " + uri);
                         openDialogPopup();
                         return false;
                     }
@@ -155,38 +129,38 @@ public class IITC_WebViewPopup extends WebView {
         if (mDialog.isShowing()) return;
 
         // Set the dialog content view to match parent's height and width
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        );
-        mDialog.getWindow().setContentView(this, params);
-
-        // Set horizontal and vertical margins
+//        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+//            ViewGroup.LayoutParams.MATCH_PARENT,
+//            ViewGroup.LayoutParams.MATCH_PARENT
+//        );
+//        mDialog.getWindow().setContentView(this, params);
+//
+//        // Set horizontal and vertical margins
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         layoutParams.copyFrom(mDialog.getWindow().getAttributes());
-
-        // Set width and height to match_parent
+//
+//        // Set width and height to match_parent
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-
-        // Calculate the margin size
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
-        float widthMargin = displayMetrics.widthPixels * 0.05f;
-        float heightMargin = displayMetrics.heightPixels * 0.05f;
-
-        // Convert pixels to dp to use as margin
-        float density = displayMetrics.density;
-        int marginWidthDp = (int) (widthMargin / density);
-        int marginHeightDp = (int) (heightMargin / density);
-
-        layoutParams.horizontalMargin = marginWidthDp;
-        layoutParams.verticalMargin = marginHeightDp;
+//
+//        // Calculate the margin size
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+//        float widthMargin = displayMetrics.widthPixels * 5f;
+//        float heightMargin = displayMetrics.heightPixels * 0.01f;
+//
+//        // Convert pixels to dp to use as margin
+//        float density = displayMetrics.density;
+//        int marginWidthDp = (int) (widthMargin / density);
+//        int marginHeightDp = (int) (heightMargin / density);
+//
+//        layoutParams.horizontalMargin = -0.3f;
+//        layoutParams.verticalMargin = 0.3f;
+//
+        mDialog.getWindow().setAttributes(layoutParams);
+//        mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
         mDialog.show();
-
-        mDialog.getWindow().setAttributes(layoutParams);
-        mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
 
     // constructors -------------------------------------------------
