@@ -129,36 +129,36 @@ public class IITC_WebViewPopup extends WebView {
         if (mDialog.isShowing()) return;
 
         // Set the dialog content view to match parent's height and width
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        );
-        mDialog.getWindow().setContentView(this, params);
-
-        // Set horizontal and vertical margins
+//        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+//            ViewGroup.LayoutParams.MATCH_PARENT,
+//            ViewGroup.LayoutParams.MATCH_PARENT
+//        );
+//        mDialog.getWindow().setContentView(this, params);
+//
+//        // Set horizontal and vertical margins
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         layoutParams.copyFrom(mDialog.getWindow().getAttributes());
-
-        // Set width and height to match_parent
+//
+//        // Set width and height to match_parent
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-
-        // Calculate the margin size
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
-        float widthMargin = displayMetrics.widthPixels * 5f;
-        float heightMargin = displayMetrics.heightPixels * 0.01f;
-
-        // Convert pixels to dp to use as margin
-        float density = displayMetrics.density;
-        int marginWidthDp = (int) (widthMargin / density);
-        int marginHeightDp = (int) (heightMargin / density);
-
-        layoutParams.horizontalMargin = marginWidthDp;
-        layoutParams.verticalMargin = marginHeightDp;
-
+//
+//        // Calculate the margin size
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        ((WindowManager) mIitc.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+//        float widthMargin = displayMetrics.widthPixels * 5f;
+//        float heightMargin = displayMetrics.heightPixels * 0.01f;
+//
+//        // Convert pixels to dp to use as margin
+//        float density = displayMetrics.density;
+//        int marginWidthDp = (int) (widthMargin / density);
+//        int marginHeightDp = (int) (heightMargin / density);
+//
+//        layoutParams.horizontalMargin = -0.3f;
+//        layoutParams.verticalMargin = 0.3f;
+//
         mDialog.getWindow().setAttributes(layoutParams);
-        mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+//        mDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
 
         mDialog.show();
     }
