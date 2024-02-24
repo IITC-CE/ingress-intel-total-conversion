@@ -30,12 +30,12 @@ privacyView.text = {
 
 privacyView.toggle = () => {
   privacyView.is_active = !privacyView.is_active;
+  document.body.classList.toggle('privacy_active', privacyView.is_active);
   if (window.isSmartphone()) {
     IITC.toolbox.updateButton('privacytoggle', { label: privacyView.text[privacyView.is_active] });
   } else {
-    const active = document.body.classList.toggle('privacy_active');
-    $('#privacytoggle').innerHTML = active ? 'Privacy active' : 'Privacy inactive';
-    if (!active) {
+    $('#privacytoggle').text(privacyView.is_active ? 'Privacy active' : 'Privacy inactive');
+    if (!privacyView.is_active) {
       // refresh chat
       window.startRefreshTimeout(0.1 * 1000);
     }
