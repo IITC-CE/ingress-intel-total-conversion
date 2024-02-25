@@ -157,8 +157,8 @@ document.body.innerHTML =
   '    </div>' +
   '    <div id="portaldetails"></div>' +
   '    <input id="redeem" placeholder="Redeem code…" type="text"/>' +
-  '    <div id="toolbox"></div>' +
   '    <div id="toolbox_component"></div>' +
+  '    <div id="toolbox"></div>' +
   '  </div>' +
   '</div>' +
   '<div id="updatestatus"><div id="innerstatus"></div></div>' +
