@@ -6,6 +6,78 @@
 var chat = function () {};
 window.chat = chat;
 
+// List of functions to track for synchronization between chat and comm
+const legacyFunctions = [
+  'genPostData',
+  'updateOldNewHash',
+  'parseMsgData',
+  'writeDataToHash',
+  'renderText',
+  'getChatPortalName',
+  'renderPortal',
+  'renderFactionEnt',
+  'renderPlayer',
+  'renderMarkupEntity',
+  'renderMarkup',
+  'renderTimeCell',
+  'renderNickCell',
+  'renderMsgCell',
+  'renderMsgRow',
+  'renderDivider',
+  'renderData',
+];
+const newCommApi = [
+  '_genPostData',
+  '_updateOldNewHash',
+  'parseMsgData',
+  '_writeDataToHash',
+  'renderText',
+  'getChatPortalName',
+  'renderPortal',
+  'renderFactionEnt',
+  'renderPlayer',
+  'renderMarkupEntity',
+  'renderMarkup',
+  'renderTimeCell',
+  'renderNickCell',
+  'renderMsgCell',
+  'renderMsgRow',
+  'renderDivider',
+  'renderData',
+];
+
+// Function to map legacy function names to their new names in comm
+function mapLegacyFunctionNameToCommApi(functionName) {
+  const index = legacyFunctions.indexOf(functionName);
+  return index !== -1 ? newCommApi[index] : functionName;
+}
+
+// Create a proxy for chat to ensure backward compatibility of migrated functions from chat to comm
+window.chat = new Proxy(window.chat, {
+  get(target, prop, receiver) {
+    if (prop in target) {
+      // Return the property from chat if it's defined
+      return target[prop];
+    } else if (legacyFunctions.includes(prop)) {
+      // Map the legacy function name to its new name in comm and return the corresponding function
+      const commProp = mapLegacyFunctionNameToCommApi(prop);
+      return window.IITC.comm[commProp];
+    }
+    // Return default value if the property is not found
+    return Reflect.get(target, prop, receiver);
+  },
+  set(target, prop, value) {
+    if (legacyFunctions.includes(prop)) {
+      // Map the legacy function name to its new name in comm and synchronize the function between chat and comm
+      const commProp = mapLegacyFunctionNameToCommApi(prop);
+      window.IITC.comm[commProp] = value;
+    }
+    // Update or add the property in chat
+    target[prop] = value;
+    return true; // Indicates that the assignment was successful
+  },
+});
+
 //
 // common
 //
@@ -472,23 +544,6 @@ chat.setupTabs = function () {
   chat.renderAlerts = function (oldMsgsWereAdded) {
     return IITC.comm.renderChannel('allerts', oldMsgsWereAdded);
   };
-
-  chat.getChatPortalName = IITC.comm.getChatPortalName;
-
-  /**
-   * Renders data from the data-hash to the element defined by the given ID.
-   *
-   * @function chat.renderData
-   * @param {Object} data - Chat data to be rendered.
-   * @param {string} element - ID of the DOM element to render the chat into.
-   * @param {boolean} likelyWereOldMsgs - Flag indicating if older messages are likely to have been added.
-   * @param {Array} sortedGuids - Sorted array of GUIDs representing the order of messages.
-   * @memberof window.chat
-   * @type {Object}
-   */
-  chat.renderData = function (data, element, likelyWereOldMsgs, sortedGuids) {
-    return IITC.comm.renderData(data, element, likelyWereOldMsgs, sortedGuids);
-  };
 };
 
 /**
@@ -640,6 +695,60 @@ chat.setupPosting = function () {
     event.preventDefault();
     chat.postMsg();
   });
+};
+
+/**
+ * Legacy function for rendering chat messages. Used for backward compatibility with plugins.
+ *
+ * @deprecated
+ * @function window.chat.renderMsg
+ * @param {string} msg - The chat message.
+ * @param {string} nick - The nickname of the player who sent the message.
+ * @param {number} time - The timestamp of the message.
+ * @param {string} team - The team of the player who sent the message.
+ * @param {boolean} msgToPlayer - Flag indicating if the message is directed to the player.
+ * @param {boolean} systemNarrowcast - Flag indicating if the message is a system narrowcast.
+ * @returns {string} The HTML string representing a chat message row.
+ */
+chat.renderMsg = function (msg, nick, time, team, msgToPlayer, systemNarrowcast) {
+  // Imitating data usually derived from processing raw chat data
+  var fakeData = {
+    guid: 'legacyguid-' + Math.random(),
+    time: time,
+    public: !systemNarrowcast,
+    secure: systemNarrowcast,
+    alert: msgToPlayer,
+    msgToPlayer: msgToPlayer,
+    type: systemNarrowcast ? 'SYSTEM_NARROWCAST' : 'PLAYER_GENERATED',
+    narrowcast: systemNarrowcast,
+    auto: false, // Assuming the message is player-generated if it's not a system broadcast
+    team: team,
+    player: {
+      name: nick,
+      team: team,
+    },
+    markup: [
+      ['TEXT', { plain: msg }], // A simple message with no special markup
+    ],
+  };
+
+  // Use existing IITC functions to render a chat message row
+  return IITC.comm.renderMsgRow(fakeData);
+};
+
+/**
+ * Legacy function for converts a chat tab name to its corresponding COMM channel name.
+ * Used for backward compatibility with plugins.
+ *
+ * @deprecated
+ * @function window.chat.tabToChannel
+ * @param {string} tab - The name of the chat tab.
+ * @returns {string} The corresponding channel name ('faction', 'alerts', or 'all').
+ */
+chat.tabToChannel = function (tab) {
+  if (tab === 'faction') return 'faction';
+  if (tab === 'alerts') return 'alerts';
+  return 'all';
 };
 
 /* global log, PLAYER, L, IITC, app */
