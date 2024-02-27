@@ -239,11 +239,15 @@ var _oldBBox = null;
  * @private
  * @param {string} channel - The chat channel.
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
+ * @param args=undefined - Used for backward compatibility when calling a function with three arguments.
  * @returns {Object} The generated post data.
  */
-function _genPostData(channel, getOlderMsgs) {
+function _genPostData(channel, getOlderMsgs, ...args) {
   if (typeof channel !== 'string') {
     throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
+  }
+  if (args.length === 1) {
+    getOlderMsgs = args[0];
   }
 
   var b = window.clampLatLngBounds(map.getBounds());
@@ -776,6 +780,9 @@ IITC.comm = {
   renderChannel,
   renderData,
   _channelsData,
+  _genPostData,
+  _updateOldNewHash,
+  _writeDataToHash,
 };
 
 /* global log, map, chat, IITC */
