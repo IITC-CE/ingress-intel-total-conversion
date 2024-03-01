@@ -177,6 +177,7 @@ function createDefaultOverlays() {
       filter: [
         { portal: true, data: { level: i, team: 'R' } },
         { portal: true, data: { level: i, team: 'E' } },
+        { portal: true, data: { level: i, team: 'M' } },
       ],
     });
     addLayers[t] = portalsLayer;
