@@ -44,18 +44,18 @@ public class IITC_WebViewPopup extends WebView {
             }
         });
         setWebViewClient(new WebViewClient() {
-            // duplicate code from IITC_WebViewClient
+            // reload the view if the UserAgent needs to be changed wrt the url
             private boolean reloadWithUserAgent(final WebView view, final String url) {
+                final String currentUA = view.getSettings().getUserAgentString();
+
                 final Uri uri = Uri.parse(url);
                 final String uriHost = uri.getHost();
-
-                final String currentUA = view.getSettings().getUserAgentString();
                 final String targetUA = mIitc.getUserAgentForHostname(uriHost);
+
                 if (targetUA == null || currentUA.equals(targetUA))
                     return false;
 
-                Log.d("reload url from " + uriHost + " with UA `" + targetUA + "`");
-
+                Log.d("change UA popup for url `" + uriHost + "` to: `" + targetUA + "`");
                 view.getSettings().setUserAgentString(targetUA);
                 view.loadUrl(url);
                 return true;
@@ -79,11 +79,6 @@ public class IITC_WebViewPopup extends WebView {
                         return true;
                     }
 
-                    if (reloadWithUserAgent(view, url)) {
-                        openDialogPopup();
-                        return true;
-                    }
-
                     if ((uriHost.startsWith("google.") || uriHost.contains(".google."))
                             && uriPath.equals("/url") && uriQuery != null) {
                         Log.d("popup: redirect to: " + uriQuery);
@@ -93,7 +88,7 @@ public class IITC_WebViewPopup extends WebView {
                     if (mIitc.isInternalHostname(uriHost) || LoginUrlChecker.isLoginUrl(uri)) {
                         Log.d("Opening popup: " + uri);
                         openDialogPopup();
-                        return false;
+                        return reloadWithUserAgent(view, url);
                     }
                 }
 
