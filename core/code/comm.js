@@ -435,19 +435,45 @@ function renderText(text) {
 }
 
 /**
+ * List of transformations for portal names used in chat.
+ * Each transformation function takes the portal markup object and returns a transformed name.
+ * If a transformation does not apply, the original name is returned.
+ *
+ * @const IITC.comm.portalNameTransformations
+ * @example
+ * // Adding a transformation that appends the portal location to its name
+ * portalNameTransformations.push((markup) => {
+ *   const latlng = `${markup.latE6 / 1E6},${markup.lngE6 / 1E6}`; // Convert E6 format to decimal
+ *   return `[${latlng}] ${markup.name}`;
+ * });
+ */
+const portalNameTransformations = [
+  // Transformation for 'US Post Office'
+  (markup) => {
+    if (markup.name === 'US Post Office') {
+      const address = markup.address.split(',');
+      return 'USPS: ' + address[0];
+    }
+    return markup.name;
+  },
+];
+
+/**
  * Overrides portal names used repeatedly in chat, such as 'US Post Office', with more specific names.
+ * Applies a series of transformations to the portal name based on the portal markup.
  *
  * @function IITC.comm.getChatPortalName
  * @param {Object} markup - An object containing portal markup, including the name and address.
  * @returns {string} The processed portal name.
  */
 function getChatPortalName(markup) {
-  var name = markup.name;
-  if (name === 'US Post Office') {
-    var address = markup.address.split(',');
-    name = 'USPS: ' + address[0];
-  }
-  return name;
+  // Use reduce to apply each transformation to the data
+  const transformedData = portalNameTransformations.reduce((initialMarkup, transform) => {
+    const updatedName = transform(initialMarkup);
+    return {...initialMarkup, name: updatedName};
+  }, markup);
+
+  return transformedData.name;
 }
 
 /**
@@ -761,6 +787,8 @@ IITC.comm = {
   channels: _channels,
   sendChatMessage,
   parseMsgData,
+  // List of transformations
+  portalNameTransformations,
   // Render primitive, may be override
   renderMsgRow,
   renderDivider,
