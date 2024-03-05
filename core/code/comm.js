@@ -789,6 +789,7 @@ function renderData(data, element, likelyWereOldMsgs, sortedGuids) {
   var prevTime = null;
   vals.forEach(function (guid) {
     var msg = data[guid];
+    if (IITC.comm.declarativeMessageFilter.filterMessage(msg[4])) return;
     var nextTime = new Date(msg[0]).toLocaleDateString();
     if (prevTime && prevTime !== nextTime) {
       msgs += IITC.comm.renderDivider(nextTime);
