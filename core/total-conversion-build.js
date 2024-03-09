@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.38.0
+// @version        0.38.1
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -10,6 +10,10 @@ window.IITC = IITC;
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.38.1',
+    changes: ['Fix toolbar for some deprecated plugins', 'Fix dialogs on iitc boot'],
+  },
   {
     version: '0.38.0',
     changes: [

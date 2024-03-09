@@ -1,13 +1,17 @@
 // @author         johnd0e
 // @name           Privacy view on Intel
 // @category       Misc
-// @version        1.2.0
+// @version        1.2.1
 // @description    Hide info from intel which shouldn't leak to players of the other faction.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '1.2.1',
+    changes: ['Fix plugin on mobile'],
+  },
   {
     version: '1.2.0',
     changes: ['IITC.toolbox API is used to create plugin buttons and refactoring'],
