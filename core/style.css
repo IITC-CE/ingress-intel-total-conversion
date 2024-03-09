@@ -840,7 +840,7 @@ h3.title {
 }
 
 #toolbox {
-  display: none;
+  display: none !important;
 }
 
 #toolbox, #toolbox_component {
