@@ -7,6 +7,7 @@
 
 /**
  * @type {chat.ChannelDescription[]}
+ * @memberof IITC.comm
  */
 var _channels = [
   {
@@ -46,6 +47,7 @@ var _channels = [
  * Holds data related to each intel channel.
  *
  * @type {Object}
+ * @memberof IITC.comm
  */
 var _channelsData = {};
 
@@ -66,6 +68,43 @@ function _initChannelData(id) {
   _channelsData[id].newestTimestamp = -1;
   delete _channelsData[id].newestGUID;
 }
+
+/**
+ * Template of portal link in comm.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let portalTemplate = '<a onclick="window.selectPortalByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="help">{{ portal_name }}</a>';
+/**
+ * Template for time cell.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let timeCellTemplate = '<td><time class="{{ class_names }}" title="{{ time_title }}" data-timestamp="{{ unixtime }}">{{ time }}</time></td>';
+/**
+ * Template for player's nickname cell.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let nickCellTemplate = '<td><span class="invisep">&lt;</span><mark class="{{ class_names }}">{{ nick }}</mark><span class="invisep">&gt;</span></td>';
+/**
+ * Template for chat message text cell.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let msgCellTemplate = '<td class="{{ class_names }}">{{ msg }}</td>';
+/**
+ * Template for message row, includes cells for time, player nickname and message text.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let msgRowTemplate = '<tr data-guid="{{ guid }}" class="{{ class_names }}">{{ time_cell }}{{ nick_cell }}{{ msg_cell }}</tr>';
+/**
+ * Template for message divider.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let dividerTemplate = '<tr class="divider"><td><hr></td><td>{{ text }}</td><td><hr></td></tr>';
 
 /**
  * Updates the oldest and newest message timestamps and GUIDs in the chat storage.
@@ -484,11 +523,17 @@ function getChatPortalName(markup) {
  * @returns {string} HTML string of the portal link.
  */
 function renderPortal(portal) {
-  var lat = portal.latE6 / 1e6,
-    lng = portal.lngE6 / 1e6;
-  var perma = window.makePermalink([lat, lng]);
-  var js = 'window.selectPortalByLatLng(' + lat + ', ' + lng + ');return false';
-  return '<a onclick="' + js + '"' + ' title="' + portal.address + '"' + ' href="' + perma + '" class="help">' + IITC.comm.getChatPortalName(portal) + '</a>';
+  const lat = portal.latE6 / 1e6;
+  const lng = portal.lngE6 / 1e6;
+  const permalink = window.makePermalink([lat, lng]);
+  const portalName = IITC.comm.getChatPortalName(portal);
+
+  return IITC.comm.portalTemplate
+    .replace("{{ lat }}", lat.toString())
+    .replace("{{ lng }}", lng.toString())
+    .replace("{{ title }}", portal.address)
+    .replace("{{ url }}", permalink)
+    .replace("{{ portal_name }}", portalName);
 }
 
 /**
@@ -668,16 +713,22 @@ const transformMessage = (data) => {
  * Formats the time and adds it to a <time> HTML element with a tooltip showing the full date and time.
  *
  * @function IITC.comm.renderTimeCell
- * @param {number} time - The timestamp of the message.
+ * @param {number} unixtime - The timestamp of the message.
  * @param {string} classNames - Additional class names to be added to the time cell.
  * @returns {string} The HTML string representing a table cell with the formatted time.
  */
-function renderTimeCell(time, classNames) {
-  const ta = window.unixTimeToHHmm(time);
-  let tb = window.unixTimeToDateTimeString(time, true);
+function renderTimeCell(unixtime, classNames) {
+  const time = window.unixTimeToHHmm(unixtime);
+  const datetime = window.unixTimeToDateTimeString(unixtime, true);
   // add <small> tags around the milliseconds
-  tb = (tb.slice(0, 19) + '<small class="milliseconds">' + tb.slice(19) + '</small>').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  return '<td><time class="' + classNames + '" title="' + tb + '" data-timestamp="' + time + '">' + ta + '</time></td>';
+  const datetime_title = (datetime.slice(0, 19) + '<small class="milliseconds">' + datetime.slice(19) + '</small>').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  return IITC.comm.timeCellTemplate
+    .replace("{{ class_names }}", classNames)
+    .replace("{{ datetime }}", datetime)
+    .replace("{{ time_title }}", datetime_title)
+    .replace("{{ unixtime }}", unixtime.toString())
+    .replace("{{ time }}", time);
 }
 
 /**
@@ -690,8 +741,7 @@ function renderTimeCell(time, classNames) {
  * @returns {string} The HTML string representing a table cell with the player's nickname.
  */
 function renderNickCell(nick, classNames) {
-  const i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
-  return '<td>' + i[0] + '<mark class="' + classNames + '">' + nick + '</mark>' + i[1] + '</td>';
+  return IITC.comm.nickCellTemplate.replace("{{ class_names }}", classNames).replace("{{ nick }}", nick);
 }
 
 /**
@@ -704,7 +754,7 @@ function renderNickCell(nick, classNames) {
  * @returns {string} The HTML string representing a table cell with the chat message.
  */
 function renderMsgCell(msg, classNames) {
-  return '<td class="' + classNames + '">' + msg + '</td>';
+  return IITC.comm.msgCellTemplate.replace("{{ class_names }}", classNames).replace("{{ msg }}", msg);
 }
 
 /**
@@ -740,7 +790,13 @@ function renderMsgRow(data) {
   } else if (!data.auto && data.secure) {
     className = 'faction';
   }
-  return '<tr data-guid="' + data.guid + '" class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
+
+  return IITC.comm.msgRowTemplate
+    .replace("{{ class_names }}", className)
+    .replace("{{ guid }}", data.guid)
+    .replace("{{ time_cell }}", timeCell)
+    .replace("{{ nick_cell }}", nickCell)
+    .replace("{{ msg_cell }}", msgCell)
 }
 
 /**
@@ -751,7 +807,7 @@ function renderMsgRow(data) {
  * @returns {string} The HTML string representing a divider row in the chat table.
  */
 function renderDivider(text) {
-  return '<tr class="divider"><td><hr></td><td>' + text + '</td><td><hr></td></tr>';
+  return IITC.comm.dividerTemplate.replace("{{ text }}", text);
 }
 
 /**
@@ -840,6 +896,13 @@ IITC.comm = {
   renderPortal,
   renderText,
   getChatPortalName,
+  // templates
+  portalTemplate,
+  timeCellTemplate,
+  nickCellTemplate,
+  msgCellTemplate,
+  msgRowTemplate,
+  dividerTemplate,
   // exposed API for legacy
   requestChannel,
   renderChannel,
