@@ -74,7 +74,8 @@ function _initChannelData(id) {
  * @type {String}
  * @memberof IITC.comm
  */
-let portalTemplate = '<a onclick="window.selectPortalByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="help">{{ portal_name }}</a>';
+let portalTemplate =
+  '<a onclick="window.selectPortalByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="help">{{ portal_name }}</a>';
 /**
  * Template for time cell.
  * @type {String}
@@ -519,7 +520,7 @@ function getChatPortalName(markup) {
   // Use reduce to apply each transformation to the data
   const transformedData = portalNameTransformations.reduce((initialMarkup, transform) => {
     const updatedName = transform(initialMarkup);
-    return {...initialMarkup, name: updatedName};
+    return { ...initialMarkup, name: updatedName };
   }, markup);
 
   return transformedData.name;
@@ -539,11 +540,11 @@ function renderPortal(portal) {
   const portalName = IITC.comm.getChatPortalName(portal);
 
   return IITC.comm.portalTemplate
-    .replace("{{ lat }}", lat.toString())
-    .replace("{{ lng }}", lng.toString())
-    .replace("{{ title }}", portal.address)
-    .replace("{{ url }}", permalink)
-    .replace("{{ portal_name }}", portalName);
+    .replace('{{ lat }}', lat.toString())
+    .replace('{{ lng }}', lng.toString())
+    .replace('{{ title }}', portal.address)
+    .replace('{{ url }}', permalink)
+    .replace('{{ portal_name }}', portalName);
 }
 
 /**
@@ -712,7 +713,7 @@ const transformMessage = (data) => {
   // Use reduce to apply each transformation to the data
   const transformedData = messageTransformFunctions.reduce((data, transform) => {
     const updatedMarkup = transform(data);
-    return {...data, markup: updatedMarkup};
+    return { ...data, markup: updatedMarkup };
   }, initialData);
 
   return transformedData.markup;
@@ -731,14 +732,17 @@ function renderTimeCell(unixtime, classNames) {
   const time = window.unixTimeToHHmm(unixtime);
   const datetime = window.unixTimeToDateTimeString(unixtime, true);
   // add <small> tags around the milliseconds
-  const datetime_title = (datetime.slice(0, 19) + '<small class="milliseconds">' + datetime.slice(19) + '</small>').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const datetime_title = (datetime.slice(0, 19) + '<small class="milliseconds">' + datetime.slice(19) + '</small>')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 
   return IITC.comm.timeCellTemplate
-    .replace("{{ class_names }}", classNames)
-    .replace("{{ datetime }}", datetime)
-    .replace("{{ time_title }}", datetime_title)
-    .replace("{{ unixtime }}", unixtime.toString())
-    .replace("{{ time }}", time);
+    .replace('{{ class_names }}', classNames)
+    .replace('{{ datetime }}', datetime)
+    .replace('{{ time_title }}', datetime_title)
+    .replace('{{ unixtime }}', unixtime.toString())
+    .replace('{{ time }}', time);
 }
 
 /**
@@ -751,7 +755,7 @@ function renderTimeCell(unixtime, classNames) {
  * @returns {string} The HTML string representing a table cell with the player's nickname.
  */
 function renderNickCell(nick, classNames) {
-  return IITC.comm.nickCellTemplate.replace("{{ class_names }}", classNames).replace("{{ nick }}", nick);
+  return IITC.comm.nickCellTemplate.replace('{{ class_names }}', classNames).replace('{{ nick }}', nick);
 }
 
 /**
@@ -764,7 +768,7 @@ function renderNickCell(nick, classNames) {
  * @returns {string} The HTML string representing a table cell with the chat message.
  */
 function renderMsgCell(msg, classNames) {
-  return IITC.comm.msgCellTemplate.replace("{{ class_names }}", classNames).replace("{{ msg }}", msg);
+  return IITC.comm.msgCellTemplate.replace('{{ class_names }}', classNames).replace('{{ msg }}', msg);
 }
 
 /**
@@ -802,11 +806,11 @@ function renderMsgRow(data) {
   }
 
   return IITC.comm.msgRowTemplate
-    .replace("{{ class_names }}", className)
-    .replace("{{ guid }}", data.guid)
-    .replace("{{ time_cell }}", timeCell)
-    .replace("{{ nick_cell }}", nickCell)
-    .replace("{{ msg_cell }}", msgCell)
+    .replace('{{ class_names }}', className)
+    .replace('{{ guid }}', data.guid)
+    .replace('{{ time_cell }}', timeCell)
+    .replace('{{ nick_cell }}', nickCell)
+    .replace('{{ msg_cell }}', msgCell);
 }
 
 /**
@@ -817,7 +821,7 @@ function renderMsgRow(data) {
  * @returns {string} The HTML string representing a divider row in the chat table.
  */
 function renderDivider(text) {
-  return IITC.comm.dividerTemplate.replace("{{ text }}", text);
+  return IITC.comm.dividerTemplate.replace('{{ text }}', text);
 }
 
 /**

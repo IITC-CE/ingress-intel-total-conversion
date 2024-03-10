@@ -120,13 +120,19 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // remove complete page. We only wanted the user-data and the page’s
 // security context so we can access the API easily. Setup as much as
 // possible without requiring scripts.
-document.head.innerHTML = ''
-  + '<title>Ingress Intel Map</title>'
-  + '<style>'+'@include_string:style.css@'+'</style>'
-  + '<style>'+'@include_css:external/leaflet.css@'+'</style>'
-  + '<style>'+'@include_css:external/jquery-ui-1.12.1-resizable.css@'+'</style>'
+document.head.innerHTML =
+  '<title>Ingress Intel Map</title>' +
+  '<style>' +
+  '@include_string:style.css@' +
+  '</style>' +
+  '<style>' +
+  '@include_css:external/leaflet.css@' +
+  '</style>' +
+  '<style>' +
+  '@include_css:external/jquery-ui-1.12.1-resizable.css@' +
+  '</style>' +
 //note: smartphone.css injection moved into code/smartphone.js
-  + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
+  '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
 // remove body element entirely to remove event listeners
 document.body = document.createElement('body');
