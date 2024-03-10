@@ -1,5 +1,7 @@
-import { describe, it, before } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
+
+/* eslint-disable no-unused-expressions */
 
 globalThis.IITC = { comm: {} };
 import('../core/code/comm_declarative_message_filter.js');
@@ -7,94 +9,97 @@ import('../core/code/comm_declarative_message_filter.js');
 // Define test messages
 const testMessages = [
   {
-    "guid":"3d.d",
-    "time":1709,
-    "public":false,
-    "secure":true,
-    "alert":false,
-    "msgToPlayer":false,
-    "type":"SYSTEM_BROADCAST",
-    "narrowcast":false,
-    "auto":true,
-    "team":2,
-    "player": {
-      "name":"Spedd",
-      "team":2
+    guid: '3d.d',
+    time: 1709,
+    public: false,
+    secure: true,
+    alert: false,
+    msgToPlayer: false,
+    type: 'SYSTEM_BROADCAST',
+    narrowcast: false,
+    auto: true,
+    team: 2,
+    player: {
+      name: 'Spedd',
+      team: 2,
     },
-    "markup":[
-      ["TEXT",{"plain":"Drone returned to Agent by "}],
-      ["PLAYER",{"plain":"Spedd","team":"ENLIGHTENED"}]
-    ]
+    markup: [
+      ['TEXT', { plain: 'Drone returned to Agent by ' }],
+      ['PLAYER', { plain: 'Spedd', team: 'ENLIGHTENED' }],
+    ],
   },
   {
-    "guid":"40.d",
-    "time":1709,
-    "public":false,
-    "secure":true,
-    "alert":false,
-    "msgToPlayer":false,
-    "type":"PLAYER_GENERATED",
-    "narrowcast":false,
-    "auto":false,
-    "team":2,
-    "player": {
-      "name":"43Bad",
-      "team":2
+    guid: '40.d',
+    time: 1709,
+    public: false,
+    secure: true,
+    alert: false,
+    msgToPlayer: false,
+    type: 'PLAYER_GENERATED',
+    narrowcast: false,
+    auto: false,
+    team: 2,
+    player: {
+      name: '43Bad',
+      team: 2,
     },
-    "markup":[
-      ["SECURE",{"plain":"[secure] "}],
-      ["SENDER",{"plain":"43Bad: ","team":"ENLIGHTENED"}],
-      ["TEXT",{"plain":""}],
-      ["AT_PLAYER",{"plain":"@RockDeckard","team":"ENLIGHTENED"}],
-      ["TEXT",{"plain":": HI!"}]
-    ]
+    markup: [
+      ['SECURE', { plain: '[secure] ' }],
+      ['SENDER', { plain: '43Bad: ', team: 'ENLIGHTENED' }],
+      ['TEXT', { plain: '' }],
+      ['AT_PLAYER', { plain: '@RockDeckard', team: 'ENLIGHTENED' }],
+      ['TEXT', { plain: ': HI!' }],
+    ],
   },
   {
-    "guid":"40.d",
-    "time":1709,
-    "public":true,
-    "secure":false,
-    "alert":false,
-    "msgToPlayer":false,
-    "type":"SYSTEM_BROADCAST",
-    "narrowcast":false,
-    "auto":true,
-    "team":0,
-    "player": {
-      "name":"b3387",
-      "team":2
+    guid: '40.d',
+    time: 1709,
+    public: true,
+    secure: false,
+    alert: false,
+    msgToPlayer: false,
+    type: 'SYSTEM_BROADCAST',
+    narrowcast: false,
+    auto: true,
+    team: 0,
+    player: {
+      name: 'b3387',
+      team: 2,
     },
-    "markup":[
-      ["TEXT",{"plain":"Agent "}],
-      ["PLAYER",{"plain":"b3387","team":"ENLIGHTENED"}],
-      ["TEXT",{"plain":" destroyed the "}],
-      ["FACTION",{"team":"NEUTRAL","plain":"Neutral"}],
-      ["TEXT",{"plain":" Link "}],
-      ["PORTAL",{"plain":"Turner Ave. (London N15 5DG, UK)","name":"Turner Ave","address":"London N15 5DG, UK","latE6":5000,"lngE6":-800,"team":"NEUTRAL"}],
-      ["TEXT",{"plain":" to "}],
-      ["PORTAL",{"plain":"Notice board (London N15 5DG, UK)","name":"Notice board","address":"London N15 5DG, UK","latE6":5001,"lngE6":-801,"team":"NEUTRAL"}]
-    ]
+    markup: [
+      ['TEXT', { plain: 'Agent ' }],
+      ['PLAYER', { plain: 'b3387', team: 'ENLIGHTENED' }],
+      ['TEXT', { plain: ' destroyed the ' }],
+      ['FACTION', { team: 'NEUTRAL', plain: 'Neutral' }],
+      ['TEXT', { plain: ' Link ' }],
+      ['PORTAL', { plain: 'Turner Ave. (London N15 5DG, UK)', name: 'Turner Ave', address: 'London N15 5DG, UK', latE6: 5000, lngE6: -800, team: 'NEUTRAL' }],
+      ['TEXT', { plain: ' to ' }],
+      [
+        'PORTAL',
+        { plain: 'Notice board (London N15 5DG, UK)', name: 'Notice board', address: 'London N15 5DG, UK', latE6: 5001, lngE6: -801, team: 'NEUTRAL' },
+      ],
+    ],
   },
   {
-    "guid":"ae.d",
-    "time":1709,
-    "public":true,
-    "secure":false,
-    "alert":false,
-    "msgToPlayer":false,
-    "type":"SYSTEM_BROADCAST",
-    "narrowcast":false,
-    "auto":true,
-    "team":1,
-    "player": {
-      "name":"Q77n",
-      "team":1
+    guid: 'ae.d',
+    time: 1709,
+    public: true,
+    secure: false,
+    alert: false,
+    msgToPlayer: false,
+    type: 'SYSTEM_BROADCAST',
+    narrowcast: false,
+    auto: true,
+    team: 1,
+    player: {
+      name: 'Q77n',
+      team: 1,
     },
-    "markup":[
-      ["PLAYER",{"plain":"Q77n","team":"RESISTANCE"}],
-      ["TEXT",{"plain":" captured "}],
-      ["PORTAL",{"plain":"Bridge (UK)","name":"Bridge","address":"UK","latE6":6000,"lngE6":-4000,"team":"RESISTANCE"}]
-    ]
+    markup: [
+      ['PLAYER', { plain: 'Q77n', team: 'RESISTANCE' }],
+      ['TEXT', { plain: ' captured ' }],
+      ['PORTAL', { plain: 'Bridge (UK)', name: 'Bridge', address: 'UK', latE6: 6000, lngE6: -4000, team: 'RESISTANCE' }],
+    ],
   },
 ];
 
@@ -198,3 +203,5 @@ describe('IITC Comm Declarative Message Filter', () => {
     expect(shouldNotMatch).to.be.false;
   });
 });
+
+/* global IITC */

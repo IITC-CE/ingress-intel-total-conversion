@@ -1,9 +1,12 @@
 {
     "env": {
         "browser": true,
-        "es6": true,
+        "es2024": true,
         "jquery": true,
         "greasemonkey": true
+    },
+    "parserOptions": {
+        "sourceType": "module"
     },
     "extends": [
         "eslint:recommended",
