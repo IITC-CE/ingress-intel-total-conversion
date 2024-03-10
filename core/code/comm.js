@@ -107,6 +107,16 @@ let msgRowTemplate = '<tr data-guid="{{ guid }}" class="{{ class_names }}">{{ ti
 let dividerTemplate = '<tr class="divider"><td><hr></td><td>{{ text }}</td><td><hr></td></tr>';
 
 /**
+ * Returns the coordinates for the message to be sent, default is the center of the map.
+ *
+ * @function IITC.comm.getLatLngForSendingMessage
+ * @returns {L.LatLng}
+ */
+function getLatLngForSendingMessage() {
+  return map.getCenter();
+}
+
+/**
  * Updates the oldest and newest message timestamps and GUIDs in the chat storage.
  *
  * @function IITC.comm._updateOldNewHash
@@ -246,7 +256,7 @@ function _writeDataToHash(newData, storageHash, isOlderMsgs, isAscendingOrder) {
 function sendChatMessage(tab, msg) {
   if (tab !== 'all' && tab !== 'faction') return;
 
-  var latlng = map.getCenter();
+  const latlng = IITC.comm.getLatLngForSendingMessage();
 
   var data = {
     message: msg,
@@ -879,6 +889,7 @@ IITC.comm = {
   channels: _channels,
   sendChatMessage,
   parseMsgData,
+  getLatLngForSendingMessage,
   // List of transformations
   portalNameTransformations,
   messageTransformFunctions,
