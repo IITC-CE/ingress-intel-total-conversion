@@ -1,4 +1,4 @@
-name: GitHub pages
+name: GitHub pages JSDoc
 
 on:
   push:
@@ -18,7 +18,6 @@ jobs:
       - name: Build
         uses: andstor/jsdoc-action@v1
         with:
-          source_dir: ./core
           output_dir: ./out
           config_file: jsdoc-conf.json
           template: tui-jsdoc-template
