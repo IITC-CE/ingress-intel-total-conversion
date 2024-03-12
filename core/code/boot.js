@@ -255,11 +255,11 @@ function boot() {
   var loadPlugins = prepPluginsToLoad();
   loadPlugins('boot');
 
+  window.setupDialogs();
   checkingIntelURL();
   setupIngressMarkers();
   window.extractFromStock();
   window.setupIdle();
-  window.setupDialogs();
   window.setupDataTileParams();
   window.setupMap();
   window.setupOMS();
