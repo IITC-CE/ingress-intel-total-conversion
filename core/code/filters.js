@@ -1,10 +1,64 @@
 /* global IITC, L */
 
-/** # Filters API
-
-  @memberof IITC
-  @namespace filters
-*/
+/**
+ * ### Filters API
+ *
+ * Filters API is a mechanism to hide intel entities using their properties (faction,
+ * health, timestamp...). It provides two level APIs: a set of named filters that
+ * apply globally (any entity matching one of the filters will be hidden), and low
+ * level API to test an entity against a filter for generic purpose.
+ * This comes with a Leaflet layer system following the old layer system, the filter
+ * is disabled when the layer is added to the map and is enabled when removed.
+ *
+ * A filter applies to a combinaison of portal/link/field and is described by
+ *  - data properties that must (all) match
+ *  - or a predicate for complex filter
+ *
+ *   `{ portal: true, link: true, data: { team: 'E' }}`
+ *       filters any ENL portal/link
+ *
+ *   `[{ link: true, data: { oGuid: "some guid" }}, { link: true, data: { dGuid: "some guid" }}]`
+ *       filters any links on portal with guid "some guid"
+ *
+ *   `{ field: true, pred: function (f) { return f.options.timestamp < Date.parse('2021-10-31'); } }`
+ *       filters any fields made before Halloween 2021
+ *
+ * Data properties can be specified as value, or as a complex expression (required
+ * for array data properties). A complex expression is a 2-array, first element is
+ * an operator, second is the argument of the operator for the property.
+ * The operators are:
+ *  - `['eq', value]` : this is equivalent to type directly `value`
+ *  - `['not', ]`
+ *  - `['or', [exp1, exp2,...]]`: the expression matches if one of the exp1.. matches
+ *  - `['and', [exp1, exp2...]]`: matches if all exp1 matches (useful for array
+ *   properties)
+ *  - `['some', exp]`: when the property is an array, matches if one of the element
+ *   matches `exp`
+ *  - `['every', exp]`: all elements must match `exp`
+ *  - `['<', number]`: for number comparison (and <= > >=)
+ *
+ * Examples:
+ *
+ *   `{ portal: true, data:  ['not', { history: { scoutControlled: false }, ornaments:
+ *   ['some', 'sc5_p'] }] }`
+ *       filters all portals but the one never scout controlled that have a scout
+ *       volatile ornament
+ *
+ *   `{ portal: true, data: ['not', { resonators: ['every', { owner: 'some agent' } ] } ] }`
+ *       filters all portals that have resonators not owned from 'some agent'
+ *       (note: that would need to load portal details)
+ *
+ *   `{ portal: true, data: { level: ['or', [1,4,5]], health: ['>', 85] } }`
+ *       filters all portals with level 1,4 or 5 and health over 85
+ *
+ *   `{ portal: true, link: true, field: true, options: { timestamp: ['<',
+ *   Date.now() - 3600000] } }`
+ *       filters all entities with no change since 1 hour (from the creation of
+ *       the filter)
+ *
+ * @memberof IITC
+ * @namespace filters
+ */
 
 IITC.filters = {};
 /**
