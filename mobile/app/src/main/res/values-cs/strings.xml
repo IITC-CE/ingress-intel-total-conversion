@@ -109,4 +109,13 @@
 \nIITC úplně změní způsob, jakým používáte mapu, podstatně zvyšuje efektivitu použitím hardwarové akcelerace a rozšiřuje možnosti využití přes různé přídavné moduly.</string>
     <string name="pref_user_location_show_position_and_orientation">Zobrazit polohu a orientaci na mapě</string>
     <string name="pref_hide_fullscreen_action_bar">Lišta akční IITC</string>
+    <string name="menu_plugins_add_url">Přidat pluginy přes URL</string>
+    <string name="appintro_location_description">IITC-CE Mobile vyžaduje povolení k přístupu k vašim údajům o poloze pro snahou navigaci.
+\n
+\nAle žádné obavy: neposíláme nikam žádná data o vaší poloze.</string>
+    <string name="appintro_nfc_title">NFC povolení</string>
+    <string name="appintro_layers_title">Vrstvy/Zvýraznění</string>
+    <string name="pref_webview_zoom_sum">Ovlivňuje velikost písma/textu v info panelu, commu, atd…</string>
+    <string name="pref_webview_zoom">Velikost písma</string>
+    <string name="pref_webview_zoom_defaultValue">Výchozí systémové nastavení</string>
 </resources>

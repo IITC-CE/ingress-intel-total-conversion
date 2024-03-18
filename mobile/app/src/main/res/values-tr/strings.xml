@@ -12,7 +12,7 @@
     <string name="activity_share_to_clipboard">Arabelleğe Kopyala</string>
     <string name="toggle_map">Harita görünümü</string>
     <string name="debug_run">Çalıştır</string>
-    <string name="activity_share">Paylaş…</string>
+    <string name="activity_share">Şunu kullanarak paylaş…</string>
     <string name="download_description">Son Intel paketi indiriliyor…</string>
     <string name="pref_user_location">Haritada oyuncu yerini göster</string>
     <string name="pref_plugins_title">Kullanılabilir Eklentiler</string>
@@ -29,4 +29,91 @@
     <string name="pref_advanced_options">Gelişmiş Ayarlar</string>
     <string name="pref_persistent_zoom">şuanki yakınlaşma seviyesi</string>
     <string name="bugtracker">Hata takipçisi</string>
+    <string name="pref_android_menu_sum">IITCm menü girişlerinin görünürlüğünü değiştir</string>
+    <string name="pref_update_plugins_interval_1_day">1 gün</string>
+    <string name="pref_update_plugins_interval_2_days">2 gün</string>
+    <string name="pref_update_plugins_interval_1_week">1 hafta</string>
+    <string name="pref_update_plugins_interval_2_weeks">2 hafta</string>
+    <string name="pref_webview_zoom">Yazı tipi boyutu</string>
+    <string name="pref_webview_zoom_defaultValue">Sistem varsayılanı</string>
+    <string name="menu_plugins_add_url">URL ile eklentileri ekleyin</string>
+    <string name="install_dialog_top">Harici eklenti yüklemek istiyor musunuz\?</string>
+    <string name="pref_android_menu">IITCm menüsünü yapılandır</string>
+    <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Sürüm: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;IITC Sürümü: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;${cradle_link}, ${fkloft_link} ve katkıda bulunanlar tarafından&lt;/b&gt; &lt;p&gt;&lt;b&gt;Simge: ${giuseppe_lucido_link} tarafından&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobil&lt;/b&gt;, &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; kullanıcı betiği için optimize edilmiş bir mobil tarayıcıdır. &lt;h3&gt;Topluluk:&lt;/h3&gt; • Yeni sürümler ve masaüstü versiyonu için ${website_link} adresini ziyaret edin.&lt;br&gt; • Duyurular için ${tg_iitc_news_link} Telegram kanalını takip edin ve ${tg_iitc_group_link} sohbetine katılın.&lt;br&gt; • Yardım almak ve diğer kullanıcılarla tartışmak için ${reddit_iitc_link} Reddit topluluğuna katılın.&lt;br&gt; • Sorunları bildirin ve geliştirmeler önerin: ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Geliştiriciler:&lt;/h3&gt; Github üzerinde ${github_iitc_link}. &lt;h3&gt;IITC Lisansı:&lt;/h3&gt; ${ISC_license_text}</string>
+    <string name="pref_fullscreen_sum">Tam ekran modunda hangi öğelerin gizlenmesi gerektiği. Not: IITCm hala Navigasyon Çekmeceleri aracılığıyla kontrol edilebilir</string>
+    <string name="pref_force_desktop_sum">Tabletler için güzel, akıllı telefonlarda kötü görünüyor</string>
+    <string name="pref_fake_user_agent_sum">Intel sitesinde IITCm\'in bir masaüstü tarayıcısı gibi görünmesine izin verin. Not: Sadece masaüstü modunu kullanmak istiyorsanız \'masaüstü modunu zorla\' ayarını kullanın</string>
+    <string name="pref_external_storage_sum">Yeniden başlatma gereklidir! Önbelleği sdCard\'a yazın. Harici depolama birimi bağlanmalıdır.</string>
+    <string name="pref_press_twice_to_exit">Çıkmak için geri düğmesine iki kez basın</string>
+    <string name="pref_user_location_show_position_and_orientation">Haritada kullanıcı konumunu ve yönelimini göster</string>
+    <string name="pref_webview_zoom_sum">Bilgi panelinde, iletişim, açılır pencereler vb. gibi yazı tipi/yazı boyutunu etkiler…</string>
+    <string name="appintro_welcome_description">Bu, Ingress oyuncusu için vazgeçilmez bir yardımcının mobil sürümüdür.
+\n
+\nIngress Intel Total Conversion (IITC), resmi Intel Ingress haritası için bir ek olarak çalışan bir katman olarak işlev görür.
+\n
+\nIITC harita ile çalışma şeklinizi tamamen değiştirir, donanım hızlandırması uygulayarak verimliliği önemli ölçüde artırır ve çeşitli eklentiler kullanarak yetenekleri genişletir.</string>
+    <string name="appintro_nfc_description">Her iki cihaz da NFC\'yi destekliyorsa, mevcut portal bağlantısını/daimi bağlantıyı hızlıca başka bir cihaza gönderebilirsiniz.
+\n
+\nHer iki cihazı da arka arkaya tutun ve haritayı diğer cihaza göndermek için ekrana dokunun.</string>
+    <string name="appintro_location_title">Konum izni</string>
+    <string name="appintro_location_description">IITC-CE Mobile, kolay navigasyon için konumunuza erişim izni gerektirir.
+\n
+\nAncak endişelenmeyin: konumunuzla ilgili verileri hiçbir yere göndermiyoruz.</string>
+    <string name="appintro_nfc_title">NFC izni</string>
+    <string name="pref_press_twice_to_exit_sum">Kazara çıkışları önler</string>
+    <string name="msg_prepare_screenshot">Hazırlanıyor…</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm aşağıdaki javascript dosyasını yüklemesi istendi: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Dikkatli olun:&lt;/b&gt; Harici kaynaklardan gelen javascriptler zararlı kodlar içerebilir (casus yazılım vb.)! &lt;p&gt;Devam etmek istediğinizden emin misiniz\?</string>
+    <string name="label_base_layer">Ana Katman</string>
+    <string name="label_overlay_layers">Yerleştirme Katmanları</string>
+    <string name="label_highlighter">Vurgulayıcı</string>
+    <string name="tab_share">Paylaş</string>
+    <string name="tab_map">Konum Bul</string>
+    <string name="sign_in_action">Giriş yap</string>
+    <string name="password">Şifre</string>
+    <string name="username">Kullanıcı adı</string>
+    <string name="notice_do_not_show_again">Tekrar gösterme</string>
+    <string name="sign_in_to">%1$s %2$s hesabına giriş yap</string>
+    <string name="msg_copied">Panoya kopyalandı…</string>
+    <string name="msg_take_screenshot">Ekran görüntüsü alınıyor…</string>
+    <string name="intent_error">Adres açılamadı</string>
+    <string name="search_hint">Konumları ara</string>
+    <string name="login_failed">Giriş başarısız.</string>
+    <string name="choose_account_to_login">Giriş yapmak için hesabı seçin</string>
+    <string name="menu_delete">Sil</string>
+    <string name="menu_copy">Kopyala</string>
+    <string name="menu_plugins_add">Harici eklentileri ekleyin</string>
+    <string name="menu_send_screenshot">Ekran görüntüsü gönder</string>
+    <string name="menu_debug">Hata Ayıklama</string>
+    <string name="menu_open_plugins">Eklentiler</string>
+    <string name="menu_clear_cookies">Çerezleri Temizle</string>
+    <string name="menu_search">Ara</string>
+    <string name="menu_locate">Konum Al</string>
+    <string name="menu_layer_chooser">Katman Seçici</string>
+    <string name="menu_toggle_fullscreen">Tam Ekran</string>
+    <string name="menu_reload">IITC\'yi yeniden yükle</string>
+    <string name="pref_hide_fullscreen_action_bar">IITC Eylem Çubuğu</string>
+    <string name="pref_hide_fullscreen_status_bar">IITC Durum Çubuğu</string>
+    <string name="pref_language">Dil</string>
+    <string name="pref_hide_fullscreen_notification_bar">Sistem Bildirim Çubuğu</string>
+    <string name="pref_hide_fullscreen_navigation_bar">Sistem Navigasyon Çubuğu</string>
+    <string name="pref_user_location_dont_show">Kullanıcı konumunu gösterme</string>
+    <string name="pref_force_plugin_update_sum">Tüm etkinleştirilmiş kullanıcı eklentilerini güncelle</string>
+    <string name="pref_force_plugin_update">Eklenti güncellemesini zorla</string>
+    <string name="pref_update_plugins_interval_sum">IITCm\'nin yeni eklenti sürümlerini araması için ne sıklıkta olması gerektiğini belirtin</string>
+    <string name="tab_browser">Intel</string>
+    <string name="pref_external_storage">Dilbilgisi dosyasını harici depolama birimine taşı</string>
+    <string name="pref_dex_desktop">Samsung DeX Modunu Destekle</string>
+    <string name="pref_dex_desktop_sum">DeX modu etkin olduğunda masaüstü modunu zorla</string>
+    <string name="pref_force_desktop">Masaüstü modunu zorla</string>
+    <string name="pref_user_zoom_sum">Çoklu dokunma yeteneğine sahip cihazlarda bile +/- düğmelerini gösterir.</string>
+    <string name="pref_fullscreen">Tam ekran modunu yapılandır</string>
+    <string name="pref_persistent_zoom_sum">Konum düğmesine basıldığında yakınlaştırma seviyesini değiştirmeyin</string>
+    <string name="pref_user_zoom">Yakınlaştırma kontrollerini göster</string>
+    <string name="pref_plugins_sum">Eklentiler, IITC deneyimini genişletir/değiştirir. Masaüstü IITC\'den bilinen çoğu eklenti burada bulunabilir.</string>
+    <string name="notice_sharing">&lt;p&gt;&lt;em&gt;Portalı Paylaş&lt;/em&gt; ile şunları yapabilirsiniz: &lt;p&gt; • portal bağlantısını diğer insanlara gönderin&lt;br&gt; • seçilen portalın konumunu başka bir uygulamada görüntüleyin&lt;br&gt; • portal bağlantısını bir web tarayıcısında açın&lt;br&gt; &lt;p&gt;İpucu: Google Haritalar (veya başka bir yüklenmiş navigasyon yazılımı) seçerek, seçilen porta hızlıca yönlenebilirsiniz. &lt;p&gt;Bu ipuçları aynı şekilde &lt;em&gt;kalıcı bağlantı&lt;/em&gt; için de geçerlidir.</string>
+    <string name="notice_extplugins">&lt;p&gt;İpucu: &lt;p&gt;IITC Mobile dış eklentileri de yükleyebilir! &lt;p&gt;Onları sağ üst köşedeki (+) simgesine tıklayarak ekleyin. Eklenti dosyalarının sonu \'.user.js\' ile bitmeli ve &lt;b&gt;%1$s&lt;/b&gt; klasörüne kopyalanmalıdır</string>
+    <string name="notice_info">&lt;p&gt;İpucu: Bilgi ekranını açmanın alternatif yolları: &lt;p&gt; • Bir portalı bir saniye boyunca dokunun ve basılı tutun&lt;br&gt; • Durum çubuğunun sol yarısına dokunun&lt;br&gt;</string>
+    <string name="pref_update_plugins_interval">Eklenti güncelleme aralığını yapılandır</string>
+    <string name="pref_user_location_show_position">Haritada kullanıcı konumunu göster</string>
+    <string name="pref_update_plugins_interval_disable">Devre dışı bırak</string>
 </resources>

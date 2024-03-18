@@ -146,4 +146,13 @@
     <string name="notice_sharing">&lt;p&gt;透過 &lt;em&gt;分享 portal&lt;/em&gt; 功能，您可以：&lt;p&gt; • 向其他人傳送 portal 連結&lt;br&gt; • 在其他 app 內查看 portal 的位置&lt;br&gt; • 在瀏覽器中開啟 portal 連結&lt;br&gt; &lt;p&gt;小提示：選取 Google 地圖（或其他導航軟體）即可快速導航至選取的 portal。&lt;p&gt;以上小提示同樣適用於 &lt;em&gt;永久連結&lt;/em&gt;。</string>
     <string name="tab_browser">Intel</string>
     <string name="file_browser_is_required">未能選取任何檔案。請安裝檔案瀏覽器！</string>
+    <string name="tab_prime">Ingress</string>
+    <string name="menu_plugins_add_url">透過網址新增插件</string>
+    <string name="update_notifications_channel_name">更新通知</string>
+    <string name="update_notifications_text">新版本%1$s已經釋出，點擊下載。</string>
+    <string name="update_notifications_title">新的IITC程式版本已經釋出</string>
+    <string name="update_notifications_action_hide_forever">永久隱藏</string>
+    <string name="pref_webview_zoom">字體大小</string>
+    <string name="pref_webview_zoom_defaultValue">系統預設</string>
+    <string name="pref_webview_zoom_sum">影響資訊面板、通訊、彈出視窗等的字體/文字大小…</string>
 </resources>
