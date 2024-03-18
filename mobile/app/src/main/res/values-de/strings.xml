@@ -169,4 +169,8 @@
     <string name="pref_webview_zoom">Schriftgröße</string>
     <string name="delete_plugin_question">Plugin \"%s\" löschen\?</string>
     <string name="pref_debug_info_sum">Informationen anzeigen, die für die Lösung von Problemen mit IITC Mobile wichtig sind</string>
+    <string name="update_notifications_channel_name">Aktualisierungsmeldungen</string>
+    <string name="pref_webview_zoom_defaultValue">Systemvoreinstellung</string>
+    <string name="pref_webview_zoom_sum">Beeinflusst die Schrift-/Textgröße im Infopanel, COMM, in Popup-Fenstern usw…</string>
+    <string name="update_notifications_text">Eine neue Version %1$s ist verfügbar. Zum Herunterladen antippen.</string>
 </resources>
