@@ -176,7 +176,7 @@ IITC.toolbox = {
     if (typeof buttonData.title === 'string') buttonElement.title = buttonData.title;
     if (typeof buttonData.class === 'string') buttonElement.className = buttonData.class;
     if (typeof buttonData.access_key === 'string') buttonElement.accessKey = buttonData.access_key;
-    if (typeof buttonData.mouseover === 'string') buttonElement.mouseover = buttonData.mouseover;
+    if (typeof buttonData.mouseover === 'function') buttonElement.onmouseover = buttonData.mouseover;
 
     if (typeof buttonData.icon === 'string') {
       const iconHTML = `&lt;i class="fa ${buttonData.icon}">&lt;/i>`;
