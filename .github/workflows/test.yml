@@ -1,0 +1,29 @@
+name: Tests
+'on':
+  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  test:
+    name: 'Node.js v18'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '18'
+      - name: 'Cache node_modules'
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-18-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-18-
+      - name: Install Dependencies
+        run: npm install
+      - name: Run All Node.js Tests
+        run: npm run test

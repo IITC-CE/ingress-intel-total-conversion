@@ -5,8 +5,13 @@
 // @description    Add a debug console tab
 
 /* exported setup, changelog --eslint */
+/* global L */
 
 var changelog = [
+  {
+    version: '0.2.0',
+    changes: ['Use channel new API', 'Handle multiline messages'],
+  },
   {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
@@ -18,41 +23,36 @@ var debugTab = {};
 // DEBUGGING TOOLS ///////////////////////////////////////////////////
 // meant to be used from browser debugger tools and the like.
 
-
-debugTab.renderDetails = function() {
-  debugTab.console.log('portals: ' + Object.keys(window.portals).length);
-  debugTab.console.log('links:   ' + Object.keys(window.links).length);
-  debugTab.console.log('fields:  ' + Object.keys(window.fields).length);
+debugTab.create = function () {
+  window.chat.addChannel({
+    id: 'debug',
+    name: 'Debug',
+    inputPrompt: 'debug:',
+    inputClass: 'debug',
+    sendMessage: function (_, msg) {
+      var result;
+      try {
+        result = eval('(' + msg + ')');
+      } catch (e) {
+        if (e.stack) {
+          console.error(e.stack);
+        }
+        throw e; // to trigger native error message
+      }
+      if (result !== undefined) {
+        console.log(result);
+      }
+    },
+  });
 };
 
-debugTab.printStackTrace = function() {
-  var e = new Error('dummy');
-  debugTab.console.error(e.stack);
-  return e.stack;
-};
-
-debugTab.console = {};
-debugTab.console.show = function() {
-  $('#chat, #chatinput').show();
-  $('#chatinput mark').css('cssText', 'color: #bbb !important').text('debug:');
-  $('#chat > div').hide();
-  $('#debugconsole').show();
-  $('#chatcontrols .active').removeClass('active');
-  $("#chatcontrols a:contains('debug')").addClass('active');
-};
-
-debugTab.console.renderLine = function(errorType, args) {
+debugTab.renderLine = function (errorType, args) {
   args = Array.prototype.slice.call(args);
-  var color = '#eee';
-  switch (errorType) {
-  case 'error':   color = '#FF424D'; break;
-  case 'warning': color = '#FFDE42'; break;
-  }
   var text = [];
   args.forEach(function (v) {
     if (typeof v !== 'string' && typeof v !== 'number') {
       var cache = [];
-      v = JSON.stringify(v, function(key, value) {
+      v = JSON.stringify(v, function (key, value) {
         if (typeof value === 'object' && value !== null) {
           if (cache.indexOf(value) !== -1) {
             // Circular reference found, discard key
@@ -68,29 +68,57 @@ debugTab.console.renderLine = function(errorType, args) {
     text.push(v);
   });
   text = text.join(' ');
+
+  // Time
+  var time = document.createElement('time');
   var d = new Date();
-  var ta = d.toLocaleTimeString(); // print line instead maybe?
-  var tb = d.toLocaleString();
-  var t = '<time title="'+tb+'" data-timestamp="'+d.getTime()+'">'+ta+'</time>';
-  var s = 'style="color:'+color+'"';
-  var l = '<tr><td>'+t+'</td><td><mark '+s+'>'+errorType+'</mark></td><td>'+text+'</td></tr>';
-  $('#debugconsole table').prepend(l);
+  time.textContent = d.toLocaleTimeString();
+  time.title = d.toLocaleString();
+  time.dataset.timestamp = d.getTime();
+
+  // Type
+  var type = document.createElement('mark');
+  type.textContent = errorType;
+  type.className = errorType;
+
+  // Text
+  var pre = document.createElement('pre');
+  pre.textContent = text;
+
+  // Check if the last message is visible
+  var debugContainer = document.getElementById('chatdebug');
+  var isAtBottom = debugContainer.scrollTop >= debugContainer.scrollTopMax;
+
+  // Insert Row
+  var table = document.querySelector('#chatdebug table');
+  var row = table.insertRow();
+  row.insertCell().append(time);
+  row.insertCell().append(type);
+  row.insertCell().append(pre);
+
+  // Auto-scroll to bottom
+  if (isAtBottom) debugContainer.scrollTo(0, debugContainer.scrollTopMax);
 };
 
-debugTab.console.log = function() {
-  debugTab.console.renderLine('notice', arguments);
+debugTab.console = {};
+debugTab.console.log = function () {
+  debugTab.renderLine('notice', arguments);
 };
 
-debugTab.console.warn = function() {
-  debugTab.console.renderLine('warning', arguments);
+debugTab.console.warn = function () {
+  debugTab.renderLine('warning', arguments);
 };
 
-debugTab.console.error = function() {
-  debugTab.console.renderLine('error', arguments);
+debugTab.console.error = function () {
+  debugTab.renderLine('error', arguments);
 };
 
-debugTab.console.debug = function() {
-  debugTab.console.renderLine('debug', arguments);
+debugTab.console.debug = function () {
+  debugTab.renderLine('debug', arguments);
+};
+
+debugTab.console.info = function () {
+  debugTab.renderLine('info', arguments);
 };
 
 function overwriteNative() {
@@ -98,7 +126,7 @@ function overwriteNative() {
   window.console = L.extend({}, window.console);
 
   function overwrite(which) {
-    window.console[which] = function() {
+    window.console[which] = function () {
       if (nativeConsole) {
         nativeConsole[which].apply(nativeConsole, arguments);
       }
@@ -110,77 +138,41 @@ function overwriteNative() {
   overwrite('warn');
   overwrite('error');
   overwrite('debug');
+  overwrite('info');
 }
 
-function setupPosting() {
-  if (!window.isSmartphone()) {
-    $('#chatinput input').keydown(function(event) {
-      var kc = event.keyCode ? event.keyCode : event.which;
-      if (kc === 13) { // enter
-        if ($('#chatcontrols .active').text() === 'debug') {
-          event.preventDefault();
-          userInput();
-        }
-      }
-    });
-  }
+// Old API utils
+debugTab.renderDetails = function () {
+  debugTab.console.log('portals: ' + Object.keys(window.portals).length);
+  debugTab.console.log('links:   ' + Object.keys(window.links).length);
+  debugTab.console.log('fields:  ' + Object.keys(window.fields).length);
+};
 
-  $('#chatinput').submit(function(event) {
-    event.preventDefault();
-    userInput();
-  });
-}
+debugTab.printStackTrace = function () {
+  var e = new Error('dummy');
+  debugTab.console.error(e.stack);
+  return e.stack;
+};
 
-function userInput() {
-  if ($('#chatcontrols .active').text() !== 'debug') {return;}
-
-  var msg = $.trim($('#chatinput input').val());
-  if (!msg) { return; }
-
-  var result;
-  try {
-    result = eval(msg);
-  } catch (e) {
-    if (e.stack) { debugTab.console.error(e.stack); }
-    throw e; // to trigger native error message
-  }
-  if (result !== undefined) {
-    debugTab.console.log(result.toString());
-  }
-}
-
-
-function create() {
-  if ($('#debugconsole').length) return;
-  $('#chatcontrols').append('<a>debug</a>');
-  $('#chatcontrols a:last').click(debugTab.console.show);
-  $('#chat').append('<div style="display: none" id="debugconsole"><table></table></div>');
-
-  setupPosting();
-
-  if (window.useAndroidPanes()) {
-    android.addPane('debug', 'Debug', 'ic_action_view_as_list');
-    window.addHook('paneChanged', function (id) {
-      if (id === 'debug') {
-        debugTab.console.show();
-      }
-    });
-  }
-}
+debugTab.show = function () {
+  window.chat.show('debug');
+};
 
 function setup() {
   window.plugin.debug = debugTab;
-  create();
+  debugTab.create();
   overwriteNative();
+
+  $('<style>').prop('type', 'text/css').text('@include_string:debug-console.css@').appendTo('head');
 
   // emulate old API
   window.debug = function () {};
   window.debug.renderDetails = debugTab.renderDetails;
   window.debug.printStackTrace = debugTab.printStackTrace;
   window.debug.console = function () {};
-  window.debug.console.show = debugTab.console.show;
+  window.debug.console.show = debugTab.show;
   window.debug.console.renderLine = function (text, errorType) {
-    return debugTab.console.renderLine(errorType, [text]);
+    return debugTab.renderLine(errorType, [text]);
   };
   window.debug.console.log = debugTab.console.log;
   window.debug.console.warn = debugTab.console.warn;
@@ -188,4 +180,3 @@ function setup() {
 }
 
 setup.priority = 'boot';
-

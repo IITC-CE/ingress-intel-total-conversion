@@ -120,13 +120,19 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // remove complete page. We only wanted the user-data and the page’s
 // security context so we can access the API easily. Setup as much as
 // possible without requiring scripts.
-document.head.innerHTML = ''
-  + '<title>Ingress Intel Map</title>'
-  + '<style>'+'@include_string:style.css@'+'</style>'
-  + '<style>'+'@include_css:external/leaflet.css@'+'</style>'
-  + '<style>'+'@include_css:external/jquery-ui-1.12.1-resizable.css@'+'</style>'
+document.head.innerHTML =
+  '<title>Ingress Intel Map</title>' +
+  '<style>' +
+  '@include_string:style.css@' +
+  '</style>' +
+  '<style>' +
+  '@include_css:external/leaflet.css@' +
+  '</style>' +
+  '<style>' +
+  '@include_css:external/jquery-ui-1.12.1-resizable.css@' +
+  '</style>' +
 //note: smartphone.css injection moved into code/smartphone.js
-  + '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
+  '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
 // remove body element entirely to remove event listeners
 document.body = document.createElement('body');
@@ -134,15 +140,8 @@ document.body.innerHTML =
   '<div id="map">Loading, please wait</div>' +
   '<div id="chatcontrols" style="display:none">' +
   '<a accesskey="0" title="[0]"><span class="toggle"></span></a>' +
-  '<a accesskey="1" title="[1]">all</a>' +
-  '<a accesskey="2" title="[2]" class="active">faction</a>' +
-  '<a accesskey="3" title="[3]">alerts</a>' +
   '</div>' +
-  '<div id="chat" style="display:none">' +
-  '  <div id="chatfaction"></div>' +
-  '  <div id="chatall"></div>' +
-  '  <div id="chatalerts"></div>' +
-  '</div>' +
+  '<div id="chat" style="display:none"></div>' +
   '<form id="chatinput" style="display:none"><table><tr>' +
   '  <td><time></time></td>' +
   '  <td><mark>tell faction:</mark></td>' +
