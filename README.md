@@ -37,7 +37,7 @@ Install IITC: https://iitc.app/
 
 ## Developers
 
-- See [Contribution Guidelines](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/CONTRIBUTING)
+- See [Contribution Guidelines](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/Contributing-to-IITC%E2%80%90CE)
 - and [Quickstart](https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/HACKING).
 
 
