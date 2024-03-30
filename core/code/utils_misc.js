@@ -529,7 +529,7 @@ window.makePermalink = function (latlng, options) {
   if (options.fullURL) {
     url += new URL(document.baseURI).origin;
   }
-  url += '/';
+  url += '/intel';
   return url + '?' + args.join('&');
 };
 
