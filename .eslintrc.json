@@ -6,15 +6,8 @@
         "greasemonkey": true
     },
     "extends": [
-        "eslint:recommended",
-        "plugin:prettier/recommended",
-        "prettier"
+        "eslint:recommended"
     ],
-    "ignorePatterns": [
-        "/core/external/*.js",
-        "/plugins/external/*.js"
-    ],
-    "plugins": ["prettier"],
     "rules": {
         "eqeqeq": "error",
         "spaced-comment": "error",

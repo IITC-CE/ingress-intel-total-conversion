@@ -743,7 +743,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
     const folders = window.plugin.bookmarks.bkmrksObj['portals'];
     const idsInUse = new Set();
 
-    const counts = {'skip': 0, 'add': 0, 'delete': 0};
+    const counts = {skip: 0, add: 0, delete: 0};
     let total = 0;
 
     // Find existing ids in use so we don't accidentally reuse them.
@@ -773,7 +773,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
           case 'skip':
             break;
 
-          case 'add':
+          case 'add': {
             const label = portal.options.data.title;
             const ll = portal.getLatLng();
             const latlng = `${ll.lat},${ll.lng}`;
@@ -787,11 +787,12 @@ window.plugin.bookmarks.loadStorageBox = function() {
             idsInUse.add(ID);
 
             window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {
-              'guid': guid,
-              'latlng': latlng,
-              'label': label,
+              guid: guid,
+              latlng: latlng,
+              label: label,
             };
             break;
+          }
 
           case 'delete':
             delete folders[bkmrkData['id_folder']]['bkmrk'][bkmrkData['id_bookmark']];
@@ -805,7 +806,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
       window.plugin.bookmarks.refreshBkmrks();
       window.plugin.bookmarks.updateStarPortal();
       window.runHooks('pluginBkmrksEdit',
-                      {'target': 'all', 'action': 'import'});
+                      {target: 'all', action: 'import'});
       console.log('BOOKMARKS:', total, counts);
     }
   }
