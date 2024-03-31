@@ -741,18 +741,10 @@ window.plugin.bookmarks.loadStorageBox = function() {
     console.log('BOOKMARKS: visible ' + command);
     const displayBounds = map.getBounds();
     const folders = window.plugin.bookmarks.bkmrksObj['portals'];
-    const idsInUse = new Set();
 
     const counts = {skip: 0, add: 0, delete: 0};
     let total = 0;
 
-    // Find existing ids in use so we don't accidentally reuse them.
-    for (const idFolders of Object.keys(folders)) {
-      idsInUse.add(idFolders);
-      for (const idBkmrk of Object.keys(folders[idFolders]['bkmrk'])) {
-        idsInUse.add(idBkmrk);
-      }
-    }
     for (const [guid, portal] of Object.entries(portals)) {
       // The check for _map restricts to portals actually shown currently
       if (displayBounds.contains(portal.getLatLng()) && portal._map) {
@@ -778,13 +770,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
             const ll = portal.getLatLng();
             const latlng = `${ll.lat},${ll.lng}`;
 
-            // Even with random numbers, generateID() can collide
             let ID = window.plugin.bookmarks.generateID();
-            while (idsInUse.has(ID)) {
-              console.log('BOOKMARKS: id collision: ' + ID);
-              ID = window.plugin.bookmarks.generateID();
-            }
-            idsInUse.add(ID);
 
             window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {
               guid: guid,
