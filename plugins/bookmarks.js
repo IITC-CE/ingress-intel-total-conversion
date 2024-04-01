@@ -374,6 +374,58 @@ window.plugin.bookmarks.loadStorageBox = function() {
     }
   }
 
+  /**
+   * Adds a portal to the default bookmark folder.
+   *
+   * @param {L.circleMarker} marker - As enhanced when added to
+   * window.portals.
+   * @param {boolean} doPostProcess - Whether additional post processing
+   * should be done after the bookmark was added.  E.g., saving to local
+   * storage, refreshing the widget, and running hooks.  If part of a batch
+   * update, this should probably be false.
+   */
+  window.plugin.bookmarks.addPortalBookmarkByMarker = function(marker, doPostProcess) {
+    const guid = marker.options.guid;
+    const label = marker.options.data.title;
+    const ll = marker.getLatLng();
+    const latlng = `${ll.lat},${ll.lng}`;
+    const ID = window.plugin.bookmarks.generateID();
+
+    window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {
+      guid: guid,
+      latlng: latlng,
+      label: label,
+    };
+
+    if (doPostProcess) {
+      window.plugin.bookmarks.saveStorage();
+      window.plugin.bookmarks.refreshBkmrks();
+      window.runHooks('pluginBkmrksEdit', {
+        target: 'portal',
+        action: 'add',
+        id: ID,
+        guid: guid,
+      });
+      console.log(`BOOKMARKS: added portal ${ID}`);
+    }
+  }
+
+  /**
+   * Adds a portal to the default bookmark folder.
+   *
+   * @param {string} guid - The GUID of the portal.
+   * @param {boolean} doPostProcess - Whether additional post processing
+   * should be done after the bookmark was added.  E.g., saving to local
+   * storage, refreshing the widget, and running hooks.  If part of a batch
+   * update, this should probably be false.
+   */
+  window.plugin.bookmarks.addPortalBookmarkByGuid = function(guid, doPostProcess) {
+    const marker = window.portals[guid];
+    if (marker) {
+      window.plugin.bookmarks.addPortalBookmarkByMarker(marker, doPostProcess);
+    }
+  }
+
   plugin.bookmarks.addPortalBookmark = function(guid, latlng, label) {
     var ID = window.plugin.bookmarks.generateID();
 
