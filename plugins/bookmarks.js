@@ -787,13 +787,13 @@ window.plugin.bookmarks.loadStorageBox = function() {
       }
     }
 
-    if (total) {
+    if (counts.add || counts.delete) {
       window.plugin.bookmarks.saveStorage();
       window.plugin.bookmarks.refreshBkmrks();
       window.runHooks('pluginBkmrksEdit',
                       {target: 'all', action: 'import'});
-      console.log('BOOKMARKS:', total, counts);
     }
+    console.log('BOOKMARKS:', total, counts);
   }
 
   window.plugin.bookmarks.dialogLoadListFolders = function(idBox, clickAction, showOthersF, scanType/*0 = maps&portals; 1 = maps; 2 = portals*/) {
