@@ -797,44 +797,19 @@ window.plugin.bookmarks.loadStorageBox = function() {
     const counts = {skip: 0, add: 0, delete: 0};
     let visible = 0;
 
-    for (const [guid, portal] of Object.entries(portals)) {
+    for (const [guid, marker] of Object.entries(portals)) {
       // The check for _map restricts to portals actually shown currently
       if (displayBounds.contains(portal.getLatLng()) && portal._map) {
         visible += 1;
 
-        // First, figure out what to do with the portal.
-        let op = 'skip';
         const bkmrkData = window.plugin.bookmarks.findByGuid(guid);
         if (bkmrkData && ['off', 'toggle'].includes(command)) {
-          op = 'delete';
+          delete folders[bkmrkData['id_folder']]['bkmrk'][bkmrkData['id_bookmark']];    counts.delete += 1;
         } else if (!bkmrkData && ['on', 'toggle'].includes(command)) {
-          op = 'add';
-        }
-        counts[op]++;
-
-        // Then do it.
-        switch (op) {
-          case 'skip':
-            break;
-
-          case 'add': {
-            const label = portal.options.data.title;
-            const ll = portal.getLatLng();
-            const latlng = `${ll.lat},${ll.lng}`;
-
-            let ID = window.plugin.bookmarks.generateID();
-
-            window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {
-              guid: guid,
-              latlng: latlng,
-              label: label,
-            };
-            break;
-          }
-
-          case 'delete':
-            delete folders[bkmrkData['id_folder']]['bkmrk'][bkmrkData['id_bookmark']];
-            break;
+          window.plugin.bookmarks.addPortalBookmarkByMarker(marker, false);
+          counts.add += 1;
+        } else {
+          counts.skip += 1;
         }
       }
     }
