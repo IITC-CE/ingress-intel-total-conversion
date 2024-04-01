@@ -790,7 +790,6 @@ window.plugin.bookmarks.loadStorageBox = function() {
     if (total) {
       window.plugin.bookmarks.saveStorage();
       window.plugin.bookmarks.refreshBkmrks();
-      window.plugin.bookmarks.updateStarPortal();
       window.runHooks('pluginBkmrksEdit',
                       {target: 'all', action: 'import'});
       console.log('BOOKMARKS:', total, counts);
