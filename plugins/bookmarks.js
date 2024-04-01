@@ -799,7 +799,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
 
     for (const [guid, marker] of Object.entries(portals)) {
       // The check for _map restricts to portals actually shown currently
-      if (displayBounds.contains(portal.getLatLng()) && portal._map) {
+      if (displayBounds.contains(marker.getLatLng()) && marker._map) {
         visible += 1;
 
         const bkmrkData = window.plugin.bookmarks.findByGuid(guid);
