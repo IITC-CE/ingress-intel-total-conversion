@@ -743,12 +743,12 @@ window.plugin.bookmarks.loadStorageBox = function() {
     const folders = window.plugin.bookmarks.bkmrksObj['portals'];
 
     const counts = {skip: 0, add: 0, delete: 0};
-    let total = 0;
+    let visible = 0;
 
     for (const [guid, portal] of Object.entries(portals)) {
       // The check for _map restricts to portals actually shown currently
       if (displayBounds.contains(portal.getLatLng()) && portal._map) {
-        total += 1;
+        visible += 1;
 
         // First, figure out what to do with the portal.
         let op = 'skip';
@@ -793,7 +793,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
       window.runHooks('pluginBkmrksEdit',
                       {target: 'all', action: 'import'});
     }
-    console.log('BOOKMARKS:', total, counts);
+    console.log('BOOKMARKS:', `visible: ${visible}`, 'summary:', counts);
   }
 
   window.plugin.bookmarks.dialogLoadListFolders = function(idBox, clickAction, showOthersF, scanType/*0 = maps&portals; 1 = maps; 2 = portals*/) {
