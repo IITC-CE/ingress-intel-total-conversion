@@ -791,13 +791,13 @@ window.plugin.bookmarks.loadStorageBox = function() {
     // per portal basis.  Instead, it uses the same one ran when bookmarks are
     // imported.
     console.log('BOOKMARKS: visible ' + command);
-    const displayBounds = map.getBounds();
+    const displayBounds = window.map.getBounds();
     const folders = window.plugin.bookmarks.bkmrksObj['portals'];
 
     const counts = {skip: 0, add: 0, delete: 0};
     let visible = 0;
 
-    for (const [guid, marker] of Object.entries(portals)) {
+    for (const [guid, marker] of Object.entries(window.portals)) {
       // The check for _map restricts to portals actually shown currently
       if (displayBounds.contains(marker.getLatLng()) && marker._map) {
         visible += 1;
