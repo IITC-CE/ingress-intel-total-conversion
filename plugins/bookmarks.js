@@ -367,10 +367,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
     }
     // If portal isn't saved in bookmarks: Add this bookmark
     else{
-      // Get portal name and coordinates
-      var p = window.portals[guid];
-      var ll = p.getLatLng();
-      plugin.bookmarks.addPortalBookmark(guid, ll.lat+','+ll.lng, p.options.data.title);
+      window.plugin.bookmarks.addPortalBookmarkByGuid(guid, true);
     }
   }
 
@@ -1239,8 +1236,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
           if(window.plugin.bookmarks.findByGuid(guid)) {
             window.plugin.bookmarks.switchStarPortal(guid);
           } else {
-            var ll = portal.getLatLng();
-            plugin.bookmarks.addPortalBookmark(guid, ll.lat+','+ll.lng, portal.options.data.title);
+            window.plugin.bookmarks.addPortalBookmarkByGuid(guid, true);
           }
         }, false);
 
