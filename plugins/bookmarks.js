@@ -423,6 +423,19 @@ window.plugin.bookmarks.loadStorageBox = function() {
     }
   }
 
+  /**
+   * Adds a portal to the default bookmark folder.
+   *
+   * The window.plugin.bookmarks.addPortalBookmarkBy{Guid,Marker}() functions
+   * should be used for new code.
+   *
+   * @deprecated
+   * @param {string} guid - The GUID of the portal.
+   * @param {string} latlng - 'lat,lng' for the portal.
+   * @param {string} label - The title of the portal.  Typically this is the
+   * same value as the options.data.title property from the appropriate
+   * window.portals entry, though nothing enforces this.
+   */
   plugin.bookmarks.addPortalBookmark = function(guid, latlng, label) {
     var ID = window.plugin.bookmarks.generateID();
 
