@@ -28,7 +28,7 @@ var changelog = [
 ********************************************************************** */
 
   // use own namespace for plugin
-  window.plugin.bookmarks = function() {};  // No-op change.
+  window.plugin.bookmarks = function() {};  // No-op change
 
   window.plugin.bookmarks.SYNC_DELAY = 5000;
 
