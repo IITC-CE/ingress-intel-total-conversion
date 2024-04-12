@@ -50,7 +50,7 @@ def exec_gradle(source, dist_ext):
     elif dist_ext == 'aab':
         build_folder_name = 'bundle'
         build_action = build_folder_name + buildtype.capitalize()
-        build_file_name = 'app.' + dist_ext
+        build_file_name = f'app-{buildtype}.{dist_ext}'
     else:
         raise UserWarning(f'Unknown value in gradle_distributiontypes: {dist_ext}')
 
