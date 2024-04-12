@@ -16,16 +16,13 @@ def getVersionCodeTimeStamps = { ->
     return Integer.parseInt(unixtime)
 }
 
-def metaFDroid(outputFileName) {
-    new File(outputFileName, "version_fdroid.txt").text = [
-            ["versionName", android.defaultConfig.versionName].join("="),
-            ["versionCode", android.defaultConfig.versionCode].join("="),
-    ].join("\n")
+def metaFDroid(File apkDir, variant) {
+    File outputFile = new File(apkDir, "version_fdroid.txt")
+    outputFile.text = """versionName=${variant.versionName}\nversionCode=${variant.versionCode}"""
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion = '29.0.3'
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "org.exarhteam.iitc_mobile"
@@ -88,12 +85,13 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+    namespace 'org.exarhteam.iitc_mobile'
 
     applicationVariants.all { variant ->
-        variant.resValue  "string", "application_id", variant.applicationId
         variant.getAssembleProvider().configure() {
             it.doLast {
-                metaFDroid(variant.getPackageApplicationProvider().get().outputDirectory)
+                File buildDir = variant.outputs.first().outputFile.parentFile
+                metaFDroid(buildDir, variant)
             }
         }
     }
@@ -102,7 +100,7 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'com.github.AppIntro:AppIntro:6.0.0'
+    implementation 'com.github.AppIntro:AppIntro:6.3.1'
     implementation 'com.akexorcist:localization:1.2.5'
     implementation 'org.apache.commons:commons-text:1.8'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
