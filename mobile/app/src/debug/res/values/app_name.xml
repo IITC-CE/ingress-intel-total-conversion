@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">IITC Mobile Test</string>
+    <string name="application_id" translatable="false">org.exarhteam.iitc_mobile.debug</string>
 </resources>

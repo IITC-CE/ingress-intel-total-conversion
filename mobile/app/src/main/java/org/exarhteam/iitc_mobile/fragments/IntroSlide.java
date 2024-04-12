@@ -17,7 +17,7 @@ public class IntroSlide extends Fragment {
     private static final String ARG_LAYOUT_RES_ID = "layoutResId";
     private int layoutResId;
 
-    public static IntroSlide newInstance(int layoutResId) {
+    public static IntroSlide createInstance(int layoutResId) {
         IntroSlide IntroSlide = new IntroSlide();
 
         Bundle args = new Bundle();
