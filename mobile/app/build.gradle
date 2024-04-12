@@ -23,7 +23,6 @@ def metaFDroid(File apkDir, variant) {
 
 android {
     compileSdkVersion 33
-    buildToolsVersion = '29.0.3'
 
     defaultConfig {
         applicationId "org.exarhteam.iitc_mobile"
@@ -86,6 +85,7 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+    namespace 'org.exarhteam.iitc_mobile'
 
     applicationVariants.all { variant ->
         variant.getAssembleProvider().configure() {
