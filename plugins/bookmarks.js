@@ -1249,7 +1249,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
           if(window.plugin.bookmarks.findByGuid(guid)) {
             window.plugin.bookmarks.switchStarPortal(guid);
           } else {
-            window.plugin.bookmarks.addPortalBookmarkByGuid(guid, true);
+            window.plugin.bookmarks.addPortalBookmarkByMarker(portal, true);
           }
         }, false);
 
