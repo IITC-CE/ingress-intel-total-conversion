@@ -415,11 +415,14 @@ window.plugin.bookmarks.loadStorageBox = function() {
    * should be done after the bookmark was added.  E.g., saving to local
    * storage, refreshing the widget, and running hooks.  If part of a batch
    * update, this should probably be false.
+   * @throws {Error} - If guid does not exist in window.portals.
    */
   window.plugin.bookmarks.addPortalBookmarkByGuid = function(guid, doPostProcess) {
     const marker = window.portals[guid];
     if (marker) {
       window.plugin.bookmarks.addPortalBookmarkByMarker(marker, doPostProcess);
+    } else {
+      throw new Error(`Could not find portal information for guid "${guid}"`);
     }
   }
 
