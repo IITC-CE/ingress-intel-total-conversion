@@ -367,24 +367,89 @@ window.plugin.bookmarks.loadStorageBox = function() {
     }
     // If portal isn't saved in bookmarks: Add this bookmark
     else{
-      // Get portal name and coordinates
-      var p = window.portals[guid];
-      var ll = p.getLatLng();
-      plugin.bookmarks.addPortalBookmark(guid, ll.lat+','+ll.lng, p.options.data.title);
+    window.plugin.bookmarks.addPortalBookmarkByGuid(guid, true);
     }
   }
 
-  plugin.bookmarks.addPortalBookmark = function(guid, latlng, label) {
-    var ID = window.plugin.bookmarks.generateID();
+/**
+ * Adds a portal to the default bookmark folder.
+ *
+ * @param {L.circleMarker} marker - As enhanced when added to
+ * window.portals.
+ * @param {boolean} doPostProcess - Whether additional post-processing
+ * should be done after the bookmark was added.  E.g., saving to local
+ * storage, refreshing the widget, and running hooks.  If part of a batch
+ * update, this should probably be false.
+ */
+window.plugin.bookmarks.addPortalBookmarkByMarker = function (marker, doPostProcess) {
+  const guid = marker.options.guid;
+  const label = marker.options.data.title;
+  const ll = marker.getLatLng();
+  const latlng = `${ll.lat},${ll.lng}`;
+  const ID = window.plugin.bookmarks.generateID();
 
-    // Add bookmark in the localStorage
-    window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {"guid":guid,"latlng":latlng,"label":label};
+  window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {
+    guid: guid,
+    latlng: latlng,
+    label: label,
+  };
 
+  if (doPostProcess) {
     window.plugin.bookmarks.saveStorage();
     window.plugin.bookmarks.refreshBkmrks();
-    window.runHooks('pluginBkmrksEdit', {"target": "portal", "action": "add", "id": ID, "guid": guid});
-    console.log('BOOKMARKS: added portal '+ID);
+    window.runHooks('pluginBkmrksEdit', {
+      target: 'portal',
+      action: 'add',
+      id: ID,
+      guid: guid,
+    });
+    console.log(`BOOKMARKS: added portal ${ID}`);
   }
+};
+
+/**
+ * Adds a portal to the default bookmark folder.
+ *
+ * @param {string} guid - The GUID of the portal.
+ * @param {boolean} doPostProcess - Whether additional post processing
+ * should be done after the bookmark was added.  E.g., saving to local
+ * storage, refreshing the widget, and running hooks.  If part of a batch
+ * update, this should probably be false.
+ * @throws {Error} - If guid does not exist in window.portals.
+ */
+window.plugin.bookmarks.addPortalBookmarkByGuid = function (guid, doPostProcess) {
+  const marker = window.portals[guid];
+  if (marker) {
+    window.plugin.bookmarks.addPortalBookmarkByMarker(marker, doPostProcess);
+  } else {
+    throw new Error(`Could not find portal information for guid "${guid}"`);
+  }
+};
+
+/**
+ * Adds a portal to the default bookmark folder.
+ *
+ * The window.plugin.bookmarks.addPortalBookmarkBy{Guid,Marker}() functions
+ * should be used for new code.
+ *
+ * @deprecated
+ * @param {string} guid - The GUID of the portal.
+ * @param {string} latlng - 'lat,lng' for the portal.
+ * @param {string} label - The title of the portal.  Typically this is the
+ * same value as the options.data.title property from the appropriate
+ * window.portals entry, though nothing enforces this.
+ */
+window.plugin.bookmarks.addPortalBookmark = function (guid, latlng, label) {
+  var ID = window.plugin.bookmarks.generateID();
+
+  // Add bookmark in the localStorage
+  window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = { guid: guid, latlng: latlng, label: label };
+
+  window.plugin.bookmarks.saveStorage();
+  window.plugin.bookmarks.refreshBkmrks();
+  window.runHooks('pluginBkmrksEdit', { target: 'portal', action: 'add', id: ID, guid: guid });
+  console.log('BOOKMARKS: added portal ' + ID);
+};
 
   // Add BOOKMARK/FOLDER
   window.plugin.bookmarks.addElement = function(elem, type) {
@@ -1187,8 +1252,7 @@ window.plugin.bookmarks.loadStorageBox = function() {
           if(window.plugin.bookmarks.findByGuid(guid)) {
             window.plugin.bookmarks.switchStarPortal(guid);
           } else {
-            var ll = portal.getLatLng();
-            plugin.bookmarks.addPortalBookmark(guid, ll.lat+','+ll.lng, portal.options.data.title);
+              window.plugin.bookmarks.addPortalBookmarkByMarker(portal, true);
           }
         }, false);
 
