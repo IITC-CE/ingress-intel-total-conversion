@@ -43,6 +43,8 @@ window.artifact.setup = function() {
     title: 'Show artifact portal list',
     action: window.artifact.showArtifactList,
   });
+
+  window.addHook('mapDataEntityInject', window.artifact.entityInject);
 }
 
 /**
@@ -201,11 +203,21 @@ window.artifact.isArtifact = function(type) {
 /**
  * Used to render portals that would otherwise be below the visible level.
  * @function window.artifact.getArtifactEntities
- * @returns {Array} An array of artifact entities.
+ * @returns {Array} array of Portal entities with shards or shard targets
+ *
+ * unused by IITC
  */
-window.artifact.getArtifactEntities = function() {
+window.artifact.getArtifactEntities = function () {
   return artifact.entities;
 }
+
+/**
+ * Inject artifact portals into render process
+ * @param {hookdata} data
+ */
+window.artifact.entityInject = function (data) {
+  data.callback(window.artifact.entities, 'summary');
+};
 
 /**
  * Gets the portals that are relevant to the artifacts.
@@ -232,8 +244,10 @@ window.artifact.isInterestingPortal = function(guid) {
  * @param {string} guid - The GUID of the portal.
  * @param {string} artifactId - The ID of the artifact type.
  * @returns {Object|false} Artifact data for the specified portal and type, or undefined if not available.
+ *
+ * unused by IITC
  */
-window.artifact.getPortalData = function(guid,artifactId) {
+window.artifact.getPortalData = function (guid, artifactId) {
   return artifact.portalInfo[guid] && artifact.portalInfo[guid][artifactId];
 }
 
