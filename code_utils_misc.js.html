@@ -583,11 +583,13 @@ window.makePermalink = function (latlng, options) {
   return url + '?' + args.join('&amp;');
 };
 
-Object.defineProperty(String.prototype, 'capitalize', {
-  value: function() {
-    return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
-  }
-});
+if (!String.prototype.capitalize) {
+  Object.defineProperty(String.prototype, 'capitalize', {
+    value: function () {
+      return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+    },
+  });
+}
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith#polyfill
 if (!String.prototype.startsWith) {
