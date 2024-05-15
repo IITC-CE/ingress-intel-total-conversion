@@ -323,6 +323,15 @@ em {
   height: 100%;
 }
 
+#chatinput.public mark,
+#chatinput.public input {
+  color: #f66;
+}
+
+#chatinput.alerts mark {
+  color: #bbb;
+}
+
 #chat td, #chatinput td {
   font-size: 13px;
   vertical-align: top;

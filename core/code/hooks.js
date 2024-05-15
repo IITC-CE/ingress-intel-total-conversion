@@ -31,9 +31,10 @@
  * - `fieldRemoved`: Triggered when a field has been removed.
  * - `portalDetailsUpdated`: Fired after the details in the sidebar have been (re-)rendered.
  *                           Provides data about the selected portal.
- * - `publicChatDataAvailable`: Runs after data for any of the public chats has been received and processed,
- *                              but not yet displayed. Contains both the unprocessed raw AJAX response
- *                              and the processed chat data that is going to be used for display.
+ * - `commDataAvailable`: Runs after data for any of the chats has been received and processed, but not yet
+ *                        been displayed. The data hash contains both the unprocessed raw ajax response as
+ *                        well as the chat data that is going to be used for display.
+ * - `publicChatDataAvailable`: Similar to `chatDataAvailable`, but for all chat only.
  * - `factionChatDataAvailable`: Similar to `publicChatDataAvailable`, but for faction chat.
  * - `alertsChatDataAvailable`: Similar to `publicChatDataAvailable`, but for alerts chat.
  * - `requestFinished`: **Deprecated**. Recommended to use `mapDataRefreshEnd` instead.
