@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Module: portal_info | IITC-CE</title>
+    <title>Namespace: chat | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,9 +48,7 @@
 
 <header>
     
-        <h2>portal_info</h2>
-        
-            
+        <h2>chat</h2>
         
     
 </header>
@@ -60,41 +58,10 @@
         <div class="container-overview">
         
             
-                <div class="description"><p>This file contains functions that handle the extraction and computation of raw data
-from portal details for various purposes.</p></div>
+                <div class="description"><p>Namespace for chat-related functionalities.</p></div>
             
 
             
-                
-
-<dt>
-    
-</dt>
-<dd>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
 
 <dl class="details">
@@ -130,10 +97,6 @@ from portal details for various purposes.</p></div>
     
 </dl>
 
-
-    
-
-</dd>
 
             
         
@@ -153,6 +116,89 @@ from portal details for various purposes.</p></div>
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".channels">
+    <span class="type-signature"><span class="icon green">static</span> </span>channels<span class="type-signature"> :Array.&lt;<a href="chat.html#.ChannelDescription">chat.ChannelDescription</a>></span>
+    
+    <div class="container-source members">
+        <code><a href="code_chat.js.html">code/chat.js</a></code>,
+        <code><a href="code_chat.js.html#line97">line 97</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Holds channels infos.</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;<a href="chat.html#.ChannelDescription">chat.ChannelDescription</a>></span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -162,14 +208,14 @@ from portal details for various purposes.</p></div>
 
 <dt>
     
-        <h4 class="name" id="~fixPortalImageUrl">
+        <h4 class="name" id=".addChannel">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>fixPortalImageUrl<span class="signature">(url)</span><span class="type-signature"> &rarr; {string}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>addChannel<span class="signature">(channelDesc)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line178">line 178</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line360">line 360</a></code>
             </div>
             
         </h4>
@@ -181,7 +227,8 @@ from portal details for various purposes.</p></div>
 
     
     <div class="description">
-        <p>Corrects the portal image URL to match the current protocol (http/https).</p>
+        <p>Add to the channel list a new channel description</p>
+<p>If tabs are already created, a tab is created for this channel as well</p>
     </div>
     
 
@@ -217,7 +264,146 @@ from portal details for various purposes.</p></div>
 
         <tr>
             
-                <td class="name"><code>url</code></td>
+                <td class="name"><code>channelDesc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="chat.html#.ChannelDescription">chat.ChannelDescription</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>channel description</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".addNickname">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>addNickname<span class="signature">(nick)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line13">line 13</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds a nickname to the chat input.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>nick</code></td>
             
 
             <td class="type">
@@ -233,7 +419,7 @@ from portal details for various purposes.</p></div>
 
             
 
-            <td class="description last"><p>The original image URL.</p></td>
+            <td class="description last"><p>The nickname to add.</p></td>
         </tr>
 
     
@@ -241,6 +427,702 @@ from portal details for various purposes.</p></div>
 </table>
 
     </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".backgroundChannelData">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>backgroundChannelData<span class="signature">(instance, channel, flag)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line124">line 124</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Allows plugins to request and monitor COMM data streams in the background. This is useful for plugins
+that need to process COMM data even when the user is not actively viewing the COMM channels.
+It tracks the requested channels for each plugin instance and updates the global state accordingly.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>instance</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A unique identifier for the plugin or instance requesting background COMM data.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>channel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the COMM channel ('all', 'faction', or 'alerts').</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>flag</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Set to true to request data for the specified channel, false to stop requesting.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chooser">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chooser<span class="signature">(event)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line283">line 283</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Chat tab chooser handler.
+This function is triggered by a click event on the chat tab. It reads the tab name from the event target
+and activates the corresponding chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The event triggered by clicking a chat tab.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chooseTab">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chooseTab<span class="signature">(tab)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line189">line 189</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Chooses and activates a specified chat tab.
+Also triggers an early refresh of the chat data when switching tabs.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tab</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the chat tab to activate ('all', 'faction', or 'alerts').</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".createChannelTab">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>createChannelTab<span class="signature">(channelDesc)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line325">line 325</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Create and insert into the DOM/Mobile app the channel tab</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>channelDesc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="chat.html#.ChannelDescription">chat.ChannelDescription</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>channel description</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getActive">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getActive<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line99">line 99</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Gets the name of the active chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
     
 
     
@@ -267,7 +1149,7 @@ from portal details for various purposes.</p></div>
 
 
 
-- <p>The corrected image URL.</p>
+- <p>The name of the active chat tab.</p>
 
 
 
@@ -322,14 +1204,14 @@ from portal details for various purposes.</p></div>
 
 <dt>
     
-        <h4 class="name" id="~getAttackApGain">
+        <h4 class="name" id=".getChannelDesc">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>getAttackApGain<span class="signature">(d, fieldCount, linkCount)</span><span class="type-signature"> &rarr; {Object}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>getChannelDesc<span class="signature">(tab)</span><span class="type-signature"> &rarr; {<a href="chat.html#.ChannelDescription">chat.ChannelDescription</a>}</span>
                 
             
             <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line115">line 115</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line109">line 109</a></code>
             </div>
             
         </h4>
@@ -341,7 +1223,7 @@ from portal details for various purposes.</p></div>
 
     
     <div class="description">
-        <p>Calculates the potential AP gain from attacking a portal.</p>
+        <p>Converts a chat tab name to its corresponding channel object.</p>
     </div>
     
 
@@ -377,1699 +1259,7 @@ from portal details for various purposes.</p></div>
 
         <tr>
             
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing resonator and ownership information.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>fieldCount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The number of fields attached to the portal.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>linkCount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The number of links attached to the portal.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">Object</span>
-
-
-
-
-
-- <p>An object detailing various components of AP gain, including totals for friendly and enemy factions.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getCurrentPortalEnergy">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getCurrentPortalEnergy<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line46">line 46</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates the current energy of a portal based on its resonators.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing resonator information.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">number</span>
-
-
-
-
-
-- <p>The current energy of the portal.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getLinkAmpRangeBoost">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getLinkAmpRangeBoost<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line85">line 85</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates the boost in link range provided by installed Link Amps.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing mod information.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">number</span>
-
-
-
-
-
-- <p>The total boost factor for the link range.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getMaxOutgoingLinks">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getMaxOutgoingLinks<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line308">line 308</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates the maximum number of outgoing links that can be created from a portal.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing mod information.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">number</span>
-
-
-
-
-
-- <p>The maximum number of outgoing links.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getPortalAttackValues">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalAttackValues<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line395">line 395</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates various attack values of a portal, including hit bonus, force amplifier, and attack frequency.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing mod information.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">Object</span>
-
-
-
-
-
-- <p>An object containing attack values such as hit bonus, force amplifier, and attack frequency.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getPortalHackDetails">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalHackDetails<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line327">line 327</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates hack-related details of a portal, such as hack cooldown and burnout time.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing mod information.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">Object</span>
-
-
-
-
-
-- <p>An object containing hack-related details like cooldown time, hack count, and burnout time.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getPortalLevel">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalLevel<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line7">line 7</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates the displayed level of a portal, which is always rounded down from the actual float value.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing resonator information.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">number</span>
-
-
-
-
-
-- <p>The calculated portal level.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getPortalLinkDefenseBoost">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalLinkDefenseBoost<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line251">line 251</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates the link defense boost provided by installed Ultra Link Amps.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing mod information.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">number</span>
-
-
-
-
-
-- <p>The total link defense boost factor.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getPortalLinksMitigation">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalLinksMitigation<span class="signature">(linkCount)</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line270">line 270</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates the additional mitigation provided by links attached to a portal.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>linkCount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The number of links attached to the portal.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">number</span>
-
-
-
-
-
-- <p>The additional mitigation value provided by the links.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getPortalMitigationDetails">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalMitigationDetails<span class="signature">(d, linkCount)</span><span class="type-signature"> &rarr; {Object}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line282">line 282</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates detailed mitigation information for a portal, including contributions from shields and links.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing mod and resonator information.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>linkCount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The number of links attached to the portal.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">Object</span>
-
-
-
-
-
-- <p>An object detailing various components of mitigation.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~getPortalModsByType">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalModsByType<span class="signature">(d, type)</span><span class="type-signature"> &rarr; {Array}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line197">line 197</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns a list of portal mods filtered by a specific type.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing mod information.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>tab</code></td>
             
 
             <td class="type">
@@ -2085,7 +1275,7 @@ from portal details for various purposes.</p></div>
 
             
 
-            <td class="description last"><p>The type of mods to filter (e.g., 'RES_SHIELD', 'LINK_AMPLIFIER').</p></td>
+            <td class="description last"><p>The name of the chat tab.</p></td>
         </tr>
 
     
@@ -2113,13 +1303,13 @@ from portal details for various purposes.</p></div>
 
 
 
-<span class="param-type">Array</span>
+<span class="param-type"><a href="chat.html#.ChannelDescription">chat.ChannelDescription</a></span>
 
 
 
 
 
-- <p>An array of mods matching the specified type.</p>
+- <p>The corresponding channel name ('faction', 'alerts', or 'all').</p>
 
 
 
@@ -2174,14 +1364,14 @@ from portal details for various purposes.</p></div>
 
 <dt>
     
-        <h4 class="name" id="~getPortalRange">
+        <h4 class="name" id=".handleTabCompletion">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalRange<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>handleTabCompletion<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line62">line 62</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line554">line 554</a></code>
             </div>
             
         </h4>
@@ -2193,65 +1383,7 @@ from portal details for various purposes.</p></div>
 
     
     <div class="description">
-        <p>Calculates the range of a portal for creating links. The range depends on portal level and any installed Link Amps.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>d</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal detail object containing details about the team and resonators.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
+        <p>Handles tab completion in chat input.</p>
     </div>
     
 
@@ -2266,28 +1398,13 @@ from portal details for various purposes.</p></div>
     
 
     
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
 
+    
 
+    
 
-<span class="param-type">Object</span>
+    
 
-
-
-
-
-- <p>An object containing the base range (<code>base</code>), boost multiplier (<code>boost</code>),
-total range after applying the boost (<code>range</code>),
-and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p>
-
-
-
-
-            
-    </div>
     
 
     
@@ -2336,14 +1453,14 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
 <dt>
     
-        <h4 class="name" id="~getPortalShieldMitigation">
+        <h4 class="name" id=".keepScrollPosition">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalShieldMitigation<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>keepScrollPosition<span class="signature">(box, scrollBefore, isOldMsgs)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line233">line 233</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line297">line 297</a></code>
             </div>
             
         </h4>
@@ -2355,7 +1472,9 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
     
     <div class="description">
-        <p>Calculates the total mitigation provided by shields installed on a portal.</p>
+        <p>Maintains the scroll position of a chat box when new messages are added.
+This function is designed to keep the scroll position fixed when old messages are loaded, and to automatically scroll
+to the bottom when new messages are added if the user is already at the bottom of the chat.</p>
     </div>
     
 
@@ -2391,13 +1510,13 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
         <tr>
             
-                <td class="name"><code>d</code></td>
+                <td class="name"><code>box</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">jQuery</span>
 
 
             
@@ -2407,41 +1526,339 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
             
 
-            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+            <td class="description last"><p>The jQuery object of the chat box.</p></td>
         </tr>
 
     
-    </tbody>
-</table>
 
-    </div>
-    
+        <tr>
+            
+                <td class="name"><code>scrollBefore</code></td>
+            
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
+            <td class="type">
+            
                 
-
-
-
 <span class="param-type">number</span>
 
 
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The scroll position before new messages were added.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isOldMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if the added messages are older messages.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".needMoreMessages">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>needMoreMessages<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line168">line 168</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Checks if the currently selected chat tab needs more messages.
+This function is triggered by scroll events and loads older messages when the user scrolls to the top.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".nicknameClicked">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>nicknameClicked<span class="signature">(event, nickname)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line25">line 25</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Handles click events on nicknames in the chat.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The click event.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nickname</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The clicked nickname.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
 
 
 
-- <p>The total mitigation value from all shields installed on the portal.</p>
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>Always returns false.</p>
 
 
 
@@ -2496,14 +1913,14 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
 <dt>
     
-        <h4 class="name" id="~getPortalSummaryData">
+        <h4 class="name" id=".postMsg">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>getPortalSummaryData<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>postMsg<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line359">line 359</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line595">line 595</a></code>
             </div>
             
         </h4>
@@ -2515,7 +1932,96 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
     
     <div class="description">
-        <p>Converts detailed portal information into a summary format similar to that seen in the map tile data.</p>
+        <p>Posts a chat message to the currently active chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".renderAlerts">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>renderAlerts<span class="signature">(oldMsgsWereAdded)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line466">line 466</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders alerts chat in the UI.</p>
     </div>
     
 
@@ -2551,13 +2057,13 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
         <tr>
             
-                <td class="name"><code>d</code></td>
+                <td class="name"><code>oldMsgsWereAdded</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">boolean</span>
 
 
             
@@ -2567,7 +2073,2113 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
             
 
-            <td class="description last"><p>The detailed portal data.</p></td>
+            <td class="description last"><p>Indicates if older messages were added to the chat.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".renderFaction">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>renderFaction<span class="signature">(oldMsgsWereAdded)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line456">line 456</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders faction chat.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>oldMsgsWereAdded</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if old messages were added in the current rendering.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".renderPublic">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>renderPublic<span class="signature">(oldMsgsWereAdded)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line446">line 446</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders public chat in the UI.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>oldMsgsWereAdded</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if older messages were added to the chat.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".request">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>request<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line153">line 153</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Requests chat messages for the currently active chat tab and background channels.
+It calls the appropriate request function based on the active tab or background channels.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".requestAlerts">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>requestAlerts<span class="signature">(getOlderMsgs, isRetry<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line435">line 435</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Initiates a request for alerts chat data.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>getOlderMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether to retrieve older messages.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether the request is a retry.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".requestFaction">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>requestFaction<span class="signature">(getOlderMsgs, isRetry<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line424">line 424</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Requests faction chat messages.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>getOlderMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Flag to determine if older messages are being requested.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Flag to indicate if this is a retry attempt.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".requestPublic">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>requestPublic<span class="signature">(getOlderMsgs, isRetry<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line413">line 413</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Initiates a request for public chat data.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>getOlderMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether to retrieve older messages.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether the request is a retry.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setup">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setup<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line494">line 494</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets up the chat interface.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setupPosting">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setupPosting<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line613">line 613</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets up the chat message posting functionality.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setupTabs">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setupTabs<span class="signature">(channelDesc)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line391">line 391</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets up all channels starting from intel COMM</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>channelDesc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="chat.html#.ChannelDescription">chat.ChannelDescription</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>channel description</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setupTime">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setupTime<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line527">line 527</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets up the time display in the chat input box.
+This function updates the time displayed next to the chat input field every minute to reflect the current time.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".show">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>show<span class="signature">(name)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line266">line 266</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Displays the chat interface and activates a specified chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the chat tab to show and activate.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".toggle">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>toggle<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line244">line 244</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Toggles the chat window between expanded and collapsed states.
+When expanded, the chat window covers a larger area of the screen.
+This function also ensures that the chat is scrolled to the bottom when collapsed.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        <dl>
+                
+
+<dt>
+<h4 class="name" id=".ChannelDescription">
+    ChannelDescription
+    
+    <div class="container-source members">
+        <code><a href="code_chat.js.html">code/chat.js</a></code>,
+        <code><a href="code_chat.js.html#line58">line 58</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Hold channel description</p>
+<p>See comm.js for examples</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>uniq id, matches 'tab' parameter for server requests</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>visible name</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>inputPrompt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>(optional) string for the input prompt</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>inputClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>(optional) class to apply to #chatinput</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sendMessage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="chat.html#.ChannelSendMessageFn">chat.ChannelSendMessageFn</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>(optional) function to send the message</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="chat.html#.ChannelRequestFn">chat.ChannelRequestFn</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>(optional) function to call to request new message</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>render</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="chat.html#.ChannelRenderFn">chat.ChannelRenderFn</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>(optional) function to render channel content,, called on tab change</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>localBounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>(optional) if true, reset on view change</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".ChannelRenderFn">
+            
+                <span class="type-signature"></span>ChannelRenderFn<span class="signature">(id, oldMsgsWereAdded)</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line85">line 85</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>channel id</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>oldMsgsWereAdded</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>true if data has been added at the top (to preserve scroll position)</p></td>
         </tr>
 
     
@@ -2595,13 +4207,11 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
 
 
-<span class="param-type">Object</span>
+<span class="param-type">void</span>
 
 
 
 
-
-- <p>A summary of the portal data, including level, title, image, resonator count, health, and team.</p>
 
 
 
@@ -2656,14 +4266,14 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
 <dt>
     
-        <h4 class="name" id="~getTotalPortalEnergy">
+        <h4 class="name" id=".ChannelRequestFn">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>getTotalPortalEnergy<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                <span class="type-signature"></span>ChannelRequestFn<span class="signature">(id, getOlderMsgs, isRetry)</span><span class="type-signature"> &rarr; {void}</span>
                 
             
             <div class="container-source members">
-                <code><a href="code_portal_info.js.html">code/portal_info.js</a></code>,
-                <code><a href="code_portal_info.js.html#line25">line 25</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line78">line 78</a></code>
             </div>
             
         </h4>
@@ -2673,10 +4283,6 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 </dt>
 <dd>
 
-    
-    <div class="description">
-        <p>Calculates the total energy capacity of a portal based on its resonators.</p>
-    </div>
     
 
     
@@ -2711,13 +4317,13 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
         <tr>
             
-                <td class="name"><code>d</code></td>
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
 
 
             
@@ -2727,7 +4333,53 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
             
 
-            <td class="description last"><p>The portal detail object containing resonator information.</p></td>
+            <td class="description last"><p>channel id</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>getOlderMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>true if request data from a scroll to top</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -2755,13 +4407,188 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 
 
 
-<span class="param-type">number</span>
+<span class="param-type">void</span>
 
 
 
 
 
-- <p>The total energy capacity of the portal.</p>
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".ChannelSendMessageFn">
+            
+                <span class="type-signature"></span>ChannelSendMessageFn<span class="signature">(id, message)</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line72">line 72</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>channel id</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>input message</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
 
 
 
@@ -2815,8 +4642,6 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
     
 
     
-
-    
 </article>
 
 </section>
@@ -2836,7 +4661,7 @@ and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'module:portal_info_sub'.replace(/"/g, '_');
+        var id = 'chat_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
