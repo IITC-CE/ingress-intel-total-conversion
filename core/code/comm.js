@@ -7,6 +7,7 @@
 
 /**
  * @type {chat.ChannelDescription[]}
+ * @memberof IITC.comm
  */
 var _channels = [
   {
@@ -46,6 +47,7 @@ var _channels = [
  * Holds data related to each intel channel.
  *
  * @type {Object}
+ * @memberof IITC.comm
  */
 var _channelsData = {};
 
@@ -65,6 +67,54 @@ function _initChannelData(id) {
   delete _channelsData[id].oldestGUID;
   _channelsData[id].newestTimestamp = -1;
   delete _channelsData[id].newestGUID;
+}
+
+/**
+ * Template of portal link in comm.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let portalTemplate =
+  '<a onclick="window.selectPortalByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="help">{{ portal_name }}</a>';
+/**
+ * Template for time cell.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let timeCellTemplate = '<td><time class="{{ class_names }}" title="{{ time_title }}" data-timestamp="{{ unixtime }}">{{ time }}</time></td>';
+/**
+ * Template for player's nickname cell.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let nickCellTemplate = '<td><span class="invisep">&lt;</span><mark class="{{ class_names }}">{{ nick }}</mark><span class="invisep">&gt;</span></td>';
+/**
+ * Template for chat message text cell.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let msgCellTemplate = '<td class="{{ class_names }}">{{ msg }}</td>';
+/**
+ * Template for message row, includes cells for time, player nickname and message text.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let msgRowTemplate = '<tr data-guid="{{ guid }}" class="{{ class_names }}">{{ time_cell }}{{ nick_cell }}{{ msg_cell }}</tr>';
+/**
+ * Template for message divider.
+ * @type {String}
+ * @memberof IITC.comm
+ */
+let dividerTemplate = '<tr class="divider"><td><hr></td><td>{{ text }}</td><td><hr></td></tr>';
+
+/**
+ * Returns the coordinates for the message to be sent, default is the center of the map.
+ *
+ * @function IITC.comm.getLatLngForSendingMessage
+ * @returns {L.LatLng}
+ */
+function getLatLngForSendingMessage() {
+  return map.getCenter();
 }
 
 /**
@@ -207,7 +257,7 @@ function _writeDataToHash(newData, storageHash, isOlderMsgs, isAscendingOrder) {
 function sendChatMessage(tab, msg) {
   if (tab !== 'all' && tab !== 'faction') return;
 
-  var latlng = map.getCenter();
+  const latlng = IITC.comm.getLatLngForSendingMessage();
 
   var data = {
     message: msg,
@@ -239,11 +289,15 @@ var _oldBBox = null;
  * @private
  * @param {string} channel - The chat channel.
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
+ * @param args=undefined - Used for backward compatibility when calling a function with three arguments.
  * @returns {Object} The generated post data.
  */
-function _genPostData(channel, getOlderMsgs) {
+function _genPostData(channel, getOlderMsgs, ...args) {
   if (typeof channel !== 'string') {
     throw new Error('API changed: isFaction flag now a channel string - all, faction, alerts');
+  }
+  if (args.length === 1) {
+    getOlderMsgs = args[0];
   }
 
   var b = window.clampLatLngBounds(map.getBounds());
@@ -431,19 +485,45 @@ function renderText(text) {
 }
 
 /**
+ * List of transformations for portal names used in chat.
+ * Each transformation function takes the portal markup object and returns a transformed name.
+ * If a transformation does not apply, the original name is returned.
+ *
+ * @const IITC.comm.portalNameTransformations
+ * @example
+ * // Adding a transformation that appends the portal location to its name
+ * portalNameTransformations.push((markup) => {
+ *   const latlng = `${markup.latE6 / 1E6},${markup.lngE6 / 1E6}`; // Convert E6 format to decimal
+ *   return `[${latlng}] ${markup.name}`;
+ * });
+ */
+const portalNameTransformations = [
+  // Transformation for 'US Post Office'
+  (markup) => {
+    if (markup.name === 'US Post Office') {
+      const address = markup.address.split(',');
+      return 'USPS: ' + address[0];
+    }
+    return markup.name;
+  },
+];
+
+/**
  * Overrides portal names used repeatedly in chat, such as 'US Post Office', with more specific names.
+ * Applies a series of transformations to the portal name based on the portal markup.
  *
  * @function IITC.comm.getChatPortalName
  * @param {Object} markup - An object containing portal markup, including the name and address.
  * @returns {string} The processed portal name.
  */
 function getChatPortalName(markup) {
-  var name = markup.name;
-  if (name === 'US Post Office') {
-    var address = markup.address.split(',');
-    name = 'USPS: ' + address[0];
-  }
-  return name;
+  // Use reduce to apply each transformation to the data
+  const transformedData = portalNameTransformations.reduce((initialMarkup, transform) => {
+    const updatedName = transform(initialMarkup);
+    return { ...initialMarkup, name: updatedName };
+  }, markup);
+
+  return transformedData.name;
 }
 
 /**
@@ -454,11 +534,17 @@ function getChatPortalName(markup) {
  * @returns {string} HTML string of the portal link.
  */
 function renderPortal(portal) {
-  var lat = portal.latE6 / 1e6,
-    lng = portal.lngE6 / 1e6;
-  var perma = window.makePermalink([lat, lng]);
-  var js = 'window.selectPortalByLatLng(' + lat + ', ' + lng + ');return false';
-  return '<a onclick="' + js + '"' + ' title="' + portal.address + '"' + ' href="' + perma + '" class="help">' + IITC.comm.getChatPortalName(portal) + '</a>';
+  const lat = portal.latE6 / 1e6;
+  const lng = portal.lngE6 / 1e6;
+  const permalink = window.makePermalink([lat, lng]);
+  const portalName = IITC.comm.getChatPortalName(portal);
+
+  return IITC.comm.portalTemplate
+    .replace('{{ lat }}', lat.toString())
+    .replace('{{ lng }}', lng.toString())
+    .replace('{{ title }}', portal.address)
+    .replace('{{ url }}', permalink)
+    .replace('{{ portal_name }}', portalName);
 }
 
 /**
@@ -561,58 +647,102 @@ function renderMarkup(markup) {
 }
 
 /**
- * Transforms a the markup array into an older, more straightforward format for easier understanding.
+ * List of transformations to be applied to the message data.
+ * Each transformation function takes the full message data object and returns the transformed markup.
+ * The default transformations aim to convert the message markup into an older, more straightforward format,
+ * facilitating easier understanding and backward compatibility with plugins expecting the older message format.
  *
+ * @const IITC.comm.messageTransformFunctions
+ * @example
+ * // Adding a new transformation function to the array
+ * // This new function adds a "new" prefix to the player's plain text if the player is from the RESISTANCE team
+ * messageTransformFunctions.push((data) => {
+ *   const markup = data.markup;
+ *   if (markup.length > 2 && markup[0][0] === 'PLAYER' && markup[0][1].team === 'RESISTANCE') {
+ *     markup[1][1].plain = 'new ' + markup[1][1].plain;
+ *   }
+ *   return markup;
+ * });
+ */
+const messageTransformFunctions = [
+  // Collapse <faction> + "Link"/"Field".
+  (data) => {
+    const markup = data.markup;
+    if (
+      markup.length > 4 &&
+      markup[3][0] === 'FACTION' &&
+      markup[4][0] === 'TEXT' &&
+      (markup[4][1].plain === ' Link ' || markup[4][1].plain === ' Control Field @')
+    ) {
+      markup[4][1].team = markup[3][1].team;
+      markup.splice(3, 1);
+    }
+    return markup;
+  },
+  // Skip "Agent <player>" at the beginning
+  (data) => {
+    const markup = data.markup;
+    if (markup.length > 1 && markup[0][0] === 'TEXT' && markup[0][1].plain === 'Agent ' && markup[1][0] === 'PLAYER') {
+      markup.splice(0, 2);
+    }
+    return markup;
+  },
+  // Skip "<faction> agent <player>" at the beginning
+  (data) => {
+    const markup = data.markup;
+    if (markup.length > 2 && markup[0][0] === 'FACTION' && markup[1][0] === 'TEXT' && markup[1][1].plain === ' agent ' && markup[2][0] === 'PLAYER') {
+      markup.splice(0, 3);
+    }
+    return markup;
+  },
+];
+
+/**
+ * Applies transformations to the markup array based on the transformations defined in
+ * the {@link IITC.comm.messageTransformFunctions} array.
+ * Assumes all transformations return a new markup array.
  * May be used to build an entirely new markup to be rendered without altering the original one.
  *
  * @function IITC.comm.transformMessage
  * @param {Object} data - The data for the message, including time, player, and message content.
- * @returns {Array} The transformed markup array with a simplified structure.
+ * @returns {Object} The transformed markup array.
  */
-function transformMessage(data) {
-  // Make a copy of the markup array to avoid modifying the original input
-  let newMarkup = JSON.parse(JSON.stringify(data.markup));
+const transformMessage = (data) => {
+  const initialData = JSON.parse(JSON.stringify(data));
 
-  // Collapse <faction> + "Link"/"Field". Example: "Agent <player> destroyed the <faction> Link ..."
-  if (newMarkup.length > 4) {
-    if (newMarkup[3][0] === 'FACTION' && newMarkup[4][0] === 'TEXT' && (newMarkup[4][1].plain === ' Link ' || newMarkup[4][1].plain === ' Control Field @')) {
-      newMarkup[4][1].team = newMarkup[3][1].team;
-      newMarkup.splice(3, 1);
-    }
-  }
+  // Use reduce to apply each transformation to the data
+  const transformedData = messageTransformFunctions.reduce((data, transform) => {
+    const updatedMarkup = transform(data);
+    return { ...data, markup: updatedMarkup };
+  }, initialData);
 
-  // Skip "Agent <player>" at the beginning
-  if (newMarkup.length > 1) {
-    if (newMarkup[0][0] === 'TEXT' && newMarkup[0][1].plain === 'Agent ' && newMarkup[1][0] === 'PLAYER') {
-      newMarkup.splice(0, 2);
-    }
-  }
-
-  // Skip "<faction> agent <player>" at the beginning
-  if (newMarkup.length > 2) {
-    if (newMarkup[0][0] === 'FACTION' && newMarkup[1][0] === 'TEXT' && newMarkup[1][1].plain === ' agent ' && newMarkup[2][0] === 'PLAYER') {
-      newMarkup.splice(0, 3);
-    }
-  }
-
-  return newMarkup;
-}
+  return transformedData.markup;
+};
 
 /**
  * Renders a cell in the chat table to display the time a message was sent.
  * Formats the time and adds it to a <time> HTML element with a tooltip showing the full date and time.
  *
  * @function IITC.comm.renderTimeCell
- * @param {number} time - The timestamp of the message.
+ * @param {number} unixtime - The timestamp of the message.
  * @param {string} classNames - Additional class names to be added to the time cell.
  * @returns {string} The HTML string representing a table cell with the formatted time.
  */
-function renderTimeCell(time, classNames) {
-  const ta = window.unixTimeToHHmm(time);
-  let tb = window.unixTimeToDateTimeString(time, true);
+function renderTimeCell(unixtime, classNames) {
+  const time = window.unixTimeToHHmm(unixtime);
+  const datetime = window.unixTimeToDateTimeString(unixtime, true);
   // add <small> tags around the milliseconds
-  tb = (tb.slice(0, 19) + '<small class="milliseconds">' + tb.slice(19) + '</small>').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  return '<td><time class="' + classNames + '" title="' + tb + '" data-timestamp="' + time + '">' + ta + '</time></td>';
+  const datetime_title = (datetime.slice(0, 19) + '<small class="milliseconds">' + datetime.slice(19) + '</small>')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+  return IITC.comm.timeCellTemplate
+    .replace('{{ class_names }}', classNames)
+    .replace('{{ datetime }}', datetime)
+    .replace('{{ time_title }}', datetime_title)
+    .replace('{{ unixtime }}', unixtime.toString())
+    .replace('{{ time }}', time);
 }
 
 /**
@@ -625,8 +755,7 @@ function renderTimeCell(time, classNames) {
  * @returns {string} The HTML string representing a table cell with the player's nickname.
  */
 function renderNickCell(nick, classNames) {
-  const i = ['<span class="invisep">&lt;</span>', '<span class="invisep">&gt;</span>'];
-  return '<td>' + i[0] + '<mark class="' + classNames + '">' + nick + '</mark>' + i[1] + '</td>';
+  return IITC.comm.nickCellTemplate.replace('{{ class_names }}', classNames).replace('{{ nick }}', nick);
 }
 
 /**
@@ -639,7 +768,7 @@ function renderNickCell(nick, classNames) {
  * @returns {string} The HTML string representing a table cell with the chat message.
  */
 function renderMsgCell(msg, classNames) {
-  return '<td class="' + classNames + '">' + msg + '</td>';
+  return IITC.comm.msgCellTemplate.replace('{{ class_names }}', classNames).replace('{{ msg }}', msg);
 }
 
 /**
@@ -675,7 +804,13 @@ function renderMsgRow(data) {
   } else if (!data.auto && data.secure) {
     className = 'faction';
   }
-  return '<tr data-guid="' + data.guid + '" class="' + className + '">' + timeCell + nickCell + msgCell + '</tr>';
+
+  return IITC.comm.msgRowTemplate
+    .replace('{{ class_names }}', className)
+    .replace('{{ guid }}', data.guid)
+    .replace('{{ time_cell }}', timeCell)
+    .replace('{{ nick_cell }}', nickCell)
+    .replace('{{ msg_cell }}', msgCell);
 }
 
 /**
@@ -686,7 +821,7 @@ function renderMsgRow(data) {
  * @returns {string} The HTML string representing a divider row in the chat table.
  */
 function renderDivider(text) {
-  return '<tr class="divider"><td><hr></td><td>' + text + '</td><td><hr></td></tr>';
+  return IITC.comm.dividerTemplate.replace('{{ text }}', text);
 }
 
 /**
@@ -724,6 +859,7 @@ function renderData(data, element, likelyWereOldMsgs, sortedGuids) {
   var prevTime = null;
   vals.forEach(function (guid) {
     var msg = data[guid];
+    if (IITC.comm.declarativeMessageFilter.filterMessage(msg[4])) return;
     var nextTime = new Date(msg[0]).toLocaleDateString();
     if (prevTime && prevTime !== nextTime) {
       msgs += IITC.comm.renderDivider(nextTime);
@@ -757,6 +893,10 @@ IITC.comm = {
   channels: _channels,
   sendChatMessage,
   parseMsgData,
+  getLatLngForSendingMessage,
+  // List of transformations
+  portalNameTransformations,
+  messageTransformFunctions,
   // Render primitive, may be override
   renderMsgRow,
   renderDivider,
@@ -771,11 +911,21 @@ IITC.comm = {
   renderPortal,
   renderText,
   getChatPortalName,
+  // templates
+  portalTemplate,
+  timeCellTemplate,
+  nickCellTemplate,
+  msgCellTemplate,
+  msgRowTemplate,
+  dividerTemplate,
   // exposed API for legacy
   requestChannel,
   renderChannel,
   renderData,
   _channelsData,
+  _genPostData,
+  _updateOldNewHash,
+  _writeDataToHash,
 };
 
 /* global log, map, chat, IITC */
