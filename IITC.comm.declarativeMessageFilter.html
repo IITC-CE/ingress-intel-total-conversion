@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Module: utils_file | IITC-CE</title>
+    <title>Namespace: declarativeMessageFilter | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,9 +48,8 @@
 
 <header>
     
-        <h2>utils_file</h2>
-        
-            
+        <h2>
+            <span class="ancestors"><a href="IITC.comm.html">.comm</a>.</span>declarativeMessageFilter</h2>
         
     
 </header>
@@ -60,41 +59,10 @@
         <div class="container-overview">
         
             
-                <div class="description"><p>This file provides utilities for handling files in an environment-independent way, including
-functions to save files and wrappers around the FileReader API to integrate with Leaflet's event system.</p></div>
+                <div class="description"><p>Declarative message filter for COMM API</p></div>
             
 
             
-                
-
-<dt>
-    
-</dt>
-<dd>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
 
 <dl class="details">
@@ -126,21 +94,10 @@ functions to save files and wrappers around the FileReader API to integrate with
     
 
     
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="https://github.com/IITC-CE/ingress-intel-total-conversion/issues/244">https://github.com/IITC-CE/ingress-intel-total-conversion/issues/244</a></li>
-        </ul>
-    </dd>
-    
 
     
 </dl>
 
-
-    
-
-</dd>
 
             
         
@@ -169,14 +126,14 @@ functions to save files and wrappers around the FileReader API to integrate with
 
 <dt>
     
-        <h4 class="name" id="~saveAs">
+        <h4 class="name" id=".addRule">
             
-                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">inner</span> </span>saveAs<span class="signature">(data, filename<span class="signature-attributes">opt</span>, dataType<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>addRule<span class="signature">(id, rule)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_utils_file.js.html">code/utils_file.js</a></code>,
-                <code><a href="code_utils_file.js.html#line9">line 9</a></code>
+                <code><a href="code_comm_declarative_message_filter.js.html">code/comm_declarative_message_filter.js</a></code>,
+                <code><a href="code_comm_declarative_message_filter.js.html#line46">line 46</a></code>
             </div>
             
         </h4>
@@ -188,7 +145,7 @@ functions to save files and wrappers around the FileReader API to integrate with
 
     
     <div class="description">
-        <p>Saves data as a file with a specified filename and data type.</p>
+        <p>Adds a new filtering rule with a given ID.</p>
     </div>
     
 
@@ -212,8 +169,6 @@ functions to save files and wrappers around the FileReader API to integrate with
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -226,103 +181,46 @@ functions to save files and wrappers around the FileReader API to integrate with
 
         <tr>
             
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">string</span>
-|
-
-<span class="param-type">BlobPart</span>
-|
-
-<span class="param-type">Array.&lt;BlobPart></span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"><p>The data to be saved.</p></td>
+            <td class="description last"><p>The ID of the rule to add.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>filename</code></td>
+                <td class="name"><code>rule</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Object</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"><p>The name of the file to save.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>dataType</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>The MIME type of the file, used to specify the file format.</p></td>
+            <td class="description last"><p>The rule to add.</p></td>
         </tr>
 
     
@@ -382,6 +280,33 @@ functions to save files and wrappers around the FileReader API to integrate with
 
 
     
+        <h5>Examples</h5>
+        
+    <pre class="prettyprint"><code>// Hide all messages from Resistance team
+IITC.comm.declarativeMessageFilter.addRule({
+  id: "hideResistanceTeam1",
+  conditions: [
+    { field: "player.team", value: "Resistance" },
+  ]
+});</code></pre>
+
+    <pre class="prettyprint"><code>// Hide all messages except those from the Resistance team using the inverted rule
+IITC.comm.declarativeMessageFilter.addRule({
+  id: "hideExceptResistanceTeam",
+  conditions: [
+    { field: "player.team", value: "Resistance", invert: true },
+  ]
+});</code></pre>
+
+    <pre class="prettyprint"><code>// Hide messages that look like spam
+IITC.comm.declarativeMessageFilter.addRule({
+  id: "hideSpam",
+  conditions: [
+    { field: "markup[4][1].plain", condition: /ingress-(shop|store)|(store|shop)-ingress/i },
+  ]
+});</code></pre>
+
+    
 
 </dd>
 
@@ -390,14 +315,14 @@ functions to save files and wrappers around the FileReader API to integrate with
 
 <dt>
     
-        <h4 class="name" id="~saveFile">
+        <h4 class="name" id=".filterMessage">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>saveFile<span class="signature">(data, filename<span class="signature-attributes">opt</span>, dataType<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>filterMessage<span class="signature">(message)</span><span class="type-signature"> &rarr; {boolean}</span>
                 
             
             <div class="container-source members">
-                <code><a href="code_utils_file.js.html">code/utils_file.js</a></code>,
-                <code><a href="code_utils_file.js.html#line34">line 34</a></code>
+                <code><a href="code_comm_declarative_message_filter.js.html">code/comm_declarative_message_filter.js</a></code>,
+                <code><a href="code_comm_declarative_message_filter.js.html#line141">line 141</a></code>
             </div>
             
         </h4>
@@ -409,9 +334,7 @@ functions to save files and wrappers around the FileReader API to integrate with
 
     
     <div class="description">
-        <p>Saves data to a file with the given filename. This function is an alias to the <code>saveAs</code> function.
-or it can use the IITC Mobile file chooser (overwritten in app.js). The <code>dataType</code> parameter can be used to filter
-file types in the IITCm file chooser.</p>
+        <p>Checks if a message matches any of the current filtering rules.</p>
     </div>
     
 
@@ -435,7 +358,275 @@ file types in the IITCm file chooser.</p>
         <th>Type</th>
 
         
-        <th>Attributes</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The message to check.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the message matches any rule, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getAllRules">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getAllRules<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_comm_declarative_message_filter.js.html">code/comm_declarative_message_filter.js</a></code>,
+                <code><a href="code_comm_declarative_message_filter.js.html#line81">line 81</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Gets all current filtering rules.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>The current set of filtering rules.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getMessageValueByPath">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getMessageValueByPath<span class="signature">(object, path)</span><span class="type-signature"> &rarr; {*}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_comm_declarative_message_filter.js.html">code/comm_declarative_message_filter.js</a></code>,
+                <code><a href="code_comm_declarative_message_filter.js.html#line92">line 92</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Extracts the value from the message object by a given path.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
         
 
         
@@ -449,44 +640,190 @@ file types in the IITCm file chooser.</p>
 
         <tr>
             
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>object</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
-|
-
-<span class="param-type">BlobPart</span>
-|
-
-<span class="param-type">Array.&lt;BlobPart></span>
+<span class="param-type">Object</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"><p>The data to be saved.</p></td>
+            <td class="description last"><p>The message object.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>filename</code></td>
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Path to the property in dot notation.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">*</span>
+
+
+
+
+
+- <p>The value of the property at the specified path or undefined if the path is not valid.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getRuleById">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getRuleById<span class="signature">(id)</span><span class="type-signature"> &rarr; {Object|null}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_comm_declarative_message_filter.js.html">code/comm_declarative_message_filter.js</a></code>,
+                <code><a href="code_comm_declarative_message_filter.js.html#line72">line 72</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Gets a rule by its ID.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
@@ -499,27 +836,340 @@ file types in the IITCm file chooser.</p>
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
+
+            
+
+            <td class="description last"><p>The ID of the rule to get.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
                 
 
+
+
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+
+
+- <p>The rule object, or null if not found.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
                 
 
+<dt>
+    
+        <h4 class="name" id=".matchesRule">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>matchesRule<span class="signature">(message, rule)</span><span class="type-signature"> &rarr; {boolean}</span>
                 
-                </td>
+            
+            <div class="container-source members">
+                <code><a href="code_comm_declarative_message_filter.js.html">code/comm_declarative_message_filter.js</a></code>,
+                <code><a href="code_comm_declarative_message_filter.js.html#line113">line 113</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Checks if the message matches a single rule.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
             
 
             
 
-            <td class="description last"><p>The name of the file to save.</p></td>
+            <td class="description last"><p>The message to check.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>dataType</code></td>
+                <td class="name"><code>rule</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The rule to match against.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the message matches the rule, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".removeRule">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>removeRule<span class="signature">(id)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_comm_declarative_message_filter.js.html">code/comm_declarative_message_filter.js</a></code>,
+                <code><a href="code_comm_declarative_message_filter.js.html#line58">line 58</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a filtering rule by its ID.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
             
 
             <td class="type">
@@ -532,20 +1182,10 @@ file types in the IITCm file chooser.</p>
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"><p>The MIME type of the file, used to specify the file format.</p></td>
+            <td class="description last"><p>The ID of the rule to remove.</p></td>
         </tr>
 
     
@@ -633,7 +1273,7 @@ file types in the IITCm file chooser.</p>
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'module:utils_file_sub'.replace(/"/g, '_');
+        var id = 'IITC.comm.declarativeMessageFilter_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
