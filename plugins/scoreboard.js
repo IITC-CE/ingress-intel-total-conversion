@@ -170,7 +170,7 @@ function displayScoreboard () {
   } else {
     dialog({
       html: html,
-      width: 400,
+      width: 'auto',
       dialogClass: 'ui-dialog-scoreboard',
       title: 'Scoreboard',
       id: 'Scoreboard'
