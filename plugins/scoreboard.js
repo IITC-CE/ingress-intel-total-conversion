@@ -55,7 +55,7 @@ function getPortalsInfo (portals,bounds) {
   });
 
   if (portals.length) {
-    [TEAM_RES,TEAM_ENL].forEach(function (teamN) {
+    [TEAM_RES,TEAM_ENL, TEAM_MAC].forEach(function (teamN) {
       var team = score[teamN];
       team.health = team.total ? (team.health/team.total).toFixed(1)+'%' : '-';
       team.levels = team.total ? (team.levels/team.total).toFixed(1) : '-';
@@ -65,7 +65,8 @@ function getPortalsInfo (portals,bounds) {
     });
     return {
       enl: score[TEAM_ENL],
-      res: score[TEAM_RES]
+      res: score[TEAM_RES],
+      mac: score[TEAM_MAC]
     };
   }
 }
@@ -86,6 +87,7 @@ function getEntitiesCount (entities,bounds) {
   return {
     enl: counts[window.TEAM_ENL] || 0,
     res: counts[window.TEAM_RES] || 0,
+    mac: counts[window.TEAM_MAC] || 0,
   };
 }
 
@@ -93,34 +95,49 @@ function makeTable (portals,linksCount,fieldsCount) {
 
   var html = '';
   html += '<table>'
-  + '<colgroup><col><col class="enl"><col class="res"></colgroup>'
+  + '<colgroup><col><col class="enl"><col class="res"><col class="mac"></colgroup>'
   + '<tr>'
   + '<th>Metrics</th>'
   + '<th class="enl">Enlightened</th>'
   + '<th class="res">Resistance</th>'
+  + '<th class="mac">__MACHINA__</th>'
   + '</tr>\n';
 
   html += '<tr><td>Portals</td>'
     +'<td>'+portals.enl.total+'</td>'
-    +'<td>'+portals.res.total+'</td></tr>'
+    +'<td>'+portals.res.total+'</td>'
+    +'<td>'+portals.mac.total+'</td>'
+    +'</tr>'
   +'<tr><td>avg Level</td>'
     +'<td>'+portals.enl.levels+'</td>'
-    +'<td>'+portals.res.levels+'</td></tr>'
+    +'<td>'+portals.res.levels+'</td>'
+    +'<td>'+portals.mac.levels+'</td>'
+    +'</tr>'
   + '<tr><td>avg Health</td>'
     +'<td>'+portals.enl.health+'</td>'
-    +'<td>'+portals.res.health+'</td></tr>'
+    +'<td>'+portals.res.health+'</td>'
+    +'<td>'+portals.mac.health+'</td>'
+    +'</tr>'
   +'<tr><td>Level 8</td>'
     +'<td>'+portals.enl.level8+'</td>'
-    +'<td>'+portals.res.level8+'</td></tr>'
+    +'<td>'+portals.res.level8+'</td>'
+    +'<td>'+portals.mac.level8+'</td>'
+    +'</tr>'
   +'<tr><td>Max Level</td>'
     +'<td>'+portals.enl.maxLevel+'</td>'
-    +'<td>'+portals.res.maxLevel+'</td></tr>'
+    +'<td>'+portals.res.maxLevel+'</td>'
+    +'<td>'+portals.mac.maxLevel+'</td>'
+    +'</tr>'
   +'<tr><td>Links</td>'
     +'<td>'+linksCount.enl+'</td>'
-    +'<td>'+linksCount.res+'</td></tr>'
+    +'<td>'+linksCount.res+'</td>'
+    +'<td>'+linksCount.mac+'</td>'
+    +'</tr>'
   +'<tr><td>Fields</td>'
     +'<td>'+fieldsCount.enl+'</td>'
-    +'<td>'+fieldsCount.res+'</td></tr>';
+    +'<td>'+fieldsCount.res+'</td>'
+    +'<td>'+fieldsCount.mac+'</td>'
+    +'</tr>'
 
   html += '</table>';
   return html;
@@ -153,6 +170,7 @@ function displayScoreboard () {
   } else {
     dialog({
       html: html,
+      width: 400,
       dialogClass: 'ui-dialog-scoreboard',
       title: 'Scoreboard',
       id: 'Scoreboard'
@@ -184,6 +202,7 @@ function setup () {
     #scoreboard td, #scoreboard th { padding: 3px 10px; text-align: left; }\
     #scoreboard col.enl { background-color: #017f01; }\
     #scoreboard col.res { background-color: #005684; }\
+    #scoreboard col.mac { background-color: #7f3333; }\
     #scoreboard .disclaimer { margin-top: 10px; color: yellow; }\
     #scoreboard.mobile { position: absolute; top: 0; width: 100%; }\
     ').appendTo('head');
