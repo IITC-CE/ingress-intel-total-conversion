@@ -155,4 +155,22 @@
     <string name="pref_webview_zoom">字體大小</string>
     <string name="pref_webview_zoom_defaultValue">系統預設</string>
     <string name="pref_webview_zoom_sum">影響資訊面板、通訊、彈出視窗等的字體/文字大小…</string>
+    <string name="plugin_deleted">插件\"%s\"已被删除</string>
+    <string name="button_confirm_description">是</string>
+    <string name="menu_delete_plugin">刪除</string>
+    <string name="delete_plugin_question">確定要刪除插件 \"%s\"？</string>
+    <string name="button_cancel_description">否</string>
+    <string name="menu_share_plugin_download_url">分享下載連結</string>
+    <string name="menu_share_plugin_update_url">分享更新連結</string>
+    <string name="menu_share_plugin_file">分享插件檔案</string>
+    <string name="pref_debug_info_sum">展示對於解決 IITC Mobile 問題重要的資訊</string>
+    <string name="debug_info_dialog_title">除錯用資訊</string>
+    <string name="debug_info_dialog_share_btn">分享</string>
+    <string name="debug_info_dialog_copy_btn">複製</string>
+    <string name="ok">好</string>
+    <string name="pref_enabled">啟用</string>
+    <string name="pref_disabled">禁用</string>
+    <string name="pref_check_for_updates">檢查更新</string>
+    <string name="pref_check_for_updates_summary">開啓時檢查更新</string>
+    <string name="pref_debug_info">除錯用資訊</string>
 </resources>
