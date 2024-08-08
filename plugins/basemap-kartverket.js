@@ -1,7 +1,7 @@
 ﻿// @author         johnd0e
 // @name           Kartverket.no maps (Norway)
 // @category       Map Tiles
-// @version        0.2.3
+// @version        0.3.0
 // @description    Add Kartverket.no map layers.
 
 /* exported setup, changelog --eslint */
