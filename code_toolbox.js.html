@@ -64,7 +64,7 @@
  * @property {Function|undefined} action - The onclick action for the button.
  * @property {string|null} [class] - Optional. The class(es) for the button.
  * @property {string|null} [title] - Optional. The title (tooltip) for the button.
- * @property {string|null} [access_key] - Optional. The access key for the button.
+ * @property {string|null} [accessKey] - Optional. The access key for the button.
  * @property {Function|null} [mouseover] - Optional. The mouseover event for the button.
  * @property {string|null} [icon] - Optional. Icon name from FontAwesome for the button.
  */
@@ -176,6 +176,8 @@ IITC.toolbox = {
     if (typeof buttonData.title === 'string') buttonElement.title = buttonData.title;
     if (typeof buttonData.class === 'string') buttonElement.className = buttonData.class;
     if (typeof buttonData.access_key === 'string') buttonElement.accessKey = buttonData.access_key;
+    if (typeof buttonData.accesskey === 'string') buttonElement.accessKey = buttonData.accesskey;
+    if (typeof buttonData.accessKey === 'string') buttonElement.accessKey = buttonData.accessKey;
     if (typeof buttonData.mouseover === 'function') buttonElement.onmouseover = buttonData.mouseover;
 
     if (typeof buttonData.icon === 'string') {
@@ -251,7 +253,7 @@ IITC.toolbox = {
           action: () => node.click(),
           class: node.className,
           title: node.title,
-          access_key: node.accessKey,
+          accessKey: node.accessKey,
           mouseover: node.mouseover,
           icon: iconClass,
         };
