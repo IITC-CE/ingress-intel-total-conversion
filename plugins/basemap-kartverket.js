@@ -25,12 +25,11 @@ mapKartverket.setup = function () {
 
   L.TileLayer.Kartverket = L.TileLayer.extend({
 
-    baseUrl: 'https://cache.kartverket.no/v1/wmts/1.0.0/'
-           + '{layer}/default/webmercator/{z}/{y}/{x}.png',
+    baseUrl: 'https://cache.kartverket.no/v1/wmts/1.0.0/' + '{layer}/default/webmercator/{z}/{y}/{x}.png',
 
     options: {
       maxNativeZoom: 18,
-      attribution: '&copy; <a href="http://kartverket.no">Kartverket</a>'
+      attribution: '&copy; <a href="http://kartverket.no">Kartverket</a>',
     },
 
     mappings: {
@@ -56,9 +55,9 @@ mapKartverket.setup = function () {
     },
 
     layers: {
-        topo: 'Kartverket Topo (farger)',
-        topograatone: 'Kartverket Topo (gråtone)',
-        toporaster: 'Kartverket Topo (raster)',
+      topo: 'Kartverket Topo (farger)',
+      topograatone: 'Kartverket Topo (gråtone)',
+      toporaster: 'Kartverket Topo (raster)',
     },
 
     initialize: function (layer, options) {
