@@ -1,6 +1,6 @@
 // @author         Costaspap
 // @name           Localized scoreboard
-// @version        0.3.4
+// @version        0.4.0
 // @category       Info
 // @description    Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
 
@@ -8,6 +8,10 @@
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.4.0',
+    changes: ['Includes information on Machina'],
+  },
   {
     version: '0.3.4',
     changes: ['IITC.toolbox API is used to create plugin buttons'],
@@ -55,7 +59,7 @@ function getPortalsInfo (portals,bounds) {
   });
 
   if (portals.length) {
-    [TEAM_RES,TEAM_ENL].forEach(function (teamN) {
+    [window.TEAM_RES, window.TEAM_ENL, window.TEAM_MAC].forEach(function (teamN) {
       var team = score[teamN];
       team.health = team.total ? (team.health/team.total).toFixed(1)+'%' : '-';
       team.levels = team.total ? (team.levels/team.total).toFixed(1) : '-';
@@ -64,8 +68,9 @@ function getPortalsInfo (portals,bounds) {
       team.total = team.placeHolders ? team.total + ' + ' + team.placeHolders : team.total;
     });
     return {
-      enl: score[TEAM_ENL],
-      res: score[TEAM_RES]
+      enl: score[window.TEAM_ENL],
+      res: score[window.TEAM_RES],
+      mac: score[window.TEAM_MAC],
     };
   }
 }
@@ -86,41 +91,37 @@ function getEntitiesCount (entities,bounds) {
   return {
     enl: counts[window.TEAM_ENL] || 0,
     res: counts[window.TEAM_RES] || 0,
+    mac: counts[window.TEAM_MAC] || 0,
   };
 }
 
 function makeTable (portals,linksCount,fieldsCount) {
 
   var html = '';
-  html += '<table>'
-  + '<colgroup><col><col class="enl"><col class="res"></colgroup>'
-  + '<tr>'
-  + '<th>Metrics</th>'
-  + '<th class="enl">Enlightened</th>'
-  + '<th class="res">Resistance</th>'
-  + '</tr>\n';
+  html +=
+    '<table>' +
+    '<colgroup><col><col class="enl"><col class="res"><col class="mac"></colgroup>' +
+    '<tr>' +
+    '<th>Metrics</th>' +
+    '<th class="enl">Enlightened</th>' +
+    '<th class="res">Resistance</th>' +
+    '<th class="mac">__MACHINA__</th>' +
+    '</tr>\n';
 
-  html += '<tr><td>Portals</td>'
-    +'<td>'+portals.enl.total+'</td>'
-    +'<td>'+portals.res.total+'</td></tr>'
-  +'<tr><td>avg Level</td>'
-    +'<td>'+portals.enl.levels+'</td>'
-    +'<td>'+portals.res.levels+'</td></tr>'
-  + '<tr><td>avg Health</td>'
-    +'<td>'+portals.enl.health+'</td>'
-    +'<td>'+portals.res.health+'</td></tr>'
-  +'<tr><td>Level 8</td>'
-    +'<td>'+portals.enl.level8+'</td>'
-    +'<td>'+portals.res.level8+'</td></tr>'
-  +'<tr><td>Max Level</td>'
-    +'<td>'+portals.enl.maxLevel+'</td>'
-    +'<td>'+portals.res.maxLevel+'</td></tr>'
-  +'<tr><td>Links</td>'
-    +'<td>'+linksCount.enl+'</td>'
-    +'<td>'+linksCount.res+'</td></tr>'
-  +'<tr><td>Fields</td>'
-    +'<td>'+fieldsCount.enl+'</td>'
-    +'<td>'+fieldsCount.res+'</td></tr>';
+  const lines = [
+    ['Portals', portals.enl.total, portals.res.total, portals.mac.total],
+    ['avg Level', portals.enl.levels, portals.res.levels, portals.mac.levels],
+    ['avg Health', portals.enl.health, portals.res.health, portals.mac.health],
+    ['Level 8', portals.enl.level8, portals.res.level8, portals.mac.level8],
+    ['Max Level', portals.enl.maxLevel, portals.res.maxLevel, portals.mac.maxLevel],
+    ['Links', linksCount.enl, linksCount.res, linksCount.mac],
+    ['Fields', fieldsCount.enl, fieldsCount.res, fieldsCount.mac],
+  ];
+
+  html += lines.map((line) => {
+    const cells = line.map((cell) => `<td>${cell}</td>`);
+    return `<tr>${cells}</tr>`;
+  });
 
   html += '</table>';
   return html;
@@ -153,6 +154,7 @@ function displayScoreboard () {
   } else {
     dialog({
       html: html,
+      width: 'auto',
       dialogClass: 'ui-dialog-scoreboard',
       title: 'Scoreboard',
       id: 'Scoreboard'
@@ -184,6 +186,7 @@ function setup () {
     #scoreboard td, #scoreboard th { padding: 3px 10px; text-align: left; }\
     #scoreboard col.enl { background-color: #017f01; }\
     #scoreboard col.res { background-color: #005684; }\
+    #scoreboard col.mac { background-color: #7f3333; }\
     #scoreboard .disclaimer { margin-top: 10px; color: yellow; }\
     #scoreboard.mobile { position: absolute; top: 0; width: 100%; }\
     ').appendTo('head');
