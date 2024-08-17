@@ -1,13 +1,17 @@
 ﻿// @author         johnd0e
 // @name           Kartverket.no maps (Norway)
 // @category       Map Tiles
-// @version        0.2.3
+// @version        0.3.0
 // @description    Add Kartverket.no map layers.
 
 /* exported setup, changelog --eslint */
 /* global L, layerChooser */
 
 var changelog = [
+  {
+    version: '0.3.0',
+    changes: ['Migrated to new WMTS server due to deprecation of Statkart opencache'],
+  },
   {
     version: '0.2.3',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
@@ -21,38 +25,39 @@ mapKartverket.setup = function () {
 
   L.TileLayer.Kartverket = L.TileLayer.extend({
 
-    baseUrl: 'https://opencache{s}.statkart.no/gatekeeper/gk/gk.open_gmaps?'
-           + 'layers={layer}&zoom={z}&x={x}&y={y}',
+    baseUrl: 'https://cache.kartverket.no/v1/wmts/1.0.0/' + '{layer}/default/webmercator/{z}/{y}/{x}.png',
 
     options: {
       maxNativeZoom: 18,
       attribution: '&copy; <a href="http://kartverket.no">Kartverket</a>',
-      subdomains: ['', '2', '3']
     },
 
     mappings: {
-      kartdata2: 'topo4',
-      matrikkel_bakgrunn: 'matrikkel_bakgrunn2',
-      norgeskart_bakgrunn: 'topo4',
-      sjo_hovedkart2: 'sjokartraster',
-      toporaster: 'toporaster3',
-      topo2: 'topo4',
-      topo2graatone: 'topo4graatone'
+      bakgrunnskart_forenklet: 'topograatone',
+      egk: 'topo', // *1
+      europa: 'topo', // *1
+      havbunn_grunnkart: 'topo', // *1
+      kartdata2: 'topo',
+      matrikkel_bakgrunn: 'topo',
+      matrikkel_bakgrunn2: 'topo',
+      norges_grunnkart: 'topo',
+      norges_grunnkart_graatone: 'topograatone',
+      norgeskart_bakgrunn: 'topo',
+      sjo_hovedkart2: 'topo', // *1
+      sjokartraster: 'topo', // *1
+      terreng_norgeskart: 'topo',
+      toporaster3: 'toporaster',
+      topo2: 'topo',
+      topo4: 'topo',
+      topo2graatone: 'topograatone',
+      topo4graatone: 'topograatone',
+      // *1 = This layer is not provided on cache.kartverket.no.
     },
 
     layers: {
-      matrikkel_bakgrunn2:'Matrikkel bakgrunn',
-      topo4:              'Topografisk norgeskart',
-      topo4graatone:      'Topografisk norgeskart gråtone',
-      europa:             'Europakart',
-      toporaster3:        'Topografisk norgeskart, raster',
-      sjokartraster:      'Sjøkart hovedkartserien',
-      norges_grunnkart:   'Norges Grunnkart',
-      norges_grunnkart_graatone: 'Norges grunnkart gråtone',
-      egk:                'Europeiske grunnkart',
-      terreng_norgeskart: 'Terreng',
-      havbunn_grunnkart:  'Havbunn grunnkart',
-      bakgrunnskart_forenklet: null
+      topo: 'Kartverket Topo (farger)',
+      topograatone: 'Kartverket Topo (gråtone)',
+      toporaster: 'Kartverket Topo (raster)',
     },
 
     initialize: function (layer, options) {
