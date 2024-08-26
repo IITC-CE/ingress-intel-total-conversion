@@ -1,4 +1,5 @@
-/* global script_info, app, log, L */
+/* global L, log -- eslint */
+
 /**
  * @file This file contains functions related to the 'About IITC' dialog.
  * @module dialog_about
@@ -10,17 +11,17 @@
  *
  * @function
  */
-window.aboutIITC = function() {
+window.aboutIITC = function () {
   var html = createDialogContent();
 
-  dialog({
+  window.dialog({
     title: 'IITC ' + getIITCVersion(),
     id: 'iitc-about',
     html: html,
     width: 'auto',
-    dialogClass: 'ui-dialog-aboutIITC'
+    dialogClass: 'ui-dialog-aboutIITC',
   });
-}
+};
 
 /**
  * Creates the content for the 'About IITC' dialog.
@@ -50,8 +51,8 @@ function createDialogContent() {
     html += '<div class="warning">You are running low on LocalStorage memory.<br/>Please free some space to prevent data loss.</div>';
   }
 
-  if (window.isApp && app.getVersionName) {
-    html += '<div>IITC Mobile ' + app.getVersionName() + '</div>';
+  if (window.isApp && window.app.getVersionName) {
+    html += '<div>IITC Mobile ' + window.app.getVersionName() + '</div>';
   }
 
   var plugins = getPlugins();
@@ -78,9 +79,14 @@ function getPlugins() {
 
   var extra = getIITCVersionAddition();
 
-  var plugins = pluginsInfo.map(convertPluginInfo)
-    .sort(function (a, b) { return a.name > b.name ? 1 : -1; })
-    .map(function (p) { return pluginInfoToString(p, extra); })
+  var plugins = pluginsInfo
+    .map(convertPluginInfo)
+    .sort(function (a, b) {
+      return a.name > b.name ? 1 : -1;
+    })
+    .map(function (p) {
+      return pluginInfoToString(p, extra);
+    })
     .join('\n');
 
   return plugins;
@@ -109,7 +115,7 @@ function convertPluginInfo(info, index) {
     date: info.dateTimeVersion,
     error: info.error,
     version: undefined,
-    description: undefined
+    description: undefined,
   };
 
   var script = info.script;
@@ -122,10 +128,12 @@ function convertPluginInfo(info, index) {
   }
 
   if (!result.name) {
-    if (script_info.script) { // check if GM_info is available
+    if (window.script_info.script) {
+      // check if GM_info is available
       result.name = '[unknown plugin: index ' + index + ']';
       result.description = "this plugin does not have proper wrapper; report to it's author";
-    } else { // userscript manager fault
+    } else {
+      // userscript manager fault
       result.name = '[3rd-party plugin: index ' + index + ']';
     }
   }
@@ -178,7 +186,7 @@ function pluginInfoToString(p, extra) {
     class: '',
     description: p.description || '',
     name: p.name,
-    verinfo: formatVerInfo(p, extra)
+    verinfo: formatVerInfo(p, extra),
   };
 
   if (isStandardPlugin(p)) {
@@ -206,7 +214,7 @@ function pluginInfoToString(p, extra) {
  * @returns {boolean} True if the plugin is standard, false otherwise.
  */
 function isStandardPlugin(plugin) {
-  return (plugin.build === script_info.buildName && plugin.date === script_info.dateTimeVersion);
+  return plugin.build === window.script_info.buildName && plugin.date === window.script_info.dateTimeVersion;
 }
 
 /**
@@ -216,8 +224,8 @@ function isStandardPlugin(plugin) {
  * @returns {string} The IITC version string.
  */
 function getIITCVersion() {
-  var iitc = script_info;
-  return (iitc.script && iitc.script.version || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
+  var iitc = window.script_info;
+  return ((iitc.script && iitc.script.version) || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
 }
 
 /**
@@ -227,7 +235,7 @@ function getIITCVersion() {
  * @returns {string} The additional version information, if any.
  */
 function getIITCVersionAddition() {
-  var extra = script_info.script && script_info.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
+  var extra = window.script_info.script && window.script_info.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
   return extra && extra[1];
 }
 
@@ -247,18 +255,22 @@ function formatVerInfo(p, extra) {
     var cutPos = p.version.length - extra.length;
     // cut extra version component (timestamp) if it is equal to main script's one
     if (p.version.substring(cutPos) === extra) {
-      p.version = p.version.substring(0,cutPos);
+      p.version = p.version.substring(0, cutPos);
     }
   }
 
   p.version = p.version || p.date;
   if (p.version) {
     var tooltip = [];
-    if (p.build) { tooltip.push('[' + p.build + ']'); }
-    if (p.date && p.date !== p.version) { tooltip.push(p.date); }
+    if (p.build) {
+      tooltip.push('[' + p.build + ']');
+    }
+    if (p.date && p.date !== p.version) {
+      tooltip.push(p.date);
+    }
     return L.Util.template(' - <code{title}>{version}</code>', {
       title: tooltip[0] ? ' title="' + tooltip.join(' ') + '"' : '',
-      version: p.version
+      version: p.version,
     });
   }
 
