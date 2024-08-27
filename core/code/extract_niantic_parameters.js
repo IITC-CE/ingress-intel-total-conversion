@@ -1,3 +1,5 @@
+/* global log -- eslint */
+
 /**
  * Extract essential parameters and functions from the Ingress Intel site's minified JavaScript.
  * Necessary due to Niantic's minification and obfuscation of their Intel Map code.
@@ -12,8 +14,8 @@
  * @function extractFromStock
  */
 
-window.extractFromStock = function() {
-  window.niantic_params = {}
+window.extractFromStock = function () {
+  window.niantic_params = {};
 
   // extract the former nemesis.dashboard.config.CURRENT_VERSION from the code
   var reVersion = new RegExp('"X-CSRFToken".*[a-z].v="([a-f0-9]{40})";');
@@ -26,40 +28,37 @@ window.extractFromStock = function() {
 
       var topObject = window[topLevel];
       if (topObject && topObject.prototype) {
-
         // the object has a prototype - iterate through the properties of that
         for (var secLevel in topObject.prototype) {
           if (minified.test(secLevel)) {
             // looks like we've found an object of the format "XX.prototype.YY"...
             var item = topObject.prototype[secLevel];
 
-            if (item && typeof(item) == "function") {
+            if (item && typeof item === 'function') {
               // a function - test it against the relevant regular expressions
               var funcStr = item.toString();
 
               var match = reVersion.exec(funcStr);
               if (match) {
-                log.log('Found former CURRENT_VERSION in '+topLevel+'.prototype.'+secLevel);
-                niantic_params.CURRENT_VERSION = match[1];
+                log.log('Found former CURRENT_VERSION in ' + topLevel + '.prototype.' + secLevel);
+                window.niantic_params.CURRENT_VERSION = match[1];
               }
             }
           }
         }
-
-      } //end 'if .prototype'
+      } // end 'if .prototype'
 
       if (topObject && Array.isArray && Array.isArray(topObject)) {
         // find all non-zero length arrays containing just numbers
-        if (topObject.length>0) {
+        if (topObject.length > 0) {
           var justInts = true;
-          for (var i=0; i<topObject.length; i++) {
-            if (typeof(topObject[i]) !== 'number' || topObject[i] != parseInt(topObject[i])) {
+          for (var i = 0; i < topObject.length; i++) {
+            if (typeof topObject[i] !== 'number' || topObject[i] !== parseInt(topObject[i])) {
               justInts = false;
               break;
             }
           }
           if (justInts) {
-
             // current lengths are: 17: ZOOM_TO_LEVEL, 14: TILES_PER_EDGE
             // however, slightly longer or shorter are a possibility in the future
 
@@ -69,11 +68,11 @@ window.extractFromStock = function() {
               // a. portal level limits. decreasing numbers, starting at 8
               // b. tiles per edge. increasing numbers. current max is 36000, 9000 was the previous value - 18000 is a likely possibility too
 
-              if (topObject[0] == 8) {
+              if (topObject[0] === 8) {
                 // check for tile levels
                 var decreasing = true;
-                for (var i=1; i<topObject.length; i++) {
-                  if (topObject[i-1] < topObject[i]) {
+                for (let i = 1; i < topObject.length; i++) {
+                  if (topObject[i - 1] < topObject[i]) {
                     decreasing = false;
                     break;
                   }
@@ -84,10 +83,10 @@ window.extractFromStock = function() {
               } // end if (topObject[0] == 8)
 
               // 2015-06-25 - changed to top value of 64000, then to 32000 - allow for them to restore it just in case
-              if (topObject[topObject.length-1] >= 9000 && topObject[topObject.length-1] <= 64000) {
+              if (topObject[topObject.length - 1] >= 9000 && topObject[topObject.length - 1] <= 64000) {
                 var increasing = true;
-                for (var i=1; i<topObject.length; i++) {
-                  if (topObject[i-1] > topObject[i]) {
+                for (let i = 1; i < topObject.length; i++) {
+                  if (topObject[i - 1] > topObject[i]) {
                     increasing = false;
                     break;
                   }
@@ -95,31 +94,25 @@ window.extractFromStock = function() {
                 if (increasing) {
                   window.niantic_params.TILES_PER_EDGE = topObject;
                 }
-
-              } //end if (topObject[topObject.length-1] == 9000) {
-
+              } // end if (topObject[topObject.length-1] == 9000) {
             }
           }
         }
       }
-
-
     }
   }
 
-
-  if (niantic_params.CURRENT_VERSION === undefined) {
-    dialog({
+  if (window.niantic_params.CURRENT_VERSION === undefined) {
+    window.dialog({
       title: 'IITC Broken',
-      html: '<p>IITC failed to extract the required parameters from the intel site</p>'
-           +'<p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.</p>',
+      html:
+        '<p>IITC failed to extract the required parameters from the intel site</p>' +
+        '<p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.</p>',
     });
 
     log.log('Discovered parameters');
-    log.log(JSON.stringify(window.niantic_params,null,2));
+    log.log(JSON.stringify(window.niantic_params, null, 2));
 
     throw new Error('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
   }
-
-}
-
+};
