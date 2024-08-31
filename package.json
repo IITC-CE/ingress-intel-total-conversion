@@ -7,12 +7,14 @@
   "private": true,
   "type": "module",
   "devDependencies": {
+    "@eslint/js": "^9.9.1",
     "chai": "^4.3.6",
-    "eslint": "^8.20.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint": "^9.9.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
     "mocha": "^9.2.2",
-    "prettier": "^2.7.1"
+    "prettier": "^3.3.3"
   },
   "scripts": {
     "build": "npm run build:local",
