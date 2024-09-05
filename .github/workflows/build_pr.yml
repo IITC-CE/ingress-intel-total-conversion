@@ -46,7 +46,7 @@ jobs:
           echo $( ls ./build/build/ | grep '.zip' ) > ./build/.metadata/zip_filename
           echo $(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./build/build/total-conversion-build.user.js)") > ./build/.metadata/buildstamp
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: build
           path: |
