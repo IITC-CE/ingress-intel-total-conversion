@@ -11,15 +11,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
@@ -46,9 +46,10 @@ jobs:
           echo $( ls ./build/build/ | grep '.zip' ) > ./build/.metadata/zip_filename
           echo $(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./build/build/total-conversion-build.user.js)") > ./build/.metadata/buildstamp
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: build
+          include-hidden-files: true
           path: |
             ./build/.metadata/
             ./build/build/
