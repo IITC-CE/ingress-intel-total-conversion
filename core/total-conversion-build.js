@@ -122,6 +122,7 @@ if (!window.PLAYER || !PLAYER.nickname) {
 // possible without requiring scripts.
 document.head.innerHTML =
   '<title>Ingress Intel Map</title>' +
+  '<link rel="shortcut icon" href="/img/favicon.ico" />' +
   '<style>' +
   '@include_string:style.css@' +
   '</style>' +
