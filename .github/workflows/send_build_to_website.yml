@@ -14,7 +14,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: 'Download artifact'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         if: ${{ env.WEBSITE_REPO != '' }}
@@ -79,7 +79,7 @@ jobs:
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         if: ${{ env.WEBSITE_REPO != '' }}
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           repository: ${{ env.WEBSITE_REPO }}
