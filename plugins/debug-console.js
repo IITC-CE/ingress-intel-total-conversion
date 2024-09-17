@@ -51,19 +51,22 @@ debugTab.renderLine = function (errorType, args) {
   var text = [];
   args.forEach(function (v) {
     if (typeof v !== 'string' && typeof v !== 'number') {
-      var cache = [];
-      v = JSON.stringify(v, function (key, value) {
-        if (typeof value === 'object' && value !== null) {
-          if (cache.indexOf(value) !== -1) {
-            // Circular reference found, discard key
-            return;
+      try {
+        var cache = [];
+        v = JSON.stringify(v, function (key, value) {
+          if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+              // Circular reference found, discard key
+              return;
+            }
+            // Store value in our collection
+            cache.push(value);
           }
-          // Store value in our collection
-          cache.push(value);
-        }
-        return value;
-      });
-      cache = null;
+          return value;
+        });
+      } finally {
+        cache = null;
+      }
     }
     text.push(v);
   });
