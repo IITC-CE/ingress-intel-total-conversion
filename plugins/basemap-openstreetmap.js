@@ -1,17 +1,21 @@
 // @author         jonatkins
 // @name           OpenStreetMap.org map
 // @category       Map Tiles
-// @version        0.1.5
+// @version        0.1.6
 // @description    Add the native OpenStreetMap.org map tiles as an optional layer.
 
 /* exported setup, changelog --eslint */
-/* global L, layerChooser */
+/* global L -- eslint */
 
 // use own namespace for plugin
 var mapOpenStreetMap = {};
 window.plugin.mapOpenStreetMap = mapOpenStreetMap;
 
 var changelog = [
+  {
+    version: '0.1.6',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.1.5',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -59,6 +63,6 @@ function setup() {
 
   for (var entry of mapOpenStreetMap.LAYERS) {
     var layer = new L.TileLayer(entry.url, entry.options);
-    layerChooser.addBaseLayer(layer, entry.name);
+    window.layerChooser.addBaseLayer(layer, entry.name);
   }
 }
