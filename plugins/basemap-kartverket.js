@@ -5,12 +5,12 @@
 // @description    Add Kartverket.no map layers.
 
 /* exported setup, changelog --eslint */
-/* global L, layerChooser */
+/* global L -- eslint */
 
 var changelog = [
   {
     version: '0.3.0',
-    changes: ['Migrated to new WMTS server due to deprecation of Statkart opencache'],
+    changes: ['Migrated to new WMTS server due to deprecation of Statkart opencache', 'Refactoring: fix eslint'],
   },
   {
     version: '0.2.3',
@@ -22,9 +22,7 @@ var changelog = [
 var mapKartverket = {};
 
 mapKartverket.setup = function () {
-
   L.TileLayer.Kartverket = L.TileLayer.extend({
-
     baseUrl: 'https://cache.kartverket.no/v1/wmts/1.0.0/' + '{layer}/default/webmercator/{z}/{y}/{x}.png',
 
     options: {
@@ -72,8 +70,7 @@ mapKartverket.setup = function () {
       L.TileLayer.prototype.initialize.call(this, this.baseUrl, options);
       this.options.layer = layer;
       this._name = this.layers[layer] || layer;
-    }
-
+    },
   });
 
   L.tileLayer.kartverket = function (layer, options) {
@@ -81,13 +78,13 @@ mapKartverket.setup = function () {
   };
 
   L.tileLayer.kartverket.getLayers = function () {
-    return L.extend({},L.TileLayer.Kartverket.prototype.layers);
+    return L.extend({}, L.TileLayer.Kartverket.prototype.layers);
   };
 
   var l, layer;
   for (layer in L.tileLayer.kartverket.getLayers()) {
     l = L.tileLayer.kartverket(layer);
-    layerChooser.addBaseLayer(l, l._name);
+    window.layerChooser.addBaseLayer(l, l._name);
   }
 };
 
