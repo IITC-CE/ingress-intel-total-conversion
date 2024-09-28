@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Stamen.com map layers
 // @category       Map Tiles
-// @version        0.2.4
+// @version        0.2.5
 // @description    Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
 
 /* exported setup, changelog --eslint */
-/* global L, layerChooser */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.5',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.2.4',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -36,23 +40,23 @@ mapStamen.setup = function () {
         'Map tiles by <a href="http://stamen.com/">Stamen Design</a>, ',
         'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
         'Data by <a href="http://openstreetmap.org/">OpenStreetMap</a>, ',
-        'under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
-      ].join('')
+        'under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
+      ].join(''),
     },
     initialize: function (name, options) {
-      options.layer = name.replace(' ','-').toLowerCase();
+      options.layer = name.replace(' ', '-').toLowerCase();
       L.TileLayer.prototype.initialize.call(this, baseUrl, options);
-    }
+    },
   });
 
-  function addLayer (name,options) {
-    layerChooser.addBaseLayer(new L_StamenTileLayer(name,options),'Stamen ' + name);
+  function addLayer(name, options) {
+    window.layerChooser.addBaseLayer(new L_StamenTileLayer(name, options), 'Stamen ' + name);
   }
 
   var options = { minZoom: 0, maxNativeZoom: 20 };
-  addLayer('Toner',options);
-  addLayer('Toner Background',options);
-  addLayer('Toner Lite',options);
+  addLayer('Toner', options);
+  addLayer('Toner Background', options);
+  addLayer('Toner Lite', options);
   // transparent layers. could be useful over satellite imagery or similar
   // addLayer('Toner Hybrid',options);
   // addLayer('Toner Labels',options);
@@ -73,10 +77,10 @@ mapStamen.setup = function () {
       'Map tiles by <a href="http://stamen.com/">Stamen Design</a>, ',
       'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
       'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, ',
-      'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
-    ].join('')
+      'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+    ].join(''),
   };
-  addLayer('Watercolor',options);
+  addLayer('Watercolor', options);
 };
 
 function setup() {
