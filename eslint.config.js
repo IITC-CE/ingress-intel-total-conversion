@@ -41,4 +41,10 @@ export default [
       'no-unused-expressions': 'error',
     },
   },
+  {
+    files: ['plugins/*.js'],
+    rules: {
+      'no-unused-vars': ['error', { vars: 'all', varsIgnorePattern: '^setup|changelog$' }],
+    },
+  },
 ];
