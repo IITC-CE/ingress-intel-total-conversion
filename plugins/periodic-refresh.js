@@ -1,32 +1,33 @@
 // @author         jonatkins
 // @name           Periodic refresh
 // @category       Tweaks
-// @version        0.1.1
+// @version        0.1.2
 // @description    For use for unattended display screens only, this plugin causes idle mode to be left once per hour.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
   {
+    version: '0.1.2',
+    changes: ['Refactoring: fix eslint'],
+  },
+  {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
   },
 ];
 
-window.plugin.periodicRefresh = function() {};
+window.plugin.periodicRefresh = function () {};
 
-window.plugin.periodicRefresh.wakeup = function() {
+window.plugin.periodicRefresh.wakeup = function () {
   console.log('periodicRefresh: timer fired - leaving idle mode');
-  idleReset();
-}
+  window.idleReset();
+};
 
-
-window.plugin.periodicRefresh.setup = function() {
-
+window.plugin.periodicRefresh.setup = function () {
   var refreshMinutes = 60;
 
-  setInterval ( window.plugin.periodicRefresh.wakeup, refreshMinutes*60*1000 );
-
+  setInterval(window.plugin.periodicRefresh.wakeup, refreshMinutes * 60 * 1000);
 };
 
 var setup = window.plugin.periodicRefresh.setup;

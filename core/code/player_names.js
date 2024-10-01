@@ -13,7 +13,6 @@
  * @returns {boolean} Returns `true` if the player name is a system account, otherwise `false`.
  */
 window.isSystemPlayer = function (name) {
-
   switch (name) {
     case '__ADA__':
     case '__JARVIS__':
@@ -23,5 +22,4 @@ window.isSystemPlayer = function (name) {
     default:
       return false;
   }
-
-}
+};
