@@ -1,6 +1,6 @@
 // @author         Costaspap
 // @name           Localized scoreboard
-// @version        0.4.0
+// @version        0.4.1
 // @category       Info
 // @description    Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
 
@@ -8,6 +8,10 @@
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.4.1',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.4.0',
     changes: ['Includes information on Machina', 'Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -28,19 +32,20 @@ var changelog = [
 var scoreboard = {};
 window.plugin.scoreboard = scoreboard;
 
-function getPortalsInfo (portals,bounds) {
-  function init () {
+function getPortalsInfo(portals, bounds) {
+  function init() {
     return {
       placeHolders: 0,
       total: 0,
       level8: 0,
       levels: 0,
       maxLevel: 0,
-      health: 0
+      health: 0,
     };
   }
   var score = window.TEAM_NAMES.map(() => init());
-  portals = portals.filter(function (portal) { // only consider portals in view
+  portals = portals.filter(function (portal) {
+    // only consider portals in view
     return bounds.contains(portal.getLatLng());
   });
   portals.forEach(function (portal) {
@@ -53,16 +58,18 @@ function getPortalsInfo (portals,bounds) {
     }
     team.health += info.data.health;
     team.levels += info.level;
-    if (info.level === 8) { team.level8++; }
-    team.maxLevel = Math.max(team.maxLevel,info.level);
+    if (info.level === 8) {
+      team.level8++;
+    }
+    team.maxLevel = Math.max(team.maxLevel, info.level);
     team.total++;
   });
 
   if (portals.length) {
     [window.TEAM_RES, window.TEAM_ENL, window.TEAM_MAC].forEach(function (teamN) {
       var team = score[teamN];
-      team.health = team.total ? (team.health/team.total).toFixed(1)+'%' : '-';
-      team.levels = team.total ? (team.levels/team.total).toFixed(1) : '-';
+      team.health = team.total ? (team.health / team.total).toFixed(1) + '%' : '-';
+      team.levels = team.total ? (team.levels / team.total).toFixed(1) : '-';
       team.level8 = team.level8 || '-';
       team.maxLevel = team.maxLevel || '-';
       team.total = team.placeHolders ? team.total + ' + ' + team.placeHolders : team.total;
@@ -75,7 +82,7 @@ function getPortalsInfo (portals,bounds) {
   }
 }
 
-function getEntitiesCount (entities,bounds) {
+function getEntitiesCount(entities, bounds) {
   // only consider entities that start/end on-screen
   // todo: consider entities that have intersections with map bounds
   var total = entities.filter(function (ent) {
@@ -95,8 +102,7 @@ function getEntitiesCount (entities,bounds) {
   };
 }
 
-function makeTable (portals,linksCount,fieldsCount) {
-
+function makeTable(portals, linksCount, fieldsCount) {
   var html = '';
   html +=
     '<table>' +
@@ -127,24 +133,24 @@ function makeTable (portals,linksCount,fieldsCount) {
   return html;
 }
 
-function displayScoreboard () {
-  function toArr (entities) {
+function displayScoreboard() {
+  function toArr(entities) {
     return Object.keys(entities).map(function (guid) {
       return entities[guid];
     });
   }
-  var bounds = map.getBounds();
-  var portals = getPortalsInfo(toArr(window.portals),bounds);
+  var bounds = window.map.getBounds();
+  var portals = getPortalsInfo(toArr(window.portals), bounds);
   var html = '';
   if (portals) {
-    var linksCount = getEntitiesCount(toArr(window.links),bounds);
-    var fieldsCount = getEntitiesCount(toArr(window.fields),bounds);
-    html += makeTable(portals,linksCount,fieldsCount);
+    var linksCount = getEntitiesCount(toArr(window.links), bounds);
+    var fieldsCount = getEntitiesCount(toArr(window.fields), bounds);
+    html += makeTable(portals, linksCount, fieldsCount);
   } else {
     html += '<p>Nothing to show!<p>';
   }
 
-  if (map.getZoom() < 15) {
+  if (window.map.getZoom() < 15) {
     html += '<p class="disclaimer"><b>Zoom in for a more accurate scoreboard!</b></p>';
   }
 
@@ -152,20 +158,20 @@ function displayScoreboard () {
   if (window.useAppPanes()) {
     $(html).addClass('mobile').appendTo(document.body);
   } else {
-    dialog({
+    window.dialog({
       html: html,
       width: 'auto',
       dialogClass: 'ui-dialog-scoreboard',
       title: 'Scoreboard',
-      id: 'Scoreboard'
+      id: 'Scoreboard',
     });
   }
 }
 
-function setup () {
+function setup() {
   if (window.useAppPanes()) {
-    app.addPane('plugin-Scoreboard', 'Scoreboard', 'ic_action_view_as_list_compact');
-    addHook('paneChanged', function (pane) {
+    window.app.addPane('plugin-Scoreboard', 'Scoreboard', 'ic_action_view_as_list_compact');
+    window.addHook('paneChanged', function (pane) {
       if (pane === 'plugin-Scoreboard') {
         displayScoreboard();
       } else {
@@ -180,7 +186,9 @@ function setup () {
     });
   }
 
-  $('<style>').html('\
+  $('<style>')
+    .html(
+      '\
     #scoreboard table { margin-top: 5px; border-collapse: collapse; width: 100%; background-color: #1b415e }\
     #scoreboard tr { border-bottom: 1px solid #0b314e; color: white; }\
     #scoreboard td, #scoreboard th { padding: 3px 10px; text-align: left; }\
@@ -189,5 +197,7 @@ function setup () {
     #scoreboard col.mac { background-color: #7f3333; }\
     #scoreboard .disclaimer { margin-top: 10px; color: yellow; }\
     #scoreboard.mobile { position: absolute; top: 0; width: 100%; }\
-    ').appendTo('head');
+    '
+    )
+    .appendTo('head');
 }
