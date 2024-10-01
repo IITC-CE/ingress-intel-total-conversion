@@ -1,12 +1,17 @@
 // @author         breunigs
 // @name           Scale bar
 // @category       Controls
-// @version        0.1.2
+// @version        0.1.3
 // @description    Show scale bar on the map.
 
 /* exported setup, changelog --eslint */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.1.3',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.1.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
@@ -26,7 +31,7 @@ scaleBar.mobileOptions = { position: 'bottomright', maxWidth: 100 };
 
 scaleBar.desktopOptions = { position: 'topleft', maxWidth: 200 };
 
-function moveToEdge (ctrl) {
+function moveToEdge(ctrl) {
   var $el = $(ctrl.getContainer());
   var $corner = $el.parent();
   var pos = ctrl.getPosition();
@@ -38,10 +43,12 @@ function moveToEdge (ctrl) {
   }
 }
 
-function setup () {
+function setup() {
   var options = L.extend({}, window.isSmartphone() ? scaleBar.mobileOptions : scaleBar.desktopOptions, scaleBar.options);
   scaleBar.control = L.control.scale(options).addTo(window.map);
   // wait other controls to initialize (should be initialized last)
-  setTimeout(function () { moveToEdge(scaleBar.control); });
+  setTimeout(function () {
+    moveToEdge(scaleBar.control);
+  });
 }
 setup.priority = 'low';
