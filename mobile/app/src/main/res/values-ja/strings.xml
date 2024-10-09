@@ -163,4 +163,14 @@
     <string name="update_notifications_channel_name">更新通知</string>
     <string name="update_notifications_title">新しいIITC Mobileが利用可能</string>
     <string name="update_notifications_action_hide_forever">永久に隠す</string>
+    <string name="pref_disabled">無効</string>
+    <string name="debug_info_dialog_share_btn">共有</string>
+    <string name="debug_info_dialog_copy_btn">コピー</string>
+    <string name="ok">OK</string>
+    <string name="pref_enabled">有効</string>
+    <string name="pref_check_for_updates">更新を確認</string>
+    <string name="pref_check_for_updates_summary">起動時に更新を確認</string>
+    <string name="pref_debug_info">デバッグ情報</string>
+    <string name="pref_debug_info_sum">IITCモバイルの不具合解決のための情報を表示</string>
+    <string name="debug_info_dialog_title">デバッグ情報</string>
 </resources>
