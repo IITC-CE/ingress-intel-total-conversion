@@ -1,12 +1,16 @@
 // @author         fragger
 // @name           Pan control
 // @category       Controls
-// @version        0.2.3
+// @version        0.2.4
 // @description    Show a panning control on the map.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.3',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

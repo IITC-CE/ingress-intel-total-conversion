@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Direction of links on map
 // @category       Tweaks
-// @version        0.2.3
+// @version        0.2.4
 // @description    Show the direction of links on the map by adding short dashes to the line at the origin portal.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.3',
     changes: ['Default value for link show direction mode was set to Static near origin', 'IITC.toolbox API is used to create plugin buttons'],

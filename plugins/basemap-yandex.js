@@ -1,13 +1,17 @@
 // @author         johnd0e
 // @name           Yandex maps
 // @category       Map Tiles
-// @version        0.3.2
+// @version        0.3.3
 // @description    Add Yandex.com (Russian/Русский) map layers
 
 /* exported setup, changelog --eslint */
 /* global L, layerChooser */
 
 var changelog = [
+  {
+    version: '0.3.3',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.3.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

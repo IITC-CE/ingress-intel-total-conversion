@@ -1,13 +1,17 @@
 // @author         xelio
 // @name           Keys
 // @category       Misc
-// @version        0.4.1
+// @version        0.4.2
 // @description    Allow manual entry of key counts for each portal. Use the 'keys-on-map' plugin to show the numbers on the map, and 'sync' to share between multiple browsers or desktop/mobile.
 
 /* exported setup, changelog --eslint */
 /* global plugin */
 
 var changelog = [
+  {
+    version: '0.4.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.4.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

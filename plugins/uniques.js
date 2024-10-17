@@ -1,12 +1,16 @@
 // @author         3ch01c
 // @name           Uniques
 // @category       Misc
-// @version        0.2.5
+// @version        0.2.6
 // @description    Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.2.6',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.5',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

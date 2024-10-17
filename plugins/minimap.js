@@ -1,12 +1,16 @@
 // @author         johnd0e
 // @name           Mini map
 // @category       Controls
-// @version        0.4.2
+// @version        0.4.3
 // @description    Show a mini map on the corner of the map.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.4.3',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.4.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

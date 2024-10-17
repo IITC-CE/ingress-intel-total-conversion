@@ -1,11 +1,19 @@
 // @author         screach
 // @name           Highlight moved portals
 // @category       Highlighter
-// @version        0.1.0
+// @version        0.1.1
 // @description    Highlights portals with links with different location data
 
-/* exported setup --eslint */
+/* exported setup, changelog --eslint */
 /* global L */
+
+var changelog = [
+  {
+    version: '0.1.1',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
+];
+
 // use own namespace for plugin
 var movedPortals = {};
 window.plugin.portalHighlighterMovedPortals = movedPortals;
