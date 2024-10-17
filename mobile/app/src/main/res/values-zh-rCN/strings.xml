@@ -163,12 +163,12 @@
     <string name="update_notifications_channel_name">更新通知</string>
     <string name="update_notifications_text">一个新版本的%1$s可用。点击下载。</string>
     <string name="update_notifications_action_hide_forever">永远隐藏</string>
-    <string name="pref_debug_info">调式信息</string>
+    <string name="pref_debug_info">调试信息</string>
     <string name="debug_info_dialog_title">调试信息</string>
     <string name="debug_info_dialog_share_btn">分享</string>
     <string name="debug_info_dialog_copy_btn">复制</string>
     <string name="ok">确定</string>
-    <string name="pref_debug_info_sum">展示用于解决 IITC Mobile 问题的重要信息</string>
+    <string name="pref_debug_info_sum">展示对于解决 IITC Mobile 问题重要的信息</string>
     <string name="pref_enabled">启用</string>
     <string name="pref_disabled">禁用</string>
     <string name="pref_check_for_updates">检查更新</string>

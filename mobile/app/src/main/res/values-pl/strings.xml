@@ -117,4 +117,60 @@
     <string name="pref_hide_fullscreen_status_bar">Belka statusu IITC</string>
     <string name="pref_hide_fullscreen_action_bar">Belka działań IITC</string>
     <string name="pref_hide_fullscreen_notification_bar">Belka powiadomień systemowych</string>
+    <string name="pref_webview_zoom_sum">Wpływa na rozmiar czcionki/tekstu w panelu informacyjnym, komunikatach, oknach wyskakujących itp.</string>
+    <string name="menu_delete_plugin">Skasuj</string>
+    <string name="delete_plugin_question">Usunąć wtyczkę \"%s\"\?</string>
+    <string name="button_confirm_description">Tak</string>
+    <string name="button_cancel_description">Nie</string>
+    <string name="menu_share_plugin_update_url">Udostępnij adres URL aktualizacji</string>
+    <string name="menu_share_plugin_download_url">Udostępnij adres URL do pobierania</string>
+    <string name="plugin_deleted">Wtyczka \"%s\" usunięta</string>
+    <string name="appintro_location_title">Pozwolenie na lokalizację</string>
+    <string name="appintro_layers_title">Warstwy/Wyróżnienia</string>
+    <string name="appintro_layers_description"> Przesuń palcem od prawej krawędzi ekranu (lub kliknij ikonę wyboru warstw na pasku akcji), aby wywołać <i>Szufladę warstw</i>.
+\n
+\n Tutaj możesz zmienić usługę mapy online lub włączyć/wyłączyć wyświetlanie niezbędnych elementów na mapie. </string>
+    <string name="appintro_plugins_title">Wtyczki</string>
+    <string name="pref_webview_zoom_defaultValue">Domyślne ustawienie systemowe</string>
+    <string name="pref_debug_info">Informacje debugowania</string>
+    <string name="pref_debug_info_sum">Pokaż informacje ważne dla rozwiązania problemów z IITC Mobile</string>
+    <string name="debug_info_dialog_title">Informacje debugowania</string>
+    <string name="debug_info_dialog_share_btn">Udostępnij</string>
+    <string name="debug_info_dialog_copy_btn">Kopiuj</string>
+    <string name="pref_enabled">Włączone</string>
+    <string name="pref_disabled">Wyłączone</string>
+    <string name="pref_check_for_updates">Sprawdź aktualizację</string>
+    <string name="pref_check_for_updates_summary">Sprawdź aktualizacje po uruchomieniu</string>
+    <string name="ok">OK</string>
+    <string name="update_notifications_title">Dostępna jest nowa wersja mobilna IITC</string>
+    <string name="appintro_nfc_title">Uprawnienia NFC</string>
+    <string name="update_notifications_action_hide_forever">Ukryj na zawsze</string>
+    <string name="menu_share_plugin_file">Udostępnij plik wtyczki</string>
+    <string name="appintro_welcome_description">To jest mobilna wersja niezbędnego pomocnika dla gracza Ingress.
+\n
+\n Ingress Intel Total Conversion (IITC) to dodatek działający jako nakładka na oficjalną mapę Intel Ingress.
+\n
+\n IITC całkowicie zmienia sposób pracy z mapą, znacząco zwiększa wydajność poprzez zastosowanie akceleracji sprzętowej oraz rozszerza możliwości poprzez zastosowanie różnych wtyczek.</string>
+    <string name="update_notifications_channel_name">Aktualizuj powiadomienia</string>
+    <string name="update_notifications_text">Dostępna jest nowa wersja %1$s. Kliknij, aby pobrać.</string>
+    <string name="tab_prime">Ingress</string>
+    <string name="pref_webview_zoom">Rozmiar czcionki</string>
+    <string name="appintro_plugins_description">Możesz zacząć korzystać z IITC-CE już teraz.
+\n
+\n Jednak główną przewagą nad oficjalną mapą Intel Ingress jest bogactwo wtyczek rozszerzających możliwości.
+\n
+\n W ustawieniach możesz dodać oficjalne lub zewnętrzne wtyczki.</string>
+    <string name="appintro_navigation_title">Nawigacja</string>
+    <string name="menu_plugins_add_url">Dodaj wtyczki według adresu URL</string>
+    <string name="appintro_location_description">IITC-CE Mobile wymaga pozwolenia na dostęp do Twojej lokalizacji w celu łatwej nawigacji.
+\n
+\n Ale nie martw się: nigdzie nie wysyłamy danych o Twojej lokalizacji.</string>
+    <string name="appintro_nfc_description">Możesz szybko wysłać bieżący link do portalu/link bezpośredni do innego urządzenia, jeśli oba urządzenia obsługują NFC.
+\n
+\n Przytrzymaj oba urządzenia jeden po drugim i dotknij ekranu, aby przesłać mapę do drugiego urządzenia.</string>
+    <string name="appintro_navigation_description"> Przesuń palcem od lewej krawędzi ekranu (lub kliknij ikonę menu), aby wywołać <i>Szufladę nawigacji</i>.
+\n Kliknij ikonę Wstecz, aby powrócić do mapy.
+\n
+\n Niektóre wtyczki (np. <i>lista portali</i> i <i>zakładki</i>) pojawiają się teraz w <i>Szufladzie nawigacyjnej</i>, umożliwiając szybki dostęp.
+\n Nie będą już wyświetlane w okienku informacyjnym. </string>
 </resources>
