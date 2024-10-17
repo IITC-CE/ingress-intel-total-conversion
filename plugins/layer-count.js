@@ -1,12 +1,17 @@
 // @author         fkloft
 // @name           Layer count
 // @category       Info
-// @version        0.2.3
+// @version        0.2.4
 // @description    Allow users to count nested fields
 
 /* exported setup, changelog --eslint */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.2.3',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
@@ -18,10 +23,12 @@ var layerCount = {};
 window.plugin.layerCount = layerCount;
 
 var tooltip;
-function calculate (ev) {
+function calculate(ev) {
   var point = ev.layerPoint;
   var fields = window.fields;
-  var layersRes = 0, layersEnl = 0, layersDrawn = 0;
+  var layersRes = 0,
+    layersEnl = 0,
+    layersDrawn = 0;
 
   for (var guid in fields) {
     var field = fields[guid];
@@ -35,9 +42,9 @@ function calculate (ev) {
       }
     }
     if (window.pnpoly(rings, point)) {
-      if (field.options.team === TEAM_ENL) {
+      if (field.options.team === window.TEAM_ENL) {
         layersEnl++;
-      } else if (field.options.team === TEAM_RES) {
+      } else if (field.options.team === window.TEAM_RES) {
         layersRes++;
       }
     }
@@ -67,30 +74,34 @@ function calculate (ev) {
   tooltip.innerHTML = content;
 }
 
-function setup () {
+function setup() {
   $('<style>').prop('type', 'text/css').html('@include_string:layer-count.css@').appendTo('head');
 
   var LayerCount = L.Control.extend({
     options: {
-      position: 'topleft'
+      position: 'topleft',
     },
 
     onAdd: function (map) {
       var button = document.createElement('a');
       button.className = 'leaflet-bar-part';
-      button.addEventListener('click', function toggle () {
-        var btn = this;
-        if (btn.classList.contains('active')) {
-          map.off('click', calculate);
-          btn.classList.remove('active');
-        } else {
-          map.on('click', calculate);
-          btn.classList.add('active');
-          setTimeout(function () {
-            tooltip.textContent = 'Click on map';
-          }, 10);
-        }
-      }, false);
+      button.addEventListener(
+        'click',
+        function toggle() {
+          var btn = this;
+          if (btn.classList.contains('active')) {
+            map.off('click', calculate);
+            btn.classList.remove('active');
+          } else {
+            map.on('click', calculate);
+            btn.classList.add('active');
+            setTimeout(function () {
+              tooltip.textContent = 'Click on map';
+            }, 10);
+          }
+        },
+        false
+      );
       button.title = 'Count nested fields';
 
       tooltip = document.createElement('div');
@@ -105,10 +116,8 @@ function setup () {
 
     onRemove: function (map) {
       map.off('click', calculate);
-    }
+    },
   });
-  var ctrl = new LayerCount;
+  var ctrl = new LayerCount();
   ctrl.addTo(window.map);
 }
-
-/* exported setup */

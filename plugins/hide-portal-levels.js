@@ -1,10 +1,11 @@
 // @author         johnd0e
 // @name           Hide portal levels
 // @category       Layer
-// @version        0.1.1
+// @version        0.1.2
 // @description    Replace all levels with single layerChooser's entry; reverting on longclick
 
 /* exported setup, changelog --eslint */
+/* global L -- eslint */
 
 // use own namespace for plugin
 var hideLevels = {};
@@ -15,6 +16,10 @@ hideLevels.initCollapsed = true;
 
 var changelog = [
   {
+    version: '0.1.2',
+    changes: ['Refactoring: fix eslint'],
+  },
+  {
     version: '0.1.1',
     changes: ['FIX: Hide only portal layers'],
   },
@@ -24,7 +29,7 @@ var changelog = [
   },
 ];
 
-function setup () {
+function setup() {
   var ctrl = window.layerChooser;
 
   hideLevels.portals = L.layerGroup();
@@ -36,14 +41,21 @@ function setup () {
     var allDisabled = true;
     levels.forEach(function (data) {
       allDisabled = allDisabled && !data.layer._map;
-      ctrl.removeLayer(data.layer, {keepOnMap: true});
+      ctrl.removeLayer(data.layer, { keepOnMap: true });
       hideLevels.portals.addLayer(data.layer);
     });
-    ctrl.addOverlay(hideLevels.portals, 'Portals', L.extend({
-      sortPriority: -1000,
-    }, set && {
-      enable: !allDisabled
-    }));
+    ctrl.addOverlay(
+      hideLevels.portals,
+      'Portals',
+      L.extend(
+        {
+          sortPriority: -1000,
+        },
+        set && {
+          enable: !allDisabled,
+        }
+      )
+    );
 
     var onMap = window.map.hasLayer(hideLevels.portals);
     levels.forEach(function (data) {
@@ -58,20 +70,22 @@ function setup () {
   hideLevels.expand = function () {
     var enable = !!hideLevels.portals._map;
     levels.forEach(function (data) {
-      ctrl.addOverlay(data.layer, data.name, {enable: enable});
+      ctrl.addOverlay(data.layer, data.name, { enable: enable });
     });
     hideLevels.portals._layers = {};
     ctrl.removeLayer(hideLevels.portals);
   };
 
   levels.forEach(function (data) {
-    data.layer.on('longclick', function (e) { // collapse
+    data.layer.on('longclick', function (e) {
+      // collapse
       e.preventDefault();
       hideLevels.collapse('set');
     });
   });
 
-  hideLevels.portals.on('longclick', function (e) { // expand
+  hideLevels.portals.on('longclick', function (e) {
+    // expand
     e.preventDefault();
     hideLevels.expand();
   });

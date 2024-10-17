@@ -1,12 +1,16 @@
 // @author         johnd0e
 // @name           Remove extra layers
 // @category       Layer
-// @version        0.1.1
+// @version        0.1.2
 // @description    Remove 'Artifacts', 'Beacons' and 'Frackers' from layerChooser (still keeping them on map)
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.1.2',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
@@ -19,10 +23,8 @@ window.plugin.remove = removeExtraLayers;
 
 removeExtraLayers.names = ['Artifacts', 'Beacons', 'Frackers'];
 
-function setup () {
+function setup() {
   removeExtraLayers.names.forEach(function (name) {
-    window.layerChooser.removeLayer(name, {keepOnMap: true});
+    window.layerChooser.removeLayer(name, { keepOnMap: true });
   });
 }
-
-/* exported setup */

@@ -1,3 +1,5 @@
+/* global log -- eslint */
+
 /**
  * @file Decode the on-network array entity format into an object format closer to that used before
  * makes much more sense as an object, means that existing code didn't need to change, and it's what the
@@ -9,7 +11,7 @@
 /**
  * @namespace window.decodeArray
  */
-window.decodeArray = function(){};
+window.decodeArray = function () {};
 
 /**
  * Parses a mod array into an object.
@@ -19,7 +21,9 @@ window.decodeArray = function(){};
  * @returns {Object|null} Parsed mod object or null if the input is falsy.
  */
 function parseMod(arr) {
-  if (!arr) { return null; }
+  if (!arr) {
+    return null;
+  }
   return {
     owner: arr[0],
     name: arr[1],
@@ -36,7 +40,9 @@ function parseMod(arr) {
  * @returns {Object|null} Parsed resonator object or null if the input is falsy.
  */
 function parseResonator(arr) {
-  if (!arr) { return null; }
+  if (!arr) {
+    return null;
+  }
   return {
     owner: arr[0],
     level: arr[1],
@@ -51,7 +57,9 @@ function parseResonator(arr) {
  * @returns {Object|null} Parsed artifact brief object or null if the input is falsy.
  */
 function parseArtifactBrief(arr) {
-  if (!arr) { return null; }
+  if (!arr) {
+    return null;
+  }
 
   // array index 0 is for fragments at the portal. index 1 is for target portals
   // each of those is two dimensional - not sure why. part of this is to allow for multiple types of artifacts,
@@ -62,7 +70,7 @@ function parseArtifactBrief(arr) {
 
   function decodeArtifactArray(arr) {
     var result = {};
-    for (var i=0; i<arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
       // we'll use the type as the key - and store any additional array values as the value
       // that will be an empty array for now, so only object keys are useful data
       result[arr[i][0]] = arr[i].slice(1);
@@ -84,7 +92,9 @@ function parseArtifactBrief(arr) {
  * @returns {Object|null} Parsed artifact detail object or null if the input is falsy.
  */
 function parseArtifactDetail(arr) {
-  if (!arr) { return null; }
+  if (!arr) {
+    return null;
+  }
   // empty artifact data is pointless - ignore it
   if (arr.length === 3 && arr[0] === '' && arr[1] === '' && arr[2].length === 0) {
     return null;
@@ -106,14 +116,13 @@ function parseArtifactDetail(arr) {
 function parseHistoryDetail(bitarray) {
   return {
     _raw: bitarray,
-    visited:  !!(bitarray & 1),
+    visited: !!(bitarray & 1),
     captured: !!(bitarray & 2),
-    scoutControlled:  !!(bitarray & 4),
+    scoutControlled: !!(bitarray & 4),
   };
 }
 
-
-//there's also a 'placeholder' portal - generated from the data in links/fields. only has team/lat/lng
+// there's also a 'placeholder' portal - generated from the data in links/fields. only has team/lat/lng
 
 var CORE_PORTAL_DATA_LENGTH = 4;
 
@@ -127,15 +136,15 @@ var CORE_PORTAL_DATA_LENGTH = 4;
 function corePortalData(a) {
   return {
     // a[0] == type (always 'p')
-    team:          a[1],
-    latE6:         a[2],
-    lngE6:         a[3]
-  }
+    team: a[1],
+    latE6: a[2],
+    lngE6: a[3],
+  };
 }
 
 var SUMMARY_PORTAL_DATA_LENGTH = 14;
-var DETAILED_PORTAL_DATA_LENGTH = SUMMARY_PORTAL_DATA_LENGTH+4;
-var EXTENDED_PORTAL_DATA_LENGTH = DETAILED_PORTAL_DATA_LENGTH+1;
+var DETAILED_PORTAL_DATA_LENGTH = SUMMARY_PORTAL_DATA_LENGTH + 4;
+var EXTENDED_PORTAL_DATA_LENGTH = DETAILED_PORTAL_DATA_LENGTH + 1;
 
 /**
  * Parses the summary portal data from an array.
@@ -146,16 +155,16 @@ var EXTENDED_PORTAL_DATA_LENGTH = DETAILED_PORTAL_DATA_LENGTH+1;
  */
 function summaryPortalData(a) {
   return {
-    level:         a[4],
-    health:        a[5],
-    resCount:      a[6],
-    image:         a[7],
-    title:         a[8],
-    ornaments:     a[9],
-    mission:       a[10],
+    level: a[4],
+    health: a[5],
+    resCount: a[6],
+    image: a[7],
+    title: a[8],
+    ornaments: a[9],
+    mission: a[10],
     mission50plus: a[11],
     artifactBrief: parseArtifactBrief(a[12]),
-    timestamp:     a[13]
+    timestamp: a[13],
   };
 }
 
@@ -168,11 +177,11 @@ function summaryPortalData(a) {
  */
 function detailsPortalData(a) {
   return {
-    mods:           a[SUMMARY_PORTAL_DATA_LENGTH+0].map(parseMod),
-    resonators:     a[SUMMARY_PORTAL_DATA_LENGTH+1].map(parseResonator),
-    owner:          a[SUMMARY_PORTAL_DATA_LENGTH+2],
-    artifactDetail: parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH+3])
-  }
+    mods: a[SUMMARY_PORTAL_DATA_LENGTH].map(parseMod),
+    resonators: a[SUMMARY_PORTAL_DATA_LENGTH + 1].map(parseResonator),
+    owner: a[SUMMARY_PORTAL_DATA_LENGTH + 2],
+    artifactDetail: parseArtifactDetail(a[SUMMARY_PORTAL_DATA_LENGTH + 3]),
+  };
 }
 
 /**
@@ -184,16 +193,15 @@ function detailsPortalData(a) {
 function extendedPortalData(a) {
   return {
     history: parseHistoryDetail(a[DETAILED_PORTAL_DATA_LENGTH] || 0),
-  }
+  };
 }
-
 
 window.decodeArray.dataLen = {
   core: [CORE_PORTAL_DATA_LENGTH],
   summary: [SUMMARY_PORTAL_DATA_LENGTH],
   detailed: [EXTENDED_PORTAL_DATA_LENGTH, DETAILED_PORTAL_DATA_LENGTH],
   extended: [EXTENDED_PORTAL_DATA_LENGTH, SUMMARY_PORTAL_DATA_LENGTH],
-  anyknown: [CORE_PORTAL_DATA_LENGTH, SUMMARY_PORTAL_DATA_LENGTH, DETAILED_PORTAL_DATA_LENGTH, EXTENDED_PORTAL_DATA_LENGTH]
+  anyknown: [CORE_PORTAL_DATA_LENGTH, SUMMARY_PORTAL_DATA_LENGTH, DETAILED_PORTAL_DATA_LENGTH, EXTENDED_PORTAL_DATA_LENGTH],
 };
 
 /**
@@ -205,7 +213,7 @@ window.decodeArray.dataLen = {
  *                                        Can be 'core', 'summary', 'detailed', 'extended', or 'anyknown'.
  * @returns {Object} An object containing decoded portal data.
  */
-window.decodeArray.portal = function(a, details) {
+window.decodeArray.portal = function (a, details) {
   if (!a) {
     log.warn('Argument not specified');
     return;
@@ -216,10 +224,9 @@ window.decodeArray.portal = function(a, details) {
   }
 
   details = details || 'anyknown';
-  var expected = decodeArray.dataLen[details];
+  var expected = window.decodeArray.dataLen[details];
   if (expected.indexOf(a.length) === -1) {
     log.warn('Unexpected portal data length: ' + a.length + ' (' + details + ')');
-    debugger;
   }
 
   var data = corePortalData(a);
@@ -233,7 +240,6 @@ window.decodeArray.portal = function(a, details) {
       $.extend(data, detailsPortalData(a));
     } else if (details === 'detailed') {
       log.warn('Portal details missing');
-      debugger;
     }
   }
 
@@ -247,10 +253,12 @@ window.decodeArray.portal = function(a, details) {
   return data;
 };
 
-window.decodeArray.portalSummary = function(a) { // deprecated!!
+window.decodeArray.portalSummary = function (a) {
+  // deprecated!!
   return window.decodeArray.portal(a, 'summary');
 };
 
-window.decodeArray.portalDetail = function(a) { // deprecated!!
+window.decodeArray.portalDetail = function (a) {
+  // deprecated!!
   return window.decodeArray.portal(a, 'detailed');
 };
