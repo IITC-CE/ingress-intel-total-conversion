@@ -1,7 +1,7 @@
 // @author         johnd0e
 // @name           Hide portal levels
 // @category       Layer
-// @version        0.1.1
+// @version        0.1.2
 // @description    Replace all levels with single layerChooser's entry; reverting on longclick
 
 /* exported setup, changelog --eslint */
@@ -14,6 +14,10 @@ hideLevels.layerFilterRegexp = new RegExp(/Level \d* Portals/);
 hideLevels.initCollapsed = true;
 
 var changelog = [
+  {
+    version: '0.1.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.1.1',
     changes: ['FIX: Hide only portal layers'],

@@ -1,12 +1,16 @@
 // @author         jonatkins
 // @name           Debug: Raw portal JSON data
 // @category       Portal Info
-// @version        0.2.5
+// @version        0.2.6
 // @description    Developer debugging aid: Add a link to the portal details to show the raw data of a portal.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.2.6',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.5',
     changes: ['Added human readable timestamp for portal links and fields'],

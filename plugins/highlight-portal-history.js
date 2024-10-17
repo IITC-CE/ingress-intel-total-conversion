@@ -1,13 +1,17 @@
 // @author         Johtaja
 // @name           Highlight portals based on history
 // @category       Highlighter
-// @version        0.3.1
+// @version        0.3.2
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 /* exported setup, changelog --eslint */
 /* global L */
 
 var changelog = [
+  {
+    version: '0.3.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.3.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

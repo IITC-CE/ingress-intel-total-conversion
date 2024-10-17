@@ -1,13 +1,17 @@
 // @author         teo96
 // @name           Portals list
 // @category       Info
-// @version        0.4.3
+// @version        0.4.4
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
 /* global IITC, plugin -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.4.4',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.4.3',
     changes: ['Moved "portalApGainMaths" function from core to portalList plugin', 'IITC.toolbox API is used to create plugin buttons'],

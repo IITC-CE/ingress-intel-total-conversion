@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.3.2
+// @version        0.3.3
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.3.3',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.3.2',
     changes: ['IITC.toolbox API is used to create plugin buttons'],

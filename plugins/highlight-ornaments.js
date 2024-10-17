@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Highlight portals with ornaments
 // @category       Highlighter
-// @version        0.2.2
+// @version        0.2.3
 // @description    Use the portal fill color to denote portals with additional 'ornament' markers.
 //                 e.g. Anomaly portals
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.2.3',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

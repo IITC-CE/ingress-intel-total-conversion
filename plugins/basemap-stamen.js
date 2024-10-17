@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Stamen.com map layers
 // @category       Map Tiles
-// @version        0.2.3
+// @version        0.2.4
 // @description    Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
 
 /* exported setup, changelog --eslint */
 /* global L, layerChooser */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.3',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

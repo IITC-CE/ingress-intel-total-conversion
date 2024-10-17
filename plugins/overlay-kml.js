@@ -1,12 +1,16 @@
 // @author         danielatkins
 // @name           Overlay KML / GPX / GeoJSON
 // @category       Layer
-// @version        0.3.1
+// @version        0.3.2
 // @description    Allow users to overlay their own KML / GPX / GeoJSON files on top of IITC.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.3.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.3.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

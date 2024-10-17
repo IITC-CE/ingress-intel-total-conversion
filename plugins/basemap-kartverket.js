@@ -10,7 +10,10 @@
 var changelog = [
   {
     version: '0.3.0',
-    changes: ['Migrated to new WMTS server due to deprecation of Statkart opencache'],
+    changes: [
+      'Migrated to new WMTS server due to deprecation of Statkart opencache',
+      'Version upgrade due to a change in the wrapper: plugin icons are now vectorized',
+    ],
   },
   {
     version: '0.2.3',

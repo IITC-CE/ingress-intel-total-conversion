@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Blank map
 // @category       Map Tiles
-// @version        0.1.4
+// @version        0.1.5
 // @description    Add a blank map layer - no roads or other features.
 
 /* exported setup, changelog --eslint */
 /* global L, layerChooser */
 
 var changelog = [
+  {
+    version: '0.1.5',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.1.4',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

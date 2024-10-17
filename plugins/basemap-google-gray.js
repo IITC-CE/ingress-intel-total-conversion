@@ -1,13 +1,17 @@
 // @author         jacob1123
 // @name           Gray Google map
 // @category       Map Tiles
-// @version        0.1.5
+// @version        0.1.6
 // @description    Add a simplified gray Version of Google map tiles as an optional layer.
 
 /* exported setup, changelog --eslint */
 /* global L, layerChooser */
 
 var changelog = [
+  {
+    version: '0.1.6',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.1.5',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

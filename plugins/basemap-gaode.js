@@ -1,13 +1,17 @@
 ﻿// @author         johnd0e
 // @name           Gaode (高德地图) / AutoNavi map
 // @category       Map Tiles
-// @version        0.1.2
+// @version        0.1.3
 // @description    Map layers from AutoNavi / Gaode (高德地图)
 
 /* exported setup, changelog --eslint */
 /* global L, layerChooser */
 
 var changelog = [
+  {
+    version: '0.1.3',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.1.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

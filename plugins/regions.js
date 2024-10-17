@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Ingress scoring regions
 // @category       Layer
-// @version        0.3.1
+// @version        0.3.2
 // @description    Show the regional scoring cells grid on the map
 
 /* global S2 */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.3.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.3.1',
     changes: ['fixed region names'],

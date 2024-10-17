@@ -1,13 +1,17 @@
 // @name           Machina tracker
 // @author         McBen
 // @category       Layer
-// @version        1.0.0
+// @version        1.0.1
 // @description    Show locations of Machina activities
 
 /* exported setup, changelog --eslint */
 /* global L */
 
 var changelog = [
+  {
+    version: '1.0.1',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '1.0.0',
     changes: ['First version'],
