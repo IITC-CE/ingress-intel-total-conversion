@@ -1,12 +1,16 @@
 // @author         Fly33
 // @name           Fly Links
 // @category       Draw
-// @version        0.5.1
+// @version        0.5.2
 // @description    Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.5.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.5.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

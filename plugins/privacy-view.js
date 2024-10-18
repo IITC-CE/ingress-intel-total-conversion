@@ -1,13 +1,17 @@
 // @author         johnd0e
 // @name           Privacy view on Intel
 // @category       Misc
-// @version        1.2.1
+// @version        1.2.2
 // @description    Hide info from intel which shouldn't leak to players of the other faction.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '1.2.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '1.2.1',
     changes: ['Fix plugin on mobile'],

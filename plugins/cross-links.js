@@ -1,12 +1,16 @@
 // @author         mcben
 // @name           Cross links
 // @category       Draw
-// @version        1.3.2
+// @version        1.3.3
 // @description    Checks for existing links that cross planned links. Requires draw-tools plugin.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '1.3.3',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '1.3.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

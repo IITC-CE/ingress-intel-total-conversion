@@ -10,7 +10,12 @@
 var changelog = [
   {
     version: '0.2.0',
-    changes: ['Use channel new API', 'Handle multiline messages', 'Handle errors when serializing logged objects'],
+    changes: [
+      'Use channel new API',
+      'Handle multiline messages',
+      'Handle errors when serializing logged objects',
+      'Version upgrade due to a change in the wrapper: plugin icons are now vectorized',
+    ],
   },
   {
     version: '0.1.1',

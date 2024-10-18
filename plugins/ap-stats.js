@@ -1,12 +1,16 @@
 // @author         Hollow011
 // @name           Available AP statistics
 // @category       Info
-// @version        0.4.3
+// @version        0.4.4
 // @description    Displays the per-team AP gains available in the current view.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.4.4',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.4.3',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

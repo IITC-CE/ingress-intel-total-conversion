@@ -1,12 +1,16 @@
 // @author         ZasoGD
 // @name           Portal Names
 // @category       Layer
-// @version        0.2.2
+// @version        0.2.3
 // @description    Show portal names on the map.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.2.3',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.2',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

@@ -1,7 +1,7 @@
 // @author         vita10gy
 // @name           Highlight portals that need recharging
 // @category       Highlighter
-// @version        0.2.1
+// @version        0.2.2
 // @description    Use the portal fill color to denote if the portal needs recharging and how much.
 //                 Yellow: above 85%. Orange: above 70%. Red: above 15%. Magenta: below 15%.
 
@@ -9,6 +9,10 @@
 /* global L, TEAM_NONE*/
 
 var changelog = [
+  {
+    version: '0.2.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.2.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],

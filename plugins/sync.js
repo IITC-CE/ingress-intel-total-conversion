@@ -1,13 +1,17 @@
 // @author         xelio
 // @name           Sync
 // @category       Misc
-// @version        0.5.1
+// @version        0.5.2
 // @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 /* global gapi, IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.5.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.5.1',
     changes: ['IITC.toolbox API is used to create plugin buttons'],

@@ -1,13 +1,17 @@
 // @name           Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.9.0
+// @version        0.9.1
 // @description    Machina investigation tools - 2 new layers to see possible Machina spread and portal detail links to display Machina cluster information and to navigate to parent or seed Machina portal
 
 /* exported setup, changelog --eslint */
 /* global , digits, L, map, dialog, getPortalLinks, portalDetail, turf, IITC */
 
 var changelog = [
+  {
+    version: '0.9.1',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.9.0',
     changes: [

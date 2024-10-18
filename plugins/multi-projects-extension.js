@@ -1,13 +1,17 @@
 // @author         ZasoGD
 // @name           Multi Projects Extension
 // @category       Controls
-// @version        0.1.3
+// @version        0.1.4
 // @description    Create separated projects in some plugins.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.1.4',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.1.3',
     changes: ['IITC.toolbox API is used to create plugin buttons'],

@@ -1,12 +1,16 @@
 // @author         johtata
 // @name           Ornament icons extended
 // @category       Layer
-// @version        0.1.1
+// @version        0.1.2
 // @description    Additonal icons and names for beacons
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.1.2',
+    changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
+  },
   {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: added plugin icon'],
