@@ -783,9 +783,10 @@ function renderMsgRow(data) {
   var timeCell = IITC.comm.renderTimeCell(data.time, timeClass);
 
   var nickClasses = ['nickname'];
-  if (data.player.team === window.TEAM_ENL || data.player.team === window.TEAM_RES) {
+  if (window.TEAM_TO_CSS[data.player.team]) {
     nickClasses.push(window.TEAM_TO_CSS[data.player.team]);
   }
+
   // highlight things said/done by the player in a unique colour
   // (similar to @player mentions from others in the chat text itself)
   if (data.player.name === window.PLAYER.nickname) {
