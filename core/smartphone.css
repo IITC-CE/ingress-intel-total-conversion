@@ -125,10 +125,6 @@ body {
   margin-left: 4px;
 }
 
-#sidebar, #chatcontrols, #chat, #chatinput {
-  background: transparent !important;
-}
-
 .leaflet-top .leaflet-control {
   margin-top: 5px !important;
   margin-left: 5px !important;
@@ -257,3 +253,34 @@ body {
    https://github.com/IITC-CE/ingress-intel-total-conversion/issues/89
 */
 .leaflet-bottom { bottom: 5px; }
+
+/* Controls for mobile view without an app */
+:root {
+  --top-controls-height: 38px;
+}
+
+body.show_controls #chatcontrols {
+  display: flex !important;
+  top: 0;
+  overflow-x: auto;
+  width: calc(100% - 1px);
+}
+
+body.show_controls #chatcontrols a {
+  flex: 1;
+  min-width: fit-content;
+  padding: 0 5px;
+}
+
+body.show_controls #map {
+  height: calc(100vh - var(--top-controls-height) - 25px);
+  margin-top: var(--top-controls-height);
+}
+
+body.show_controls #scrollwrapper {
+  margin-top: var(--top-controls-height)
+}
+
+body.show_controls #chat {
+  top: var(--top-controls-height) !important;
+}

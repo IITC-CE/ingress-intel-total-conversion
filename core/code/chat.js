@@ -364,7 +364,12 @@ chat.show = function (name) {
 chat.chooser = function (event) {
   var t = $(event.target);
   var tab = t.data('channel');
-  chat.chooseTab(tab);
+
+  if (window.isSmartphone() && !window.useAppPanes()) {
+    window.show(tab);
+  } else {
+    chat.chooseTab(tab);
+  }
 };
 
 /**
