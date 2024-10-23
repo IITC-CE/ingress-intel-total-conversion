@@ -63,20 +63,26 @@ window.runOnSmartphonesBeforeBoot = function() {
   }
 
   window.smartphone.mapButton = $('<a>map</a>').click(function() {
+    window.show('map');
     $('#map').css({'visibility': 'visible', 'opacity': '1'});
     $('#updatestatus').show();
-    $('#chatcontrols a .active').removeClass('active');
+    $('#chatcontrols a.active').removeClass('active');
     $("#chatcontrols a:contains('map')").addClass('active');
   });
 
   window.smartphone.sideButton = $('<a>info</a>').click(function() {
+    window.show('info');
     $('#scrollwrapper').show();
     window.resetScrollOnNewPortal();
-    $('.active').removeClass('active');
+    $('#chatcontrols a.active').removeClass('active');
     $("#chatcontrols a:contains('info')").addClass('active');
   });
 
   $('#chatcontrols').append(smartphone.mapButton).append(smartphone.sideButton);
+
+  if (!window.useAppPanes()) {
+    document.body.classList.add('show_controls');
+  }
 
   window.addHook('portalDetailsUpdated', function(data) {
     var x = $('.imgpreview img').removeClass('hide');
@@ -193,8 +199,4 @@ window.runOnSmartphonesAfterBoot = function() {
         $("#sidebar").animate({ scrollTop: newTop }, 200);
       }
     });
-
-  // make buttons in action bar flexible
-  var l = $('#chatcontrols a:visible');
-  l.css('width', 100/l.length + '%');
 }
