@@ -1,13 +1,17 @@
 // @name           Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.9.1
+// @version        0.9.2
 // @description    Machina investigation tools - 2 new layers to see possible Machina spread and portal detail links to display Machina cluster information and to navigate to parent or seed Machina portal
 
 /* exported setup, changelog --eslint */
-/* global , digits, L, map, dialog, getPortalLinks, portalDetail, turf, IITC */
+/* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.9.2',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.9.1',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -60,7 +64,7 @@ machinaTools.findParent = function (portalGuid) {
   var parent = undefined;
 
   if (portalGuid !== 'undefined') {
-    var linkGuids = getPortalLinks(portalGuid);
+    var linkGuids = window.getPortalLinks(portalGuid);
     $.each(linkGuids.in, function (i, lguid) {
       var l = window.links[lguid];
       var ld = l.options.data;
@@ -87,7 +91,7 @@ machinaTools.goToParent = function (portalGuid) {
   if (parent !== undefined) {
     window.zoomToAndShowPortal(parent.guid, [parent.lat, parent.lng]);
   } else {
-    dialog({
+    window.dialog({
       html: $('<div id="no-machina-parent">No Parent found.</div>'),
       title: 'Machina Tools',
       id: 'no-machina-parent',
@@ -159,7 +163,8 @@ machinaTools.gatherMachinaPortalDetail = function (portalGuid, depth) {
       latlng: toLatLng(portal.options.data.latE6, portal.options.data.lngE6),
       level: Math.max(portal.options.level, ...(portal.options.data.resonators || []).map((r) => r.level)),
       name: portal.options.data.title,
-      children: getPortalLinks(portalGuid)
+      children: window
+        .getPortalLinks(portalGuid)
         .out.map((lGuid) => {
           var l = window.links[lGuid];
           return {
@@ -253,9 +258,9 @@ function createChildListItem(parent, childData, childPortal) {
 
   var lengthDescription;
   if (childData.length < 100000) {
-    lengthDescription = digits(Math.round(childData.length)) + 'm';
+    lengthDescription = window.digits(Math.round(childData.length)) + 'm';
   } else {
-    lengthDescription = digits(Math.round(childData.length / 1000)) + 'km';
+    lengthDescription = window.digits(Math.round(childData.length / 1000)) + 'km';
   }
 
   if (window.LINK_RANGE_MAC[parent.level] < childData.length) {
@@ -333,7 +338,7 @@ function doDisplayClusterInfo(seed) {
   if (machinaTools._clusterDialogs[guid]) {
     machinaTools._clusterDialogs[guid].html(html);
   } else {
-    machinaTools._clusterDialogs[guid] = dialog({
+    machinaTools._clusterDialogs[guid] = window.dialog({
       html: html,
       title: 'Machina Cluster',
       id: 'machina-cluster-' + guid.replaceAll('.', '_'),
@@ -360,7 +365,7 @@ machinaTools.onPortalDetailsUpdated = function () {
   // If the portal was cleared then exit.
   if (window.selectedPortal === null) return;
 
-  portalData = portalDetail.get(window.selectedPortal);
+  portalData = window.portalDetail.get(window.selectedPortal);
 
   if (portalData.team === window.TEAM_CODE_MAC) {
     var linkdetails = $('.linkdetails');
@@ -415,7 +420,7 @@ machinaTools.addConflictZone = function (guid, zone) {
   if (!machinaTools.conflictArea) {
     machinaTools.conflictArea = zone.toGeoJSON();
   } else {
-    machinaTools.conflictArea = turf.union(machinaTools.conflictArea, zone.toGeoJSON());
+    machinaTools.conflictArea = window.turf.union(machinaTools.conflictArea, zone.toGeoJSON());
   }
 };
 
@@ -580,7 +585,7 @@ function refreshDialogs(guid) {
 }
 
 machinaTools.showConflictAreaInfoDialog = function () {
-  machinaTools._conflictAreaInfoDialog = dialog({
+  machinaTools._conflictAreaInfoDialog = window.dialog({
     html: createAreaInfoDialogContent(),
     title: 'Machina Conflict Area Info',
     id: 'machina-conflict-area-info',
@@ -595,11 +600,11 @@ machinaTools.showConflictAreaInfoDialog = function () {
 };
 
 function isDisplayLayerEnabled() {
-  return map.hasLayer(machinaTools.displayLayer);
+  return window.map.hasLayer(machinaTools.displayLayer);
 }
 
 function isConflictLayerEnabled() {
-  return map.hasLayer(machinaTools.conflictLayer);
+  return window.map.hasLayer(machinaTools.conflictLayer);
 }
 
 machinaTools.loadConflictAreas = function () {
@@ -659,7 +664,7 @@ function createClustersInfoDialog() {
   var seeds = [];
   var linkLengths;
   var htmlLines = Object.values(window.portals)
-    .filter((p) => p.options.team === window.TEAM_MAC && map.getBounds().contains(p.getLatLng()))
+    .filter((p) => p.options.team === window.TEAM_MAC && window.map.getBounds().contains(p.getLatLng()))
     .map((p) => {
       var seedData = machinaTools.findSeed(p.options.guid);
       if (!seeds.find((s) => s.guid === seedData.guid)) {
@@ -686,7 +691,7 @@ function createClustersInfoDialog() {
 }
 
 machinaTools.showClustersDialog = function () {
-  machinaTools._clustersInfoDialog = dialog({
+  machinaTools._clustersInfoDialog = window.dialog({
     html: createClustersInfoDialog(),
     title: 'Visible Machina Clusters',
     dialogClass: 'machina-tools',
@@ -715,11 +720,11 @@ function loadLinkBoxPosition() {
 }
 
 machinaTools.refreshLinkLengths = function () {
-  if (map.hasLayer(machinaTools.linkLengthsLayer)) {
+  if (window.map.hasLayer(machinaTools.linkLengthsLayer)) {
     machinaTools.removeLinkLengths();
     machinaTools._maxLinks[0] = 0;
     machinaTools._maxLinks = Object.values(window.links)
-      .filter((l) => l.options.team === window.TEAM_MAC && map.getBounds().contains(L.latLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6)))
+      .filter((l) => l.options.team === window.TEAM_MAC && window.map.getBounds().contains(L.latLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6)))
       .reduce((previousValue, link) => {
         var origin = window.portals[link.options.data.oGuid];
         if (origin && origin.options.data.resCount === 8) {
@@ -804,7 +809,7 @@ function setupHooks() {
   window.addHook('mapDataRefreshEnd', machinaTools.mapDataRefreshEnd);
 
   // Add a hook to trigger the showOrHide method when the map finishes zooming or reloads.
-  map.on('zoomend', machinaTools.zoomEnded);
+  window.map.on('zoomend', machinaTools.zoomEnded);
 }
 
 function setupToolBoxLinks() {
@@ -881,13 +886,12 @@ var setup = function () {
   setupUI();
 };
 
-/* eslint-disable */
-function loadExternals () {
+function loadExternals() {
   try {
+    // eslint-disable-next-line
    '@include_raw:external/turf-union.js@';
   } catch (e) {
     console.error('loading externals failed');
     throw e;
   }
 }
-/* eslint-enable */

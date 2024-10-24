@@ -1,12 +1,16 @@
 // @author         johtata
 // @name           Ornament icons basic
 // @category       Layer
-// @version        0.1.2
+// @version        0.1.3
 // @description    Add own icons and names for ornaments
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.1.3',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.1.2',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -17,7 +21,7 @@ var changelog = [
   },
 ];
 
-/**********************
+/** ********************
 // Added as part of the Ingress #Helios in 2014, ornaments
 // are additional image overlays for portals.
 // currently there are 6 known types of ornaments: ap$x$suffix
@@ -85,7 +89,7 @@ window.plugin.ornamentIcons = function () {};
 window.plugin.ornamentIcons.jsonUrl = 'https://iitc.app/extras/ornaments/definitions.json';
 
 // append or overwrite external definitions
-window.plugin.ornamentIcons.setIcons = function(externalIconDefinitions) {
+window.plugin.ornamentIcons.setIcons = function (externalIconDefinitions) {
   const localIconDefinitions = {
     // give a name, leave layer to default, url and offset ([0, 0.5] to place above the portal)
     // 'peTOASTY': {
@@ -94,15 +98,13 @@ window.plugin.ornamentIcons.setIcons = function(externalIconDefinitions) {
     //   url: '##include_img:images/ornament-TOASTY.svg##' // replace "##" with single "@"
     // }
   };
-  window.ornaments.icon = {...window.ornaments.icon, ...externalIconDefinitions, ...localIconDefinitions};
-}
+  window.ornaments.icon = { ...window.ornaments.icon, ...externalIconDefinitions, ...localIconDefinitions };
+};
 
-function setup () {
-  fetch(window.plugin.ornamentIcons.jsonUrl).then(response => {
-    response.json().then(data => {
+function setup() {
+  fetch(window.plugin.ornamentIcons.jsonUrl).then((response) => {
+    response.json().then((data) => {
       window.plugin.ornamentIcons.setIcons(data.ornaments);
-    })
+    });
   });
-
 }
-/* exported setup */

@@ -1,13 +1,17 @@
 // @author         johnd0e
 // @name           Yandex maps
 // @category       Map Tiles
-// @version        0.3.3
+// @version        0.3.4
 // @description    Add Yandex.com (Russian/Русский) map layers
 
 /* exported setup, changelog --eslint */
-/* global L, layerChooser */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.4',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.3.3',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -23,19 +27,19 @@ var mapYandex = {};
 
 mapYandex.types = {
   map: {
-    type: 'map'
+    type: 'map',
   },
   satellite: {
-    type: 'satellite'
+    type: 'satellite',
   },
   hybrid: {
-    type: 'hybrid'
+    type: 'hybrid',
   },
 };
 
 mapYandex.options = {
   // set this to your API key
-  apiParams: '<your API-key>'
+  apiParams: '<your API-key>',
 };
 
 function setup() {
@@ -43,12 +47,11 @@ function setup() {
 
   for (var name in mapYandex.types) {
     var options = L.extend({}, mapYandex.options, mapYandex.types[name]);
-    layerChooser.addBaseLayer(L.yandex(options), 'Yandex ' + name);
+    window.layerChooser.addBaseLayer(L.yandex(options), 'Yandex ' + name);
   }
 }
 
-function setupYandexLeaflet () {
-
+function setupYandexLeaflet() {
   try {
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Yandex.js
     '@include_raw:external/Yandex.js@'; // eslint-disable-line

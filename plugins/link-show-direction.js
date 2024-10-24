@@ -4,8 +4,8 @@
 // @version        0.2.4
 // @description    Show the direction of links on the map by adding short dashes to the line at the origin portal.
 
-/* global IITC -- eslint */
 /* exported setup, changelog --eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   {
@@ -23,19 +23,15 @@ var changelog = [
 ];
 
 // use own namespace for plugin
-window.plugin.linkShowDirection = function() {};
+window.plugin.linkShowDirection = function () {};
 window.plugin.linkShowDirection.ANIMATE_UPDATE_TIME = 1000; // 1000ms = 1s
 
 // Hack:
 // 100000 - a large enough number to be the equivalent of 100%, which is not supported Leaflet when displaying with canvas
 window.plugin.linkShowDirection.styles = {
-  'Disabled': [null],
-  'Static *': [
-    '30,5,15,5,15,5,2,5,2,5,2,5,2,5,30,0',
-  ],
-  'Static near origin': [
-    '10,5,5,5,5,5,5,5,100000',
-  ],
+  Disabled: [null],
+  'Static *': ['30,5,15,5,15,5,2,5,2,5,2,5,2,5,30,0'],
+  'Static near origin': ['10,5,5,5,5,5,5,5,100000'],
   'Animate near origin': [
     '10,5,5,5,5,5,5,5,100000',
     '12,5,5,5,5,5,5,3,100000',
@@ -43,24 +39,17 @@ window.plugin.linkShowDirection.styles = {
     '10,1,5,5,5,5,5,5,100000',
     '10,3,5,5,5,5,5,5,100000',
   ],
-  'Animate full link': [
-    '4,6,4,6,4,6,4,6',
-    '0,2,4,6,4,6,4,4',
-    '0,4,4,6,4,6,4,2',
-    '0,6,4,6,4,6,4,0',
-    '2,6,4,6,4,6,2,0',
-  ],
+  'Animate full link': ['4,6,4,6,4,6,4,6', '0,2,4,6,4,6,4,4', '0,4,4,6,4,6,4,2', '0,6,4,6,4,6,4,0', '2,6,4,6,4,6,2,0'],
 };
 window.plugin.linkShowDirection.dashArray = null;
 window.plugin.linkShowDirection.frame = 0;
 window.plugin.linkShowDirection.moving = false;
 
-
-window.plugin.linkShowDirection.animateLinks = function() {
+window.plugin.linkShowDirection.animateLinks = function () {
   var frames = window.plugin.linkShowDirection.styles[window.plugin.linkShowDirection.mode];
-  if(!frames) frames = [null];
+  if (!frames) frames = [null];
 
-  if(!window.plugin.linkShowDirection.moving) {
+  if (!window.plugin.linkShowDirection.moving) {
     var frame = window.plugin.linkShowDirection.frame;
     frame = (frame + 1) % frames.length;
     window.plugin.linkShowDirection.frame = frame;
@@ -69,7 +58,7 @@ window.plugin.linkShowDirection.animateLinks = function() {
     window.plugin.linkShowDirection.addAllLinkStyles();
   }
 
-  if(frames.length < 2) return; // no animation needed
+  if (frames.length < 2) return; // no animation needed
 
   // browsers don't render the SVG style changes until after the timer function has finished.
   // this means if we start the next timeout in here a lot of the delay time will be taken by the browser itself
@@ -78,87 +67,94 @@ window.plugin.linkShowDirection.animateLinks = function() {
   // to prevent this, create a short timer that then sets the timer for the next frame. if the browser is slow to render,
   // the short timer should fire later, at which point the desired ANIMATE_UPDATE_TIME timer is started
   clearTimeout(window.plugin.linkShowDirection.timer);
-  window.plugin.linkShowDirection.timer = setTimeout(function() {
+  window.plugin.linkShowDirection.timer = setTimeout(function () {
     clearTimeout(window.plugin.linkShowDirection.timer);
-    window.plugin.linkShowDirection.timer = setTimeout(
-      window.plugin.linkShowDirection.animateLinks,
-      window.plugin.linkShowDirection.ANIMATE_UPDATE_TIME);
+    window.plugin.linkShowDirection.timer = setTimeout(window.plugin.linkShowDirection.animateLinks, window.plugin.linkShowDirection.ANIMATE_UPDATE_TIME);
   }, 10);
 };
 
-window.plugin.linkShowDirection.addAllLinkStyles = function() {
-  $.each(links,function(guid,link) { window.plugin.linkShowDirection.addLinkStyle(link); });
+window.plugin.linkShowDirection.addAllLinkStyles = function () {
+  $.each(window.links, function (guid, link) {
+    window.plugin.linkShowDirection.addLinkStyle(link);
+  });
 
-  if(window.plugin.drawTools && localStorage['plugin-linkshowdirection-drawtools'] == "true") {
-    window.plugin.drawTools.drawnItems.eachLayer(function(layer) {
-      if(layer instanceof L.GeodesicPolyline)
-        window.plugin.linkShowDirection.addLinkStyle(layer);
+  if (window.plugin.drawTools && localStorage['plugin-linkshowdirection-drawtools'] === 'true') {
+    window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
+      if (layer instanceof L.GeodesicPolyline) window.plugin.linkShowDirection.addLinkStyle(layer);
     });
   }
 };
 
-window.plugin.linkShowDirection.addLinkStyle = function(link) {
-  link.setStyle({dashArray: window.plugin.linkShowDirection.dashArray});
+window.plugin.linkShowDirection.addLinkStyle = function (link) {
+  link.setStyle({ dashArray: window.plugin.linkShowDirection.dashArray });
 };
 
-window.plugin.linkShowDirection.removeDrawToolsStyle = function() {
-  if(!window.plugin.drawTools) return;
+window.plugin.linkShowDirection.removeDrawToolsStyle = function () {
+  if (!window.plugin.drawTools) return;
 
-  window.plugin.drawTools.drawnItems.eachLayer(function(layer) {
-    if(layer instanceof L.GeodesicPolyline)
-      layer.setStyle({dashArray: null});
+  window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
+    if (layer instanceof L.GeodesicPolyline) layer.setStyle({ dashArray: null });
   });
 };
 
-window.plugin.linkShowDirection.showDialog = function() {
+window.plugin.linkShowDirection.showDialog = function () {
   var div = document.createElement('div');
 
-  $.each(window.plugin.linkShowDirection.styles, function(style) {
+  $.each(window.plugin.linkShowDirection.styles, function (style) {
     var label = div.appendChild(document.createElement('label'));
     var input = label.appendChild(document.createElement('input'));
     input.type = 'radio';
     input.name = 'plugin-link-show-direction';
     input.value = style;
-    if(style == window.plugin.linkShowDirection.mode) {
+    if (style === window.plugin.linkShowDirection.mode) {
       input.checked = true;
     }
 
-    input.addEventListener('click', function() {
-      window.plugin.linkShowDirection.mode = style;
-      localStorage['plugin-linkshowdirection-mode'] = style;
-      window.plugin.linkShowDirection.animateLinks();
-    }, false);
+    input.addEventListener(
+      'click',
+      function () {
+        window.plugin.linkShowDirection.mode = style;
+        localStorage['plugin-linkshowdirection-mode'] = style;
+        window.plugin.linkShowDirection.animateLinks();
+      },
+      false
+    );
 
     label.appendChild(document.createTextNode(' ' + style));
 
     div.appendChild(document.createElement('br'));
   });
 
-  div.appendChild(document.createTextNode(
-    ' * Static: six segments will indicate each link\'s direction. ' +
-    'Two long segments are on the origin\'s side, follow by four short segments on the destination\'s side.'));
+  div.appendChild(
+    document.createTextNode(
+      " * Static: six segments will indicate each link's direction. " +
+        "Two long segments are on the origin's side, follow by four short segments on the destination's side."
+    )
+  );
 
-  if(window.plugin.drawTools) {
+  if (window.plugin.drawTools) {
     div.appendChild(document.createElement('br'));
 
     var label = div.appendChild(document.createElement('label'));
     var input = label.appendChild(document.createElement('input'));
     input.type = 'checkbox';
-    input.checked = localStorage['plugin-linkshowdirection-drawtools'] == "true";
+    input.checked = localStorage['plugin-linkshowdirection-drawtools'] === 'true';
 
-    input.addEventListener('click', function() {
-      localStorage['plugin-linkshowdirection-drawtools'] = input.checked.toString();
+    input.addEventListener(
+      'click',
+      function () {
+        localStorage['plugin-linkshowdirection-drawtools'] = input.checked.toString();
 
-      if(input.checked)
-        window.plugin.linkShowDirection.animateLinks();
-      else
-        window.plugin.linkShowDirection.removeDrawToolsStyle();
-    }, false);
+        if (input.checked) window.plugin.linkShowDirection.animateLinks();
+        else window.plugin.linkShowDirection.removeDrawToolsStyle();
+      },
+      false
+    );
 
     label.appendChild(document.createTextNode(' Apply to DrawTools'));
   }
 
-  dialog({
+  window.dialog({
     id: 'plugin-link-show-direction',
     html: div,
     title: 'Show link direction',
@@ -171,7 +167,9 @@ window.plugin.linkShowDirection.setup = function () {
     action: window.plugin.linkShowDirection.showDialog,
   });
 
-  addHook('linkAdded', function(data) { window.plugin.linkShowDirection.addLinkStyle(data.link); });
+  window.addHook('linkAdded', function (data) {
+    window.plugin.linkShowDirection.addLinkStyle(data.link);
+  });
 
   const default_mode = 'Static near origin';
   try {
@@ -184,8 +182,12 @@ window.plugin.linkShowDirection.setup = function () {
   window.plugin.linkShowDirection.animateLinks();
 
   // set up move start/end handlers to pause animations while moving
-  map.on('movestart', function() { window.plugin.linkShowDirection.moving = true; });
-  map.on('moveend', function() { window.plugin.linkShowDirection.moving = false; });
+  window.map.on('movestart', function () {
+    window.plugin.linkShowDirection.moving = true;
+  });
+  window.map.on('moveend', function () {
+    window.plugin.linkShowDirection.moving = false;
+  });
 };
 
-var setup =  window.plugin.linkShowDirection.setup;
+var setup = window.plugin.linkShowDirection.setup;

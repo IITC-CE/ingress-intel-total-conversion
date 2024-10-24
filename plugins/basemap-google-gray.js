@@ -1,13 +1,17 @@
 // @author         jacob1123
 // @name           Gray Google map
 // @category       Map Tiles
-// @version        0.1.6
+// @version        0.1.7
 // @description    Add a simplified gray Version of Google map tiles as an optional layer.
 
 /* exported setup, changelog --eslint */
-/* global L, layerChooser */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.1.7',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.1.6',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -35,12 +39,12 @@ grayGMaps.addLayer = function () {
       { featureType: 'poi' },
       { featureType: 'landscape.man_made', stylers: [{ saturation: -100 }, { gamma: 0.13 }] },
       { featureType: 'water', elementType: 'labels', stylers: [{ visibility: 'off' }] },
-    ]
+    ],
   };
 
   var grayGMaps = L.gridLayer.googleMutant(grayGMapsOptions);
 
-  layerChooser.addBaseLayer(grayGMaps, "Google Gray");
+  window.layerChooser.addBaseLayer(grayGMaps, 'Google Gray');
 };
 
 function setup() {

@@ -1,12 +1,17 @@
 ﻿// @author         modos189
 // @name           Fix maps offsets in China
 // @category       Tweaks
-// @version        0.3.3
+// @version        0.3.4
 // @description    Show correct maps for China user by applying offset tweaks.
 
 /* exported setup, changelog --eslint */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.4',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.3.3',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -27,7 +32,6 @@ window.plugin.fixChinaMapOffset = fixChinaMapOffset;
 // to any map that has custom TileLayer option `needFixChinaOffset: true`.
 //
 // Example: basemap-gaode.user.js
-
 
 // Before understanding how this plugin works, you should know 3 points:
 //
@@ -77,8 +81,8 @@ window.plugin.fixChinaMapOffset = fixChinaMapOffset;
 // https://github.com/Artoria2e5/PRCoords
 // (more info: https://github.com/iitc-project/ingress-intel-total-conversion/pull/1188)
 
-var insane_is_in_china = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/misc/insane_is_in_china.js
-/* eslint-disable */
+var insane_is_in_china = (function () {
+  // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/misc/insane_is_in_china.js
   'use strict';
 
   // This set of points roughly illustrates the scope of Google's
@@ -88,6 +92,7 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
   //
   // Edits around these points are welcome.
 
+  /* eslint-disable */
   // lon, lat
   var POINTS = [
     // start hkmo
@@ -162,60 +167,83 @@ var insane_is_in_china = (function () { // adapted from https://github.com/Artor
     107.730505, 18.193406,
     110.669856, 17.754550,
   ];
+  /* eslint-enable */
 
-  var lats = POINTS.filter(function (_, idx) { return idx % 2 === 1; });
-  var lons = POINTS.filter(function (_, idx) { return idx % 2 === 0; });
-  var XYs = lats.map(function (_, i) { return { x: lats[i], y: lons[i]}; });
+  var lats = POINTS.filter(function (_, idx) {
+    return idx % 2 === 1;
+  });
+  var lons = POINTS.filter(function (_, idx) {
+    return idx % 2 === 0;
+  });
+  var XYs = lats.map(function (_, i) {
+    return { x: lats[i], y: lons[i] };
+  });
 
-  function isInChina (lat, lon) {
+  function isInChina(lat, lon) {
     // Yank out South China Sea as it's not distorted.
-    if (lat >= 17.754 && lat <= 55.8271 &&
-        lon >= 72.004 && lon <= 137.8347) {
-      return window.pnpoly(XYs, {x: lat, y: lon});
+    if (lat >= 17.754 && lat <= 55.8271 && lon >= 72.004 && lon <= 137.8347) {
+      return window.pnpoly(XYs, { x: lat, y: lon });
     }
   }
 
   return { isInChina: isInChina };
-/* eslint-enable */
 })();
 
 fixChinaMapOffset.isInChina = insane_is_in_china.isInChina;
 
-var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
-/* eslint-disable */
+var PRCoords = (function () {
+  // adapted from https://github.com/Artoria2e5/PRCoords/blob/master/js/PRCoords.js
   'use strict';
 
-  /// Krasovsky 1940 ellipsoid
-  /// @const
+  // Krasovsky 1940 ellipsoid
+  // @const
   var GCJ_A = 6378245;
+  // eslint-disable-next-line no-loss-of-precision
   var GCJ_EE = 0.00669342162296594323; // f = 1/298.3; e^2 = 2*f - f**2
 
-  function wgs_gcj (wgs) {
-
+  function wgs_gcj(wgs) {
     var x = wgs.lng - 105, // mod: lon->lng
-        y = wgs.lat - 35;
+      y = wgs.lat - 35;
 
     // These distortion functions accept (x = lon - 105, y = lat - 35).
     // They return distortions in terms of arc lengths, in meters.
-    var dLat_m = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y +
-      0.2 * Math.sqrt(Math.abs(x)) + (
-        2 * Math.sin(x * 6 * Math.PI) + 2 * Math.sin(x * 2 * Math.PI) +
-        2 * Math.sin(y * Math.PI) + 4 * Math.sin(y / 3 * Math.PI) +
-        16 * Math.sin(y / 12 * Math.PI) + 32 * Math.sin(y / 30 * Math.PI)
-      ) * 20 / 3;
-    var dLon_m = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y +
-      0.1 * Math.sqrt(Math.abs(x)) + (
-        2 * Math.sin(x * 6 * Math.PI) + 2 * Math.sin(x * 2 * Math.PI) +
-        2 * Math.sin(x * Math.PI) + 4 * Math.sin(x / 3 * Math.PI) +
-        15 * Math.sin(x / 12 * Math.PI) + 30 * Math.sin(x / 30 * Math.PI)
-      ) * 20 / 3;
+    var dLat_m =
+      -100 +
+      2 * x +
+      3 * y +
+      0.2 * y * y +
+      0.1 * x * y +
+      0.2 * Math.sqrt(Math.abs(x)) +
+      ((2 * Math.sin(x * 6 * Math.PI) +
+        2 * Math.sin(x * 2 * Math.PI) +
+        2 * Math.sin(y * Math.PI) +
+        4 * Math.sin((y / 3) * Math.PI) +
+        16 * Math.sin((y / 12) * Math.PI) +
+        32 * Math.sin((y / 30) * Math.PI)) *
+        20) /
+        3;
+    var dLon_m =
+      300 +
+      x +
+      2 * y +
+      0.1 * x * x +
+      0.1 * x * y +
+      0.1 * Math.sqrt(Math.abs(x)) +
+      ((2 * Math.sin(x * 6 * Math.PI) +
+        2 * Math.sin(x * 2 * Math.PI) +
+        2 * Math.sin(x * Math.PI) +
+        4 * Math.sin((x / 3) * Math.PI) +
+        15 * Math.sin((x / 12) * Math.PI) +
+        30 * Math.sin((x / 30) * Math.PI)) *
+        20) /
+        3;
 
-    var radLat = wgs.lat / 180 * Math.PI;
+    var radLat = (wgs.lat / 180) * Math.PI;
     var magic = 1 - GCJ_EE * Math.pow(Math.sin(radLat), 2); // just a common expr
 
     // Arc lengths per degree, on the wrong ellipsoid
-    var lat_deg_arclen = Math.PI / 180 * (GCJ_A * (1 - GCJ_EE)) / Math.pow(magic, 1.5);
-    var lon_deg_arclen = Math.PI / 180 * (GCJ_A * Math.cos(radLat) / Math.sqrt(magic));
+    var lat_deg_arclen = ((Math.PI / 180) * (GCJ_A * (1 - GCJ_EE))) / Math.pow(magic, 1.5);
+    var lon_deg_arclen = (Math.PI / 180) * ((GCJ_A * Math.cos(radLat)) / Math.sqrt(magic));
 
     return {
       lat: wgs.lat + dLat_m / lat_deg_arclen,
@@ -224,7 +252,6 @@ var PRCoords = (function () { // adapted from https://github.com/Artoria2e5/PRCo
   }
 
   return { wgs_gcj: wgs_gcj };
-/* eslint-enable */
 })();
 
 fixChinaMapOffset.wgs_gcj = PRCoords.wgs_gcj;
@@ -233,12 +260,14 @@ fixChinaMapOffset.wgs_gcj = PRCoords.wgs_gcj;
 var fixChinaOffset = {
   _inChina: false,
 
-  _inChinaLastChecked: [0,0],
+  _inChinaLastChecked: [0, 0],
 
   _inChinaValidRadius: 100000,
 
   _isInChina: function (latlng) {
-    if (latlng._notChina) { return false; } // do not check twice same latlng
+    if (latlng._notChina) {
+      return false;
+    } // do not check twice same latlng
 
     if (latlng.distanceTo(this._inChinaLastChecked) > this._inChinaValidRadius) {
       // recheck only when beyond of specified radius, otherwise keep last known value
@@ -250,10 +279,12 @@ var fixChinaOffset = {
   },
 
   _fixChinaOffset: function (latlng) {
-    if (!this.options.needFixChinaOffset) { return latlng; }
-    if (!latlng._gcj) { // do not calculate twice same latlng
-      latlng._gcj = this._isInChina(latlng) &&
-        fixChinaMapOffset.wgs_gcj(latlng);
+    if (!this.options.needFixChinaOffset) {
+      return latlng;
+    }
+    if (!latlng._gcj) {
+      // do not calculate twice same latlng
+      latlng._gcj = this._isInChina(latlng) && fixChinaMapOffset.wgs_gcj(latlng);
     }
     return latlng._gcj || latlng;
   },
@@ -266,11 +297,11 @@ var fixChinaOffset = {
   _setZoomTransform: function (level, center, zoom) {
     center = this._fixChinaOffset(center);
     return L.GridLayer.prototype._setZoomTransform.call(this, level, center, zoom);
-  }
+  },
 };
 
 // redefine L.GridLayer.GoogleMutant methods
-function fixGoogleMutant (_update, style) {
+function fixGoogleMutant(_update, style) {
   return function (wgs) {
     wgs = wgs || this._map.getCenter();
     _update.call(this, wgs);
@@ -280,8 +311,7 @@ function fixGoogleMutant (_update, style) {
         wgs._gcj = wgs._gcj || fixChinaMapOffset.wgs_gcj(wgs);
         if (o.type === 'hybrid') {
           var zoom = this._map.getZoom();
-          var offset = this._map.project(wgs, zoom)
-            .subtract(this._map.project(wgs._gcj, zoom));
+          var offset = this._map.project(wgs, zoom).subtract(this._map.project(wgs._gcj, zoom));
           style.transform = L.Util.template('translate3d({x}px, {y}px, 0px)', offset);
         } else {
           this._mutant.setCenter(wgs._gcj);
@@ -291,7 +321,7 @@ function fixGoogleMutant (_update, style) {
   };
 }
 
-function setup () {
+function setup() {
   // add support of `needFixChinaOffset` property to any TileLayer
   L.TileLayer.include(fixChinaOffset);
 
@@ -300,11 +330,10 @@ function setup () {
   var css = document.body.appendChild(styleEl).sheet;
   var cssrule = css.cssRules[css.insertRule('.google-mutant .leaflet-tile img:nth-child(2) {}')];
 
-  L.GridLayer.GoogleMutant
-    .mergeOptions({className: 'google-mutant'})
+  L.GridLayer.GoogleMutant.mergeOptions({ className: 'google-mutant' })
     .include(fixChinaOffset)
     .include({
-      _update: fixGoogleMutant(L.GridLayer.GoogleMutant.prototype._update, cssrule.style)
+      _update: fixGoogleMutant(L.GridLayer.GoogleMutant.prototype._update, cssrule.style),
     })
     .addInitHook(function () {
       var o = this.options;
