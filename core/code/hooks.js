@@ -1,3 +1,5 @@
+/* global log -- eslint */
+
 /**
  * @file Plugin hooks for IITC. This file defines the infrastructure for managing and executing hooks,
  * which are used to trigger custom plugin actions at specific points in the application lifecycle.
@@ -66,29 +68,27 @@ var isRunning = 0;
  * @param {Object} [data] - Additional data to pass to each callback.
  * @returns {boolean} Returns `false` if the execution of the callbacks was interrupted, otherwise `true`.
  */
-window.runHooks = function(event, data) {
-  if (!_hooks[event]) { return true; }
+window.runHooks = function (event, data) {
+  if (!window._hooks[event]) {
+    return true;
+  }
   var interrupted = false;
   isRunning++;
-  $.each(_hooks[event], function (ind, callback) {
+  $.each(window._hooks[event], function (ind, callback) {
     try {
       if (callback(data) === false) {
         interrupted = true;
         return false; // break from $.each
       }
     } catch (e) {
-      log.error('error running hook ' + event,
-        '\n' + e,
-        '\ncallback: ', callback,
-        '\ndata: ', data
-      );
+      log.error('error running hook ' + event, '\n' + e, '\ncallback: ', callback, '\ndata: ', data);
     }
   });
   isRunning--;
   return !interrupted;
 };
 
-window.pluginCreateHook = function() {}; // stub for compatibility
+window.pluginCreateHook = function () {}; // stub for compatibility
 
 /**
  * Registers a callback function for a specified hook event.
@@ -97,15 +97,15 @@ window.pluginCreateHook = function() {}; // stub for compatibility
  * @param {string} event - The name of the hook event.
  * @param {Function} callback - The callback function to be executed when the event is triggered.
  */
-window.addHook = function(event, callback) {
+window.addHook = function (event, callback) {
   if (typeof callback !== 'function') {
     throw new Error('Callback must be a function.');
   }
 
-  if (!_hooks[event]) {
-    _hooks[event] = [callback];
+  if (!window._hooks[event]) {
+    window._hooks[event] = [callback];
   } else {
-    _hooks[event].push(callback);
+    window._hooks[event].push(callback);
   }
 };
 
@@ -117,12 +117,12 @@ window.addHook = function(event, callback) {
  * @param {string} event - The name of the hook event.
  * @param {Function} callback - The callback function to be removed.
  */
-window.removeHook = function(event, callback) {
+window.removeHook = function (event, callback) {
   if (typeof callback !== 'function') {
     throw new Error('Callback must be a function.');
   }
 
-  var listeners = _hooks[event];
+  var listeners = window._hooks[event];
   if (listeners) {
     var index = listeners.indexOf(callback);
     if (index === -1) {
@@ -130,7 +130,7 @@ window.removeHook = function(event, callback) {
     } else {
       if (isRunning) {
         listeners[index] = $.noop;
-        _hooks[event] = listeners = listeners.slice();
+        window._hooks[event] = listeners = listeners.slice();
       }
       listeners.splice(index, 1);
     }

@@ -465,7 +465,6 @@ chat.addChannel = function (channelDesc) {
  * Sets up all channels starting from intel COMM
  *
  * @function setupTabs
- * @param {ChannelDescription} channelDesc - channel description
  */
 chat.setupTabs = function () {
   isTabsSetup = true;

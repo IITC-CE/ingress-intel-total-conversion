@@ -1,13 +1,17 @@
 // @author         Johtaja
 // @name           Highlight portals based on history
 // @category       Highlighter
-// @version        0.3.2
+// @version        0.3.3
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 /* exported setup, changelog --eslint */
-/* global L */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.3',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.3.2',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -25,20 +29,20 @@ window.plugin.portalHighlighterPortalsHistory = portalsHistory;
 // exposed objects
 portalsHistory.styles = {
   common: {
-    fillOpacity: 1
+    fillOpacity: 1,
   },
   marked: {
-    fillColor: 'red'
+    fillColor: 'red',
   },
   semiMarked: {
-    fillColor: 'yellow'
+    fillColor: 'yellow',
   },
   commonOther: {
     // no action by default
-  }
+  },
 };
 
-function highlightPortalsHistoryVisited (data) {
+function highlightPortalsHistoryVisited(data) {
   var history = data.portal.options.data.history;
   if (!history) {
     return;
@@ -53,7 +57,7 @@ function highlightPortalsHistoryVisited (data) {
   }
 }
 
-function highlightPortalsHistoryNotVisited (data) {
+function highlightPortalsHistoryNotVisited(data) {
   var history = data.portal.options.data.history;
   if (!history) {
     return;
@@ -68,7 +72,7 @@ function highlightPortalsHistoryNotVisited (data) {
   }
 }
 
-function highlightPortalsHistoryScoutControlled (data) {
+function highlightPortalsHistoryScoutControlled(data) {
   var history = data.portal.options.data.history;
   if (!history) {
     return;
@@ -81,7 +85,7 @@ function highlightPortalsHistoryScoutControlled (data) {
   }
 }
 
-function highlightPortalsHistoryNotScoutControlled (data) {
+function highlightPortalsHistoryNotScoutControlled(data) {
   var history = data.portal.options.data.history;
   if (!history) {
     return;
@@ -95,7 +99,7 @@ function highlightPortalsHistoryNotScoutControlled (data) {
 }
 
 // Creating styles based on a given template
-function inherit (parentName, childNames) {
+function inherit(parentName, childNames) {
   var styles = portalsHistory.styles;
   childNames.forEach(function (name) {
     // Extension of _styles_ with a new _name_ object, created based on _parentName_ object.
@@ -103,7 +107,7 @@ function inherit (parentName, childNames) {
   });
 }
 
-function setup () {
+function setup() {
   inherit('common', ['marked', 'semiMarked']);
   inherit('semiMarked', ['visited', 'captureTarget']);
   inherit('marked', ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget']);

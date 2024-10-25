@@ -1,5 +1,3 @@
-/* global REFRESH MINIMUM_OVERRIDE_REFRESH */
-
 /**
  * @file This file contains functions and variables related to request handling in IITC.
  * Note: only meant for portal/links/fields request, everything else does not count towards “loading”
@@ -31,8 +29,8 @@ window.requests._lastRefreshTime = 0;
  */
 window.requests.add = function (ajax) {
   window.activeRequests.push(ajax);
-  renderUpdateStatus();
-}
+  window.renderUpdateStatus();
+};
 
 /**
  * Removes an AJAX request from the activeRequests array and updates the status.
@@ -42,8 +40,8 @@ window.requests.add = function (ajax) {
  */
 window.requests.remove = function (ajax) {
   window.activeRequests.splice(window.activeRequests.indexOf(ajax), 1);
-  renderUpdateStatus();
-}
+  window.renderUpdateStatus();
+};
 
 /**
  * Aborts all active AJAX requests and resets related variables and status.
@@ -58,8 +56,8 @@ window.requests.abort = function () {
   window.activeRequests = [];
   window.failedRequestCount = 0;
 
-  renderUpdateStatus();
-}
+  window.renderUpdateStatus();
+};
 
 /**
  * Sets a timeout for the next automatic refresh of data. Ensures only one timeout is queued.
@@ -79,22 +77,22 @@ window.startRefreshTimeout = function (override) {
   var t = 0;
   if (override) {
     t = override;
-    //ensure override can't cause too fast a refresh if repeatedly used (e.g. lots of scrolling/zooming)
+    // ensure override can't cause too fast a refresh if repeatedly used (e.g. lots of scrolling/zooming)
     let timeSinceLastRefresh = new Date().getTime() - window.requests._lastRefreshTime;
     if (timeSinceLastRefresh < 0) timeSinceLastRefresh = 0; // in case of clock adjustments
-    if (timeSinceLastRefresh < MINIMUM_OVERRIDE_REFRESH * 1000) {
-      t = MINIMUM_OVERRIDE_REFRESH * 1000 - timeSinceLastRefresh;
+    if (timeSinceLastRefresh < window.MINIMUM_OVERRIDE_REFRESH * 1000) {
+      t = window.MINIMUM_OVERRIDE_REFRESH * 1000 - timeSinceLastRefresh;
     }
   } else {
-    t = REFRESH * 1000;
+    t = window.REFRESH * 1000;
 
-    var adj = ZOOM_LEVEL_ADJ * (18 - map.getZoom());
+    var adj = window.ZOOM_LEVEL_ADJ * (18 - window.map.getZoom());
     if (adj > 0) t += adj * 1000;
   }
 
   window.refreshTimeout = setTimeout(window.requests._callOnRefreshFunctions, t);
-  renderUpdateStatus();
-}
+  window.renderUpdateStatus();
+};
 
 window.requests._onRefreshFunctions = [];
 
@@ -105,10 +103,10 @@ window.requests._onRefreshFunctions = [];
  * @function window.requests._callOnRefreshFunctions
  */
 window.requests._callOnRefreshFunctions = function () {
-  startRefreshTimeout();
+  window.startRefreshTimeout();
 
   if (window.isIdle()) {
-    renderUpdateStatus();
+    window.renderUpdateStatus();
     return;
   }
 
@@ -117,7 +115,7 @@ window.requests._callOnRefreshFunctions = function () {
   $.each(window.requests._onRefreshFunctions, function (ind, f) {
     f();
   });
-}
+};
 
 /**
  * Adds a function to the list of functions to be called on each automatic refresh.
@@ -127,4 +125,4 @@ window.requests._callOnRefreshFunctions = function () {
  */
 window.requests.addRefreshFunction = function (f) {
   window.requests._onRefreshFunctions.push(f);
-}
+};

@@ -1,12 +1,17 @@
 // @author         mcben
 // @name           Cross links
 // @category       Draw
-// @version        1.3.3
+// @version        1.3.4
 // @description    Checks for existing links that cross planned links. Requires draw-tools plugin.
 
 /* exported setup, changelog --eslint */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '1.3.4',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '1.3.3',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -17,13 +22,12 @@ var changelog = [
   },
 ];
 
-window.plugin.crossLinks = function () { };
+window.plugin.crossLinks = function () {};
 
 /**
  * greatCircleArcIntersect
  */
 window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
-
   // 0) quick checks
   // zero length line
   if (a0.equals(a1)) return false;
@@ -62,7 +66,8 @@ window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
   // c) special case when both planes are equal
   // = both lines are on the same greatarc. test if they overlap
   var len2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];
-  if (len2 < 1e-30) /* === 0 */ {
+  if (len2 < 1e-30) {
+    // === 0
     // b0 inside a0-a1 ?
     var s1 = dot(cb0, da0);
     var d1 = dot(cb0, da1);
@@ -80,7 +85,9 @@ window.plugin.crossLinks.greatCircleArcIntersect = function (a0, a1, b0, b1) {
 
   // normalize P
   var n = 1 / Math.sqrt(len2);
-  p[0] *= n, p[1] *= n, p[2] *= n
+  p[0] *= n;
+  p[1] *= n;
+  p[2] *= n;
 
   // d) at this point we have two possible collision points
   //    p or -p  (in 3D space)
@@ -111,20 +118,18 @@ function toCartesian(lat, lng) {
   lat *= d2r;
   lng *= d2r;
   var o = Math.cos(lat);
-  return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)]
+  return [o * Math.cos(lng), o * Math.sin(lng), Math.sin(lat)];
 }
 
 function cross(t, n) {
-  return [t[1] * n[2] - t[2] * n[1], t[2] * n[0] - t[0] * n[2], t[0] * n[1] - t[1] * n[0]]
+  return [t[1] * n[2] - t[2] * n[1], t[2] * n[0] - t[0] * n[2], t[0] * n[1] - t[1] * n[0]];
 }
 
 function dot(t, n) {
-  return t[0] * n[0] + t[1] * n[1] + t[2] * n[2]
+  return t[0] * n[0] + t[1] * n[1] + t[2] * n[2];
 }
 
-
 window.plugin.crossLinks.testPolyLine = function (polyline, link, closed) {
-
   var a = link.getLatLngs();
   var b = polyline.getLatLngs();
 
@@ -137,48 +142,47 @@ window.plugin.crossLinks.testPolyLine = function (polyline, link, closed) {
   }
 
   return false;
-}
+};
 
 window.plugin.crossLinks.onLinkAdded = function (data) {
   if (window.plugin.crossLinks.disabled) return;
 
-  plugin.crossLinks.testLink(data.link);
-}
+  window.plugin.crossLinks.testLink(data.link);
+};
 
 window.plugin.crossLinks.checkAllLinks = function () {
   if (window.plugin.crossLinks.disabled) return;
 
   console.debug('Cross-Links: checking all links');
-  plugin.crossLinks.linkLayer.clearLayers();
-  plugin.crossLinks.linkLayerGuids = {};
+  window.plugin.crossLinks.linkLayer.clearLayers();
+  window.plugin.crossLinks.linkLayerGuids = {};
 
   $.each(window.links, function (guid, link) {
-    plugin.crossLinks.testLink(link);
+    window.plugin.crossLinks.testLink(link);
   });
-}
+};
 
 window.plugin.crossLinks.testLink = function (link) {
-  if (plugin.crossLinks.linkLayerGuids[link.options.guid]) return;
+  if (window.plugin.crossLinks.linkLayerGuids[link.options.guid]) return;
 
-  for (var i in plugin.drawTools.drawnItems._layers) { // leaflet don't support breaking out of the loop
-    var layer = plugin.drawTools.drawnItems._layers[i];
+  for (var i in window.plugin.drawTools.drawnItems._layers) {
+    // leaflet don't support breaking out of the loop
+    var layer = window.plugin.drawTools.drawnItems._layers[i];
     if (layer instanceof L.GeodesicPolygon) {
-      if (plugin.crossLinks.testPolyLine(layer, link, true)) {
-        plugin.crossLinks.showLink(link);
+      if (window.plugin.crossLinks.testPolyLine(layer, link, true)) {
+        window.plugin.crossLinks.showLink(link);
         break;
       }
     } else if (layer instanceof L.GeodesicPolyline) {
-      if (plugin.crossLinks.testPolyLine(layer, link)) {
-        plugin.crossLinks.showLink(link);
+      if (window.plugin.crossLinks.testPolyLine(layer, link)) {
+        window.plugin.crossLinks.showLink(link);
         break;
       }
     }
   }
-}
-
+};
 
 window.plugin.crossLinks.showLink = function (link) {
-
   var poly = L.geodesicPolyline(link.getLatLngs(), {
     color: '#d22',
     opacity: 0.7,
@@ -186,12 +190,12 @@ window.plugin.crossLinks.showLink = function (link) {
     interactive: false,
     dashArray: '8,8',
 
-    guid: link.options.guid
+    guid: link.options.guid,
   });
 
-  poly.addTo(plugin.crossLinks.linkLayer);
-  plugin.crossLinks.linkLayerGuids[link.options.guid] = poly;
-}
+  poly.addTo(window.plugin.crossLinks.linkLayer);
+  window.plugin.crossLinks.linkLayerGuids[link.options.guid] = poly;
+};
 
 window.plugin.crossLinks.onMapDataRefreshEnd = function () {
   if (window.plugin.crossLinks.disabled) return;
@@ -199,65 +203,65 @@ window.plugin.crossLinks.onMapDataRefreshEnd = function () {
   window.plugin.crossLinks.linkLayer.bringToFront();
 
   window.plugin.crossLinks.testForDeletedLinks();
-}
+};
 
 window.plugin.crossLinks.testAllLinksAgainstLayer = function (layer) {
   if (window.plugin.crossLinks.disabled) return;
 
   $.each(window.links, function (guid, link) {
-    if (!plugin.crossLinks.linkLayerGuids[link.options.guid]) {
+    if (!window.plugin.crossLinks.linkLayerGuids[link.options.guid]) {
       if (layer instanceof L.GeodesicPolygon) {
-        if (plugin.crossLinks.testPolyLine(layer, link, true)) {
-          plugin.crossLinks.showLink(link);
+        if (window.plugin.crossLinks.testPolyLine(layer, link, true)) {
+          window.plugin.crossLinks.showLink(link);
         }
       } else if (layer instanceof L.GeodesicPolyline) {
-        if (plugin.crossLinks.testPolyLine(layer, link)) {
-          plugin.crossLinks.showLink(link);
+        if (window.plugin.crossLinks.testPolyLine(layer, link)) {
+          window.plugin.crossLinks.showLink(link);
         }
       }
     }
   });
-}
+};
 
 window.plugin.crossLinks.testForDeletedLinks = function () {
   window.plugin.crossLinks.linkLayer.eachLayer(function (layer) {
     var guid = layer.options.guid;
     if (!window.links[guid]) {
       console.log('link removed');
-      plugin.crossLinks.linkLayer.removeLayer(layer);
-      delete plugin.crossLinks.linkLayerGuids[guid];
+      window.plugin.crossLinks.linkLayer.removeLayer(layer);
+      delete window.plugin.crossLinks.linkLayerGuids[guid];
     }
   });
-}
+};
 
 window.plugin.crossLinks.createLayer = function () {
   window.plugin.crossLinks.linkLayer = new L.FeatureGroup();
   window.plugin.crossLinks.linkLayerGuids = {};
   window.layerChooser.addOverlay(window.plugin.crossLinks.linkLayer, 'Cross Links');
 
-  map.on('layeradd', function (obj) {
+  window.map.on('layeradd', function (obj) {
     if (obj.layer === window.plugin.crossLinks.linkLayer) {
       delete window.plugin.crossLinks.disabled;
       window.plugin.crossLinks.checkAllLinks();
     }
   });
-  map.on('layerremove', function (obj) {
+  window.map.on('layerremove', function (obj) {
     if (obj.layer === window.plugin.crossLinks.linkLayer) {
       window.plugin.crossLinks.disabled = true;
       window.plugin.crossLinks.linkLayer.clearLayers();
-      plugin.crossLinks.linkLayerGuids = {};
+      window.plugin.crossLinks.linkLayerGuids = {};
     }
   });
 
   // ensure 'disabled' flag is initialised
-  if (!map.hasLayer(window.plugin.crossLinks.linkLayer)) {
+  if (!window.map.hasLayer(window.plugin.crossLinks.linkLayer)) {
     window.plugin.crossLinks.disabled = true;
   }
-}
+};
 
 var setup = function () {
   if (window.plugin.drawTools === undefined) {
-    alert('\'Cross-Links\' requires \'draw-tools\'');
+    alert("'Cross-Links' requires 'draw-tools'");
     return;
   }
 
@@ -276,5 +280,4 @@ var setup = function () {
 
   window.addHook('linkAdded', window.plugin.crossLinks.onLinkAdded);
   window.addHook('mapDataRefreshEnd', window.plugin.crossLinks.onMapDataRefreshEnd);
-
-}
+};

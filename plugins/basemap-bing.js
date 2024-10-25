@@ -1,13 +1,17 @@
 // @author         johnd0e
 // @name           Bing maps
 // @category       Map Tiles
-// @version        0.3.3
+// @version        0.3.4
 // @description    Add the bing.com map layers.
 
 /* exported setup, changelog --eslint */
-/* global L, layerChooser */
+/* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.4',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.3.3',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -23,42 +27,40 @@ var mapBing = {};
 
 mapBing.sets = {
   Road: {
-    imagerySet: 'RoadOnDemand'
+    imagerySet: 'RoadOnDemand',
   },
   Dark: {
-    imagerySet: 'CanvasDark'
+    imagerySet: 'CanvasDark',
   },
   Aerial: {
-    imagerySet: 'Aerial'
+    imagerySet: 'Aerial',
   },
   Hybrid: {
-    imagerySet: 'AerialWithLabelsOnDemand'
-  }
+    imagerySet: 'AerialWithLabelsOnDemand',
+  },
 };
 
 mapBing.options = {
   // set this to your API key
-  key: 'ArR2hTa2C9cRQZT-RmgrDkfvh3PwEVRl0gB34OO4wJI7vQNElg3DDWvbo5lfUs3p'
+  key: 'ArR2hTa2C9cRQZT-RmgrDkfvh3PwEVRl0gB34OO4wJI7vQNElg3DDWvbo5lfUs3p',
 };
 
-function setup () {
+function setup() {
   setupBingLeaflet();
 
   for (var name in mapBing.sets) {
     var options = L.extend({}, mapBing.options, mapBing.sets[name]);
-    layerChooser.addBaseLayer(L.bingLayer(options), 'Bing ' + name);
+    window.layerChooser.addBaseLayer(L.bingLayer(options), 'Bing ' + name);
   }
 }
 
-function setupBingLeaflet () {
+function setupBingLeaflet() {
   try {
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.js
     '@include_raw:external/Bing.js@'; // eslint-disable-line
 
-
     // https://github.com/shramov/leaflet-plugins/blob/master/layer/tile/Bing.addon.applyMaxNativeZoom.js
     '@include_raw:external/Bing.addon.applyMaxNativeZoom.js@'; // eslint-disable-line
-
   } catch (e) {
     console.error('Bing.js loading failed');
     throw e;

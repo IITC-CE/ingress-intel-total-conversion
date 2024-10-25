@@ -1,13 +1,17 @@
 // @author         yenky
 // @name           Portal count
 // @category       Info
-// @version        0.2.5
+// @version        0.2.6
 // @description    Display a list of all localized portals by level and faction.
 
-/* global IITC -- eslint */
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.6',
+    changes: ['Refactoring: fix eslint'],
+  },
   {
     version: '0.2.5',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -26,7 +30,7 @@ window.plugin.portalcounts = {
   BAR_PADDING: 5,
   RADIUS_INNER: 70,
   RADIUS_OUTER: 100,
-  nozeroes: true
+  nozeroes: true,
 };
 
 window.plugin.portalcounts.withPlayerFactionStyles = function (factionFunction) {
@@ -208,19 +212,21 @@ window.plugin.portalcounts.getPortals = function () {
     counts += '<p class="help"><b>Warning</b>: Portal counts is inaccurate when zoomed to link-level</p>';
   }
 
-  var title = total + ' ' + (total == 1 ? 'portal' : 'portals');
+  var title = total + ' ' + (total === 1 ? 'portal' : 'portals');
 
   if (window.useAppPanes()) {
-    $('<div id="portalcounts" class="mobile">'
-    + '<div class="ui-dialog-titlebar"><span class="ui-dialog-title ui-dialog-title-active">' + title + '</span></div>'
-    + counts
-    + '</div>').appendTo(document.body);
+    $(
+      '<div id="portalcounts" class="mobile">' +
+        `<div class="ui-dialog-titlebar"><span class="ui-dialog-title ui-dialog-title-active">${title}</span></div>` +
+        counts +
+        '</div>'
+    ).appendTo(document.body);
   } else {
-    dialog({
+    window.dialog({
       html: '<div id="portalcounts">' + counts + '</div>',
       title: 'Portal counts: ' + title,
       id: 'plugin-portal-counts',
-      width: 'auto'
+      width: 'auto',
     });
   }
   if (window.plugin.portalcounts.nozeroes) {
@@ -229,19 +235,20 @@ window.plugin.portalcounts.getPortals = function () {
   $('#portalcounts svg').click(function () {
     $('#portalcounts').toggleClass('nozeroes');
   });
-}
+};
 
-window.plugin.portalcounts.makeBar = function(portals, text, color, shift) {
+window.plugin.portalcounts.makeBar = function (portals, text, color, shift) {
   var self = window.plugin.portalcounts;
-  var g = $('<g>').attr('transform', 'translate('+shift+',0)');
-  var sum = portals.reduce(function(a,b){ return a+b });
+  var g = $('<g>').attr('transform', `translate(${shift},0)`);
+  var sum = portals.reduce(function (a, b) {
+    return a + b;
+  });
   var top = self.BAR_TOP;
 
-  if(sum != 0) {
-    for(var i=portals.length-1;i>=0;i--) {
-      if(!portals[i])
-        continue;
-      var height = self.BAR_HEIGHT * portals[i] / sum;
+  if (sum !== 0) {
+    for (let i = portals.length - 1; i >= 0; i--) {
+      if (!portals[i]) continue;
+      var height = (self.BAR_HEIGHT * portals[i]) / sum;
       $('<rect>')
         .attr({
           x: 0,
@@ -277,34 +284,32 @@ window.plugin.portalcounts.makeBar = function(portals, text, color, shift) {
 };
 
 window.plugin.portalcounts.makePie = function (startAngle, endAngle, color, teamName) {
-  if(startAngle == endAngle)
-    return $([]); // return empty element query
+  if (startAngle === endAngle) return $([]); // return empty element query
 
   var self = window.plugin.portalcounts;
-  var large_arc = (endAngle - startAngle) > 0.5 ? 1 : 0;
+  var large_arc = endAngle - startAngle > 0.5 ? 1 : 0;
 
   var labelAngle = (endAngle + startAngle) / 2;
   var label = Math.round((endAngle - startAngle) * 100) + '%';
 
   startAngle = 0.5 - startAngle;
-  endAngle   = 0.5 - endAngle;
+  endAngle = 0.5 - endAngle;
   labelAngle = 0.5 - labelAngle;
 
   var p1x = Math.sin(startAngle * 2 * Math.PI) * self.RADIUS_INNER;
   var p1y = Math.cos(startAngle * 2 * Math.PI) * self.RADIUS_INNER;
-  var p2x = Math.sin(endAngle   * 2 * Math.PI) * self.RADIUS_INNER;
-  var p2y = Math.cos(endAngle   * 2 * Math.PI) * self.RADIUS_INNER;
-  var lx  = Math.sin(labelAngle * 2 * Math.PI) * self.RADIUS_INNER / 1.5;
-  var ly  = Math.cos(labelAngle * 2 * Math.PI) * self.RADIUS_INNER / 1.5;
+  var p2x = Math.sin(endAngle * 2 * Math.PI) * self.RADIUS_INNER;
+  var p2y = Math.cos(endAngle * 2 * Math.PI) * self.RADIUS_INNER;
+  var lx = (Math.sin(labelAngle * 2 * Math.PI) * self.RADIUS_INNER) / 1.5;
+  var ly = (Math.cos(labelAngle * 2 * Math.PI) * self.RADIUS_INNER) / 1.5;
 
   // for a full circle, both coordinates would be identical, so no circle would be drawn
-  if(startAngle == 0.5 && endAngle == -0.5)
-    p2x -= 1E-5;
+  if (startAngle === 0.5 && endAngle === -0.5) p2x -= 1e-5;
 
   var text = $('<text>')
     .attr({
       'text-anchor': 'middle',
-      'dominant-baseline' :'central',
+      'dominant-baseline': 'central',
       x: lx,
       y: ly,
       title: teamName,
@@ -322,24 +327,24 @@ window.plugin.portalcounts.makePie = function (startAngle, endAngle, color, team
 
 window.plugin.portalcounts.makeRing = function (startAngle, endAngle, level) {
   var self = window.plugin.portalcounts;
-  var large_arc = (endAngle - startAngle) > 0.5 ? 1 : 0;
+  var large_arc = endAngle - startAngle > 0.5 ? 1 : 0;
 
   startAngle = 0.5 - startAngle;
-  endAngle   = 0.5 - endAngle;
+  endAngle = 0.5 - endAngle;
 
   var p1x = Math.sin(startAngle * 2 * Math.PI) * self.RADIUS_OUTER;
   var p1y = Math.cos(startAngle * 2 * Math.PI) * self.RADIUS_OUTER;
-  var p2x = Math.sin(endAngle   * 2 * Math.PI) * self.RADIUS_OUTER;
-  var p2y = Math.cos(endAngle   * 2 * Math.PI) * self.RADIUS_OUTER;
-  var p3x = Math.sin(endAngle   * 2 * Math.PI) * self.RADIUS_INNER;
-  var p3y = Math.cos(endAngle   * 2 * Math.PI) * self.RADIUS_INNER;
+  var p2x = Math.sin(endAngle * 2 * Math.PI) * self.RADIUS_OUTER;
+  var p2y = Math.cos(endAngle * 2 * Math.PI) * self.RADIUS_OUTER;
+  var p3x = Math.sin(endAngle * 2 * Math.PI) * self.RADIUS_INNER;
+  var p3y = Math.cos(endAngle * 2 * Math.PI) * self.RADIUS_INNER;
   var p4x = Math.sin(startAngle * 2 * Math.PI) * self.RADIUS_INNER;
   var p4y = Math.cos(startAngle * 2 * Math.PI) * self.RADIUS_INNER;
 
   // for a full circle, both coordinates would be identical, so no circle would be drawn
-  if(startAngle == 0.5 && endAngle == -0.5) {
-    p2x -= 1E-5;
-    p3x -= 1E-5;
+  if (startAngle === 0.5 && endAngle === -0.5) {
+    p2x -= 1e-5;
+    p3x -= 1e-5;
   }
 
   return $('<path>').attr({
@@ -354,25 +359,23 @@ window.plugin.portalcounts.makeRing = function (startAngle, endAngle, level) {
   });
 };
 
-window.plugin.portalcounts.format = function(str) {
+window.plugin.portalcounts.format = function (str) {
   var re = /%s/;
-  for(var i = 1; i < arguments.length; i++) {
+  for (let i = 1; i < arguments.length; i++) {
     str = str.replace(re, arguments[i]);
   }
   return str;
-}
-
-window.plugin.portalcounts.onPaneChanged = function(pane) {
-  if(pane == 'plugin-portalcounts')
-    window.plugin.portalcounts.getPortals();
-  else
-    $('#portalcounts').remove()
 };
 
-var setup =  function() {
+window.plugin.portalcounts.onPaneChanged = function (pane) {
+  if (pane === 'plugin-portalcounts') window.plugin.portalcounts.getPortals();
+  else $('#portalcounts').remove();
+};
+
+var setup = function () {
   if (window.useAppPanes()) {
-    app.addPane('plugin-portalcounts', 'Portal counts', 'ic_action_data_usage');
-    addHook('paneChanged', window.plugin.portalcounts.onPaneChanged);
+    window.app.addPane('plugin-portalcounts', 'Portal counts', 'ic_action_data_usage');
+    window.addHook('paneChanged', window.plugin.portalcounts.onPaneChanged);
   } else {
     IITC.toolbox.addButton({
       label: 'Portal counts',
@@ -381,26 +384,28 @@ var setup =  function() {
     });
   }
 
-  $('head').append('<style>' +
-    '#portalcounts.mobile {background: transparent; border: 0 none !important; height: 100% !important; width: 100% !important; left: 0 !important; top: 0 !important; position: absolute; overflow: auto; z-index: 9000 !important; }' +
-    '#portalcounts table {margin-top:5px; border-collapse: collapse; empty-cells: show; width:100%; clear: both;}' +
-    '#portalcounts table td, #portalcounts table th {border-bottom: 1px solid #0b314e; padding:3px; color:white; background-color:#1b415e}' +
-    '#portalcounts table tr.res th {  background-color: #005684; }' +
-    '#portalcounts table tr.enl th {  background-color: #017f01; }' +
-    '#portalcounts table th { text-align: center;}' +
-    '#portalcounts table td { text-align: center;}' +
-    '#portalcounts table td.L0 { background-color: #000000 !important;}' +
-    '#portalcounts table td.L1 { background-color: #FECE5A !important;}' +
-    '#portalcounts table td.L2 { background-color: #FFA630 !important;}' +
-    '#portalcounts table td.L3 { background-color: #FF7315 !important;}' +
-    '#portalcounts table td.L4 { background-color: #E40000 !important;}' +
-    '#portalcounts table td.L5 { background-color: #FD2992 !important;}' +
-    '#portalcounts table td.L6 { background-color: #EB26CD !important;}' +
-    '#portalcounts table td.L7 { background-color: #C124E0 !important;}' +
-    '#portalcounts table td.L8 { background-color: #9627F4 !important;}' +
-    '#portalcounts table td:nth-child(1) { text-align: left;}' +
-    '#portalcounts table th:nth-child(1) { text-align: left;}' +
-    '#portalcounts table th:nth-child(1) { text-align: left;}' +
-    '#portalcounts.nozeroes table tr.zeroes { display: none;}' +
-    '</style>');
-}
+  $('head').append(
+    '<style>' +
+      '#portalcounts.mobile {background: transparent; border: 0 none !important; height: 100% !important; width: 100% !important; left: 0 !important; top: 0 !important; position: absolute; overflow: auto; z-index: 9000 !important; }' +
+      '#portalcounts table {margin-top:5px; border-collapse: collapse; empty-cells: show; width:100%; clear: both;}' +
+      '#portalcounts table td, #portalcounts table th {border-bottom: 1px solid #0b314e; padding:3px; color:white; background-color:#1b415e}' +
+      '#portalcounts table tr.res th {  background-color: #005684; }' +
+      '#portalcounts table tr.enl th {  background-color: #017f01; }' +
+      '#portalcounts table th { text-align: center;}' +
+      '#portalcounts table td { text-align: center;}' +
+      '#portalcounts table td.L0 { background-color: #000000 !important;}' +
+      '#portalcounts table td.L1 { background-color: #FECE5A !important;}' +
+      '#portalcounts table td.L2 { background-color: #FFA630 !important;}' +
+      '#portalcounts table td.L3 { background-color: #FF7315 !important;}' +
+      '#portalcounts table td.L4 { background-color: #E40000 !important;}' +
+      '#portalcounts table td.L5 { background-color: #FD2992 !important;}' +
+      '#portalcounts table td.L6 { background-color: #EB26CD !important;}' +
+      '#portalcounts table td.L7 { background-color: #C124E0 !important;}' +
+      '#portalcounts table td.L8 { background-color: #9627F4 !important;}' +
+      '#portalcounts table td:nth-child(1) { text-align: left;}' +
+      '#portalcounts table th:nth-child(1) { text-align: left;}' +
+      '#portalcounts table th:nth-child(1) { text-align: left;}' +
+      '#portalcounts.nozeroes table tr.zeroes { display: none;}' +
+      '</style>'
+  );
+};
