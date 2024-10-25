@@ -50,6 +50,8 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+/* global L, log -- eslint */
+
 /**
  * Represents a control for selecting layers on the map. It extends the Leaflet's L.Control.Layers class.
  * This control not only manages layer visibility but also provides persistence of layer display states between sessions.
@@ -77,8 +79,8 @@ var LayerChooser = L.Control.Layers.extend({
     sortFunction: function (A, B) {
       var a = A.sortPriority;
       var b = B.sortPriority;
-      return a &lt; b ? -1 : (b &lt; a ? 1 : 0);
-    }
+      return a &lt; b ? -1 : b &lt; a ? 1 : 0;
+    },
   },
 
   /**
@@ -120,7 +122,7 @@ var LayerChooser = L.Control.Layers.extend({
         name: name,
         // label: name,
         overlay: overlay,
-        persistent: 'persistent' in options ? options.persistent : true
+        persistent: 'persistent' in options ? options.persistent : true,
       };
     } else {
       delete layer._chooser;
@@ -156,7 +158,9 @@ var LayerChooser = L.Control.Layers.extend({
     }
     var map = this._map || this._mapToAdd;
     if (!data.persistent) {
-      if (!data.overlay) { return; }
+      if (!data.overlay) {
+        return;
+      }
       if ('enable' in options ? options.enable : data.default) {
         layer.addTo(map);
       }
@@ -167,11 +171,14 @@ var LayerChooser = L.Control.Layers.extend({
         this._storeOverlayState(data.name, e.type === 'add');
       };
       layer.on('add remove', data.statusTracking, this);
-      if ('enable' in options) { // do as explicitly specified
+      if ('enable' in options) {
+        // do as explicitly specified
         map[options.enable ? 'addLayer' : 'removeLayer'](layer);
-      } else if (layer._map) { // already on map, only store state
+      } else if (layer._map) {
+        // already on map, only store state
         this._storeOverlayState(data.name, true);
-      } else { // restore at recorded state
+      } else {
+        // restore at recorded state
         if (this._isOverlayDisplayed(data.name, data.default)) {
           layer.addTo(map);
         }
@@ -188,7 +195,7 @@ var LayerChooser = L.Control.Layers.extend({
     var labelEl = L.Control.Layers.prototype._addItem.call(this, {
       layer: obj.layer,
       overlay: obj.overlay,
-      name: obj.label || obj.name
+      name: obj.label || obj.name,
     });
     obj.labelEl = labelEl;
     // obj.inputEl = this._layerControlInputs[this._layerControlInputs.length-1];
@@ -210,7 +217,7 @@ var LayerChooser = L.Control.Layers.extend({
    */
   addBaseLayer: function (layer, name, options) {
     this._addLayer(layer, name, false, options);
-    return (this._map) ? this._update() : this;
+    return this._map ? this._update() : this;
   },
 
   /**
@@ -232,7 +239,7 @@ var LayerChooser = L.Control.Layers.extend({
    */
   addOverlay: function (layer, name, options) {
     this._addLayer(layer, name, true, options);
-    return (this._map) ? this._update() : this;
+    return this._map ? this._update() : this;
   },
 
   /**
@@ -254,7 +261,7 @@ var LayerChooser = L.Control.Layers.extend({
       }
       L.Control.Layers.prototype.removeLayer.apply(this, arguments);
       if (this._map &amp;&amp; !options.keepOnMap) {
-        map.removeLayer(data.layer);
+        window.map.removeLayer(data.layer);
       }
       delete data.labelEl;
       // delete data.inputEl;
@@ -279,8 +286,7 @@ var LayerChooser = L.Control.Layers.extend({
 
   __byName: function (data) {
     var name = this.toString();
-    return data.name === name ||
-      data.label === name;
+    return data.name === name || data.label === name;
   },
 
   __byLayer: function (data) {
@@ -306,9 +312,7 @@ var LayerChooser = L.Control.Layers.extend({
    *                   `persistent`, `default`, `labelEl`, `inputEl`, `statusTracking`.
    */
   layerInfo: function (layer) {
-    var fn = layer instanceof L.Layer ? this.__byLayer
-      : layer instanceof HTMLElement ? this.__byLabelEl
-        : this.__byName;
+    var fn = layer instanceof L.Layer ? this.__byLayer : layer instanceof HTMLElement ? this.__byLabelEl : this.__byName;
     return this._layers.find(fn, layer);
   },
 
@@ -402,11 +406,11 @@ var LayerChooser = L.Control.Layers.extend({
     var obj = {
       control: this,
       data: data,
-      originalEvent: originalEvent || {type: 'taphold'},
+      originalEvent: originalEvent || { type: 'taphold' },
       preventDefault: function () {
         defaultPrevented = true;
         this.defaultPrevented = true;
-      }
+      },
     };
 
     // @namespace Layer
@@ -426,19 +430,22 @@ var LayerChooser = L.Control.Layers.extend({
   // adds listeners to the overlays list to make inputs toggleable.
   _initLayout: function () {
     L.Control.Layers.prototype._initLayout.call(this);
-    $(this._overlaysList).on('click taphold', 'label', function (e) {
-      if (!(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.type === 'taphold')) {
-        return;
-      }
-      // e.preventDefault(); // seems no effect
-      var labelEl = e.target.closest('label');
-      this._onLongClick(this.layerInfo(labelEl), e);
-    }.bind(this));
+    $(this._overlaysList).on(
+      'click taphold',
+      'label',
+      function (e) {
+        if (!(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.type === 'taphold')) {
+          return;
+        }
+        // e.preventDefault(); // seems no effect
+        var labelEl = e.target.closest('label');
+        this._onLongClick(this.layerInfo(labelEl), e);
+      }.bind(this)
+    );
   },
 
   _filterOverlays: function (data) {
-    return data.overlay &amp;&amp;
-      ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(data.name) === -1;
+    return data.overlay &amp;&amp; ['DEBUG Data Tiles', 'Resistance', 'Enlightened'].indexOf(data.name) === -1;
   },
 
   // Hides all the control's overlays except given one,
@@ -454,10 +461,12 @@ var LayerChooser = L.Control.Layers.extend({
     var checked = 0;
     var overlays = this._layers.filter(this._filterOverlays);
     overlays.forEach(function (el) {
-      if (map.hasLayer(el.layer)) { checked++; }
+      if (map.hasLayer(el.layer)) {
+        checked++;
+      }
     });
 
-    if (checked === 0 || isChecked &amp;&amp; checked === 1) {
+    if (checked === 0 || (isChecked &amp;&amp; checked === 1)) {
       // if nothing is selected, or specified overlay is exclusive,
       // assume all boxes should be checked again
       overlays.forEach(function (el) {
@@ -501,15 +510,15 @@ var LayerChooser = L.Control.Layers.extend({
       (data.overlay ? overlayLayers : baseLayers).push({
         layerId: idx,
         name: this._stripHtmlTags(data.label || data.name), // IITCm does not support html in layers labels
-        active: this._map.hasLayer(data.layer)
+        active: this._map.hasLayer(data.layer),
       });
     }, this);
 
     return {
       baseLayers: baseLayers,
-      overlayLayers: overlayLayers
+      overlayLayers: overlayLayers,
     };
-  }
+  },
 });
 
 window.LayerChooser = LayerChooser;
@@ -532,8 +541,10 @@ LayerChooser.addInitHook(function () {
 
 // !!deprecated: use `layerChooser.addOverlay` directly
 window.addLayerGroup = function (name, layerGroup, defaultDisplay) {
-  var options = {default: defaultDisplay};
-  if (arguments.length &lt; 3) { options = undefined; }
+  var options = { default: defaultDisplay };
+  if (arguments.length &lt; 3) {
+    options = undefined;
+  }
   window.layerChooser.addOverlay(layerGroup, name, options);
 };
 

@@ -60,7 +60,7 @@
  *
  * @function setupSidebar
  */
-window.setupSidebar = function() {
+window.setupSidebar = function () {
   window.setupStyles();
   setupIcons();
   window.setupPlayerStat();
@@ -77,19 +77,25 @@ window.setupSidebar = function() {
  * @function setupStyles
  */
 window.setupStyles = function () {
-  $('head').append('&lt;style>' +
-    [ '#largepreview.enl img { border:2px solid '+COLORS[TEAM_ENL]+'; } ',
-      '#largepreview.res img { border:2px solid '+COLORS[TEAM_RES]+'; } ',
-      '#largepreview.none img { border:2px solid '+COLORS[TEAM_NONE]+'; } ',
-      '#chatcontrols { bottom: '+(CHAT_SHRINKED+22)+'px; }',
-      '#chat { height: '+CHAT_SHRINKED+'px; } ',
-      '.leaflet-right { margin-right: '+(SIDEBAR_WIDTH+1)+'px } ',
-      '#updatestatus { width:'+(SIDEBAR_WIDTH+2)+'px;  } ',
-      '#sidebar { width:'+(SIDEBAR_WIDTH + HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1 /*border*/)+'px;  } ',
-      '#sidebartoggle { right:'+(SIDEBAR_WIDTH+1)+'px;  } ',
-      '#scrollwrapper  { width:'+(SIDEBAR_WIDTH + 2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH)+'px; right:-'+(2*HIDDEN_SCROLLBAR_ASSUMED_WIDTH-2)+'px } ',
-      '#sidebar > * { width:'+(SIDEBAR_WIDTH+1)+'px;  }'].join('\n')
-    + '&lt;/style>');
+  $('head').append(
+    '&lt;style>' +
+      [
+        '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
+        '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
+        '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
+        '#chatcontrols { bottom: ' + (window.CHAT_SHRINKED + 22) + 'px; }',
+        '#chat { height: ' + window.CHAT_SHRINKED + 'px; } ',
+        '.leaflet-right { margin-right: ' + (window.SIDEBAR_WIDTH + 1) + 'px } ',
+        '#updatestatus { width:' + (window.SIDEBAR_WIDTH + 2) + 'px;  } ',
+        '#sidebar { width:' + (window.SIDEBAR_WIDTH + window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1) /* border*/ + 'px;  } ',
+        '#sidebartoggle { right:' + (window.SIDEBAR_WIDTH + 1) + 'px;  } ',
+        `#scrollwrapper  { width:${window.SIDEBAR_WIDTH + 2 * window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH}px; right:-${
+          2 * window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH - 2
+        }px } `,
+        '#sidebar > * { width:' + (window.SIDEBAR_WIDTH + 1) + 'px;  }',
+      ].join('\n') +
+      '&lt;/style>'
+  );
 };
 
 /**
@@ -97,15 +103,19 @@ window.setupStyles = function () {
  *
  * @function setupIcons
  */
-function setupIcons () {
-  $(['&lt;svg>',
+function setupIcons() {
+  $(
+    [
+      '&lt;svg>',
       // Material Icons
 
       // portal_detail_display.js
       '&lt;symbol id="ic_place_24px" viewBox="0 0 24 24">',
-        '&lt;path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
+      '&lt;path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
       '&lt;/symbol>',
-    '&lt;/svg>'].join('\\n')).appendTo('body');
+      '&lt;/svg>',
+    ].join('\\n')
+  ).appendTo('body');
 }
 
 /**
@@ -117,33 +127,33 @@ function setupIcons () {
  */
 window.setupPlayerStat = function () {
   // stock site updated to supply the actual player level, AP requirements and XM capacity values
-  var level = PLAYER.verified_level;
-  PLAYER.level = level; // for historical reasons IITC expects PLAYER.level to contain the current player level
+  var level = window.PLAYER.verified_level;
+  window.PLAYER.level = level; // for historical reasons IITC expects PLAYER.level to contain the current player level
 
-  var n = PLAYER.nickname;
-  PLAYER.nickMatcher = new RegExp('\\b('+n+')\\b', 'ig');
+  var n = window.PLAYER.nickname;
+  window.PLAYER.nickMatcher = new RegExp('\\b(' + n + ')\\b', 'ig');
 
-  var ap = parseInt(PLAYER.ap);
-  var thisLvlAp = parseInt(PLAYER.min_ap_for_current_level);
-  var nextLvlAp = parseInt(PLAYER.min_ap_for_next_level);
+  var ap = parseInt(window.PLAYER.ap);
+  var thisLvlAp = parseInt(window.PLAYER.min_ap_for_current_level);
+  var nextLvlAp = parseInt(window.PLAYER.min_ap_for_next_level);
 
   if (nextLvlAp) {
-    var lvlUpAp = digits(nextLvlAp-ap);
-    var lvlApProg = Math.round((ap-thisLvlAp)/(nextLvlAp-thisLvlAp)*100);
+    var lvlUpAp = window.digits(nextLvlAp - ap);
+    var lvlApProg = Math.round(((ap - thisLvlAp) / (nextLvlAp - thisLvlAp)) * 100);
   } // else zero nextLvlAp - so at maximum level(?)
 
-  var xmMax = parseInt(PLAYER.xm_capacity);
-  var xmRatio = Math.round(PLAYER.energy/xmMax*100);
+  var xmMax = parseInt(window.PLAYER.xm_capacity);
+  var xmRatio = Math.round((window.PLAYER.energy / xmMax) * 100);
 
-  var cls = PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
+  var cls = window.PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
 
-
-  var t = 'Level:\t' + level + '\n'
-        + 'XM:\t' + PLAYER.energy + ' / ' + xmMax + '\n'
-        + 'AP:\t' + digits(ap) + '\n'
-        + (nextLvlAp > 0 ? 'level up in:\t' + lvlUpAp + ' AP' : 'Maximum level reached(!)')
-        + '\nInvites:\t'+PLAYER.available_invites
-        + '\n\nNote: your player stats can only be updated by a full reload (F5)';
+  var t =
+    `Level:\t${level}\n` +
+    `XM:\t${window.PLAYER.energy} / ${xmMax}\n` +
+    `AP:\t${window.digits(ap)}\n` +
+    (nextLvlAp > 0 ? `level up in:\t${lvlUpAp} AP` : 'Maximum level reached(!)') +
+    `\nInvites:\t${window.PLAYER.available_invites}` +
+    `\n\nNote: your player stats can only be updated by a full reload (F5)`;
 
   $('#playerstat').html(
     `&lt;h2 title="${t}">
@@ -165,21 +175,21 @@ window.setupPlayerStat = function () {
  *
  * @function setupSidebarToggle
  */
-function setupSidebarToggle () {
-  $('#sidebartoggle').on('click', function() {
+function setupSidebarToggle() {
+  $('#sidebartoggle').on('click', function () {
     var toggle = $('#sidebartoggle');
     var sidebar = $('#scrollwrapper');
     if (sidebar.is(':visible')) {
       sidebar.hide();
-      $('.leaflet-right').css('margin-right','0');
+      $('.leaflet-right').css('margin-right', '0');
       toggle.html('&lt;span class="toggle open">&lt;/span>');
       toggle.css('right', '0');
     } else {
       sidebar.show();
       window.resetScrollOnNewPortal();
-      $('.leaflet-right').css('margin-right', SIDEBAR_WIDTH+1+'px');
+      $('.leaflet-right').css('margin-right', window.SIDEBAR_WIDTH + 1 + 'px');
       toggle.html('&lt;span class="toggle close">&lt;/span>');
-      toggle.css('right', SIDEBAR_WIDTH+1+'px');
+      toggle.css('right', window.SIDEBAR_WIDTH + 1 + 'px');
     }
     $('.ui-tooltip').remove();
   });
@@ -192,11 +202,11 @@ function setupSidebarToggle () {
  *
  * @function setupLargeImagePreview
  */
-function setupLargeImagePreview  () {
+function setupLargeImagePreview() {
   $('#portaldetails').on('click', '.imgpreview', function (e) {
     var img = this.querySelector('img');
-    //dialogs have 12px padding around the content
-    var dlgWidth = Math.max(img.naturalWidth+24,500);
+    // dialogs have 12px padding around the content
+    var dlgWidth = Math.max(img.naturalWidth + 24, 500);
     // This might be a case where multiple dialogs make sense, for example
     // someone might want to compare images of multiple portals.  But
     // usually we only want to show one version of each image.
@@ -207,7 +217,7 @@ function setupLargeImagePreview  () {
     preview.src = img.src;
     preview.style = 'margin: auto; display: block';
     var title = e.delegateTarget.querySelector('.title').innerText;
-    dialog({
+    window.dialog({
       html: preview,
       title: title,
       id: 'iitc-portal-image',
@@ -223,7 +233,7 @@ function setupLargeImagePreview  () {
  *
  * @function setPermaLink
  */
-function setPermaLink () {
+function setPermaLink() {
   this.href = window.makePermalink(null, true);
 }
 
@@ -232,7 +242,7 @@ function setPermaLink () {
  *
  * @function setupAddons
  */
-function setupAddons () {
+function setupAddons() {
   IITC.toolbox.addButton({
     id: 'permalink',
     label: 'Permalink',

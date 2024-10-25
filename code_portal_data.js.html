@@ -61,23 +61,22 @@
  * @param {string} guid - The GUID of the portal to search for links.
  * @returns {Object} An object containing arrays of incoming ('in') and outgoing ('out') link GUIDs.
  */
-window.getPortalLinks = function(guid) {
-
+window.getPortalLinks = function (guid) {
   var links = { in: [], out: [] };
 
-  $.each(window.links, function(g,l) {
+  $.each(window.links, function (g, l) {
     var d = l.options.data;
 
-    if (d.oGuid == guid) {
+    if (d.oGuid === guid) {
       links.out.push(g);
     }
-    if (d.dGuid == guid) {
+    if (d.dGuid === guid) {
       links.in.push(g);
     }
   });
 
   return links;
-}
+};
 
 /**
  * Counts the total number of links (both incoming and outgoing) for a specified portal.
@@ -86,10 +85,10 @@ window.getPortalLinks = function(guid) {
  * @param {string} guid - The GUID of the portal.
  * @returns {number} The total number of links for the portal.
  */
-window.getPortalLinksCount = function(guid) {
-  var links = getPortalLinks(guid);
-  return links.in.length+links.out.length;
-}
+window.getPortalLinksCount = function (guid) {
+  var links = window.getPortalLinks(guid);
+  return links.in.length + links.out.length;
+};
 
 /**
  * Searches through the fields for all fields that reference a specified portal.
@@ -98,22 +97,19 @@ window.getPortalLinksCount = function(guid) {
  * @param {string} guid - The GUID of the portal to search for fields.
  * @returns {Array} An array containing the GUIDs of fields associated with the portal.
  */
-window.getPortalFields = function(guid) {
+window.getPortalFields = function (guid) {
   var fields = [];
 
-  $.each(window.fields, function(g,f) {
+  $.each(window.fields, function (g, f) {
     var d = f.options.data;
 
-    if ( d.points[0].guid == guid
-      || d.points[1].guid == guid
-      || d.points[2].guid == guid ) {
-
+    if (d.points[0].guid === guid || d.points[1].guid === guid || d.points[2].guid === guid) {
       fields.push(g);
     }
   });
 
   return fields;
-}
+};
 
 /**
  * Counts the total number of fields associated with a specified portal.
@@ -122,11 +118,10 @@ window.getPortalFields = function(guid) {
  * @param {string} guid - The GUID of the portal.
  * @returns {number} The total number of fields associated with the portal.
  */
-window.getPortalFieldsCount = function(guid) {
-  var fields = getPortalFields(guid);
+window.getPortalFieldsCount = function (guid) {
+  var fields = window.getPortalFields(guid);
   return fields.length;
 };
-
 
 (function () {
   var cache = {};
@@ -144,31 +139,31 @@ window.getPortalFieldsCount = function(guid) {
    * @param {number} lngE6 - The longitude in E6 format.
    * @returns {string|null} The GUID of the portal at the specified location, or null if not found.
    */
-  window.findPortalGuidByPositionE6 = function(latE6, lngE6) {
-    var item = cache[latE6+","+lngE6];
-    if(item) return item[0];
+  window.findPortalGuidByPositionE6 = function (latE6, lngE6) {
+    var item = cache[latE6 + ',' + lngE6];
+    if (item) return item[0];
 
     // now try searching through currently rendered portals
-    for(var guid in window.portals) {
+    for (var guid in window.portals) {
       var data = window.portals[guid].options.data;
-      if(data.latE6 == latE6 &amp;&amp; data.lngE6 == lngE6) return guid;
+      if (data.latE6 === latE6 &amp;&amp; data.lngE6 === lngE6) return guid;
     }
 
     // now try searching through fields
-    for(var fguid in window.fields) {
+    for (var fguid in window.fields) {
       var points = window.fields[fguid].options.data.points;
 
-      for(var i in points) {
+      for (var i in points) {
         var point = points[i];
-        if(point.latE6 == latE6 &amp;&amp; point.lngE6 == lngE6) return point.guid;
+        if (point.latE6 === latE6 &amp;&amp; point.lngE6 === lngE6) return point.guid;
       }
     }
 
     // and finally search through links
-    for(var lguid in window.links) {
+    for (var lguid in window.links) {
       var l = window.links[lguid].options.data;
-      if(l.oLatE6 == latE6 &amp;&amp; l.oLngE6 == lngE6) return l.oGuid;
-      if(l.dLatE6 == latE6 &amp;&amp; l.dLngE6 == lngE6) return l.dGuid;
+      if (l.oLatE6 === latE6 &amp;&amp; l.oLngE6 === lngE6) return l.oGuid;
+      if (l.dLatE6 === latE6 &amp;&amp; l.dLngE6 === lngE6) return l.dGuid;
     }
 
     return null;
@@ -183,22 +178,26 @@ window.getPortalFieldsCount = function(guid) {
    * @param {number} latE6 - The latitude in E6 format.
    * @param {number} lngE6 - The longitude in E6 format.
    */
-  window.pushPortalGuidPositionCache = function(guid, latE6, lngE6) {
-    cache[latE6+","+lngE6] = [guid, Date.now()];
+  window.pushPortalGuidPositionCache = function (guid, latE6, lngE6) {
+    cache[latE6 + ',' + lngE6] = [guid, Date.now()];
     cache_level += 1;
 
-    if(cache_level > GC_LIMIT) {
+    if (cache_level > GC_LIMIT) {
       Object.keys(cache) // get all latlngs
-        .map(function(latlng) { return [latlng, cache[latlng][1]]; })  // map them to [latlng, timestamp]
-        .sort(function(a,b) { return b[1] - a[1]; }) // sort them
+        .map(function (latlng) {
+          return [latlng, cache[latlng][1]];
+        }) // map them to [latlng, timestamp]
+        .sort(function (a, b) {
+          return b[1] - a[1];
+        }) // sort them
         .slice(GC_KEEP) // drop the MRU
-        .forEach(function(item) { delete cache[item[0]] }); // delete the rest
-      cache_level = Object.keys(cache).length
+        .forEach(function (item) {
+          delete cache[item[0]];
+        }); // delete the rest
+      cache_level = Object.keys(cache).length;
     }
-  }
+  };
 })();
-
-
 </code></pre>
         </article>
     </section>

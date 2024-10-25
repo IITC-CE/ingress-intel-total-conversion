@@ -89,7 +89,7 @@ window.search = {
  * @param {string} term - The search term.
  * @param {boolean} confirmed - Indicates if the search is confirmed (e.g., by pressing Enter).
  */
-window.search.Query = function(term, confirmed) {
+window.search.Query = function (term, confirmed) {
   this.term = term;
   this.confirmed = confirmed;
   this.init();
@@ -100,18 +100,17 @@ window.search.Query = function(term, confirmed) {
  *
  * @function
  */
-window.search.Query.prototype.init = function() {
+window.search.Query.prototype.init = function () {
   this.results = [];
 
   this.container = $('&lt;div>').addClass('searchquery');
 
   this.header = $('&lt;h3>')
-    .text(this.confirmed
-      ? this.term
-      : ((this.term.length > 16
-        ? this.term.substr(0,8) + '…' + this.term.substr(this.term.length-8,8)
-        : this.term)
-        + ' (Return to load more)'))
+    .text(
+      this.confirmed
+        ? this.term
+        : (this.term.length > 16 ? this.term.substr(0, 8) + '…' + this.term.substr(this.term.length - 8, 8) : this.term) + ' (Return to load more)'
+    )
     .appendTo(this.container);
 
   this.list = $('&lt;ul>')
@@ -123,7 +122,7 @@ window.search.Query.prototype.init = function() {
     heightStyle: 'content',
   });
 
-  runHooks('search', this);
+  window.runHooks('search', this);
 };
 
 /**
@@ -131,7 +130,7 @@ window.search.Query.prototype.init = function() {
  *
  * @function
  */
-window.search.Query.prototype.show = function() {
+window.search.Query.prototype.show = function () {
   this.container.appendTo('#searchwrapper');
 };
 
@@ -140,7 +139,7 @@ window.search.Query.prototype.show = function() {
  *
  * @function
  */
-window.search.Query.prototype.hide = function() {
+window.search.Query.prototype.hide = function () {
   this.container.remove();
   this.removeSelectedResult();
   this.removeHoverResult();
@@ -152,8 +151,8 @@ window.search.Query.prototype.hide = function() {
  * @function
  * @param {Object} result - The search result object to add.
  */
-window.search.Query.prototype.addResult = function(result) {
-  if(this.results.length == 0) {
+window.search.Query.prototype.addResult = function (result) {
+  if (this.results.length === 0) {
     // remove 'No results'
     this.list.empty();
   }
@@ -162,23 +161,32 @@ window.search.Query.prototype.addResult = function(result) {
   var item = $('&lt;li>')
     .appendTo(this.list)
     .attr('tabindex', '0')
-    .on('click dblclick', function(ev) {
-      this.onResultSelected(result, ev);
-    }.bind(this))
-    .on('mouseover', function(ev) {
-      this.onResultHoverStart(result, ev);
-    }.bind(this))
-    .on('mouseout', function(ev) {
-      this.onResultHoverEnd(result, ev);
-    }.bind(this))
-    .keypress(function(ev) {
-      if((ev.keyCode || ev.charCode || ev.which) == 32) {
+    .on(
+      'click dblclick',
+      function (ev) {
+        this.onResultSelected(result, ev);
+      }.bind(this)
+    )
+    .on(
+      'mouseover',
+      function (ev) {
+        this.onResultHoverStart(result, ev);
+      }.bind(this)
+    )
+    .on(
+      'mouseout',
+      function (ev) {
+        this.onResultHoverEnd(result, ev);
+      }.bind(this)
+    )
+    .keypress(function (ev) {
+      if ((ev.keyCode || ev.charCode || ev.which) === 32) {
         ev.preventDefault();
         ev.type = 'click';
         $(this).trigger(ev);
         return;
       }
-      if((ev.keyCode || ev.charCode || ev.which) == 13) {
+      if ((ev.keyCode || ev.charCode || ev.which) === 13) {
         ev.preventDefault();
         ev.type = 'dblclick';
         $(this).trigger(ev);
@@ -186,20 +194,15 @@ window.search.Query.prototype.addResult = function(result) {
       }
     });
 
-  var link = $('&lt;a>')
-    .append(result.title)
-    .appendTo(item);
+  var link = $('&lt;a>').append(result.title).appendTo(item);
 
-  if(result.icon) {
-    link.css('background-image', 'url("'+result.icon+'")');
+  if (result.icon) {
+    link.css('background-image', 'url("' + result.icon + '")');
     item.css('list-style', 'none');
   }
 
-  if(result.description) {
-    item
-      .append($('&lt;br>'))
-      .append($('&lt;em>')
-        .append(result.description));
+  if (result.description) {
+    item.append($('&lt;br>')).append($('&lt;em>').append(result.description));
   }
 };
 
@@ -210,18 +213,18 @@ window.search.Query.prototype.addResult = function(result) {
  * @param {Object} result - The search result object.
  * @returns {L.Layer} The layer created for this result.
  */
-window.search.Query.prototype.resultLayer = function(result) {
-  if(result.layer !== null &amp;&amp; !result.layer) {
+window.search.Query.prototype.resultLayer = function (result) {
+  if (result.layer !== null &amp;&amp; !result.layer) {
     result.layer = L.layerGroup();
 
-    if(result.position) {
+    if (result.position) {
       L.marker(result.position, {
         icon: L.divIcon.coloredSvg('red'),
-        title: result.title
+        title: result.title,
       }).addTo(result.layer);
     }
 
-    if(result.bounds) {
+    if (result.bounds) {
       L.rectangle(result.bounds, {
         title: result.title,
         interactive: false,
@@ -230,8 +233,7 @@ window.search.Query.prototype.resultLayer = function(result) {
       }).addTo(result.layer);
     }
   }
-return result.layer;
-
+  return result.layer;
 };
 
 /**
@@ -241,65 +243,64 @@ return result.layer;
  * @param {Object} result - The selected search result object.
  * @param {Event} ev - The event associated with the selection.
  */
-window.search.Query.prototype.onResultSelected = function(result, ev) {
+window.search.Query.prototype.onResultSelected = function (result, ev) {
   this.removeHoverResult();
   this.removeSelectedResult();
   this.selectedResult = result;
 
-  if(result.onSelected) {
-    if(result.onSelected(result, ev)) return;
+  if (result.onSelected) {
+    if (result.onSelected(result, ev)) return;
   }
 
-  if(ev.type == 'dblclick') {
-    if(result.position) {
-      map.setView(result.position, DEFAULT_ZOOM);
-    } else if(result.bounds) {
-      map.fitBounds(result.bounds, {maxZoom: DEFAULT_ZOOM});
+  if (ev.type === 'dblclick') {
+    if (result.position) {
+      window.map.setView(result.position, window.DEFAULT_ZOOM);
+    } else if (result.bounds) {
+      window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
     }
-  } else { // ev.type != 'dblclick'
-    if(result.bounds) {
-      map.fitBounds(result.bounds, {maxZoom: DEFAULT_ZOOM});
-    } else if(result.position) {
-      map.setView(result.position);
+  } else {
+    // ev.type != 'dblclick'
+    if (result.bounds) {
+      window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
+    } else if (result.position) {
+      window.map.setView(result.position);
     }
   }
 
   result.layer = this.resultLayer(result);
 
-  if(result.layer)
-    map.addLayer(result.layer);
+  if (result.layer) window.map.addLayer(result.layer);
 
-  if(window.isSmartphone()) window.show('map');
-}
+  if (window.isSmartphone()) window.show('map');
+};
 
 /**
  * Removes the currently selected search result from the map and performs cleanup.
  *
  * @function
  */
-window.search.Query.prototype.removeSelectedResult = function() {
-  if(this.selectedResult) {
-    if(this.selectedResult.layer) map.removeLayer(this.selectedResult.layer);
-    if(this.selectedResult.onRemove) this.selectedResult.onRemove(this.selectedResult);
+window.search.Query.prototype.removeSelectedResult = function () {
+  if (this.selectedResult) {
+    if (this.selectedResult.layer) window.map.removeLayer(this.selectedResult.layer);
+    if (this.selectedResult.onRemove) this.selectedResult.onRemove(this.selectedResult);
   }
-}
+};
 
 /**
  * Handles the start of a hover over a search result. Adds the layer for the result to the map if not already selected.
  *
  * @function
  * @param {Object} result - The search result object being hovered over.
- * @param {Event} ev - The event associated with the hover start.
  */
-window.search.Query.prototype.onResultHoverStart = function(result, ev) {
+window.search.Query.prototype.onResultHoverStart = function (result) {
   this.removeHoverResult();
   this.hoverResult = result;
 
-  if(result === this.selectedResult) return;
+  if (result === this.selectedResult) return;
 
   result.layer = this.resultLayer(result);
 
-  if(result.layer) map.addLayer(result.layer);
+  if (result.layer) window.map.addLayer(result.layer);
 };
 
 /**
@@ -307,10 +308,12 @@ window.search.Query.prototype.onResultHoverStart = function(result, ev) {
  *
  * @function
  */
-window.search.Query.prototype.removeHoverResult = function() {
-  if(this.hoverResult !== this.selectedResult) {
-    if(this.hoverResult) {
-      if(this.hoverResult.layer) { map.removeLayer(this.hoverResult.layer); }
+window.search.Query.prototype.removeHoverResult = function () {
+  if (this.hoverResult !== this.selectedResult) {
+    if (this.hoverResult) {
+      if (this.hoverResult.layer) {
+        window.map.removeLayer(this.hoverResult.layer);
+      }
     }
   }
   this.hoverResult = null;
@@ -318,12 +321,8 @@ window.search.Query.prototype.removeHoverResult = function() {
 
 /**
  * Handles the end of a hover over a search result. Removes the hover result layer from the map.
- *
- * @function
- * @param {Object} result - The search result object being hovered over.
- * @param {Event} ev - The event associated with the hover end.
  */
-window.search.Query.prototype.onResultHoverEnd = function(result, ev) {
+window.search.Query.prototype.onResultHoverEnd = function () {
   this.removeHoverResult();
 };
 
@@ -334,31 +333,25 @@ window.search.Query.prototype.onResultHoverEnd = function(result, ev) {
  * @param {string} term - The search term.
  * @param {boolean} confirmed - Indicates if the search term is confirmed.
  */
-window.search.doSearch = function(term, confirmed) {
+window.search.doSearch = function (term, confirmed) {
   term = term.trim();
 
   // minimum 3 characters for automatic search
-  if(term.length &lt; 3 &amp;&amp; !confirmed) return;
+  if (term.length &lt; 3 &amp;&amp; !confirmed) return;
 
   // don't clear last confirmed search
-  if(window.search.lastSearch
-  &amp;&amp; window.search.lastSearch.confirmed
-  &amp;&amp; !confirmed)
-    return;
+  if (window.search.lastSearch &amp;&amp; window.search.lastSearch.confirmed &amp;&amp; !confirmed) return;
 
   // don't make the same query again
-  if(window.search.lastSearch
-  &amp;&amp; window.search.lastSearch.confirmed == confirmed
-  &amp;&amp; window.search.lastSearch.term == term)
-    return;
+  if (window.search.lastSearch &amp;&amp; window.search.lastSearch.confirmed === confirmed &amp;&amp; window.search.lastSearch.term === term) return;
 
-  if(window.search.lastSearch) window.search.lastSearch.hide();
+  if (window.search.lastSearch) window.search.lastSearch.hide();
   window.search.lastSearch = null;
 
   // clear results
-  if(term == '') return;
+  if (term === '') return;
 
-  if(useAppPanes()) show('info');
+  if (window.useAppPanes()) window.show('info');
 
   $('.ui-tooltip').remove();
 
@@ -371,10 +364,10 @@ window.search.doSearch = function(term, confirmed) {
  *
  * @function window.search.setup
  */
-window.search.setup = function() {
+window.search.setup = function () {
   $('#search')
-    .keypress(function(e) {
-      if((e.keyCode ? e.keyCode : e.which) != 13) return;
+    .keypress(function (e) {
+      if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
       e.preventDefault();
 
       var term = $(this).val();
@@ -382,15 +375,18 @@ window.search.setup = function() {
       clearTimeout(window.search.timer);
       window.search.doSearch(term, true);
     })
-    .on('keyup keypress change paste', function(e) {
+    .on('keyup keypress change paste', function () {
       clearTimeout(window.search.timer);
-      window.search.timer = setTimeout(function() {
-        var term = $(this).val();
-        window.search.doSearch(term, false);
-      }.bind(this), 500);
+      window.search.timer = setTimeout(
+        function () {
+          var term = $(this).val();
+          window.search.doSearch(term, false);
+        }.bind(this),
+        500
+      );
     });
-  $('#buttongeolocation').click(function(){
-    map.locate({setView : true, maxZoom: 13});
+  $('#buttongeolocation').click(function () {
+    window.map.locate({ setView: true, maxZoom: 13 });
   });
 };
 
@@ -431,81 +427,90 @@ window.search.addSearchResult = function (query, data, guid) {
 window.addHook('search', function (query) {
   var term = query.term.toLowerCase();
 
-  $.each(portals, function(guid, portal) {
+  $.each(window.portals, function (guid, portal) {
     var data = portal.options.data;
-    if(!data.title) return;
+    if (!data.title) return;
 
-    if(data.title.toLowerCase().indexOf(term) !== -1) {
+    if (data.title.toLowerCase().indexOf(term) !== -1) {
       window.search.addSearchResult(query, data, guid);
     }
   });
 });
-
 
 // search for locations
 // TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
 window.addHook('search', function (query) {
   var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   var added = {};
-  if(!locations) return;
-  locations.forEach(function(location) {
+  if (!locations) return;
+  locations.forEach(function (location) {
     var pair = location.split(',').map(function (s) {
       return parseFloat(s.trim()).toFixed(6);
     });
-    var ll = pair.join(",");
-    var latlng = L.latLng(pair.map(function(s) { return parseFloat(s); }));
-    if(added[ll]) return;
+    var ll = pair.join(',');
+    var latlng = L.latLng(
+      pair.map(function (s) {
+        return parseFloat(s);
+      })
+    );
+    if (added[ll]) return;
     added[ll] = true;
 
     query.addResult({
       title: ll,
       description: 'geo coordinates',
       position: latlng,
-      onSelected: function(result, event) {
-        for(var guid in window.portals) {
+      onSelected: function (result) {
+        for (var guid in window.portals) {
           var p = window.portals[guid].getLatLng();
-          if((p.lat.toFixed(6)+","+p.lng.toFixed(6)) == ll) {
-            renderPortalDetails(guid);
+          if (p.lat.toFixed(6) + ',' + p.lng.toFixed(6) === ll) {
+            window.renderPortalDetails(guid);
             return;
           }
         }
 
-        urlPortalLL = [result.position.lat, result.position.lng];
+        window.urlPortalLL = [result.position.lat, result.position.lng];
       },
     });
   });
 });
 
-
 // search on OpenStreetMap
 window.addHook('search', function (query) {
-  if(!query.confirmed) return;
+  if (!query.confirmed) return;
 
   // Viewbox search orders results so they're closer to the viewbox
-  var mapBounds = map.getBounds();
-  var viewbox = '&amp;viewbox=' + mapBounds.getSouthWest().lng + ',' + mapBounds.getSouthWest().lat + ',' + mapBounds.getNorthEast().lng + ',' + mapBounds.getNorthEast().lat;
+  var mapBounds = window.map.getBounds();
+  var viewbox =
+    '&amp;viewbox=' + mapBounds.getSouthWest().lng + ',' + mapBounds.getSouthWest().lat + ',' + mapBounds.getNorthEast().lng + ',' + mapBounds.getNorthEast().lat;
 
   var resultCount = 0;
   var resultMap = {};
   function onQueryResult(isViewboxResult, data) {
     resultCount += data.length;
-    if(isViewboxResult) {
+    if (isViewboxResult) {
       // Search for things outside the viewbox
-      $.getJSON(NOMINATIM + encodeURIComponent(query.term) + viewbox, onQueryResult.bind(null, false));
-      if(resultCount === 0) { return; }
+      $.getJSON(window.NOMINATIM + encodeURIComponent(query.term) + viewbox, onQueryResult.bind(null, false));
+      if (resultCount === 0) {
+        return;
+      }
     } else {
-      if(resultCount === 0) {
+      if (resultCount === 0) {
         query.addResult({
           title: 'No results on OpenStreetMap',
           icon: '//www.openstreetmap.org/favicon.ico',
-          onSelected: function() {return true;},
+          onSelected: function () {
+            return true;
+          },
         });
         return;
       }
     }
 
-    data.forEach(function(item) {
-      if(resultMap[item.place_id]) { return; } // duplicate
+    data.forEach(function (item) {
+      if (resultMap[item.place_id]) {
+        return;
+      } // duplicate
       resultMap[item.place_id] = true;
 
       var result = {
@@ -515,26 +520,26 @@ window.addHook('search', function (query) {
         icon: item.icon,
       };
 
-      if(item.geojson) {
+      if (item.geojson) {
         result.layer = L.geoJson(item.geojson, {
           interactive: false,
           color: 'red',
           opacity: 0.7,
           weight: 2,
           fill: false,
-          pointToLayer: function(featureData,latLng) {
+          pointToLayer: function (featureData, latLng) {
             return L.marker(latLng, {
               icon: L.divIcon.coloredSvg('red'),
-              title: item.display_name
+              title: item.display_name,
             });
-          }
+          },
         });
       }
 
       var b = item.boundingbox;
-      if(b) {
+      if (b) {
         var southWest = new L.LatLng(b[0], b[2]),
-            northEast = new L.LatLng(b[1], b[3]);
+          northEast = new L.LatLng(b[1], b[3]);
         result.bounds = new L.LatLngBounds(southWest, northEast);
       }
 
@@ -546,7 +551,7 @@ window.addHook('search', function (query) {
   // http://wiki.openstreetmap.org/wiki/Nominatim/Special_Phrases/EN
   var bounded = '&amp;bounded=1';
 
-  $.getJSON(NOMINATIM + encodeURIComponent(query.term) + viewbox + bounded, onQueryResult.bind(null, true));
+  $.getJSON(window.NOMINATIM + encodeURIComponent(query.term) + viewbox + bounded, onQueryResult.bind(null, true));
 });
 
 // search on guid

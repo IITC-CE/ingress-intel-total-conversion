@@ -48,7 +48,7 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* global android, app -- eslint */
+            <pre class="prettyprint source linenums"><code>/* global L -- eslint */
 
 /**
  * @file This file contains the main JavaScript code for the app, including utility functions,
@@ -72,22 +72,23 @@ window.isApp = isApp;
  */
 window.useAppPanes = function () {
   // isSmartphone is important to disable panes in desktop mode
-  return isApp &amp;&amp; app.addPane &amp;&amp; window.isSmartphone();
+  return isApp &amp;&amp; window.app.addPane &amp;&amp; window.isSmartphone();
 };
 window.useAndroidPanes = window.useAppPanes; // compatibility
 
 if (isApp) {
-  if (typeof app === 'undefined') { // compatibility
-    window.app = android;
+  if (typeof app === 'undefined') {
+    // compatibility
+    window.app = window.android;
   } else {
-    window.android = app;
+    window.android = window.app;
   }
 
-  window.requestFile = function (callback) { // deprecated
-    L.FileListLoader.loadFiles()
-      .on('load', function (e) {
-        callback(e.file.name, e.reader.result);
-      });
+  window.requestFile = function (callback) {
+    // deprecated
+    L.FileListLoader.loadFiles().on('load', function (e) {
+      callback(e.file.name, e.reader.result);
+    });
   };
 }
 
@@ -116,13 +117,13 @@ function debounce(callback, time) {
   };
 }
 
-function extendLayerChooser () {
-  if (app.setLayers) {
+function extendLayerChooser() {
+  if (window.app.setLayers) {
     // hook some additional code into the LayerControl so it's easy for the mobile app to interface with it
     window.LayerChooser.include({
       _setAppLayers: debounce(function () {
         var l = this.getLayers();
-        app.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
+        window.app.setLayers(JSON.stringify(l.baseLayers), JSON.stringify(l.overlayLayers));
       }, 1000),
 
       setLabel: (function (setLabel) {
@@ -135,69 +136,72 @@ function extendLayerChooser () {
       _update: function () {
         this._setAppLayers();
         return L.Control.Layers.prototype._update.apply(this, arguments);
-      }
+      },
     });
   }
 }
 
 window.runOnAppBeforeBoot = function () {
-  if (!isApp) { return; }
+  if (!isApp) {
+    return;
+  }
 
-  if (app.showZoom) {
-    window.mapOptions.zoomControl = app.showZoom();
+  if (window.app.showZoom) {
+    window.mapOptions.zoomControl = window.app.showZoom();
   }
 
   extendLayerChooser();
 
   // add jquery listeners ******************************************************
-  if (app.dialogOpened &amp;&amp; app.dialogFocused) {
+  if (window.app.dialogOpened &amp;&amp; window.app.dialogFocused) {
     $(document.body).on({
       // hints for iitc mobile
       dialogopen: function (e) {
         var id = $(e.target).data('id');
-        app.dialogOpened(id, true);
+        window.app.dialogOpened(id, true);
       },
       dialogclose: function (e) {
         var id = $(e.target).data('id');
-        app.dialogOpened(id, false);
+        window.app.dialogOpened(id, false);
       },
       dialogfocus: function (e) {
         var id = $(e.target).data('id');
-        app.dialogFocused(id);
-      }
+        window.app.dialogFocused(id);
+      },
     });
   }
   // notify app that a select spinner is enabled.
   // this disables javascript injection on app's side.
   // if app is not notified, the spinner closes on the next JS call
-  if (app.spinnerEnabled) {
+  if (window.app.spinnerEnabled) {
     $(document.body).on('click', 'select', function () {
-      app.spinnerEnabled(true);
+      window.app.spinnerEnabled(true);
     });
   }
 
   // add iitc hooks ************************************************************
-  if (app.switchToPane) {
-    window.addHook('paneChanged', function (name) { // https://stackoverflow.com/a/59158952/2520247
-      app.switchToPane(name);
+  if (window.app.switchToPane) {
+    window.addHook('paneChanged', function (name) {
+      // https://stackoverflow.com/a/59158952/2520247
+      window.app.switchToPane(name);
     });
   }
 
   // overwrite some functions **************************************************
-  if (app.copy) {
+  if (window.app.copy) {
     window.androidCopy = function (text) {
-      app.copy(text);
+      window.app.copy(text);
       return false;
     };
   }
 
-  if (app.saveFile) {
+  if (window.app.saveFile) {
     window.saveFile = function (data, filename, dataType) {
-      app.saveFile(filename || '', dataType || '*/*', data);
+      window.app.saveFile(filename || '', dataType || '*/*', data);
     };
   }
 
-  if (app.intentPosLink) {
+  if (window.app.intentPosLink) {
     window.renderPortalUrl = function (lat, lng, title, guid) {
       // one share link option - and the app provides an interface to share the URL,
       // share as a geo: intent (navigation via google maps), etc
@@ -213,25 +217,27 @@ window.runOnAppBeforeBoot = function () {
 };
 
 window.runOnAppAfterBoot = function () {
-  if (!isApp) { return; }
+  if (!isApp) {
+    return;
+  }
 
-  if (app.intentPosLink) {
+  if (window.app.intentPosLink) {
     $('#permalink').click(function (e) {
       e.preventDefault();
       var center = window.map.getCenter();
-      app.intentPosLink(center.lat, center.lng, window.map.getZoom(), 'Selected map view', false);
+      window.app.intentPosLink(center.lat, center.lng, window.map.getZoom(), 'Selected map view', false);
     });
   }
 
   // add leaflet listeners *****************************************************
-  if (app.setPermalink) {
+  if (window.app.setPermalink) {
     var setAppPermalink = function () {
       var p = window.selectedPortal &amp;&amp; window.portals[window.selectedPortal];
       var href = window.makePermalink(p &amp;&amp; p.getLatLng(), {
         fullURL: true,
-        includeMapView: true
+        includeMapView: true,
       });
-      app.setPermalink(href);
+      window.app.setPermalink(href);
     };
 
     window.map.on('moveend', setAppPermalink);
@@ -239,7 +245,7 @@ window.runOnAppAfterBoot = function () {
   }
 
   // hide layer chooser if booted with the iitcm app
-  if (app.setLayers) {
+  if (window.app.setLayers) {
     $('.leaflet-control-layers').hide();
   }
 
@@ -250,7 +256,9 @@ window.runOnAppAfterBoot = function () {
   setTimeout(function () { map.invalidateSize(); }, 0.2*1000);
   */
 
-  if (app.bootFinished) { app.bootFinished(); }
+  if (window.app.bootFinished) {
+    window.app.bootFinished();
+  }
 };
 </code></pre>
         </article>

@@ -48,7 +48,9 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
+            <pre class="prettyprint source linenums"><code>/* global L -- eslint */
+
+/**
  * @file Misc utils
  *
  * @module utils_misc
@@ -61,21 +63,20 @@
  * @param {string} param - The name of the parameter to retrieve.
  * @returns {string} The value of the parameter, or an empty string if not found.
  */
-window.getURLParam = function(param) {
+window.getURLParam = function (param) {
   var items = window.location.search.substr(1).split('&amp;');
-  if (items == "") return "";
 
-  for (var i=0; i&lt;items.length; i++) {
+  for (var i = 0; i &lt; items.length; i++) {
     var item = items[i].split('=');
 
-    if (item[0] == param) {
-      var val = item.length==1 ? '' : decodeURIComponent (item[1].replace(/\+/g,' '));
+    if (item[0] === param) {
+      var val = item.length === 1 ? '' : decodeURIComponent(item[1].replace(/\+/g, ' '));
       return val;
     }
   }
 
   return '';
-}
+};
 
 /**
  * Reads a cookie by name.
@@ -85,15 +86,17 @@ window.getURLParam = function(param) {
  * @param {string} name - The name of the cookie to read.
  * @returns {string} The value of the cookie, or undefined if not found.
  */
-window.readCookie = function(name){
-  var C, i, c = document.cookie.split('; ');
+window.readCookie = function (name) {
+  var C,
+    i,
+    c = document.cookie.split('; ');
   var cookies = {};
-  for(i=c.length-1; i>=0; i--){
+  for (i = c.length - 1; i >= 0; i--) {
     C = c[i].split('=');
     cookies[C[0]] = unescape(C[1]);
   }
   return cookies[name];
-}
+};
 
 /**
  * Writes a cookie with a specified name and value.
@@ -102,10 +105,10 @@ window.readCookie = function(name){
  * @param {string} name - The name of the cookie.
  * @param {string} val - The value of the cookie.
  */
-window.writeCookie = function(name, val) {
+window.writeCookie = function (name, val) {
   var d = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
-  document.cookie = name + "=" + val + '; expires='+d+'; path=/';
-}
+  document.cookie = name + '=' + val + '; expires=' + d + '; path=/';
+};
 
 /**
  * Erases a cookie with a specified name.
@@ -113,9 +116,9 @@ window.writeCookie = function(name, val) {
  * @function eraseCookie
  * @param {string} name - The name of the cookie to erase.
  */
-window.eraseCookie = function(name) {
+window.eraseCookie = function (name) {
   document.cookie = name + '=; expires=Thu, 1 Jan 1970 00:00:00 GMT; path=/';
-}
+};
 
 /**
  * Adds thousand separators to a given number.
@@ -125,11 +128,11 @@ window.eraseCookie = function(name) {
  * @param {number} d - The number to format.
  * @returns {string} The formatted number with thousand separators.
  */
-window.digits = function(d) {
+window.digits = function (d) {
   // U+2009 - Thin Space. Recommended for use as a thousands separator...
   // https://en.wikipedia.org/wiki/Space_(punctuation)#Table_of_spaces
-  return (d+"").replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1&amp;#8201;");
-}
+  return (d + '').replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1&amp;#8201;');
+};
 
 /**
  * Pads a number with zeros up to a specified length.
@@ -139,33 +142,31 @@ window.digits = function(d) {
  * @param {number} pad - The desired length of the output string.
  * @returns {string} The padded number as a string.
  */
-window.zeroPad = function(number,pad) {
+window.zeroPad = function (number, pad) {
   number = number.toString();
   var zeros = pad - number.length;
-  return Array(zeros>0?zeros+1:0).join("0") + number;
-}
+  return Array(zeros > 0 ? zeros + 1 : 0).join('0') + number;
+};
 
 /**
  * Converts a UNIX timestamp to a human-readable string.
  * If the timestamp is from today, returns the time (HH:mm:ss format); otherwise, returns the date (YYYY-MM-DD).
  *
  * @function unixTimeToString
- * @param {number} time - The UNIX timestamp to convert.
+ * @param {number} timestamp - The UNIX timestamp to convert.
  * @param {boolean} [full] - If true, returns both date and time.
  * @returns {string|null} The formatted date and/or time.
  */
-window.unixTimeToString = function(time, full) {
-  if(!time) return null;
-  var d = new Date(typeof time === 'string' ? parseInt(time) : time);
+window.unixTimeToString = function (timestamp, full) {
+  if (!timestamp) return null;
+  var d = new Date(typeof timestamp === 'string' ? parseInt(timestamp) : timestamp);
   var time = d.toLocaleTimeString();
-//  var time = zeroPad(d.getHours(),2)+':'+zeroPad(d.getMinutes(),2)+':'+zeroPad(d.getSeconds(),2);
-  var date = d.getFullYear()+'-'+zeroPad(d.getMonth()+1,2)+'-'+zeroPad(d.getDate(),2);
-  if(typeof full !== 'undefined' &amp;&amp; full) return date + ' ' + time;
-  if(d.toDateString() == new Date().toDateString())
-    return time;
-  else
-    return date;
-}
+  //  var time = zeroPad(d.getHours(),2)+':'+zeroPad(d.getMinutes(),2)+':'+zeroPad(d.getSeconds(),2);
+  var date = d.getFullYear() + '-' + window.zeroPad(d.getMonth() + 1, 2) + '-' + window.zeroPad(d.getDate(), 2);
+  if (typeof full !== 'undefined' &amp;&amp; full) return date + ' ' + time;
+  if (d.toDateString() === new Date().toDateString()) return time;
+  else return date;
+};
 
 /**
  * Converts a UNIX timestamp to a precise date and time string in the local timezone.
@@ -176,12 +177,24 @@ window.unixTimeToString = function(time, full) {
  * @param {boolean} [millisecond] - Whether to include millisecond precision.
  * @returns {string|null} The formatted date and time string.
  */
-window.unixTimeToDateTimeString = function(time, millisecond) {
-  if(!time) return null;
+window.unixTimeToDateTimeString = function (time, millisecond) {
+  if (!time) return null;
   var d = new Date(typeof time === 'string' ? parseInt(time) : time);
-  return d.getFullYear()+'-'+zeroPad(d.getMonth()+1,2)+'-'+zeroPad(d.getDate(),2)
-    +' '+zeroPad(d.getHours(),2)+':'+zeroPad(d.getMinutes(),2)+':'+zeroPad(d.getSeconds(),2)+(millisecond?'.'+zeroPad(d.getMilliseconds(),3):'');
-}
+  return (
+    d.getFullYear() +
+    '-' +
+    window.zeroPad(d.getMonth() + 1, 2) +
+    '-' +
+    window.zeroPad(d.getDate(), 2) +
+    ' ' +
+    window.zeroPad(d.getHours(), 2) +
+    ':' +
+    window.zeroPad(d.getMinutes(), 2) +
+    ':' +
+    window.zeroPad(d.getSeconds(), 2) +
+    (millisecond ? '.' + window.zeroPad(d.getMilliseconds(), 3) : '')
+  );
+};
 
 /**
  * Converts a UNIX timestamp to a time string formatted as HH:mm.
@@ -190,13 +203,15 @@ window.unixTimeToDateTimeString = function(time, millisecond) {
  * @param {number|string} time - The UNIX timestamp to convert.
  * @returns {string|null} Formatted time as HH:mm.
  */
-window.unixTimeToHHmm = function(time) {
-  if(!time) return null;
+window.unixTimeToHHmm = function (time) {
+  if (!time) return null;
   var d = new Date(typeof time === 'string' ? parseInt(time) : time);
-  var h = '' + d.getHours(); h = h.length === 1 ? '0' + h : h;
-  var s = '' + d.getMinutes(); s = s.length === 1 ? '0' + s : s;
-  return  h + ':' + s;
-}
+  var h = '' + d.getHours();
+  h = h.length === 1 ? '0' + h : h;
+  var s = '' + d.getMinutes();
+  s = s.length === 1 ? '0' + s : s;
+  return h + ':' + s;
+};
 
 /**
  * Formats an interval of time given in seconds into a human-readable string.
@@ -206,23 +221,22 @@ window.unixTimeToHHmm = function(time) {
  * @param {number} [maxTerms] - The maximum number of time units to include.
  * @returns {string} The formatted time interval.
  */
-window.formatInterval = function(seconds,maxTerms) {
-
+window.formatInterval = function (seconds, maxTerms) {
   var d = Math.floor(seconds / 86400);
   var h = Math.floor((seconds % 86400) / 3600);
   var m = Math.floor((seconds % 3600) / 60);
   var s = seconds % 60;
 
   var terms = [];
-  if (d > 0) terms.push(d+'d');
-  if (h > 0) terms.push(h+'h');
-  if (m > 0) terms.push(m+'m');
-  if (s > 0 || terms.length==0) terms.push(s+'s');
+  if (d > 0) terms.push(d + 'd');
+  if (h > 0) terms.push(h + 'h');
+  if (m > 0) terms.push(m + 'm');
+  if (s > 0 || terms.length === 0) terms.push(s + 's');
 
-  if (maxTerms) terms = terms.slice(0,maxTerms);
+  if (maxTerms) terms = terms.slice(0, maxTerms);
 
   return terms.join(' ');
-}
+};
 
 /**
  * Formats a distance in meters, converting to kilometers if the distance is over 10,000 meters.
@@ -240,12 +254,10 @@ window.formatDistance = function (distance) {
  *
  * @function rangeLinkClick
  */
-window.rangeLinkClick = function() {
-  if(window.portalRangeIndicator)
-    window.map.fitBounds(window.portalRangeIndicator.getBounds());
-  if(window.isSmartphone())
-    window.show('map');
-}
+window.rangeLinkClick = function () {
+  if (window.portalRangeIndicator) window.map.fitBounds(window.portalRangeIndicator.getBounds());
+  if (window.isSmartphone()) window.show('map');
+};
 
 /**
  * Displays a dialog with links to show the specified location on various map services.
@@ -255,20 +267,21 @@ window.rangeLinkClick = function() {
  * @param {number} lng - Longitude of the location.
  * @param {string} name - Name of the location.
  */
-window.showPortalPosLinks = function(lat, lng, name) {
+window.showPortalPosLinks = function (lat, lng, name) {
   var encoded_name = encodeURIComponent(name);
   var qrcode = '&lt;div id="qrcode">&lt;/div>';
-  var script = '&lt;script>$(\'#qrcode\').qrcode({text:\'GEO:'+lat+','+lng+'\'});&lt;/script>';
-  var gmaps = '&lt;a href="https://maps.google.com/maps?ll='+lat+','+lng+'&amp;q='+lat+','+lng+'%20('+encoded_name+')">Google Maps&lt;/a>';
-  var bingmaps = '&lt;a href="https://www.bing.com/maps/?v=2&amp;cp='+lat+'~'+lng+'&amp;lvl=16&amp;sp=Point.'+lat+'_'+lng+'_'+encoded_name+'___">Bing Maps&lt;/a>';
-  var osm = '&lt;a href="https://www.openstreetmap.org/?mlat='+lat+'&amp;mlon='+lng+'&amp;zoom=16">OpenStreetMap&lt;/a>';
-  var latLng = '&lt;span>' + lat + ',' + lng +'&lt;/span>';
-  dialog({
+  var script = "&lt;script>$('#qrcode').qrcode({text:'GEO:" + lat + ',' + lng + "'});&lt;/script>";
+  var gmaps = '&lt;a href="https://maps.google.com/maps?ll=' + lat + ',' + lng + '&amp;q=' + lat + ',' + lng + '%20(' + encoded_name + ')">Google Maps&lt;/a>';
+  var bingmaps =
+    '&lt;a href="https://www.bing.com/maps/?v=2&amp;cp=' + lat + '~' + lng + '&amp;lvl=16&amp;sp=Point.' + lat + '_' + lng + '_' + encoded_name + '___">Bing Maps&lt;/a>';
+  var osm = '&lt;a href="https://www.openstreetmap.org/?mlat=' + lat + '&amp;mlon=' + lng + '&amp;zoom=16">OpenStreetMap&lt;/a>';
+  var latLng = '&lt;span>' + lat + ',' + lng + '&lt;/span>';
+  window.dialog({
     html: '&lt;div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '&lt;br />' + latLng + '&lt;/div>',
     title: name,
-    id: 'poslinks'
+    id: 'poslinks',
   });
-}
+};
 
 /**
  * Checks if the device is a touch-enabled device.
@@ -276,16 +289,18 @@ window.showPortalPosLinks = function(lat, lng, name) {
  * @function isTouchDevice
  * @returns {boolean} True if the device is touch-enabled, otherwise false.
  */
-window.isTouchDevice = function() {
-  return 'ontouchstart' in window // works on most browsers
-      || 'onmsgesturechange' in window; // works on ie10
+window.isTouchDevice = function () {
+  return (
+    'ontouchstart' in window || // works on most browsers
+    'onmsgesturechange' in window
+  ); // works on ie10
 };
 
 // !!deprecated
 // to be ovewritten in app.js
-window.androidCopy = function(text) {
+window.androidCopy = function () {
   return true; // i.e. execute other actions
-}
+};
 
 /**
  * Calculates the number of pixels left to scroll down before reaching the bottom of an element.
@@ -294,27 +309,25 @@ window.androidCopy = function(text) {
  * @param {string|jQuery} elm - The element to calculate the scroll bottom for.
  * @returns {number} The number of pixels from the bottom.
  */
-window.scrollBottom = function(elm) {
-  if(typeof elm === 'string') elm = $(elm);
+window.scrollBottom = function (elm) {
+  if (typeof elm === 'string') elm = $(elm);
   return elm.get(0).scrollHeight - elm.innerHeight() - elm.scrollTop();
-}
+};
 
 /**
  * Zooms the map to a specific portal and shows its details if available.
  *
  * @function zoomToAndShowPortal
  * @param {string} guid - The globally unique identifier of the portal.
- * @param {L.LatLng} latlng - The latitude and longitude of the portal.
+ * @param {L.LatLng|number[]} latlng - The latitude and longitude of the portal.
  */
-window.zoomToAndShowPortal = function(guid, latlng) {
-  map.setView(latlng, DEFAULT_ZOOM);
+window.zoomToAndShowPortal = function (guid, latlng) {
+  window.map.setView(latlng, window.DEFAULT_ZOOM);
   // if the data is available, render it immediately. Otherwise defer
   // until it becomes available.
-  if(window.portals[guid])
-    renderPortalDetails(guid);
-  else
-    urlPortal = guid;
-}
+  if (window.portals[guid]) window.renderPortalDetails(guid);
+  else window.urlPortal = guid;
+};
 
 /**
  * Selects a portal by its latitude and longitude.
@@ -324,25 +337,25 @@ window.zoomToAndShowPortal = function(guid, latlng) {
  *                                      or an array or L.LatLng object containing both latitude and longitude.
  * @param {number} [lng] - The longitude of the portal.
  */
-window.selectPortalByLatLng = function(lat, lng) {
-  if(lng === undefined &amp;&amp; lat instanceof Array) {
+window.selectPortalByLatLng = function (lat, lng) {
+  if (lng === undefined &amp;&amp; lat instanceof Array) {
     lng = lat[1];
     lat = lat[0];
-  } else if(lng === undefined &amp;&amp; lat instanceof L.LatLng) {
+  } else if (lng === undefined &amp;&amp; lat instanceof L.LatLng) {
     lng = lat.lng;
     lat = lat.lat;
   }
-  for(var guid in window.portals) {
+  for (var guid in window.portals) {
     var latlng = window.portals[guid].getLatLng();
-    if(latlng.lat == lat &amp;&amp; latlng.lng == lng) {
-      renderPortalDetails(guid);
+    if (latlng.lat === lat &amp;&amp; latlng.lng === lng) {
+      window.renderPortalDetails(guid);
       return;
     }
   }
 
   // not currently visible
-  urlPortalLL = [lat, lng];
-  map.setView(urlPortalLL, DEFAULT_ZOOM);
+  window.urlPortalLL = [lat, lng];
+  window.map.setView(window.urlPortalLL, window.DEFAULT_ZOOM);
 };
 
 /**
@@ -353,9 +366,9 @@ window.selectPortalByLatLng = function(lat, lng) {
  * @param {string} str - The string to escape.
  * @returns {string} The escaped string.
  */
-window.escapeJavascriptString = function(str) {
-  return (str+'').replace(/[\\"']/g,'\\$&amp;');
-}
+window.escapeJavascriptString = function (str) {
+  return (str + '').replace(/[\\"']/g, '\\$&amp;');
+};
 
 /**
  * Escapes HTML special characters in a string.
@@ -364,12 +377,12 @@ window.escapeJavascriptString = function(str) {
  * @param {string} str - The string to escape.
  * @returns {string} The escaped string.
  */
-window.escapeHtmlSpecialChars = function(str) {
+window.escapeHtmlSpecialChars = function (str) {
   var div = document.createElement('div');
   var text = document.createTextNode(str);
   div.appendChild(text);
   return div.innerHTML;
-}
+};
 
 /**
  * Formats energy of portal.
@@ -378,9 +391,9 @@ window.escapeHtmlSpecialChars = function(str) {
  * @param {number} nrg - The energy value to format.
  * @returns {string} The formatted energy value.
  */
-window.prettyEnergy = function(nrg) {
-  return nrg> 1000 ? Math.round(nrg/1000) + ' k': nrg;
-}
+window.prettyEnergy = function (nrg) {
+  return nrg > 1000 ? Math.round(nrg / 1000) + ' k' : nrg;
+};
 
 /**
  * Converts a list of items into a unique array, removing duplicates.
@@ -389,11 +402,11 @@ window.prettyEnergy = function(nrg) {
  * @param {Array} arr - The array to process.
  * @returns {Array} A new array containing only unique elements.
  */
-window.uniqueArray = function(arr) {
-  return $.grep(arr, function(v, i) {
+window.uniqueArray = function (arr) {
+  return $.grep(arr, function (v, i) {
     return $.inArray(v, arr) === i;
   });
-}
+};
 
 /**
  * Generates a four-column HTML table from an array of data blocks.
@@ -401,18 +414,24 @@ window.uniqueArray = function(arr) {
  * @param {Array} blocks - Array of data blocks, where each block is an array with details for one row.
  * @returns {string} HTML string representing the constructed table.
  */
-window.genFourColumnTable = function(blocks) {
-  var t = $.map(blocks, function(detail, index) {
-    if(!detail) return '';
-    var title = detail[2] ? ' title="'+escapeHtmlSpecialChars(detail[2]) + '"' : '';
-    if(index % 2 === 0)
-      return '&lt;tr>&lt;td'+title+'>'+detail[1]+'&lt;/td>&lt;th'+title+'>'+detail[0]+'&lt;/th>';
-    else
-      return '    &lt;th'+title+'>'+detail[0]+'&lt;/th>&lt;td'+title+'>'+detail[1]+'&lt;/td>&lt;/tr>';
+window.genFourColumnTable = function (blocks) {
+  let t = $.map(blocks, function (detail, index) {
+    if (!detail) return '';
+    const title = detail[2] ? ' title="' + window.escapeHtmlSpecialChars(detail[2]) + '"' : '';
+    if (index % 2 === 0) {
+      return '&lt;tr>&lt;td' + title + '>' + detail[1] + '&lt;/td>&lt;th' + title + '>' + detail[0] + '&lt;/th>';
+    } else {
+      return '&lt;th' + title + '>' + detail[0] + '&lt;/th>&lt;td' + title + '>' + detail[1] + '&lt;/td>&lt;/tr>';
+    }
   }).join('');
-  if(t.length % 2 === 1) t + '&lt;td>&lt;/td>&lt;td>&lt;/td>&lt;/tr>';
+
+  // If the total number of rows is odd, add empty cells to complete the last row
+  if (blocks.length % 2 === 1) {
+    t += '&lt;td>&lt;/td>&lt;td>&lt;/td>&lt;/tr>';
+  }
+
   return t;
-}
+};
 
 /**
  * Converts text with newlines (`\n`) and tabs (`\t`) into an HTML table.
@@ -421,36 +440,36 @@ window.genFourColumnTable = function(blocks) {
  * @param {string} text - The text to convert.
  * @returns {string} The resulting HTML table.
  */
-window.convertTextToTableMagic = function(text) {
+window.convertTextToTableMagic = function (text) {
   // check if it should be converted to a table
-  if(!text.match(/\t/)) return text.replace(/\n/g, '&lt;br>');
+  if (!text.match(/\t/)) return text.replace(/\n/g, '&lt;br>');
 
   var data = [];
   var columnCount = 0;
 
   // parse data
   var rows = text.split('\n');
-  $.each(rows, function(i, row) {
+  $.each(rows, function (i, row) {
     data[i] = row.split('\t');
-    if(data[i].length > columnCount) columnCount = data[i].length;
+    if (data[i].length > columnCount) columnCount = data[i].length;
   });
 
   // build the table
   var table = '&lt;table>';
-  $.each(data, function(i, row) {
+  $.each(data, function (i) {
     table += '&lt;tr>';
-    $.each(data[i], function(k, cell) {
+    $.each(data[i], function (k, cell) {
       var attributes = '';
-      if(k === 0 &amp;&amp; data[i].length &lt; columnCount) {
-        attributes = ' colspan="'+(columnCount - data[i].length + 1)+'"';
+      if (k === 0 &amp;&amp; data[i].length &lt; columnCount) {
+        attributes = ' colspan="' + (columnCount - data[i].length + 1) + '"';
       }
-      table += '&lt;td'+attributes+'>'+cell+'&lt;/td>';
+      table += '&lt;td' + attributes + '>' + cell + '&lt;/td>';
     });
     table += '&lt;/tr>';
   });
   table += '&lt;/table>';
   return table;
-}
+};
 
 /**
  * Clamps a given value between a minimum and maximum value.
@@ -478,11 +497,8 @@ var MAX_LATITUDE = 85.051128; // L.Projection.SphericalMercator.MAX_LATITUDE
  */
 window.clampLatLng = function (latlng) {
   // Ingress accepts requests only for this range
-  return [
-    clamp(latlng.lat, MAX_LATITUDE, -MAX_LATITUDE),
-    clamp(latlng.lng, 179.999999, -180)
-  ];
-}
+  return [clamp(latlng.lat, MAX_LATITUDE, -MAX_LATITUDE), clamp(latlng.lng, 179.999999, -180)];
+};
 
 /**
  * Clamps a latitude and longitude bounds to the maximum and minimum valid values.
@@ -492,9 +508,10 @@ window.clampLatLng = function (latlng) {
  * @returns {L.LatLngBounds} The clamped bounds.
  */
 window.clampLatLngBounds = function (bounds) {
-  var SW = bounds.getSouthWest(), NE = bounds.getNorthEast();
-  return L.latLngBounds(clampLatLng(SW), clampLatLng(NE));
-}
+  var SW = bounds.getSouthWest(),
+    NE = bounds.getNorthEast();
+  return L.latLngBounds(window.clampLatLng(SW), window.clampLatLng(NE));
+};
 
 /*
 pnpoly Copyright (c) 1970-2003, Wm. Randolph Franklin
@@ -527,8 +544,9 @@ window.pnpoly = function (polygon, point) {
   var inside = 0;
   // j records previous value. Also handles wrapping around.
   for (var i = 0, j = polygon.length - 1; i &lt; polygon.length; j = i++) {
-    inside ^= polygon[i].y > point.y !== polygon[j].y > point.y &amp;&amp;
-              point.x - polygon[i].x &lt; (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y);
+    inside ^=
+      polygon[i].y > point.y !== polygon[j].y > point.y &amp;&amp;
+      point.x - polygon[i].x &lt; ((polygon[j].x - polygon[i].x) * (point.y - polygon[i].y)) / (polygon[j].y - polygon[i].y);
   }
   // Let's make js as magical as C. Yay.
   return !!inside;
@@ -550,7 +568,7 @@ window.makePrimeLink = function (guid, lat, lng) {
 /**
  * Generates a permalink URL based on the specified latitude and longitude and additional options.
  *
- * @param {L.LatLng} [latlng] - The latitude and longitude for the permalink.
+ * @param {L.LatLng|number[]} [latlng] - The latitude and longitude for the permalink.
  *                              Can be omitted to create mapview-only permalink.
  * @param {Object} [options] - Additional options for permalink generation.
  * @param {boolean} [options.includeMapView] - Include current map view in the permalink.
@@ -560,20 +578,20 @@ window.makePrimeLink = function (guid, lat, lng) {
 window.makePermalink = function (latlng, options) {
   options = options || {};
 
-  function round (l) { // ensures that lat,lng are with same precision as in stock intel permalinks
-    return Math.floor(l*1e6)/1e6;
+  function round(l) {
+    // ensures that lat,lng are with same precision as in stock intel permalinks
+    return Math.floor(l * 1e6) / 1e6;
   }
   var args = [];
   if (!latlng || options.includeMapView) {
     var c = window.map.getCenter();
-    args.push(
-      'll='+[round(c.lat),round(c.lng)].join(','),
-      'z='+window.map.getZoom()
-    );
+    args.push('ll=' + [round(c.lat), round(c.lng)].join(','), 'z=' + window.map.getZoom());
   }
   if (latlng) {
-    if ('lat' in latlng) { latlng = [latlng.lat, latlng.lng]; }
-    args.push('pll='+latlng.join(','));
+    if ('lat' in latlng) {
+      latlng = [latlng.lat, latlng.lng];
+    }
+    args.push('pll=' + latlng.join(','));
   }
   var url = '';
   if (options.fullURL) {
@@ -594,10 +612,10 @@ if (!String.prototype.capitalize) {
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith#polyfill
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {
-    value: function(search, rawPos) {
-      var pos = rawPos > 0 ? rawPos|0 : 0;
+    value: function (search, rawPos) {
+      var pos = rawPos > 0 ? rawPos | 0 : 0;
       return this.substring(pos, pos + search.length) === search;
-    }
+    },
   });
 }
 
@@ -613,9 +631,9 @@ if (!Math.trunc) {
 // https://tc39.github.io/ecma262/#sec-array.prototype.find
 if (!Array.prototype.find) {
   Object.defineProperty(Array.prototype, 'find', {
-    value: function(predicate) {
+    value: function (predicate) {
       // 1. Let O be ? ToObject(this value).
-      if (this == null) {
+      if (this === null) {
         throw TypeError('"this" is null or not defined');
       }
 
@@ -653,19 +671,17 @@ if (!Array.prototype.find) {
       return undefined;
     },
     configurable: true,
-    writable: true
+    writable: true,
   });
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#polyfill
 if (!Element.prototype.matches) {
-  Element.prototype.matches =
-    Element.prototype.msMatchesSelector ||
-    Element.prototype.webkitMatchesSelector;
+  Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
 }
 
 if (!Element.prototype.closest) {
-  Element.prototype.closest = function(s) {
+  Element.prototype.closest = function (s) {
     var el = this;
 
     do {
