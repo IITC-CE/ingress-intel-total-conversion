@@ -154,9 +154,10 @@ window.runOnSmartphonesBeforeBoot = function () {
  * This function is hooked to the 'portalSelected' event and is specific to the smartphone layout.
  *
  * @function smartphoneInfo
+ * @param {Object} selectedPortalData - The object containing details about the selected portal.
  */
-window.smartphoneInfo = function () {
-  var guid = data.selectedPortalGuid;
+window.smartphoneInfo = function (selectedPortalData) {
+  var guid = selectedPortalData.selectedPortalGuid;
   if (!window.portals[guid]) return;
 
   var data = window.portals[window.selectedPortal].options.data;
