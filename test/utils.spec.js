@@ -349,6 +349,38 @@ describe('IITC.utils.formatDistance', () => {
   });
 });
 
+describe('IITC.utils.formatAgo', () => {
+  const now = Date.now();
+
+  describe('Basic functionality', () => {
+    it('should return "0s" when there is no time difference and seconds are enabled', () => {
+      expect(IITC.utils.formatAgo(now, now, { showSeconds: true })).to.equal('0s');
+    });
+
+    it('should return "0m" when time difference is negative and seconds are disabled', () => {
+      const futureTime = now + 1000;
+      expect(IITC.utils.formatAgo(futureTime, now)).to.equal('0m');
+    });
+  });
+
+  describe('Complex scenarios', () => {
+    it('should not show seconds if seconds are disabled', () => {
+      const time = now - 45 * 1000; // 45 seconds ago
+      expect(IITC.utils.formatAgo(time, now)).to.equal('0m');
+    });
+
+    it('should return only minutes if time difference is less than an hour', () => {
+      const time = now - 5 * 60 * 1000; // 5 minutes ago
+      expect(IITC.utils.formatAgo(time, now)).to.equal('5m');
+    });
+
+    it('should handle all units enabled', () => {
+      const time = now - (2 * 86400 + 5 * 3600 + 30 * 60 + 15) * 1000; // 2 days, 5 hours, 30 minutes, and 15 seconds ago
+      expect(IITC.utils.formatAgo(time, now, { showSeconds: true })).to.equal('2d 5h 30m 15s');
+    });
+  });
+});
+
 describe('IITC.utils.escapeJS', () => {
   it('should escape double quotes in the string', () => {
     const result = IITC.utils.escapeJS('Hello "World"');
