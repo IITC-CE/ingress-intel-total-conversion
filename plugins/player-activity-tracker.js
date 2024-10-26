@@ -1,13 +1,17 @@
 // @author         breunigs
 // @name           Player activity tracker
 // @category       Layer
-// @version        0.13.2
+// @version        0.14.0
 // @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.14.0',
+    changes: ['Using `IITC.utils.formatAgo` instead of the plugin own function'],
+  },
   {
     version: '0.13.2',
     changes: ['Refactoring: fix eslint'],
@@ -274,17 +278,6 @@ window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
   return L.latLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
 };
 
-window.plugin.playerTracker.ago = function (time, now) {
-  var s = (now - time) / 1000;
-  var h = Math.floor(s / 3600);
-  var m = Math.floor((s % 3600) / 60);
-  var returnVal = m + 'm';
-  if (h > 0) {
-    returnVal = h + 'h' + returnVal;
-  }
-  return returnVal;
-};
-
 window.plugin.playerTracker.drawData = function () {
   var isTouchDev = window.isTouchDevice();
 
@@ -314,7 +307,7 @@ window.plugin.playerTracker.drawData = function () {
 
     var evtsLength = playerData.events.length;
     var last = playerData.events[evtsLength - 1];
-    var ago = window.plugin.playerTracker.ago;
+    const ago = IITC.utils.formatAgo;
 
     // tooltip for marker - no HTML - and not shown on touchscreen devices
     var tooltip = isTouchDev ? '' : plrname + ', ' + ago(last.time, now) + ' ago';
