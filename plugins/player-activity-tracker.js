@@ -10,7 +10,7 @@
 var changelog = [
   {
     version: '0.14.0',
-    changes: ['Using `IITC.utils.formatAgo` instead of the plugin own function'],
+    changes: ['Using `IITC.utils.formatAgo` instead of the plugin own function', 'Refactoring to make it easier to extend plugin functions'],
   },
   {
     version: '0.13.2',
@@ -38,6 +38,7 @@ window.PLAYER_TRACKER_MAX_TIME = 3 * 60 * 60 * 1000; // in milliseconds
 window.PLAYER_TRACKER_MIN_ZOOM = 9;
 window.PLAYER_TRACKER_MIN_OPACITY = 0.3;
 window.PLAYER_TRACKER_LINE_COLOUR = '#FF00FD';
+window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS = 10; // Maximum number of events in a popup
 
 // use own namespace for plugin
 window.plugin.playerTracker = function () {};
@@ -283,8 +284,7 @@ window.plugin.playerTracker.drawData = function () {
 
   var gllfe = window.plugin.playerTracker.getLatLngFromEvent;
 
-  var polyLineByAgeEnl = [[], [], [], []];
-  var polyLineByAgeRes = [[], [], [], []];
+  var polyLineByPlayerAndAge = {};
 
   var split = window.PLAYER_TRACKER_MAX_TIME / 4;
   var now = Date.now();
@@ -301,8 +301,10 @@ window.plugin.playerTracker.drawData = function () {
       var ageBucket = Math.min(Math.trunc((now - p.time) / split), 4 - 1);
       var line = [gllfe(p), gllfe(playerData.events[i - 1])];
 
-      if (playerData.team === 'RESISTANCE') polyLineByAgeRes[ageBucket].push(line);
-      else polyLineByAgeEnl[ageBucket].push(line);
+      if (!polyLineByPlayerAndAge[plrname]) {
+        polyLineByPlayerAndAge[plrname] = [[], [], [], []];
+      }
+      polyLineByPlayerAndAge[plrname][ageBucket].push(line);
     }
 
     var evtsLength = playerData.events.length;
@@ -351,7 +353,7 @@ window.plugin.playerTracker.drawData = function () {
       popup.append('<br>').append('<br>').append(document.createTextNode('previous locations:')).append('<br>');
 
       var table = $('<table>').appendTo(popup).css('border-spacing', '0');
-      for (let i = evtsLength - 2; i >= 0 && i >= evtsLength - 10; i--) {
+      for (let i = evtsLength - 2; i >= 0 && i >= evtsLength - window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS; i--) {
         var ev = playerData.events[i];
         $('<tr>')
           .append($('<td>').text(ago(ev.time, now) + ' ago'))
@@ -368,7 +370,8 @@ window.plugin.playerTracker.drawData = function () {
     var icon = playerData.team === 'RESISTANCE' ? new window.plugin.playerTracker.iconRes() : new window.plugin.playerTracker.iconEnl();
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
-    var m = L.marker(gllfe(last), { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
+    const markerPos = gllfe(last);
+    var m = L.marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
     m.addEventListener('spiderfiedclick', window.plugin.playerTracker.onClickListener);
 
     // m.bindPopup(title);
@@ -382,7 +385,7 @@ window.plugin.playerTracker.drawData = function () {
 
     playerData.marker = m;
 
-    m.addTo(playerData.team === 'RESISTANCE' ? window.plugin.playerTracker.drawnTracesRes : window.plugin.playerTracker.drawnTracesEnl);
+    m.addTo(window.plugin.playerTracker.getDrawnTracesByTeam(playerData.team));
     window.registerMarkerForOMS(m);
 
     // jQueryUI doesn’t automatically notice the new markers
@@ -392,36 +395,27 @@ window.plugin.playerTracker.drawData = function () {
   });
 
   // draw the poly lines to the map
-  $.each(polyLineByAgeEnl, function (i, polyLine) {
-    if (polyLine.length === 0) return true;
+  for (const [playerName, polyLineByAge] of Object.entries(polyLineByPlayerAndAge)) {
+    polyLineByAge.forEach((polyLine, i) => {
+      if (polyLine.length === 0) return;
 
-    var opts = {
-      weight: 2 - 0.25 * i,
-      color: window.PLAYER_TRACKER_LINE_COLOUR,
-      interactive: false,
-      opacity: 1 - 0.2 * i,
-      dashArray: '5,8',
-    };
+      const opts = {
+        weight: 2 - 0.25 * i,
+        color: window.PLAYER_TRACKER_LINE_COLOUR,
+        interactive: false,
+        opacity: 1 - 0.2 * i,
+        dashArray: '5,8',
+      };
 
-    $.each(polyLine, function (ind, poly) {
-      L.polyline(poly, opts).addTo(window.plugin.playerTracker.drawnTracesEnl);
+      polyLine.forEach((poly) => {
+        L.polyline(poly, opts).addTo(window.plugin.playerTracker.getDrawnTracesByTeam(window.plugin.playerTracker.stored[playerName].team));
+      });
     });
-  });
-  $.each(polyLineByAgeRes, function (i, polyLine) {
-    if (polyLine.length === 0) return true;
+  }
+};
 
-    var opts = {
-      weight: 2 - 0.25 * i,
-      color: window.PLAYER_TRACKER_LINE_COLOUR,
-      interactive: false,
-      opacity: 1 - 0.2 * i,
-      dashArray: '5,8',
-    };
-
-    $.each(polyLine, function (ind, poly) {
-      L.polyline(poly, opts).addTo(window.plugin.playerTracker.drawnTracesRes);
-    });
-  });
+window.plugin.playerTracker.getDrawnTracesByTeam = function (team) {
+  return team === 'RESISTANCE' ? window.plugin.playerTracker.drawnTracesRes : window.plugin.playerTracker.drawnTracesEnl;
 };
 
 window.plugin.playerTracker.getPortalLink = function (data) {
