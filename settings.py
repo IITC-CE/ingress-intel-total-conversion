@@ -40,6 +40,7 @@ def load(build_name, localfile=None):
     mod.pop('load')
     mod['build_name'] = build_name
     utc = time.gmtime()
+    # Keep formatting in sync with build.watch()
     mod['build_date'] = time.strftime('%Y-%m-%d-%H%M%S', utc)
     mod['build_timestamp'] = time.strftime('%Y%m%d.%H%M%S', utc)
     base = Path(localfile or __file__).parent

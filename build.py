@@ -118,7 +118,7 @@ def watch(build_cb, *args, interval=1, **kwargs):
     Every found dependancy (to be watched for changes) build_cb must append
     to deps_list, which is passed to it as additional keyword argument.
     """
-    from time import ctime, sleep, time
+    from time import ctime, gmtime, sleep, strftime, time
     from traceback import print_exc
 
     basetime = None
@@ -134,6 +134,10 @@ def watch(build_cb, *args, interval=1, **kwargs):
             else:
                 continue
         basetime = time()
+        utc = gmtime(basetime)
+        # Keep formatting in sync with settings.load()
+        settings.build_date = strftime('%Y-%m-%d-%H%M%S', utc)
+        settings.build_timestamp = strftime('%Y%m%d.%H%M%S', utc)
         print('\nrebuild started [{}]'.format(ctime(basetime)))
         watch_list = []
         try:
