@@ -12,7 +12,7 @@
 
 * https://github.com/jeromeetienne/jquery-qrcode
   jquery.qrcode.min.js: 2b253c58f4f23f7c522c9f24627d4a51412f8588
-  used in: utils_misc.js (showPortalPosLinks)
+  used in: utils.js (showPortalPosLinks)
 
 * https://github.com/IITC-CE/jquery-taphold
   taphold.js: 5f069454d28c49a9b18228e75d5f18ec43e9a7e9

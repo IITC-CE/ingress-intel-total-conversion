@@ -162,3 +162,15 @@ window.findPortalLatLng = function (guid) {
   // no luck finding portal lat/lng
   return undefined;
 };
+
+// to be ovewritten in app.js
+/**
+ * Finds the latitude and longitude for a portal using all available data sources.
+ * This includes the list of portals, cached portal details, and information from links and fields.
+ *
+ * @deprecated
+ * @function androidCopy
+ */
+window.androidCopy = function () {
+  return true; // i.e. execute other actions
+};

@@ -1,19 +1,21 @@
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 /**
- * @file Misc utils
+ * Namespace for IITC utils
  *
- * @module utils_misc
+ * @memberof IITC
+ * @namespace utils
  */
 
 /**
  * Retrieves a parameter from the URL query string.
  *
+ * @memberof IITC.utils
  * @function getURLParam
  * @param {string} param - The name of the parameter to retrieve.
  * @returns {string} The value of the parameter, or an empty string if not found.
  */
-window.getURLParam = function (param) {
+const getURLParam = function (param) {
   var items = window.location.search.substr(1).split('&');
 
   for (var i = 0; i < items.length; i++) {
@@ -32,11 +34,12 @@ window.getURLParam = function (param) {
  * Reads a cookie by name.
  * @see http://stackoverflow.com/a/5639455/1684530
  *
+ * @memberof IITC.utils
  * @function readCookie
  * @param {string} name - The name of the cookie to read.
  * @returns {string} The value of the cookie, or undefined if not found.
  */
-window.readCookie = function (name) {
+const readCookie = function (name) {
   var C,
     i,
     c = document.cookie.split('; ');
@@ -51,11 +54,12 @@ window.readCookie = function (name) {
 /**
  * Writes a cookie with a specified name and value.
  *
+ * @memberof IITC.utils
  * @function writeCookie
  * @param {string} name - The name of the cookie.
  * @param {string} val - The value of the cookie.
  */
-window.writeCookie = function (name, val) {
+const writeCookie = function (name, val) {
   var d = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
   document.cookie = name + '=' + val + '; expires=' + d + '; path=/';
 };
@@ -63,10 +67,11 @@ window.writeCookie = function (name, val) {
 /**
  * Erases a cookie with a specified name.
  *
+ * @memberof IITC.utils
  * @function eraseCookie
  * @param {string} name - The name of the cookie to erase.
  */
-window.eraseCookie = function (name) {
+const eraseCookie = function (name) {
   document.cookie = name + '=; expires=Thu, 1 Jan 1970 00:00:00 GMT; path=/';
 };
 
@@ -74,11 +79,12 @@ window.eraseCookie = function (name) {
  * Adds thousand separators to a given number.
  * @see http://stackoverflow.com/a/1990590/1684530
  *
+ * @memberof IITC.utils
  * @function digits
  * @param {number} d - The number to format.
  * @returns {string} The formatted number with thousand separators.
  */
-window.digits = function (d) {
+const digits = function (d) {
   // U+2009 - Thin Space. Recommended for use as a thousands separator...
   // https://en.wikipedia.org/wiki/Space_(punctuation)#Table_of_spaces
   return (d + '').replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1&#8201;');
@@ -87,12 +93,13 @@ window.digits = function (d) {
 /**
  * Pads a number with zeros up to a specified length.
  *
+ * @memberof IITC.utils
  * @function zeroPad
  * @param {number} number - The number to pad.
  * @param {number} pad - The desired length of the output string.
  * @returns {string} The padded number as a string.
  */
-window.zeroPad = function (number, pad) {
+const zeroPad = function (number, pad) {
   number = number.toString();
   var zeros = pad - number.length;
   return Array(zeros > 0 ? zeros + 1 : 0).join('0') + number;
@@ -102,12 +109,13 @@ window.zeroPad = function (number, pad) {
  * Converts a UNIX timestamp to a human-readable string.
  * If the timestamp is from today, returns the time (HH:mm:ss format); otherwise, returns the date (YYYY-MM-DD).
  *
+ * @memberof IITC.utils
  * @function unixTimeToString
  * @param {number} timestamp - The UNIX timestamp to convert.
  * @param {boolean} [full] - If true, returns both date and time.
  * @returns {string|null} The formatted date and/or time.
  */
-window.unixTimeToString = function (timestamp, full) {
+const unixTimeToString = function (timestamp, full) {
   if (!timestamp) return null;
   var d = new Date(typeof timestamp === 'string' ? parseInt(timestamp) : timestamp);
   var time = d.toLocaleTimeString();
@@ -122,12 +130,13 @@ window.unixTimeToString = function (timestamp, full) {
  * Converts a UNIX timestamp to a precise date and time string in the local timezone.
  * Formatted in ISO-style YYYY-MM-DD hh:mm:ss.mmm - but using local timezone
  *
+ * @memberof IITC.utils
  * @function unixTimeToDateTimeString
  * @param {number} time - The UNIX timestamp to convert.
  * @param {boolean} [millisecond] - Whether to include millisecond precision.
  * @returns {string|null} The formatted date and time string.
  */
-window.unixTimeToDateTimeString = function (time, millisecond) {
+const unixTimeToDateTimeString = function (time, millisecond) {
   if (!time) return null;
   var d = new Date(typeof time === 'string' ? parseInt(time) : time);
   return (
@@ -149,11 +158,12 @@ window.unixTimeToDateTimeString = function (time, millisecond) {
 /**
  * Converts a UNIX timestamp to a time string formatted as HH:mm.
  *
+ * @memberof IITC.utils
  * @function unixTimeToHHmm
  * @param {number|string} time - The UNIX timestamp to convert.
  * @returns {string|null} Formatted time as HH:mm.
  */
-window.unixTimeToHHmm = function (time) {
+const unixTimeToHHmm = function (time) {
   if (!time) return null;
   var d = new Date(typeof time === 'string' ? parseInt(time) : time);
   var h = '' + d.getHours();
@@ -166,12 +176,13 @@ window.unixTimeToHHmm = function (time) {
 /**
  * Formats an interval of time given in seconds into a human-readable string.
  *
+ * @memberof IITC.utils
  * @function formatInterval
  * @param {number} seconds - The interval in seconds.
  * @param {number} [maxTerms] - The maximum number of time units to include.
  * @returns {string} The formatted time interval.
  */
-window.formatInterval = function (seconds, maxTerms) {
+const formatInterval = function (seconds, maxTerms) {
   var d = Math.floor(seconds / 86400);
   var h = Math.floor((seconds % 86400) / 3600);
   var m = Math.floor((seconds % 3600) / 60);
@@ -191,20 +202,22 @@ window.formatInterval = function (seconds, maxTerms) {
 /**
  * Formats a distance in meters, converting to kilometers if the distance is over 10,000 meters.
  *
+ * @memberof IITC.utils
  * @function formatDistance
  * @param {number} distance - The distance in meters.
  * @returns {string} The formatted distance.
  */
-window.formatDistance = function (distance) {
+const formatDistance = function (distance) {
   return window.digits(distance > 10000 ? (distance / 1000).toFixed(2) + 'km' : Math.round(distance) + 'm');
 };
 
 /**
  * Changes the coordinates and map scale to show the range for portal links.
  *
+ * @memberof IITC.utils
  * @function rangeLinkClick
  */
-window.rangeLinkClick = function () {
+const rangeLinkClick = function () {
   if (window.portalRangeIndicator) window.map.fitBounds(window.portalRangeIndicator.getBounds());
   if (window.isSmartphone()) window.show('map');
 };
@@ -212,12 +225,13 @@ window.rangeLinkClick = function () {
 /**
  * Displays a dialog with links to show the specified location on various map services.
  *
+ * @memberof IITC.utils
  * @function showPortalPosLinks
  * @param {number} lat - Latitude of the location.
  * @param {number} lng - Longitude of the location.
  * @param {string} name - Name of the location.
  */
-window.showPortalPosLinks = function (lat, lng, name) {
+const showPortalPosLinks = function (lat, lng, name) {
   var encoded_name = encodeURIComponent(name);
   var qrcode = '<div id="qrcode"></div>';
   var script = "<script>$('#qrcode').qrcode({text:'GEO:" + lat + ',' + lng + "'});</script>";
@@ -236,30 +250,26 @@ window.showPortalPosLinks = function (lat, lng, name) {
 /**
  * Checks if the device is a touch-enabled device.
  *
+ * @memberof IITC.utils
  * @function isTouchDevice
  * @returns {boolean} True if the device is touch-enabled, otherwise false.
  */
-window.isTouchDevice = function () {
+const isTouchDevice = function () {
   return (
     'ontouchstart' in window || // works on most browsers
     'onmsgesturechange' in window
   ); // works on ie10
 };
 
-// !!deprecated
-// to be ovewritten in app.js
-window.androidCopy = function () {
-  return true; // i.e. execute other actions
-};
-
 /**
  * Calculates the number of pixels left to scroll down before reaching the bottom of an element.
  *
+ * @memberof IITC.utils
  * @function scrollBottom
  * @param {string|jQuery} elm - The element to calculate the scroll bottom for.
  * @returns {number} The number of pixels from the bottom.
  */
-window.scrollBottom = function (elm) {
+const scrollBottom = function (elm) {
   if (typeof elm === 'string') elm = $(elm);
   return elm.get(0).scrollHeight - elm.innerHeight() - elm.scrollTop();
 };
@@ -267,11 +277,12 @@ window.scrollBottom = function (elm) {
 /**
  * Zooms the map to a specific portal and shows its details if available.
  *
+ * @memberof IITC.utils
  * @function zoomToAndShowPortal
  * @param {string} guid - The globally unique identifier of the portal.
  * @param {L.LatLng|number[]} latlng - The latitude and longitude of the portal.
  */
-window.zoomToAndShowPortal = function (guid, latlng) {
+const zoomToAndShowPortal = function (guid, latlng) {
   window.map.setView(latlng, window.DEFAULT_ZOOM);
   // if the data is available, render it immediately. Otherwise defer
   // until it becomes available.
@@ -282,12 +293,13 @@ window.zoomToAndShowPortal = function (guid, latlng) {
 /**
  * Selects a portal by its latitude and longitude.
  *
+ * @memberof IITC.utils
  * @function selectPortalByLatLng
  * @param {number|Array|L.LatLng} lat - The latitude of the portal
  *                                      or an array or L.LatLng object containing both latitude and longitude.
  * @param {number} [lng] - The longitude of the portal.
  */
-window.selectPortalByLatLng = function (lat, lng) {
+const selectPortalByLatLng = function (lat, lng) {
   if (lng === undefined && lat instanceof Array) {
     lng = lat[1];
     lat = lat[0];
@@ -312,22 +324,24 @@ window.selectPortalByLatLng = function (lat, lng) {
  * Escapes special characters in a string for use in JavaScript.
  * (for strings passed as parameters to html onclick="..." for example)
  *
+ * @memberof IITC.utils
  * @function escapeJavascriptString
  * @param {string} str - The string to escape.
  * @returns {string} The escaped string.
  */
-window.escapeJavascriptString = function (str) {
+const escapeJavascriptString = function (str) {
   return (str + '').replace(/[\\"']/g, '\\$&');
 };
 
 /**
  * Escapes HTML special characters in a string.
  *
+ * @memberof IITC.utils
  * @function escapeHtmlSpecialChars
  * @param {string} str - The string to escape.
  * @returns {string} The escaped string.
  */
-window.escapeHtmlSpecialChars = function (str) {
+const escapeHtmlSpecialChars = function (str) {
   var div = document.createElement('div');
   var text = document.createTextNode(str);
   div.appendChild(text);
@@ -337,22 +351,24 @@ window.escapeHtmlSpecialChars = function (str) {
 /**
  * Formats energy of portal.
  *
+ * @memberof IITC.utils
  * @function prettyEnergy
  * @param {number} nrg - The energy value to format.
  * @returns {string} The formatted energy value.
  */
-window.prettyEnergy = function (nrg) {
+const prettyEnergy = function (nrg) {
   return nrg > 1000 ? Math.round(nrg / 1000) + ' k' : nrg;
 };
 
 /**
  * Converts a list of items into a unique array, removing duplicates.
  *
+ * @memberof IITC.utils
  * @function uniqueArray
  * @param {Array} arr - The array to process.
  * @returns {Array} A new array containing only unique elements.
  */
-window.uniqueArray = function (arr) {
+const uniqueArray = function (arr) {
   return $.grep(arr, function (v, i) {
     return $.inArray(v, arr) === i;
   });
@@ -361,10 +377,11 @@ window.uniqueArray = function (arr) {
 /**
  * Generates a four-column HTML table from an array of data blocks.
  *
+ * @memberof IITC.utils
  * @param {Array} blocks - Array of data blocks, where each block is an array with details for one row.
  * @returns {string} HTML string representing the constructed table.
  */
-window.genFourColumnTable = function (blocks) {
+const genFourColumnTable = function (blocks) {
   let t = $.map(blocks, function (detail, index) {
     if (!detail) return '';
     const title = detail[2] ? ' title="' + window.escapeHtmlSpecialChars(detail[2]) + '"' : '';
@@ -386,11 +403,12 @@ window.genFourColumnTable = function (blocks) {
 /**
  * Converts text with newlines (`\n`) and tabs (`\t`) into an HTML table.
  *
+ * @memberof IITC.utils
  * @function convertTextToTableMagic
  * @param {string} text - The text to convert.
  * @returns {string} The resulting HTML table.
  */
-window.convertTextToTableMagic = function (text) {
+const convertTextToTableMagic = function (text) {
   // check if it should be converted to a table
   if (!text.match(/\t/)) return text.replace(/\n/g, '<br>');
 
@@ -423,7 +441,9 @@ window.convertTextToTableMagic = function (text) {
 
 /**
  * Clamps a given value between a minimum and maximum value.
+ * Simple implementation for internal use.
  *
+ * @memberof IITC.utils
  * @private
  * @function clamp
  * @param {number} n - The value to clamp.
@@ -431,21 +451,29 @@ window.convertTextToTableMagic = function (text) {
  * @param {number} min - The minimum allowed value.
  * @returns {number} The clamped value.
  */
-function clamp(n, max, min) {
+const clamp = function (n, max, min) {
   if (n === 0) return 0;
   return n > 0 ? Math.min(n, max) : Math.max(n, min);
-}
+};
 
-var MAX_LATITUDE = 85.051128; // L.Projection.SphericalMercator.MAX_LATITUDE
+/**
+ * The maximum absolute latitude that can be represented in Web Mercator projection (EPSG:3857).
+ * This value is taken from L.Projection.SphericalMercator.MAX_LATITUDE
+ *
+ * @memberof IITC.utils
+ * @constant {Number}
+ */
+const MAX_LATITUDE = 85.051128;
 
 /**
  * Clamps a latitude and longitude to the maximum and minimum valid values.
  *
+ * @memberof IITC.utils
  * @function clampLatLng
  * @param {L.LatLng} latlng - The latitude and longitude to clamp.
  * @returns {Array<number>} The clamped latitude and longitude.
  */
-window.clampLatLng = function (latlng) {
+const clampLatLng = function (latlng) {
   // Ingress accepts requests only for this range
   return [clamp(latlng.lat, MAX_LATITUDE, -MAX_LATITUDE), clamp(latlng.lng, 179.999999, -180)];
 };
@@ -453,11 +481,12 @@ window.clampLatLng = function (latlng) {
 /**
  * Clamps a latitude and longitude bounds to the maximum and minimum valid values.
  *
+ * @memberof IITC.utils
  * @function clampLatLngBounds
  * @param {L.LatLngBounds} bounds - The bounds to clamp.
  * @returns {L.LatLngBounds} The clamped bounds.
  */
-window.clampLatLngBounds = function (bounds) {
+const clampLatLngBounds = function (bounds) {
   var SW = bounds.getSouthWest(),
     NE = bounds.getNorthEast();
   return L.latLngBounds(window.clampLatLng(SW), window.clampLatLng(NE));
@@ -486,11 +515,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 /**
  * Determines if a point is inside a polygon.
  *
+ * @memberof IITC.utils
  * @param {Array<L.LatLng>} polygon - The vertices of the polygon.
  * @param {L.LatLng} point - The point to test.
  * @returns {boolean} True if the point is inside the polygon, false otherwise.
  */
-window.pnpoly = function (polygon, point) {
+const pnpoly = function (polygon, point) {
   var inside = 0;
   // j records previous value. Also handles wrapping around.
   for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -505,19 +535,21 @@ window.pnpoly = function (polygon, point) {
 /**
  * Creates a link to open a specific portal in Ingress Prime.
  *
+ * @memberof IITC.utils
  * @function makePrimeLink
  * @param {string} guid - The globally unique identifier of the portal.
  * @param {number} lat - The latitude of the portal.
  * @param {number} lng - The longitude of the portal.
  * @returns {string} The Ingress Prime link for the portal
  */
-window.makePrimeLink = function (guid, lat, lng) {
+const makePrimeLink = function (guid, lat, lng) {
   return `https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fportal%2F${guid}&apn=com.nianticproject.ingress&isi=576505181&ibi=com.google.ingress&ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181&ofl=https%3A%2F%2Fintel.ingress.com%2Fintel%3Fpll%3D${lat}%2C${lng}`;
 };
 
 /**
  * Generates a permalink URL based on the specified latitude and longitude and additional options.
  *
+ * @memberof IITC.utils
  * @param {L.LatLng|number[]} [latlng] - The latitude and longitude for the permalink.
  *                              Can be omitted to create mapview-only permalink.
  * @param {Object} [options] - Additional options for permalink generation.
@@ -525,7 +557,7 @@ window.makePrimeLink = function (guid, lat, lng) {
  * @param {boolean} [options.fullURL] - Generate a fully qualified URL (default: relative link).
  * @returns {string} The generated permalink URL.
  */
-window.makePermalink = function (latlng, options) {
+const makePermalink = function (latlng, options) {
   options = options || {};
 
   function round(l) {
@@ -551,93 +583,82 @@ window.makePermalink = function (latlng, options) {
   return url + '?' + args.join('&');
 };
 
-if (!String.prototype.capitalize) {
-  Object.defineProperty(String.prototype, 'capitalize', {
-    value: function () {
-      return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+IITC.utils = {
+  getURLParam,
+  readCookie,
+  writeCookie,
+  eraseCookie,
+  digits,
+  zeroPad,
+  unixTimeToString,
+  unixTimeToDateTimeString,
+  unixTimeToHHmm,
+  formatInterval,
+  formatDistance,
+  rangeLinkClick,
+  showPortalPosLinks,
+  isTouchDevice,
+  scrollBottom,
+  zoomToAndShowPortal,
+  selectPortalByLatLng,
+  escapeJavascriptString,
+  escapeHtmlSpecialChars,
+  prettyEnergy,
+  uniqueArray,
+  genFourColumnTable,
+  convertTextToTableMagic,
+  clamp,
+  clampLatLng,
+  clampLatLngBounds,
+  pnpoly,
+  makePrimeLink,
+  makePermalink,
+};
+
+// List of functions to track for synchronization between window.* and IITC.utils.*
+const legacyFunctions = [
+  'getURLParam',
+  'readCookie',
+  'writeCookie',
+  'eraseCookie',
+  'digits',
+  'zeroPad',
+  'unixTimeToString',
+  'unixTimeToDateTimeString',
+  'unixTimeToHHmm',
+  'formatInterval',
+  'formatDistance',
+  'rangeLinkClick',
+  'showPortalPosLinks',
+  'isTouchDevice',
+  'scrollBottom',
+  'zoomToAndShowPortal',
+  'selectPortalByLatLng',
+  'escapeJavascriptString',
+  'escapeHtmlSpecialChars',
+  'prettyEnergy',
+  'uniqueArray',
+  'genFourColumnTable',
+  'convertTextToTableMagic',
+  'clamp',
+  'clampLatLng',
+  'clampLatLngBounds',
+  'pnpoly',
+  'makePrimeLink',
+  'makePermalink',
+];
+
+legacyFunctions.forEach((funcName) => {
+  window.IITC.utils[funcName] = window.IITC.utils[funcName] || function () {};
+
+  // Define a getter/setter on `window` to synchronize with `IITC.utils`
+  Object.defineProperty(window, funcName, {
+    get() {
+      return window.IITC.utils[funcName];
     },
-  });
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith#polyfill
-if (!String.prototype.startsWith) {
-  Object.defineProperty(String.prototype, 'startsWith', {
-    value: function (search, rawPos) {
-      var pos = rawPos > 0 ? rawPos | 0 : 0;
-      return this.substring(pos, pos + search.length) === search;
-    },
-  });
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc#polyfill
-// (required for KitKat support)
-if (!Math.trunc) {
-  Math.trunc = function (v) {
-    return v < 0 ? Math.ceil(v) : Math.floor(v);
-  };
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#polyfill
-// https://tc39.github.io/ecma262/#sec-array.prototype.find
-if (!Array.prototype.find) {
-  Object.defineProperty(Array.prototype, 'find', {
-    value: function (predicate) {
-      // 1. Let O be ? ToObject(this value).
-      if (this === null) {
-        throw TypeError('"this" is null or not defined');
-      }
-
-      var o = Object(this);
-
-      // 2. Let len be ? ToLength(? Get(O, "length")).
-      var len = o.length >>> 0;
-
-      // 3. If IsCallable(predicate) is false, throw a TypeError exception.
-      if (typeof predicate !== 'function') {
-        throw TypeError('predicate must be a function');
-      }
-
-      // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
-      var thisArg = arguments[1];
-
-      // 5. Let k be 0.
-      var k = 0;
-
-      // 6. Repeat, while k < len
-      while (k < len) {
-        // a. Let Pk be ! ToString(k).
-        // b. Let kValue be ? Get(O, Pk).
-        // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
-        // d. If testResult is true, return kValue.
-        var kValue = o[k];
-        if (predicate.call(thisArg, kValue, k, o)) {
-          return kValue;
-        }
-        // e. Increase k by 1.
-        k++;
-      }
-
-      // 7. Return undefined.
-      return undefined;
+    set(newFunc) {
+      window.IITC.utils[funcName] = newFunc;
     },
     configurable: true,
-    writable: true,
   });
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#polyfill
-if (!Element.prototype.matches) {
-  Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-}
-
-if (!Element.prototype.closest) {
-  Element.prototype.closest = function (s) {
-    var el = this;
-
-    do {
-      if (Element.prototype.matches.call(el, s)) return el;
-      el = el.parentElement || el.parentNode;
-    } while (el !== null && el.nodeType === 1);
-    return null;
-  };
-}
+});
