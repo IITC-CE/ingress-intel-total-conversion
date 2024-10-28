@@ -6,11 +6,33 @@ Defaults are taken from buildsettings.py, and extended with
 values from localbuildsettings.py (if exists).
 """
 
+import time
+
+
+def get_current_timestamp():
+    """Get current build date and timestamp in desired formats."""
+    utc = time.gmtime()
+    return (
+        time.strftime('%Y-%m-%d-%H%M%S', utc),  # build_date
+        time.strftime('%Y%m%d.%H%M%S', utc)     # build_timestamp
+    )
+
+
+def build_timestamp():
+    """Dynamically generate current build timestamp."""
+    _, timestamp = get_current_timestamp()
+    return timestamp
+
+
+def build_date():
+    """Dynamically generate current build date."""
+    date, _ = get_current_timestamp()
+    return date
+
 
 def load(build_name, localfile=None):
     """Load settings for given iitc build name."""
     import buildsettings as config
-    import time
     from pathlib import Path
     from runpy import run_path
 
@@ -39,9 +61,6 @@ def load(build_name, localfile=None):
     mod = vars(__import__(__name__))
     mod.pop('load')
     mod['build_name'] = build_name
-    utc = time.gmtime()
-    mod['build_date'] = time.strftime('%Y-%m-%d-%H%M%S', utc)
-    mod['build_timestamp'] = time.strftime('%Y%m%d.%H%M%S', utc)
     base = Path(localfile or __file__).parent
     mod['build_source_dir'] = base
     mod['build_target_dir'] = base / 'build' / build_name
