@@ -1,9 +1,11 @@
 import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 
+/* global IITC */
 /* eslint-disable no-unused-expressions */
 
-globalThis.IITC = { comm: {} };
+if (!globalThis.IITC) globalThis.IITC = {};
+globalThis.IITC.comm = {};
 import('../core/code/comm_declarative_message_filter.js');
 
 // Define test messages
@@ -203,5 +205,3 @@ describe('IITC Comm Declarative Message Filter', () => {
     expect(shouldNotMatch).to.be.false;
   });
 });
-
-/* global IITC */
