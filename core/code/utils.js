@@ -15,19 +15,9 @@
  * @param {string} param - The name of the parameter to retrieve.
  * @returns {string} The value of the parameter, or an empty string if not found.
  */
-const getURLParam = function (param) {
-  var items = window.location.search.substr(1).split('&');
-
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i].split('=');
-
-    if (item[0] === param) {
-      var val = item.length === 1 ? '' : decodeURIComponent(item[1].replace(/\+/g, ' '));
-      return val;
-    }
-  }
-
-  return '';
+const getURLParam = (param) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param) || '';
 };
 
 /**
