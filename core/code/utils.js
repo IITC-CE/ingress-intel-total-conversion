@@ -7,6 +7,20 @@
  * @namespace utils
  */
 
+// The sv-SE locale is one of the closest to the ISO format among all locales
+const timeWithSecondsFormatter = new Intl.DateTimeFormat('sv-SE', {
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+});
+
+const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
 /**
  * Retrieves a parameter from the URL query string.
  *
@@ -95,19 +109,24 @@ const zeroPad = (number, length) => number.toString().padStart(length, '0');
  *
  * @memberof IITC.utils
  * @function unixTimeToString
- * @param {number} timestamp - The UNIX timestamp to convert.
- * @param {boolean} [full] - If true, returns both date and time.
- * @returns {string|null} The formatted date and/or time.
+ * @param {number|string} timestamp - The UNIX timestamp in milliseconds to convert.
+ * @param {boolean} [full=false] - If true, returns both date and time in "YYYY-MM-DD <locale time>" format.
+ * @returns {string|null} The formatted date and/or time string, or null if no timestamp provided.
  */
-const unixTimeToString = function (timestamp, full) {
+const unixTimeToString = (timestamp, full = false) => {
   if (!timestamp) return null;
-  var d = new Date(typeof timestamp === 'string' ? parseInt(timestamp) : timestamp);
-  var time = d.toLocaleTimeString();
-  //  var time = zeroPad(d.getHours(),2)+':'+zeroPad(d.getMinutes(),2)+':'+zeroPad(d.getSeconds(),2);
-  var date = d.getFullYear() + '-' + window.zeroPad(d.getMonth() + 1, 2) + '-' + window.zeroPad(d.getDate(), 2);
-  if (typeof full !== 'undefined' && full) return date + ' ' + time;
-  if (d.toDateString() === new Date().toDateString()) return time;
-  else return date;
+
+  const dateObj = new Date(Number(timestamp));
+  const today = new Date();
+
+  // Check if the date is today
+  const isToday = dateObj.getFullYear() === today.getFullYear() && dateObj.getMonth() === today.getMonth() && dateObj.getDate() === today.getDate();
+
+  const time = timeWithSecondsFormatter.format(dateObj);
+  const date = dateFormatter.format(dateObj);
+
+  if (full) return `${date} ${time}`;
+  return isToday ? time : date;
 };
 
 /**

@@ -182,7 +182,15 @@ describe('IITC.utils.unixTimeToString', () => {
     const now = new Date();
     const timestamp = now.getTime();
     const timeString = IITC.utils.unixTimeToString(timestamp);
-    const expectedTime = now.toLocaleTimeString();
+
+    const timeFormatter = new Intl.DateTimeFormat('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    const expectedTime = timeFormatter.format(now);
     expect(timeString).to.equal(expectedTime);
   });
 
@@ -190,18 +198,14 @@ describe('IITC.utils.unixTimeToString', () => {
     const testDate = new Date(2023, 10, 5, 14, 30, 45); // November 5, 2023, 14:30:45
     const timestamp = testDate.getTime();
     const dateTimeString = IITC.utils.unixTimeToString(timestamp, true);
-
-    // Expected format: YYYY-MM-DD HH:mm:ss
-    const expectedDate = '2023-11-05';
-    const expectedTime = testDate.toLocaleTimeString();
-    expect(dateTimeString).to.equal(`${expectedDate} ${expectedTime}`);
+    expect(dateTimeString).to.equal('2023-11-05 14:30:45');
   });
 
   it('should handle string timestamps', () => {
-    const someOtherDay = new Date(2023, 3, 15, 12, 34, 56);
+    const someOtherDay = new Date(2023, 10, 5, 14, 30, 45);
     const timestamp = someOtherDay.getTime();
     const dateString = IITC.utils.unixTimeToString(timestamp.toString());
-    expect(dateString).to.equal('2023-04-15');
+    expect(dateString).to.equal('2023-11-05');
   });
 });
 
