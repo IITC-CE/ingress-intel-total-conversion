@@ -272,12 +272,13 @@ const isTouchDevice = function () {
  *
  * @memberof IITC.utils
  * @function scrollBottom
- * @param {string|jQuery} elm - The element to calculate the scroll bottom for.
+ * @param {string|HTMLElement|jQuery} elm - The element or selector to calculate the scroll bottom for.
  * @returns {number} The number of pixels from the bottom.
  */
-const scrollBottom = function (elm) {
-  if (typeof elm === 'string') elm = $(elm);
-  return elm.get(0).scrollHeight - elm.innerHeight() - elm.scrollTop();
+const scrollBottom = (elm) => {
+  // Ensure elm is an HTMLElement: resolve selector strings or extract DOM element from jQuery object
+  const element = typeof elm === 'string' ? document.querySelector(elm) : elm instanceof jQuery ? elm[0] : elm;
+  return element.scrollHeight - element.clientHeight - element.scrollTop;
 };
 
 /**
