@@ -320,7 +320,7 @@ describe('IITC.utils.formatDistance', () => {
 
   it('should round distance to the nearest meter if below 10 000', () => {
     const result = IITC.utils.formatDistance(999.6); // rounded to 1000 meters
-    expect(result).to.equal('1&#8201;000m');
+    expect(result).to.equal('1\u2009000m');
   });
 
   it('should format distance in kilometers with two decimal places if above 10 000 meters', () => {
@@ -330,7 +330,7 @@ describe('IITC.utils.formatDistance', () => {
 
   it('should format exactly 10 000 meters in meters, not kilometers', () => {
     const result = IITC.utils.formatDistance(10000); // 10 000 meters
-    expect(result).to.equal('10&#8201;000m');
+    expect(result).to.equal('10\u2009000m');
   });
 
   it('should format large distances in kilometers with two decimal places', () => {

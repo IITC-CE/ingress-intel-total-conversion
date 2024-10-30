@@ -197,8 +197,12 @@ const formatInterval = (seconds, maxTerms) => {
  * @param {number} distance - The distance in meters.
  * @returns {string} The formatted distance.
  */
-const formatDistance = function (distance) {
-  return window.digits(distance > 10000 ? (distance / 1000).toFixed(2) + 'km' : Math.round(distance) + 'm');
+const formatDistance = (distance) => {
+  if (distance === null || distance === undefined) return '';
+  const isKilometers = distance > 10000;
+  const value = isKilometers ? (distance / 1000).toFixed(2) : Math.round(distance);
+  const unit = isKilometers ? 'km' : 'm';
+  return `${IITC.utils.formatNumber(value)}${unit}`;
 };
 
 /**
