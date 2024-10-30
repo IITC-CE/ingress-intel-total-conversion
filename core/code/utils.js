@@ -176,21 +176,17 @@ const unixTimeToHHmm = (time) => {
  * @param {number} [maxTerms] - The maximum number of time units to include.
  * @returns {string} The formatted time interval.
  */
-const formatInterval = function (seconds, maxTerms) {
-  var d = Math.floor(seconds / 86400);
-  var h = Math.floor((seconds % 86400) / 3600);
-  var m = Math.floor((seconds % 3600) / 60);
-  var s = seconds % 60;
+const formatInterval = (seconds, maxTerms) => {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
 
-  var terms = [];
-  if (d > 0) terms.push(d + 'd');
-  if (h > 0) terms.push(h + 'h');
-  if (m > 0) terms.push(m + 'm');
-  if (s > 0 || terms.length === 0) terms.push(s + 's');
+  // Collect terms if they have a non-zero value
+  const terms = [days ? `${days}d` : null, hours ? `${hours}h` : null, minutes ? `${minutes}m` : null, secs ? `${secs}s` : null].filter(Boolean);
 
-  if (maxTerms) terms = terms.slice(0, maxTerms);
-
-  return terms.join(' ');
+  // Limit terms to maxTerms if specified
+  return (maxTerms ? terms.slice(0, maxTerms) : terms).join(' ') || '0s';
 };
 
 /**
