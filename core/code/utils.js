@@ -53,14 +53,14 @@ const setCookie = (name, value, days = 3650) => {
 };
 
 /**
- * Erases a cookie with a specified name.
+ * Deletes a cookie by name.
  *
  * @memberof IITC.utils
- * @function eraseCookie
- * @param {string} name - The name of the cookie to erase.
+ * @function deleteCookie
+ * @param {string} name - The name of the cookie to delete.
  */
-const eraseCookie = function (name) {
-  document.cookie = name + '=; expires=Thu, 1 Jan 1970 00:00:00 GMT; path=/';
+const deleteCookie = (name) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
 };
 
 /**
@@ -575,7 +575,7 @@ IITC.utils = {
   getURLParam,
   getCookie,
   setCookie,
-  eraseCookie,
+  deleteCookie,
   digits,
   zeroPad,
   unixTimeToString,
