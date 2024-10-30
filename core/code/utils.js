@@ -225,17 +225,29 @@ const rangeLinkClick = function () {
  * @param {number} lng - Longitude of the location.
  * @param {string} name - Name of the location.
  */
-const showPortalPosLinks = function (lat, lng, name) {
-  var encoded_name = encodeURIComponent(name);
-  var qrcode = '<div id="qrcode"></div>';
-  var script = "<script>$('#qrcode').qrcode({text:'GEO:" + lat + ',' + lng + "'});</script>";
-  var gmaps = '<a href="https://maps.google.com/maps?ll=' + lat + ',' + lng + '&q=' + lat + ',' + lng + '%20(' + encoded_name + ')">Google Maps</a>';
-  var bingmaps =
-    '<a href="https://www.bing.com/maps/?v=2&cp=' + lat + '~' + lng + '&lvl=16&sp=Point.' + lat + '_' + lng + '_' + encoded_name + '___">Bing Maps</a>';
-  var osm = '<a href="https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lng + '&zoom=16">OpenStreetMap</a>';
-  var latLng = '<span>' + lat + ',' + lng + '</span>';
+const showPortalPosLinks = (lat, lng, name) => {
+  const encodedName = encodeURIComponent(name);
+
+  const qrcodeContainer = `<div id="qrcode"></div>`;
+  const qrcodeScript = `<script>$('#qrcode').qrcode({ text: 'GEO:${lat},${lng}' });</script>`;
+
+  const gmapsLink = `<a href="https://maps.google.com/maps?ll=${lat},${lng}&q=${lat},${lng}%20(${encodedName})">Google Maps</a>`;
+  const bingmapsLink = `<a href="https://www.bing.com/maps/?v=2&cp=${lat}~${lng}&lvl=16&sp=Point.${lat}_${lng}_${encodedName}___">Bing Maps</a>`;
+  const osmLink = `<a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16">OpenStreetMap</a>`;
+
+  const latLngDisplay = `<span>${lat}, ${lng}</span>`;
+
+  const content = `
+    <div style="text-align: center;">
+      ${qrcodeContainer}
+      ${qrcodeScript}
+      ${gmapsLink}; ${bingmapsLink}; ${osmLink}<br />
+      ${latLngDisplay}
+    </div>
+  `;
+
   window.dialog({
-    html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
+    html: content,
     title: name,
     id: 'poslinks',
   });
