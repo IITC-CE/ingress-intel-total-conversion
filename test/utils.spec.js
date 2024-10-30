@@ -1,6 +1,7 @@
 import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 
+/* global IITC */
 /* eslint-disable no-unused-expressions */
 
 if (!globalThis.document) globalThis.document = {};
@@ -55,34 +56,34 @@ describe('IITC.utils.getURLParam', () => {
   });
 });
 
-describe('IITC.utils.readCookie', () => {
+describe('IITC.utils.getCookie', () => {
   beforeEach(() => {
     document.cookie = '';
   });
 
   it('should return undefined if the cookie is not present', () => {
-    expect(IITC.utils.readCookie('nonexistent')).to.be.undefined;
+    expect(IITC.utils.getCookie('nonexistent')).to.be.undefined;
   });
 
   it('should return the value of the cookie if it is present', () => {
     document.cookie = 'mycookie=value';
-    expect(IITC.utils.readCookie('mycookie')).to.equal('value');
+    expect(IITC.utils.getCookie('mycookie')).to.equal('value');
   });
 
   it('should handle multiple cookies', () => {
     document.cookie = 'cookie1=value1; cookie2=value2';
-    expect(IITC.utils.readCookie('cookie1')).to.equal('value1');
-    expect(IITC.utils.readCookie('cookie2')).to.equal('value2');
+    expect(IITC.utils.getCookie('cookie1')).to.equal('value1');
+    expect(IITC.utils.getCookie('cookie2')).to.equal('value2');
   });
 
   it('should handle cookies with special characters and percent-encoded values', () => {
     document.cookie = 'cookie=value%20with spaces';
-    expect(IITC.utils.readCookie('cookie')).to.equal('value with spaces');
+    expect(IITC.utils.getCookie('cookie')).to.equal('value with spaces');
   });
 
   it('should handle cookies with empty values', () => {
     document.cookie = 'cookie=';
-    expect(IITC.utils.readCookie('cookie')).to.equal('');
+    expect(IITC.utils.getCookie('cookie')).to.equal('');
   });
 });
 
@@ -507,5 +508,3 @@ describe('IITC.utils.makePermalink', () => {
     expect(permalink).to.equal('/?ll=51.505,-0.09&z=13');
   });
 });
-
-/* global IITC */

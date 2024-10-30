@@ -21,23 +21,20 @@ const getURLParam = (param) => {
 };
 
 /**
- * Reads a cookie by name.
- * @see http://stackoverflow.com/a/5639455/1684530
+ * Retrieves the value of a cookie by name.
  *
  * @memberof IITC.utils
- * @function readCookie
- * @param {string} name - The name of the cookie to read.
- * @returns {string} The value of the cookie, or undefined if not found.
+ * @function getCookie
+ * @param {string} name - The name of the cookie to retrieve.
+ * @returns {string|undefined} The value of the cookie, or undefined if not found.
  */
-const readCookie = function (name) {
-  var C,
-    i,
-    c = document.cookie.split('; ');
-  var cookies = {};
-  for (i = c.length - 1; i >= 0; i--) {
-    C = c[i].split('=');
-    cookies[C[0]] = unescape(C[1]);
-  }
+const getCookie = (name) => {
+  const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
+    const [key, value] = cookie.split('=');
+    acc[key] = decodeURIComponent(value);
+    return acc;
+  }, {});
+
   return cookies[name];
 };
 
@@ -575,7 +572,7 @@ const makePermalink = function (latlng, options) {
 
 IITC.utils = {
   getURLParam,
-  readCookie,
+  getCookie,
   writeCookie,
   eraseCookie,
   digits,
