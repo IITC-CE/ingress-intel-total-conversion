@@ -39,16 +39,17 @@ const getCookie = (name) => {
 };
 
 /**
- * Writes a cookie with a specified name and value.
+ * Sets a cookie with a specified name and value, with a default expiration of 10 years.
  *
  * @memberof IITC.utils
- * @function writeCookie
+ * @function setCookie
  * @param {string} name - The name of the cookie.
- * @param {string} val - The value of the cookie.
+ * @param {string} value - The value of the cookie.
+ * @param {number} [days=3650] - Optional: the number of days until the cookie expires (default is 10 years).
  */
-const writeCookie = function (name, val) {
-  var d = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
-  document.cookie = name + '=' + val + '; expires=' + d + '; path=/';
+const setCookie = (name, value, days = 3650) => {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
 };
 
 /**
@@ -573,7 +574,7 @@ const makePermalink = function (latlng, options) {
 IITC.utils = {
   getURLParam,
   getCookie,
-  writeCookie,
+  setCookie,
   eraseCookie,
   digits,
   zeroPad,

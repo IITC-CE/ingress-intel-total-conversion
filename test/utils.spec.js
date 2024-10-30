@@ -87,30 +87,30 @@ describe('IITC.utils.getCookie', () => {
   });
 });
 
-describe('IITC.utils.writeCookie', () => {
+describe('IITC.utils.setCookie', () => {
   beforeEach(() => {
     document.cookie = '';
   });
 
   it('should write a cookie with the specified name and value', () => {
-    IITC.utils.writeCookie('testcookie', 'testvalue');
+    IITC.utils.setCookie('testcookie', 'testvalue');
     expect(document.cookie).to.include('testcookie=testvalue');
   });
 
   it('should set the cookie expiration date to 10 years from now', () => {
-    IITC.utils.writeCookie('testcookie', 'testvalue');
+    IITC.utils.setCookie('testcookie', 'testvalue');
     const expirationDate = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toUTCString();
     expect(document.cookie).to.include(`expires=${expirationDate}`);
   });
 
   it('should set the cookie path to /', () => {
-    IITC.utils.writeCookie('testcookie', 'testvalue');
+    IITC.utils.setCookie('testcookie', 'testvalue');
     expect(document.cookie).to.include('path=/');
   });
 
   it('should overwrite an existing cookie with the same name', () => {
-    IITC.utils.writeCookie('testcookie', 'value1');
-    IITC.utils.writeCookie('testcookie', 'value2');
+    IITC.utils.setCookie('testcookie', 'value1');
+    IITC.utils.setCookie('testcookie', 'value2');
     expect(document.cookie).to.include('testcookie=value2');
   });
 });
