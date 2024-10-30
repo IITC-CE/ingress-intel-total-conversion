@@ -12,7 +12,11 @@ const timeWithSecondsFormatter = new Intl.DateTimeFormat('sv-SE', {
   hour: '2-digit',
   minute: '2-digit',
   second: '2-digit',
-  hour12: false,
+});
+
+const timeFormatter = new Intl.DateTimeFormat('sv-SE', {
+  hour: '2-digit',
+  minute: '2-digit',
 });
 
 const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
@@ -158,14 +162,9 @@ const unixTimeToDateTimeString = (time, millisecond) => {
  * @param {number|string} time - The UNIX timestamp to convert.
  * @returns {string|null} Formatted time as HH:mm.
  */
-const unixTimeToHHmm = function (time) {
+const unixTimeToHHmm = (time) => {
   if (!time) return null;
-  var d = new Date(typeof time === 'string' ? parseInt(time) : time);
-  var h = '' + d.getHours();
-  h = h.length === 1 ? '0' + h : h;
-  var s = '' + d.getMinutes();
-  s = s.length === 1 ? '0' + s : s;
-  return h + ':' + s;
+  return timeFormatter.format(new Date(Number(time)));
 };
 
 /**
