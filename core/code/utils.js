@@ -64,18 +64,18 @@ const deleteCookie = (name) => {
 };
 
 /**
- * Adds thousand separators to a given number.
- * @see http://stackoverflow.com/a/1990590/1684530
+ * Formats a number with thousand separators (thin spaces).
+ * see https://en.wikipedia.org/wiki/Space_(punctuation)#Table_of_spaces
  *
  * @memberof IITC.utils
- * @function digits
- * @param {number} d - The number to format.
+ * @function formatNumber
+ * @param {number} num - The number to format.
  * @returns {string} The formatted number with thousand separators.
  */
-const digits = function (d) {
-  // U+2009 - Thin Space. Recommended for use as a thousands separator...
-  // https://en.wikipedia.org/wiki/Space_(punctuation)#Table_of_spaces
-  return (d + '').replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1&#8201;');
+const formatNumber = (num) => {
+  if (num === null || num === undefined) return '';
+  // Convert number to string and use a thin space (U+2009) as thousand separator
+  return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
 };
 
 /**
@@ -576,7 +576,7 @@ IITC.utils = {
   getCookie,
   setCookie,
   deleteCookie,
-  digits,
+  formatNumber,
   zeroPad,
   unixTimeToString,
   unixTimeToDateTimeString,

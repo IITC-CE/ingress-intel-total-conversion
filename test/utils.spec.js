@@ -115,33 +115,33 @@ describe('IITC.utils.setCookie', () => {
   });
 });
 
-describe('IITC.utils.formatDigits', () => {
+describe('IITC.utils.formatNumber', () => {
   it('should format a number with thousand separators', () => {
-    expect(IITC.utils.digits(1000)).to.equal('1&#8201;000');
-    expect(IITC.utils.digits(12345)).to.equal('12&#8201;345');
-    expect(IITC.utils.digits(123456789)).to.equal('123&#8201;456&#8201;789');
+    expect(IITC.utils.formatNumber(1000)).to.equal('1\u2009000');
+    expect(IITC.utils.formatNumber(12345)).to.equal('12\u2009345');
+    expect(IITC.utils.formatNumber(123456789)).to.equal('123\u2009456\u2009789');
   });
 
   it('should handle negative numbers', () => {
-    expect(IITC.utils.digits(-1000)).to.equal('-1&#8201;000');
-    expect(IITC.utils.digits(-12345)).to.equal('-12&#8201;345');
-    expect(IITC.utils.digits(-123456789)).to.equal('-123&#8201;456&#8201;789');
+    expect(IITC.utils.formatNumber(-1000)).to.equal('-1\u2009000');
+    expect(IITC.utils.formatNumber(-12345)).to.equal('-12\u2009345');
+    expect(IITC.utils.formatNumber(-123456789)).to.equal('-123\u2009456\u2009789');
   });
 
   it('should handle floating-point numbers', () => {
-    expect(IITC.utils.digits(1000.5)).to.equal('1&#8201;000.5');
-    expect(IITC.utils.digits(12345.67)).to.equal('12&#8201;345.67');
+    expect(IITC.utils.formatNumber(1000.5)).to.equal('1\u2009000.5');
+    expect(IITC.utils.formatNumber(12345.67)).to.equal('12\u2009345.67');
   });
 
   it('should handle zero', () => {
-    expect(IITC.utils.digits(0)).to.equal('0');
+    expect(IITC.utils.formatNumber(0)).to.equal('0');
   });
 
-  // it('should handle non-numeric input', () => {
-  //   expect(IITC.utils.digits('abc')).to.equal('abc');
-  //   expect(IITC.utils.digits(null)).to.equal('');
-  //   expect(IITC.utils.digits(undefined)).to.equal('');
-  // });
+  it('should handle non-numeric input', () => {
+    expect(IITC.utils.formatNumber('abc')).to.equal('abc');
+    expect(IITC.utils.formatNumber(null)).to.equal('');
+    expect(IITC.utils.formatNumber(undefined)).to.equal('');
+  });
 });
 
 describe('IITC.utils.zeroPad', () => {
