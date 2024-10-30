@@ -131,7 +131,7 @@ const unixTimeToString = (timestamp, full = false) => {
 
 /**
  * Converts a UNIX timestamp to a precise date and time string in the local timezone.
- * Formatted in ISO-style YYYY-MM-DD hh:mm:ss.mmm - but using local timezone
+ * Formatted in ISO-style YYYY-MM-DD hh:mm:ss.mmm - but using local timezone.
  *
  * @memberof IITC.utils
  * @function unixTimeToDateTimeString
@@ -139,23 +139,15 @@ const unixTimeToString = (timestamp, full = false) => {
  * @param {boolean} [millisecond] - Whether to include millisecond precision.
  * @returns {string|null} The formatted date and time string.
  */
-const unixTimeToDateTimeString = function (time, millisecond) {
+const unixTimeToDateTimeString = (time, millisecond) => {
   if (!time) return null;
-  var d = new Date(typeof time === 'string' ? parseInt(time) : time);
-  return (
-    d.getFullYear() +
-    '-' +
-    window.zeroPad(d.getMonth() + 1, 2) +
-    '-' +
-    window.zeroPad(d.getDate(), 2) +
-    ' ' +
-    window.zeroPad(d.getHours(), 2) +
-    ':' +
-    window.zeroPad(d.getMinutes(), 2) +
-    ':' +
-    window.zeroPad(d.getSeconds(), 2) +
-    (millisecond ? '.' + window.zeroPad(d.getMilliseconds(), 3) : '')
-  );
+  const date = new Date(Number(time));
+  const pad = (num) => IITC.utils.zeroPad(num, 2);
+
+  const dateString = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const timeString = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  const dateTimeString = `${dateString} ${timeString}`;
+  return millisecond ? `${dateTimeString}.${IITC.utils.zeroPad(date.getMilliseconds(), 3)}` : dateTimeString;
 };
 
 /**
