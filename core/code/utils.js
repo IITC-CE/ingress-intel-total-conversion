@@ -84,14 +84,10 @@ const formatNumber = (num) => {
  * @memberof IITC.utils
  * @function zeroPad
  * @param {number} number - The number to pad.
- * @param {number} pad - The desired length of the output string.
+ * @param {number} length - The desired length of the output string.
  * @returns {string} The padded number as a string.
  */
-const zeroPad = function (number, pad) {
-  number = number.toString();
-  var zeros = pad - number.length;
-  return Array(zeros > 0 ? zeros + 1 : 0).join('0') + number;
-};
+const zeroPad = (number, length) => number.toString().padStart(length, '0');
 
 /**
  * Converts a UNIX timestamp to a human-readable string.

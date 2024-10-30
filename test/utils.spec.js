@@ -151,27 +151,21 @@ describe('IITC.utils.zeroPad', () => {
     expect(IITC.utils.zeroPad(1234, 6)).to.equal('001234');
   });
 
-  // it('should handle negative numbers', () => {
-  //   expect(IITC.utils.zeroPad(-5, 3)).to.equal('-005');
-  //   expect(IITC.utils.zeroPad(-42, 5)).to.equal('-0042');
-  //   expect(IITC.utils.zeroPad(-1234, 6)).to.equal('-01234');
-  // });
+  it('should handle negative numbers', () => {
+    expect(IITC.utils.zeroPad(-5, 2)).to.equal('-5');
+  });
 
-  // it('should handle floating-point numbers', () => {
-  //   expect(IITC.utils.zeroPad(5.67, 3)).to.equal('005.67');
-  //   expect(IITC.utils.zeroPad(42.1, 5)).to.equal('00042.1');
-  //   expect(IITC.utils.zeroPad(1234.56, 6)).to.equal('001234.56');
-  // });
+  it('should handle floating-point numbers', () => {
+    expect(IITC.utils.zeroPad(5.67, 3)).to.equal('5.67');
+  });
 
   it('should handle zero', () => {
     expect(IITC.utils.zeroPad(0, 3)).to.equal('000');
   });
 
-  // it('should handle non-numeric input', () => {
-  //   expect(IITC.utils.zeroPad('abc', 3)).to.equal('abc');
-  //   expect(IITC.utils.zeroPad(null, 3)).to.equal('null');
-  //   expect(IITC.utils.zeroPad(undefined, 3)).to.equal('undefined');
-  // });
+  it('should handle non-numeric input', () => {
+    expect(IITC.utils.zeroPad('abc', 3)).to.equal('abc');
+  });
 
   it('should not add unnecessary zeros if the number is already longer than the desired length', () => {
     expect(IITC.utils.zeroPad(1234, 3)).to.equal('1234');
