@@ -556,36 +556,31 @@ const makePrimeLink = function (guid, lat, lng) {
  *
  * @memberof IITC.utils
  * @param {L.LatLng|number[]} [latlng] - The latitude and longitude for the permalink.
- *                              Can be omitted to create mapview-only permalink.
- * @param {Object} [options] - Additional options for permalink generation.
- * @param {boolean} [options.includeMapView] - Include current map view in the permalink.
- * @param {boolean} [options.fullURL] - Generate a fully qualified URL (default: relative link).
+ *                                       Can be omitted to create mapview-only permalink.
+ * @param {Object} [options={}] - Additional options for permalink generation.
+ * @param {boolean} [options.includeMapView=false] - Include current map view in the permalink.
+ * @param {boolean} [options.fullURL=false] - Generate a fully qualified URL (default: relative link).
  * @returns {string} The generated permalink URL.
  */
-const makePermalink = function (latlng, options) {
-  options = options || {};
+const makePermalink = (latlng, options = {}) => {
+  const { includeMapView = false, fullURL = false } = options;
 
-  function round(l) {
-    // ensures that lat,lng are with same precision as in stock intel permalinks
-    return Math.floor(l * 1e6) / 1e6;
-  }
-  var args = [];
-  if (!latlng || options.includeMapView) {
-    var c = window.map.getCenter();
-    args.push('ll=' + [round(c.lat), round(c.lng)].join(','), 'z=' + window.map.getZoom());
+  // Rounds latitude/longitude to match stock intel permalinks precision
+  const round = (l) => Math.floor(l * 1e6) / 1e6;
+
+  const params = [];
+  if (!latlng || includeMapView) {
+    const center = window.map.getCenter();
+    params.push(`ll=${round(center.lat)},${round(center.lng)}`);
+    params.push(`z=${window.map.getZoom()}`);
   }
   if (latlng) {
-    if ('lat' in latlng) {
-      latlng = [latlng.lat, latlng.lng];
-    }
-    args.push('pll=' + latlng.join(','));
+    const [lat, lng] = 'lat' in latlng ? [latlng.lat, latlng.lng] : latlng;
+    params.push(`pll=${lat},${lng}`);
   }
-  var url = '';
-  if (options.fullURL) {
-    url += new URL(document.baseURI).origin;
-  }
-  url += '/';
-  return url + '?' + args.join('&');
+  const baseURL = fullURL ? new URL(document.baseURI).origin : '';
+
+  return `${baseURL}/?${params.join('&')}`;
 };
 
 IITC.utils = {
