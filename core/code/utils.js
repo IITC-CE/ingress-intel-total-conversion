@@ -356,16 +356,14 @@ const escapeHtmlSpecialChars = function (str) {
 };
 
 /**
- * Formats energy of portal.
+ * Formats the energy of a portal, converting to "k" units if over 1000.
  *
  * @memberof IITC.utils
  * @function prettyEnergy
  * @param {number} nrg - The energy value to format.
- * @returns {string} The formatted energy value.
+ * @returns {string|number} The formatted energy value.
  */
-const prettyEnergy = function (nrg) {
-  return nrg > 1000 ? Math.round(nrg / 1000) + ' k' : nrg;
-};
+const prettyEnergy = (nrg) => (nrg > 1000 ? `${Math.round(nrg / 1000)}k` : nrg);
 
 /**
  * Converts a list of items into a unique array, removing duplicates.

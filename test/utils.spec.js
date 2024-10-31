@@ -399,17 +399,17 @@ describe('IITC.utils.prettyEnergy', () => {
 
   it('should round and format energy in 2 k if it is greater than 1000', () => {
     const result = IITC.utils.prettyEnergy(1500);
-    expect(result).to.equal('2 k');
+    expect(result).to.equal('2k');
   });
 
   it('should round energy to the nearest 2 k', () => {
     const result = IITC.utils.prettyEnergy(2499);
-    expect(result).to.equal('2 k');
+    expect(result).to.equal('2k');
   });
 
   it('should handle very large energy values correctly', () => {
     const result = IITC.utils.prettyEnergy(1234567);
-    expect(result).to.equal('1235 k');
+    expect(result).to.equal('1235k');
   });
 
   it('should return 0 for energy value of 0', () => {
