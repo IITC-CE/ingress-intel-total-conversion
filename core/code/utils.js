@@ -190,7 +190,13 @@ const formatInterval = (seconds, maxTerms) => {
 };
 
 /**
- * Formats a distance in meters, converting to kilometers if the distance is over 10,000 meters.
+ * Formats a distance in meters, converting to kilometers with appropriate precision
+ * based on the distance range.
+ *
+ * For distances:
+ * - Under 1000m: shows in meters, rounded to whole numbers
+ * - 1000m to 9999m: shows in kilometers with 1 decimal place
+ * - 10000m and above: shows in whole kilometers
  *
  * @memberof IITC.utils
  * @function formatDistance
@@ -199,9 +205,22 @@ const formatInterval = (seconds, maxTerms) => {
  */
 const formatDistance = (distance) => {
   if (distance === null || distance === undefined) return '';
-  const isKilometers = distance > 10000;
-  const value = isKilometers ? (distance / 1000).toFixed(2) : Math.round(distance);
-  const unit = isKilometers ? 'km' : 'm';
+  let value, unit;
+
+  if (distance >= 10000) {
+    // For 10km and above: show whole kilometers
+    value = Math.round(distance / 1000);
+    unit = 'km';
+  } else if (distance >= 1000) {
+    // For 1km to 9.9km: show kilometers with one decimal
+    value = Math.round(distance / 100) / 10;
+    unit = 'km';
+  } else {
+    // For under 1km: show in meters
+    value = Math.round(distance);
+    unit = 'm';
+  }
+
   return `${IITC.utils.formatNumber(value)}${unit}`;
 };
 

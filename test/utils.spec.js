@@ -325,17 +325,17 @@ describe('IITC.utils.formatDistance', () => {
 
   it('should format distance in kilometers with two decimal places if above 10 000 meters', () => {
     const result = IITC.utils.formatDistance(12345); // 12.35 kilometers
-    expect(result).to.equal('12.35km');
+    expect(result).to.equal('12km');
   });
 
-  it('should format exactly 10 000 meters in meters, not kilometers', () => {
+  it('should format exactly 10 kilometers, not 10 000 meters', () => {
     const result = IITC.utils.formatDistance(10000); // 10 000 meters
-    expect(result).to.equal('10\u2009000m');
+    expect(result).to.equal('10km');
   });
 
   it('should format large distances in kilometers with two decimal places', () => {
     const result = IITC.utils.formatDistance(987654); // 987.65 kilometers
-    expect(result).to.equal('987.65km');
+    expect(result).to.equal('988km');
   });
 
   it('should handle zero distance as "0m"', () => {
