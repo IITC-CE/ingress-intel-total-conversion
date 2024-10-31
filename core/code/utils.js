@@ -595,49 +595,51 @@ IITC.utils = {
   makePermalink,
 };
 
-// List of functions to track for synchronization between window.* and IITC.utils.*
-const legacyFunctions = [
-  'getURLParam',
-  'readCookie',
-  'writeCookie',
-  'eraseCookie',
-  'digits',
-  'zeroPad',
-  'unixTimeToString',
-  'unixTimeToDateTimeString',
-  'unixTimeToHHmm',
-  'formatInterval',
-  'formatDistance',
-  'rangeLinkClick',
-  'showPortalPosLinks',
-  'isTouchDevice',
-  'scrollBottom',
-  'zoomToAndShowPortal',
-  'selectPortalByLatLng',
-  'escapeJavascriptString',
-  'escapeHtmlSpecialChars',
-  'prettyEnergy',
-  'uniqueArray',
-  'genFourColumnTable',
-  'convertTextToTableMagic',
-  'clamp',
-  'clampLatLng',
-  'clampLatLngBounds',
-  'pnpoly',
-  'makePrimeLink',
-  'makePermalink',
-];
+// Map of legacy function names to their new names (or the same name if not renamed)
+const legacyFunctionMappings = {
+  getURLParam: 'getURLParam',
+  readCookie: 'getCookie',
+  writeCookie: 'setCookie',
+  eraseCookie: 'deleteCookie',
+  digits: 'formatNumber',
+  zeroPad: 'zeroPad',
+  unixTimeToString: 'unixTimeToString',
+  unixTimeToDateTimeString: 'unixTimeToDateTimeString',
+  unixTimeToHHmm: 'unixTimeToHHmm',
+  formatInterval: 'formatInterval',
+  formatDistance: 'formatDistance',
+  rangeLinkClick: 'rangeLinkClick',
+  showPortalPosLinks: 'showPortalPosLinks',
+  isTouchDevice: 'isTouchDevice',
+  scrollBottom: 'scrollBottom',
+  zoomToAndShowPortal: 'zoomToAndShowPortal',
+  selectPortalByLatLng: 'selectPortalByLatLng',
+  escapeJavascriptString: 'escapeJavascriptString',
+  escapeHtmlSpecialChars: 'escapeHtmlSpecialChars',
+  prettyEnergy: 'prettyEnergy',
+  uniqueArray: 'uniqueArray',
+  genFourColumnTable: 'genFourColumnTable',
+  convertTextToTableMagic: 'convertTextToTableMagic',
+  clamp: 'clamp',
+  clampLatLng: 'clampLatLng',
+  clampLatLngBounds: 'clampLatLngBounds',
+  pnpoly: 'isPointInPolygon',
+  makePrimeLink: 'makePrimeLink',
+  makePermalink: 'makePermalink',
+};
 
-legacyFunctions.forEach((funcName) => {
-  window.IITC.utils[funcName] = window.IITC.utils[funcName] || function () {};
+// Set up synchronization between `window` and `IITC.utils` with new names
+Object.entries(legacyFunctionMappings).forEach(([oldName, newName]) => {
+  // Initialize IITC.utils[newName] if not already defined
+  window.IITC.utils[newName] = window.IITC.utils[newName] || function () {};
 
   // Define a getter/setter on `window` to synchronize with `IITC.utils`
-  Object.defineProperty(window, funcName, {
+  Object.defineProperty(window, oldName, {
     get() {
-      return window.IITC.utils[funcName];
+      return window.IITC.utils[newName];
     },
     set(newFunc) {
-      window.IITC.utils[funcName] = newFunc;
+      window.IITC.utils[newName] = newFunc;
     },
     configurable: true,
   });
