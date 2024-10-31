@@ -32,3 +32,4 @@ Parts imported from other projects remain under their respective licenses:
 - [**delaunay.js**](https://github.com/ironwallaby/delaunay) © [_Jay LaPorte_](http://ironwallaby.github.io/): [[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)]
 - [**s2-geometry-javascript**](https://github.com/jonatkins/s2-geometry-javascript) © _Jon Atkins_: [LICENSE: same as IITC]
 - [**ulog**](https://github.com/Download/ulog) © [_Stijn de Witt_](http://StijnDeWitt.com/):  [[CC-BY-4.0](https://github.com/Download/ulog/blob/master/LICENSE.md)]
+- [**pnpoly**](https://wrfranklin.org/Research/Short_Notes/pnpoly.html) © [_W Randolph Franklin (WRF)_](http://wrfranklin.org/nikola/pages/index.html):  [[MIT with Attribution](https://wrfranklin.org/Research/Short_Notes/pnpoly.html)] used in: utils.js (isPointInPolygon)
