@@ -58,6 +58,25 @@ class UI {
     return list;
   }
 
+  /**
+   * Renders the list of results.
+   * @param {Array} results - Array of result objects to display.
+   * @param {Function} onResultInteraction - Callback for interaction events.
+   */
+  renderResults(results, onResultInteraction) {
+    this.clearList();
+
+    if (results.length === 0) {
+      this.list.append($('<li>').text('No results found.'));
+    } else {
+      results.forEach((result) => {
+        const item = this.createListItem(result);
+        item.on('click dblclick mouseover mouseout', (ev) => onResultInteraction(result, ev));
+        this.list.append(item);
+      });
+    }
+  }
+
   createListItem(result) {
     const item = $('<li>').attr('tabindex', '0');
     const link = $('<a>').text(result.title).appendTo(item);
@@ -129,22 +148,14 @@ class Query {
   }
 
   /**
-   * Adds a search result to this query.
+   * Adds a search result to this query and re-renders the list.
    *
    * @function
    * @param {Object} result - The search result object to add.
    */
   addResult(result) {
-    if (this.results.length === 0) this.ui.clearList();
     this.results.push(result);
-
-    const item = this.ui.createListItem(result);
-    item.on('click dblclick', (ev) => this.onResultSelected(result, ev));
-    item.on('mouseover', (ev) => this.onResultHoverStart(result, ev));
-    item.on('mouseout', (ev) => this.onResultHoverEnd(result, ev));
-    item.keypress((ev) => this.handleKeyPress(ev, result));
-
-    this.ui.list.append(item);
+    this.renderResults();
   }
 
   handleKeyPress(ev, result) {
@@ -152,6 +163,36 @@ class Query {
       ev.preventDefault();
       const type = ev.key === ' ' ? 'click' : 'dblclick';
       this.onResultSelected(result, { ...ev, type });
+    }
+  }
+
+  /**
+   * Passes results to UI for rendering and sets up interactions.
+   */
+  renderResults() {
+    this.ui.renderResults(this.results, (result, event) => this.handleResultInteraction(result, event));
+  }
+
+  /**
+   * Manages interactions with search results, such as selection and hover.
+   * @param {Object} result - The search result object.
+   * @param {Event} event - The event associated with the interaction.
+   */
+  handleResultInteraction(result, event) {
+    switch (event.type) {
+      case 'click':
+      case 'dblclick':
+        this.onResultSelected(result, event);
+        break;
+      case 'mouseover':
+        this.onResultHoverStart(result);
+        break;
+      case 'mouseout':
+        this.onResultHoverEnd();
+        break;
+      case 'keypress':
+        this.handleKeyPress(event, result);
+        break;
     }
   }
 
@@ -190,26 +231,27 @@ class Query {
    *
    * @function
    * @param {Object} result - The selected search result object.
-   * @param {Event} ev - The event associated with the selection.
+   * @param {Event} event - The event associated with the selection.
    */
-  onResultSelected(result, ev) {
+  onResultSelected(result, event) {
     this.removeHoverResult();
     this.removeSelectedResult();
     this.selectedResult = result;
 
-    if (result.onSelected && result.onSelected(result, ev)) return;
+    if (result.onSelected && result.onSelected(result, event)) return;
 
-    if (ev.type === 'dblclick') {
-      if (result.position) {
-        window.map.setView(result.position, window.DEFAULT_ZOOM);
-      } else if (result.bounds) {
-        window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
+    const { position, bounds } = result;
+    if (event.type === 'dblclick') {
+      if (position) {
+        window.map.setView(position, window.DEFAULT_ZOOM);
+      } else if (bounds) {
+        window.map.fitBounds(bounds, { maxZoom: window.DEFAULT_ZOOM });
       }
     } else {
-      if (result.bounds) {
-        window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
-      } else if (result.position) {
-        window.map.setView(result.position);
+      if (bounds) {
+        window.map.fitBounds(bounds, { maxZoom: window.DEFAULT_ZOOM });
+      } else if (position) {
+        window.map.setView(position);
       }
     }
 
