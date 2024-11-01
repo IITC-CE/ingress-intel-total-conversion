@@ -36,245 +36,244 @@ window.search = {
  * @memberof window.search
  * @class
  * @name window.search.Query
- * @param {string} term - The search term.
- * @param {boolean} confirmed - Indicates if the search is confirmed (e.g., by pressing Enter).
  */
-window.search.Query = function (term, confirmed) {
-  this.term = term;
-  this.confirmed = confirmed;
-  this.init();
-};
+class Query {
+  /**
+   * Initializes the search query, setting up the DOM elements and triggering the 'search' hook.
+   *
+   * @function
+   * @param {string} term - The search term.
+   * @param {boolean} confirmed - Indicates if the search is confirmed (e.g., by pressing Enter).
+   */
+  constructor(term, confirmed) {
+    this.term = term;
+    this.confirmed = confirmed;
+    this.results = [];
+    this.container = $('<div>').addClass('searchquery');
 
-/**
- * Initializes the search query, setting up the DOM elements and triggering the 'search' hook.
- *
- * @function
- */
-window.search.Query.prototype.init = function () {
-  this.results = [];
+    this.header = $('<h3>')
+      .text(
+        this.confirmed
+          ? this.term
+          : (this.term.length > 16 ? this.term.substr(0, 8) + '…' + this.term.substr(this.term.length - 8, 8) : this.term) + ' (Return to load more)'
+      )
+      .appendTo(this.container);
 
-  this.container = $('<div>').addClass('searchquery');
+    this.list = $('<ul>')
+      .appendTo(this.container)
+      .append($('<li>').text(this.confirmed ? 'No local results, searching online...' : 'No local results.'));
 
-  this.header = $('<h3>')
-    .text(
-      this.confirmed
-        ? this.term
-        : (this.term.length > 16 ? this.term.substr(0, 8) + '…' + this.term.substr(this.term.length - 8, 8) : this.term) + ' (Return to load more)'
-    )
-    .appendTo(this.container);
-
-  this.list = $('<ul>')
-    .appendTo(this.container)
-    .append($('<li>').text(this.confirmed ? 'No local results, searching online...' : 'No local results.'));
-
-  this.container.accordion({
-    collapsible: true,
-    heightStyle: 'content',
-  });
-
-  window.runHooks('search', this);
-};
-
-/**
- * Displays the search query results in the search wrapper.
- *
- * @function
- */
-window.search.Query.prototype.show = function () {
-  this.container.appendTo('#searchwrapper');
-};
-
-/**
- * Hides the search query results and cleans up.
- *
- * @function
- */
-window.search.Query.prototype.hide = function () {
-  this.container.remove();
-  this.removeSelectedResult();
-  this.removeHoverResult();
-};
-
-/**
- * Adds a search result to this query.
- *
- * @function
- * @param {Object} result - The search result object to add.
- */
-window.search.Query.prototype.addResult = function (result) {
-  if (this.results.length === 0) {
-    // remove 'No results'
-    this.list.empty();
-  }
-
-  this.results.push(result);
-  var item = $('<li>')
-    .appendTo(this.list)
-    .attr('tabindex', '0')
-    .on(
-      'click dblclick',
-      function (ev) {
-        this.onResultSelected(result, ev);
-      }.bind(this)
-    )
-    .on(
-      'mouseover',
-      function (ev) {
-        this.onResultHoverStart(result, ev);
-      }.bind(this)
-    )
-    .on(
-      'mouseout',
-      function (ev) {
-        this.onResultHoverEnd(result, ev);
-      }.bind(this)
-    )
-    .keypress(function (ev) {
-      if ((ev.keyCode || ev.charCode || ev.which) === 32) {
-        ev.preventDefault();
-        ev.type = 'click';
-        $(this).trigger(ev);
-        return;
-      }
-      if ((ev.keyCode || ev.charCode || ev.which) === 13) {
-        ev.preventDefault();
-        ev.type = 'dblclick';
-        $(this).trigger(ev);
-        return;
-      }
+    this.container.accordion({
+      collapsible: true,
+      heightStyle: 'content',
     });
 
-  var link = $('<a>').append(result.title).appendTo(item);
-
-  if (result.icon) {
-    link.css('background-image', 'url("' + result.icon + '")');
-    item.css('list-style', 'none');
+    window.runHooks('search', this);
   }
 
-  if (result.description) {
-    item.append($('<br>')).append($('<em>').append(result.description));
+  /**
+   * Displays the search query results in the search wrapper.
+   *
+   * @function
+   */
+  show() {
+    this.container.appendTo('#searchwrapper');
   }
-};
 
-/**
- * Creates and returns a layer for the given search result, which could be markers or shapes on the map.
- *
- * @function
- * @param {Object} result - The search result object.
- * @returns {L.Layer} The layer created for this result.
- */
-window.search.Query.prototype.resultLayer = function (result) {
-  if (result.layer !== null && !result.layer) {
-    result.layer = L.layerGroup();
+  /**
+   * Hides the search query results and cleans up.
+   *
+   * @function
+   */
+  hide() {
+    this.container.remove();
+    this.removeSelectedResult();
+    this.removeHoverResult();
+  }
 
-    if (result.position) {
-      L.marker(result.position, {
-        icon: L.divIcon.coloredSvg('red'),
-        title: result.title,
-      }).addTo(result.layer);
+  /**
+   * Adds a search result to this query.
+   *
+   * @function
+   * @param {Object} result - The search result object to add.
+   */
+  addResult(result) {
+    if (this.results.length === 0) {
+      // remove 'No results'
+      this.list.empty();
     }
 
-    if (result.bounds) {
-      L.rectangle(result.bounds, {
-        title: result.title,
-        interactive: false,
-        color: 'red',
-        fill: false,
-      }).addTo(result.layer);
+    this.results.push(result);
+    var item = $('<li>')
+      .appendTo(this.list)
+      .attr('tabindex', '0')
+      .on(
+        'click dblclick',
+        function (ev) {
+          this.onResultSelected(result, ev);
+        }.bind(this)
+      )
+      .on(
+        'mouseover',
+        function (ev) {
+          this.onResultHoverStart(result, ev);
+        }.bind(this)
+      )
+      .on(
+        'mouseout',
+        function (ev) {
+          this.onResultHoverEnd(result, ev);
+        }.bind(this)
+      )
+      .keypress(function (ev) {
+        if ((ev.keyCode || ev.charCode || ev.which) === 32) {
+          ev.preventDefault();
+          ev.type = 'click';
+          $(this).trigger(ev);
+          return;
+        }
+        if ((ev.keyCode || ev.charCode || ev.which) === 13) {
+          ev.preventDefault();
+          ev.type = 'dblclick';
+          $(this).trigger(ev);
+          return;
+        }
+      });
+
+    var link = $('<a>').append(result.title).appendTo(item);
+
+    if (result.icon) {
+      link.css('background-image', 'url("' + result.icon + '")');
+      item.css('list-style', 'none');
+    }
+
+    if (result.description) {
+      item.append($('<br>')).append($('<em>').append(result.description));
     }
   }
-  return result.layer;
-};
 
-/**
- * Handles the selection of a search result, including map view adjustments and layer management.
- *
- * @function
- * @param {Object} result - The selected search result object.
- * @param {Event} ev - The event associated with the selection.
- */
-window.search.Query.prototype.onResultSelected = function (result, ev) {
-  this.removeHoverResult();
-  this.removeSelectedResult();
-  this.selectedResult = result;
+  /**
+   * Creates and returns a layer for the given search result, which could be markers or shapes on the map.
+   *
+   * @function
+   * @param {Object} result - The search result object.
+   * @returns {L.Layer} The layer created for this result.
+   */
+  resultLayer(result) {
+    if (result.layer !== null && !result.layer) {
+      result.layer = L.layerGroup();
 
-  if (result.onSelected) {
-    if (result.onSelected(result, ev)) return;
-  }
+      if (result.position) {
+        L.marker(result.position, {
+          icon: L.divIcon.coloredSvg('red'),
+          title: result.title,
+        }).addTo(result.layer);
+      }
 
-  if (ev.type === 'dblclick') {
-    if (result.position) {
-      window.map.setView(result.position, window.DEFAULT_ZOOM);
-    } else if (result.bounds) {
-      window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
-    }
-  } else {
-    // ev.type != 'dblclick'
-    if (result.bounds) {
-      window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
-    } else if (result.position) {
-      window.map.setView(result.position);
-    }
-  }
-
-  result.layer = this.resultLayer(result);
-
-  if (result.layer) window.map.addLayer(result.layer);
-
-  if (window.isSmartphone()) window.show('map');
-};
-
-/**
- * Removes the currently selected search result from the map and performs cleanup.
- *
- * @function
- */
-window.search.Query.prototype.removeSelectedResult = function () {
-  if (this.selectedResult) {
-    if (this.selectedResult.layer) window.map.removeLayer(this.selectedResult.layer);
-    if (this.selectedResult.onRemove) this.selectedResult.onRemove(this.selectedResult);
-  }
-};
-
-/**
- * Handles the start of a hover over a search result. Adds the layer for the result to the map if not already selected.
- *
- * @function
- * @param {Object} result - The search result object being hovered over.
- */
-window.search.Query.prototype.onResultHoverStart = function (result) {
-  this.removeHoverResult();
-  this.hoverResult = result;
-
-  if (result === this.selectedResult) return;
-
-  result.layer = this.resultLayer(result);
-
-  if (result.layer) window.map.addLayer(result.layer);
-};
-
-/**
- * Removes the hover result layer from the map unless it's the selected result.
- *
- * @function
- */
-window.search.Query.prototype.removeHoverResult = function () {
-  if (this.hoverResult !== this.selectedResult) {
-    if (this.hoverResult) {
-      if (this.hoverResult.layer) {
-        window.map.removeLayer(this.hoverResult.layer);
+      if (result.bounds) {
+        L.rectangle(result.bounds, {
+          title: result.title,
+          interactive: false,
+          color: 'red',
+          fill: false,
+        }).addTo(result.layer);
       }
     }
+    return result.layer;
   }
-  this.hoverResult = null;
-};
 
-/**
- * Handles the end of a hover over a search result. Removes the hover result layer from the map.
- */
-window.search.Query.prototype.onResultHoverEnd = function () {
-  this.removeHoverResult();
-};
+  /**
+   * Handles the selection of a search result, including map view adjustments and layer management.
+   *
+   * @function
+   * @param {Object} result - The selected search result object.
+   * @param {Event} ev - The event associated with the selection.
+   */
+  onResultSelected(result, ev) {
+    this.removeHoverResult();
+    this.removeSelectedResult();
+    this.selectedResult = result;
+
+    if (result.onSelected) {
+      if (result.onSelected(result, ev)) return;
+    }
+
+    if (ev.type === 'dblclick') {
+      if (result.position) {
+        window.map.setView(result.position, window.DEFAULT_ZOOM);
+      } else if (result.bounds) {
+        window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
+      }
+    } else {
+      // ev.type != 'dblclick'
+      if (result.bounds) {
+        window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
+      } else if (result.position) {
+        window.map.setView(result.position);
+      }
+    }
+
+    result.layer = this.resultLayer(result);
+
+    if (result.layer) window.map.addLayer(result.layer);
+
+    if (window.isSmartphone()) window.show('map');
+  }
+
+  /**
+   * Removes the currently selected search result from the map and performs cleanup.
+   *
+   * @function
+   */
+  removeSelectedResult() {
+    if (this.selectedResult) {
+      if (this.selectedResult.layer) window.map.removeLayer(this.selectedResult.layer);
+      if (this.selectedResult.onRemove) this.selectedResult.onRemove(this.selectedResult);
+    }
+  }
+
+  /**
+   * Handles the start of a hover over a search result. Adds the layer for the result to the map if not already selected.
+   *
+   * @function
+   * @param {Object} result - The search result object being hovered over.
+   */
+  onResultHoverStart(result) {
+    this.removeHoverResult();
+    this.hoverResult = result;
+
+    if (result === this.selectedResult) return;
+
+    result.layer = this.resultLayer(result);
+
+    if (result.layer) window.map.addLayer(result.layer);
+  }
+
+  /**
+   * Removes the hover result layer from the map unless it's the selected result.
+   *
+   * @function
+   */
+  removeHoverResult() {
+    if (this.hoverResult !== this.selectedResult) {
+      if (this.hoverResult) {
+        if (this.hoverResult.layer) {
+          window.map.removeLayer(this.hoverResult.layer);
+        }
+      }
+    }
+    this.hoverResult = null;
+  }
+
+  /**
+   * Handles the end of a hover over a search result. Removes the hover result layer from the map.
+   */
+  onResultHoverEnd() {
+    this.removeHoverResult();
+  }
+}
+
+window.search.Query = Query;
 
 /**
  * Initiates a search with the specified term and confirmation status.
