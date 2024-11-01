@@ -30,30 +30,13 @@ window.search = {
   lastSearch: null,
 };
 
-/**
- * Represents a search query.
- *
- * @memberof window.search
- * @class
- * @name window.search.Query
- */
-class Query {
-  /**
-   * Initializes the search query, setting up the DOM elements and triggering the 'search' hook.
-   *
-   * @function
-   * @param {string} term - The search term.
-   * @param {boolean} confirmed - Indicates if the search is confirmed (e.g., by pressing Enter).
-   */
+class UI {
   constructor(term, confirmed) {
     this.term = term;
     this.confirmed = confirmed;
-    this.results = [];
     this.container = this.createContainer();
     this.header = this.createHeader();
     this.list = this.createList();
-
-    window.runHooks('search', this);
   }
 
   createContainer() {
@@ -75,13 +58,63 @@ class Query {
     return list;
   }
 
+  createListItem(result) {
+    const item = $('<li>').attr('tabindex', '0');
+    const link = $('<a>').text(result.title).appendTo(item);
+
+    if (result.icon) {
+      link.css('background-image', `url("${result.icon}")`);
+      item.css('list-style', 'none');
+    }
+
+    if (result.description) item.append($('<br>')).append($('<em>').append(result.description));
+    return item;
+  }
+
+  renderIn(selector) {
+    this.container.appendTo(selector);
+  }
+
+  remove() {
+    this.container.remove();
+  }
+
+  clearList() {
+    this.list.empty();
+  }
+}
+
+/**
+ * Represents a search query.
+ *
+ * @memberof window.search
+ * @class
+ * @name window.search.Query
+ */
+class Query {
+  /**
+   * Initializes the search query, setting up the DOM elements and triggering the 'search' hook.
+   *
+   * @function
+   * @param {string} term - The search term.
+   * @param {boolean} confirmed - Indicates if the search is confirmed (e.g., by pressing Enter).
+   */
+  constructor(term, confirmed) {
+    this.term = term;
+    this.confirmed = confirmed;
+    this.results = [];
+    this.ui = new UI(term, confirmed);
+
+    window.runHooks('search', this);
+  }
+
   /**
    * Displays the search query results in the search wrapper.
    *
    * @function
    */
   show() {
-    this.container.appendTo('#searchwrapper');
+    this.ui.renderIn('#searchwrapper');
   }
 
   /**
@@ -90,7 +123,7 @@ class Query {
    * @function
    */
   hide() {
-    this.container.remove();
+    this.ui.remove();
     this.removeSelectedResult();
     this.removeHoverResult();
   }
@@ -102,29 +135,16 @@ class Query {
    * @param {Object} result - The search result object to add.
    */
   addResult(result) {
-    if (this.results.length === 0) this.list.empty();
+    if (this.results.length === 0) this.ui.clearList();
     this.results.push(result);
 
-    const item = this.createListItem(result);
-    this.list.append(item);
-  }
-
-  createListItem(result) {
-    const item = $('<li>').attr('tabindex', '0');
-    const link = $('<a>').text(result.title).appendTo(item);
-
-    if (result.icon) {
-      link.css('background-image', `url("${result.icon}")`);
-      item.css('list-style', 'none');
-    }
-
+    const item = this.ui.createListItem(result);
     item.on('click dblclick', (ev) => this.onResultSelected(result, ev));
     item.on('mouseover', (ev) => this.onResultHoverStart(result, ev));
     item.on('mouseout', (ev) => this.onResultHoverEnd(result, ev));
     item.keypress((ev) => this.handleKeyPress(ev, result));
 
-    if (result.description) item.append($('<br>')).append($('<em>').append(result.description));
-    return item;
+    this.ui.list.append(item);
   }
 
   handleKeyPress(ev, result) {
