@@ -49,26 +49,30 @@ class Query {
     this.term = term;
     this.confirmed = confirmed;
     this.results = [];
-    this.container = $('<div>').addClass('searchquery');
-
-    this.header = $('<h3>')
-      .text(
-        this.confirmed
-          ? this.term
-          : (this.term.length > 16 ? this.term.substr(0, 8) + '…' + this.term.substr(this.term.length - 8, 8) : this.term) + ' (Return to load more)'
-      )
-      .appendTo(this.container);
-
-    this.list = $('<ul>')
-      .appendTo(this.container)
-      .append($('<li>').text(this.confirmed ? 'No local results, searching online...' : 'No local results.'));
-
-    this.container.accordion({
-      collapsible: true,
-      heightStyle: 'content',
-    });
+    this.container = this.createContainer();
+    this.header = this.createHeader();
+    this.list = this.createList();
 
     window.runHooks('search', this);
+  }
+
+  createContainer() {
+    const container = $('<div>').addClass('searchquery');
+    container.accordion({ collapsible: true, heightStyle: 'content' });
+    return container;
+  }
+
+  createHeader() {
+    const headerText = this.confirmed
+      ? this.term
+      : `${this.term.length > 16 ? this.term.substr(0, 8) + '…' + this.term.substr(this.term.length - 8, 8) : this.term} (Return to load more)`;
+    return $('<h3>').text(headerText).appendTo(this.container);
+  }
+
+  createList() {
+    const list = $('<ul>').appendTo(this.container);
+    list.append($('<li>').text(this.confirmed ? 'No local results, searching online...' : 'No local results.'));
+    return list;
   }
 
   /**
@@ -98,57 +102,36 @@ class Query {
    * @param {Object} result - The search result object to add.
    */
   addResult(result) {
-    if (this.results.length === 0) {
-      // remove 'No results'
-      this.list.empty();
-    }
-
+    if (this.results.length === 0) this.list.empty();
     this.results.push(result);
-    var item = $('<li>')
-      .appendTo(this.list)
-      .attr('tabindex', '0')
-      .on(
-        'click dblclick',
-        function (ev) {
-          this.onResultSelected(result, ev);
-        }.bind(this)
-      )
-      .on(
-        'mouseover',
-        function (ev) {
-          this.onResultHoverStart(result, ev);
-        }.bind(this)
-      )
-      .on(
-        'mouseout',
-        function (ev) {
-          this.onResultHoverEnd(result, ev);
-        }.bind(this)
-      )
-      .keypress(function (ev) {
-        if ((ev.keyCode || ev.charCode || ev.which) === 32) {
-          ev.preventDefault();
-          ev.type = 'click';
-          $(this).trigger(ev);
-          return;
-        }
-        if ((ev.keyCode || ev.charCode || ev.which) === 13) {
-          ev.preventDefault();
-          ev.type = 'dblclick';
-          $(this).trigger(ev);
-          return;
-        }
-      });
 
-    var link = $('<a>').append(result.title).appendTo(item);
+    const item = this.createListItem(result);
+    this.list.append(item);
+  }
+
+  createListItem(result) {
+    const item = $('<li>').attr('tabindex', '0');
+    const link = $('<a>').text(result.title).appendTo(item);
 
     if (result.icon) {
-      link.css('background-image', 'url("' + result.icon + '")');
+      link.css('background-image', `url("${result.icon}")`);
       item.css('list-style', 'none');
     }
 
-    if (result.description) {
-      item.append($('<br>')).append($('<em>').append(result.description));
+    item.on('click dblclick', (ev) => this.onResultSelected(result, ev));
+    item.on('mouseover', (ev) => this.onResultHoverStart(result, ev));
+    item.on('mouseout', (ev) => this.onResultHoverEnd(result, ev));
+    item.keypress((ev) => this.handleKeyPress(ev, result));
+
+    if (result.description) item.append($('<br>')).append($('<em>').append(result.description));
+    return item;
+  }
+
+  handleKeyPress(ev, result) {
+    if (ev.key === ' ' || ev.key === 'Enter') {
+      ev.preventDefault();
+      const type = ev.key === ' ' ? 'click' : 'dblclick';
+      this.onResultSelected(result, { ...ev, type });
     }
   }
 
@@ -160,7 +143,7 @@ class Query {
    * @returns {L.Layer} The layer created for this result.
    */
   resultLayer(result) {
-    if (result.layer !== null && !result.layer) {
+    if (!result.layer) {
       result.layer = L.layerGroup();
 
       if (result.position) {
@@ -194,9 +177,7 @@ class Query {
     this.removeSelectedResult();
     this.selectedResult = result;
 
-    if (result.onSelected) {
-      if (result.onSelected(result, ev)) return;
-    }
+    if (result.onSelected && result.onSelected(result, ev)) return;
 
     if (ev.type === 'dblclick') {
       if (result.position) {
@@ -205,7 +186,6 @@ class Query {
         window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
       }
     } else {
-      // ev.type != 'dblclick'
       if (result.bounds) {
         window.map.fitBounds(result.bounds, { maxZoom: window.DEFAULT_ZOOM });
       } else if (result.position) {
@@ -216,7 +196,6 @@ class Query {
     result.layer = this.resultLayer(result);
 
     if (result.layer) window.map.addLayer(result.layer);
-
     if (window.isSmartphone()) window.show('map');
   }
 
@@ -255,12 +234,8 @@ class Query {
    * @function
    */
   removeHoverResult() {
-    if (this.hoverResult !== this.selectedResult) {
-      if (this.hoverResult) {
-        if (this.hoverResult.layer) {
-          window.map.removeLayer(this.hoverResult.layer);
-        }
-      }
+    if (this.hoverResult && this.hoverResult.layer && this.hoverResult !== this.selectedResult) {
+      window.map.removeLayer(this.hoverResult.layer);
     }
     this.hoverResult = null;
   }
