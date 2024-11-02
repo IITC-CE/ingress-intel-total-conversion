@@ -22,18 +22,18 @@ class Query {
     this.term = term;
     this.confirmed = confirmed;
     this.results = [];
-    this.ui = new IITC.search.UI(term, confirmed);
+    this.resultsView = new IITC.search.QueryResultsView(term, confirmed);
 
     window.runHooks('search', this);
   }
 
   /**
-   * Displays the search query results in the specified UI container.
+   * Displays the search query results in the specified resultsView container.
    *
    * @memberof IITC.search.Query
    */
   show() {
-    this.ui.renderIn('#searchwrapper');
+    this.resultsView.renderIn('#searchwrapper');
   }
 
   /**
@@ -42,7 +42,7 @@ class Query {
    * @memberof IITC.search.Query
    */
   hide() {
-    this.ui.remove();
+    this.resultsView.remove();
     this.removeSelectedResult();
     this.removeHoverResult();
   }
@@ -74,12 +74,12 @@ class Query {
   }
 
   /**
-   * Renders all search results through the UI class and sets up event handling for each result.
+   * Renders all search results through the resultsView class and sets up event handling for each result.
    *
    * @memberof IITC.search.Query
    */
   renderResults() {
-    this.ui.renderResults(this.results, (result, event) => this.handleResultInteraction(result, event));
+    this.resultsView.renderResults(this.results, (result, event) => this.handleResultInteraction(result, event));
   }
 
   /**
