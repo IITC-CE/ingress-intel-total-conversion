@@ -170,8 +170,11 @@ document.body.innerHTML =
   '    <div id="gamestat">&nbsp;loading global control stats</div>' +
   '    <div id="searchwrapper">' +
   '      <div id="searchbox">' +
+  '        <div id="searchicon"><img src="' +
+  '@include_img:images/icon-search.svg@' +
+  '" alt="Search"/></div>' +
   '        <button title="Current location" id="buttongeolocation"><img src="' +
-  '@include_img:images/current-location.png@' +
+  '@include_img:images/icon-my-location.svg@' +
   '" alt="Current location"/></button>' +
   '        <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>' +
   '      </div>' +

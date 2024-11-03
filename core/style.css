@@ -564,22 +564,31 @@ input[type="search"], input[type="url"] {
 }
 #search {
   width: 100%;
+  padding-left: 24px;
   padding-right: 24px;
 }
-#buttongeolocation {
+#searchicon, #buttongeolocation {
+  display: flex;
+  align-items: center;
   position: absolute;
-  right: 0;
   margin: 0;
   border: 0 none transparent;
-  padding: 0 2px 0 0;
+  padding: 0 2px;
   height: 24px;
   background-color: transparent;
 }
+#searchicon img, #buttongeolocation img {
+  height: 20px;
+}
+#searchicon {
+  left: 0;
+}
+#buttongeolocation {
+  right: 0;
+  cursor: pointer;
+}
 #buttongeolocation:focus {
   outline: 1px dotted #ffce00;
-}
-#buttongeolocation img {
-  vertical-align: middle;
 }
 .searchquery {
   max-height: 25em;
