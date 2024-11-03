@@ -20,6 +20,7 @@ class QueryResultsView {
     this.container = this.createContainer();
     this.header = this.createHeader();
     this.list = this.createList();
+    this.setupAccordion();
   }
 
   /**
@@ -74,6 +75,17 @@ class QueryResultsView {
     list.appendChild(initialItem);
     this.container.appendChild(list);
     return list;
+  }
+
+  /**
+   * Sets up the accordion functionality for expanding and collapsing results.
+   *
+   * @memberof IITC.search.QueryResultsView
+   */
+  setupAccordion() {
+    this.header.addEventListener('click', () => {
+      this.container.classList.toggle('collapsed');
+    });
   }
 
   /**
