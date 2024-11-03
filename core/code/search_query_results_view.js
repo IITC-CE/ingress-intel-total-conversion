@@ -26,11 +26,11 @@ class QueryResultsView {
    * Creates and returns the main container element for the query results.
    *
    * @memberof IITC.search.QueryResultsView
-   * @returns {jQuery} - The jQuery container element for the results.
+   * @returns {HTMLElement} - The container element for the results.
    */
   createContainer() {
-    const container = $('<div>').addClass('searchquery');
-    container.accordion({ collapsible: true, heightStyle: 'content' });
+    const container = document.createElement('div');
+    container.classList.add('searchquery');
     return container;
   }
 
@@ -38,24 +38,41 @@ class QueryResultsView {
    * Creates and appends a header to the container based on the search term.
    *
    * @memberof IITC.search.QueryResultsView
-   * @returns {jQuery} - The jQuery header element displaying the search term or a loading message.
+   * @returns {HTMLElement} - The header element displaying the search term or a loading message.
    */
   createHeader() {
-    const headerText = this.confirmed
-      ? this.term
-      : `${this.term.length > 16 ? this.term.substr(0, 8) + '…' + this.term.substr(this.term.length - 8, 8) : this.term} (Return to load more)`;
-    return $('<h3>').text(headerText).appendTo(this.container);
+    const header = document.createElement('h3');
+    let headerText;
+
+    if (this.confirmed) {
+      headerText = this.term;
+    } else {
+      if (this.term.length > 16) {
+        const start = this.term.slice(0, 8);
+        const end = this.term.slice(-8);
+        headerText = `${start}…${end} (Return to load more)`;
+      } else {
+        headerText = `${this.term} (Return to load more)`;
+      }
+    }
+
+    header.textContent = headerText;
+    this.container.appendChild(header);
+    return header;
   }
 
   /**
    * Creates and appends an initial list element to display the search results.
    *
    * @memberof IITC.search.QueryResultsView
-   * @returns {jQuery} - The jQuery list element for displaying the results.
+   * @returns {HTMLElement} - The list element for displaying the results.
    */
   createList() {
-    const list = $('<ul>').appendTo(this.container);
-    list.append($('<li>').text(this.confirmed ? 'No local results, searching online...' : 'No local results.'));
+    const list = document.createElement('ul');
+    const initialItem = document.createElement('li');
+    initialItem.textContent = this.confirmed ? 'No local results, searching online...' : 'No local results.';
+    list.appendChild(initialItem);
+    this.container.appendChild(list);
     return list;
   }
 
@@ -64,18 +81,23 @@ class QueryResultsView {
    *
    * @memberof IITC.search.QueryResultsView
    * @param {Array<Object>} results - An array of search result objects to display.
-   * @param {Function} - onResultInteraction - A callback function for handling interaction events on results.
+   * @param {Function} onResultInteraction - A callback function for handling interaction events on results.
    */
   renderResults(results, onResultInteraction) {
     this.clearList();
 
     if (results.length === 0) {
-      this.list.append($('<li>').text('No results found.'));
+      const noResultsItem = document.createElement('li');
+      noResultsItem.textContent = 'No results found.';
+      this.list.appendChild(noResultsItem);
     } else {
       results.forEach((result) => {
         const item = this.createListItem(result);
-        item.on('click dblclick mouseover mouseout', (ev) => onResultInteraction(result, ev));
-        this.list.append(item);
+        item.addEventListener('click', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('dblclick', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('mouseover', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('mouseout', (ev) => onResultInteraction(result, ev));
+        this.list.appendChild(item);
       });
     }
   }
@@ -85,18 +107,29 @@ class QueryResultsView {
    *
    * @memberof IITC.search.QueryResultsView
    * @param {Object} result - The search result object with properties such as title, description, and icon.
-   * @returns {jQuery} - The jQuery list item element representing the search result.
+   * @returns {HTMLElement} - The list item element representing the search result.
    */
   createListItem(result) {
-    const item = $('<li>').attr('tabindex', '0');
-    const link = $('<a>').text(result.title).appendTo(item);
+    const item = document.createElement('li');
+    item.tabIndex = 0;
+
+    const link = document.createElement('a');
+    link.innerHTML = result.title;
 
     if (result.icon) {
-      link.css('background-image', `url("${result.icon}")`);
-      item.css('list-style', 'none');
+      link.style.backgroundImage = `url("${result.icon}")`;
+      item.style.listStyle = 'none';
     }
 
-    if (result.description) item.append($('<br>')).append($('<em>').append(result.description));
+    item.appendChild(link);
+
+    if (result.description) {
+      const description = document.createElement('em');
+      description.innerHTML = result.description;
+      item.appendChild(document.createElement('br'));
+      item.appendChild(description);
+    }
+
     return item;
   }
 
@@ -107,7 +140,8 @@ class QueryResultsView {
    * @param {string} selector - The selector string for the target container.
    */
   renderIn(selector) {
-    this.container.appendTo(selector);
+    const target = document.querySelector(selector);
+    if (target) target.appendChild(this.container);
   }
 
   /**
@@ -116,7 +150,9 @@ class QueryResultsView {
    * @memberof IITC.search.QueryResultsView
    */
   remove() {
-    this.container.remove();
+    if (this.container.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
   }
 
   /**
@@ -125,7 +161,7 @@ class QueryResultsView {
    * @memberof IITC.search.QueryResultsView
    */
   clearList() {
-    this.list.empty();
+    this.list.innerHTML = '';
   }
 }
 
