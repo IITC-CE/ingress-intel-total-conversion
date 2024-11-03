@@ -6,6 +6,10 @@
 
 /* global plugin_info, PLAYER -- eslint */
 
+/**
+ * @namespace IITC
+ */
+
 // create IITC scope
 const IITC = {};
 window.IITC = IITC;

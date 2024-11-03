@@ -1,6 +1,37 @@
 /* global IITC, L -- eslint */
 
 /**
+ * @memberOf IITC.search.Query
+ * @typedef {Object} SearchResult
+ * @property {string} title - The label for this result (HTML-formatted).
+ * @property {string} [description] - Secondary information for this result (HTML-formatted).
+ * @property {L.LatLng} [position] - Position of this result.
+ * @property {L.LatLngBounds} [bounds] - Bounds of this result.
+ * @property {L.Layer|null} [layer] - Layer to be added to the map on result selection.
+ * @property {string} [icon] - URL to a 12x12px icon for the result list.
+ * @property {IITC.search.Query.onSelectedCallback} [onSelected] - Handler called when result is selected.
+ *           May return `true` to prevent the map from being repositioned.
+ *           You may reposition the map yourself or do other work.
+ * @property {IITC.search.Query.onRemoveCallback} [onRemove] - Handler called when result is removed from map.
+ *           (because another result has been selected or the search was cancelled by the user).
+ */
+
+/**
+ * @memberOf IITC.search.Query
+ * @callback onSelectedCallback
+ * @param {IITC.search.Query.SearchResult} result - The selected search result.
+ * @param {Event} event - The event that triggered the selection.
+ * @returns {boolean} - Returns true to prevent map repositioning.
+ */
+
+/**
+ * @memberOf IITC.search.Query
+ * @callback onRemoveCallback
+ * @param {IITC.search.Query.SearchResult} result - The search result that is being removed.
+ * @returns {void} - No return value.
+ */
+
+/**
  * Represents a search query within the IITC search module, managing query state, results, and UI rendering.
  *
  * This class provides functionality to handle search operations such as displaying and interacting with results,
@@ -31,6 +62,7 @@ class Query {
    * Displays the search query results in the specified resultsView container.
    *
    * @memberof IITC.search.Query
+   * @function show
    */
   show() {
     this.resultsView.renderIn('#searchwrapper');
@@ -40,6 +72,7 @@ class Query {
    * Hides and removes the current search results, clearing selection and hover states.
    *
    * @memberof IITC.search.Query
+   * @function show
    */
   hide() {
     this.resultsView.remove();
@@ -51,7 +84,8 @@ class Query {
    * Adds a search result to the query and triggers re-rendering of the results list.
    *
    * @memberof IITC.search.Query
-   * @param {Object} result - The search result to add, including title, position, and interactions.
+   * @function addResult
+   * @param {IITC.search.Query.SearchResult} result - The search result to add, including title, position, and interactions.
    */
   addResult(result) {
     this.results.push(result);
@@ -99,6 +133,7 @@ class Query {
    * Handles keyboard interactions for selecting a result with Enter or Space keys.
    *
    * @memberof IITC.search.Query
+   * @function handleKeyPress
    * @param {Event} ev - The keyboard event.
    * @param {Object} result - The result being interacted with.
    */
@@ -114,6 +149,7 @@ class Query {
    * Renders all search results through the resultsView class and sets up event handling for each result.
    *
    * @memberof IITC.search.Query
+   * @function renderResults
    */
   renderResults() {
     this.resultsView.renderResults(this.results, (result, event) => this.handleResultInteraction(result, event));
@@ -123,6 +159,7 @@ class Query {
    * Manages interactions with search results, such as clicks, hovers, and keyboard events.
    *
    * @memberof IITC.search.Query
+   * @function handleResultInteraction
    * @param {Object} result - The result being interacted with.
    * @param {Event} event - The event associated with the interaction.
    */
@@ -148,6 +185,7 @@ class Query {
    * Creates and returns a map layer for the given search result, which could include markers or shapes.
    *
    * @memberof IITC.search.Query
+   * @function resultLayer
    * @param {Object} result - The search result object.
    * @returns {L.Layer} - The generated layer for the result.
    */
@@ -178,6 +216,7 @@ class Query {
    * Handles the selection of a search result, adjusting the map view and adding its layer to the map.
    *
    * @memberof IITC.search.Query
+   * @function onResultSelected
    * @param {Object} result - The selected search result object.
    * @param {Event} event - The event associated with the selection.
    */
@@ -213,6 +252,7 @@ class Query {
    * Removes the currently selected search result from the map and performs necessary cleanup.
    *
    * @memberof IITC.search.Query
+   * @function removeSelectedResult
    */
   removeSelectedResult() {
     if (this.selectedResult) {
@@ -225,6 +265,7 @@ class Query {
    * Starts a hover interaction on a search result, displaying its layer on the map.
    *
    * @memberof IITC.search.Query
+   * @function onResultHoverStart
    * @param {Object} result - The result being hovered over.
    */
   onResultHoverStart(result) {
@@ -242,6 +283,7 @@ class Query {
    * Ends a hover interaction by removing the hover layer from the map if it is not selected.
    *
    * @memberof IITC.search.Query
+   * @function removeHoverResult
    */
   removeHoverResult() {
     if (this.hoverResult && this.hoverResult.layer && this.hoverResult !== this.selectedResult) {
@@ -254,6 +296,7 @@ class Query {
    * Handles the end of a hover event, removing the hover layer from the map.
    *
    * @memberof IITC.search.Query
+   * @function onResultHoverEnd
    */
   onResultHoverEnd() {
     this.removeHoverResult();

@@ -1,4 +1,4 @@
-/* global IITC, L -- eslint */
+/* global IITC -- eslint */
 
 /**
  * Provides functionality for the search system within the application.
@@ -6,27 +6,29 @@
  * You can implement your own result provider by listening to the search hook:
  * ```window.addHook('search', function(query) {});```.
  *
- * The `query` object has the following members:
- * - `term`: The term for which the user has searched.
- * - `confirmed`: A boolean indicating if the user has pressed enter after searching.
- *   You should not search online or do heavy processing unless the user has confirmed the search term.
- * - `addResult(result)`: A method to add a result to the query.
+ * @example
+ * // Adding a search result
+ * window.addHook('search', function(query) {
+ *   query.addResult({
+ *     title: 'My Result',
+ *     position: L.latLng(0, 0)
+ *   });
+ * });
  *
- * The `result` object can have the following members (`title` is required, as well as one of `position` and `bounds`):
- * - `title`: The label for this result. Will be interpreted as HTML, so make sure to escape properly.
- * - `description`: Secondary information for this result. Will be interpreted as HTML, so make sure to escape properly.
- * - `position`: A L.LatLng object describing the position of this result.
- * - `bounds`: A L.LatLngBounds object describing the bounds of this result.
- * - `layer`: An ILayer to be added to the map when the user selects this search result.
- *   Will be generated if not set. Set to `null` to prevent the result from being added to the map.
- * - `icon`: A URL to an icon to display in the result list. Should be 12x12 pixels.
- * - `onSelected(result, event)`: A handler to be called when the result is selected.
- *   May return `true` to prevent the map from being repositioned. You may reposition the map yourself or do other work.
- * - `onRemove(result)`: A handler to be called when the result is removed from the map
- *   (because another result has been selected or the search was cancelled by the user).
  *  @namespace IITC.search
  *  @memberof IITC
  */
+
+/**
+ * @memberOf IITC.search
+ * @typedef {Object} SearchQuery
+ * @property {string} term - The term for which the user has searched.
+ * @property {boolean} confirmed - Indicates if the user has pressed enter after searching.
+ *           You should not search online or do heavy processing unless the user has confirmed the search term.
+ * @property {IITC.search.Query.addResult} addResult - Method to add a result to the query.
+ * @property {IITC.search.Query.addPortalResult} addPortalResult - Method to add a portal to the query.
+ */
+
 IITC.search = {
   lastSearch: null,
 };

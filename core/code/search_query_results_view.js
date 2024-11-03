@@ -27,6 +27,7 @@ class QueryResultsView {
    * Creates and returns the main container element for the query results.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function createContainer
    * @returns {HTMLElement} - The container element for the results.
    */
   createContainer() {
@@ -39,6 +40,7 @@ class QueryResultsView {
    * Creates and appends a header to the container based on the search term.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function createHeader
    * @returns {HTMLElement} - The header element displaying the search term or a loading message.
    */
   createHeader() {
@@ -66,6 +68,7 @@ class QueryResultsView {
    * Creates and appends an initial list element to display the search results.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function createList
    * @returns {HTMLElement} - The list element for displaying the results.
    */
   createList() {
@@ -81,6 +84,7 @@ class QueryResultsView {
    * Sets up the accordion functionality for expanding and collapsing results.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function setupAccordion
    */
   setupAccordion() {
     this.header.addEventListener('click', () => {
@@ -92,6 +96,7 @@ class QueryResultsView {
    * Renders the search results within the list container and sets up event interactions.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function renderResults
    * @param {Array<Object>} results - An array of search result objects to display.
    * @param {Function} onResultInteraction - A callback function for handling interaction events on results.
    */
@@ -118,6 +123,7 @@ class QueryResultsView {
    * Creates and returns a list item for an individual search result.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function createListItem
    * @param {Object} result - The search result object with properties such as title, description, and icon.
    * @returns {HTMLElement} - The list item element representing the search result.
    */
@@ -149,6 +155,7 @@ class QueryResultsView {
    * Appends the results container to a specified selector on the page.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function renderIn
    * @param {string} selector - The selector string for the target container.
    */
   renderIn(selector) {
@@ -160,6 +167,7 @@ class QueryResultsView {
    * Removes the results container from the page.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function remove
    */
   remove() {
     if (this.container.parentNode) {
@@ -171,6 +179,7 @@ class QueryResultsView {
    * Clears all items from the results list.
    *
    * @memberof IITC.search.QueryResultsView
+   * @function clearList
    */
   clearList() {
     this.list.innerHTML = '';
