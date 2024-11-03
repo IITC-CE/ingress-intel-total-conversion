@@ -8,26 +8,17 @@ values from localbuildsettings.py (if exists).
 
 import time
 
+_build_date = None
+_build_timestamp = None
 
-def get_current_timestamp():
-    """Get current build date and timestamp in desired formats."""
+
+def generate_timestamps():
+    """Generate build date and timestamp in desired formats."""
+    global _build_date, _build_timestamp
+
     utc = time.gmtime()
-    return (
-        time.strftime('%Y-%m-%d-%H%M%S', utc),  # build_date
-        time.strftime('%Y%m%d.%H%M%S', utc)     # build_timestamp
-    )
-
-
-def build_timestamp():
-    """Dynamically generate current build timestamp."""
-    _, timestamp = get_current_timestamp()
-    return timestamp
-
-
-def build_date():
-    """Dynamically generate current build date."""
-    date, _ = get_current_timestamp()
-    return date
+    _build_date = time.strftime('%Y-%m-%d-%H%M%S', utc)
+    _build_timestamp = time.strftime('%Y%m%d.%H%M%S', utc)
 
 
 def load(build_name, localfile=None):
@@ -61,6 +52,8 @@ def load(build_name, localfile=None):
     mod = vars(__import__(__name__))
     mod.pop('load')
     mod['build_name'] = build_name
+    mod['build_date'] = lambda: _build_date
+    mod['build_timestamp'] = lambda: _build_timestamp
     base = Path(localfile or __file__).parent
     mod['build_source_dir'] = base
     mod['build_target_dir'] = base / 'build' / build_name
