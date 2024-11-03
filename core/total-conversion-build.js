@@ -169,10 +169,12 @@ document.body.innerHTML =
   '    <div id="playerstat">t</div>' +
   '    <div id="gamestat">&nbsp;loading global control stats</div>' +
   '    <div id="searchwrapper">' +
-  '      <button title="Current location" id="buttongeolocation"><img src="' +
+  '      <div id="searchbox">' +
+  '        <button title="Current location" id="buttongeolocation"><img src="' +
   '@include_img:images/current-location.png@' +
   '" alt="Current location"/></button>' +
-  '      <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>' +
+  '        <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>' +
+  '      </div>' +
   '    </div>' +
   '    <div id="portaldetails"></div>' +
   '    <input id="redeem" placeholder="Redeem code…" type="text"/>' +
