@@ -59,6 +59,43 @@ class Query {
   }
 
   /**
+   * Adds a search result for a portal to the search query results.
+   *
+   * @memberof IITC.search.Query
+   * @function addPortalResult
+   * @param {Object} data - The portal data for the search result. This includes information such as title, team, level, health, etc.
+   * @param {string} guid - GUID if the portal.
+   */
+  addPortalResult(data, guid) {
+    const team = window.teamStringToId(data.team);
+    const color = team === window.TEAM_NONE ? '#CCC' : window.COLORS[team];
+    const latLng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
+
+    this.addResult({
+      title: data.title,
+      description: `${window.TEAM_SHORTNAMES[team]}, L${data.level}, ${data.health}%, ${data.resCount} Resonators`,
+      position: latLng,
+      icon: `data:image/svg+xml;base64,${btoa('@include_string:images/icon-portal.svg@'.replace(/%COLOR%/g, color))}`,
+
+      onSelected(result, event) {
+        const { position } = result;
+
+        if (event.type === 'dblclick') {
+          window.zoomToAndShowPortal(guid, latLng);
+        } else if (window.portals[guid]) {
+          if (!window.map.getBounds().contains(position)) {
+            window.map.setView(position);
+          }
+          window.renderPortalDetails(guid);
+        } else {
+          window.selectPortalByLatLng(latLng);
+        }
+        return true;
+      },
+    });
+  }
+
+  /**
    * Handles keyboard interactions for selecting a result with Enter or Space keys.
    *
    * @memberof IITC.search.Query
