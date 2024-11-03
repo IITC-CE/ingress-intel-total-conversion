@@ -16,17 +16,17 @@
  * @param {Object} query - The search query object.
  * @fires hook#search
  */
-window.addHook('search', function (query) {
-  var term = query.term.toLowerCase();
+window.addHook('search', (query) => {
+  const term = query.term.toLowerCase();
 
-  $.each(window.portals, function (guid, portal) {
-    var data = portal.options.data;
-    if (!data.title) return;
+  for (const [guid, portal] of Object.entries(window.portals)) {
+    const data = portal.options.data;
+    if (!data.title) continue;
 
-    if (data.title.toLowerCase().indexOf(term) !== -1) {
+    if (data.title.toLowerCase().includes(term)) {
       window.search.addSearchResult(query, data, guid);
     }
-  });
+  }
 });
 
 /**
@@ -36,31 +36,28 @@ window.addHook('search', function (query) {
  * @param {Object} query - The search query object.
  * @fires hook#search
  */
-window.addHook('search', function (query) {
-  var locations = query.term.replaceAll(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
-  var added = {};
+window.addHook('search', (query) => {
+  const locations = query.term.replace(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
+  const added = new Set();
+
   if (!locations) return;
-  locations.forEach(function (location) {
-    var pair = location.split(',').map(function (s) {
-      return parseFloat(s.trim()).toFixed(6);
-    });
-    var ll = pair.join(',');
-    var latlng = L.latLng(
-      pair.map(function (s) {
-        return parseFloat(s);
-      })
-    );
-    if (added[ll]) return;
-    added[ll] = true;
+
+  locations.forEach((location) => {
+    const pair = location.split(',').map((s) => parseFloat(s.trim()).toFixed(6));
+    const ll = pair.join(',');
+    const latlng = L.latLng(pair.map(parseFloat));
+
+    if (added.has(ll)) return;
+    added.add(ll);
 
     query.addResult({
       title: ll,
       description: 'geo coordinates',
       position: latlng,
-      onSelected: function (result) {
-        for (var guid in window.portals) {
-          var p = window.portals[guid].getLatLng();
-          if (p.lat.toFixed(6) + ',' + p.lng.toFixed(6) === ll) {
+      onSelected: (result) => {
+        for (const [guid, portal] of Object.entries(window.portals)) {
+          const p = portal.getLatLng();
+          if (`${p.lat.toFixed(6)},${p.lng.toFixed(6)}` === ll) {
             window.renderPortalDetails(guid);
             return;
           }
@@ -78,82 +75,79 @@ window.addHook('search', function (query) {
  * @param {Object} query - The search query object.
  * @fires hook#search
  */
-window.addHook('search', function (query) {
+window.addHook('search', async (query) => {
   if (!query.confirmed) return;
 
-  // Viewbox search orders results so they're closer to the viewbox
-  var mapBounds = window.map.getBounds();
-  var viewbox =
-    '&viewbox=' + mapBounds.getSouthWest().lng + ',' + mapBounds.getSouthWest().lat + ',' + mapBounds.getNorthEast().lng + ',' + mapBounds.getNorthEast().lat;
+  const mapBounds = window.map.getBounds();
+  const viewbox = `&viewbox=${mapBounds.getSouthWest().lng},${mapBounds.getSouthWest().lat},${mapBounds.getNorthEast().lng},${mapBounds.getNorthEast().lat}`;
+  // Bounded search allows amenity-only searches (e.g. "amenity=toilet") via special phrases
+  // https://wiki.openstreetmap.org/wiki/Nominatim/Special_Phrases/EN
+  const bounded = '&bounded=1';
 
-  var resultCount = 0;
-  var resultMap = {};
-  function onQueryResult(isViewboxResult, data) {
-    resultCount += data.length;
-    if (isViewboxResult) {
-      // Search for things outside the viewbox
-      $.getJSON(window.NOMINATIM + encodeURIComponent(query.term) + viewbox, onQueryResult.bind(null, false));
-      if (resultCount === 0) {
+  const resultMap = new Set();
+  let resultCount = 0;
+
+  async function fetchResults(isViewboxResult) {
+    try {
+      const response = await fetch(`${window.NOMINATIM}${encodeURIComponent(query.term)}${isViewboxResult ? viewbox + bounded : viewbox}`);
+      const data = await response.json();
+
+      if (isViewboxResult && data.length === 0) {
+        // If no results found within the viewbox, try a broader search
+        await fetchResults(false);
         return;
-      }
-    } else {
-      if (resultCount === 0) {
+      } else if (!isViewboxResult && resultCount === 0 && data.length === 0) {
+        // If no results at all
         query.addResult({
           title: 'No results on OpenStreetMap',
           icon: '//www.openstreetmap.org/favicon.ico',
-          onSelected: function () {
-            return true;
-          },
+          onSelected: () => true,
         });
         return;
       }
+
+      resultCount += data.length;
+
+      data.forEach((item) => {
+        if (resultMap.has(item.place_id)) return; // duplicate
+        resultMap.add(item.place_id);
+
+        const result = {
+          title: item.display_name,
+          description: `Type: ${item.type}`,
+          position: L.latLng(parseFloat(item.lat), parseFloat(item.lon)),
+          icon: item.icon,
+        };
+
+        if (item.geojson) {
+          result.layer = L.geoJson(item.geojson, {
+            interactive: false,
+            color: 'red',
+            opacity: 0.7,
+            weight: 2,
+            fill: false,
+            pointToLayer: (featureData, latLng) =>
+              L.marker(latLng, {
+                icon: L.divIcon.coloredSvg('red'),
+                title: item.display_name,
+              }),
+          });
+        }
+
+        if (item.boundingbox) {
+          const [south, north, west, east] = item.boundingbox;
+          result.bounds = new L.LatLngBounds(L.latLng(parseFloat(south), parseFloat(west)), L.latLng(parseFloat(north), parseFloat(east)));
+        }
+
+        query.addResult(result);
+      });
+    } catch (error) {
+      console.error('Error fetching OSM data:', error);
     }
-
-    data.forEach(function (item) {
-      if (resultMap[item.place_id]) {
-        return;
-      } // duplicate
-      resultMap[item.place_id] = true;
-
-      var result = {
-        title: item.display_name,
-        description: 'Type: ' + item.type,
-        position: L.latLng(parseFloat(item.lat), parseFloat(item.lon)),
-        icon: item.icon,
-      };
-
-      if (item.geojson) {
-        result.layer = L.geoJson(item.geojson, {
-          interactive: false,
-          color: 'red',
-          opacity: 0.7,
-          weight: 2,
-          fill: false,
-          pointToLayer: function (featureData, latLng) {
-            return L.marker(latLng, {
-              icon: L.divIcon.coloredSvg('red'),
-              title: item.display_name,
-            });
-          },
-        });
-      }
-
-      var b = item.boundingbox;
-      if (b) {
-        var southWest = new L.LatLng(b[0], b[2]),
-          northEast = new L.LatLng(b[1], b[3]);
-        result.bounds = new L.LatLngBounds(southWest, northEast);
-      }
-
-      query.addResult(result);
-    });
   }
 
-  // Bounded search allows amenity-only searches (e.g. "amenity=toilet") via special phrases
-  // http://wiki.openstreetmap.org/wiki/Nominatim/Special_Phrases/EN
-  var bounded = '&bounded=1';
-
-  $.getJSON(window.NOMINATIM + encodeURIComponent(query.term) + viewbox + bounded, onQueryResult.bind(null, true));
+  // Start with viewbox-bounded search
+  await fetchResults(true);
 });
 
 /**
@@ -162,17 +156,23 @@ window.addHook('search', function (query) {
  * @param {Object} query - The search query object.
  * @fires hook#search
  */
-window.addHook('search', function (query) {
-  const guid_re = /[0-9a-f]{32}\.[0-9a-f]{2}/;
-  const res = query.term.match(guid_re);
-  if (res) {
-    const guid = res[0];
+window.addHook('search', async (query) => {
+  const guidRegex = /[0-9a-f]{32}\.[0-9a-f]{2}/;
+  const match = query.term.match(guidRegex);
+
+  if (match) {
+    const guid = match[0];
     const data = window.portalDetail.get(guid);
-    if (data) window.search.addSearchResult(query, data, guid);
-    else {
-      window.portalDetail.request(guid).then(function (data) {
-        window.search.addSearchResult(query, data, guid);
-      });
+
+    if (data) {
+      window.search.addSearchResult(query, data, guid);
+    } else {
+      try {
+        const fetchedData = await window.portalDetail.request(guid);
+        window.search.addSearchResult(query, fetchedData, guid);
+      } catch (error) {
+        console.error('Error fetching portal details:', error);
+      }
     }
   }
 });
