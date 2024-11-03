@@ -31,41 +31,63 @@ window.addHook('search', (query) => {
 
 /**
  * Searches for geographical coordinates formatted as latitude, longitude and adds the results.
- * TODO: recognize 50°31'03.8"N 7°59'05.3"E and similar formats
+ * Supports both decimal format (e.g., 51.5074, -0.1278) and DMS format (e.g., 50°31'03.8"N 7°59'05.3"E).
  *
  * @param {Object} query - The search query object.
  * @fires hook#search
  */
 window.addHook('search', (query) => {
-  const locations = query.term.replace(/%2C/gi, ',').match(/[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g);
   const added = new Set();
 
-  if (!locations) return;
+  // Regular expression for decimal coordinates
+  const decimalRegex = /[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g;
+  // Regular expression for DMS coordinates
+  const dmsRegex = /(\d{1,3})°(\d{1,2})'(\d{1,2}(?:\.\d+)?)?"\s*([NS]),?\s*(\d{1,3})°(\d{1,2})'(\d{1,2}(?:\.\d+)?)?"\s*([EW])/g;
 
-  locations.forEach((location) => {
-    const pair = location.split(',').map((s) => parseFloat(s.trim()).toFixed(6));
-    const ll = pair.join(',');
-    const latlng = L.latLng(pair.map(parseFloat));
+  // Convert DMS to decimal format
+  const parseDMS = (deg, min, sec, dir) => {
+    const decimal = parseFloat(deg) + parseFloat(min) / 60 + parseFloat(sec) / 3600;
+    return dir === 'S' || dir === 'W' ? -decimal : decimal;
+  };
 
-    if (added.has(ll)) return;
-    added.add(ll);
+  // Universal function for adding search result
+  const addResult = (lat, lng) => {
+    const latLngString = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+    if (added.has(latLngString)) return;
+    added.add(latLngString);
 
     query.addResult({
-      title: ll,
+      title: latLngString,
       description: 'geo coordinates',
-      position: latlng,
+      position: L.latLng(lat, lng),
       onSelected: (result) => {
         for (const [guid, portal] of Object.entries(window.portals)) {
-          const p = portal.getLatLng();
-          if (`${p.lat.toFixed(6)},${p.lng.toFixed(6)}` === ll) {
+          const { lat: pLat, lng: pLng } = portal.getLatLng();
+          if (`${pLat.toFixed(6)},${pLng.toFixed(6)}` === latLngString) {
             window.renderPortalDetails(guid);
             return;
           }
         }
-
         window.urlPortalLL = [result.position.lat, result.position.lng];
       },
     });
+  };
+
+  // Search and process decimal coordinates
+  const decimalMatches = query.term.replace(/%2C/gi, ',').match(decimalRegex);
+  if (decimalMatches) {
+    decimalMatches.forEach((location) => {
+      const [lat, lng] = location.split(',').map(Number);
+      addResult(lat, lng);
+    });
+  }
+
+  // Search and process DMS coordinates
+  const dmsMatches = Array.from(query.term.matchAll(dmsRegex));
+  dmsMatches.forEach((match) => {
+    const lat = parseDMS(match[1], match[2], match[3], match[4]);
+    const lng = parseDMS(match[5], match[6], match[7], match[8]);
+    addResult(lat, lng);
   });
 });
 
