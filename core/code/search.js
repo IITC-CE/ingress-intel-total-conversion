@@ -40,6 +40,11 @@ IITC.search = {
  */
 IITC.search.doSearch = function (term, confirmed) {
   const searchTerm = term.trim();
+  const searchCancelButton = document.querySelector('#searchcancel');
+
+  if (searchCancelButton) {
+    searchCancelButton.classList.toggle('visible', searchTerm.length > 0);
+  }
 
   // Minimum 3 characters for automatic search
   if (searchTerm.length < 3 && !confirmed) return;
@@ -71,6 +76,7 @@ IITC.search.doSearch = function (term, confirmed) {
  */
 IITC.search.setup = function () {
   const searchInput = document.querySelector('#search');
+  const searchCancelButton = document.querySelector('#searchcancel');
   const geoLocationButton = document.querySelector('#buttongeolocation');
   let searchTimer;
 
@@ -90,6 +96,22 @@ IITC.search.setup = function () {
         const term = searchInput.value.trim();
         IITC.search.doSearch(term, false);
       }, 100);
+    });
+  }
+
+  if (searchCancelButton) {
+    searchCancelButton.classList.remove('visible');
+
+    searchCancelButton.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+        searchCancelButton.classList.remove('visible');
+
+        // Clear the current search
+        clearTimeout(searchTimer);
+        IITC.search.doSearch('', true);
+      }
     });
   }
 

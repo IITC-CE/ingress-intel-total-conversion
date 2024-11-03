@@ -173,6 +173,9 @@ document.body.innerHTML =
   '        <div id="searchicon"><img src="' +
   '@include_img:images/icon-search.svg@' +
   '" alt="Search"/></div>' +
+  '        <div id="searchcancel"><img src="' +
+  '@include_img:images/icon-close-small.svg@' +
+  '" alt="Cancel search"/></div>' +
   '        <button title="Current location" id="buttongeolocation"><img src="' +
   '@include_img:images/icon-my-location.svg@' +
   '" alt="Current location"/></button>' +

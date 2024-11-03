@@ -565,9 +565,12 @@ input[type="search"], input[type="url"] {
 #search {
   width: 100%;
   padding-left: 24px;
-  padding-right: 24px;
+  padding-right: 36px;
 }
-#searchicon, #buttongeolocation {
+#search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+#searchicon, #searchcancel, #buttongeolocation {
   display: flex;
   align-items: center;
   position: absolute;
@@ -577,11 +580,22 @@ input[type="search"], input[type="url"] {
   height: 24px;
   background-color: transparent;
 }
-#searchicon img, #buttongeolocation img {
+#searchicon img, #searchcancel img, #buttongeolocation img {
   height: 20px;
 }
 #searchicon {
   left: 0;
+}
+#searchcancel {
+  right: 24px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#searchcancel.visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 #buttongeolocation {
   right: 0;
