@@ -29,6 +29,7 @@ class QueryResultsView {
    * @memberof IITC.search.QueryResultsView
    * @function createContainer
    * @returns {HTMLElement} - The container element for the results.
+   * @private
    */
   createContainer() {
     const container = document.createElement('div');
@@ -42,6 +43,7 @@ class QueryResultsView {
    * @memberof IITC.search.QueryResultsView
    * @function createHeader
    * @returns {HTMLElement} - The header element displaying the search term or a loading message.
+   * @private
    */
   createHeader() {
     const header = document.createElement('h3');
@@ -70,6 +72,7 @@ class QueryResultsView {
    * @memberof IITC.search.QueryResultsView
    * @function createList
    * @returns {HTMLElement} - The list element for displaying the results.
+   * @private
    */
   createList() {
     const list = document.createElement('ul');
@@ -85,6 +88,7 @@ class QueryResultsView {
    *
    * @memberof IITC.search.QueryResultsView
    * @function setupAccordion
+   * @private
    */
   setupAccordion() {
     this.header.addEventListener('click', () => {
@@ -126,6 +130,7 @@ class QueryResultsView {
    * @function createListItem
    * @param {Object} result - The search result object with properties such as title, description, and icon.
    * @returns {HTMLElement} - The list item element representing the search result.
+   * @private
    */
   createListItem(result) {
     const item = document.createElement('li');
@@ -168,6 +173,7 @@ class QueryResultsView {
    *
    * @memberof IITC.search.QueryResultsView
    * @function remove
+   * @private
    */
   remove() {
     if (this.container.parentNode) {
@@ -180,6 +186,7 @@ class QueryResultsView {
    *
    * @memberof IITC.search.QueryResultsView
    * @function clearList
+   * @private
    */
   clearList() {
     this.list.innerHTML = '';

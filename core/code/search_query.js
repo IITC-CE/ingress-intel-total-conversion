@@ -63,6 +63,7 @@ class Query {
    *
    * @memberof IITC.search.Query
    * @function show
+   * @private
    */
   show() {
     this.resultsView.renderIn('#searchwrapper');
@@ -73,6 +74,7 @@ class Query {
    *
    * @memberof IITC.search.Query
    * @function show
+   * @private
    */
   hide() {
     this.resultsView.remove();
@@ -136,6 +138,7 @@ class Query {
    * @function handleKeyPress
    * @param {Event} ev - The keyboard event.
    * @param {Object} result - The result being interacted with.
+   * @private
    */
   handleKeyPress(ev, result) {
     if (ev.key === ' ' || ev.key === 'Enter') {
@@ -150,6 +153,7 @@ class Query {
    *
    * @memberof IITC.search.Query
    * @function renderResults
+   * @private
    */
   renderResults() {
     this.resultsView.renderResults(this.results, (result, event) => this.handleResultInteraction(result, event));
@@ -162,6 +166,7 @@ class Query {
    * @function handleResultInteraction
    * @param {Object} result - The result being interacted with.
    * @param {Event} event - The event associated with the interaction.
+   * @private
    */
   handleResultInteraction(result, event) {
     switch (event.type) {
@@ -188,6 +193,7 @@ class Query {
    * @function resultLayer
    * @param {Object} result - The search result object.
    * @returns {L.Layer} - The generated layer for the result.
+   * @private
    */
   resultLayer(result) {
     if (!result.layer) {
@@ -219,6 +225,7 @@ class Query {
    * @function onResultSelected
    * @param {Object} result - The selected search result object.
    * @param {Event} event - The event associated with the selection.
+   * @private
    */
   onResultSelected(result, event) {
     this.removeHoverResult();
@@ -253,6 +260,7 @@ class Query {
    *
    * @memberof IITC.search.Query
    * @function removeSelectedResult
+   * @private
    */
   removeSelectedResult() {
     if (this.selectedResult) {
@@ -267,6 +275,7 @@ class Query {
    * @memberof IITC.search.Query
    * @function onResultHoverStart
    * @param {Object} result - The result being hovered over.
+   * @private
    */
   onResultHoverStart(result) {
     this.removeHoverResult();
@@ -284,6 +293,7 @@ class Query {
    *
    * @memberof IITC.search.Query
    * @function removeHoverResult
+   * @private
    */
   removeHoverResult() {
     if (this.hoverResult && this.hoverResult.layer && this.hoverResult !== this.selectedResult) {
@@ -297,6 +307,7 @@ class Query {
    *
    * @memberof IITC.search.Query
    * @function onResultHoverEnd
+   * @private
    */
   onResultHoverEnd() {
     this.removeHoverResult();
