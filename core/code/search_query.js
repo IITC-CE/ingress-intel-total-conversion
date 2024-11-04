@@ -180,7 +180,7 @@ class Query {
       case 'mouseout':
         this.onResultHoverEnd();
         break;
-      case 'keypress':
+      case 'keydown':
         this.handleKeyPress(event, result);
         break;
     }

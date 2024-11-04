@@ -118,6 +118,7 @@ class QueryResultsView {
         item.addEventListener('dblclick', (ev) => onResultInteraction(result, ev));
         item.addEventListener('mouseover', (ev) => onResultInteraction(result, ev));
         item.addEventListener('mouseout', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('keydown', (ev) => onResultInteraction(result, ev));
         this.list.appendChild(item);
       });
     }
