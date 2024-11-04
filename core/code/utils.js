@@ -274,17 +274,13 @@ const showPortalPosLinks = (lat, lng, name) => {
 
 /**
  * Checks if the device is a touch-enabled device.
+ * Alias for `L.Browser.touch()`
  *
  * @memberof IITC.utils
  * @function isTouchDevice
  * @returns {boolean} True if the device is touch-enabled, otherwise false.
  */
-const isTouchDevice = function () {
-  return (
-    'ontouchstart' in window || // works on most browsers
-    'onmsgesturechange' in window
-  ); // works on ie10
-};
+const isTouchDevice = () => L.Browser.touch;
 
 /**
  * Calculates the number of pixels left to scroll down before reaching the bottom of an element.
