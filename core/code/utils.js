@@ -295,9 +295,7 @@ const prettyEnergy = (nrg) => (nrg > 1000 ? `${Math.round(nrg / 1000)}k` : nrg);
  * @returns {Array} A new array containing only unique elements.
  */
 const uniqueArray = function (arr) {
-  return $.grep(arr, function (v, i) {
-    return $.inArray(v, arr) === i;
-  });
+  return [...new Set(arr)];
 };
 
 /**

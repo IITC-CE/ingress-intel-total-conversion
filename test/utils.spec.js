@@ -423,6 +423,28 @@ describe('IITC.utils.prettyEnergy', () => {
   });
 });
 
+describe('IITC.utils.uniqueArray', () => {
+  it('should remove duplicate numbers', () => {
+    const result = IITC.utils.uniqueArray([1, 2, 2, 3, 4, 4, 5]);
+    expect(result).to.deep.equal([1, 2, 3, 4, 5]);
+  });
+
+  it('should return the same array if there are no duplicates', () => {
+    const result = IITC.utils.uniqueArray([1, 2, 3, 4, 5]);
+    expect(result).to.deep.equal([1, 2, 3, 4, 5]);
+  });
+
+  it('should handle an array with all identical elements', () => {
+    const result = IITC.utils.uniqueArray([1, 1, 1, 1]);
+    expect(result).to.deep.equal([1]);
+  });
+
+  it('should return an empty array if input is empty', () => {
+    const result = IITC.utils.uniqueArray([]);
+    expect(result).to.deep.equal([]);
+  });
+});
+
 describe('IITC.utils.clamp', () => {
   it('should return the value itself if it is within the range', () => {
     const result = IITC.utils.clamp(5, 10, -10);
