@@ -306,22 +306,24 @@ const uniqueArray = function (arr) {
  * @returns {string} HTML string representing the constructed table.
  */
 const genFourColumnTable = function (blocks) {
-  let t = $.map(blocks, function (detail, index) {
-    if (!detail) return '';
-    const title = detail[2] ? ' title="' + window.escapeHtmlSpecialChars(detail[2]) + '"' : '';
-    if (index % 2 === 0) {
-      return '<tr><td' + title + '>' + detail[1] + '</td><th' + title + '>' + detail[0] + '</th>';
-    } else {
-      return '<th' + title + '>' + detail[0] + '</th><td' + title + '>' + detail[1] + '</td></tr>';
-    }
-  }).join('');
+  const rows = blocks
+    .map((detail, index) => {
+      if (!detail) return '';
+      const title = detail[2] ? ` title="${IITC.utils.escapeHtmlSpecialChars(detail[2])}"` : '';
 
-  // If the total number of rows is odd, add empty cells to complete the last row
-  if (blocks.length % 2 === 1) {
-    t += '<td></td><td></td></tr>';
-  }
+      if (index % 2 === 0) {
+        // If index is even, start a new row and add <td> for data and <th> for header
+        return `<tr><td${title}>${detail[1]}</td><th${title}>${detail[0]}</th>`;
+      } else {
+        // If index is odd, complete the row with <th> for header and <td> for data, then close </tr>
+        return `<th${title}>${detail[0]}</th><td${title}>${detail[1]}</td></tr>`;
+      }
+    })
+    .join('');
 
-  return t;
+  // If total number of blocks is odd, add empty cells to complete the last row
+  const isOdd = blocks.length % 2 === 1;
+  return isOdd ? rows + '<td></td><td></td></tr>' : rows;
 };
 
 /**

@@ -445,6 +445,90 @@ describe('IITC.utils.uniqueArray', () => {
   });
 });
 
+describe('IITC.utils.genFourColumnTable', () => {
+  beforeEach(() => {
+    // Mock IITC.utils.escapeHtmlSpecialChars
+    IITC.utils.escapeHtmlSpecialChars = (msg) => msg;
+  });
+
+  it('should generate an empty string for an empty array', () => {
+    const result = IITC.utils.genFourColumnTable([]);
+    expect(result).to.equal('');
+  });
+
+  it('should generate a single row with two data cells for one block', () => {
+    const blocks = [['Header1', 'Data1', 'Tooltip1']];
+    const result = IITC.utils.genFourColumnTable(blocks);
+    /* eslint-disable-next-line */
+    const check = `` +
+      `<tr>` +
+      `<td title="Tooltip1">Data1</td>` +
+      `<th title="Tooltip1">Header1</th>` +
+      `<td></td>` +
+      `<td></td>` +
+      `</tr>`;
+    expect(result).to.equal(check);
+  });
+
+  it('should generate a table with two rows for two blocks', () => {
+    const blocks = [
+      ['Header1', 'Data1', 'Tooltip1'],
+      ['Header2', 'Data2', 'Tooltip2'],
+    ];
+    const result = IITC.utils.genFourColumnTable(blocks);
+    /* eslint-disable-next-line */
+    const check = `` +
+      `<tr>` +
+      `<td title="Tooltip1">Data1</td>` +
+      `<th title="Tooltip1">Header1</th>` +
+      `<th title="Tooltip2">Header2</th>` +
+      `<td title="Tooltip2">Data2</td>` +
+      `</tr>`;
+    expect(result).to.equal(check);
+  });
+
+  it('should correctly handle an array with an odd number of blocks by adding empty cells at the end', () => {
+    const blocks = [
+      ['Header1', 'Data1', 'Tooltip1'],
+      ['Header2', 'Data2', 'Tooltip2'],
+      ['Header3', 'Data3', 'Tooltip3'],
+    ];
+    const result = IITC.utils.genFourColumnTable(blocks);
+    /* eslint-disable-next-line */
+    const check = `` +
+      `<tr>` +
+      `<td title="Tooltip1">Data1</td>` +
+      `<th title="Tooltip1">Header1</th>` +
+      `<th title="Tooltip2">Header2</th>` +
+      `<td title="Tooltip2">Data2</td>` +
+      `</tr>` +
+      `<tr>` +
+      `<td title="Tooltip3">Data3</td>` +
+      `<th title="Tooltip3">Header3</th>` +
+      `<td></td>` +
+      `<td></td>` +
+      `</tr>`;
+    expect(result).to.equal(check);
+  });
+
+  it('should handle missing title gracefully', () => {
+    const blocks = [
+      ['Header1', 'Data1'],
+      ['Header2', 'Data2'],
+    ];
+    const result = IITC.utils.genFourColumnTable(blocks);
+    /* eslint-disable-next-line */
+    const check = `` +
+      `<tr>` +
+      `<td>Data1</td>` +
+      `<th>Header1</th>` +
+      `<th>Header2</th>` +
+      `<td>Data2</td>` +
+      `</tr>`;
+    expect(result).to.equal(check);
+  });
+});
+
 describe('IITC.utils.clamp', () => {
   it('should return the value itself if it is within the range', () => {
     const result = IITC.utils.clamp(5, 10, -10);
