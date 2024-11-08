@@ -253,11 +253,11 @@ const scrollBottom = (elm) => {
  * (for strings passed as parameters to html onclick="..." for example)
  *
  * @memberof IITC.utils
- * @function escapeJavascriptString
+ * @function escapeJS
  * @param {string} str - The string to escape.
  * @returns {string} The escaped string.
  */
-const escapeJavascriptString = function (str) {
+const escapeJS = function (str) {
   return (str + '').replace(/[\\"']/g, '\\$&');
 };
 
@@ -265,15 +265,19 @@ const escapeJavascriptString = function (str) {
  * Escapes HTML special characters in a string.
  *
  * @memberof IITC.utils
- * @function escapeHtmlSpecialChars
+ * @function escapeHtml
  * @param {string} str - The string to escape.
  * @returns {string} The escaped string.
  */
-const escapeHtmlSpecialChars = function (str) {
-  var div = document.createElement('div');
-  var text = document.createTextNode(str);
-  div.appendChild(text);
-  return div.innerHTML;
+const escapeHtml = function (str) {
+  const escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return str.replace(/[&<>"']/g, (char) => escapeMap[char]);
 };
 
 /**
@@ -309,7 +313,7 @@ const genFourColumnTable = function (blocks) {
   const rows = blocks
     .map((detail, index) => {
       if (!detail) return '';
-      const title = detail[2] ? ` title="${IITC.utils.escapeHtmlSpecialChars(detail[2])}"` : '';
+      const title = detail[2] ? ` title="${IITC.utils.escapeHtml(detail[2])}"` : '';
 
       if (index % 2 === 0) {
         // If index is even, start a new row and add <td> for data and <th> for header
@@ -452,8 +456,8 @@ IITC.utils = {
   formatDistance,
   isTouchDevice,
   scrollBottom,
-  escapeJavascriptString,
-  escapeHtmlSpecialChars,
+  escapeJS,
+  escapeHtml,
   prettyEnergy,
   uniqueArray,
   genFourColumnTable,
@@ -479,8 +483,8 @@ const legacyFunctionMappings = {
   formatDistance: 'formatDistance',
   isTouchDevice: 'isTouchDevice',
   scrollBottom: 'scrollBottom',
-  escapeJavascriptString: 'escapeJavascriptString',
-  escapeHtmlSpecialChars: 'escapeHtmlSpecialChars',
+  escapeJavascriptString: 'escapeJS',
+  escapeHtmlSpecialChars: 'escapeHtml',
   prettyEnergy: 'prettyEnergy',
   uniqueArray: 'uniqueArray',
   genFourColumnTable: 'genFourColumnTable',

@@ -349,40 +349,77 @@ describe('IITC.utils.formatDistance', () => {
   });
 });
 
-describe('IITC.utils.escapeJavascriptString', () => {
+describe('IITC.utils.escapeJS', () => {
   it('should escape double quotes in the string', () => {
-    const result = IITC.utils.escapeJavascriptString('Hello "World"');
+    const result = IITC.utils.escapeJS('Hello "World"');
     expect(result).to.equal('Hello \\"World\\"');
   });
 
   it('should escape single quotes in the string', () => {
-    const result = IITC.utils.escapeJavascriptString("It's a test");
+    const result = IITC.utils.escapeJS("It's a test");
     expect(result).to.equal("It\\'s a test");
   });
 
   it('should escape backslashes in the string', () => {
-    const result = IITC.utils.escapeJavascriptString('Back\\slash');
+    const result = IITC.utils.escapeJS('Back\\slash');
     expect(result).to.equal('Back\\\\slash');
   });
 
   it('should escape a mix of special characters in the string', () => {
-    const result = IITC.utils.escapeJavascriptString('He said, "It\'s \\awesome!"');
+    const result = IITC.utils.escapeJS('He said, "It\'s \\awesome!"');
     expect(result).to.equal('He said, \\"It\\\'s \\\\awesome!\\"');
   });
 
   it('should handle an empty string', () => {
-    const result = IITC.utils.escapeJavascriptString('');
+    const result = IITC.utils.escapeJS('');
     expect(result).to.equal('');
   });
 
   it('should return the same string if no special characters are present', () => {
-    const result = IITC.utils.escapeJavascriptString('Just a regular string');
+    const result = IITC.utils.escapeJS('Just a regular string');
     expect(result).to.equal('Just a regular string');
   });
 
   it('should treat non-string inputs as strings', () => {
-    const result = IITC.utils.escapeJavascriptString(12345);
+    const result = IITC.utils.escapeJS(12345);
     expect(result).to.equal('12345');
+  });
+});
+
+describe('IITC.utils.escapeHtml', () => {
+  it('should escape HTML tags correctly', () => {
+    const result = IITC.utils.escapeHtml('<div>Hello</div>');
+    expect(result).to.equal('&lt;div&gt;Hello&lt;/div&gt;');
+  });
+
+  it('should escape script tags', () => {
+    const result = IITC.utils.escapeHtml('<script>alert("XSS")</script>');
+    expect(result).to.equal('&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;');
+  });
+
+  it('should escape ampersands', () => {
+    const result = IITC.utils.escapeHtml('Tom & Jerry');
+    expect(result).to.equal('Tom &amp; Jerry');
+  });
+
+  it('should escape double quotes', () => {
+    const result = IITC.utils.escapeHtml('"Hello"');
+    expect(result).to.equal('&quot;Hello&quot;');
+  });
+
+  it('should escape single quotes', () => {
+    const result = IITC.utils.escapeHtml("'Hello'");
+    expect(result).to.equal('&#39;Hello&#39;');
+  });
+
+  it('should escape greater than and less than symbols', () => {
+    const result = IITC.utils.escapeHtml('5 > 3 && 3 < 5');
+    expect(result).to.equal('5 &gt; 3 &amp;&amp; 3 &lt; 5');
+  });
+
+  it('should return the same string if there are no special characters', () => {
+    const result = IITC.utils.escapeHtml('No special chars');
+    expect(result).to.equal('No special chars');
   });
 });
 
@@ -446,11 +483,6 @@ describe('IITC.utils.uniqueArray', () => {
 });
 
 describe('IITC.utils.genFourColumnTable', () => {
-  beforeEach(() => {
-    // Mock IITC.utils.escapeHtmlSpecialChars
-    IITC.utils.escapeHtmlSpecialChars = (msg) => msg;
-  });
-
   it('should generate an empty string for an empty array', () => {
     const result = IITC.utils.genFourColumnTable([]);
     expect(result).to.equal('');
