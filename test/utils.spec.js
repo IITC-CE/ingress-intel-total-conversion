@@ -561,6 +561,54 @@ describe('IITC.utils.genFourColumnTable', () => {
   });
 });
 
+describe('IITC.utils.textToTable', () => {
+  it('should return text with BR instead of \\n if no tabs are present', () => {
+    const text = 'Line1\nLine2\nLine3';
+    const result = IITC.utils.textToTable(text);
+    expect(result).to.equal('Line1<br>Line2<br>Line3');
+  });
+
+  it('should create a table with one row and two columns for a single tab-separated line', () => {
+    const text = 'Cell1\tCell2';
+    const result = IITC.utils.textToTable(text);
+    const check = `<table>` + `<tr><td>Cell1</td><td>Cell2</td></tr>` + `</table>`;
+    expect(result).to.equal(check);
+  });
+
+  it('should create a table with multiple rows and columns for text with multiple lines and tabs', () => {
+    const text = 'R1C1\tR1C2\nR2C1\tR2C2\nR3C1\tR3C2';
+    const result = IITC.utils.textToTable(text);
+    const check =
+      `<table>` + `<tr><td>R1C1</td><td>R1C2</td></tr>` + `<tr><td>R2C1</td><td>R2C2</td></tr>` + `<tr><td>R3C1</td><td>R3C2</td></tr>` + `</table>`;
+    expect(result).to.equal(check);
+  });
+
+  it('should add colspan to rows with fewer columns than the longest row', () => {
+    const text = 'R1C1\tR1C2\tR1C3\nR2C1\tR2C2\nR3C1';
+    const result = IITC.utils.textToTable(text);
+    const check =
+      `<table>` +
+      `<tr><td>R1C1</td><td>R1C2</td><td>R1C3</td></tr>` +
+      `<tr><td colspan="2">R2C1</td><td>R2C2</td></tr>` +
+      `<tr><td colspan="3">R3C1</td></tr>` +
+      `</table>`;
+    expect(result).to.equal(check);
+  });
+
+  it('should handle empty input text as is', () => {
+    const text = '';
+    const result = IITC.utils.textToTable(text);
+    expect(result).to.equal('');
+  });
+
+  it('should escape HTML special characters within cells', () => {
+    const text = 'Cell1\tCell<2>\nCell&3\tCell"4"';
+    const result = IITC.utils.textToTable(text);
+    const check = `<table>` + `<tr><td>Cell1</td><td>Cell&lt;2&gt;</td></tr>` + `<tr><td>Cell&amp;3</td><td>Cell&quot;4&quot;</td></tr>` + `</table>`;
+    expect(result).to.equal(check);
+  });
+});
+
 describe('IITC.utils.clamp', () => {
   it('should return the value itself if it is within the range', () => {
     const result = IITC.utils.clamp(5, 10, -10);

@@ -334,39 +334,33 @@ const genFourColumnTable = function (blocks) {
  * Converts text with newlines (`\n`) and tabs (`\t`) into an HTML table.
  *
  * @memberof IITC.utils
- * @function convertTextToTableMagic
+ * @function textToTable
  * @param {string} text - The text to convert.
  * @returns {string} The resulting HTML table.
  */
-const convertTextToTableMagic = function (text) {
-  // check if it should be converted to a table
-  if (!text.match(/\t/)) return text.replace(/\n/g, '<br>');
+const textToTable = function (text) {
+  // If no tabs are present, replace newlines with <br> and return
+  if (!text.includes('\t')) return text.replace(/\n/g, '<br>');
 
-  var data = [];
-  var columnCount = 0;
+  // Split text into rows and columns, tracking the max column count
+  const rows = text.split('\n').map((row) => row.split('\t'));
+  const columnCount = Math.max(...rows.map((row) => row.length));
 
-  // parse data
-  var rows = text.split('\n');
-  $.each(rows, function (i, row) {
-    data[i] = row.split('\t');
-    if (data[i].length > columnCount) columnCount = data[i].length;
-  });
+  // Build the table rows
+  const tableRows = [];
+  for (const row of rows) {
+    let rowHtml = '<tr>';
+    for (let k = 0; k < row.length; k++) {
+      const cell = IITC.utils.escapeHtml(row[k]);
+      const colspan = k === 0 && row.length < columnCount ? ` colspan="${columnCount - row.length + 1}"` : '';
+      rowHtml += `<td${colspan}>${cell}</td>`;
+    }
+    rowHtml += '</tr>';
+    tableRows.push(rowHtml);
+  }
 
-  // build the table
-  var table = '<table>';
-  $.each(data, function (i) {
-    table += '<tr>';
-    $.each(data[i], function (k, cell) {
-      var attributes = '';
-      if (k === 0 && data[i].length < columnCount) {
-        attributes = ' colspan="' + (columnCount - data[i].length + 1) + '"';
-      }
-      table += '<td' + attributes + '>' + cell + '</td>';
-    });
-    table += '</tr>';
-  });
-  table += '</table>';
-  return table;
+  // Combine all rows into a single table HTML
+  return `<table>${tableRows.join('')}</table>`;
 };
 
 /**
@@ -461,7 +455,7 @@ IITC.utils = {
   prettyEnergy,
   uniqueArray,
   genFourColumnTable,
-  convertTextToTableMagic,
+  textToTable,
   clamp,
   clampLatLng,
   clampLatLngBounds,
@@ -488,7 +482,7 @@ const legacyFunctionMappings = {
   prettyEnergy: 'prettyEnergy',
   uniqueArray: 'uniqueArray',
   genFourColumnTable: 'genFourColumnTable',
-  convertTextToTableMagic: 'convertTextToTableMagic',
+  convertTextToTableMagic: 'textToTable',
   clamp: 'clamp',
   clampLatLng: 'clampLatLng',
   clampLatLngBounds: 'clampLatLngBounds',
