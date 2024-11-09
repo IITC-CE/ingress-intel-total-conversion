@@ -1,3 +1,5 @@
+/* global L -- eslint */
+
 /**
  * @file Contain misc functions to get portal info
  * @module portal_data
@@ -71,6 +73,50 @@ window.getPortalFields = function (guid) {
 window.getPortalFieldsCount = function (guid) {
   var fields = window.getPortalFields(guid);
   return fields.length;
+};
+
+/**
+ * Zooms the map to a specific portal and shows its details if available.
+ *
+ * @function zoomToAndShowPortal
+ * @param {string} guid - The globally unique identifier of the portal.
+ * @param {L.LatLng|number[]} latlng - The latitude and longitude of the portal.
+ */
+window.zoomToAndShowPortal = function (guid, latlng) {
+  window.map.setView(latlng, window.DEFAULT_ZOOM);
+  // if the data is available, render it immediately. Otherwise defer
+  // until it becomes available.
+  if (window.portals[guid]) window.renderPortalDetails(guid);
+  else window.urlPortal = guid;
+};
+
+/**
+ * Selects a portal by its latitude and longitude.
+ *
+ * @function selectPortalByLatLng
+ * @param {number|Array|L.LatLng} lat - The latitude of the portal
+ *                                      or an array or L.LatLng object containing both latitude and longitude.
+ * @param {number} [lng] - The longitude of the portal.
+ */
+window.selectPortalByLatLng = function (lat, lng) {
+  if (lng === undefined && lat instanceof Array) {
+    lng = lat[1];
+    lat = lat[0];
+  } else if (lng === undefined && lat instanceof L.LatLng) {
+    lng = lat.lng;
+    lat = lat.lat;
+  }
+  for (var guid in window.portals) {
+    var latlng = window.portals[guid].getLatLng();
+    if (latlng.lat === lat && latlng.lng === lng) {
+      window.renderPortalDetails(guid);
+      return;
+    }
+  }
+
+  // not currently visible
+  window.urlPortalLL = [lat, lng];
+  window.map.setView(window.urlPortalLL, window.DEFAULT_ZOOM);
 };
 
 (function () {
