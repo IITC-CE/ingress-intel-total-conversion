@@ -225,6 +225,42 @@ const formatDistance = (distance) => {
 };
 
 /**
+ * Formats the time difference between two timestamps (in milliseconds) as a string.
+ *
+ * @memberof IITC.utils
+ * @function formatAgo
+ * @param {number} time - The past timestamp in milliseconds.
+ * @param {number} now - The current timestamp in milliseconds.
+ * @param {Object} [options] - Options for formatting.
+ * @param {boolean} [options.showSeconds=false] - Whether to include seconds in the result.
+ * @returns {string} The formatted time difference (e.g., "45s", "5m", "2h 45m", "1d 3h 45m")
+ */
+const formatAgo = (time, now, options = { showSeconds: false }) => {
+  const secondsTotal = Math.floor(Math.max(0, (now - time) / 1000));
+
+  // Calculate time units
+  const days = Math.floor(secondsTotal / 86400);
+  const hours = Math.floor((secondsTotal % 86400) / 3600);
+  const minutes = Math.floor((secondsTotal % 3600) / 60);
+  const seconds = secondsTotal % 60;
+
+  const result = [];
+
+  // Include units conditionally based on non-zero values
+  if (days > 0) result.push(`${days}d`);
+  if (hours > 0 || result.length !== 0) result.push(`${hours}h`);
+  if (minutes > 0 || result.length !== 0) result.push(`${minutes}m`);
+  if (options.showSeconds && (result.length === 0 || seconds > 0)) result.push(`${seconds}s`);
+
+  // If no units were added, show "0" with the smallest available unit
+  if (result.length === 0) {
+    return options.showSeconds ? '0s' : '0m';
+  }
+
+  return result.join(' ');
+};
+
+/**
  * Checks if the device is a touch-enabled device.
  * Alias for `L.Browser.touch()`
  *
@@ -448,6 +484,7 @@ IITC.utils = {
   unixTimeToHHmm,
   formatInterval,
   formatDistance,
+  formatAgo,
   isTouchDevice,
   scrollBottom,
   escapeJS,
