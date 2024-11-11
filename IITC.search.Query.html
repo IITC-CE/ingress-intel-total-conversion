@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/map_data_debug.js | IITC-CE</title>
+    <title>Class: Query | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -45,197 +43,2540 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* global L -- eslint */
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="IITC.html">IITC</a><a href="IITC.search.html">.search</a>.</span>Query<span class="signature">(term, confirmed)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description"><p>Represents a search query within the IITC search module, managing query state, results, and UI rendering.</p>
+<p>This class provides functionality to handle search operations such as displaying and interacting with results,
+including selection, hover actions, and map adjustments. Hooks for custom search actions are triggered when
+a new search query is initialized.</p></div>
+        
+    
+</header>
 
-/**
- * Contains functions for rendering debug tiles on the map. These are used for debugging map data tiles.
- * @class RenderDebugTiles
- */
-window.RenderDebugTiles = function () {
-  this.CLEAR_CHECK_TIME = 0.1;
-  this.FADE_TIME = 1.0;
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-  this.debugTileLayer = L.layerGroup();
-  window.layerChooser.addOverlay(this.debugTileLayer, 'DEBUG Data Tiles', { default: false });
+<dt>
+    
+        <h4 class="name" id="Query">
+            
+                new <span class="type-signature"></span>Query<span class="signature">(term, confirmed)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line44">line 44</a></code>
+            </div>
+            
+        </h4>
 
-  this.debugTileToRectangle = {};
-  this.debugTileClearTimes = {};
-  this.timer = undefined;
-};
+        
+    
+</dt>
+<dd>
 
-/**
- * Resets the debug tiles by clearing all layers, rectangles and clear times.
- * @function
- * @memberof RenderDebugTiles
- */
-window.RenderDebugTiles.prototype.reset = function () {
-  this.debugTileLayer.clearLayers();
-  this.debugTileToRectangle = {};
-  this.debugTileClearTimes = {};
-};
+    
+    <div class="description">
+        <p>Initializes the search query, setting up UI elements and triggering the 'search' hook.</p>
+    </div>
+    
 
-/**
- * Creates a new debug tile with the specified ID and bounds.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {L.LatLngBounds} bounds - The geographical bounds of the tile.
- */
-window.RenderDebugTiles.prototype.create = function (id, bounds) {
-  var s = { color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false };
+    
 
-  bounds = new L.LatLngBounds(bounds);
-  bounds = bounds.pad(-0.02);
+    
 
-  var l = L.rectangle(bounds, s);
-  this.debugTileToRectangle[id] = l;
-  this.debugTileLayer.addLayer(l);
-  if (window.map.hasLayer(this.debugTileLayer)) {
-    // only bring to back if we have the debug layer turned on
-    l.bringToBack();
-  }
-};
+    
 
-/**
- * Sets the color of the border and fill for a specific debug tile.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {string} bordercol - The color for the border.
- * @param {string} fillcol - The color for the fill.
- */
-window.RenderDebugTiles.prototype.setColour = function (id, bordercol, fillcol) {
-  var l = this.debugTileToRectangle[id];
-  if (l) {
-    var s = { color: bordercol, fillColor: fillcol };
-    l.setStyle(s);
-  }
-};
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-/**
- * Sets the state of a specific debug tile. Changes its color based on the state.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {string} state - The state of the tile (e.g., 'ok', 'error', 'requested').
- */
-window.RenderDebugTiles.prototype.setState = function (id, state) {
-  var col = '#f0f';
-  var fill = '#f0f';
-  var clearDelay = -1;
-  switch (state) {
-    case 'ok':
-      col = '#0f0';
-      fill = '#0f0';
-      clearDelay = 2;
-      break;
-    case 'error':
-      col = '#f00';
-      fill = '#f00';
-      clearDelay = 30;
-      break;
-    case 'cache-fresh':
-      col = '#0f0';
-      fill = '#ff0';
-      clearDelay = 2;
-      break;
-    case 'cache-stale':
-      col = '#f00';
-      fill = '#ff0';
-      clearDelay = 10;
-      break;
-    case 'requested':
-      col = '#66f';
-      fill = '#66f';
-      break;
-    case 'retrying':
-      col = '#666';
-      fill = '#666';
-      break;
-    case 'request-fail':
-      col = '#a00';
-      fill = '#666';
-      break;
-    case 'tile-fail':
-      col = '#f00';
-      fill = '#666';
-      break;
-    case 'tile-timeout':
-      col = '#ff0';
-      fill = '#666';
-      break;
-    case 'render-queue':
-      col = '#f0f';
-      fill = '#f0f';
-      break;
-  }
-  this.setColour(id, col, fill);
-  if (clearDelay >= 0) {
-    var clearAt = Date.now() + clearDelay * 1000;
-    this.debugTileClearTimes[id] = clearAt;
+        <th>Type</th>
 
-    if (!this.timer) {
-      this.startTimer(clearDelay * 1000);
-    }
-  }
-};
+        
 
-/**
- * Starts a timer to run the clear pass function after a specified wait time.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {number} waitTime - The wait time in milliseconds before running the clear pass.
- */
-window.RenderDebugTiles.prototype.startTimer = function (waitTime) {
-  var _this = this;
-  if (!_this.timer) {
-    // a timeout of 0 firing the actual timeout - helps things run smoother
-    _this.timer = setTimeout(function () {
-      _this.timer = setTimeout(function () {
-        _this.timer = undefined;
-        _this.runClearPass();
-      }, waitTime);
-    }, 0);
-  }
-};
+        
 
-/**
- * Executes a pass to clear debug tiles that have exceeded their fade time.
- * This function adjusts the opacity of the tiles and removes them if necessary.
- *
- * @function
- * @memberof RenderDebugTiles
- */
-window.RenderDebugTiles.prototype.runClearPass = function () {
-  var now = Date.now();
-  for (var id in this.debugTileClearTimes) {
-    var diff = now - this.debugTileClearTimes[id];
-    if (diff > 0) {
-      if (diff > this.FADE_TIME * 1000) {
-        this.debugTileLayer.removeLayer(this.debugTileToRectangle[id]);
-        delete this.debugTileClearTimes[id];
-      } else {
-        var fade = 1.0 - diff / (this.FADE_TIME * 1000);
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-        this.debugTileToRectangle[id].setStyle({ opacity: 0.4 * fade, fillOpacity: 0.1 * fade });
-      }
-    }
-  }
+    <tbody>
+    
 
-  if (Object.keys(this.debugTileClearTimes).length > 0) {
-    this.startTimer(this.CLEAR_CHECK_TIME * 1000);
-  }
-};
-</code></pre>
-        </article>
-    </section>
+        <tr>
+            
+                <td class="name"><code>term</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The search term.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>confirmed</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if the search is confirmed (e.g., by pressing Enter).</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id=".addPortalResult">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>addPortalResult<span class="signature">(data, guid)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line97">line 97</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds a search result for a portal to the search query results.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal data for the search result. This includes information such as title, team, level, health, etc.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>GUID if the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".addResult">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>addResult<span class="signature">(result)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line85">line 85</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Adds a search result to the query and triggers re-rendering of the results list.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="IITC.search.Query.html#.SearchResult">IITC.search.Query.SearchResult</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The search result to add, including title, position, and interactions.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".handleKeyPress">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>handleKeyPress<span class="signature">(ev, result)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line134">line 134</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Handles keyboard interactions for selecting a result with Enter or Space keys.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ev</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The keyboard event.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The result being interacted with.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".handleResultInteraction">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>handleResultInteraction<span class="signature">(result, event)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line162">line 162</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Manages interactions with search results, such as clicks, hovers, and keyboard events.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The result being interacted with.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The event associated with the interaction.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".onResultHoverEnd">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>onResultHoverEnd<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line305">line 305</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Handles the end of a hover event, removing the hover layer from the map.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".onResultHoverStart">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>onResultHoverStart<span class="signature">(result)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line272">line 272</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Starts a hover interaction on a search result, displaying its layer on the map.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The result being hovered over.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".onResultSelected">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>onResultSelected<span class="signature">(result, event)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line221">line 221</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Handles the selection of a search result, adjusting the map view and adding its layer to the map.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The selected search result object.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The event associated with the selection.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".removeHoverResult">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>removeHoverResult<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line291">line 291</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Ends a hover interaction by removing the hover layer from the map if it is not selected.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".removeSelectedResult">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>removeSelectedResult<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line258">line 258</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes the currently selected search result from the map and performs necessary cleanup.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".renderResults">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>renderResults<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line151">line 151</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders all search results through the resultsView class and sets up event handling for each result.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".resultLayer">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>resultLayer<span class="signature">(result)</span><span class="type-signature"> &rarr; {L.Layer}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line189">line 189</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates and returns a map layer for the given search result, which could include markers or shapes.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The search result object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">L.Layer</span>
+
+
+
+
+
+- <ul>
+<li>The generated layer for the result.</li>
+</ul>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".show">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>show<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line61">line 61</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Displays the search query results in the specified resultsView container.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".show">
+            
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>show<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line72">line 72</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Hides and removes the current search results, clearing selection and hover states.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id=".onRemoveCallback">
+            
+                <span class="type-signature"></span>onRemoveCallback<span class="signature">(result)</span><span class="type-signature"> &rarr; {void}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line27">line 27</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="IITC.search.Query.html#.SearchResult">IITC.search.Query.SearchResult</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The search result that is being removed.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">void</span>
+
+
+
+
+
+- <ul>
+<li>No return value.</li>
+</ul>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".onSelectedCallback">
+            
+                <span class="type-signature"></span>onSelectedCallback<span class="signature">(result, event)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+                <code><a href="code_search_query.js.html#line19">line 19</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="IITC.search.Query.html#.SearchResult">IITC.search.Query.SearchResult</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The selected search result.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The event that triggered the selection.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <ul>
+<li>Returns true to prevent map repositioning.</li>
+</ul>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+<h4 class="name" id=".SearchResult">
+    SearchResult
+    
+    <div class="container-source members">
+        <code><a href="code_search_query.js.html">code/search_query.js</a></code>,
+        <code><a href="code_search_query.js.html#line3">line 3</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>title</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The label for this result (HTML-formatted).</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Secondary information for this result (HTML-formatted).</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>position</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.LatLng</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Position of this result.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.LatLngBounds</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Bounds of this result.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.Layer</span>
+|
+
+<span class="param-type">null</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Layer to be added to the map on result selection.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>icon</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>URL to a 12x12px icon for the result list.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onSelected</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="IITC.search.Query.html#.onSelectedCallback">IITC.search.Query.onSelectedCallback</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Handler called when result is selected.
+May return <code>true</code> to prevent the map from being repositioned.
+You may reposition the map yourself or do other work.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onRemove</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="IITC.search.Query.html#.onRemoveCallback">IITC.search.Query.onRemoveCallback</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Handler called when result is removed from map.
+(because another result has been selected or the search was cancelled by the user).</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+            </dl>
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -252,7 +2593,7 @@ window.RenderDebugTiles.prototype.runClearPass = function () {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'IITC.search.Query_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

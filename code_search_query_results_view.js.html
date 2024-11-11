@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/map_data_debug.js | IITC-CE</title>
+    <title>Source: code/search_query_results_view.js | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,191 +48,203 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* global L -- eslint */
+            <pre class="prettyprint source linenums"><code>/* global IITC -- eslint */
 
 /**
- * Contains functions for rendering debug tiles on the map. These are used for debugging map data tiles.
- * @class RenderDebugTiles
- */
-window.RenderDebugTiles = function () {
-  this.CLEAR_CHECK_TIME = 0.1;
-  this.FADE_TIME = 1.0;
-
-  this.debugTileLayer = L.layerGroup();
-  window.layerChooser.addOverlay(this.debugTileLayer, 'DEBUG Data Tiles', { default: false });
-
-  this.debugTileToRectangle = {};
-  this.debugTileClearTimes = {};
-  this.timer = undefined;
-};
-
-/**
- * Resets the debug tiles by clearing all layers, rectangles and clear times.
- * @function
- * @memberof RenderDebugTiles
- */
-window.RenderDebugTiles.prototype.reset = function () {
-  this.debugTileLayer.clearLayers();
-  this.debugTileToRectangle = {};
-  this.debugTileClearTimes = {};
-};
-
-/**
- * Creates a new debug tile with the specified ID and bounds.
+ * Represents the view for displaying search query results in the IITC search module.
  *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {L.LatLngBounds} bounds - The geographical bounds of the tile.
+ * @memberof IITC.search
+ * @class
  */
-window.RenderDebugTiles.prototype.create = function (id, bounds) {
-  var s = { color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false };
-
-  bounds = new L.LatLngBounds(bounds);
-  bounds = bounds.pad(-0.02);
-
-  var l = L.rectangle(bounds, s);
-  this.debugTileToRectangle[id] = l;
-  this.debugTileLayer.addLayer(l);
-  if (window.map.hasLayer(this.debugTileLayer)) {
-    // only bring to back if we have the debug layer turned on
-    l.bringToBack();
+class QueryResultsView {
+  /**
+   * Initializes the query results view, setting up the display elements for the search term.
+   *
+   * @constructor
+   * @param {string} term - The search term.
+   * @param {boolean} confirmed - Indicates if the search is confirmed (e.g., by pressing Enter).
+   */
+  constructor(term, confirmed) {
+    this.term = term;
+    this.confirmed = confirmed;
+    this.container = this.createContainer();
+    this.header = this.createHeader();
+    this.list = this.createList();
+    this.setupAccordion();
   }
-};
 
-/**
- * Sets the color of the border and fill for a specific debug tile.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {string} bordercol - The color for the border.
- * @param {string} fillcol - The color for the fill.
- */
-window.RenderDebugTiles.prototype.setColour = function (id, bordercol, fillcol) {
-  var l = this.debugTileToRectangle[id];
-  if (l) {
-    var s = { color: bordercol, fillColor: fillcol };
-    l.setStyle(s);
+  /**
+   * Creates and returns the main container element for the query results.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function createContainer
+   * @returns {HTMLElement} - The container element for the results.
+   * @private
+   */
+  createContainer() {
+    const container = document.createElement('div');
+    container.classList.add('searchquery');
+    return container;
   }
-};
 
-/**
- * Sets the state of a specific debug tile. Changes its color based on the state.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {string} state - The state of the tile (e.g., 'ok', 'error', 'requested').
- */
-window.RenderDebugTiles.prototype.setState = function (id, state) {
-  var col = '#f0f';
-  var fill = '#f0f';
-  var clearDelay = -1;
-  switch (state) {
-    case 'ok':
-      col = '#0f0';
-      fill = '#0f0';
-      clearDelay = 2;
-      break;
-    case 'error':
-      col = '#f00';
-      fill = '#f00';
-      clearDelay = 30;
-      break;
-    case 'cache-fresh':
-      col = '#0f0';
-      fill = '#ff0';
-      clearDelay = 2;
-      break;
-    case 'cache-stale':
-      col = '#f00';
-      fill = '#ff0';
-      clearDelay = 10;
-      break;
-    case 'requested':
-      col = '#66f';
-      fill = '#66f';
-      break;
-    case 'retrying':
-      col = '#666';
-      fill = '#666';
-      break;
-    case 'request-fail':
-      col = '#a00';
-      fill = '#666';
-      break;
-    case 'tile-fail':
-      col = '#f00';
-      fill = '#666';
-      break;
-    case 'tile-timeout':
-      col = '#ff0';
-      fill = '#666';
-      break;
-    case 'render-queue':
-      col = '#f0f';
-      fill = '#f0f';
-      break;
-  }
-  this.setColour(id, col, fill);
-  if (clearDelay >= 0) {
-    var clearAt = Date.now() + clearDelay * 1000;
-    this.debugTileClearTimes[id] = clearAt;
+  /**
+   * Creates and appends a header to the container based on the search term.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function createHeader
+   * @returns {HTMLElement} - The header element displaying the search term or a loading message.
+   * @private
+   */
+  createHeader() {
+    const header = document.createElement('h3');
+    let headerText;
 
-    if (!this.timer) {
-      this.startTimer(clearDelay * 1000);
-    }
-  }
-};
-
-/**
- * Starts a timer to run the clear pass function after a specified wait time.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {number} waitTime - The wait time in milliseconds before running the clear pass.
- */
-window.RenderDebugTiles.prototype.startTimer = function (waitTime) {
-  var _this = this;
-  if (!_this.timer) {
-    // a timeout of 0 firing the actual timeout - helps things run smoother
-    _this.timer = setTimeout(function () {
-      _this.timer = setTimeout(function () {
-        _this.timer = undefined;
-        _this.runClearPass();
-      }, waitTime);
-    }, 0);
-  }
-};
-
-/**
- * Executes a pass to clear debug tiles that have exceeded their fade time.
- * This function adjusts the opacity of the tiles and removes them if necessary.
- *
- * @function
- * @memberof RenderDebugTiles
- */
-window.RenderDebugTiles.prototype.runClearPass = function () {
-  var now = Date.now();
-  for (var id in this.debugTileClearTimes) {
-    var diff = now - this.debugTileClearTimes[id];
-    if (diff > 0) {
-      if (diff > this.FADE_TIME * 1000) {
-        this.debugTileLayer.removeLayer(this.debugTileToRectangle[id]);
-        delete this.debugTileClearTimes[id];
+    if (this.confirmed) {
+      headerText = this.term;
+    } else {
+      if (this.term.length > 16) {
+        const start = this.term.slice(0, 8);
+        const end = this.term.slice(-8);
+        headerText = `${start}…${end} (Return to load more)`;
       } else {
-        var fade = 1.0 - diff / (this.FADE_TIME * 1000);
-
-        this.debugTileToRectangle[id].setStyle({ opacity: 0.4 * fade, fillOpacity: 0.1 * fade });
+        headerText = `${this.term} (Return to load more)`;
       }
     }
+
+    header.textContent = headerText;
+    this.container.appendChild(header);
+    return header;
   }
 
-  if (Object.keys(this.debugTileClearTimes).length > 0) {
-    this.startTimer(this.CLEAR_CHECK_TIME * 1000);
+  /**
+   * Creates and appends an initial list element to display the search results.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function createList
+   * @returns {HTMLElement} - The list element for displaying the results.
+   * @private
+   */
+  createList() {
+    const list = document.createElement('ul');
+    const initialItem = document.createElement('li');
+    initialItem.textContent = this.confirmed ? 'No local results, searching online...' : 'No local results.';
+    list.appendChild(initialItem);
+    this.container.appendChild(list);
+    return list;
   }
-};
+
+  /**
+   * Sets up the accordion functionality for expanding and collapsing results.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function setupAccordion
+   * @private
+   */
+  setupAccordion() {
+    this.header.addEventListener('click', () => {
+      this.container.classList.toggle('collapsed');
+    });
+  }
+
+  /**
+   * Renders the search results within the list container and sets up event interactions.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function renderResults
+   * @param {Array&lt;Object>} results - An array of search result objects to display.
+   * @param {Function} onResultInteraction - A callback function for handling interaction events on results.
+   */
+  renderResults(results, onResultInteraction) {
+    this.clearList();
+
+    if (results.length === 0) {
+      const noResultsItem = document.createElement('li');
+      noResultsItem.textContent = 'No results found.';
+      this.list.appendChild(noResultsItem);
+    } else {
+      results.forEach((result) => {
+        const item = this.createListItem(result);
+        item.addEventListener('click', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('dblclick', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('mouseover', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('mouseout', (ev) => onResultInteraction(result, ev));
+        item.addEventListener('keydown', (ev) => onResultInteraction(result, ev));
+        this.list.appendChild(item);
+      });
+    }
+  }
+
+  /**
+   * Creates and returns a list item for an individual search result.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function createListItem
+   * @param {Object} result - The search result object with properties such as title, description, and icon.
+   * @returns {HTMLElement} - The list item element representing the search result.
+   * @private
+   */
+  createListItem(result) {
+    const item = document.createElement('li');
+    item.tabIndex = 0;
+
+    const link = document.createElement('a');
+    link.innerHTML = result.title;
+
+    if (result.icon) {
+      link.style.backgroundImage = `url("${result.icon}")`;
+      item.style.listStyle = 'none';
+    }
+
+    item.appendChild(link);
+
+    if (result.description) {
+      const description = document.createElement('em');
+      description.innerHTML = result.description;
+      item.appendChild(document.createElement('br'));
+      item.appendChild(description);
+    }
+
+    return item;
+  }
+
+  /**
+   * Appends the results container to a specified selector on the page.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function renderIn
+   * @param {string} selector - The selector string for the target container.
+   */
+  renderIn(selector) {
+    const target = document.querySelector(selector);
+    if (target) target.appendChild(this.container);
+  }
+
+  /**
+   * Removes the results container from the page.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function remove
+   * @private
+   */
+  remove() {
+    if (this.container.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
+  }
+
+  /**
+   * Clears all items from the results list.
+   *
+   * @memberof IITC.search.QueryResultsView
+   * @function clearList
+   * @private
+   */
+  clearList() {
+    this.list.innerHTML = '';
+  }
+}
+
+IITC.search.QueryResultsView = QueryResultsView;
 </code></pre>
         </article>
     </section>

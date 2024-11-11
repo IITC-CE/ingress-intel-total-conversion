@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/map_data_debug.js | IITC-CE</title>
+    <title>Source: code/search_hooks.js | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -51,188 +51,203 @@
             <pre class="prettyprint source linenums"><code>/* global L -- eslint */
 
 /**
- * Contains functions for rendering debug tiles on the map. These are used for debugging map data tiles.
- * @class RenderDebugTiles
- */
-window.RenderDebugTiles = function () {
-  this.CLEAR_CHECK_TIME = 0.1;
-  this.FADE_TIME = 1.0;
-
-  this.debugTileLayer = L.layerGroup();
-  window.layerChooser.addOverlay(this.debugTileLayer, 'DEBUG Data Tiles', { default: false });
-
-  this.debugTileToRectangle = {};
-  this.debugTileClearTimes = {};
-  this.timer = undefined;
-};
-
-/**
- * Resets the debug tiles by clearing all layers, rectangles and clear times.
- * @function
- * @memberof RenderDebugTiles
- */
-window.RenderDebugTiles.prototype.reset = function () {
-  this.debugTileLayer.clearLayers();
-  this.debugTileToRectangle = {};
-  this.debugTileClearTimes = {};
-};
-
-/**
- * Creates a new debug tile with the specified ID and bounds.
+ * Handles search-related hooks for the IITC.search module, adding various search result types.
  *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {L.LatLngBounds} bounds - The geographical bounds of the tile.
+ * These functions supply default search results to the IITC search system by responding to `search` hooks with
+ * data for portals, geographic coordinates, OpenStreetMap locations, and portal GUIDs.
+ *
+ * @namespace hooks
+ * @memberof IITC.search
  */
-window.RenderDebugTiles.prototype.create = function (id, bounds) {
-  var s = { color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false };
-
-  bounds = new L.LatLngBounds(bounds);
-  bounds = bounds.pad(-0.02);
-
-  var l = L.rectangle(bounds, s);
-  this.debugTileToRectangle[id] = l;
-  this.debugTileLayer.addLayer(l);
-  if (window.map.hasLayer(this.debugTileLayer)) {
-    // only bring to back if we have the debug layer turned on
-    l.bringToBack();
-  }
-};
 
 /**
- * Sets the color of the border and fill for a specific debug tile.
+ * Searches for portals by matching the query term against portal titles and adds matched results.
  *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {string} bordercol - The color for the border.
- * @param {string} fillcol - The color for the fill.
+ * @param {Object} query - The search query object.
+ * @fires hook#search
  */
-window.RenderDebugTiles.prototype.setColour = function (id, bordercol, fillcol) {
-  var l = this.debugTileToRectangle[id];
-  if (l) {
-    var s = { color: bordercol, fillColor: fillcol };
-    l.setStyle(s);
-  }
-};
+window.addHook('search', (query) => {
+  const term = query.term.toLowerCase();
 
-/**
- * Sets the state of a specific debug tile. Changes its color based on the state.
- *
- * @function
- * @memberof RenderDebugTiles
- * @param {string} id - The ID of the debug tile.
- * @param {string} state - The state of the tile (e.g., 'ok', 'error', 'requested').
- */
-window.RenderDebugTiles.prototype.setState = function (id, state) {
-  var col = '#f0f';
-  var fill = '#f0f';
-  var clearDelay = -1;
-  switch (state) {
-    case 'ok':
-      col = '#0f0';
-      fill = '#0f0';
-      clearDelay = 2;
-      break;
-    case 'error':
-      col = '#f00';
-      fill = '#f00';
-      clearDelay = 30;
-      break;
-    case 'cache-fresh':
-      col = '#0f0';
-      fill = '#ff0';
-      clearDelay = 2;
-      break;
-    case 'cache-stale':
-      col = '#f00';
-      fill = '#ff0';
-      clearDelay = 10;
-      break;
-    case 'requested':
-      col = '#66f';
-      fill = '#66f';
-      break;
-    case 'retrying':
-      col = '#666';
-      fill = '#666';
-      break;
-    case 'request-fail':
-      col = '#a00';
-      fill = '#666';
-      break;
-    case 'tile-fail':
-      col = '#f00';
-      fill = '#666';
-      break;
-    case 'tile-timeout':
-      col = '#ff0';
-      fill = '#666';
-      break;
-    case 'render-queue':
-      col = '#f0f';
-      fill = '#f0f';
-      break;
-  }
-  this.setColour(id, col, fill);
-  if (clearDelay >= 0) {
-    var clearAt = Date.now() + clearDelay * 1000;
-    this.debugTileClearTimes[id] = clearAt;
+  for (const [guid, portal] of Object.entries(window.portals)) {
+    const data = portal.options.data;
+    if (!data.title) continue;
 
-    if (!this.timer) {
-      this.startTimer(clearDelay * 1000);
+    if (data.title.toLowerCase().includes(term)) {
+      window.search.addSearchResult(query, data, guid);
     }
   }
-};
+});
 
 /**
- * Starts a timer to run the clear pass function after a specified wait time.
+ * Searches for geographical coordinates formatted as latitude, longitude and adds the results.
+ * Supports both decimal format (e.g., 51.5074, -0.1278) and DMS format (e.g., 50°31'03.8"N 7°59'05.3"E).
  *
- * @function
- * @memberof RenderDebugTiles
- * @param {number} waitTime - The wait time in milliseconds before running the clear pass.
+ * @param {Object} query - The search query object.
+ * @fires hook#search
  */
-window.RenderDebugTiles.prototype.startTimer = function (waitTime) {
-  var _this = this;
-  if (!_this.timer) {
-    // a timeout of 0 firing the actual timeout - helps things run smoother
-    _this.timer = setTimeout(function () {
-      _this.timer = setTimeout(function () {
-        _this.timer = undefined;
-        _this.runClearPass();
-      }, waitTime);
-    }, 0);
+window.addHook('search', (query) => {
+  const added = new Set();
+
+  // Regular expression for decimal coordinates
+  const decimalRegex = /[+-]?\d+\.\d+, ?[+-]?\d+\.\d+/g;
+  // Regular expression for DMS coordinates
+  const dmsRegex = /(\d{1,3})°(\d{1,2})'(\d{1,2}(?:\.\d+)?)?"\s*([NS]),?\s*(\d{1,3})°(\d{1,2})'(\d{1,2}(?:\.\d+)?)?"\s*([EW])/g;
+
+  // Convert DMS to decimal format
+  const parseDMS = (deg, min, sec, dir) => {
+    const decimal = parseFloat(deg) + parseFloat(min) / 60 + parseFloat(sec) / 3600;
+    return dir === 'S' || dir === 'W' ? -decimal : decimal;
+  };
+
+  // Universal function for adding search result
+  const addResult = (lat, lng) => {
+    const latLngString = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+    if (added.has(latLngString)) return;
+    added.add(latLngString);
+
+    query.addResult({
+      title: latLngString,
+      description: 'geo coordinates',
+      position: L.latLng(lat, lng),
+      onSelected: (result) => {
+        for (const [guid, portal] of Object.entries(window.portals)) {
+          const { lat: pLat, lng: pLng } = portal.getLatLng();
+          if (`${pLat.toFixed(6)},${pLng.toFixed(6)}` === latLngString) {
+            window.renderPortalDetails(guid);
+            return;
+          }
+        }
+        window.urlPortalLL = [result.position.lat, result.position.lng];
+      },
+    });
+  };
+
+  // Search and process decimal coordinates
+  const decimalMatches = query.term.replace(/%2C/gi, ',').match(decimalRegex);
+  if (decimalMatches) {
+    decimalMatches.forEach((location) => {
+      const [lat, lng] = location.split(',').map(Number);
+      addResult(lat, lng);
+    });
   }
-};
+
+  // Search and process DMS coordinates
+  const dmsMatches = Array.from(query.term.matchAll(dmsRegex));
+  dmsMatches.forEach((match) => {
+    const lat = parseDMS(match[1], match[2], match[3], match[4]);
+    const lng = parseDMS(match[5], match[6], match[7], match[8]);
+    addResult(lat, lng);
+  });
+});
 
 /**
- * Executes a pass to clear debug tiles that have exceeded their fade time.
- * This function adjusts the opacity of the tiles and removes them if necessary.
+ * Searches for results on OpenStreetMap based on the query term, considering map view boundaries.
  *
- * @function
- * @memberof RenderDebugTiles
+ * @param {Object} query - The search query object.
+ * @fires hook#search
  */
-window.RenderDebugTiles.prototype.runClearPass = function () {
-  var now = Date.now();
-  for (var id in this.debugTileClearTimes) {
-    var diff = now - this.debugTileClearTimes[id];
-    if (diff > 0) {
-      if (diff > this.FADE_TIME * 1000) {
-        this.debugTileLayer.removeLayer(this.debugTileToRectangle[id]);
-        delete this.debugTileClearTimes[id];
-      } else {
-        var fade = 1.0 - diff / (this.FADE_TIME * 1000);
+window.addHook('search', async (query) => {
+  if (!query.confirmed) return;
 
-        this.debugTileToRectangle[id].setStyle({ opacity: 0.4 * fade, fillOpacity: 0.1 * fade });
+  const mapBounds = window.map.getBounds();
+  const viewbox = `&amp;viewbox=${mapBounds.getSouthWest().lng},${mapBounds.getSouthWest().lat},${mapBounds.getNorthEast().lng},${mapBounds.getNorthEast().lat}`;
+  // Bounded search allows amenity-only searches (e.g. "amenity=toilet") via special phrases
+  // https://wiki.openstreetmap.org/wiki/Nominatim/Special_Phrases/EN
+  const bounded = '&amp;bounded=1';
+
+  const resultMap = new Set();
+  let resultCount = 0;
+
+  async function fetchResults(isViewboxResult) {
+    try {
+      const response = await fetch(`${window.NOMINATIM}${encodeURIComponent(query.term)}${isViewboxResult ? viewbox + bounded : viewbox}`);
+      const data = await response.json();
+
+      if (isViewboxResult &amp;&amp; data.length === 0) {
+        // If no results found within the viewbox, try a broader search
+        await fetchResults(false);
+        return;
+      } else if (!isViewboxResult &amp;&amp; resultCount === 0 &amp;&amp; data.length === 0) {
+        // If no results at all
+        query.addResult({
+          title: 'No results on OpenStreetMap',
+          icon: '//www.openstreetmap.org/favicon.ico',
+          onSelected: () => true,
+        });
+        return;
+      }
+
+      resultCount += data.length;
+
+      data.forEach((item) => {
+        if (resultMap.has(item.place_id)) return; // duplicate
+        resultMap.add(item.place_id);
+
+        const result = {
+          title: item.display_name,
+          description: `Type: ${item.type}`,
+          position: L.latLng(parseFloat(item.lat), parseFloat(item.lon)),
+          icon: item.icon,
+        };
+
+        if (item.geojson) {
+          result.layer = L.geoJson(item.geojson, {
+            interactive: false,
+            color: 'red',
+            opacity: 0.7,
+            weight: 2,
+            fill: false,
+            pointToLayer: (featureData, latLng) =>
+              L.marker(latLng, {
+                icon: L.divIcon.coloredSvg('red'),
+                title: item.display_name,
+              }),
+          });
+        }
+
+        if (item.boundingbox) {
+          const [south, north, west, east] = item.boundingbox;
+          result.bounds = new L.LatLngBounds(L.latLng(parseFloat(south), parseFloat(west)), L.latLng(parseFloat(north), parseFloat(east)));
+        }
+
+        query.addResult(result);
+      });
+    } catch (error) {
+      console.error('Error fetching OSM data:', error);
+    }
+  }
+
+  // Start with viewbox-bounded search
+  await fetchResults(true);
+});
+
+/**
+ * Searches by GUID in the query term.
+ *
+ * @param {Object} query - The search query object.
+ * @fires hook#search
+ */
+window.addHook('search', async (query) => {
+  const guidRegex = /[0-9a-f]{32}\.[0-9a-f]{2}/;
+  const match = query.term.match(guidRegex);
+
+  if (match) {
+    const guid = match[0];
+    const data = window.portalDetail.get(guid);
+
+    if (data) {
+      window.search.addSearchResult(query, data, guid);
+    } else {
+      try {
+        const fetchedData = await window.portalDetail.request(guid);
+        window.search.addSearchResult(query, fetchedData, guid);
+      } catch (error) {
+        console.error('Error fetching portal details:', error);
       }
     }
   }
-
-  if (Object.keys(this.debugTileClearTimes).length > 0) {
-    this.startTimer(this.CLEAR_CHECK_TIME * 1000);
-  }
-};
+});
 </code></pre>
         </article>
     </section>
