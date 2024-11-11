@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, before, beforeEach } from 'mocha';
 import { expect } from 'chai';
 
 /* global IITC */
@@ -665,5 +665,34 @@ describe('IITC.utils.clamp', () => {
   it('should handle negative maximum and minimum values', () => {
     const result = IITC.utils.clamp(-5, -2, -10);
     expect(result).to.equal(-5);
+  });
+});
+
+describe('IITC.utils.teamStringToId', () => {
+  before(() => {
+    window.TEAM_CODENAMES = ['NEUTRAL', 'RESISTANCE', 'ENLIGHTENED', 'MACHINA'];
+    window.TEAM_CODES = ['N', 'R', 'E', 'M'];
+    window.TEAM_NONE = -1;
+  });
+
+  it('should return the correct ID for a valid team name in TEAM_CODENAMES', () => {
+    expect(IITC.utils.teamStringToId('NEUTRAL')).to.equal(0);
+    expect(IITC.utils.teamStringToId('RESISTANCE')).to.equal(1);
+    expect(IITC.utils.teamStringToId('ENLIGHTENED')).to.equal(2);
+    expect(IITC.utils.teamStringToId('MACHINA')).to.equal(3);
+  });
+
+  it('should return the correct ID for a valid team code in TEAM_CODES', () => {
+    expect(IITC.utils.teamStringToId('N')).to.equal(0);
+    expect(IITC.utils.teamStringToId('R')).to.equal(1);
+    expect(IITC.utils.teamStringToId('E')).to.equal(2);
+    expect(IITC.utils.teamStringToId('M')).to.equal(3);
+  });
+
+  it('should return TEAM_NONE for an invalid team name or code', () => {
+    expect(IITC.utils.teamStringToId('ALIENS')).to.equal(window.TEAM_NONE);
+    expect(IITC.utils.teamStringToId('X')).to.equal(window.TEAM_NONE);
+    expect(IITC.utils.teamStringToId('')).to.equal(window.TEAM_NONE);
+    expect(IITC.utils.teamStringToId(null)).to.equal(window.TEAM_NONE);
   });
 });
