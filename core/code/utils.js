@@ -480,11 +480,13 @@ const isPointInPolygon = (polygon, point) => {
  * @param {string} teamStr - The team string to convert.
  * @returns {number} The team ID corresponding to the team string.
  */
-const teamStringToId = function (teamStr) {
-  var teamIndex = window.TEAM_CODENAMES.indexOf(teamStr);
-  if (teamIndex >= 0) return teamIndex;
-  teamIndex = window.TEAM_CODES.indexOf(teamStr);
-  if (teamIndex >= 0) return teamIndex;
+const teamStringToId = (teamStr) => {
+  if (window.TEAM_CODENAMES.includes(teamStr)) {
+    return window.TEAM_CODENAMES.indexOf(teamStr);
+  }
+  if (window.TEAM_CODES.includes(teamStr)) {
+    return window.TEAM_CODES.indexOf(teamStr);
+  }
   return window.TEAM_NONE;
 };
 
