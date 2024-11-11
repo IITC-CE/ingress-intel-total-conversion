@@ -6,6 +6,10 @@
 
 /* global plugin_info, PLAYER -- eslint */
 
+/**
+ * @namespace IITC
+ */
+
 // create IITC scope
 const IITC = {};
 window.IITC = IITC;
@@ -169,10 +173,18 @@ document.body.innerHTML =
   '    <div id="playerstat">t</div>' +
   '    <div id="gamestat">&nbsp;loading global control stats</div>' +
   '    <div id="searchwrapper">' +
-  '      <button title="Current location" id="buttongeolocation"><img src="' +
-  '@include_img:images/current-location.png@' +
+  '      <div id="searchbox">' +
+  '        <div id="searchicon"><img src="' +
+  '@include_img:images/icon-search.svg@' +
+  '" alt="Search"/></div>' +
+  '        <div id="searchcancel"><img src="' +
+  '@include_img:images/icon-close-small.svg@' +
+  '" alt="Cancel search"/></div>' +
+  '        <button title="Current location" id="buttongeolocation"><img src="' +
+  '@include_img:images/icon-my-location.svg@' +
   '" alt="Current location"/></button>' +
-  '      <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>' +
+  '        <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>' +
+  '      </div>' +
   '    </div>' +
   '    <div id="portaldetails"></div>' +
   '    <input id="redeem" placeholder="Redeem code…" type="text"/>' +

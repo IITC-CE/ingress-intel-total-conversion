@@ -564,52 +564,79 @@ input[type="search"], input[type="url"] {
 }
 #search {
   width: 100%;
-  padding-right: 24px;
+  padding-left: 24px;
+  padding-right: 36px;
 }
-#buttongeolocation {
+#search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+#searchicon, #searchcancel, #buttongeolocation {
+  display: flex;
+  align-items: center;
   position: absolute;
-  right: 0;
-  bottom: 0;
   margin: 0;
   border: 0 none transparent;
-  padding: 0 2px 0 0;
-  height: 100%;
+  padding: 0 2px;
+  height: 24px;
   background-color: transparent;
+}
+#searchicon img, #searchcancel img, #buttongeolocation img {
+  height: 20px;
+}
+#searchicon {
+  left: 0;
+}
+#searchcancel {
+  right: 24px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#searchcancel.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#buttongeolocation {
+  right: 0;
+  cursor: pointer;
 }
 #buttongeolocation:focus {
   outline: 1px dotted #ffce00;
-}
-#buttongeolocation img {
-  vertical-align: middle;
-}
-#searchwrapper h3 {
-  font-size: 1em;
-  height: auto;
-  cursor: pointer;
 }
 .searchquery {
   max-height: 25em;
   overflow-y: auto;
 }
-#searchwrapper .ui-accordion-header::before {
-  font-size: 18px;
+#searchwrapper h3 {
+  padding: 0 0 0 25px;
+  position: relative;
+  font-size: 1em;
+  height: auto;
+  cursor: pointer;
+}
+#searchwrapper h3::before {
+  position: absolute;
+  left: 5px;
+  font-size: 14px;
   margin-right: 2px;
   font-weight: normal;
-  line-height: 1em;
-  content: "⊞";
+  content: "▲";
+  transition: transform 0.3s ease;
 }
-#searchwrapper .ui-accordion-header-active::before {
-  content: "⊟";
-}
-#searchwrapper .ui-accordion-content {
-  margin: 0;
-  overflow: hidden;
+#searchwrapper .searchquery.collapsed h3::before {
+  transform: rotate(180deg);
 }
 #searchwrapper ul {
-  padding-left: 14px;
+  max-height: 100%;
+  padding-left: 16px;
+  overflow: hidden;
 }
 #searchwrapper li {
   cursor: pointer;
+}
+#searchwrapper .searchquery.collapsed ul {
+  max-height: 0;
 }
 #searchwrapper li a {
   margin-left: -14px;
