@@ -185,5 +185,5 @@ window.androidCopy = function () {
  * @returns {number} The team ID the entity belongs to.
  */
 window.getTeam = function (details) {
-  return IITC.utils.teamStringToId(details.team);
+  return IITC.utils.getTeamId(details.team);
 };

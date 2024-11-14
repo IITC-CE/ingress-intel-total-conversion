@@ -668,31 +668,83 @@ describe('IITC.utils.clamp', () => {
   });
 });
 
-describe('IITC.utils.teamStringToId', () => {
+describe('IITC.utils.getTeamId', () => {
   before(() => {
     window.TEAM_CODENAMES = ['NEUTRAL', 'RESISTANCE', 'ENLIGHTENED', 'MACHINA'];
     window.TEAM_CODES = ['N', 'R', 'E', 'M'];
-    window.TEAM_NONE = -1;
+    window.TEAM_NONE = 0;
   });
 
-  it('should return the correct ID for a valid team name in TEAM_CODENAMES', () => {
-    expect(IITC.utils.teamStringToId('NEUTRAL')).to.equal(0);
-    expect(IITC.utils.teamStringToId('RESISTANCE')).to.equal(1);
-    expect(IITC.utils.teamStringToId('ENLIGHTENED')).to.equal(2);
-    expect(IITC.utils.teamStringToId('MACHINA')).to.equal(3);
+  describe('string input', () => {
+    it('should return correct ID for valid team names from TEAM_CODENAMES', () => {
+      expect(IITC.utils.getTeamId('NEUTRAL')).to.equal(0);
+      expect(IITC.utils.getTeamId('RESISTANCE')).to.equal(1);
+      expect(IITC.utils.getTeamId('ENLIGHTENED')).to.equal(2);
+      expect(IITC.utils.getTeamId('MACHINA')).to.equal(3);
+    });
+
+    it('should return correct ID for valid team codes from TEAM_CODES', () => {
+      expect(IITC.utils.getTeamId('N')).to.equal(0);
+      expect(IITC.utils.getTeamId('R')).to.equal(1);
+      expect(IITC.utils.getTeamId('E')).to.equal(2);
+      expect(IITC.utils.getTeamId('M')).to.equal(3);
+    });
+
+    it('should be case sensitive', () => {
+      expect(IITC.utils.getTeamId('resistance')).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId('Resistance')).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId('r')).to.equal(window.TEAM_NONE);
+    });
+
+    it('should return TEAM_NONE for invalid team names or codes', () => {
+      expect(IITC.utils.getTeamId('ALIENS')).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId('X')).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId('')).to.equal(window.TEAM_NONE);
+    });
   });
 
-  it('should return the correct ID for a valid team code in TEAM_CODES', () => {
-    expect(IITC.utils.teamStringToId('N')).to.equal(0);
-    expect(IITC.utils.teamStringToId('R')).to.equal(1);
-    expect(IITC.utils.teamStringToId('E')).to.equal(2);
-    expect(IITC.utils.teamStringToId('M')).to.equal(3);
+  describe('object input', () => {
+    it('should return correct ID for objects with valid team names', () => {
+      expect(IITC.utils.getTeamId({ team: 'NEUTRAL' })).to.equal(0);
+      expect(IITC.utils.getTeamId({ team: 'RESISTANCE' })).to.equal(1);
+      expect(IITC.utils.getTeamId({ team: 'ENLIGHTENED' })).to.equal(2);
+      expect(IITC.utils.getTeamId({ team: 'MACHINA' })).to.equal(3);
+    });
+
+    it('should return correct ID for objects with valid team codes', () => {
+      expect(IITC.utils.getTeamId({ team: 'N' })).to.equal(0);
+      expect(IITC.utils.getTeamId({ team: 'R' })).to.equal(1);
+      expect(IITC.utils.getTeamId({ team: 'E' })).to.equal(2);
+      expect(IITC.utils.getTeamId({ team: 'M' })).to.equal(3);
+    });
+
+    it('should return TEAM_NONE for objects with invalid team property values', () => {
+      expect(IITC.utils.getTeamId({ team: 'ALIENS' })).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId({ team: 'X' })).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId({ team: '' })).to.equal(window.TEAM_NONE);
+    });
   });
 
-  it('should return TEAM_NONE for an invalid team name or code', () => {
-    expect(IITC.utils.teamStringToId('ALIENS')).to.equal(window.TEAM_NONE);
-    expect(IITC.utils.teamStringToId('X')).to.equal(window.TEAM_NONE);
-    expect(IITC.utils.teamStringToId('')).to.equal(window.TEAM_NONE);
-    expect(IITC.utils.teamStringToId(null)).to.equal(window.TEAM_NONE);
+  describe('error handling', () => {
+    it('should return TEAM_NONE for null/undefined input', () => {
+      expect(IITC.utils.getTeamId(null)).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId(undefined)).to.equal(window.TEAM_NONE);
+    });
+
+    it('should return TEAM_NONE for objects without team property', () => {
+      expect(IITC.utils.getTeamId({})).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId({ notTeam: 'RESISTANCE' })).to.equal(window.TEAM_NONE);
+    });
+
+    it('should return TEAM_NONE for objects with null/undefined team property', () => {
+      expect(IITC.utils.getTeamId({ team: null })).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId({ team: undefined })).to.equal(window.TEAM_NONE);
+    });
+
+    it('should return TEAM_NONE for non-string/non-object inputs', () => {
+      expect(IITC.utils.getTeamId(123)).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId(true)).to.equal(window.TEAM_NONE);
+      expect(IITC.utils.getTeamId([])).to.equal(window.TEAM_NONE);
+    });
   });
 });

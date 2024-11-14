@@ -473,14 +473,18 @@ const isPointInPolygon = (polygon, point) => {
 };
 
 /**
- * Converts a team string to a team ID.
+ * Converts a team string or object to a team ID.
+ * Accepts either team string directly (e.g. "RESISTANCE", "R") or an object with team property.
+ * Returns TEAM_NONE if no match found.
  *
  * @memberof IITC.utils
- * @function teamStringToId
- * @param {string} teamStr - The team string to convert.
+ * @function getTeamId
+ * @param {(Object|string)} input - Input to convert to team ID
+ * @param {string} [input.team] - Team string when input is an object
  * @returns {number} The team ID corresponding to the team string.
  */
-const teamStringToId = (teamStr) => {
+const getTeamId = (input) => {
+  const teamStr = typeof input === 'string' ? input : input?.team;
   if (window.TEAM_CODENAMES.includes(teamStr)) {
     return window.TEAM_CODENAMES.indexOf(teamStr);
   }
@@ -515,7 +519,7 @@ IITC.utils = {
   clampLatLng,
   clampLatLngBounds,
   isPointInPolygon,
-  teamStringToId,
+  getTeamId,
 };
 
 // Map of legacy function names to their new names (or the same name if not renamed)
@@ -543,7 +547,7 @@ const legacyFunctionMappings = {
   clampLatLng: 'clampLatLng',
   clampLatLngBounds: 'clampLatLngBounds',
   pnpoly: 'isPointInPolygon',
-  teamStringToId: 'teamStringToId',
+  teamStringToId: 'getTeamId',
 };
 
 // Set up synchronization between `window` and `IITC.utils` with new names
