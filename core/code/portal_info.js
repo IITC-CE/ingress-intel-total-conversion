@@ -60,6 +60,21 @@ window.getCurrentPortalEnergy = function (d) {
 };
 
 /**
+ * Calculates the health percentage of a portal based on its current and total energy.
+ *
+ * @function getPortalHealth
+ * @param {Object} d - The portal detail object containing resonator information.
+ * @returns {number} The portal health as a percentage (0-100).
+ *                   Returns 0 if the portal has no total energy.
+ */
+window.getPortalHealth = function (d) {
+  var max = window.getTotalPortalEnergy(d);
+  var cur = window.getCurrentPortalEnergy(d);
+
+  return max > 0 ? Math.floor((cur / max) * 100) : 0;
+};
+
+/**
  * Calculates the range of a portal for creating links. The range depends on portal level and any installed Link Amps.
  *
  * @function getPortalRange

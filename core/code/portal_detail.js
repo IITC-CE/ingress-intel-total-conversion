@@ -54,27 +54,24 @@ window.portalDetail.isFresh = function (guid) {
   return cache.isFresh(guid);
 };
 
+window.portalDetail.remove = function (guid) {
+  return cache.remove(guid);
+};
+
 var handleResponse = function (deferred, guid, data, success) {
   if (!data || data.error || !data.result) {
     success = false;
   }
 
   if (success) {
-    var dict = window.decodeArray.portal(data.result, 'detailed');
-
     // entity format, as used in map data
-    var ent = [guid, dict.timestamp, data.result];
+    var ent = [guid, data.result[13], data.result];
+    var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
-    cache.store(guid, dict);
+    cache.store(guid, portal.options.data);
 
-    // FIXME..? better way of handling sidebar refreshing...
-
-    if (guid === window.selectedPortal) {
-      window.renderPortalDetails(guid);
-    }
-
-    deferred.resolve(dict);
-    window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: dict, ent: ent });
+    deferred.resolve(portal.options.data);
+    window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: portal.options.data, ent: ent });
   } else {
     if (data && data.error === 'RETRY') {
       // server asked us to try again

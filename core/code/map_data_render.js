@@ -46,7 +46,9 @@ window.Render.prototype.clearPortalsOutsideBounds = function (bounds) {
     var p = window.portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
     if (!bounds.contains(p.getLatLng()) && guid !== window.selectedPortal && !window.artifact.isInterestingPortal(guid)) {
-      this.deletePortalEntity(guid);
+      // remove the marker as a layer first
+      // deletion will be done at endRenderPass
+      p.remove();
     }
   }
 };
@@ -208,10 +210,7 @@ window.Render.prototype.endRenderPass = function () {
   // reorder portals to be after links/fields
   this.bringPortalsToFront();
 
-  // re-select the selected portal, to re-render the side-bar. ensures that any data calculated from the map data is up to date
-  if (window.selectedPortal) {
-    window.renderPortalDetails(window.selectedPortal);
-  }
+  this.isRendering = false;
 };
 
 /**
@@ -305,6 +304,7 @@ window.Render.prototype.deleteFieldEntity = function (guid) {
  * @param {number} latE6 - The latitude of the portal in E6 format.
  * @param {number} lngE6 - The longitude of the portal in E6 format.
  * @param {string} team - The team faction of the portal.
+ * @param {number} [timestamp=0] - Timestamp of the portal data. Defaults to 0 to allow newer data sources to override
  * @param {number} [timestamp] - The timestamp of the portal data.
  */
 window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, lngE6, team, timestamp) {
@@ -319,7 +319,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, l
 
   var ent = [
     guid, // ent[0] = guid
-    -1, // ent[1] = timestamp - zero will mean any other source of portal data will have a higher timestamp
+    timestamp, // ent[1] = timestamp
     // ent[2] = an array with the entity data
     [
       'p', // 0 - a portal
@@ -329,22 +329,7 @@ window.Render.prototype.createPlaceholderPortalEntity = function (guid, latE6, l
     ],
   ];
 
-  // placeholder portals don't have a useful timestamp value - so the standard code that checks for updated
-  // portal details doesn't apply
-  // so, check that the basic details are valid and delete the existing portal if out of date
-  var portalMoved = false;
-  if (guid in window.portals) {
-    var p = window.portals[guid];
-    portalMoved = latE6 !== p.options.data.latE6 || lngE6 !== p.options.data.lngE6;
-    if (team !== p.options.data.team && p.options.timestamp < timestamp) {
-      // team - delete existing portal
-      this.deletePortalEntity(guid);
-    }
-  }
-
-  if (!portalMoved) {
-    this.createPortalEntity(ent, 'core'); // placeholder
-  }
+  this.createPortalEntity(ent, 'core'); // placeholder
 };
 
 /**
@@ -362,102 +347,95 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   var previousData = undefined;
 
   var data = window.decodeArray.portal(ent[2], details);
+  var guid = ent[0];
+
+  // add missing fields
+  data.guid = guid;
+  if (!data.timestamp) {
+    data.timestamp = ent[1];
+  }
+
+  // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
+  data.ent = ent;
 
   // check if entity already exists
-  if (ent[0] in window.portals) {
-    // yes. now check to see if the entity data we have is newer than that in place
-    var p = window.portals[ent[0]];
+  const oldPortal = guid in window.portals;
 
-    if (!data.history || p.options.data.history === data.history)
-      if (p.options.timestamp >= ent[1]) {
-        return; // this data is identical or older - abort processing
-      }
+  if (oldPortal) {
+    // yes. now check to see if the entity data we have is newer than that in place
+    var p = window.portals[guid];
+
+    if (!p.willUpdate(data)) {
+      // this data doesn't bring new detail - abort processing
+      // re-add the portal to the relevant layer (does nothing if already in the correct layer)
+      // useful for portals outside the view
+      this.addPortalToMapLayer(p);
+      return p;
+    }
 
     // the data we have is newer. many data changes require re-rendering of the portal
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
-    // so to keep things simple we'll always re-create the entity in this case
 
     // remember the old details, for the callback
-
-    previousData = p.options.data;
-
-    // preserve history
-    if (!data.history) {
-      data.history = previousData.history;
-    }
-
-    this.deletePortalEntity(ent[0]);
+    previousData = $.extend(true, {}, p.getDetails());
   }
-
-  var portalLevel = parseInt(data.level) || 0;
-  var team = window.teamStringToId(data.team);
-  // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
-  if (team === window.TEAM_NONE) portalLevel = 0;
 
   var latlng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
-  var dataOptions = {
-    level: portalLevel,
-    team: team,
-    ent: ent, // LEGACY - TO BE REMOVED AT SOME POINT! use .guid, .timestamp and .data instead
-    guid: ent[0],
-    timestamp: ent[1],
-    data: data,
-  };
-
-  window.pushPortalGuidPositionCache(ent[0], data.latE6, data.lngE6);
-
-  var marker = window.createMarker(latlng, dataOptions);
-
-  function handler_portal_click(e) {
-    window.renderPortalDetails(e.target.options.guid);
-  }
-  function handler_portal_dblclick(e) {
-    window.renderPortalDetails(e.target.options.guid);
-    window.map.setView(e.target.getLatLng(), window.DEFAULT_ZOOM);
-  }
-  function handler_portal_contextmenu(e) {
-    window.renderPortalDetails(e.target.options.guid);
-    if (window.isSmartphone()) {
-      window.show('info');
-    } else if (!$('#scrollwrapper').is(':visible')) {
-      $('#sidebartoggle').click();
-    }
-  }
-
-  marker.on('click', handler_portal_click);
-  marker.on('dblclick', handler_portal_dblclick);
-  marker.on('contextmenu', handler_portal_contextmenu);
-
-  window.runHooks('portalAdded', { portal: marker, previousData: previousData });
-
-  window.portals[ent[0]] = marker;
+  window.pushPortalGuidPositionCache(data.guid, data.latE6, data.lngE6);
 
   // check for URL links to portal, and select it if this is the one
-  if (window.urlPortalLL && window.urlPortalLL[0] === marker.getLatLng().lat && window.urlPortalLL[1] === marker.getLatLng().lng) {
+  if (window.urlPortalLL && window.urlPortalLL[0] === latlng.lat && window.urlPortalLL[1] === latlng.lng) {
     // URL-passed portal found via pll parameter - set the guid-based parameter
-    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + window.urlPortalLL[1] + ' matches portal GUID ' + ent[0]);
+    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + window.urlPortalLL[1] + ' matches portal GUID ' + data.guid);
 
-    window.urlPortal = ent[0];
+    window.urlPortal = data.guid;
     window.urlPortalLL = undefined; // clear the URL parameter so it's not matched again
   }
-  if (window.urlPortal === ent[0]) {
+  if (window.urlPortal === data.guid) {
     // URL-passed portal found via guid parameter - set it as the selected portal
     log.log('urlPortal GUID ' + window.urlPortal + ' found - selecting...');
-    window.selectedPortal = ent[0];
+    window.selectedPortal = data.guid;
     window.urlPortal = undefined; // clear the URL parameter so it's not matched again
   }
 
-  // (re-)select the portal, to refresh the sidebar on any changes
-  if (ent[0] === window.selectedPortal) {
-    log.log('portal guid ' + ent[0] + ' is the selected portal - re-rendering portal details');
-    window.renderPortalDetails(window.selectedPortal);
+  let marker = undefined;
+  if (oldPortal) {
+    // update marker style/highlight and layer
+    marker = window.portals[data.guid];
+
+    marker.updateDetails(data);
+
+    window.runHooks('portalAdded', { portal: marker, previousData: previousData });
+  } else {
+    marker = window.createMarker(latlng, data);
+
+    // in case of incomplete data while having fresh details in cache, update the portal with those details
+    if (window.portalDetail.isFresh(guid)) {
+      var oldDetails = window.portalDetail.get(guid);
+      if (data.timestamp > oldDetails.timestamp) {
+        // data is more recent than the cached details so we remove them from the cache
+        window.portalDetail.remove(guid);
+      } else if (marker.willUpdate(oldDetails)) {
+        marker.updateDetails(oldDetails);
+      }
+    }
+
+    window.runHooks('portalAdded', { portal: marker });
+
+    window.portals[data.guid] = marker;
+
+    if (window.selectedPortal === data.guid) {
+      marker.renderDetails();
+    }
   }
 
   window.ornaments.addPortal(marker);
 
   // TODO? postpone adding to the map layer
   this.addPortalToMapLayer(marker);
+
+  return marker;
 };
 
 /**
@@ -482,7 +460,7 @@ window.Render.prototype.createFieldEntity = function (ent) {
   // create placeholder portals for field corners. we already do links, but there are the odd case where this is useful
   for (var i = 0; i < 3; i++) {
     var p = data.points[i];
-    this.createPlaceholderPortalEntity(p.guid, p.latE6, p.lngE6, data.team, data.timestamp);
+    this.createPlaceholderPortalEntity(p.guid, p.latE6, p.lngE6, data.team, 0);
   }
 
   // check if entity already exists
