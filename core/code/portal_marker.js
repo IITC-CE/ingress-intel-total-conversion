@@ -1,4 +1,4 @@
-/* global L, log -- eslint */
+/* global IITC, L, log -- eslint */
 
 /**
  * @file This file contains the code related to creating and updating portal markers on the map.
@@ -168,7 +168,7 @@ L.PortalMarker = L.CircleMarker.extend({
     }
 
     this._level = parseInt(this._details.level) || 0;
-    this._team = window.teamStringToId(this._details.team);
+    this._team = IITC.utils.getTeamId(this._details.team);
 
     // the data returns unclaimed portals as level 1 - but IITC wants them treated as level 0
     if (this._team === window.TEAM_NONE) {
