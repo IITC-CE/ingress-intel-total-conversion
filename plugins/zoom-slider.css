@@ -1,0 +1,5 @@
+.leaflet-container .leaflet-control-zoomslider {
+    margin-left: 0;
+    margin-top: 0;
+    order: -40;
+}
