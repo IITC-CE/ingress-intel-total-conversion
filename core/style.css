@@ -161,6 +161,35 @@ a:hover {
   margin-left: 720px;
 }
 
+/* leaflet controls */
+.leaflet-left, .leaflet-right {
+  display: grid;
+  grid-gap: 10px;
+  justify-items: baseline;
+}
+
+.leaflet-right {
+  justify-items: end;
+}
+
+.leaflet-left .leaflet-control,
+.leaflet-right .leaflet-control {
+  margin: 0;
+}
+
+.leaflet-top {
+  top: 10px;
+}
+.leaflet-right {
+  right: 10px;
+}
+.leaflet-bottom {
+  bottom: 10px;
+}
+.leaflet-left {
+  left: 10px;
+}
+
 .help {
   cursor: help;
 }
