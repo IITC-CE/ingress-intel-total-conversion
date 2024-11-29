@@ -125,11 +125,6 @@ body {
   margin-left: 4px;
 }
 
-.leaflet-top .leaflet-control {
-  margin-top: 5px !important;
-  margin-left: 5px !important;
-}
-
 #searchwrapper .ui-accordion-header {
   padding: 0.3em 0;
 }

@@ -42,12 +42,6 @@ function setup() {
     map.zoomControl.remove();
   }
   zoomSlider.control = L.control.zoomslider(zoomSlider.options).addTo(map);
-
-  // L.Control.Zoomslider.css defines non-standard border for `.leaflet-control-zoomslider`
-  // which makes zoomslider not aligning with other leaflet controls
-  // Here we are trying to unset it (make the same as general `.leaflet-control`)
-  // (adapted from https://github.com/kartena/Leaflet.zoomslider/pull/74)
-  $('<style>').html('.leaflet-touch .leaflet-control-zoomslider { border: 2px solid rgba(0,0,0,0.2) }').appendTo('head');
 }
 
 function loadLeafletZoomslider() {
@@ -56,6 +50,7 @@ function loadLeafletZoomslider() {
     // eslint-disable-next-line
     '@include_raw:external/L.Control.Zoomslider.js@';
     $('<style>').html('@include_string:external/L.Control.Zoomslider.css@').appendTo('head');
+    $('<style>').html('@include_string:zoom-slider.css@').appendTo('head');
   } catch (e) {
     console.error('L.Control.Zoomslider.js loading failed');
     throw e;

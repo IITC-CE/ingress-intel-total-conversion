@@ -161,6 +161,35 @@ a:hover {
   margin-left: 720px;
 }
 
+/* leaflet controls */
+.leaflet-left, .leaflet-right {
+  display: grid;
+  grid-gap: 10px;
+  justify-items: baseline;
+}
+
+.leaflet-right {
+  justify-items: end;
+}
+
+.leaflet-left .leaflet-control,
+.leaflet-right .leaflet-control {
+  margin: 0;
+}
+
+.leaflet-top {
+  top: 10px;
+}
+.leaflet-right {
+  right: 10px;
+}
+.leaflet-bottom {
+  bottom: 10px;
+}
+.leaflet-left {
+  left: 10px;
+}
+
 .help {
   cursor: help;
 }
@@ -1221,16 +1250,21 @@ td + td {
 }
 
 #portal_highlight_select {
-  position: absolute;
-  top:5px;
-  left:10px;
   z-index: 2500;
   font-size:11px;
   background-color:#0E3C46;
   color:#ffce00;
-
+  order: -100;
 }
 
+.leaflet-control-scale {
+  order: -90;
+}
+
+.leaflet-bar {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+}
 
 
 .portal_details th, .portal_details td {
