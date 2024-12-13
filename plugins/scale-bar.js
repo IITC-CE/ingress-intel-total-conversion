@@ -29,30 +29,20 @@ window.plugin.scaleBar = scaleBar;
 // Before you ask: yes, I explicitely turned off imperial units. Imperial units
 // are worse than Internet Explorer 6 whirring fans combined. Upgrade to the metric
 // system already.
-scaleBar.options = { imperial: false };
-
-scaleBar.mobileOptions = { position: 'bottomright', maxWidth: 100 };
-
-scaleBar.desktopOptions = { position: 'topleft', maxWidth: 200 };
-
-function moveToEdge(ctrl) {
-  var $el = $(ctrl.getContainer());
-  var $corner = $el.parent();
-  var pos = ctrl.getPosition();
-  if (pos.indexOf('top') !== -1) {
-    $corner.prepend($el);
-  } else if (pos.indexOf('bottom') !== -1) {
-    $corner.append($el);
-    $corner.find('.leaflet-control-attribution').appendTo($corner); // make sure that attribution control is on very bottom
-  }
-}
+scaleBar.options = {
+  imperial: false,
+  position: 'bottomright',
+};
 
 function setup() {
-  var options = L.extend({}, window.isSmartphone() ? scaleBar.mobileOptions : scaleBar.desktopOptions, scaleBar.options);
+  var options = L.extend(
+    {},
+    {
+      maxWidth: window.isSmartphone() ? 100 : 200,
+    },
+    scaleBar.options
+  );
+
   scaleBar.control = L.control.scale(options).addTo(window.map);
-  // wait other controls to initialize (should be initialized last)
-  setTimeout(function () {
-    moveToEdge(scaleBar.control);
-  });
 }
 setup.priority = 'low';

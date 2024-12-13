@@ -161,9 +161,6 @@ window.renderPortalDetails = function (guid, forceSelect) {
         .text('X')
         .click(function () {
           window.renderPortalDetails(null);
-          if (window.isSmartphone()) {
-            window.show('map');
-          }
         }),
 
       // help cursor via ".imgpreview img"

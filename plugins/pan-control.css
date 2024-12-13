@@ -1,0 +1,17 @@
+.leaflet-left.has-leaflet-pan-control .leaflet-bar {
+	left: 24.5px;
+}
+
+.leaflet-touch .leaflet-left.has-leaflet-pan-control .leaflet-bar {
+  left: 34px
+}
+
+.leaflet-control-pan {
+    order: -50;
+}
+
+.leaflet-control-pan div {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+  border-radius: 4px;
+}
