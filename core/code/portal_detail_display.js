@@ -69,9 +69,12 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
  *
  * @function renderPortalDetails
  * @param {string|null} guid - The globally unique identifier of the portal to display details for.
+ * @param {boolean} [forceSelect=false] - If true, forces the portal to be selected even if it's already the current portal.
  */
-window.renderPortalDetails = function (guid) {
-  window.selectPortal(window.portals[guid] ? guid : null);
+window.renderPortalDetails = function (guid, forceSelect) {
+  if (forceSelect || window.selectedPortal !== guid) {
+    window.selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
+  }
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
@@ -95,34 +98,29 @@ window.renderPortalDetails = function (guid) {
   }
 
   var portal = window.portals[guid];
-  var data = portal.options.data;
-  var details = window.portalDetail.get(guid);
-  var historyDetails = window.getPortalHistoryDetails(data);
+  var details = portal.getDetails();
+  var hasFullDetails = portal.hasFullDetails();
+  var historyDetails = window.getPortalHistoryDetails(details);
 
-  // details and data can get out of sync. if we have details, construct a matching 'data'
-  if (details) {
-    data = window.getPortalSummaryData(details);
-  }
-
-  var modDetails = details ? '<div class="mods">' + window.getModDetails(details) + '</div>' : '';
-  var miscDetails = details ? window.getPortalMiscDetails(guid, details) : '';
-  var resoDetails = details ? window.getResonatorDetails(details) : '';
+  var modDetails = hasFullDetails ? '<div class="mods">' + window.getModDetails(details) + '</div>' : '';
+  var miscDetails = hasFullDetails ? window.getPortalMiscDetails(guid, details) : '';
+  var resoDetails = hasFullDetails ? window.getResonatorDetails(details) : '';
 
   // TODO? other status details...
-  var statusDetails = details ? '' : '<div id="portalStatus">Loading details...</div>';
+  var statusDetails = hasFullDetails ? '' : '<div id="portalStatus">Loading details...</div>';
 
-  var img = window.fixPortalImageUrl(details ? details.image : data.image);
-  var title = (details && details.title) || (data && data.title) || 'null';
+  var img = window.fixPortalImageUrl(details.image);
+  var title = details.title || 'null';
 
-  var lat = data.latE6 / 1e6;
-  var lng = data.lngE6 / 1e6;
+  var lat = details.latE6 / 1e6;
+  var lng = details.lngE6 / 1e6;
 
   var imgTitle = title + '\n\nClick to show full image.';
 
   // portal level. start with basic data - then extend with fractional info in tooltip if available
-  var levelInt = window.teamStringToId(data.team) === window.TEAM_NONE ? 0 : data.level;
+  var levelInt = portal.options.level;
   var levelDetails = levelInt;
-  if (details) {
+  if (hasFullDetails) {
     levelDetails = window.getPortalLevel(details);
     if (levelDetails !== 8) {
       if (levelDetails === Math.ceil(levelDetails)) levelDetails += '\n8';
@@ -136,7 +134,7 @@ window.renderPortalDetails = function (guid) {
 
   $('#portaldetails')
     .html('') // to ensure it's clear
-    .attr('class', window.TEAM_TO_CSS[window.teamStringToId(data.team)])
+    .attr('class', window.TEAM_TO_CSS[window.teamStringToId(details.team)])
     .append(
       $('<h3>', { class: 'title' })
         .text(title)
@@ -147,7 +145,7 @@ window.renderPortalDetails = function (guid) {
               style: 'float: left',
             })
             .click(function () {
-              window.zoomToAndShowPortal(guid, [data.latE6 / 1e6, data.lngE6 / 1e6]);
+              window.zoomToAndShowPortal(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
               if (window.isSmartphone()) {
                 window.show('map');
               }
@@ -187,9 +185,12 @@ window.renderPortalDetails = function (guid) {
 
   window.renderPortalUrl(lat, lng, title, guid);
 
+  // compatibility
+  var data = hasFullDetails ? window.getPortalSummaryData(details) : details;
+
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?
-  if (details) {
+  if (hasFullDetails) {
     window.runHooks('portalDetailsUpdated', { guid: guid, portal: portal, portalDetails: details, portalData: data });
   }
 };
@@ -337,7 +338,7 @@ window.setPortalIndicators = function (p) {
  * @param {string} guid - The GUID of the portal to select.
  * @returns {boolean} True if the same portal is re-selected (just an update), false if a different portal is selected.
  */
-window.selectPortal = function (guid) {
+window.selectPortal = function (guid, event) {
   var update = window.selectedPortal === guid;
   var oldPortalGuid = window.selectedPortal;
   window.selectedPortal = guid;
@@ -346,20 +347,18 @@ window.selectPortal = function (guid) {
   var newPortal = window.portals[guid];
 
   // Restore style of unselected portal
-  if (!update && oldPortal) window.setMarkerStyle(oldPortal, false);
+  if (!update && oldPortal) oldPortal.setSelected(false);
 
   // Change style of selected portal
-  if (newPortal) {
-    window.setMarkerStyle(newPortal, true);
-
-    if (window.map.hasLayer(newPortal)) {
-      newPortal.bringToFront();
-    }
-  }
+  if (newPortal) newPortal.setSelected(true);
 
   window.setPortalIndicators(newPortal);
 
-  window.runHooks('portalSelected', { selectedPortalGuid: guid, unselectedPortalGuid: oldPortalGuid });
+  window.runHooks('portalSelected', {
+    selectedPortalGuid: guid,
+    unselectedPortalGuid: oldPortalGuid,
+    event: event,
+  });
   return update;
 };
 
