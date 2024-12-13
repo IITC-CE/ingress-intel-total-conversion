@@ -366,6 +366,32 @@ window.setupMap = function () {
 
   map.attributionControl.setPrefix('');
 
+  /**
+   * Override default Google Maps attribution to use Leaflet's native attribution control
+   * instead of creating separate DOM elements. Extracts text content from Google's
+   * attribution container and adds it to Leaflet's control.
+   */
+  L.GridLayer.GoogleMutant.prototype._setupAttribution = function (ev) {
+    if (!this._map?.attributionControl) {
+      return;
+    }
+    // eslint-disable-next-line
+    const pos = google.maps.ControlPosition;
+    const container = ev.positions.get(pos.BOTTOM_RIGHT);
+    const attribution = container?.querySelector('span')?.textContent;
+    if (attribution) {
+      this._attributionText = attribution; // Сохраняем текст атрибуции
+      this._map.attributionControl.addAttribution(attribution);
+    }
+  };
+  const originalGoogleMutantOnRemove = L.GridLayer.GoogleMutant.prototype.onRemove;
+  L.GridLayer.GoogleMutant.prototype.onRemove = function (map) {
+    originalGoogleMutantOnRemove.call(this, map);
+    if (this._attributionText &amp;&amp; map.attributionControl) {
+      map.attributionControl.removeAttribution(this._attributionText);
+    }
+  };
+
   window.map = map;
 
   map.on('moveend', function () {
