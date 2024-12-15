@@ -129,7 +129,7 @@ var log = ulog('{.stem}');
 
 
 def bundle_code(_, path=None):
-    files = (path / 'code').glob('*.js')
+    files = filter(lambda p: p.exists(), (path / 'code').glob('*.js'))
     return '\n'.join(map(wrap_iife, sorted(files)))
 
 

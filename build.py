@@ -55,7 +55,7 @@ def iitc_build(source, outdir, deps_list=None):
     build_plugin.process_file(source / iitc_script, outdir, deps_list=deps_list)
 
     outdir.joinpath('plugins').mkdir(parents=True, exist_ok=True)
-    for filename in source.joinpath('plugins').glob('*.js'):
+    for filename in filter(lambda p: p.exists(), (source / 'plugins').glob('*.js')):
         build_plugin.process_file(
             filename,
             outdir / 'plugins',
