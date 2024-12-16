@@ -1266,6 +1266,10 @@ td + td {
   box-shadow: none;
 }
 
+.leaflet-bar a {
+  text-decoration: none;
+}
+
 
 .portal_details th, .portal_details td {
   vertical-align: top;
