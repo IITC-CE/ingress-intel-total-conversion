@@ -176,6 +176,10 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
         meta, script = readtext(source).split('\n\n', 1)
     except ValueError:
         raise Exception(f'{source}: wrong input: empty line expected after metablock')
+    except (OSError, IOError) as e:
+        print(f"{source}: {type(e).__name__}: {e}")
+        return
+
     plugin_name = source.stem
     meta, is_main = fill_meta(meta, plugin_name, dist_path)
     settings.plugin_id = plugin_name
