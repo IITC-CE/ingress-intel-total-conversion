@@ -18,6 +18,9 @@ window.setupSidebar = function () {
   setupLargeImagePreview();
   setupAddons();
   $('#sidebar').show();
+  // setup portal detail display update
+  window.addHook('portalAdded', sidebarOnPortalAdded);
+  window.addHook('portalDetailLoaded', sidebarOnPortalDetailLoaded);
 };
 
 /**
@@ -211,4 +214,24 @@ function setupAddons() {
   window.artifact.setup();
 
   window.RegionScoreboardSetup();
+}
+
+/**
+ *
+ * @function sidebarOnPortalAdded
+ */
+function sidebarOnPortalAdded(data) {
+  if (data.portal.guid === window.selectedPortal) {
+    window.renderPortalToSideBar(data.portal);
+  }
+}
+
+/**
+ *
+ * @function sidebarOnPortalDetailLoaded
+ */
+function sidebarOnPortalDetailLoaded(data) {
+  if (data.success && data.guid === window.selectedPortal) {
+    window.renderPortalDetails(window.selectedPortal);
+  }
 }

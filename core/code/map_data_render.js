@@ -209,8 +209,6 @@ window.Render.prototype.endRenderPass = function () {
 
   // reorder portals to be after links/fields
   this.bringPortalsToFront();
-
-  this.isRendering = false;
 };
 
 /**
@@ -424,11 +422,8 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     window.runHooks('portalAdded', { portal: marker });
 
     window.portals[data.guid] = marker;
-
-    if (window.selectedPortal === data.guid) {
-      marker.renderDetails();
-    }
   }
+
 
   window.ornaments.addPortal(marker);
 
