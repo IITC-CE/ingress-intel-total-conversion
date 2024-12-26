@@ -64,14 +64,19 @@ var handleResponse = function (deferred, guid, data, success) {
   }
 
   if (success) {
+    // Parse portal details
+    var dict = window.decodeArray.portal(data.result, 'detailed');
+    cache.store(guid, dict);
+
     // entity format, as used in map data
     var ent = [guid, data.result[13], data.result];
     var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
+    // Update cache with from current map
     cache.store(guid, portal.options.data);
 
     deferred.resolve(portal.options.data);
-    window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: portal.options.data, ent: ent });
+    window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: portal.options.data, ent: ent, portal: portal });
   } else {
     if (data && data.error === 'RETRY') {
       // server asked us to try again

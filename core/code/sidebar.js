@@ -217,21 +217,23 @@ function setupAddons() {
 }
 
 /**
+ * portalAdded callback to update the sidebar
  *
  * @function sidebarOnPortalAdded
  */
 function sidebarOnPortalAdded(data) {
-  if (data.portal.guid === window.selectedPortal) {
-    window.renderPortalToSideBar(data.portal);
+  if (data.portal.options.guid === window.selectedPortal) {
+    window.renderPortalDetails(window.selectedPortal);
   }
 }
 
 /**
+ * portalDetailLoaded callback to update the sidebar
  *
  * @function sidebarOnPortalDetailLoaded
  */
 function sidebarOnPortalDetailLoaded(data) {
   if (data.success && data.guid === window.selectedPortal) {
-    window.renderPortalDetails(window.selectedPortal);
+    window.renderPortalToSideBar(data.portal);
   }
 }

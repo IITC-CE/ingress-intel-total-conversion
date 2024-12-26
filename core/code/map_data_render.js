@@ -401,8 +401,15 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
   if (oldPortal) {
     // update marker style/highlight and layer
     marker = window.portals[data.guid];
-
     marker.updateDetails(data);
+
+    if (window.portalDetail.isFresh(guid)) {
+      var oldDetails = window.portalDetail.get(guid);
+      if (data.timestamp > oldDetails.timestamp) {
+        // data is more recent than the cached details so we remove them from the cache
+        window.portalDetail.remove(guid);
+      }
+    }
 
     window.runHooks('portalAdded', { portal: marker, previousData: previousData });
   } else {
