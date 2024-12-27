@@ -45,14 +45,14 @@ window.plugin.uniques.contentHTML = null;
 
 window.plugin.uniques.isHighlightActive = false;
 
-window.plugin.uniques.onPortalDetailsUpdated = function () {
+window.plugin.uniques.onPortalDetailsUpdated = function (data) {
   if (typeof Storage === 'undefined') {
     $('#portaldetails > .imgpreview').after(window.plugin.uniques.disabledMessage);
     return;
   }
 
   var guid = window.selectedPortal,
-    details = window.portalDetail.get(guid),
+    details = data.portalDetails,
     nickname = window.PLAYER.nickname;
   if (details) {
     if (details.owner === nickname) {
