@@ -186,19 +186,7 @@ L.PortalMarker = L.CircleMarker.extend({
     };
     L.setOptions(this, dataOptions);
 
-    if (this._selected) {
-      this.renderDetails();
-    }
-
     this.setSelected();
-  },
-
-  renderDetails() {
-    if (!this._rendering) {
-      this._rendering = true;
-      window.renderPortalDetails(this._details.guid);
-      this._rendering = false;
-    }
   },
 
   getDetails: function () {

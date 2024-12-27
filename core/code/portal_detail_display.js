@@ -65,7 +65,7 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
 };
 
 /**
- * Renders the details of a portal in the sidebar.
+ * Selects a portal, refresh its data and renders the details of the portal in the sidebar.
  *
  * @function renderPortalDetails
  * @param {string|null} guid - The globally unique identifier of the portal to display details for.
@@ -73,8 +73,9 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
  */
 window.renderPortalDetails = function (guid, forceSelect) {
   if (forceSelect || window.selectedPortal !== guid) {
-    window.selectPortal(window.portals[guid] ? guid : null, 'renderPortalDetails');
+    window.selectPortal(guid && window.portals[guid] ? guid : null, 'renderPortalDetails');
   }
+
   if ($('#sidebar').is(':visible')) {
     window.resetScrollOnNewPortal();
     window.renderPortalDetails.lastVisible = guid;
@@ -84,10 +85,7 @@ window.renderPortalDetails = function (guid, forceSelect) {
     window.portalDetail.request(guid);
   }
 
-  // TODO? handle the case where we request data for a particular portal GUID, but it *isn't* in
-  // window.portals....
-
-  if (!window.portals[guid]) {
+  if (!guid || !window.portals[guid]) {
     window.urlPortal = guid;
     $('#portaldetails').html('');
     if (window.isSmartphone()) {
@@ -97,7 +95,17 @@ window.renderPortalDetails = function (guid, forceSelect) {
     return;
   }
 
-  var portal = window.portals[guid];
+  window.renderPortalToSideBar(window.portals[guid]);
+};
+
+/**
+ * Renders the details of a portal in the sidebar.
+ *
+ * @function renderPortalToSideBar
+ * @param {L.PortalMarker} portal - The portal marker object holding portal details.
+ */
+window.renderPortalToSideBar = function (portal) {
+  var guid = portal.options.guid;
   var details = portal.getDetails();
   var hasFullDetails = portal.hasFullDetails();
   var historyDetails = window.getPortalHistoryDetails(details);

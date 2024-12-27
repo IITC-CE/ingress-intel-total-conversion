@@ -1438,6 +1438,7 @@ var setup = function () {
   }
 
   window.addHook('portalSelected', window.plugin.bookmarks.onPortalSelected);
+  window.addHook('portalDetailsUpdated', window.plugin.bookmarks.onPortalSelected);
   window.addHook('search', window.plugin.bookmarks.onSearch);
 
   // Sync
