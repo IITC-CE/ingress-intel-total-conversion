@@ -99,7 +99,7 @@ window.plugin.userLocation.locate = function(lat, lng, accuracy, persistentZoom)
   }
 
   window.map.setView(latlng, zoom);
-}
+};
 
 window.plugin.userLocation.onLocationChange = function(lat, lng) {
   if(!window.plugin.userLocation.marker) return;
@@ -156,10 +156,10 @@ window.plugin.userLocation.onOrientationChange = function(direction) {
 
   // HOOK: fired when the marker direction is changed
   window.runHooks('pluginUserLocation', {event: 'onOrientationChange', data:window.plugin.userLocation.user });
-}
+};
 
 window.plugin.userLocation.getUser = function() {
   return window.plugin.userLocation.user;
-}
+};
 
 var setup = window.plugin.userLocation.setup;
