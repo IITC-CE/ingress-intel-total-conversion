@@ -72,9 +72,6 @@ var handleResponse = function (deferred, guid, data, success) {
     var ent = [guid, data.result[13], data.result];
     var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
-    // Update cache with from current map
-    cache.store(guid, portal.options.data);
-
     deferred.resolve(portal.options.data);
     window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: portal.options.data, ent: ent, portal: portal });
   } else {

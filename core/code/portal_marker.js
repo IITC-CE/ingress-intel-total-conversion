@@ -187,6 +187,9 @@ L.PortalMarker = L.CircleMarker.extend({
     L.setOptions(this, dataOptions);
 
     this.setSelected();
+    if (this.hasFullDetails()) {
+      window.portalDetail.store(this.options.guid, this._details);
+    }
   },
 
   getDetails: function () {
