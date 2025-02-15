@@ -359,13 +359,13 @@ function createInfoLink(text, title, clickCallback) {
   return aside;
 }
 
-machinaTools.onPortalDetailsUpdated = function () {
+machinaTools.onPortalDetailsUpdated = function (data) {
   var portalData;
 
   // If the portal was cleared then exit.
   if (window.selectedPortal === null) return;
 
-  portalData = window.portalDetail.get(window.selectedPortal);
+  portalData = data.portalData;
 
   if (portalData.team === window.TEAM_CODE_MAC) {
     var linkdetails = $('.linkdetails');
