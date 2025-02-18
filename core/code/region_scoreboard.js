@@ -429,26 +429,26 @@ window.RegionScoreboardSetup = (function () {
     $('#cycletimer', mainDialog).html(formatMinutes(Math.max(0, Math.floor(d / 1000))));
   }
 
+  function pad(n) {
+    return window.zeroPad(n, 2);
+  }
+
   function formatMinutes(sec) {
     var hours = Math.floor(sec / 3600);
     var minutes = Math.floor((sec % 3600) / 60);
     sec = sec % 60;
 
-    var time = '';
-    time += hours + ':';
-    if (minutes < 10) time += '0';
-    time += minutes;
-    time += ':';
-    if (sec < 10) time += '0';
-    time += sec;
-    return time;
+    return hours + ':' + pad(minutes) + ':' + pad(sec);
   }
 
   function formatHours(time) {
-    return ('0' + time.getHours()).slice(-2) + ':00';
+    return pad(time.getHours()) + ':' + pad(time.getMinutes());
+  }
+  function formatDay(time) {
+    return pad(time.getDate()) + '.' + pad(time.getMonth() + 1);
   }
   function formatDayHours(time) {
-    return ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth() + 1)).slice(-2) + ' ' + ('0' + time.getHours()).slice(-2) + ':00';
+    return formatDay(time) + ' ' + formatHours(time);
   }
 
   return function setup() {
