@@ -468,6 +468,9 @@ summary {
   padding:3px 4px 1px 4px;
 }
 
+.bidi-isolate {
+    unicode-bidi: isolate;
+}
 
 
 /* sidebar ************************************************************/
