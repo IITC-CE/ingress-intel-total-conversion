@@ -75,7 +75,7 @@ function _initChannelData(id) {
  * @memberof IITC.comm
  */
 let portalTemplate =
-  '<a onclick="window.selectPortalByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="help">{{ portal_name }}</a>';
+  '<a onclick="window.selectPortalByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="bidi-isolate help">{{ portal_name }}</a>';
 /**
  * Template for time cell.
  * @type {String}
