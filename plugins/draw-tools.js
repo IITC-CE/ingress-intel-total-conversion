@@ -469,93 +469,97 @@ window.plugin.drawTools.optPaste = function () {
   var promptAction = prompt('Press CTRL+V to paste (draw-tools data or stock intel URL).', '');
   promptAction = promptAction && promptAction.trim();
   if (promptAction) {
-    try {
-      // first see if it looks like a URL-format stock intel link, and if so, try and parse out any stock drawn items
-      // from the pls parameter
+    window.plugin.drawTools.promptImport(promptAction);
+  }
+}
 
-      // var intel = new RegExp('(https?://)?(www\\.)?ingress\\.com/intel.*[?&]pls=').exec(promptAction); // old url
-      var matchIntel = new RegExp('(https://)?intel\\.ingress\\.com/.*[?&]pls=').exec(promptAction);
-      if (matchIntel && matchIntel.index === 0) {
-        // looks like a ingress URL that has drawn items...
-        var items = promptAction.split(/[?&]/);
-        var foundAt = -1;
-        for (let i = 0; i < items.length; i++) {
-          if (items[i].startsWith('pls=')) {
-            foundAt = i;
-          }
-        }
+window.plugin.drawTools.promptImport = function (promptAction) {
+  try {
+    // first see if it looks like a URL-format stock intel link, and if so, try and parse out any stock drawn items
+    // from the pls parameter
 
-        if (foundAt === -1) {
-          throw new Error('No drawn items found in intel URL');
+    // var intel = new RegExp('(https?://)?(www\\.)?ingress\\.com/intel.*[?&]pls=').exec(promptAction); // old url
+    var matchIntel = new RegExp('(https://)?intel\\.ingress\\.com/.*[?&]pls=').exec(promptAction);
+    if (matchIntel && matchIntel.index === 0) {
+      // looks like a ingress URL that has drawn items...
+      var items = promptAction.split(/[?&]/);
+      var foundAt = -1;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].startsWith('pls=')) {
+          foundAt = i;
         }
-
-        var newLines = [];
-        var linesStr = items[foundAt].slice(4).split('_');
-        for (let i = 0; i < linesStr.length; i++) {
-          var floats = linesStr[i].split(',').map(Number);
-          if (floats.length !== 4) {
-            throw new Error('URL item not a set of four floats');
-          }
-          for (var j = 0; j < floats.length; j++) {
-            if (isNaN(floats[j])) {
-              throw new Error('URL item had invalid number');
-            }
-          }
-          var layer = L.geodesicPolyline(
-            [
-              [floats[0], floats[1]],
-              [floats[2], floats[3]],
-            ],
-            window.plugin.drawTools.lineOptions
-          );
-          newLines.push(layer);
-        }
-
-        // all parsed OK - clear and insert
-        if (!window.plugin.drawTools.merge.status) {
-          window.plugin.drawTools.drawnItems.clearLayers();
-        }
-        for (let i = 0; i < newLines.length; i++) {
-          window.plugin.drawTools.drawnItems.addLayer(newLines[i]);
-        }
-        window.runHooks('pluginDrawTools', { event: 'import' });
-
-        console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'pasted drawn items from stock URL');
-        window.plugin.drawTools.optAlert('Import Successful.');
-      } else {
-        if (window.plugin.drawTools.merge.status) {
-          promptAction =
-            typeof window.localStorage[window.plugin.drawTools.KEY_STORAGE] !== 'undefined' &&
-            window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
-              ? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0, -1) + ',' + promptAction.slice(1)
-              : promptAction;
-        }
-        var data;
-        try {
-          data = JSON.parse(promptAction);
-        } catch {
-          // invalid json, filter out any leading or trailing text and try again
-          var mutatedPromptAction = promptAction;
-          if (!mutatedPromptAction.match(new RegExp('^\\[\\{'))) {
-            mutatedPromptAction = mutatedPromptAction.slice(mutatedPromptAction.indexOf('[{'));
-          }
-          if (!mutatedPromptAction.match(new RegExp('}]$'))) {
-            mutatedPromptAction = mutatedPromptAction.slice(0, mutatedPromptAction.lastIndexOf('}]') + 2);
-          }
-          data = JSON.parse(mutatedPromptAction); // throws a new exception if we still didn't get good data, which is handled by the outer enclosure
-        }
-        window.plugin.drawTools.drawnItems.clearLayers();
-        window.plugin.drawTools.import(data);
-        console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'pasted drawn items');
-        window.plugin.drawTools.optAlert('Import Successful.');
       }
 
-      // to write back the data to localStorage
-      window.plugin.drawTools.save();
-    } catch (e) {
-      console.warn('DRAWTOOLS: failed to import data: ' + e);
-      window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
+      if (foundAt === -1) {
+        throw new Error('No drawn items found in intel URL');
+      }
+
+      var newLines = [];
+      var linesStr = items[foundAt].slice(4).split('_');
+      for (let i = 0; i < linesStr.length; i++) {
+        var floats = linesStr[i].split(',').map(Number);
+        if (floats.length !== 4) {
+          throw new Error('URL item not a set of four floats');
+        }
+        for (var j = 0; j < floats.length; j++) {
+          if (isNaN(floats[j])) {
+            throw new Error('URL item had invalid number');
+          }
+        }
+        var layer = L.geodesicPolyline(
+          [
+            [floats[0], floats[1]],
+            [floats[2], floats[3]],
+          ],
+          window.plugin.drawTools.lineOptions
+        );
+        newLines.push(layer);
+      }
+
+      // all parsed OK - clear and insert
+      if (!window.plugin.drawTools.merge.status) {
+        window.plugin.drawTools.drawnItems.clearLayers();
+      }
+      for (let i = 0; i < newLines.length; i++) {
+        window.plugin.drawTools.drawnItems.addLayer(newLines[i]);
+      }
+      window.runHooks('pluginDrawTools', { event: 'import' });
+
+      console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'pasted drawn items from stock URL');
+      window.plugin.drawTools.optAlert('Import Successful.');
+    } else {
+      if (window.plugin.drawTools.merge.status) {
+        promptAction =
+          typeof window.localStorage[window.plugin.drawTools.KEY_STORAGE] !== 'undefined' &&
+            window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
+            ? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0, -1) + ',' + promptAction.slice(1)
+            : promptAction;
+      }
+      var data;
+      try {
+        data = JSON.parse(promptAction);
+      } catch {
+        // invalid json, filter out any leading or trailing text and try again
+        var mutatedPromptAction = promptAction;
+        if (!mutatedPromptAction.match(new RegExp('^\\[\\{'))) {
+          mutatedPromptAction = mutatedPromptAction.slice(mutatedPromptAction.indexOf('[{'));
+        }
+        if (!mutatedPromptAction.match(new RegExp('}]$'))) {
+          mutatedPromptAction = mutatedPromptAction.slice(0, mutatedPromptAction.lastIndexOf('}]') + 2);
+        }
+        data = JSON.parse(mutatedPromptAction); // throws a new exception if we still didn't get good data, which is handled by the outer enclosure
+      }
+      window.plugin.drawTools.drawnItems.clearLayers();
+      window.plugin.drawTools.import(data);
+      console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'pasted drawn items');
+      window.plugin.drawTools.optAlert('Import Successful.');
     }
+
+    // to write back the data to localStorage
+    window.plugin.drawTools.save();
+  } catch (e) {
+    console.warn('DRAWTOOLS: failed to import data: ' + e);
+    window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
   }
 };
 
