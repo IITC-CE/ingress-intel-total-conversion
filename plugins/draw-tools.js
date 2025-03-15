@@ -466,12 +466,23 @@ window.plugin.drawTools.optExport = function () {
 };
 
 window.plugin.drawTools.optPaste = function () {
-  var promptAction = prompt('Press CTRL+V to paste (draw-tools data or stock intel URL).', '');
-  promptAction = promptAction && promptAction.trim();
-  if (promptAction) {
-    window.plugin.drawTools.promptImport(promptAction);
-  }
-}
+  const html = $('<div>').append(
+    $('<p>', { text: 'Press CTRL+V to paste (draw-tools data or stock intel URL).' }),
+    $('<input>', { id: 'drawtoolsimport', type: 'text', style: 'width:100%' })
+  );
+
+  window.dialog({
+    title: 'Import Draw-Tools data',
+    html,
+    closeCallback: () => {
+      let promptAction = $('#drawtoolsimport').val();
+      promptAction = promptAction && promptAction.trim();
+      if (promptAction) {
+        window.plugin.drawTools.promptImport(promptAction);
+      }
+    },
+  });
+};
 
 window.plugin.drawTools.promptImport = function (promptAction) {
   try {
