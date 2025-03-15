@@ -560,11 +560,13 @@ window.plugin.drawTools.optPaste = function () {
 };
 
 window.plugin.drawTools.optImport = function () {
-  L.FileListLoader.loadFiles({ accept: 'application/json' }).on('load', function (e) {
+  let firstRun = true;
+  L.FileListLoader.loadFiles({ accept: 'application/json', multiple: true }).on('load', function (e) {
     try {
       var data = JSON.parse(e.reader.result);
-      if (!window.plugin.drawTools.merge.status) {
+      if (firstRun && !window.plugin.drawTools.merge.status) {
         window.plugin.drawTools.drawnItems.clearLayers();
+        firstRun = false;
       }
       window.plugin.drawTools.import(data);
       console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'imported drawn items');
