@@ -431,6 +431,9 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     window.portals[data.guid] = marker;
   }
 
+  if (guid === window.selectedPortal) {
+    window.setPortalIndicators(marker);
+  }
 
   window.ornaments.addPortal(marker);
 
