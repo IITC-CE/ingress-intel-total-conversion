@@ -1,8 +1,9 @@
 /* global IITC */
 
 /**
- * @file This file handles the rendering and updating of the status bar in IITC.
- * @module status_bar
+ * @file Status bar for IITC that provides status information
+ * for both map status and portal status, with API for mobile app integration.
+ * @module IITC.statusbar
  */
 
 window.IITC.statusbar = {};
@@ -137,8 +138,141 @@ window.IITC.statusbar.map = {
 };
 
 /**
+ * Selected portal status module - handles information about the currently selected portal
+ * Provides data for both mobile display and app integration
+ * @namespace IITC.statusbar.portal
+ */
+window.IITC.statusbar.portal = {
+  _data: null,
+
+  /**
+   * Gets data about a specific portal
+   * @param {string} guid - The portal's globally unique identifier
+   * @returns {Object|null} Structured data about the portal or null if unavailable
+   */
+  getData: function (guid) {
+    if (!guid || !window.portals[guid]) return null;
+
+    var portal = window.portals[guid];
+    var data = portal.options.data;
+
+    // Early return if we don't have the basic data
+    if (typeof data.title === 'undefined') return null;
+
+    // Get portal details object if available
+    var details = window.portalDetail.get(guid);
+    var percentage = data.health;
+
+    // Calculate health percentage if we have detailed energy data
+    if (details) {
+      var totalEnergy = window.getTotalPortalEnergy(details);
+      if (totalEnergy > 0) {
+        percentage = Math.floor((window.getCurrentPortalEnergy(details) / totalEnergy) * 100);
+      }
+    }
+
+    // Build structured result data
+    var result = {
+      guid: guid,
+      team: data.team,
+      level: data.level,
+      title: data.title,
+      health: percentage,
+      resonators: details ? details.resonators : [],
+    };
+
+    this._data = result;
+    return result;
+  },
+
+  /**
+   * Renders HTML for portal status
+   * @param {Object} data - Portal data to render
+   * @returns {string} HTML representation of portal status
+   */
+  render: function (data) {
+    // Default message when no portal is selected
+    if (!data) return '<div style="text-align: center"><b>tap here for info screen</b></div>';
+
+    var t = '';
+
+    // Portal level badge with appropriate team color
+    if (data.team === 'N' || data.team === 'NEUTRAL') {
+      t = '<span class="portallevel">L0</span>';
+    } else {
+      t = '<span class="portallevel" style="background: ' + window.COLORS_LVL[data.level] + ';">L' + data.level + '</span>';
+    }
+
+    // Portal health and title
+    t += ' ' + data.health + '% ';
+    t += data.title;
+
+    // Resonator visualization - only if we have resonator data
+    if (data.resonators && data.resonators.length > 0) {
+      // Convert from east-anticlockwise to north-clockwise arrangement
+      var eastAnticlockwiseToNorthClockwise = [2, 1, 0, 7, 6, 5, 4, 3];
+
+      for (var ind = 0; ind < 8; ind++) {
+        var slot, reso;
+        // Handle full resonator deployment vs partial
+        if (data.resonators.length === 8) {
+          slot = eastAnticlockwiseToNorthClockwise[ind];
+          reso = data.resonators[slot];
+        } else {
+          slot = null;
+          reso = ind < data.resonators.length ? data.resonators[ind] : null;
+        }
+
+        // Apply CSS class with team and direction information
+        var className = window.TEAM_TO_CSS[window.getTeam(data)];
+        if (slot !== null && window.OCTANTS[slot] === 'N') className += ' north';
+
+        // Calculate resonator energy level
+        var l = 0,
+          v = 0,
+          max = 0,
+          perc = 0;
+        if (reso) {
+          l = parseInt(reso.level);
+          v = parseInt(reso.energy);
+          max = window.RESO_NRG[l];
+          perc = (v / max) * 100;
+        }
+
+        // Render resonator with energy fill
+        t += '<div class="resonator ' + className + '" style="border-top-color: ' + window.COLORS_LVL[l] + ';left: ' + (100 * ind) / 8.0 + '%;">';
+        t += '<div class="filllevel" style="width:' + perc + '%;"></div>';
+        t += '</div>';
+      }
+    }
+
+    return t;
+  },
+
+  /**
+   * Updates information about the currently selected portal
+   * @param {Object} [selectedPortalData] - The object containing details about the selected portal.
+   */
+  update: function (selectedPortalData) {
+    console.log('IITC.statusbar.portal.update', selectedPortalData);
+    var guid = selectedPortalData ? selectedPortalData.selectedPortalGuid : undefined;
+    var data = this.getData(guid);
+
+    if (window.isApp && window.app.setPortalStatus) {
+      window.app.setPortalStatus(data);
+    }
+
+    $('#mobileinfo').html(this.render(data));
+  },
+};
+
+/**
  * Backward compatibility
  */
 window.renderUpdateStatus = function () {
   return IITC.statusbar.map.update();
+};
+
+window.smartphoneInfo = function (data) {
+  return IITC.statusbar.portal.update(data);
 };
