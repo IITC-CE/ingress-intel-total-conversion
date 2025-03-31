@@ -6,13 +6,31 @@
  * @module IITC.statusbar
  */
 
-window.IITC.statusbar = {};
+IITC.statusbar = {};
+
+/**
+ * Initializes the statusbar system
+ * Called after IITC boot process is complete
+ */
+IITC.statusbar.init = function () {
+  // Set up portal selection hook
+  window.addHook('portalSelected', function (data) {
+    IITC.statusbar.portal.update(data);
+  });
+
+  // Create mobile info element only in smartphone mode
+  if (window.isSmartphone()) {
+    $('#updatestatus').prepend('<div id="mobileinfo" onclick="show(\'info\')"></div>');
+    // Set initial message
+    IITC.statusbar.portal.update();
+  }
+};
 
 /**
  * Map status module - handles map status information
  * @namespace IITC.statusbar.map
  */
-window.IITC.statusbar.map = {
+IITC.statusbar.map = {
   _data: null,
   _timer: null,
 
@@ -142,7 +160,7 @@ window.IITC.statusbar.map = {
  * Provides data for both mobile display and app integration
  * @namespace IITC.statusbar.portal
  */
-window.IITC.statusbar.portal = {
+IITC.statusbar.portal = {
   _data: null,
 
   /**
@@ -254,7 +272,11 @@ window.IITC.statusbar.portal = {
    * @param {Object} [selectedPortalData] - The object containing details about the selected portal.
    */
   update: function (selectedPortalData) {
-    console.log('IITC.statusbar.portal.update', selectedPortalData);
+    // Early exit if we don't need portal status (not in app and not smartphone)
+    if (!window.isSmartphone() && !(window.isApp && window.app.setPortalStatus)) {
+      return;
+    }
+
     var guid = selectedPortalData ? selectedPortalData.selectedPortalGuid : undefined;
     var data = this.getData(guid);
 
@@ -262,7 +284,10 @@ window.IITC.statusbar.portal = {
       window.app.setPortalStatus(data);
     }
 
-    $('#mobileinfo').html(this.render(data));
+    // Update UI in smartphone mode
+    if (window.isSmartphone() && $('#mobileinfo').length) {
+      $('#mobileinfo').html(this.render(data));
+    }
   },
 };
 

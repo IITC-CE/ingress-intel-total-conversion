@@ -1,4 +1,4 @@
-/* global IITC, log -- eslint */
+/* global log -- eslint */
 
 /**
  * @file This file provides functions and utilities specifically for the smartphone layout of IITC.
@@ -117,12 +117,6 @@ window.runOnSmartphonesAfterBoot = function () {
   log.warn('running smartphone post boot stuff');
 
   window.show('map');
-
-  // add a div/hook for updating mobile info
-  $('#updatestatus').prepend('<div id="mobileinfo" onclick="show(\'info\')"></div>');
-  window.addHook('portalSelected', (data) => IITC.statusbar.portal.update(data));
-  // init msg of status bar. hint for the user that a tap leads to the info screen
-  IITC.statusbar.portal.update();
 
   // replace img full view handler
   $('#portaldetails')

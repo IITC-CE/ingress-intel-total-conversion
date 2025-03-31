@@ -88,9 +88,9 @@ window.renderPortalDetails = function (guid, forceSelect) {
   if (!guid || !window.portals[guid]) {
     window.urlPortal = guid;
     $('#portaldetails').html('');
+    IITC.statusbar.portal.update();
     if (window.isSmartphone()) {
       $('.fullimg').remove();
-      IITC.statusbar.portal.update();
     }
     return;
   }
