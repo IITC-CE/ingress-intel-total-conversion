@@ -6,6 +6,13 @@
  * @module IITC.statusbar
  */
 
+// Compass directions in clockwise order, starting from North
+const COMPASS_DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+// Mapping from game octant to compass direction
+// Game uses East=0 as starting point, going counter-clockwise
+const GAME_OCTANTS = ['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'];
+
 IITC.statusbar = {};
 
 /**
@@ -41,7 +48,7 @@ IITC.statusbar.mapTemplates = {
 
   requestsInfo: ' {{ count }} requests',
 
-  failedRequests: ' <span style="color:#f66">{{ count }} failed</span>',
+  failedRequests: ' <span class="failed-request">{{ count }} failed</span>',
 };
 
 /**
@@ -51,12 +58,12 @@ IITC.statusbar.mapTemplates = {
 IITC.statusbar.portalTemplates = {
   defaultMessage: '<div style="text-align: center"><b>tap here for info screen</b></div>',
 
-  mainInfo: '{{ levelBadge }} {{ health }}% {{ title }}{{ resonators }}',
+  mainInfo: '{{ levelBadge }} {{ health }}% {{ title }} {{ resonators }}',
 
   levelBadge: '<span class="portallevel" style="{{ style }}">L{{ level }}</span>',
 
   resonator:
-    '<div class="resonator {{ className }}" style="border-top-color: {{ borderColor }};left: {{ position }}%;">' +
+    '<div class="resonator {{ className }}" data-slot="{{ slot }}" style="--resonator-color: {{ borderColor }};">' +
     '<div class="filllevel" style="width:{{ percentage }}%;"></div>' +
     '</div>',
 };
@@ -136,7 +143,6 @@ IITC.statusbar.map = {
    * @returns {string} HTML representation of map status
    */
   render(data) {
-    console.log('IITC.statusbar.map render', data);
     const templates = IITC.statusbar.mapTemplates;
     const renderTemplate = IITC.statusbar.renderTemplate;
 
@@ -249,68 +255,90 @@ IITC.statusbar.portal = {
 
     // Get portal details object if available
     const details = window.portalDetail.get(guid);
-    let percentage = data.health;
+    let healthPct = data.health;
 
     // Calculate health percentage if we have detailed energy data
     if (details) {
       const totalEnergy = window.getTotalPortalEnergy(details);
       if (totalEnergy > 0) {
-        percentage = Math.floor((window.getCurrentPortalEnergy(details) / totalEnergy) * 100);
+        healthPct = Math.floor((window.getCurrentPortalEnergy(details) / totalEnergy) * 100);
       }
     }
 
     // Determine if portal is neutral
     const isNeutral = data.team === 'N' || data.team === 'NEUTRAL';
 
-    // Pre-calculate colors for UI rendering
-    const levelColor = !isNeutral ? window.COLORS_LVL[data.level] : null;
-    const teamCss = window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)] || '';
-
-    // Convert from east-anticlockwise to north-clockwise arrangement
-    const eastAnticlockwiseToNorthClockwise = [2, 1, 0, 7, 6, 5, 4, 3];
-
-    // Build structured result data with UI-ready values
+    // Build structured result data
     const result = {
       guid,
       team: data.team,
-      teamCss,
       level: data.level,
-      levelColor,
       isNeutral,
       title: data.title,
-      health: percentage,
+      health: healthPct,
       resonators: [],
+      ui: {
+        teamCss: window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)] || '',
+        levelColor: !isNeutral ? window.COLORS_LVL[data.level] : null,
+      },
     };
 
     // Process resonators if available
     if (details && details.resonators && details.resonators.length > 0) {
-      // Map resonators to UI-friendly format
-      result.resonators = Array.from({ length: 8 }).map((_, index) => {
-        let slot = null;
-        let reso = null;
+      // Create empty array with placeholders for all 8 positions
+      result.resonators = COMPASS_DIRECTIONS.map((direction, index) => ({
+        direction,
+        displayOrder: index,
+        level: 0,
+        energy: 0,
+        maxEnergy: 0,
+        healthPct: 0,
+        ui: {
+          color: window.COLORS_LVL[0],
+        },
+      }));
 
-        // Handle full resonator deployment vs partial
+      // Process each resonator
+      for (let i = 0; i < details.resonators.length; i++) {
+        const reso = details.resonators[i];
+        if (!reso || parseInt(reso.energy) <= 0) continue;
+
+        const level = parseInt(reso.level);
+        const energy = parseInt(reso.energy);
+        const maxEnergy = window.RESO_NRG[level] || 0;
+        const healthPct = maxEnergy > 0 ? (energy / maxEnergy) * 100 : 0;
+
+        let octant, direction, displayOrder;
+
         if (details.resonators.length === 8) {
-          slot = eastAnticlockwiseToNorthClockwise[index];
-          reso = details.resonators[slot];
+          // For full deployments (8 resonators), the array index is the octant
+          octant = i;
         } else {
-          reso = index < details.resonators.length ? details.resonators[index] : null;
+          // For partial deployments, we assume sequential from East (octant 0)
+          octant = i % 8;
         }
 
-        const level = reso ? parseInt(reso.level) : 0;
-        const energy = reso ? parseInt(reso.energy) : 0;
-        const maxEnergy = window.RESO_NRG[level] || 0;
+        // Convert octant to compass direction
+        direction = GAME_OCTANTS[octant];
 
-        return {
-          level,
-          energy,
-          maxEnergy,
-          percentage: maxEnergy > 0 ? (energy / maxEnergy) * 100 : 0,
-          isNorth: slot !== null && window.OCTANTS[slot] === 'N',
-          position: (100 * index) / 8.0, // Position for CSS left property
-          color: window.COLORS_LVL[level], // Pre-calculate color for UI
-        };
-      });
+        // Get display position from compass direction
+        displayOrder = COMPASS_DIRECTIONS.indexOf(direction);
+
+        // Update resonator at the correct position
+        if (displayOrder >= 0) {
+          result.resonators[displayOrder] = {
+            direction,
+            displayOrder,
+            level,
+            energy,
+            maxEnergy,
+            healthPct,
+            ui: {
+              color: window.COLORS_LVL[level],
+            },
+          };
+        }
+      }
     }
 
     this._data = result;
@@ -323,7 +351,6 @@ IITC.statusbar.portal = {
    * @returns {string} HTML representation of portal status
    */
   render(data) {
-    console.log('IITC.statusbar.portal render', data);
     const templates = IITC.statusbar.portalTemplates;
     const renderTemplate = IITC.statusbar.renderTemplate;
 
@@ -332,7 +359,7 @@ IITC.statusbar.portal = {
 
     // Create level badge with appropriate team color
     const levelBadge = renderTemplate(templates.levelBadge, {
-      style: data.levelColor ? `background: ${data.levelColor};` : '',
+      style: data.ui.levelColor ? `background: ${data.ui.levelColor};` : '',
       level: data.isNeutral ? '0' : data.level,
     });
 
@@ -340,14 +367,16 @@ IITC.statusbar.portal = {
     let resonatorsHtml = '';
     if (data.resonators && data.resonators.length > 0) {
       data.resonators.forEach((reso) => {
-        // Only render resonators that exist (have energy)
         if (reso.energy > 0) {
           resonatorsHtml += renderTemplate(templates.resonator, {
-            className: `${data.teamCss}${reso.isNorth ? ' north' : ''}`,
-            borderColor: reso.color,
-            position: reso.position,
-            percentage: reso.percentage,
+            className: `${data.ui.teamCss}${reso.direction === 'N' ? ' north' : ''}`,
+            slot: reso.displayOrder,
+            percentage: reso.healthPct,
+            borderColor: reso.ui.color,
           });
+        } else {
+          // For empty slots, add an empty placeholder to maintain visual structure
+          resonatorsHtml += `<div class="resonator empty" data-slot="${reso.displayOrder}"></div>`;
         }
       });
     }
