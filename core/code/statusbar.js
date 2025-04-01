@@ -9,18 +9,78 @@
 IITC.statusbar = {};
 
 /**
+ * Helper function to render a template with replacements
+ * @param {string} template - Template string with placeholders in format {{ name }}
+ * @param {Object} replacements - Object with key-value pairs for replacing placeholders
+ * @returns {string} Rendered template with substituted values
+ */
+IITC.statusbar.renderTemplate = (template, replacements) => {
+  let result = template;
+  Object.entries(replacements).forEach(([key, value]) => {
+    const replacement = value !== undefined && value !== null ? value : '';
+    result = result.replace(new RegExp(`{{ ${key} }}`, 'g'), replacement);
+  });
+  return result;
+};
+
+/**
+ * Templates for map status HTML elements
+ * @type {Object.<string, string>}
+ */
+IITC.statusbar.mapTemplates = {
+  main:
+    '<span class="help portallevel" title="Indicates portal levels/link lengths displayed. Zoom in to display more;">{{ portalLevels }}</span>' +
+    ' <span class="map"><b>map</b>: {{ mapStatus }}</span>' +
+    '{{ requestsStatus }}',
+
+  portalLevelInfo: '<span id="loadlevel">{{ content }}</span>',
+
+  mapStatusInfo: '<span class="help" title="{{ tooltip }}">{{ content }}</span>',
+
+  progressInfo: ' {{ progress }}%',
+
+  requestsInfo: ' {{ count }} requests',
+
+  failedRequests: ' <span style="color:#f66">{{ count }} failed</span>',
+};
+
+/**
+ * Templates for portal status HTML elements
+ * @type {Object.<string, string>}
+ */
+IITC.statusbar.portalTemplates = {
+  defaultMessage: '<div style="text-align: center"><b>tap here for info screen</b></div>',
+
+  mainInfo: '{{ levelBadge }} {{ health }}% {{ title }}{{ resonators }}',
+
+  levelBadge: '<span class="portallevel" style="{{ style }}">L{{ level }}</span>',
+
+  resonator:
+    '<div class="resonator {{ className }}" style="border-top-color: {{ borderColor }};left: {{ position }}%;">' +
+    '<div class="filllevel" style="width:{{ percentage }}%;"></div>' +
+    '</div>',
+};
+
+/**
  * Initializes the statusbar system
  * Called after IITC boot process is complete
  */
 IITC.statusbar.init = function () {
-  // Set up portal selection hook
-  window.addHook('portalSelected', function (data) {
+  // Set up portal selection hook - initial update with basic data
+  window.addHook('portalSelected', (data) => {
     IITC.statusbar.portal.update(data);
+  });
+
+  // Add hook for portal detail loaded - update with full details when available
+  window.addHook('portalDetailLoaded', (data) => {
+    if (data.success && data.guid === window.selectedPortal) {
+      IITC.statusbar.portal.update({ selectedPortalGuid: data.guid });
+    }
   });
 
   // Create mobile info element only in smartphone mode
   if (window.isSmartphone()) {
-    $('#updatestatus').prepend('<div id="mobileinfo" onclick="show(\'info\')"></div>');
+    document.getElementById('updatestatus').insertAdjacentHTML('afterbegin', '<div id="mobileinfo" onclick="show(\'info\')"></div>');
     // Set initial message
     IITC.statusbar.portal.update();
   }
@@ -38,30 +98,34 @@ IITC.statusbar.map = {
    * Gets current map status data
    * @returns {Object} Structured data about map status
    */
-  getData: function () {
-    var tileParams = window.getDataZoomTileParameters();
+  getData() {
+    const tileParams = window.getDataZoomTileParameters();
+    const mapStatus = window.mapDataRequest ? window.mapDataRequest.getStatus() : null;
+    const minLinkLength = tileParams.minLinkLength;
 
     // Build comprehensive status data object
     this._data = {
       portalLevels: {
         hasPortals: tileParams.hasPortals,
-        minLinkLength: tileParams.minLinkLength,
+        minLinkLength,
+        // Pre-format link length for display
+        formattedLength: minLinkLength > 1000 ? `${minLinkLength / 1000}km` : `${minLinkLength}m`,
       },
-      mapStatus: window.mapDataRequest ? window.mapDataRequest.getStatus() : null,
+      mapStatus: {
+        short: mapStatus?.short || '...unknown...',
+        long: mapStatus?.long || null,
+        progress: mapStatus?.progress !== undefined ? mapStatus.progress : 1,
+        // Pre-calculate percentage for display
+        progressPercent: mapStatus?.progress !== undefined && mapStatus.progress !== -1 ? Math.floor(mapStatus.progress * 100) : null,
+      },
       requests: {
         active: window.activeRequests.length,
         failed: window.failedRequestCount,
+        // Pre-calculate boolean flags for conditional rendering
+        hasActive: window.activeRequests.length > 0,
+        hasFailed: window.failedRequestCount > 0,
       },
-      progress: 1,
     };
-
-    // Calculate progress for progress indicator
-    if (this._data.mapStatus && this._data.mapStatus.progress !== undefined) {
-      this._data.progress = this._data.mapStatus.progress;
-    } else if (this._data.requests.active > 0) {
-      // Show indeterminate progress when requests are active but no specific progress value
-      this._data.progress = -1;
-    }
 
     return this._data;
   },
@@ -71,68 +135,72 @@ IITC.statusbar.map = {
    * @param {Object} data - Status data to render
    * @returns {string} HTML representation of map status
    */
-  render: function (data) {
-    var t = '<span class="help portallevel" title="Indicates portal levels/link lengths displayed. Zoom in to display more.">';
+  render(data) {
+    console.log('IITC.statusbar.map render', data);
+    const templates = IITC.statusbar.mapTemplates;
+    const renderTemplate = IITC.statusbar.renderTemplate;
 
-    // Portal levels / links section
+    // Create portal levels / links section
+    let portalLevelsContent = '';
     if (data.portalLevels.hasPortals) {
-      t += '<span id="loadlevel">portals</span>';
+      portalLevelsContent = renderTemplate(templates.portalLevelInfo, { content: 'portals' });
     } else {
-      if (!window.isSmartphone()) {
-        // Space is valuable on mobile
-        t += '<b>links</b>: ';
-      }
+      // Space is valuable on mobile - conditionally add "links:" prefix
+      let prefix = !window.isSmartphone() ? '<b>links</b>: ' : '';
 
+      let content = 'all links';
       if (data.portalLevels.minLinkLength > 0) {
-        t +=
-          '<span id="loadlevel">&gt;' +
-          (data.portalLevels.minLinkLength > 1000 ? data.portalLevels.minLinkLength / 1000 + 'km' : data.portalLevels.minLinkLength + 'm') +
-          '</span>';
-      } else {
-        t += '<span id="loadlevel">all links</span>';
+        content = `&gt;${data.portalLevels.formattedLength}`;
       }
+
+      portalLevelsContent = prefix + renderTemplate(templates.portalLevelInfo, { content });
     }
 
-    t += '</span>';
-
-    // Map status display section
-    t += ' <span class="map"><b>map</b>: ';
-
-    if (data.mapStatus) {
-      // If we have detailed status info
-      if (data.mapStatus.long) {
-        t += '<span class="help" title="' + data.mapStatus.long + '">' + data.mapStatus.short + '</span>';
-      } else {
-        t += '<span>' + data.mapStatus.short + '</span>';
-      }
-
-      // Show percentage if available and not indeterminate
-      if (data.mapStatus.progress !== undefined && data.mapStatus.progress !== -1) {
-        t += ' ' + Math.floor(data.mapStatus.progress * 100) + '%';
-      }
+    // Create map status section
+    let mapStatusContent = '';
+    if (data.mapStatus.long) {
+      mapStatusContent = renderTemplate(templates.mapStatusInfo, {
+        tooltip: data.mapStatus.long,
+        content: data.mapStatus.short,
+      });
     } else {
-      t += '...unknown...';
+      mapStatusContent = data.mapStatus.short;
     }
 
-    t += '</span>';
-
-    // Request status section
-    if (data.requests.active > 0) {
-      t += ' ' + data.requests.active + ' requests';
-    }
-    if (data.requests.failed > 0) {
-      t += ' <span style="color:#f66">' + data.requests.failed + ' failed</span>';
+    // Add progress percentage if available
+    if (data.mapStatus.progressPercent !== null) {
+      mapStatusContent += renderTemplate(templates.progressInfo, {
+        progress: data.mapStatus.progressPercent,
+      });
     }
 
-    return t;
+    // Create requests status section
+    let requestsStatus = '';
+    if (data.requests.hasActive) {
+      requestsStatus += renderTemplate(templates.requestsInfo, {
+        count: data.requests.active,
+      });
+    }
+    if (data.requests.hasFailed) {
+      requestsStatus += renderTemplate(templates.failedRequests, {
+        count: data.requests.failed,
+      });
+    }
+
+    // Combine all sections
+    return renderTemplate(templates.main, {
+      portalLevels: portalLevelsContent,
+      mapStatus: mapStatusContent,
+      requestsStatus: requestsStatus,
+    });
   },
 
   /**
    * Updates the map status - core function that should be called when map data changes
    * This function handles both updating the DOM and calling the mobile app API
    */
-  update: function () {
-    var data = this.getData();
+  update() {
+    const data = this.getData();
 
     if (window.isApp) {
       if (window.app.setMapStatus) {
@@ -140,17 +208,19 @@ IITC.statusbar.map = {
       }
 
       if (window.app.setProgress) {
-        window.app.setProgress(data.progress);
+        window.app.setProgress(data.mapStatus.progress);
       }
     }
 
     // Delay status update to the next event loop for better performance
     if (this._timer) clearTimeout(this._timer);
 
-    var self = this;
-    this._timer = setTimeout(function () {
-      self._timer = undefined;
-      $('#innerstatus').html(self.render(data));
+    this._timer = setTimeout(() => {
+      this._timer = undefined;
+      const innerstatus = document.getElementById('innerstatus');
+      if (innerstatus) {
+        innerstatus.innerHTML = this.render(data);
+      }
     }, 0);
   },
 };
@@ -168,36 +238,80 @@ IITC.statusbar.portal = {
    * @param {string} guid - The portal's globally unique identifier
    * @returns {Object|null} Structured data about the portal or null if unavailable
    */
-  getData: function (guid) {
+  getData(guid) {
     if (!guid || !window.portals[guid]) return null;
 
-    var portal = window.portals[guid];
-    var data = portal.options.data;
+    const portal = window.portals[guid];
+    const data = portal.options.data;
 
     // Early return if we don't have the basic data
     if (typeof data.title === 'undefined') return null;
 
     // Get portal details object if available
-    var details = window.portalDetail.get(guid);
-    var percentage = data.health;
+    const details = window.portalDetail.get(guid);
+    let percentage = data.health;
 
     // Calculate health percentage if we have detailed energy data
     if (details) {
-      var totalEnergy = window.getTotalPortalEnergy(details);
+      const totalEnergy = window.getTotalPortalEnergy(details);
       if (totalEnergy > 0) {
         percentage = Math.floor((window.getCurrentPortalEnergy(details) / totalEnergy) * 100);
       }
     }
 
-    // Build structured result data
-    var result = {
-      guid: guid,
+    // Determine if portal is neutral
+    const isNeutral = data.team === 'N' || data.team === 'NEUTRAL';
+
+    // Pre-calculate colors for UI rendering
+    const levelColor = !isNeutral ? window.COLORS_LVL[data.level] : null;
+    const teamCss = window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)] || '';
+
+    // Convert from east-anticlockwise to north-clockwise arrangement
+    const eastAnticlockwiseToNorthClockwise = [2, 1, 0, 7, 6, 5, 4, 3];
+
+    // Build structured result data with UI-ready values
+    const result = {
+      guid,
       team: data.team,
+      teamCss,
       level: data.level,
+      levelColor,
+      isNeutral,
       title: data.title,
       health: percentage,
-      resonators: details ? details.resonators : [],
+      resonators: [],
     };
+
+    // Process resonators if available
+    if (details && details.resonators && details.resonators.length > 0) {
+      // Map resonators to UI-friendly format
+      result.resonators = Array.from({ length: 8 }).map((_, index) => {
+        let slot = null;
+        let reso = null;
+
+        // Handle full resonator deployment vs partial
+        if (details.resonators.length === 8) {
+          slot = eastAnticlockwiseToNorthClockwise[index];
+          reso = details.resonators[slot];
+        } else {
+          reso = index < details.resonators.length ? details.resonators[index] : null;
+        }
+
+        const level = reso ? parseInt(reso.level) : 0;
+        const energy = reso ? parseInt(reso.energy) : 0;
+        const maxEnergy = window.RESO_NRG[level] || 0;
+
+        return {
+          level,
+          energy,
+          maxEnergy,
+          percentage: maxEnergy > 0 ? (energy / maxEnergy) * 100 : 0,
+          isNorth: slot !== null && window.OCTANTS[slot] === 'N',
+          position: (100 * index) / 8.0, // Position for CSS left property
+          color: window.COLORS_LVL[level], // Pre-calculate color for UI
+        };
+      });
+    }
 
     this._data = result;
     return result;
@@ -208,85 +322,66 @@ IITC.statusbar.portal = {
    * @param {Object} data - Portal data to render
    * @returns {string} HTML representation of portal status
    */
-  render: function (data) {
+  render(data) {
+    console.log('IITC.statusbar.portal render', data);
+    const templates = IITC.statusbar.portalTemplates;
+    const renderTemplate = IITC.statusbar.renderTemplate;
+
     // Default message when no portal is selected
-    if (!data) return '<div style="text-align: center"><b>tap here for info screen</b></div>';
+    if (!data) return templates.defaultMessage;
 
-    var t = '';
+    // Create level badge with appropriate team color
+    const levelBadge = renderTemplate(templates.levelBadge, {
+      style: data.levelColor ? `background: ${data.levelColor};` : '',
+      level: data.isNeutral ? '0' : data.level,
+    });
 
-    // Portal level badge with appropriate team color
-    if (data.team === 'N' || data.team === 'NEUTRAL') {
-      t = '<span class="portallevel">L0</span>';
-    } else {
-      t = '<span class="portallevel" style="background: ' + window.COLORS_LVL[data.level] + ';">L' + data.level + '</span>';
-    }
-
-    // Portal health and title
-    t += ' ' + data.health + '% ';
-    t += data.title;
-
-    // Resonator visualization - only if we have resonator data
+    // Create resonator visualizations
+    let resonatorsHtml = '';
     if (data.resonators && data.resonators.length > 0) {
-      // Convert from east-anticlockwise to north-clockwise arrangement
-      var eastAnticlockwiseToNorthClockwise = [2, 1, 0, 7, 6, 5, 4, 3];
-
-      for (var ind = 0; ind < 8; ind++) {
-        var slot, reso;
-        // Handle full resonator deployment vs partial
-        if (data.resonators.length === 8) {
-          slot = eastAnticlockwiseToNorthClockwise[ind];
-          reso = data.resonators[slot];
-        } else {
-          slot = null;
-          reso = ind < data.resonators.length ? data.resonators[ind] : null;
+      data.resonators.forEach((reso) => {
+        // Only render resonators that exist (have energy)
+        if (reso.energy > 0) {
+          resonatorsHtml += renderTemplate(templates.resonator, {
+            className: `${data.teamCss}${reso.isNorth ? ' north' : ''}`,
+            borderColor: reso.color,
+            position: reso.position,
+            percentage: reso.percentage,
+          });
         }
-
-        // Apply CSS class with team and direction information
-        var className = window.TEAM_TO_CSS[window.getTeam(data)];
-        if (slot !== null && window.OCTANTS[slot] === 'N') className += ' north';
-
-        // Calculate resonator energy level
-        var l = 0,
-          v = 0,
-          max = 0,
-          perc = 0;
-        if (reso) {
-          l = parseInt(reso.level);
-          v = parseInt(reso.energy);
-          max = window.RESO_NRG[l];
-          perc = (v / max) * 100;
-        }
-
-        // Render resonator with energy fill
-        t += '<div class="resonator ' + className + '" style="border-top-color: ' + window.COLORS_LVL[l] + ';left: ' + (100 * ind) / 8.0 + '%;">';
-        t += '<div class="filllevel" style="width:' + perc + '%;"></div>';
-        t += '</div>';
-      }
+      });
     }
 
-    return t;
+    // Combine all components
+    return renderTemplate(templates.mainInfo, {
+      levelBadge,
+      health: data.health,
+      title: data.title,
+      resonators: resonatorsHtml,
+    });
   },
 
   /**
    * Updates information about the currently selected portal
    * @param {Object} [selectedPortalData] - The object containing details about the selected portal.
    */
-  update: function (selectedPortalData) {
+  update(selectedPortalData) {
     // Early exit if we don't need portal status (not in app and not smartphone)
     if (!window.isSmartphone() && !(window.isApp && window.app.setPortalStatus)) {
       return;
     }
 
-    var guid = selectedPortalData ? selectedPortalData.selectedPortalGuid : undefined;
-    var data = this.getData(guid);
+    const guid = selectedPortalData ? selectedPortalData.selectedPortalGuid : undefined;
+    const data = this.getData(guid);
 
     if (window.isApp && window.app.setPortalStatus) {
       window.app.setPortalStatus(data);
     }
 
     // Update UI in smartphone mode
-    if (window.isSmartphone() && $('#mobileinfo').length) {
-      $('#mobileinfo').html(this.render(data));
+    const mobileinfo = document.getElementById('mobileinfo');
+    if (window.isSmartphone() && mobileinfo) {
+      mobileinfo.innerHTML = this.render(data);
     }
   },
 };
