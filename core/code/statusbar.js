@@ -440,14 +440,3 @@ IITC.statusbar.portal = {
     }
   },
 };
-
-/**
- * Backward compatibility
- */
-window.renderUpdateStatus = function () {
-  return IITC.statusbar.map.update();
-};
-
-window.smartphoneInfo = function (data) {
-  return IITC.statusbar.portal.update(data);
-};
