@@ -35,19 +35,28 @@ IITC.statusbar.renderTemplate = (template, replacements) => {
  * @type {Object.<string, string>}
  */
 IITC.statusbar.mapTemplates = {
-  main:
-    '<span class="help portallevel" title="Indicates portal levels/link lengths displayed. Zoom in to display more;">{{ portalLevels }}</span>' +
-    ' <span class="map"><b>map</b>: {{ mapStatus }}</span>' +
-    '{{ requestsStatus }}',
+  // Main container
+  main: '{{ portalLevels }} {{ mapStatus }}{{ requestsStatus }}',
 
-  portalLevelInfo: '<span id="loadlevel">{{ content }}</span>',
+  // Portal levels information
+  portalLevels: '<span class="help portallevel" title="Indicates portal levels/link lengths displayed. Zoom in to display more;">{{ content }}</span>',
 
-  mapStatusInfo: '<span class="help" title="{{ tooltip }}">{{ content }}</span>',
+  // Map status information
+  mapStatus: '<span class="map"><b>map</b>: {{ content }}</span>',
 
+  // Links prefix text
+  linksPrefix: '<b>links</b>: ',
+
+  // Help container with tooltip
+  helpContainer: '<span class="help" title="{{ tooltip }}">{{ content }}</span>',
+
+  // Progress indicator
   progressInfo: ' {{ progress }}%',
 
+  // Requests information
   requestsInfo: ' {{ count }} requests',
 
+  // Failed requests information
   failedRequests: ' <span class="failed-request">{{ count }} failed</span>',
 };
 
@@ -56,16 +65,23 @@ IITC.statusbar.mapTemplates = {
  * @type {Object.<string, string>}
  */
 IITC.statusbar.portalTemplates = {
+  // Default message
   defaultMessage: '<div style="text-align: center"><b>tap here for info screen</b></div>',
 
+  // Main portal information template
   mainInfo: '{{ levelBadge }} {{ health }}% {{ title }} {{ resonators }}',
 
+  // Portal level badge
   levelBadge: '<span class="portallevel" style="{{ style }}">L{{ level }}</span>',
 
+  // Resonator template
   resonator:
     '<div class="resonator {{ className }}" data-slot="{{ slot }}" style="--resonator-color: {{ borderColor }};">' +
     '<div class="filllevel" style="width:{{ percentage }}%;"></div>' +
     '</div>',
+
+  // Empty resonator slot template
+  emptyResonator: '<div class="resonator empty" data-slot="{{ slot }}"></div>',
 };
 
 /**
@@ -149,23 +165,27 @@ IITC.statusbar.map = {
     // Create portal levels / links section
     let portalLevelsContent = '';
     if (data.portalLevels.hasPortals) {
-      portalLevelsContent = renderTemplate(templates.portalLevelInfo, { content: 'portals' });
+      portalLevelsContent = 'portals';
     } else {
-      // Space is valuable on mobile - conditionally add "links:" prefix
-      let prefix = !window.isSmartphone() ? '<b>links</b>: ' : '';
+      // Space is valuable on mobile
+      let prefix = !window.isSmartphone() ? templates.linksPrefix : '';
 
       let content = 'all links';
       if (data.portalLevels.minLinkLength > 0) {
         content = `&gt;${data.portalLevels.formattedLength}`;
       }
 
-      portalLevelsContent = prefix + renderTemplate(templates.portalLevelInfo, { content });
+      portalLevelsContent = prefix + content;
     }
+
+    const portalLevels = renderTemplate(templates.portalLevels, {
+      content: portalLevelsContent,
+    });
 
     // Create map status section
     let mapStatusContent = '';
     if (data.mapStatus.long) {
-      mapStatusContent = renderTemplate(templates.mapStatusInfo, {
+      mapStatusContent = renderTemplate(templates.helpContainer, {
         tooltip: data.mapStatus.long,
         content: data.mapStatus.short,
       });
@@ -173,12 +193,16 @@ IITC.statusbar.map = {
       mapStatusContent = data.mapStatus.short;
     }
 
-    // Add progress percentage if available
+    // Add progress information if available
     if (data.mapStatus.progressPercent !== null) {
       mapStatusContent += renderTemplate(templates.progressInfo, {
         progress: data.mapStatus.progressPercent,
       });
     }
+
+    const mapStatus = renderTemplate(templates.mapStatus, {
+      content: mapStatusContent,
+    });
 
     // Create requests status section
     let requestsStatus = '';
@@ -193,11 +217,11 @@ IITC.statusbar.map = {
       });
     }
 
-    // Combine all sections
+    // Combine all elements
     return renderTemplate(templates.main, {
-      portalLevels: portalLevelsContent,
-      mapStatus: mapStatusContent,
-      requestsStatus: requestsStatus,
+      portalLevels,
+      mapStatus,
+      requestsStatus,
     });
   },
 
@@ -364,29 +388,31 @@ IITC.statusbar.portal = {
     });
 
     // Create resonator visualizations
-    let resonatorsHtml = '';
+    let resonators = '';
     if (data.resonators && data.resonators.length > 0) {
       data.resonators.forEach((reso) => {
         if (reso.energy > 0) {
-          resonatorsHtml += renderTemplate(templates.resonator, {
+          resonators += renderTemplate(templates.resonator, {
             className: `${data.ui.teamCss}${reso.direction === 'N' ? ' north' : ''}`,
             slot: reso.displayOrder,
             percentage: reso.healthPct,
             borderColor: reso.ui.color,
           });
         } else {
-          // For empty slots, add an empty placeholder to maintain visual structure
-          resonatorsHtml += `<div class="resonator empty" data-slot="${reso.displayOrder}"></div>`;
+          // Render empty slots
+          resonators += renderTemplate(templates.emptyResonator, {
+            slot: reso.displayOrder,
+          });
         }
       });
     }
 
-    // Combine all components
+    // Combine all elements
     return renderTemplate(templates.mainInfo, {
       levelBadge,
       health: data.health,
       title: data.title,
-      resonators: resonatorsHtml,
+      resonators,
     });
   },
 
