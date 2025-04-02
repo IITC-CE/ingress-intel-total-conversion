@@ -1,9 +1,11 @@
 /* global IITC */
 
 /**
- * @file Status bar for IITC that provides status information
- * for both map status and portal status, with API for mobile app integration.
- * @module IITC.statusbar
+ * Status bar module for IITC that displays both map and portal status information.
+ * Provides a template-based rendering system that can be customized by plugins.
+ *
+ * @memberof IITC
+ * @namespace statusbar
  */
 
 // Compass directions in clockwise order, starting from North
@@ -16,10 +18,15 @@ const GAME_OCTANTS = ['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'];
 IITC.statusbar = {};
 
 /**
- * Helper function to render a template with replacements
+ * Renders a template string by replacing placeholders with actual values.
+ *
+ * @function IITC.statusbar.renderTemplate
  * @param {string} template - Template string with placeholders in format {{ name }}
- * @param {Object} replacements - Object with key-value pairs for replacing placeholders
- * @returns {string} Rendered template with substituted values
+ * @param {Object} replacements - Key-value pairs where keys match placeholder names
+ * @returns {string} Rendered HTML with placeholders replaced by values
+ * @example
+ * // Returns: "<span>Hello World</span>"
+ * IITC.statusbar.renderTemplate("<span>{{ greeting }}</span>", { greeting: "Hello World" });
  */
 IITC.statusbar.renderTemplate = (template, replacements) => {
   let result = template;
@@ -118,8 +125,13 @@ IITC.statusbar.map = {
   _timer: null,
 
   /**
-   * Gets current map status data
-   * @returns {Object} Structured data about map status
+   * Gets current map status data including portal levels, map loading progress, and active requests.
+   *
+   * @function IITC.statusbar.map.getData
+   * @returns {Object} Structured object containing:
+   *   - portalLevels: Information about visible portal levels and link lengths
+   *   - mapStatus: Current map loading status and progress
+   *   - requests: Active and failed request counts
    */
   getData() {
     const tileParams = window.getDataZoomTileParameters();
@@ -154,9 +166,11 @@ IITC.statusbar.map = {
   },
 
   /**
-   * Renders HTML for map status
-   * @param {Object} data - Status data to render
-   * @returns {string} HTML representation of map status
+   * Renders HTML for map status based on the provided data.
+   *
+   * @function IITC.statusbar.map.render
+   * @param {Object} data - Map status data from getData()
+   * @returns {string} HTML string representing the current map status
    */
   render(data) {
     const templates = IITC.statusbar.mapTemplates;
@@ -226,8 +240,12 @@ IITC.statusbar.map = {
   },
 
   /**
-   * Updates the map status - core function that should be called when map data changes
-   * This function handles both updating the DOM and calling the mobile app API
+   * Updates map status information in the UI and mobile app (if applicable).
+   * Throttles updates to the next event loop for better performance.
+   *
+   * @function IITC.statusbar.map.update
+   * @fires app.setMapStatus - When in app mode
+   * @fires app.setProgress - When in app mode
    */
   update() {
     const data = this.getData();
@@ -264,9 +282,12 @@ IITC.statusbar.portal = {
   _data: null,
 
   /**
-   * Gets data about a specific portal
+   * Gets detailed data about a specific portal.
+   *
+   * @function IITC.statusbar.portal.getData
    * @param {string} guid - The portal's globally unique identifier
-   * @returns {Object|null} Structured data about the portal or null if unavailable
+   * @returns {Object|null} Structured portal data including team, level, health, and resonators,
+   *                        or null if the portal is not found
    */
   getData(guid) {
     if (!guid || !window.portals[guid]) return null;
@@ -370,9 +391,12 @@ IITC.statusbar.portal = {
   },
 
   /**
-   * Renders HTML for portal status
-   * @param {Object} data - Portal data to render
-   * @returns {string} HTML representation of portal status
+   * Renders HTML representation of portal status.
+   *
+   * @function IITC.statusbar.portal.render
+   * @param {Object} data - Portal data from getData()
+   * @returns {string} HTML string representing the portal status including level badge, health,
+   *                   title, and resonator visualization
    */
   render(data) {
     const templates = IITC.statusbar.portalTemplates;
@@ -417,8 +441,11 @@ IITC.statusbar.portal = {
   },
 
   /**
-   * Updates information about the currently selected portal
-   * @param {Object} [selectedPortalData] - The object containing details about the selected portal.
+   * Updates portal information in the UI and mobile app (if applicable).
+   *
+   * @function IITC.statusbar.portal.update
+   * @param {Object} [selectedPortalData] - Object containing the selectedPortalGuid
+   * @fires app.setPortalStatus - When in app mode
    */
   update(selectedPortalData) {
     // Early exit if we don't need portal status (not in app and not smartphone)
