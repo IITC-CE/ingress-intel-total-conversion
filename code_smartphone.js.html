@@ -239,6 +239,12 @@ window.runOnSmartphonesAfterBoot = function () {
   // add a div/hook for updating mobile info
   $('#updatestatus').prepend('&lt;div id="mobileinfo" onclick="show(\'info\')">&lt;/div>');
   window.addHook('portalSelected', window.smartphoneInfo);
+  window.addHook('portalDetailLoaded', (data) => {
+    if (data.success &amp;&amp; data.guid === window.selectedPortal) {
+      window.smartphoneInfo({ selectedPortalGuid: data.guid });
+    }
+  });
+
   // init msg of status bar. hint for the user that a tap leads to the info screen
   $('#mobileinfo').html('&lt;div style="text-align: center">&lt;b>tap here for info screen&lt;/b>&lt;/div>');
 
