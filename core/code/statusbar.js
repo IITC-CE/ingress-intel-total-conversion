@@ -252,7 +252,7 @@ IITC.statusbar.map = {
 
     if (window.isApp) {
       if (window.app.setMapStatus) {
-        window.app.setMapStatus(data);
+        window.app.setMapStatus(data.portalLevels, data.mapStatus, data.requests);
       }
 
       if (window.app.setProgress) {
@@ -322,10 +322,7 @@ IITC.statusbar.portal = {
       title: data.title,
       health: healthPct,
       resonators: [],
-      ui: {
-        teamCss: window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)] || '',
-        levelColor: !isNeutral ? window.COLORS_LVL[data.level] : null,
-      },
+      levelColor: !isNeutral ? window.COLORS_LVL[data.level] : null,
     };
 
     // Process resonators if available
@@ -338,9 +335,7 @@ IITC.statusbar.portal = {
         energy: 0,
         maxEnergy: 0,
         healthPct: 0,
-        ui: {
-          color: window.COLORS_LVL[0],
-        },
+        levelColor: window.COLORS_LVL[0],
       }));
 
       // Process each resonator
@@ -378,9 +373,7 @@ IITC.statusbar.portal = {
             energy,
             maxEnergy,
             healthPct,
-            ui: {
-              color: window.COLORS_LVL[level],
-            },
+            levelColor: window.COLORS_LVL[level],
           };
         }
       }
@@ -407,9 +400,11 @@ IITC.statusbar.portal = {
 
     // Create level badge with appropriate team color
     const levelBadge = renderTemplate(templates.levelBadge, {
-      style: data.ui.levelColor ? `background: ${data.ui.levelColor};` : '',
+      style: data.levelColor ? `background: ${data.levelColor};` : '',
       level: data.isNeutral ? '0' : data.level,
     });
+
+    const teamCss = window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)] || '';
 
     // Create resonator visualizations
     let resonators = '';
@@ -417,10 +412,10 @@ IITC.statusbar.portal = {
       data.resonators.forEach((reso) => {
         if (reso.energy > 0) {
           resonators += renderTemplate(templates.resonator, {
-            className: `${data.ui.teamCss}${reso.direction === 'N' ? ' north' : ''}`,
+            className: `${teamCss}${reso.direction === 'N' ? ' north' : ''}`,
             slot: reso.displayOrder,
             percentage: reso.healthPct,
-            borderColor: reso.ui.color,
+            borderColor: reso.levelColor,
           });
         } else {
           // Render empty slots
@@ -457,7 +452,11 @@ IITC.statusbar.portal = {
     const data = this.getData(guid);
 
     if (window.isApp && window.app.setPortalStatus) {
-      window.app.setPortalStatus(data);
+      if (data) {
+        window.app.setPortalStatus(data.guid, data.team, data.level, data.title, data.health, data.resonators, data.levelColor);
+      } else {
+        window.app.setPortalStatus(null, null, null, null, null, null, null);
+      }
     }
 
     // Update UI in smartphone mode
