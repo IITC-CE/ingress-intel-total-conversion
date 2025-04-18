@@ -331,7 +331,8 @@ public class IITC_WebViewClient extends WebViewClient {
                 Log.d("Google login");
                 return false;
             }
-            if (uriHost.startsWith("signin.nianticlabs.")) {
+            if (uriHost.startsWith("signin.nianticlabs.") ||
+                    uriHost.startsWith("signin.nianticspatial.")) {
                 Log.d("Niantic login");
                 return false;
             }

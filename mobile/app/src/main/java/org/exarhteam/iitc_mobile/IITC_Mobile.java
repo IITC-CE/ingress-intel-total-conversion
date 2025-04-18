@@ -189,6 +189,7 @@ public class IITC_Mobile extends AppCompatActivity
         mAllowedHostnames.put("facebook.com", mDesktopUA);
         mAllowedHostnames.put("appleid.apple.com", mIITCDefaultUA);
         mAllowedHostnames.put("signin.nianticlabs.com", mIITCDefaultUA);
+        mAllowedHostnames.put("signin.nianticspatial.com", mIITCDefaultUA);
 
         // enable progress bar above action bar
         // must be called BEFORE calling parent method
