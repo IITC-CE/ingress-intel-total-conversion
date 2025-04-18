@@ -37,6 +37,6 @@ public class LoginUrlChecker {
     }
 
     private static boolean isNianticAuth(String uriHost) {
-        return uriHost.startsWith("signin.nianticlabs.");
+        return uriHost.startsWith("signin.nianticspatial.");
     }
 }
