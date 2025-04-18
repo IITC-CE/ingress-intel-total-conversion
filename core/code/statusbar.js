@@ -96,6 +96,27 @@ IITC.statusbar.portalTemplates = {
  * Called after IITC boot process is complete
  */
 IITC.statusbar.init = function () {
+  // Determine display modes for portal and map status
+  const usePortalApi = window.isApp && window.app.setPortalStatus;
+  const useMapApi = window.isApp && window.app.setMapStatus;
+
+  // Set display flags based on API availability
+  this.showHtmlPortalInfo = window.isSmartphone() && !usePortalApi;
+  this.showHtmlMapInfo = !useMapApi;
+
+  // Create HTML elements only if needed
+  if (this.showHtmlPortalInfo) {
+    document.getElementById('updatestatus').insertAdjacentHTML('afterbegin', '<div id="mobileinfo" onclick="show(\'info\')"></div>');
+  }
+
+  // Hide map status if using API for map
+  if (!this.showHtmlMapInfo) {
+    const innerstatus = document.getElementById('innerstatus');
+    if (innerstatus) {
+      innerstatus.style.display = 'none';
+    }
+  }
+
   // Set up portal selection hook - initial update with basic data
   window.addHook('portalSelected', (data) => {
     IITC.statusbar.portal.update(data);
@@ -108,10 +129,8 @@ IITC.statusbar.init = function () {
     }
   });
 
-  // Create mobile info element only in smartphone mode
-  if (window.isSmartphone()) {
-    document.getElementById('updatestatus').insertAdjacentHTML('afterbegin', '<div id="mobileinfo" onclick="show(\'info\')"></div>');
-    // Set initial message
+  // Initial update if needed
+  if (this.showHtmlPortalInfo) {
     IITC.statusbar.portal.update();
   }
 };
@@ -260,16 +279,18 @@ IITC.statusbar.map = {
       }
     }
 
-    // Delay status update to the next event loop for better performance
-    if (this._timer) clearTimeout(this._timer);
+    if (IITC.statusbar.showHtmlMapInfo) {
+      // Delay status update to the next event loop for better performance
+      if (this._timer) clearTimeout(this._timer);
 
-    this._timer = setTimeout(() => {
-      this._timer = undefined;
-      const innerstatus = document.getElementById('innerstatus');
-      if (innerstatus) {
-        innerstatus.innerHTML = this.render(data);
-      }
-    }, 0);
+      this._timer = setTimeout(() => {
+        this._timer = undefined;
+        const innerstatus = document.getElementById('innerstatus');
+        if (innerstatus) {
+          innerstatus.innerHTML = this.render(data);
+        }
+      }, 0);
+    }
   },
 };
 
@@ -444,7 +465,7 @@ IITC.statusbar.portal = {
    */
   update(selectedPortalData) {
     // Early exit if we don't need portal status (not in app and not smartphone)
-    if (!window.isSmartphone() && !(window.isApp && window.app.setPortalStatus)) {
+    if (!IITC.statusbar.showHtmlPortalInfo && !(window.isApp && window.app.setPortalStatus)) {
       return;
     }
 
@@ -460,9 +481,11 @@ IITC.statusbar.portal = {
     }
 
     // Update UI in smartphone mode
-    const mobileinfo = document.getElementById('mobileinfo');
-    if (window.isSmartphone() && mobileinfo) {
-      mobileinfo.innerHTML = this.render(data);
+    if (IITC.statusbar.showHtmlPortalInfo) {
+      const mobileinfo = document.getElementById('mobileinfo');
+      if (mobileinfo) {
+        mobileinfo.innerHTML = this.render(data);
+      }
     }
   },
 };
