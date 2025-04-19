@@ -156,10 +156,10 @@
     <string name="menu_share_plugin_update_url">Update URL teilen</string>
     <string name="menu_share_plugin_file">Plugin Datei teilen</string>
     <string name="pref_disabled">aus</string>
-    <string name="menu_plugins_add_url">Plugins per URL hinzufügen</string>
+    <string name="menu_plugins_add_url">Plugins via URL hinzufügen</string>
     <string name="pref_debug_info">Debug Info</string>
     <string name="debug_info_dialog_title">Debug Info</string>
-    <string name="debug_info_dialog_share_btn">Senden</string>
+    <string name="debug_info_dialog_share_btn">Teilen</string>
     <string name="debug_info_dialog_copy_btn">Kopieren</string>
     <string name="ok">OK</string>
     <string name="pref_enabled">an</string>
@@ -169,8 +169,8 @@
     <string name="pref_webview_zoom">Schriftgröße</string>
     <string name="delete_plugin_question">Plugin \"%s\" löschen\?</string>
     <string name="pref_debug_info_sum">Informationen anzeigen, die für die Lösung von Problemen mit IITC Mobile wichtig sind</string>
-    <string name="update_notifications_channel_name">Aktualisierungsmeldungen</string>
-    <string name="pref_webview_zoom_defaultValue">Systemvoreinstellung</string>
+    <string name="update_notifications_channel_name">Aktualisierungsbenachrichtigung</string>
+    <string name="pref_webview_zoom_defaultValue">Standard</string>
     <string name="pref_webview_zoom_sum">Beeinflusst die Schrift-/Textgröße im Infopanel, COMM, in Popup-Fenstern usw…</string>
     <string name="update_notifications_text">Eine neue Version %1$s ist verfügbar. Zum Herunterladen antippen.</string>
 </resources>
