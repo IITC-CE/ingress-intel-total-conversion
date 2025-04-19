@@ -1,13 +1,17 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.10.4
+// @version        0.11.0
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 /* global IITC, L -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.11.0',
+    changes: ['Custom paste dialog', 'Import multiple files'],
+  },
   {
     version: '0.10.4',
     changes: ['Refactoring: fix eslint'],

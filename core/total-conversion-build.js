@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.39.1
+// @version        0.40.0
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -16,6 +16,18 @@ window.IITC = IITC;
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.40.0',
+    changes: [
+      'Added interface controls for the mobile version of IITC without the need for an app installation',
+      'Introduced the IITC.utils API — a set of utility functions (see more: https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/IITC-plugin-migration-guide#utils-api)',
+      'Implemented portal object persistence: portal markers are retained and updated until explicitly removed from rendering (e.g., when zooming out significantly)',
+      'Element positioning in Leaflet is now done using CSS Grid — an internal code improvement with no impact on the interface',
+      'Added the IITC.search API — providing search capabilities (see more: https://github.com/IITC-CE/ingress-intel-total-conversion/wiki/IITC-plugin-migration-guide#search-api)',
+      'Region Score: fixed display of the next control period (CP) time for time zones with a 30-minute offset — now shows the correct time',
+      'Disabled right-to-left (RTL) text support for portal names',
+    ],
+  },
   {
     version: '0.39.1',
     changes: ['Fix Machina color in chat'],
