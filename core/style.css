@@ -132,6 +132,18 @@ a:hover {
   user-select: none; 
 }
 
+.leaflet-control-container .leaflet-top.leaflet-left {
+  width: 700px;  /* chat default width */
+  height: calc(100% - 126px); /* chat default start */
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+
+
 .leaflet-control-layers-overlays label.disabled {
   text-decoration: line-through;
   cursor: help;
