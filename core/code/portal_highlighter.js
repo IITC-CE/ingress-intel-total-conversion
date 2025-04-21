@@ -61,10 +61,12 @@ window.updatePortalHighlighterControl = function () {
 
   if (window._highlighters !== null) {
     if ($('#portal_highlight_select').length === 0) {
-      $('.leaflet-top.leaflet-left').first().append("<select id='portal_highlight_select' class='leaflet-control'></select>");
+      $('body').append("<select id='portal_highlight_select'></select>");
       $('#portal_highlight_select').change(function () {
         window.changePortalHighlights($(this).val());
       });
+      $('.leaflet-top.leaflet-left').css('padding-top', '20px');
+      $('.leaflet-control-scale-line').css('margin-top', '25px');
     }
     $('#portal_highlight_select').html('');
     $('#portal_highlight_select').append($('<option>').attr('value', window._no_highlighter).text(window._no_highlighter));
