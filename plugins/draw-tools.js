@@ -1008,6 +1008,9 @@ function loadExternals() {
     // eslint-disable-next-line
     '@include_raw:external/leaflet.draw-geodesic.js@';
 
+    // eslint-disable-next-line
+    '@include_raw:external/leaflet.draw-confirm.js@';
+
     // support Leaflet >= 1
     // https://github.com/Leaflet/Leaflet.draw/pull/911
     L.Draw.Polyline.prototype.options.shapeOptions.interactive = true;
