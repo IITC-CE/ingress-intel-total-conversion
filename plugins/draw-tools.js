@@ -659,7 +659,7 @@ window.plugin.drawTools.snapToPortals = function () {
     if (minGuid) {
       var pll = window.portals[minGuid].getLatLng();
       if (pll.lat !== latlng.lat || pll.lng !== latlng.lng) {
-        return L.latLng(pll);
+        return new L.LatLng(pll.lat, pll.lng);
       }
     }
   };
