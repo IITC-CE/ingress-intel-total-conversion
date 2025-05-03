@@ -444,6 +444,6 @@ window.makePermalink = function (latlng, options) {
   if (options.fullURL) {
     url += new URL(document.baseURI).origin;
   }
-  url += '/';
+  url += document.location.pathname;
   return url + '?' + args.join('&');
 };
