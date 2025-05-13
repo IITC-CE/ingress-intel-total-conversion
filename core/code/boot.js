@@ -1,4 +1,4 @@
-/* global L, log -- eslint */
+/* global IITC, L, log -- eslint */
 
 /**
  * @file These functions set up specific areas after the boot function created a basic framework.
@@ -292,6 +292,7 @@ function boot() {
   window.portalDetail.setup();
   window.setupRedeem();
   window.setupSidebar();
+  IITC.statusbar.init();
 
   loadPlugins();
 
