@@ -136,19 +136,14 @@ window.plugin.missions = {
     '@include_img:images/mission-type-hidden.png@',
   ],
 
-  onPortalSelected: function () {
-    if (window.selectedPortal === null) {
+  onPortalDetailsUpdated: function (data) {
+    if (!data.portalDetails.mission && !data.portalDetails.mission50plus) {
       return;
     }
-    var portal = window.portals[window.selectedPortal];
-    if (!portal || (!portal.options.data.mission && !portal.options.data.mission50plus)) {
-      return;
-    }
-    // After select.
-    setTimeout(function () {
-      // #resodetails
-      $('.linkdetails').append('<aside><a tabindex="0" onclick="plugin.missions.openPortalMissions();" >Missions</a></aside>');
-    }, 0);
+    var missionHtml = $('<a>')
+      .click(this.openPortalMissions.bind(this))
+      .text('Missions');
+    $('.linkdetails').append($('<aside>').append(missionHtml));
   },
 
   openTopMissions: function (bounds) {
@@ -1296,7 +1291,7 @@ window.plugin.missions = {
     }
 
     // window.addPortalHighlighter('Mission start point', this.highlight.bind(this));
-    window.addHook('portalSelected', this.onPortalSelected.bind(this));
+    window.addHook('portalDetailsUpdated', this.onPortalDetailsUpdated.bind(this));
 
     window.addHook('search', this.onSearch.bind(this));
 
