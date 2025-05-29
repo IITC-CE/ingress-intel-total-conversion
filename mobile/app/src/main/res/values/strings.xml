@@ -293,4 +293,13 @@
     </string>
     <string name="pref_check_for_updates">Update check</string>
     <string name="pref_check_for_updates_summary">Check for updates on startup</string>
+
+    <!-- Storage Access Framework -->
+    <string name="plugins_folder_access_title">Select plugins folder</string>
+    <string name="plugins_folder_access_message">To install custom plugins, IITC Mobile needs access to a folder where plugins will be stored. Please select the IITC_Mobile folder or create a new one.</string>
+    <string name="plugin_install_successful">Plugin installed successfully</string>
+    <string name="plugin_install_failed">Failed to install plugin</string>
+    <string name="plugin_delete_failed">Failed to delete plugin</string>
+    <string name="export_not_supported">Export not supported on this device</string>
+    <string name="export_failed">Failed to export file</string>
 </resources>

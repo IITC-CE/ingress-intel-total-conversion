@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
@@ -198,17 +199,29 @@ public class IITC_JSInterface {
 
     @JavascriptInterface
     public void saveFile(final String filename, final String type, final String content) {
-        try {
-            final File outFile = new File(Environment.getExternalStorageDirectory().getPath() +
-                    "/IITC_Mobile/export/" + filename);
-            outFile.getParentFile().mkdirs();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mIitc.runOnUiThread(() -> {
+                // Use SAF for file export
+                IITC_FileManager.FileSaveRequest saveRequest =
+                        mIitc.getFileManager().new FileSaveRequest(filename, type, content);
+            });
+        } else {
+            // Legacy storage for older Android versions
+            try {
+                final File outFile = new File(Environment.getExternalStorageDirectory().getPath() +
+                        "/IITC_Mobile/export/" + filename);
+                outFile.getParentFile().mkdirs();
 
-            final FileOutputStream outStream = new FileOutputStream(outFile);
-            outStream.write(content.getBytes("UTF-8"));
-            outStream.close();
-            Toast.makeText(mIitc, "File exported to " + outFile.getPath(), Toast.LENGTH_SHORT).show();
-        } catch (final IOException e) {
-            e.printStackTrace();
+                final FileOutputStream outStream = new FileOutputStream(outFile);
+                outStream.write(content.getBytes("UTF-8"));
+                outStream.close();
+                Toast.makeText(mIitc, "File exported to " + outFile.getPath(), Toast.LENGTH_SHORT).show();
+            } catch (final IOException e) {
+                e.printStackTrace();
+                mIitc.runOnUiThread(() ->
+                        Toast.makeText(mIitc, R.string.export_failed, Toast.LENGTH_SHORT).show()
+                );
+            }
         }
     }
 

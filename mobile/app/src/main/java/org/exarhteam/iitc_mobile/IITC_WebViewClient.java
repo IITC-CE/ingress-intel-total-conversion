@@ -96,9 +96,11 @@ public class IITC_WebViewClient extends WebViewClient {
         // iterate through all plugins
         for (final Map.Entry<String, ?> entry : all_prefs.entrySet()) {
             final String plugin = entry.getKey();
-            if (plugin.endsWith(".user.js") && entry.getValue().toString().equals("true")) {
-                if (plugin.startsWith(mIitcPath)) {
-                    scripts.add("user-plugin" + DOMAIN + plugin);
+
+            boolean isPluginKey = plugin.endsWith(".user.js") || plugin.startsWith("plugin_");
+            if (isPluginKey && entry.getValue().toString().equals("true")) {
+                if (plugin.startsWith(mIitcPath) || plugin.startsWith("plugin_") || isValidUri(plugin)) {
+                    scripts.add("user-plugin" + DOMAIN + "/" + plugin);
                 } else {
                     scripts.add("script" + DOMAIN + "/plugins/" + plugin);
                 }
@@ -118,6 +120,10 @@ public class IITC_WebViewClient extends WebViewClient {
                 "});})();";
 
         view.loadJS(js);
+    }
+
+    private boolean isValidUri(String str) {
+        return str.startsWith("plugin_") || str.startsWith("content://");
     }
 
     @Override

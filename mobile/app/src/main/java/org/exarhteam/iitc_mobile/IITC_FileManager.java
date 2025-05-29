@@ -22,6 +22,7 @@ import android.webkit.WebResourceResponse;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 import org.exarhteam.iitc_mobile.IITC_Mobile.ResponseHandler;
 import org.exarhteam.iitc_mobile.async.UpdateScript;
@@ -49,6 +50,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.HashMap;
 
 public class IITC_FileManager {
     private static final int PERMISSION_REQUEST_CODE = 3;
@@ -64,6 +66,25 @@ public class IITC_FileManager {
     private long mUpdateInterval = 1000 * 60 * 60 * 24 * 7;
 
     public static final String DOMAIN = ".iitcm.localhost";
+
+    private final AssetManager mAssetManager;
+    private final Activity mActivity;
+    private final SharedPreferences mPrefs;
+    private final IITC_StorageManager mStorageManager;
+
+    private static final Map<String, DocumentFile> sPluginCache = new HashMap<>();
+    private static final Map<String, String> sPluginContentCache = new HashMap<>();
+
+    public static final String IITC_PATH = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
+    public static final String IITC_DEV_PATH = IITC_PATH + "dev/";
+    public static final String USER_PLUGINS_PATH = IITC_PATH + "plugins/";
+
+    public IITC_FileManager(final Activity activity) {
+        mActivity = activity;
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        mAssetManager = mActivity.getAssets();
+        mStorageManager = new IITC_StorageManager(activity);
+    }
 
     /**
      * copies the contents of a stream into another stream and (optionally) closes the output stream afterwards
@@ -127,34 +148,44 @@ public class IITC_FileManager {
         return os.toString();
     }
 
-    private final AssetManager mAssetManager;
-    private final Activity mActivity;
-    private final SharedPreferences mPrefs;
-    public static final String IITC_PATH = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
-    public static final String IITC_DEV_PATH = IITC_PATH + "dev/";
-    public static final String USER_PLUGINS_PATH = IITC_PATH + "plugins/";
-
-    public IITC_FileManager(final Activity activity) {
-        mActivity = activity;
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        mAssetManager = mActivity.getAssets();
-    }
-
     public InputStream getAssetFile(final String filename) throws IOException {
         if (mPrefs.getBoolean("pref_dev_checkbox", false)) {
-            final File file = new File(IITC_DEV_PATH + filename);
-            try {
-                return new FileInputStream(file);
-            } catch (final FileNotFoundException e) {
-                mActivity.runOnUiThread(() -> Toast.makeText(mActivity, "File " + IITC_DEV_PATH + filename + " not found. " +
-                                "Disable developer mode or add iitc files to the dev folder.",
-                        Toast.LENGTH_SHORT).show());
-                Log.w(e);
+            // Handle dev mode for both legacy and SAF storage
+            if (IITC_StorageManager.isLegacyStorageMode()) {
+                final File file = new File(IITC_DEV_PATH + filename);
+                try {
+                    return new FileInputStream(file);
+                } catch (final FileNotFoundException e) {
+                    showDevFileNotFoundError(filename);
+                    Log.w(e);
+                }
+            } else {
+                DocumentFile devFolder = mStorageManager.getDevFolder();
+                if (devFolder != null) {
+                    DocumentFile file = devFolder.findFile(filename);
+                    if (file != null) {
+                        try {
+                            return mStorageManager.openPluginInputStream(file);
+                        } catch (IOException e) {
+                            showDevFileNotFoundError(filename);
+                            Log.w(e);
+                        }
+                    } else {
+                        showDevFileNotFoundError(filename);
+                    }
+                }
             }
         }
 
         // load plugins from asset folder
         return mAssetManager.open(filename);
+    }
+
+    private void showDevFileNotFoundError(String filename) {
+        mActivity.runOnUiThread(() -> Toast.makeText(mActivity,
+                "File " + filename + " not found in dev folder. " +
+                        "Disable developer mode or add iitc files to the dev folder.",
+                Toast.LENGTH_SHORT).show());
     }
 
     private WebResourceResponse getFileRequest(final Uri uri) {
@@ -180,20 +211,32 @@ public class IITC_FileManager {
     }
 
     private WebResourceResponse getUserPlugin(final Uri uri) {
-        String pluginPath = uri.getPath();
-        if (!mPrefs.getBoolean(pluginPath, false)) {
-            Log.e("Attempted to inject user script that is not enabled by user: " + pluginPath);
+        String pluginKey = uri.toString();
+
+        if (!mPrefs.getBoolean(pluginKey, false)) {
+            Log.e("Attempted to inject user script that is not enabled by user: " + pluginKey);
             return EMPTY;
         }
 
         InputStream stream;
         try {
-            stream = new FileInputStream(pluginPath);
+            if (IITC_StorageManager.isLegacyStorageMode()) {
+                stream = new FileInputStream(pluginKey);
+            } else {
+                stream = mActivity.getContentResolver().openInputStream(uri);
+                if (stream == null) {
+                    Log.e("IITC_FileManager", "Failed to open stream for: " + pluginKey);
+                    throw new FileNotFoundException("Failed to open plugin stream");
+                }
+            }
         } catch (final IOException e) {
-            Log.w("Could not load plugin file: " + pluginPath, e);
+            Log.w("Could not load plugin file: " + pluginKey, e);
             SharedPreferences.Editor editor = mPrefs.edit();
-            editor.remove(pluginPath);
+            editor.remove(pluginKey);
             editor.apply();
+            return EMPTY;
+        } catch (final SecurityException e) {
+            Log.w("No permission to access plugin file: " + pluginKey, e);
             return EMPTY;
         }
 
@@ -233,8 +276,21 @@ public class IITC_FileManager {
 
         if ("script".equals(host))
             return getScript(uri);
-        if ("user-plugin".equals(host))
-            return getUserPlugin(uri);
+
+        if ("user-plugin".equals(host)) {
+            String path = uri.getPath();
+            if (path == null) {
+                Log.e("IITC_FileManager", "Plugin path is null for URI: " + uri);
+                return EMPTY;
+            }
+
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+
+            return getCachedUserPlugin(path);
+        }
+
         if ("file-request".equals(host))
             return getFileRequest(uri);
 
@@ -243,7 +299,28 @@ public class IITC_FileManager {
     }
 
     public void installPlugin(final Uri uri, final boolean invalidateHeaders) {
-        if (uri != null && checkWriteStoragePermissionGranted()) {
+        if (uri != null) {
+            if (IITC_StorageManager.isLegacyStorageMode()) {
+                if (!checkWriteStoragePermissionGranted()) {
+                    return;
+                }
+            } else if (!mStorageManager.hasPluginsFolderAccess()) {
+                // Request folder access and remember the pending installation
+                mActivity.runOnUiThread(() -> {
+                    new AlertDialog.Builder(mActivity)
+                            .setTitle(R.string.plugins_folder_access_title)
+                            .setMessage(R.string.plugins_folder_access_message)
+                            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                                mStorageManager.requestFolderAccess(mActivity);
+                                // Save pending installation URI
+                                mPrefs.edit().putString("pending_plugin_install", uri.toString()).apply();
+                            })
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show();
+                });
+                return;
+            }
+
             String text = mActivity.getString(R.string.install_dialog_msg);
             text = String.format(text, uri);
 
@@ -290,16 +367,33 @@ public class IITC_FileManager {
                         final InputStream isCopy = mActivity.getContentResolver().openInputStream(uri);
                         fileName = getScriptInfo(isCopy).getId() + ".user.js";
                     }
-                    // create IITCm external plugins directory if it doesn't already exist
-                    final File pluginsDirectory = new File(USER_PLUGINS_PATH);
-                    pluginsDirectory.mkdirs();
 
-                    // create in and out streams and copy plugin
-                    final File outFile = new File(pluginsDirectory, fileName);
-                    final OutputStream os = new FileOutputStream(outFile);
-                    IITC_FileManager.copyStream(is, os, true);
+                    if (IITC_StorageManager.isLegacyStorageMode()) {
+                        // Legacy storage handling
+                        final File pluginsDirectory = new File(USER_PLUGINS_PATH);
+                        pluginsDirectory.mkdirs();
+                        final File outFile = new File(pluginsDirectory, fileName);
+                        final OutputStream os = new FileOutputStream(outFile);
+                        IITC_FileManager.copyStream(is, os, true);
+                    } else {
+                        // SAF storage handling
+                        DocumentFile pluginFile = mStorageManager.createPluginFile(fileName);
+                        if (pluginFile != null) {
+                            OutputStream os = mStorageManager.openPluginOutputStream(pluginFile);
+                            IITC_FileManager.copyStream(is, os, true);
+                        } else {
+                            throw new IOException("Failed to create plugin file");
+                        }
+                    }
+
+                    mActivity.runOnUiThread(() ->
+                            Toast.makeText(mActivity, R.string.plugin_install_successful, Toast.LENGTH_SHORT).show()
+                    );
                 } catch (final IOException e) {
                     Log.w(e);
+                    mActivity.runOnUiThread(() ->
+                            Toast.makeText(mActivity, R.string.plugin_install_failed, Toast.LENGTH_SHORT).show()
+                    );
                 }
             }
         });
@@ -331,15 +425,27 @@ public class IITC_FileManager {
         for (final Map.Entry<String, ?> entry : all_prefs.entrySet()) {
             final String plugin = entry.getKey();
             if (plugin.endsWith(".user.js") && entry.getValue().toString().equals("true")) {
-                if (plugin.startsWith(USER_PLUGINS_PATH)) {
+                if (IITC_StorageManager.isLegacyStorageMode() && plugin.startsWith(USER_PLUGINS_PATH)) {
                     new UpdateScript(new ScriptUpdatedCallback(), forceSecureUpdates).execute(plugin);
+                } else if (!IITC_StorageManager.isLegacyStorageMode()) {
+                    // For SAF, plugin key is URI string
+                    try {
+                        Uri.parse(plugin);
+                        new UpdateScript(mActivity, new ScriptUpdatedCallback(), forceSecureUpdates).execute(plugin);
+                    } catch (Exception e) {
+                        // Not a valid URI, skip
+                    }
                 }
             }
         }
-        mPrefs
-                .edit()
+
+        mPrefs.edit()
                 .putLong("pref_last_plugin_update", now)
                 .commit();
+    }
+
+    public IITC_StorageManager getStorageManager() {
+        return mStorageManager;
     }
 
     private class ScriptUpdatedCallback implements UpdateScript.ScriptUpdatedFinishedCallback {
@@ -517,6 +623,79 @@ public class IITC_FileManager {
             } catch (final IOException e) {
                 Log.w("Could not save file!", e);
             }
+        }
+    }
+
+    /**
+     * Cache plugin file with simple ID for WebView access
+     */
+    public static String cacheUserPlugin(DocumentFile pluginFile) {
+        if (pluginFile == null) return null;
+
+        // Create simple ID from filename
+        String fileName = pluginFile.getName();
+        if (fileName == null) return null;
+
+        String pluginId = "plugin_" + fileName.replace(".user.js", "").hashCode();
+
+        // Cache the DocumentFile object (keeps permissions)
+        sPluginCache.put(pluginId, pluginFile);
+
+        return pluginId;
+    }
+
+    /**
+     * Get cached plugin content by ID
+     */
+    private WebResourceResponse getCachedUserPlugin(String pluginId) {
+        if (!mPrefs.getBoolean(pluginId, false)) {
+            Log.e("Attempted to inject user script that is not enabled by user: " + pluginId);
+            return EMPTY;
+        }
+
+        // Check content cache first
+        String cachedContent = sPluginContentCache.get(pluginId);
+        if (cachedContent != null) {
+            InputStream data = prepareUserScript(new ByteArrayInputStream(cachedContent.getBytes()));
+            return new WebResourceResponse("application/javascript", "UTF-8", data);
+        }
+
+        // Get DocumentFile from cache
+        DocumentFile pluginFile = sPluginCache.get(pluginId);
+        if (pluginFile == null) {
+            Log.e("IITC_FileManager", "Plugin file not found in cache: " + pluginId);
+            return EMPTY;
+        }
+
+        try {
+            InputStream stream;
+            if (IITC_StorageManager.isLegacyStorageMode()) {
+                // This shouldn't happen for cached plugins, but handle it
+                return EMPTY;
+            } else {
+                stream = mActivity.getContentResolver().openInputStream(pluginFile.getUri());
+                if (stream == null) {
+                    Log.e("IITC_FileManager", "Failed to open stream for cached plugin");
+                    return EMPTY;
+                }
+            }
+
+            // Read and cache content for future use
+            String content = readStream(stream);
+            sPluginContentCache.put(pluginId, content);
+
+            InputStream data = prepareUserScript(new ByteArrayInputStream(content.getBytes()));
+            return new WebResourceResponse("application/javascript", "UTF-8", data);
+
+        } catch (Exception e) {
+            Log.w("Could not load cached plugin: " + pluginId, e);
+            // Remove from cache if it fails
+            sPluginCache.remove(pluginId);
+            sPluginContentCache.remove(pluginId);
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.remove(pluginId);
+            editor.apply();
+            return EMPTY;
         }
     }
 }

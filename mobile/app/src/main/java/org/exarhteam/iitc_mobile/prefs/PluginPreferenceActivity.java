@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.text.InputType;
@@ -23,8 +22,11 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.documentfile.provider.DocumentFile;
+
 import org.exarhteam.iitc_mobile.IITC_FileManager;
 import org.exarhteam.iitc_mobile.IITC_NotificationHelper;
+import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.fragments.PluginsFragment;
@@ -124,6 +126,15 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 }
             }
         }
+
+        // Check for pending plugin installation
+        String pendingUri = getSharedPreferences("IITC_Mobile", MODE_PRIVATE)
+                .getString("pending_plugin_install", null);
+        if (pendingUri != null) {
+            getSharedPreferences("IITC_Mobile", MODE_PRIVATE).edit()
+                    .remove("pending_plugin_install").apply();
+            mFileManager.installPlugin(Uri.parse(pendingUri), true);
+        }
     }
 
     @Override
@@ -139,57 +150,80 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 onBackPressed();
                 return true;
             case R.id.menu_plugins_add:
-                if (mFileManager.checkWriteStoragePermissionGranted()) {
-                    // create the chooser Intent
-                    final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
-
-                    target.setType("*/*");
-                    // iitcm only parses *.user.js scripts
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        String[] mimeTypes = {"application/javascript", "text/plain", "text/javascript", "application/octet-stream"};
-                        target.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-                    }
-                    target.addCategory(Intent.CATEGORY_OPENABLE);
-
-                    try {
-                        startActivityForResult(Intent.createChooser(target, getString(R.string.file_browser_choose_file)), COPY_PLUGIN_REQUEST);
-                    } catch (final ActivityNotFoundException e) {
-                        Toast.makeText(this, getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
-                    }
+                if (checkStorageAccess()) {
+                    showPluginFileChooser();
                 }
                 return true;
             case R.id.menu_plugins_add_url:
-                if (mFileManager.checkWriteStoragePermissionGranted()) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(R.string.menu_plugins_add_url);
-
-                    final EditText input = new EditText(this);
-                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-                    builder.setView(input);
-
-                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            final String url = input.getText().toString();
-                            final Uri uri = Uri.parse(url);
-                            if (uri != null) {
-                                mFileManager.installPlugin(uri, true);
-                            }
-                        }
-                    });
-                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-
-                    builder.show();
+                if (checkStorageAccess()) {
+                    showPluginUrlDialog();
                 }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean checkStorageAccess() {
+        if (IITC_StorageManager.isLegacyStorageMode()) {
+            return mFileManager.checkWriteStoragePermissionGranted();
+        } else {
+            IITC_StorageManager storageManager = mFileManager.getStorageManager();
+            if (!storageManager.hasPluginsFolderAccess()) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.plugins_folder_access_title)
+                        .setMessage(R.string.plugins_folder_access_message)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            storageManager.requestFolderAccess(this);
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+                return false;
+            }
+            return true;
+        }
+    }
+
+    private void showPluginFileChooser() {
+        final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
+        target.setType("*/*");
+        String[] mimeTypes = {"application/javascript", "text/plain", "text/javascript", "application/octet-stream"};
+        target.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        target.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(Intent.createChooser(target, getString(R.string.file_browser_choose_file)), COPY_PLUGIN_REQUEST);
+        } catch (final ActivityNotFoundException e) {
+            Toast.makeText(this, getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showPluginUrlDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.menu_plugins_add_url);
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        builder.setView(input);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String url = input.getText().toString();
+                final Uri uri = Uri.parse(url);
+                if (uri != null) {
+                    mFileManager.installPlugin(uri, true);
+                }
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     @Override
@@ -214,6 +248,16 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 if (data != null && data.getData() != null) {
                     mFileManager.installPlugin(data.getData(), true);
                     return;
+                }
+                break;
+            case IITC_StorageManager.REQUEST_FOLDER_ACCESS:
+                if (resultCode == RESULT_OK && data != null) {
+                    Uri treeUri = data.getData();
+                    if (treeUri != null) {
+                        mFileManager.getStorageManager().handleFolderSelection(treeUri);
+                        invalidateHeaders();
+                        Toast.makeText(this, R.string.plugins_permission_granted, Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
             default:
@@ -249,17 +293,21 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         return asset_array;
     }
 
-    private File[] getUserPlugins() {
-        final File directory = new File(IITC_FileManager.USER_PLUGINS_PATH);
-        File[] files = directory.listFiles();
-        if (files == null) {
-            files = new File[0];
+    private Object[] getUserPlugins() {
+        if (IITC_StorageManager.isLegacyStorageMode()) {
+            final File directory = new File(IITC_FileManager.USER_PLUGINS_PATH);
+            File[] files = directory.listFiles();
+            if (files == null) {
+                files = new File[0];
+            }
+            return files;
+        } else {
+            return mFileManager.getStorageManager().getUserPlugins();
         }
-        return files;
     }
 
     void checkForNewPlugins() {
-        final File[] userPlugins = getUserPlugins();
+        final Object[] userPlugins = getUserPlugins();
         final String[] officialPlugins = getAssetPlugins();
         int numPlugins = 0;
         for (final Map.Entry<String, ArrayList<PluginInfo>> entry : sUserPlugins.entrySet()) {
@@ -292,14 +340,50 @@ public class PluginPreferenceActivity extends PreferenceActivity {
             }
         }
 
-        // load user plugins from <storage-path>/IITC_Mobile/plugins/
-        final File[] files = getUserPlugins();
-        for (final File file : files) {
+        // Load user plugins
+        final Object[] files = getUserPlugins();
+        for (final Object fileObj : files) {
             try {
-                final InputStream is = new FileInputStream(file);
-                addPluginPreference(IITC_FileManager.readStream(is), file.toString(), true);
-            } catch (final FileNotFoundException e) {
-                Log.e("couldn't read plugin " + file.toString(), e);
+                InputStream is;
+                String key;
+
+                if (fileObj instanceof File) {
+                    File file = (File) fileObj;
+                    is = new FileInputStream(file);
+                    key = file.toString();
+                } else if (fileObj instanceof DocumentFile) {
+                    DocumentFile file = (DocumentFile) fileObj;
+
+                    if (!file.exists() || !file.isFile()) {
+                        Log.w("PluginPreferenceActivity", "Skipping inaccessible file: " + file.getName());
+                        continue;
+                    }
+
+                    try {
+                        is = mFileManager.getStorageManager().openPluginInputStream(file);
+                    } catch (IOException e) {
+                        Log.e("PluginPreferenceActivity", "Failed to open plugin stream: " + file.getName(), e);
+                        continue;
+                    }
+
+                    key = IITC_FileManager.cacheUserPlugin(file);
+                    if (key == null) {
+                        Log.e("PluginPreferenceActivity", "Failed to cache plugin: " + file.getName());
+                        continue;
+                    }
+                } else {
+                    Log.w("PluginPreferenceActivity", "Unknown file object type: " + fileObj.getClass().getName());
+                    continue;
+                }
+
+                String pluginContent = IITC_FileManager.readStream(is);
+                if (pluginContent.isEmpty()) {
+                    Log.w("PluginPreferenceActivity", "Plugin content is empty, skipping");
+                    continue;
+                }
+                addPluginPreference(pluginContent, key, true);
+            } catch (final IOException e) {
+                Log.e("couldn't read plugin", e);
             }
         }
     }
@@ -331,8 +415,21 @@ public class PluginPreferenceActivity extends PreferenceActivity {
             }
         }
 
-        // now build a new checkable preference for the plugin
-        addPluginInfo(userPlugin ? sUserPlugins.get(plugin_cat) : sAssetPlugins.get(plugin_cat), plugin_key, info, userPlugin);
+        String finalKey = plugin_key;
+        if (userPlugin && !IITC_StorageManager.isLegacyStorageMode()) {
+            // Validate that the key is a proper URI for SAF mode
+            try {
+                Uri.parse(plugin_key);
+                // URI is valid, use as is
+                finalKey = plugin_key;
+            } catch (Exception e) {
+                Log.e("Invalid plugin URI key: " + plugin_key, e);
+                return; // Skip this plugin if URI is invalid
+            }
+        }
+
+        addPluginInfo(userPlugin ? sUserPlugins.get(plugin_cat) : sAssetPlugins.get(plugin_cat),
+                finalKey, info, userPlugin);
     }
 
     private void addPluginInfo(List<PluginInfo> list, String plugin_key, PluginInfo pluginInfo, boolean userPlugin) {

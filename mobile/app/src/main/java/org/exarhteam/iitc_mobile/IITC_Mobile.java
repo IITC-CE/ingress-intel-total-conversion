@@ -913,6 +913,24 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        // Handle folder selection for storage access
+        if (requestCode == IITC_StorageManager.REQUEST_FOLDER_ACCESS) {
+            if (resultCode == RESULT_OK && data != null) {
+                Uri treeUri = data.getData();
+                if (treeUri != null && mFileManager != null) {
+                    mFileManager.getStorageManager().handleFolderSelection(treeUri);
+
+                    // Check for pending plugin installation
+                    String pendingUri = mSharedPrefs.getString("pending_plugin_install", null);
+                    if (pendingUri != null) {
+                        mSharedPrefs.edit().remove("pending_plugin_install").apply();
+                        mFileManager.installPlugin(Uri.parse(pendingUri), false);
+                    }
+                }
+            }
+            return;
+        }
+
         final int index = requestCode - RESULT_FIRST_USER;
 
         try {

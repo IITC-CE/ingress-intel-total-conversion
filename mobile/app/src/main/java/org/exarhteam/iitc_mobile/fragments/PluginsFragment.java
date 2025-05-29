@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
+
+import org.exarhteam.iitc_mobile.IITC_FileManager;
+import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 import org.exarhteam.iitc_mobile.prefs.PluginPreference;
@@ -15,6 +18,8 @@ import java.util.ArrayList;
 
 public class PluginsFragment extends PreferenceFragment {
 
+    private IITC_StorageManager mStorageManager;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +29,9 @@ public class PluginsFragment extends PreferenceFragment {
 
         // alphabetical order
         getPreferenceScreen().setOrderingAsAdded(false);
+
+        // Initialize storage manager
+        mStorageManager = new IITC_FileManager(getActivity()).getStorageManager();
 
         if (getArguments() != null) {
             // get plugins category for this fragments and plugins list
@@ -53,17 +61,28 @@ public class PluginsFragment extends PreferenceFragment {
 
         if (pluginInfo.isUserPlugin()) {
             preference.setOnConfirmDelete(() -> {
-                deletePlugin(pluginInfo);
-                Toast.makeText(getActivity(), getString(R.string.plugin_deleted, pluginInfo.getName()), Toast.LENGTH_SHORT).show();
-                prefs.remove(pluginInfo);
-                preferenceScreen.removePreference(preference);
+                if (deletePlugin(pluginInfo)) {
+                    Toast.makeText(getActivity(), getString(R.string.plugin_deleted, pluginInfo.getName()), Toast.LENGTH_SHORT).show();
+                    prefs.remove(pluginInfo);
+                    preferenceScreen.removePreference(preference);
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.plugin_delete_failed), Toast.LENGTH_SHORT).show();
+                }
             });
         }
         return preference;
     }
 
-    private void deletePlugin(PluginInfo pluginInfo) {
-        new File(pluginInfo.getKey()).delete();
-    }
+    private boolean deletePlugin(PluginInfo pluginInfo) {
+        String key = pluginInfo.getKey();
 
+        if (IITC_StorageManager.isLegacyStorageMode()) {
+            // Legacy storage - delete file directly
+            File file = new File(key);
+            return file.delete();
+        } else {
+            // SAF storage - use storage manager
+            return mStorageManager.deletePlugin(key);
+        }
+    }
 }

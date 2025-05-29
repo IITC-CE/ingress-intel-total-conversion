@@ -1,14 +1,20 @@
 package org.exarhteam.iitc_mobile.async;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
+import androidx.documentfile.provider.DocumentFile;
 
 import org.exarhteam.iitc_mobile.IITC_FileManager;
+import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -28,6 +34,7 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
     private final boolean mForceSecureUpdates;
 
     private final OkHttpClient mClient;
+    private Context mContext;
 
     public UpdateScript(final ScriptUpdatedFinishedCallback callback, final Boolean forceSecureUpdates) {
         mCallback = callback;
@@ -35,13 +42,40 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
         mClient = new OkHttpClient();
     }
 
+    public UpdateScript(final Context context, final ScriptUpdatedFinishedCallback callback, final Boolean forceSecureUpdates) {
+        this(callback, forceSecureUpdates);
+        mContext = context;
+    }
+
     @Override
-    protected Boolean doInBackground(final String... urls) {
+    protected Boolean doInBackground(final String... params) {
         try {
-            final String filePath = urls[0];
-            // get local script meta information
-            final String script = IITC_FileManager.readStream(new FileInputStream(new File(filePath)));
-            final PluginInfo mScriptInfo = IITC_FileManager.getScriptInfo(script);
+            final String pluginKey = params[0];
+            String script;
+            PluginInfo mScriptInfo;
+
+            // Handle both legacy file paths and SAF URIs
+            if (IITC_StorageManager.isLegacyStorageMode() || !isValidUri(pluginKey)) {
+                // Legacy mode or asset plugin
+                script = IITC_FileManager.readStream(new FileInputStream(new File(pluginKey)));
+                mScriptInfo = IITC_FileManager.getScriptInfo(script);
+            } else {
+                // SAF mode
+                if (mContext == null) {
+                    Log.e("UpdateScript requires context for SAF mode");
+                    return false;
+                }
+
+                DocumentFile file = DocumentFile.fromSingleUri(mContext, Uri.parse(pluginKey));
+                if (file == null || !file.exists()) {
+                    Log.e("Plugin file not found: " + pluginKey);
+                    return false;
+                }
+
+                InputStream is = mContext.getContentResolver().openInputStream(file.getUri());
+                script = IITC_FileManager.readStream(is);
+                mScriptInfo = IITC_FileManager.getScriptInfo(script);
+            }
 
             mScriptName = mScriptInfo.getName();
             String updateURL = mScriptInfo.getUpdateURL();
@@ -57,13 +91,11 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             final PluginInfo updateInfo = IITC_FileManager.getScriptInfo(updateMetaScript);
 
             final String remote_version = updateInfo.getVersion();
-
-            final File local_file = new File(filePath);
             final String local_version = mScriptInfo.getVersion();
 
             if (local_version.compareTo(remote_version) >= 0) return false;
 
-            Log.d("plugin " + filePath + " outdated\n" + local_version + " vs " + remote_version);
+            Log.d("plugin " + pluginKey + " outdated\n" + local_version + " vs " + remote_version);
 
             String updatedScript = null;
             if (updateURL.equals(downloadURL)) {
@@ -81,14 +113,36 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             }
 
             Log.d("updating file....");
-            try (FileOutputStream stream = new FileOutputStream(local_file)) {
-                stream.write(updatedScript.getBytes());
+
+            // Write updated script
+            if (IITC_StorageManager.isLegacyStorageMode() || !isValidUri(pluginKey)) {
+                // Legacy mode
+                try (FileOutputStream stream = new FileOutputStream(new File(pluginKey))) {
+                    stream.write(updatedScript.getBytes());
+                }
+            } else {
+                // SAF mode
+                DocumentFile file = DocumentFile.fromSingleUri(mContext, Uri.parse(pluginKey));
+                try (OutputStream stream = mContext.getContentResolver().openOutputStream(file.getUri())) {
+                    stream.write(updatedScript.getBytes());
+                }
             }
+
             Log.d("...done");
 
             return true;
 
         } catch (final IOException e) {
+            Log.e("Failed to update plugin", e);
+            return false;
+        }
+    }
+
+    private boolean isValidUri(String str) {
+        try {
+            Uri uri = Uri.parse(str);
+            return uri.getScheme() != null;
+        } catch (Exception e) {
             return false;
         }
     }
