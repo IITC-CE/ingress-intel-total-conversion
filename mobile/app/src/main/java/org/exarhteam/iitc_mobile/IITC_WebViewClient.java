@@ -8,15 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.net.http.SslError;
-import android.os.Build;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
@@ -24,8 +21,6 @@ import android.widget.TextView;
 import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class IITC_WebViewClient extends WebViewClient {
 
@@ -37,14 +32,12 @@ public class IITC_WebViewClient extends WebViewClient {
 
     private final IITC_Mobile mIitc;
     private boolean mIitcInjected = false;
-    private final String mIitcPath;
     private final IITC_TileManager mTileManager;
     private final SharedPreferences mSharedPrefs;
 
     public IITC_WebViewClient(final IITC_Mobile iitc) {
         mIitc = iitc;
         mTileManager = new IITC_TileManager(mIitc);
-        mIitcPath = Environment.getExternalStorageDirectory().getPath() + "/IITC_Mobile/";
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
     }
 
@@ -88,26 +81,17 @@ public class IITC_WebViewClient extends WebViewClient {
     }
 
     private void loadScripts(final IITC_WebView view) {
-        final List<String> scripts = new LinkedList<String>();
+        final List<String> scripts = new LinkedList<>();
 
-        // get the plugin preferences
-        final TreeMap<String, ?> all_prefs = new TreeMap<String, Object>(mSharedPrefs.getAll());
+        // Get all enabled plugins through PluginManager
+        List<IITC_PluginManager.Plugin> enabledPlugins =
+                mIitc.getFileManager().getPluginManager().getEnabledPlugins(mSharedPrefs);
 
-        // iterate through all plugins
-        for (final Map.Entry<String, ?> entry : all_prefs.entrySet()) {
-            final String plugin = entry.getKey();
-
-            boolean isPluginKey = plugin.endsWith(".user.js") || plugin.startsWith("plugin_");
-            if (isPluginKey && entry.getValue().toString().equals("true")) {
-                if (plugin.startsWith(mIitcPath) || plugin.startsWith("plugin_") || isValidUri(plugin)) {
-                    scripts.add("user-plugin" + DOMAIN + "/" + plugin);
-                } else {
-                    scripts.add("script" + DOMAIN + "/plugins/" + plugin);
-                }
-            }
+        for (IITC_PluginManager.Plugin plugin : enabledPlugins) {
+            scripts.add("plugin" + DOMAIN + "/" + plugin.id);
         }
 
-        // inject the user location script if enabled in settings
+        // Inject user location script if enabled
         if (Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0")) != 0) {
             scripts.add("script" + DOMAIN + "/user-location.user.js");
         }
@@ -120,10 +104,6 @@ public class IITC_WebViewClient extends WebViewClient {
                 "});})();";
 
         view.loadJS(js);
-    }
-
-    private boolean isValidUri(String str) {
-        return str.startsWith("plugin_") || str.startsWith("content://");
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.UriPermission;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.PreferenceManager;
 
 import androidx.documentfile.provider.DocumentFile;
@@ -17,6 +16,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages storage access for IITC Mobile using Storage Access Framework (SAF).
+ */
 public class IITC_StorageManager {
     private static final String PREF_PLUGINS_FOLDER_URI = "plugins_folder_uri";
     private static final String PREF_IITC_FOLDER_URI = "iitc_folder_uri";
@@ -33,6 +35,9 @@ public class IITC_StorageManager {
         loadSavedFolders();
     }
 
+    /**
+     * Load previously saved folder references from preferences
+     */
     private void loadSavedFolders() {
         String pluginsUri = prefs.getString(PREF_PLUGINS_FOLDER_URI, null);
         String iitcUri = prefs.getString(PREF_IITC_FOLDER_URI, null);
@@ -70,6 +75,9 @@ public class IITC_StorageManager {
         }
     }
 
+    /**
+     * Check if we have persistent permission for the given URI
+     */
     private boolean hasUriPermission(Uri uri) {
         List<UriPermission> persistedUris = context.getContentResolver().getPersistedUriPermissions();
         for (UriPermission permission : persistedUris) {
@@ -80,10 +88,16 @@ public class IITC_StorageManager {
         return false;
     }
 
+    /**
+     * Check if we have access to plugins folder
+     */
     public boolean hasPluginsFolderAccess() {
         return pluginsFolder != null && pluginsFolder.exists() && pluginsFolder.canWrite();
     }
 
+    /**
+     * Request folder access from user via SAF dialog
+     */
     public void requestFolderAccess(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
@@ -92,6 +106,9 @@ public class IITC_StorageManager {
         activity.startActivityForResult(intent, REQUEST_FOLDER_ACCESS);
     }
 
+    /**
+     * Handle folder selection result from SAF dialog
+     */
     public void handleFolderSelection(Uri treeUri) {
         if (treeUri == null) return;
 
@@ -121,6 +138,9 @@ public class IITC_StorageManager {
         }
     }
 
+    /**
+     * Get or create dev folder for development override plugins
+     */
     public DocumentFile getDevFolder() {
         if (iitcFolder == null) return null;
 
@@ -131,6 +151,9 @@ public class IITC_StorageManager {
         return devFolder;
     }
 
+    /**
+     * Get all user plugin files from plugins directory
+     */
     public DocumentFile[] getUserPlugins() {
         if (!hasPluginsFolderAccess()) {
             return new DocumentFile[0];
@@ -148,6 +171,9 @@ public class IITC_StorageManager {
         return plugins.toArray(new DocumentFile[0]);
     }
 
+    /**
+     * Create new plugin file in plugins directory
+     */
     public DocumentFile createPluginFile(String fileName) {
         if (!hasPluginsFolderAccess()) return null;
 
@@ -159,6 +185,9 @@ public class IITC_StorageManager {
         return pluginsFolder.createFile("application/javascript", fileName);
     }
 
+    /**
+     * Delete plugin file by URI string
+     */
     public boolean deletePlugin(String uriString) {
         try {
             DocumentFile file = DocumentFile.fromSingleUri(context, Uri.parse(uriString));
@@ -169,15 +198,17 @@ public class IITC_StorageManager {
         }
     }
 
+    /**
+     * Open input stream for reading plugin content
+     */
     public InputStream openPluginInputStream(DocumentFile plugin) throws IOException {
         return context.getContentResolver().openInputStream(plugin.getUri());
     }
 
+    /**
+     * Open output stream for writing plugin content
+     */
     public OutputStream openPluginOutputStream(DocumentFile plugin) throws IOException {
         return context.getContentResolver().openOutputStream(plugin.getUri());
-    }
-
-    public static boolean isLegacyStorageMode() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP;
     }
 }

@@ -1,0 +1,320 @@
+package org.exarhteam.iitc_mobile;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.os.Build;
+import androidx.documentfile.provider.DocumentFile;
+
+import org.exarhteam.iitc_mobile.prefs.PluginInfo;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * Central plugin management system for IITC Mobile.
+ * Handles discovery, loading, and serving of plugins from multiple sources
+ */
+public class IITC_PluginManager {
+
+    public enum PluginType {
+        ASSET,  // Built-in plugins from assets (lowest priority)
+        DEV,    // Development override plugins (medium priority)
+        USER    // User-installed plugins (highest priority)
+    }
+
+    public static class Plugin {
+        public final String name;           // "plugin.user.js"
+        public final String id;             // "plugin" (without .user.js)
+        public final PluginType type;       // Source type with priority
+        public final PluginInfo info;       // Plugin metadata
+        public final DocumentFile file;    // File reference for DEV/USER, null for ASSET
+
+        public Plugin(String name, String id, PluginType type, PluginInfo info, DocumentFile file) {
+            this.name = name;
+            this.id = id;
+            this.type = type;
+            this.info = info;
+            this.file = file;
+        }
+
+        public boolean isAsset() {
+            return type == PluginType.ASSET;
+        }
+
+        public boolean isDev() {
+            return type == PluginType.DEV;
+        }
+
+        public boolean isUser() {
+            return type == PluginType.USER;
+        }
+    }
+
+    // Main registry: ID -> Plugin (highest priority only)
+    private final Map<String, Plugin> plugins = new HashMap<>();
+
+    /**
+     * Load and register all plugins from available sources
+     */
+    public void loadAllPlugins(Context context, IITC_StorageManager storageManager,
+                               AssetManager assetManager, boolean devMode) {
+        plugins.clear();
+
+        loadAssetPlugins(assetManager);
+
+        if (devMode) {
+            loadDevPlugins(context, storageManager);
+        }
+
+        loadUserPlugins(context, storageManager);
+
+        Log.d("PluginManager loaded " + plugins.size() + " plugins");
+    }
+
+    /**
+     * Load plugins from assets
+     */
+    private void loadAssetPlugins(AssetManager assetManager) {
+        try {
+            String[] assetFiles = assetManager.list("plugins");
+            if (assetFiles == null) return;
+
+            for (String fileName : assetFiles) {
+                if (!fileName.endsWith(".user.js")) continue;
+
+                try {
+                    InputStream stream = assetManager.open("plugins/" + fileName);
+                    String content = IITC_FileManager.readStream(stream);
+                    PluginInfo info = IITC_FileManager.getScriptInfo(content);
+
+                    String pluginId = extractPluginId(fileName);
+                    Plugin plugin = new Plugin(fileName, pluginId, PluginType.ASSET, info, null);
+
+                    if (!isExcludedCategory(info.getCategory())) {
+                        plugins.put(pluginId, plugin);
+                    }
+
+                } catch (IOException e) {
+                    Log.e("Failed to load asset plugin: " + fileName, e);
+                }
+            }
+        } catch (IOException e) {
+            Log.e("Failed to list asset plugins", e);
+        }
+    }
+
+    /**
+     * Load plugins from dev directory
+     */
+    private void loadDevPlugins(Context context, IITC_StorageManager storageManager) {
+        DocumentFile devFolder = storageManager.getDevFolder();
+        if (devFolder == null || !devFolder.exists()) return;
+
+        DocumentFile[] devFiles = devFolder.listFiles();
+
+        for (DocumentFile file : devFiles) {
+            if (file == null || !file.exists() || !file.isFile()) continue;
+
+            String fileName = file.getName();
+            if (fileName == null || !fileName.endsWith(".user.js")) continue;
+
+            try {
+                InputStream stream = storageManager.openPluginInputStream(file);
+                String content = IITC_FileManager.readStream(stream);
+                PluginInfo info = IITC_FileManager.getScriptInfo(content);
+
+                String pluginId = extractPluginId(fileName);
+                Plugin plugin = new Plugin(fileName, pluginId, PluginType.DEV, info, file);
+
+                if (!isExcludedCategory(info.getCategory())) {
+                    plugins.put(pluginId, plugin);
+                }
+
+            } catch (IOException e) {
+                Log.e("Failed to load dev plugin: " + fileName, e);
+            }
+        }
+    }
+
+    /**
+     * Load plugins from user directory
+     */
+    private void loadUserPlugins(Context context, IITC_StorageManager storageManager) {
+        DocumentFile[] userFiles = storageManager.getUserPlugins();
+
+        for (DocumentFile file : userFiles) {
+            if (file == null || !file.exists() || !file.isFile()) continue;
+
+            String fileName = file.getName();
+            if (fileName == null || !fileName.endsWith(".user.js")) continue;
+
+            try {
+                InputStream stream = storageManager.openPluginInputStream(file);
+                String content = IITC_FileManager.readStream(stream);
+                PluginInfo info = IITC_FileManager.getScriptInfo(content);
+
+                String pluginId = extractPluginId(fileName);
+                Plugin plugin = new Plugin(fileName, pluginId, PluginType.USER, info, file);
+
+                if (!isExcludedCategory(info.getCategory())) {
+                    plugins.put(pluginId, plugin);
+                }
+
+            } catch (IOException e) {
+                Log.e("Failed to load user plugin: " + fileName, e);
+            }
+        }
+    }
+
+    /**
+     * Extract plugin ID from filename (remove .user.js extension)
+     */
+    private String extractPluginId(String fileName) {
+        if (fileName.endsWith(".user.js")) {
+            return fileName.substring(0, fileName.length() - 8);
+        }
+        return fileName;
+    }
+
+    /**
+     * Check if plugin category should be excluded
+     */
+    private boolean isExcludedCategory(String category) {
+        return "Deleted".equals(category);
+    }
+
+    /**
+     * Get plugin by ID
+     */
+    public Plugin getPlugin(String pluginId) {
+        return plugins.get(pluginId);
+    }
+
+    /**
+     * Get all enabled plugins according to preferences
+     */
+    public List<Plugin> getEnabledPlugins(SharedPreferences prefs) {
+        List<Plugin> enabled = new ArrayList<>();
+
+        for (Plugin plugin : plugins.values()) {
+            if (isPluginEnabled(plugin.id, prefs)) {
+                enabled.add(plugin);
+            }
+        }
+
+        return enabled;
+    }
+
+    /**
+     * Check if plugin is enabled in preferences
+     */
+    public boolean isPluginEnabled(String pluginId, SharedPreferences prefs) {
+        return prefs.getBoolean(pluginId, false);
+    }
+
+    /**
+     * Read plugin content (always reads fresh, no caching)
+     */
+    public String readPluginContent(Plugin plugin, Context context,
+                                    IITC_StorageManager storageManager, AssetManager assetManager) {
+        try {
+            InputStream stream;
+
+            if (plugin.isAsset()) {
+                stream = assetManager.open("plugins/" + plugin.name);
+            } else {
+                // DEV or USER plugin
+                stream = storageManager.openPluginInputStream(plugin.file);
+            }
+
+            return IITC_FileManager.readStream(stream);
+
+        } catch (IOException e) {
+            Log.e("Failed to read plugin content: " + plugin.name, e);
+            return "";
+        }
+    }
+
+    /**
+     * Get all plugins grouped by category for UI display
+     */
+    public Map<String, List<Plugin>> getPluginsByCategory() {
+        Map<String, List<Plugin>> result = new TreeMap<>();
+
+        for (Plugin plugin : plugins.values()) {
+            String category = plugin.info.getCategory();
+            if (category == null) category = "Misc";
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                result.computeIfAbsent(category, k -> new ArrayList<>()).add(plugin);
+            } else {
+                List<Plugin> categoryList = result.get(category);
+                if (categoryList == null) {
+                    categoryList = new ArrayList<>();
+                    result.put(category, categoryList);
+                }
+                categoryList.add(plugin);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Get all plugins of specific type
+     */
+    public List<Plugin> getPluginsByType(PluginType type) {
+        List<Plugin> result = new ArrayList<>();
+
+        for (Plugin plugin : plugins.values()) {
+            if (plugin.type == type) {
+                result.add(plugin);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Get count of enabled user plugins
+     */
+    public static int getEnabledUserPluginCount(Context context, SharedPreferences prefs) {
+        try {
+            IITC_FileManager fileManager = new IITC_FileManager((Activity) context);
+            IITC_PluginManager pluginManager = fileManager.getPluginManager();
+
+            pluginManager.loadAllPlugins(context, fileManager.getStorageManager(),
+                    ((Activity) context).getAssets(),
+                    prefs.getBoolean("pref_dev_checkbox", false));
+
+            int count = 0;
+            List<IITC_PluginManager.Plugin> userPlugins = pluginManager.getPluginsByType(IITC_PluginManager.PluginType.USER);
+
+            for (IITC_PluginManager.Plugin plugin : userPlugins) {
+                if (pluginManager.isPluginEnabled(plugin.id, prefs)) {
+                    count++;
+                }
+            }
+
+            return count;
+
+        } catch (Exception e) {
+            Log.e("Failed to get user plugin count", e);
+            return 0;
+        }
+    }
+
+    /**
+     * Clear all loaded plugins (for testing or reloading)
+     */
+    public void clear() {
+        plugins.clear();
+    }
+}

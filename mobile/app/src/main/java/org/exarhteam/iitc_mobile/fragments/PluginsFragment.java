@@ -7,15 +7,18 @@ import android.preference.PreferenceScreen;
 import android.widget.Toast;
 
 import org.exarhteam.iitc_mobile.IITC_FileManager;
+import org.exarhteam.iitc_mobile.IITC_PluginManager;
 import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 import org.exarhteam.iitc_mobile.prefs.PluginPreference;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 
-import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Fragment for displaying and managing plugins in a specific category.
+ */
 public class PluginsFragment extends PreferenceFragment {
 
     private IITC_StorageManager mStorageManager;
@@ -74,15 +77,16 @@ public class PluginsFragment extends PreferenceFragment {
     }
 
     private boolean deletePlugin(PluginInfo pluginInfo) {
-        String key = pluginInfo.getKey();
+        String pluginId = pluginInfo.getKey();
 
-        if (IITC_StorageManager.isLegacyStorageMode()) {
-            // Legacy storage - delete file directly
-            File file = new File(key);
-            return file.delete();
-        } else {
-            // SAF storage - use storage manager
-            return mStorageManager.deletePlugin(key);
+        // Get the actual plugin from PluginManager to find the file
+        IITC_FileManager fileManager = new IITC_FileManager(getActivity());
+        IITC_PluginManager.Plugin plugin = fileManager.getPluginManager().getPlugin(pluginId);
+
+        if (plugin == null || !plugin.isUser()) {
+            return false;
         }
+
+        return mStorageManager.deletePlugin(plugin.file.getUri().toString());
     }
 }

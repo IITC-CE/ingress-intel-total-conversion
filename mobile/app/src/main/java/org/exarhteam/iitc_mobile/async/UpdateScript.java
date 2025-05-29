@@ -6,12 +6,8 @@ import android.os.AsyncTask;
 import androidx.documentfile.provider.DocumentFile;
 
 import org.exarhteam.iitc_mobile.IITC_FileManager;
-import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,6 +19,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 
+/**
+ * AsyncTask for updating user plugins from remote sources.
+ */
 public class UpdateScript extends AsyncTask<String, Void, Boolean> {
 
     public interface ScriptUpdatedFinishedCallback {
@@ -34,56 +33,46 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
     private final boolean mForceSecureUpdates;
 
     private final OkHttpClient mClient;
-    private Context mContext;
+    private final Context mContext;
 
-    public UpdateScript(final ScriptUpdatedFinishedCallback callback, final Boolean forceSecureUpdates) {
+    public UpdateScript(final Context context, final ScriptUpdatedFinishedCallback callback, final Boolean forceSecureUpdates) {
         mCallback = callback;
         mForceSecureUpdates = forceSecureUpdates;
         mClient = new OkHttpClient();
-    }
-
-    public UpdateScript(final Context context, final ScriptUpdatedFinishedCallback callback, final Boolean forceSecureUpdates) {
-        this(callback, forceSecureUpdates);
         mContext = context;
     }
 
     @Override
     protected Boolean doInBackground(final String... params) {
         try {
-            final String pluginKey = params[0];
-            String script;
-            PluginInfo mScriptInfo;
+            final String pluginUriString = params[0];
 
-            // Handle both legacy file paths and SAF URIs
-            if (IITC_StorageManager.isLegacyStorageMode() || !isValidUri(pluginKey)) {
-                // Legacy mode or asset plugin
-                script = IITC_FileManager.readStream(new FileInputStream(new File(pluginKey)));
-                mScriptInfo = IITC_FileManager.getScriptInfo(script);
-            } else {
-                // SAF mode
-                if (mContext == null) {
-                    Log.e("UpdateScript requires context for SAF mode");
-                    return false;
-                }
-
-                DocumentFile file = DocumentFile.fromSingleUri(mContext, Uri.parse(pluginKey));
-                if (file == null || !file.exists()) {
-                    Log.e("Plugin file not found: " + pluginKey);
-                    return false;
-                }
-
-                InputStream is = mContext.getContentResolver().openInputStream(file.getUri());
-                script = IITC_FileManager.readStream(is);
-                mScriptInfo = IITC_FileManager.getScriptInfo(script);
+            if (mContext == null) {
+                Log.e("UpdateScript requires context for SAF mode");
+                return false;
             }
+
+            // Parse plugin URI and get DocumentFile
+            DocumentFile file = DocumentFile.fromSingleUri(mContext, Uri.parse(pluginUriString));
+            if (file == null || !file.exists()) {
+                Log.e("Plugin file not found: " + pluginUriString);
+                return false;
+            }
+
+            // Read current plugin content
+            InputStream is = mContext.getContentResolver().openInputStream(file.getUri());
+            String script = IITC_FileManager.readStream(is);
+            PluginInfo mScriptInfo = IITC_FileManager.getScriptInfo(script);
 
             mScriptName = mScriptInfo.getName();
             String updateURL = mScriptInfo.getUpdateURL();
             String downloadURL = mScriptInfo.getDownloadURL();
+
             if (updateURL == null) updateURL = downloadURL;
             if (updateURL == null) return false;
             if (!isUpdateAllowed(updateURL)) return false;
 
+            // Download update metadata
             final String updateMetaScript = downloadFile(updateURL);
             if (updateMetaScript == null) {
                 return false;
@@ -93,9 +82,10 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             final String remote_version = updateInfo.getVersion();
             final String local_version = mScriptInfo.getVersion();
 
+            // Compare versions
             if (local_version.compareTo(remote_version) >= 0) return false;
 
-            Log.d("plugin " + pluginKey + " outdated\n" + local_version + " vs " + remote_version);
+            Log.d("Plugin " + pluginUriString + " outdated\n" + local_version + " vs " + remote_version);
 
             String updatedScript = null;
             if (updateURL.equals(downloadURL)) {
@@ -112,37 +102,19 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
                 }
             }
 
-            Log.d("updating file....");
+            Log.d("Updating plugin file...");
 
             // Write updated script
-            if (IITC_StorageManager.isLegacyStorageMode() || !isValidUri(pluginKey)) {
-                // Legacy mode
-                try (FileOutputStream stream = new FileOutputStream(new File(pluginKey))) {
-                    stream.write(updatedScript.getBytes());
-                }
-            } else {
-                // SAF mode
-                DocumentFile file = DocumentFile.fromSingleUri(mContext, Uri.parse(pluginKey));
-                try (OutputStream stream = mContext.getContentResolver().openOutputStream(file.getUri())) {
-                    stream.write(updatedScript.getBytes());
-                }
+            try (OutputStream stream = mContext.getContentResolver().openOutputStream(file.getUri())) {
+                stream.write(updatedScript.getBytes());
             }
 
-            Log.d("...done");
+            Log.d("Plugin update complete");
 
             return true;
 
         } catch (final IOException e) {
             Log.e("Failed to update plugin", e);
-            return false;
-        }
-    }
-
-    private boolean isValidUri(String str) {
-        try {
-            Uri uri = Uri.parse(str);
-            return uri.getScheme() != null;
-        } catch (Exception e) {
             return false;
         }
     }

@@ -273,6 +273,15 @@ public class IITC_Mobile extends AppCompatActivity
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
 
+        // Initialize PluginManager
+        boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+        mFileManager.getPluginManager().loadAllPlugins(
+                this,
+                mFileManager.getStorageManager(),
+                getAssets(),
+                devMode
+        );
+
         mUserLocation = new IITC_UserLocation(this);
         mUserLocation.setLocationMode(Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0")));
 
@@ -353,6 +362,17 @@ public class IITC_Mobile extends AppCompatActivity
         } else if (key.equals("pref_update_plugins_interval")) {
             final int interval = Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7"));
             mFileManager.setUpdateInterval(interval);
+            return;
+        } else if (key.equals("pref_dev_checkbox")) {
+            // Reload PluginManager when dev mode changes
+            boolean devMode = sharedPreferences.getBoolean("pref_dev_checkbox", false);
+            mFileManager.getPluginManager().loadAllPlugins(
+                    this,
+                    mFileManager.getStorageManager(),
+                    getAssets(),
+                    devMode
+            );
+            mReloadNeeded = true;
             return;
         } else if (key.equals("pref_press_twice_to_exit")
                 || key.equals("pref_share_selected_tab")
