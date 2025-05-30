@@ -19,10 +19,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
 import android.net.Uri;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -80,7 +76,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IITC_Mobile extends AppCompatActivity
-        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnLocaleChangedListener {
+        implements OnSharedPreferenceChangeListener, OnLocaleChangedListener {
     private static final String mIntelUrl = "https://intel.ingress.com/";
 
     private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
@@ -315,9 +311,6 @@ public class IITC_Mobile extends AppCompatActivity
         // afterwards install iitc update
         registerReceiver(mBroadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        final NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
-        if (nfc != null) nfc.setNdefPushMessageCallback(this, this);
-
         this.firstTimeIntro();
 
         handleIntent(getIntent(), true);
@@ -397,7 +390,7 @@ public class IITC_Mobile extends AppCompatActivity
     // handles ingress intel url intents, search intents, geo intents and javascript file intents
     private void handleIntent(final Intent intent, final boolean onCreate) {
         final String action = intent.getAction();
-        if (Intent.ACTION_VIEW.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+        if (Intent.ACTION_VIEW.equals(action)) {
             final Uri uri = intent.getData();
             Log.d("intent received url: " + uri.toString());
 
@@ -1266,22 +1259,6 @@ public class IITC_Mobile extends AppCompatActivity
 
         }, 2000);
 
-    }
-
-    @Override
-    public NdefMessage createNdefMessage(final NfcEvent event) {
-        NdefRecord[] records;
-        if (mPermalink == null) { // no permalink yet, just provide AAR
-            records = new NdefRecord[] {
-                    NdefRecord.createApplicationRecord(getPackageName())
-            };
-        } else {
-            records = new NdefRecord[] {
-                    NdefRecord.createUri(mPermalink),
-                    NdefRecord.createApplicationRecord(getPackageName())
-            };
-        }
-        return new NdefMessage(records);
     }
 
     public void clipboardCopy(String msg) {
