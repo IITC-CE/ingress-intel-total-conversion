@@ -153,8 +153,7 @@ public class IITC_Mobile extends AppCompatActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         // enable webview debug for debug builds
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-                && 0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+        if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
@@ -177,7 +176,7 @@ public class IITC_Mobile extends AppCompatActivity
         // Define webview user agent for known external hosts
         mIITCOriginalUA = WebSettings.getDefaultUserAgent(this);
         mIITCDefaultUA = sanitizeUserAgent(mIITCOriginalUA);
-        final String googleUA = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mIITCDefaultUA;
+        final String googleUA = mIITCDefaultUA;
 
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
         mAllowedHostnames.put("google.com", googleUA);
@@ -436,10 +435,8 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         if (onCreate) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                CookieManager cookieManager = CookieManager.getInstance();
-                cookieManager.setAcceptThirdPartyCookies(mIitcWebView, true);
-            }
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptThirdPartyCookies(mIitcWebView, true);
             loadUrl(mIntelUrl);
         }
     }
