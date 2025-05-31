@@ -296,7 +296,13 @@ public class IITC_Mobile extends AppCompatActivity
         mDesktopFilter = new IntentFilter();
         mDesktopFilter.addAction("UiModeManager.SEM_ACTION_ENTER_KNOX_DESKTOP_MODE");
         mDesktopFilter.addAction("UiModeManager.SEM_ACTION_EXIT_KNOX_DESKTOP_MODE");
-        registerReceiver(mDesktopModeReceiver, mDesktopFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+            registerReceiver(mDesktopModeReceiver, mDesktopFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31-32
+            registerReceiver(mDesktopModeReceiver, mDesktopFilter, 0x00000001); // RECEIVER_NOT_EXPORTED
+        } else {
+            registerReceiver(mDesktopModeReceiver, mDesktopFilter);
+        }
 
         // Check for app updates
         if (BuildConfig.ENABLE_CHECK_APP_UPDATES) {
@@ -308,7 +314,14 @@ public class IITC_Mobile extends AppCompatActivity
 
         // receive downloadManagers downloadComplete intent
         // afterwards install iitc update
-        registerReceiver(mBroadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        IntentFilter downloadFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+            registerReceiver(mBroadcastReceiver, downloadFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31-32
+            registerReceiver(mBroadcastReceiver, downloadFilter, 0x00000001); // RECEIVER_NOT_EXPORTED
+        } else {
+            registerReceiver(mBroadcastReceiver, downloadFilter);
+        }
 
         this.firstTimeIntro();
 
