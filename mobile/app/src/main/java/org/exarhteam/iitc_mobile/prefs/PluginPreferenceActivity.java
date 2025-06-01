@@ -270,8 +270,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         boolean devMode = getSharedPreferences("IITC_Mobile", MODE_PRIVATE)
                 .getBoolean("pref_dev_checkbox", false);
 
-        mFileManager.getPluginManager().loadAllPlugins(
-                this,
+        IITC_PluginManager.getInstance().loadAllPlugins(
                 mFileManager.getStorageManager(),
                 getAssets(),
                 devMode
@@ -279,7 +278,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
         // Get plugins grouped by category from PluginManager
         Map<String, List<IITC_PluginManager.Plugin>> pluginsByCategory =
-                mFileManager.getPluginManager().getPluginsByCategory();
+                IITC_PluginManager.getInstance().getPluginsByCategory();
 
         // Convert PluginManager data to legacy format for UI
         for (Map.Entry<String, List<IITC_PluginManager.Plugin>> entry : pluginsByCategory.entrySet()) {

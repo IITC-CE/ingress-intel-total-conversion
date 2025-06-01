@@ -80,8 +80,7 @@ public class PluginsFragment extends PreferenceFragment {
         String pluginId = pluginInfo.getKey();
 
         // Get the actual plugin from PluginManager to find the file
-        IITC_FileManager fileManager = new IITC_FileManager(getActivity());
-        IITC_PluginManager.Plugin plugin = fileManager.getPluginManager().getPlugin(pluginId);
+        IITC_PluginManager.Plugin plugin = IITC_PluginManager.getInstance().getPlugin(pluginId);
 
         if (plugin == null || !plugin.isUser()) {
             return false;

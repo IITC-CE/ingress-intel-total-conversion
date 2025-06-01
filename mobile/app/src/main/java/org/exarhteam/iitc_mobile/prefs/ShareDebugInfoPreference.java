@@ -1,6 +1,5 @@
 package org.exarhteam.iitc_mobile.prefs;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,13 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import org.exarhteam.iitc_mobile.BuildConfig;
-import org.exarhteam.iitc_mobile.IITC_FileManager;
 import org.exarhteam.iitc_mobile.IITC_PluginManager;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.share.SendToClipboard;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
-
-import java.util.List;
 
 public class ShareDebugInfoPreference extends Preference {
     private String iitcVersion;
@@ -73,7 +69,7 @@ public class ShareDebugInfoPreference extends Preference {
 
     private int getUserPluginCount() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        return IITC_PluginManager.getEnabledUserPluginCount(getContext(), preferences);
+        return IITC_PluginManager.getInstance().getEnabledUserPluginCount(preferences);
     }
 
     private String getBooleanDescription(String prefPopup, boolean defaultValue) {

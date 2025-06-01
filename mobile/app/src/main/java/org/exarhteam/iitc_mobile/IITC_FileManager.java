@@ -1,6 +1,5 @@
 package org.exarhteam.iitc_mobile;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -66,7 +65,7 @@ public class IITC_FileManager {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
         mAssetManager = mActivity.getAssets();
         mStorageManager = new IITC_StorageManager(activity);
-        mPluginManager = new IITC_PluginManager();
+        mPluginManager = IITC_PluginManager.getInstance();
     }
 
     /**
@@ -191,7 +190,7 @@ public class IITC_FileManager {
         }
 
         try {
-            String content = mPluginManager.readPluginContent(plugin, mActivity, mStorageManager, mAssetManager);
+            String content = mPluginManager.readPluginContent(plugin, mStorageManager, mAssetManager);
             if (content.isEmpty()) {
                 Log.e("Plugin content is empty: " + pluginId);
                 return EMPTY;
@@ -391,10 +390,6 @@ public class IITC_FileManager {
 
     public IITC_StorageManager getStorageManager() {
         return mStorageManager;
-    }
-
-    public IITC_PluginManager getPluginManager() {
-        return mPluginManager;
     }
 
     private class ScriptUpdatedCallback implements UpdateScript.ScriptUpdatedFinishedCallback {

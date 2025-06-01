@@ -85,7 +85,7 @@ public class IITC_WebViewClient extends WebViewClient {
 
         // Get all enabled plugins through PluginManager
         List<IITC_PluginManager.Plugin> enabledPlugins =
-                mIitc.getFileManager().getPluginManager().getEnabledPlugins(mSharedPrefs);
+                IITC_PluginManager.getInstance().getEnabledPlugins(mSharedPrefs);
 
         for (IITC_PluginManager.Plugin plugin : enabledPlugins) {
             scripts.add("plugin" + DOMAIN + "/" + plugin.id);

@@ -270,8 +270,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         // Initialize PluginManager
         boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
-        mFileManager.getPluginManager().loadAllPlugins(
-                this,
+        IITC_PluginManager.getInstance().loadAllPlugins(
                 mFileManager.getStorageManager(),
                 getAssets(),
                 devMode
@@ -371,8 +370,7 @@ public class IITC_Mobile extends AppCompatActivity
         } else if (key.equals("pref_dev_checkbox")) {
             // Reload PluginManager when dev mode changes
             boolean devMode = sharedPreferences.getBoolean("pref_dev_checkbox", false);
-            mFileManager.getPluginManager().loadAllPlugins(
-                    this,
+            IITC_PluginManager.getInstance().loadAllPlugins(
                     mFileManager.getStorageManager(),
                     getAssets(),
                     devMode

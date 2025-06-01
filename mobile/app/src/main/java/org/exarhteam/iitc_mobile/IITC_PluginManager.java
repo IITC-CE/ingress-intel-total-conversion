@@ -1,7 +1,5 @@
 package org.exarhteam.iitc_mobile;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Build;
@@ -23,6 +21,8 @@ import java.util.TreeMap;
  */
 public class IITC_PluginManager {
 
+    private static IITC_PluginManager instance;
+
     public enum PluginType {
         ASSET,  // Built-in plugins from assets (lowest priority)
         DEV,    // Development override plugins (medium priority)
@@ -34,7 +34,7 @@ public class IITC_PluginManager {
         public final String id;             // "plugin" (without .user.js)
         public final PluginType type;       // Source type with priority
         public final PluginInfo info;       // Plugin metadata
-        public final DocumentFile file;    // File reference for DEV/USER, null for ASSET
+        public final DocumentFile file;     // File reference for DEV/USER, null for ASSET
 
         public Plugin(String name, String id, PluginType type, PluginInfo info, DocumentFile file) {
             this.name = name;
@@ -61,19 +61,33 @@ public class IITC_PluginManager {
     private final Map<String, Plugin> plugins = new HashMap<>();
 
     /**
+     * Private constructor for singleton pattern
+     */
+    private IITC_PluginManager() {}
+
+    /**
+     * Get singleton instance of PluginManager
+     */
+    public static synchronized IITC_PluginManager getInstance() {
+        if (instance == null) {
+            instance = new IITC_PluginManager();
+        }
+        return instance;
+    }
+
+    /**
      * Load and register all plugins from available sources
      */
-    public void loadAllPlugins(Context context, IITC_StorageManager storageManager,
-                               AssetManager assetManager, boolean devMode) {
+    public void loadAllPlugins(IITC_StorageManager storageManager, AssetManager assetManager, boolean devMode) {
         plugins.clear();
 
         loadAssetPlugins(assetManager);
 
         if (devMode) {
-            loadDevPlugins(context, storageManager);
+            loadDevPlugins(storageManager);
         }
 
-        loadUserPlugins(context, storageManager);
+        loadUserPlugins(storageManager);
 
         Log.d("PluginManager loaded " + plugins.size() + " plugins");
     }
@@ -113,7 +127,7 @@ public class IITC_PluginManager {
     /**
      * Load plugins from dev directory
      */
-    private void loadDevPlugins(Context context, IITC_StorageManager storageManager) {
+    private void loadDevPlugins(IITC_StorageManager storageManager) {
         DocumentFile devFolder = storageManager.getDevFolder();
         if (devFolder == null || !devFolder.exists()) return;
 
@@ -146,7 +160,7 @@ public class IITC_PluginManager {
     /**
      * Load plugins from user directory
      */
-    private void loadUserPlugins(Context context, IITC_StorageManager storageManager) {
+    private void loadUserPlugins(IITC_StorageManager storageManager) {
         DocumentFile[] userFiles = storageManager.getUserPlugins();
 
         for (DocumentFile file : userFiles) {
@@ -222,8 +236,7 @@ public class IITC_PluginManager {
     /**
      * Read plugin content (always reads fresh, no caching)
      */
-    public String readPluginContent(Plugin plugin, Context context,
-                                    IITC_StorageManager storageManager, AssetManager assetManager) {
+    public String readPluginContent(Plugin plugin, IITC_StorageManager storageManager, AssetManager assetManager) {
         try {
             InputStream stream;
 
@@ -285,30 +298,17 @@ public class IITC_PluginManager {
     /**
      * Get count of enabled user plugins
      */
-    public static int getEnabledUserPluginCount(Context context, SharedPreferences prefs) {
-        try {
-            IITC_FileManager fileManager = new IITC_FileManager((Activity) context);
-            IITC_PluginManager pluginManager = fileManager.getPluginManager();
+    public int getEnabledUserPluginCount(SharedPreferences prefs) {
+        int count = 0;
+        List<Plugin> userPlugins = getPluginsByType(PluginType.USER);
 
-            pluginManager.loadAllPlugins(context, fileManager.getStorageManager(),
-                    ((Activity) context).getAssets(),
-                    prefs.getBoolean("pref_dev_checkbox", false));
-
-            int count = 0;
-            List<IITC_PluginManager.Plugin> userPlugins = pluginManager.getPluginsByType(IITC_PluginManager.PluginType.USER);
-
-            for (IITC_PluginManager.Plugin plugin : userPlugins) {
-                if (pluginManager.isPluginEnabled(plugin.id, prefs)) {
-                    count++;
-                }
+        for (Plugin plugin : userPlugins) {
+            if (isPluginEnabled(plugin.id, prefs)) {
+                count++;
             }
-
-            return count;
-
-        } catch (Exception e) {
-            Log.e("Failed to get user plugin count", e);
-            return 0;
         }
+
+        return count;
     }
 
     /**
