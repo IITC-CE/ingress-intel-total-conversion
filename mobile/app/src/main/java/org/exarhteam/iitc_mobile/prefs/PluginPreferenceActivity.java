@@ -97,6 +97,9 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         // Call super :
         super.onResume();
 
+        // Reload plugin list in case folder access was granted
+        invalidateHeaders();
+
         // Select the displayed fragment in the headers (when using a tablet) :
         // This should be done by Android, it is a bug fix
         // thx to http://stackoverflow.com/a/16793839
@@ -295,7 +298,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
                 // Convert Plugin to PluginInfo with proper key
                 PluginInfo pluginInfo = new PluginInfo(plugin.info);
-                pluginInfo.setKey(plugin.id); // Use simple ID as key
+                pluginInfo.setKey(plugin.filename);
                 pluginInfo.setUserPlugin(isUserPlugin);
 
                 targetMap.get(category).add(pluginInfo);

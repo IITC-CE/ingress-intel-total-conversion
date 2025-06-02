@@ -297,4 +297,10 @@
     <string name="plugin_delete_failed">Failed to delete plugin</string>
     <string name="export_not_supported">Export not supported on this device</string>
     <string name="export_failed">Failed to export file</string>
+
+    <!-- Migration strings -->
+    <string name="migration_saf_title">Plugin System Update</string>
+    <string name="migration_saf_message">IITC Mobile has been updated to use a more secure folder access system. Instead of accessing your entire storage, the app now only requests access to the IITC_Mobile folder.\n\nSince you have user plugins enabled, please grant access to the IITC_Mobile folder to continue using them.</string>
+    <string name="migration_saf_button_grant">Grant Access</string>
+    <string name="migration_saf_button_later">Later</string>
 </resources>

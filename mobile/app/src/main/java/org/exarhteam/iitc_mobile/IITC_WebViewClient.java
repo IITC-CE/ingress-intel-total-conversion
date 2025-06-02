@@ -88,7 +88,7 @@ public class IITC_WebViewClient extends WebViewClient {
                 IITC_PluginManager.getInstance().getEnabledPlugins(mSharedPrefs);
 
         for (IITC_PluginManager.Plugin plugin : enabledPlugins) {
-            scripts.add("plugin" + DOMAIN + "/" + plugin.id);
+            scripts.add("plugin" + DOMAIN + "/" + plugin.filename);
         }
 
         // Inject user location script if enabled

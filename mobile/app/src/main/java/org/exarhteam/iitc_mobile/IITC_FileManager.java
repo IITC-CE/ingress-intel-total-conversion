@@ -177,22 +177,22 @@ public class IITC_FileManager {
         return new WebResourceResponse("application/javascript", "UTF-8", data);
     }
 
-    private WebResourceResponse getPlugin(final String pluginId) {
-        if (!mPrefs.getBoolean(pluginId, false)) {
-            Log.e("Attempted to inject plugin that is not enabled: " + pluginId);
+    private WebResourceResponse getPlugin(final String filename) {
+        if (!mPrefs.getBoolean(filename, false)) {
+            Log.e("Attempted to inject plugin that is not enabled: " + filename);
             return EMPTY;
         }
 
-        IITC_PluginManager.Plugin plugin = mPluginManager.getPlugin(pluginId);
+        IITC_PluginManager.Plugin plugin = mPluginManager.getPlugin(filename);
         if (plugin == null) {
-            Log.e("Plugin not found: " + pluginId);
+            Log.e("Plugin not found: " + filename);
             return EMPTY;
         }
 
         try {
             String content = mPluginManager.readPluginContent(plugin, mStorageManager, mAssetManager);
             if (content.isEmpty()) {
-                Log.e("Plugin content is empty: " + pluginId);
+                Log.e("Plugin content is empty: " + filename);
                 return EMPTY;
             }
 
@@ -200,10 +200,10 @@ public class IITC_FileManager {
             return new WebResourceResponse("application/javascript", "UTF-8", data);
 
         } catch (Exception e) {
-            Log.w("Could not load plugin: " + pluginId, e);
+            Log.w("Could not load plugin: " + filename, e);
             // Disable the plugin if it fails to load
             SharedPreferences.Editor editor = mPrefs.edit();
-            editor.remove(pluginId);
+            editor.remove(filename);
             editor.apply();
             return EMPTY;
         }

@@ -268,6 +268,10 @@ public class IITC_Mobile extends AppCompatActivity
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
 
+        // Perform data migrations
+        IITC_MigrationHelper migrationHelper = new IITC_MigrationHelper(this);
+        migrationHelper.performMigrations();
+
         // Initialize PluginManager
         boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
         IITC_PluginManager.getInstance().loadAllPlugins(
@@ -941,12 +945,23 @@ public class IITC_Mobile extends AppCompatActivity
                 if (treeUri != null && mFileManager != null) {
                     mFileManager.getStorageManager().handleFolderSelection(treeUri);
 
+                    // Reload PluginManager to pick up migrated plugins
+                    boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+                    IITC_PluginManager.getInstance().loadAllPlugins(
+                            mFileManager.getStorageManager(),
+                            getAssets(),
+                            devMode
+                    );
+
                     // Check for pending plugin installation
                     String pendingUri = mSharedPrefs.getString("pending_plugin_install", null);
                     if (pendingUri != null) {
                         mSharedPrefs.edit().remove("pending_plugin_install").apply();
                         mFileManager.installPlugin(Uri.parse(pendingUri), false);
                     }
+
+                    // Reload IITC to apply changes
+                    reloadIITC();
                 }
             }
             return;

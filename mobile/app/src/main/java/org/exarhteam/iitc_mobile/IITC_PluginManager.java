@@ -30,15 +30,13 @@ public class IITC_PluginManager {
     }
 
     public static class Plugin {
-        public final String name;           // "plugin.user.js"
-        public final String id;             // "plugin" (without .user.js)
+        public final String filename;       // Full filename including .user.js
         public final PluginType type;       // Source type with priority
         public final PluginInfo info;       // Plugin metadata
         public final DocumentFile file;     // File reference for DEV/USER, null for ASSET
 
-        public Plugin(String name, String id, PluginType type, PluginInfo info, DocumentFile file) {
-            this.name = name;
-            this.id = id;
+        public Plugin(String filename, PluginType type, PluginInfo info, DocumentFile file) {
+            this.filename = filename;
             this.type = type;
             this.info = info;
             this.file = file;
@@ -108,11 +106,10 @@ public class IITC_PluginManager {
                     String content = IITC_FileManager.readStream(stream);
                     PluginInfo info = IITC_FileManager.getScriptInfo(content);
 
-                    String pluginId = extractPluginId(fileName);
-                    Plugin plugin = new Plugin(fileName, pluginId, PluginType.ASSET, info, null);
+                    Plugin plugin = new Plugin(fileName, PluginType.ASSET, info, null);
 
                     if (!isExcludedCategory(info.getCategory())) {
-                        plugins.put(pluginId, plugin);
+                        plugins.put(fileName, plugin);
                     }
 
                 } catch (IOException e) {
@@ -144,11 +141,10 @@ public class IITC_PluginManager {
                 String content = IITC_FileManager.readStream(stream);
                 PluginInfo info = IITC_FileManager.getScriptInfo(content);
 
-                String pluginId = extractPluginId(fileName);
-                Plugin plugin = new Plugin(fileName, pluginId, PluginType.DEV, info, file);
+                Plugin plugin = new Plugin(fileName, PluginType.DEV, info, file);
 
                 if (!isExcludedCategory(info.getCategory())) {
-                    plugins.put(pluginId, plugin);
+                    plugins.put(fileName, plugin);
                 }
 
             } catch (IOException e) {
@@ -174,27 +170,16 @@ public class IITC_PluginManager {
                 String content = IITC_FileManager.readStream(stream);
                 PluginInfo info = IITC_FileManager.getScriptInfo(content);
 
-                String pluginId = extractPluginId(fileName);
-                Plugin plugin = new Plugin(fileName, pluginId, PluginType.USER, info, file);
+                Plugin plugin = new Plugin(fileName, PluginType.USER, info, file);
 
                 if (!isExcludedCategory(info.getCategory())) {
-                    plugins.put(pluginId, plugin);
+                    plugins.put(fileName, plugin);
                 }
 
             } catch (IOException e) {
                 Log.e("Failed to load user plugin: " + fileName, e);
             }
         }
-    }
-
-    /**
-     * Extract plugin ID from filename (remove .user.js extension)
-     */
-    private String extractPluginId(String fileName) {
-        if (fileName.endsWith(".user.js")) {
-            return fileName.substring(0, fileName.length() - 8);
-        }
-        return fileName;
     }
 
     /**
@@ -205,10 +190,10 @@ public class IITC_PluginManager {
     }
 
     /**
-     * Get plugin by ID
+     * Get plugin by filename
      */
-    public Plugin getPlugin(String pluginId) {
-        return plugins.get(pluginId);
+    public Plugin getPlugin(String filename) {
+        return plugins.get(filename);
     }
 
     /**
@@ -218,7 +203,7 @@ public class IITC_PluginManager {
         List<Plugin> enabled = new ArrayList<>();
 
         for (Plugin plugin : plugins.values()) {
-            if (isPluginEnabled(plugin.id, prefs)) {
+            if (isPluginEnabled(plugin.filename, prefs)) {
                 enabled.add(plugin);
             }
         }
@@ -229,8 +214,8 @@ public class IITC_PluginManager {
     /**
      * Check if plugin is enabled in preferences
      */
-    public boolean isPluginEnabled(String pluginId, SharedPreferences prefs) {
-        return prefs.getBoolean(pluginId, false);
+    public boolean isPluginEnabled(String filename, SharedPreferences prefs) {
+        return prefs.getBoolean(filename, false);
     }
 
     /**
@@ -241,7 +226,7 @@ public class IITC_PluginManager {
             InputStream stream;
 
             if (plugin.isAsset()) {
-                stream = assetManager.open("plugins/" + plugin.name);
+                stream = assetManager.open("plugins/" + plugin.filename);
             } else {
                 // DEV or USER plugin
                 stream = storageManager.openPluginInputStream(plugin.file);
@@ -250,7 +235,7 @@ public class IITC_PluginManager {
             return IITC_FileManager.readStream(stream);
 
         } catch (IOException e) {
-            Log.e("Failed to read plugin content: " + plugin.name, e);
+            Log.e("Failed to read plugin content: " + plugin.filename, e);
             return "";
         }
     }
@@ -303,7 +288,7 @@ public class IITC_PluginManager {
         List<Plugin> userPlugins = getPluginsByType(PluginType.USER);
 
         for (Plugin plugin : userPlugins) {
-            if (isPluginEnabled(plugin.id, prefs)) {
+            if (isPluginEnabled(plugin.filename, prefs)) {
                 count++;
             }
         }
