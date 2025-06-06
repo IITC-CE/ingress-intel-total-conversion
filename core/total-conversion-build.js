@@ -490,6 +490,7 @@ window.MAX_RESO_PER_PLAYER = [0, 8, 4, 4, 4, 2, 2, 1, 1];
  * @memberof ingress_constants
  */
 window.BASE_HACK_COOLDOWN = 300; // 5 mins - 300 seconds
+window.FACTION_HACK_COOLDOWN = 180; // 3 min - 180 seconds
 
 /**
  * Base value, how many times at most you can hack the portal.
