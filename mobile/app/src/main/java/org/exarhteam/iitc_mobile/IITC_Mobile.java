@@ -343,6 +343,33 @@ public class IITC_Mobile extends AppCompatActivity
             final int mode = Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0"));
             if (mUserLocation.setLocationMode(mode))
                 mReloadNeeded = true;
+            
+            // Sync plugin checkbox state with location mode preference
+            boolean shouldBeEnabled = mode != 0;
+            boolean isCurrentlyEnabled = mSharedPrefs.getBoolean("user-location.user.js", false);
+            
+            if (shouldBeEnabled != isCurrentlyEnabled) {
+                SharedPreferences.Editor editor = mSharedPrefs.edit();
+                editor.putBoolean("user-location.user.js", shouldBeEnabled);
+                editor.apply();
+            }
+            return;
+        } else if (key.equals("user-location.user.js")) {
+            // Sync location mode preference when user-location plugin checkbox changes
+            boolean pluginEnabled = sharedPreferences.getBoolean(key, false);
+            String currentMode = mSharedPrefs.getString("pref_user_location_mode", "0");
+            
+            if (pluginEnabled && "0".equals(currentMode)) {
+                // Enable location mode when plugin is enabled (default to show position)
+                SharedPreferences.Editor editor = mSharedPrefs.edit();
+                editor.putString("pref_user_location_mode", "1");
+                editor.apply();
+            } else if (!pluginEnabled && !"0".equals(currentMode)) {
+                // Disable location mode when plugin is disabled
+                SharedPreferences.Editor editor = mSharedPrefs.edit();
+                editor.putString("pref_user_location_mode", "0");
+                editor.apply();
+            }
             return;
         } else if (key.equals("pref_language")) {
             final String lang = mSharedPrefs.getString("pref_language", this.getCurrentLanguage().toString());
