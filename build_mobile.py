@@ -80,8 +80,6 @@ def build_mobile(source, scripts_dir, out_dir=None, out_name=None):
         assets_dir,
         ignore=shutil.ignore_patterns(*settings.ignore_patterns),
     )
-    user_location_plug = source / 'plugins' / 'user-location.js'
-    build_plugin.process_file(user_location_plug, assets_dir)
 
     if settings.gradle_buildtype == 'copyonly':
         return

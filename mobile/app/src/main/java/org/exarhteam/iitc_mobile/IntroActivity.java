@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -93,12 +92,6 @@ public class IntroActivity extends AppIntro implements OnLocaleChangedListener {
         addSlide(IntroSlide.createInstance(R.layout.intro_welcome));
         addSlide(IntroSlide.createInstance(R.layout.intro_location));
         askForPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
-
-        final NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
-        if (nfc != null) {
-            addSlide(IntroSlide.createInstance(R.layout.intro_nfc));
-            askForPermissions(new String[]{Manifest.permission.NFC}, 3);
-        }
 
         addSlide(IntroSlide.createInstance(R.layout.intro_navigation));
         addSlide(IntroSlide.createInstance(R.layout.intro_layers));

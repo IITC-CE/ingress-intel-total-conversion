@@ -112,7 +112,12 @@ public class UpdateChecker {
         }
 
         Intent downloadIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl));
-        PendingIntent downloadPendingIntent = PendingIntent.getActivity(context, 0, downloadIntent, 0);
+
+        int pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            pendingIntentFlags = 0;
+        }
+        PendingIntent downloadPendingIntent = PendingIntent.getActivity(context, 0, downloadIntent, pendingIntentFlags);
 
         String notificationTitle = this.context.getString(R.string.update_notifications_title);
         String notificationText = String.format(this.context.getString(R.string.update_notifications_text), remoteVersionName);
@@ -124,10 +129,17 @@ public class UpdateChecker {
                 .setContentIntent(downloadPendingIntent)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
         // Add "Hide Forever" action
         Intent hideForeverIntent = new Intent(context, UpdateCheckerReceiver.class);
         hideForeverIntent.setAction("HIDE_FOREVER");
-        PendingIntent hideForeverPendingIntent = PendingIntent.getBroadcast(context, 0, hideForeverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        int broadcastFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            broadcastFlags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+        PendingIntent hideForeverPendingIntent = PendingIntent.getBroadcast(context, 0, hideForeverIntent, broadcastFlags);
+
         builder.addAction(R.drawable.ic_action_warning, notificationActionHideForever, hideForeverPendingIntent);
 
         Notification notification = builder.build();

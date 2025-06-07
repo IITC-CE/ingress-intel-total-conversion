@@ -183,11 +183,6 @@
         IITC-CE Mobile requires permission to access your location for easy navigation.\n\n
         But don\'t worry: we don\'t send data about your location anywhere.
     </string>
-    <string name="appintro_nfc_title">NFC permission</string>
-    <string name="appintro_nfc_description">
-        You can quickly send the current portal link/permalink to another device if both devices support NFC.\n\n
-        Hold both devices back-to-back and tap the screen to beam the map to the other device.
-    </string>
     <string name="appintro_navigation_title">Navigation</string>
     <string name="appintro_navigation_description">
         Swipe from the left edge of your screen (or click the menu icon) to evoke the <i>Navigation Drawer</i>.\n
@@ -293,4 +288,19 @@
     </string>
     <string name="pref_check_for_updates">Update check</string>
     <string name="pref_check_for_updates_summary">Check for updates on startup</string>
+
+    <!-- Storage Access Framework -->
+    <string name="plugins_folder_access_title">Select plugins folder</string>
+    <string name="plugins_folder_access_message">To install custom plugins, IITC Mobile needs access to a folder where plugins will be stored. Please select the IITC_Mobile folder or create a new one.</string>
+    <string name="plugin_install_successful">Plugin installed successfully</string>
+    <string name="plugin_install_failed">Failed to install plugin</string>
+    <string name="plugin_delete_failed">Failed to delete plugin</string>
+    <string name="export_not_supported">Export not supported on this device</string>
+    <string name="export_failed">Failed to export file</string>
+
+    <!-- Migration strings -->
+    <string name="migration_saf_title">Plugin System Update</string>
+    <string name="migration_saf_message">IITC Mobile has been updated to use a more secure folder access system. Instead of accessing your entire storage, the app now only requests access to the IITC_Mobile folder.\n\nSince you have user plugins enabled, please grant access to the IITC_Mobile folder to continue using them.</string>
+    <string name="migration_saf_button_grant">Grant Access</string>
+    <string name="migration_saf_button_later">Later</string>
 </resources>

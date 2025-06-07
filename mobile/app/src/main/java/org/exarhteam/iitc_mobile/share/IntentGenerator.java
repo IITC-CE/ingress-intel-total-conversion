@@ -196,11 +196,9 @@ public class IntentGenerator {
 
         final ArrayList<Intent> targets = resolveTargets(intent);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            targets.add(new Intent(intent)
-                    .setComponent(new ComponentName(mContext, SaveToFile.class))
-                    .putExtra(EXTRA_FLAG_TITLE, mContext.getString(R.string.activity_save_to_file)));
-        }
+        targets.add(new Intent(intent)
+                .setComponent(new ComponentName(mContext, SaveToFile.class))
+                .putExtra(EXTRA_FLAG_TITLE, mContext.getString(R.string.activity_save_to_file)));
 
         return targets;
     }

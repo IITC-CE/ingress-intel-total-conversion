@@ -5,8 +5,8 @@
 .user-location .container {
   height: 32px;
   width: 32px;
-          transform-origin: center;
   -webkit-transform-origin: center;
+  transform-origin: center;
 }
 
 .user-location .container .inner,
@@ -42,8 +42,8 @@
 }
 
 .user-location .circle .inner {
-  transform: scale(0.6);
   -webkit-transform: scale(0.6);
+  transform: scale(0.6);
 }
 
 .user-location .arrow .inner,
@@ -59,7 +59,7 @@
 }
 
 .user-location .arrow .inner {
-  transform: scale(0.6) translateY(15%);
   -webkit-transform: scale(0.6) translateY(15%);
+  transform: scale(0.6) translateY(15%);
 }
 
