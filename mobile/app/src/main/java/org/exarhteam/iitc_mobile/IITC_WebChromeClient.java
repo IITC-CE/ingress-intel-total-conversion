@@ -108,7 +108,6 @@ public class IITC_WebChromeClient extends WebChromeClient {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private String[] convertToMimeTypes(String[] acceptTypes) {
         final Set<String> results = new HashSet<>();
         final MimeTypeMap mtm = MimeTypeMap.getSingleton();
@@ -131,9 +130,8 @@ public class IITC_WebChromeClient extends WebChromeClient {
     }
 
     /**
-     * show file chooser for WebView on Android >= 21
+     * show file chooser
      */
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         Log.d("Opening file chooser");
@@ -158,7 +156,6 @@ public class IITC_WebChromeClient extends WebChromeClient {
         return true;
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class FileRequestHandler implements IITC_Mobile.ResponseHandler {
         FileRequestHandler(ValueCallback<Uri[]> filePathCallback) {
             this.filePathCallback = filePathCallback;

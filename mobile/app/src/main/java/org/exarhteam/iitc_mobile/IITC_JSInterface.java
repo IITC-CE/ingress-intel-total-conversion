@@ -5,18 +5,17 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Environment;
+import android.os.Build;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-// provide communication between IITC script and android app
+/**
+ * JavaScript interface for communication between IITC script and Android app.
+ * Provides access to native Android functionality from within the WebView.
+ */
 public class IITC_JSInterface {
     // context of main activity
     protected final IITC_Mobile mIitc;
@@ -198,18 +197,10 @@ public class IITC_JSInterface {
 
     @JavascriptInterface
     public void saveFile(final String filename, final String type, final String content) {
-        try {
-            final File outFile = new File(Environment.getExternalStorageDirectory().getPath() +
-                    "/IITC_Mobile/export/" + filename);
-            outFile.getParentFile().mkdirs();
-
-            final FileOutputStream outStream = new FileOutputStream(outFile);
-            outStream.write(content.getBytes("UTF-8"));
-            outStream.close();
-            Toast.makeText(mIitc, "File exported to " + outFile.getPath(), Toast.LENGTH_SHORT).show();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
+        mIitc.runOnUiThread(() -> {
+            IITC_FileManager.FileSaveRequest saveRequest =
+                    mIitc.getFileManager().new FileSaveRequest(filename, type, content);
+        });
     }
 
     @JavascriptInterface

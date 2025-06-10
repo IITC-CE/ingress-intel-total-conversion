@@ -6,13 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,22 +20,23 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import org.exarhteam.iitc_mobile.IITC_FileManager;
 import org.exarhteam.iitc_mobile.IITC_NotificationHelper;
+import org.exarhteam.iitc_mobile.IITC_PluginManager;
+import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.fragments.PluginsFragment;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Preference activity for managing IITC plugins.
+ */
 public class PluginPreferenceActivity extends PreferenceActivity {
 
     private final static int COPY_PLUGIN_REQUEST = 1;
@@ -46,12 +44,8 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
     private List<Header> mHeaders;
     // we use a tree map to have a map with alphabetical order
-    // don't initialize the asset plugin map, because it tells us if the settings are started the first time
-    // and we have to parse plugins to build the preference screen
-    private static TreeMap<String, ArrayList<PluginInfo>> sAssetPlugins = null;
-    // user plugins can be initialized.
-    private static final TreeMap<String, ArrayList<PluginInfo>> sUserPlugins = new TreeMap<>();
-    private static int mDeletedPlugins = 0;
+    private static final Map<String, ArrayList<PluginInfo>> sAssetPlugins = new TreeMap<>();
+    private static final Map<String, ArrayList<PluginInfo>> sUserPlugins = new TreeMap<>();
 
     private IITC_FileManager mFileManager;
 
@@ -73,15 +67,9 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         nh.showNotice(IITC_NotificationHelper.NOTICE_EXTPLUGINS);
 
         mHeaders = target;
-        // since the plugins container is static,
-        // it is enough to parse the plugin only on first start.
-        if (sAssetPlugins == null) {
-            Log.d("opened plugin prefs the first time since app start -> parse plugins");
-            sAssetPlugins = new TreeMap<>();
-            setUpPluginPreferenceScreen();
-        } else {
-            checkForNewPlugins();
-        }
+
+        // Always rebuild plugin data to catch new installations
+        setUpPluginPreferenceScreen();
         addHeaders();
     }
 
@@ -109,6 +97,9 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         // Call super :
         super.onResume();
 
+        // Reload plugin list in case folder access was granted
+        invalidateHeaders();
+
         // Select the displayed fragment in the headers (when using a tablet) :
         // This should be done by Android, it is a bug fix
         // thx to http://stackoverflow.com/a/16793839
@@ -123,6 +114,15 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     }
                 }
             }
+        }
+
+        // Check for pending plugin installation
+        String pendingUri = getSharedPreferences("IITC_Mobile", MODE_PRIVATE)
+                .getString("pending_plugin_install", null);
+        if (pendingUri != null) {
+            getSharedPreferences("IITC_Mobile", MODE_PRIVATE).edit()
+                    .remove("pending_plugin_install").apply();
+            mFileManager.installPlugin(Uri.parse(pendingUri), true);
         }
     }
 
@@ -139,57 +139,76 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 onBackPressed();
                 return true;
             case R.id.menu_plugins_add:
-                if (mFileManager.checkWriteStoragePermissionGranted()) {
-                    // create the chooser Intent
-                    final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
-
-                    target.setType("*/*");
-                    // iitcm only parses *.user.js scripts
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        String[] mimeTypes = {"application/javascript", "text/plain", "text/javascript", "application/octet-stream"};
-                        target.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-                    }
-                    target.addCategory(Intent.CATEGORY_OPENABLE);
-
-                    try {
-                        startActivityForResult(Intent.createChooser(target, getString(R.string.file_browser_choose_file)), COPY_PLUGIN_REQUEST);
-                    } catch (final ActivityNotFoundException e) {
-                        Toast.makeText(this, getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
-                    }
+                if (checkStorageAccess()) {
+                    showPluginFileChooser();
                 }
                 return true;
             case R.id.menu_plugins_add_url:
-                if (mFileManager.checkWriteStoragePermissionGranted()) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(R.string.menu_plugins_add_url);
-
-                    final EditText input = new EditText(this);
-                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-                    builder.setView(input);
-
-                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            final String url = input.getText().toString();
-                            final Uri uri = Uri.parse(url);
-                            if (uri != null) {
-                                mFileManager.installPlugin(uri, true);
-                            }
-                        }
-                    });
-                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-
-                    builder.show();
+                if (checkStorageAccess()) {
+                    showPluginUrlDialog();
                 }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean checkStorageAccess() {
+        IITC_StorageManager storageManager = mFileManager.getStorageManager();
+        if (!storageManager.hasPluginsFolderAccess()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.plugins_folder_access_title)
+                    .setMessage(R.string.plugins_folder_access_message)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        storageManager.requestFolderAccess(this);
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+            return false;
+        }
+        return true;
+    }
+
+    private void showPluginFileChooser() {
+        final Intent target = new Intent(Intent.ACTION_GET_CONTENT);
+        target.setType("*/*");
+        String[] mimeTypes = {"application/javascript", "text/plain", "text/javascript", "application/octet-stream"};
+        target.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        target.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(Intent.createChooser(target, getString(R.string.file_browser_choose_file)), COPY_PLUGIN_REQUEST);
+        } catch (final ActivityNotFoundException e) {
+            Toast.makeText(this, getString(R.string.file_browser_is_required), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showPluginUrlDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.menu_plugins_add_url);
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        builder.setView(input);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String url = input.getText().toString();
+                final Uri uri = Uri.parse(url);
+                if (uri != null) {
+                    mFileManager.installPlugin(uri, true);
+                }
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     @Override
@@ -216,6 +235,16 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     return;
                 }
                 break;
+            case IITC_StorageManager.REQUEST_FOLDER_ACCESS:
+                if (resultCode == RESULT_OK && data != null) {
+                    Uri treeUri = data.getData();
+                    if (treeUri != null) {
+                        mFileManager.getStorageManager().handleFolderSelection(treeUri);
+                        invalidateHeaders();
+                        Toast.makeText(this, R.string.plugins_permission_granted, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
@@ -235,110 +264,49 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         return sAssetPlugins.get(key);
     }
 
-    private String[] getAssetPlugins() {
-        final AssetManager am = getAssets();
-        String[] asset_array = null;
-        try {
-            asset_array = am.list("plugins");
-        } catch (final IOException e) {
-            Log.w(e);
-        }
-        if (asset_array == null) {
-            asset_array = new String[0];
-        }
-        return asset_array;
-    }
-
-    private File[] getUserPlugins() {
-        final File directory = new File(IITC_FileManager.USER_PLUGINS_PATH);
-        File[] files = directory.listFiles();
-        if (files == null) {
-            files = new File[0];
-        }
-        return files;
-    }
-
-    void checkForNewPlugins() {
-        final File[] userPlugins = getUserPlugins();
-        final String[] officialPlugins = getAssetPlugins();
-        int numPlugins = 0;
-        for (final Map.Entry<String, ArrayList<PluginInfo>> entry : sUserPlugins.entrySet()) {
-            numPlugins += entry.getValue().size();
-        }
-        for (final Map.Entry<String, ArrayList<PluginInfo>> entry : sAssetPlugins.entrySet()) {
-            numPlugins += entry.getValue().size();
-        }
-        if ((userPlugins.length + officialPlugins.length) != (numPlugins + mDeletedPlugins)) {
-            Log.d("new or less plugins found since last start, rebuild preferences");
-            sAssetPlugins.clear();
-            sUserPlugins.clear();
-            mDeletedPlugins = 0;
-            setUpPluginPreferenceScreen();
-        }
-    }
-
     void setUpPluginPreferenceScreen() {
-        // get all plugins from asset manager
-        final String[] assets = getAssetPlugins();
-        for (final String asset : assets) {
-            // find user plugin name for user readable entries
-            try {
-                final InputStream is = getAssets().open("plugins/" + asset);
-                addPluginPreference(IITC_FileManager.readStream(is), asset, false);
-            } catch (final FileNotFoundException e) {
-                Log.e(asset + " not found", e);
-            } catch (final IOException e) {
-                Log.e("couldn't read plugin " + asset, e);
+        // Clear previous data
+        sAssetPlugins.clear();
+        sUserPlugins.clear();
+
+        // Load all plugins through PluginManager
+        boolean devMode = getSharedPreferences("IITC_Mobile", MODE_PRIVATE)
+                .getBoolean("pref_dev_checkbox", false);
+
+        IITC_PluginManager.getInstance().loadAllPlugins(
+                mFileManager.getStorageManager(),
+                getAssets(),
+                devMode
+        );
+
+        // Get plugins grouped by category from PluginManager
+        Map<String, List<IITC_PluginManager.Plugin>> pluginsByCategory =
+                IITC_PluginManager.getInstance().getPluginsByCategory();
+
+        // Convert PluginManager data to legacy format for UI
+        for (Map.Entry<String, List<IITC_PluginManager.Plugin>> entry : pluginsByCategory.entrySet()) {
+            String category = entry.getKey();
+
+            for (IITC_PluginManager.Plugin plugin : entry.getValue()) {
+                boolean isUserPlugin = plugin.isUser();
+
+                // Get or create category list
+                Map<String, ArrayList<PluginInfo>> targetMap = isUserPlugin ? sUserPlugins : sAssetPlugins;
+                if (!targetMap.containsKey(category)) {
+                    targetMap.put(category, new ArrayList<>());
+                }
+
+                // Convert Plugin to PluginInfo with proper key
+                PluginInfo pluginInfo = new PluginInfo(plugin.info);
+                pluginInfo.setKey(plugin.filename);
+                pluginInfo.setUserPlugin(isUserPlugin);
+
+                targetMap.get(category).add(pluginInfo);
             }
         }
 
-        // load user plugins from <storage-path>/IITC_Mobile/plugins/
-        final File[] files = getUserPlugins();
-        for (final File file : files) {
-            try {
-                final InputStream is = new FileInputStream(file);
-                addPluginPreference(IITC_FileManager.readStream(is), file.toString(), true);
-            } catch (final FileNotFoundException e) {
-                Log.e("couldn't read plugin " + file.toString(), e);
-            }
-        }
-    }
-
-    void addPluginPreference(final String src, final String plugin_key, final boolean userPlugin) {
-        // parse plugin name, description and category
-        // we need default versions here otherwise iitcm may crash
-        final PluginInfo info = IITC_FileManager.getScriptInfo(src);
-        final String plugin_name = info.getName();
-        final String plugin_cat = info.getCategory();
-
-        // do not add deleted or stock map plugins
-        if (plugin_cat.equals("Deleted") || plugin_cat.equals("Stock")) {
-            mDeletedPlugins++;
-            return;
-        }
-
-        // now we have all stuff together and can build the preference
-        // first check if we need a new category
-        if (userPlugin) {
-            if (!sUserPlugins.containsKey(plugin_cat)) {
-                sUserPlugins.put(plugin_cat, new ArrayList<>());
-                Log.d("create " + plugin_cat + " and add " + plugin_name);
-            }
-        } else {
-            if (!sAssetPlugins.containsKey(plugin_cat)) {
-                sAssetPlugins.put(plugin_cat, new ArrayList<>());
-                Log.d("create " + plugin_cat + " and add " + plugin_name);
-            }
-        }
-
-        // now build a new checkable preference for the plugin
-        addPluginInfo(userPlugin ? sUserPlugins.get(plugin_cat) : sAssetPlugins.get(plugin_cat), plugin_key, info, userPlugin);
-    }
-
-    private void addPluginInfo(List<PluginInfo> list, String plugin_key, PluginInfo pluginInfo, boolean userPlugin) {
-        pluginInfo.setKey(plugin_key);
-        pluginInfo.setUserPlugin(userPlugin);
-        list.add(pluginInfo);
+        Log.d("Plugin preference screen setup complete. Asset categories: " +
+                sAssetPlugins.size() + ", User categories: " + sUserPlugins.size());
     }
 
     void addHeaders() {
@@ -465,7 +433,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                 case HEADER_TYPE_NORMAL:
                     holder.title.setText(header.getTitle(getContext().getResources()));
                     final CharSequence summary = header.getSummary(getContext().getResources());
-                    if (!TextUtils.isEmpty(summary)) {
+                    if (summary != null && summary.length() > 0) {
                         holder.summary.setVisibility(View.VISIBLE);
                         holder.summary.setText(summary);
                     } else {
