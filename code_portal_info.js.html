@@ -399,7 +399,8 @@ window.getPortalHackDetails = function (d) {
   // first mod of type is fully effective, the others are only 50% effective
   var effectivenessReduction = [1, 0.5, 0.5, 0.5];
 
-  var cooldownTime = window.BASE_HACK_COOLDOWN;
+  var isFriendly = window.teamStringToId(d.team) === window.teamStringToId(window.PLAYER.team); 
+  var cooldownTime = isFriendly ? FACTION_HACK_COOLDOWN : window.BASE_HACK_COOLDOWN; 
 
   $.each(heatsinks, function (index, mod) {
     var hackSpeed = parseInt(mod.stats.HACK_SPEED) / 1000000;
