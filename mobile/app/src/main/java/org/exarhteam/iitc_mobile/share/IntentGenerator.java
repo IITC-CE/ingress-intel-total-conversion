@@ -78,8 +78,14 @@ public class IntentGenerator {
 
     private ArrayList<Intent> resolveTargets(final Intent intent) {
         final String packageName = mContext.getPackageName();
-        final List<ResolveInfo> activityList = mPackageManager.queryIntentActivities(intent, 0);
-        final ResolveInfo defaultTarget = mPackageManager.resolveActivity(intent, 0);
+
+        int flags = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags = PackageManager.MATCH_ALL;
+        }
+
+        final List<ResolveInfo> activityList = mPackageManager.queryIntentActivities(intent, flags);
+        final ResolveInfo defaultTarget = mPackageManager.resolveActivity(intent, flags);
 
         final ArrayList<Intent> list = new ArrayList<Intent>(activityList.size());
 
@@ -99,8 +105,9 @@ public class IntentGenerator {
                     .setComponent(component)
                     .putExtra(EXTRA_FLAG_TITLE, activity.loadLabel(mPackageManager));
 
-            if (resolveInfo.activityInfo.name.equals(defaultTarget.activityInfo.name) &&
-                    resolveInfo.activityInfo.packageName.equals(defaultTarget.activityInfo.packageName)) {
+            if (defaultTarget != null &&
+                resolveInfo.activityInfo.name.equals(defaultTarget.activityInfo.name) &&
+                resolveInfo.activityInfo.packageName.equals(defaultTarget.activityInfo.packageName)) {
                 targetIntent.putExtra(EXTRA_FLAG_IS_DEFAULT, true);
             }
 
@@ -117,8 +124,12 @@ public class IntentGenerator {
 
     public List<Intent> getBrowserIntents(final String title, final String url) {
         final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                .addCategory(Intent.CATEGORY_BROWSABLE)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_REQUIRE_NON_BROWSER);
+        }
 
         return ensureCopyIntentPresent(intent, resolveTargets(intent));
     }
@@ -126,8 +137,7 @@ public class IntentGenerator {
     public ArrayList<Intent> getGeoIntents(final String title, final String mLl, final int mZoom) {
         final Intent intent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse(String.format("geo:%s?z=%d", mLl, mZoom)))
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         final ArrayList<Intent> targets = resolveTargets(intent);
 
@@ -152,15 +162,13 @@ public class IntentGenerator {
     /**
      * get a list of intents capable of sharing a plain text string
      *
-     * @param title
-     *            description of the shared string
-     * @param text
-     *            the string to be shared
-     * @param contentType
+     * @param title description of the shared string
+     * @param text the string to be shared
+     * @param contentType MIME type
      */
     public List<Intent> getShareIntents(final String title, final String text, String contentType) {
         final Intent intent = new Intent(Intent.ACTION_SEND)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .setType(contentType)
                 .putExtra(Intent.EXTRA_SUBJECT, title)
                 .putExtra(Intent.EXTRA_TEXT, text);
@@ -182,17 +190,19 @@ public class IntentGenerator {
     /**
      * get a list of intents capable of sharing the given content
      *
-     * @param uri
-     *            URI of a file to share
-     * @param type
-     *            MIME type of the file
+     * @param uri URI of a file to share
+     * @param type MIME type of the file
      */
     public ArrayList<Intent> getShareIntents(final Uri uri, final String type) {
         final Intent intent = new Intent(Intent.ACTION_SEND)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .setType(type)
                 .putExtra(Intent.EXTRA_SUBJECT, uri.getLastPathSegment())
                 .putExtra(Intent.EXTRA_STREAM, uri);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
 
         final ArrayList<Intent> targets = resolveTargets(intent);
 
