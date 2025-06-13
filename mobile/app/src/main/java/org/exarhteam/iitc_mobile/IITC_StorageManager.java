@@ -217,9 +217,18 @@ public class IITC_StorageManager {
         DocumentFile[] allFiles = pluginsFolder.listFiles();
 
         for (DocumentFile file : allFiles) {
-            // Only add actual files with .user.js extension
-            if (file.isFile() && file.getName() != null && file.getName().endsWith(".user.js")) {
-                plugins.add(file);
+            if (file == null) continue;
+            
+            try {
+                String fileName = file.getName();
+                boolean isFile = file.isFile();
+                
+                if (isFile && fileName != null && fileName.endsWith(".user.js")) {
+                    plugins.add(file);
+                }
+            } catch (SecurityException | IllegalArgumentException e) {
+                // Handle cases where file access is denied or file no longer exists
+                Log.w("Skipping inaccessible file during plugin scan: " + e.getMessage());
             }
         }
         return plugins.toArray(new DocumentFile[0]);

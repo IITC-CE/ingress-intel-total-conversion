@@ -92,13 +92,26 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
     }
 
+    private boolean mLastFolderAccessState = false;
+    private boolean mFolderAccessStateInitialized = false;
+
     @Override
     protected void onResume() {
         // Call super :
         super.onResume();
 
-        // Reload plugin list in case folder access was granted
-        invalidateHeaders();
+        // Check if folder access state has changed since last check
+        boolean currentFolderAccess = mFileManager.getStorageManager().hasPluginsFolderAccess();
+        
+        if (!mFolderAccessStateInitialized) {
+            // First time - store the state
+            mLastFolderAccessState = currentFolderAccess;
+            mFolderAccessStateInitialized = true;
+        } else if (currentFolderAccess != mLastFolderAccessState) {
+            // State changed - invalidate headers to reload plugins
+            invalidateHeaders();
+            mLastFolderAccessState = currentFolderAccess;
+        }
 
         // Select the displayed fragment in the headers (when using a tablet) :
         // This should be done by Android, it is a bug fix

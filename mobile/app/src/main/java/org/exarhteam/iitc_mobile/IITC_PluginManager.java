@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Central plugin management system for IITC Mobile.
@@ -57,6 +58,22 @@ public class IITC_PluginManager {
 
     // Main registry: ID -> Plugin (highest priority only)
     private final Map<String, Plugin> plugins = new HashMap<>();
+    
+    // Plugin cache with modification time tracking
+    private static class CachedPlugin {
+        final String content;
+        final PluginInfo metadata;
+        final long lastModified;
+        
+        CachedPlugin(String content, PluginInfo metadata, long lastModified) {
+            this.content = content;
+            this.metadata = metadata;
+            this.lastModified = lastModified;
+        }
+    }
+    
+    // Thread-safe cache for plugin data
+    private final Map<String, CachedPlugin> pluginCache = new ConcurrentHashMap<>();
 
     /**
      * Private constructor for singleton pattern
@@ -101,19 +118,10 @@ public class IITC_PluginManager {
             for (String fileName : assetFiles) {
                 if (!fileName.endsWith(".user.js")) continue;
 
-                try {
-                    InputStream stream = assetManager.open("plugins/" + fileName);
-                    String content = IITC_FileManager.readStream(stream);
-                    PluginInfo info = IITC_FileManager.getScriptInfo(content);
-
+                PluginInfo info = getPluginMetadata(fileName, PluginType.ASSET, null, null, assetManager);
+                if (info != null && !isExcludedCategory(info.getCategory())) {
                     Plugin plugin = new Plugin(fileName, PluginType.ASSET, info, null);
-
-                    if (!isExcludedCategory(info.getCategory())) {
-                        plugins.put(fileName, plugin);
-                    }
-
-                } catch (IOException e) {
-                    Log.e("Failed to load asset plugin: " + fileName, e);
+                    plugins.put(fileName, plugin);
                 }
             }
         } catch (IOException e) {
@@ -131,24 +139,25 @@ public class IITC_PluginManager {
         DocumentFile[] devFiles = devFolder.listFiles();
 
         for (DocumentFile file : devFiles) {
-            if (file == null || !file.exists() || !file.isFile()) continue;
-
-            String fileName = file.getName();
-            if (fileName == null || !fileName.endsWith(".user.js")) continue;
+            if (file == null) continue;
 
             try {
-                InputStream stream = storageManager.openPluginInputStream(file);
-                String content = IITC_FileManager.readStream(stream);
-                PluginInfo info = IITC_FileManager.getScriptInfo(content);
-
-                Plugin plugin = new Plugin(fileName, PluginType.DEV, info, file);
-
-                if (!isExcludedCategory(info.getCategory())) {
-                    plugins.put(fileName, plugin);
+                // Batch file property reads to minimize SAF IPC calls
+                String fileName = file.getName();
+                boolean isFile = file.isFile();
+                
+                if (!isFile || fileName == null || !fileName.endsWith(".user.js")) {
+                    continue;
                 }
 
-            } catch (IOException e) {
-                Log.e("Failed to load dev plugin: " + fileName, e);
+                PluginInfo info = getPluginMetadata(fileName, PluginType.DEV, file, storageManager, null);
+                if (info != null && !isExcludedCategory(info.getCategory())) {
+                    Plugin plugin = new Plugin(fileName, PluginType.DEV, info, file);
+                    plugins.put(fileName, plugin);
+                }
+            } catch (SecurityException | IllegalArgumentException e) {
+                // Handle cases where file access is denied or file no longer exists
+                Log.w("Skipping inaccessible dev plugin file: " + e.getMessage());
             }
         }
     }
@@ -160,26 +169,96 @@ public class IITC_PluginManager {
         DocumentFile[] userFiles = storageManager.getUserPlugins();
 
         for (DocumentFile file : userFiles) {
-            if (file == null || !file.exists() || !file.isFile()) continue;
+            if (file == null) continue;
 
             String fileName = file.getName();
-            if (fileName == null || !fileName.endsWith(".user.js")) continue;
+            if (fileName == null) continue;
 
-            try {
-                InputStream stream = storageManager.openPluginInputStream(file);
-                String content = IITC_FileManager.readStream(stream);
-                PluginInfo info = IITC_FileManager.getScriptInfo(content);
-
+            PluginInfo info = getPluginMetadata(fileName, PluginType.USER, file, storageManager, null);
+            if (info != null && !isExcludedCategory(info.getCategory())) {
                 Plugin plugin = new Plugin(fileName, PluginType.USER, info, file);
-
-                if (!isExcludedCategory(info.getCategory())) {
-                    plugins.put(fileName, plugin);
-                }
-
-            } catch (IOException e) {
-                Log.e("Failed to load user plugin: " + fileName, e);
+                plugins.put(fileName, plugin);
             }
         }
+    }
+
+    /**
+     * Get cached plugin data, reading from file if needed
+     */
+    private CachedPlugin getCachedPluginData(String filename, PluginType type, DocumentFile file, 
+                                            IITC_StorageManager storageManager, AssetManager assetManager) {
+        // Asset plugins - no caching needed (fast access), read directly
+        if (type == PluginType.ASSET) {
+            try {
+                InputStream stream = assetManager.open("plugins/" + filename);
+                String content = IITC_FileManager.readStream(stream);
+                PluginInfo metadata = IITC_FileManager.getScriptInfo(content);
+                return new CachedPlugin(content, metadata, 0);
+            } catch (IOException e) {
+                Log.e("Failed to read asset plugin: " + filename, e);
+                return null;
+            }
+        }
+        
+        // File-based plugins (DEV/USER) - check modification time for caching
+        if (file == null) {
+            Log.e("Plugin file is null for non-asset plugin: " + filename);
+            return null;
+        }
+        
+        String cacheKey = type + ":" + filename;
+        CachedPlugin cached = pluginCache.get(cacheKey);
+        
+        // Get modification time only if we have cached data to compare
+        long currentModified = 0;
+        if (cached != null) {
+            try {
+                currentModified = file.lastModified();
+            } catch (SecurityException | IllegalArgumentException e) {
+                // File no longer accessible, invalidate cache
+                pluginCache.remove(cacheKey);
+                cached = null;
+            }
+        }
+        
+        // Return cached data if file hasn't been modified
+        if (cached != null && cached.lastModified == currentModified) {
+            return cached;
+        }
+        
+        // File has been modified or not cached yet - read fresh content
+        try {
+            InputStream stream = storageManager.openPluginInputStream(file);
+            String content = IITC_FileManager.readStream(stream);
+            PluginInfo metadata = IITC_FileManager.getScriptInfo(content);
+
+            // Get current modification time for caching
+            if (currentModified == 0) {
+                try {
+                    currentModified = file.lastModified();
+                } catch (SecurityException | IllegalArgumentException e) {
+                    // Use -1 to indicate unreliable timestamp, will cause cache miss
+                    currentModified = -1;
+                }
+            }
+
+            cached = new CachedPlugin(content, metadata, currentModified);
+            pluginCache.put(cacheKey, cached);
+            return cached;
+            
+        } catch (IOException e) {
+            Log.e("Failed to read plugin: " + filename, e);
+            return null;
+        }
+    }
+
+    /**
+     * Get plugin metadata with caching for file-based plugins
+     */
+    private PluginInfo getPluginMetadata(String filename, PluginType type, DocumentFile file, 
+                                        IITC_StorageManager storageManager, AssetManager assetManager) {
+        CachedPlugin cached = getCachedPluginData(filename, type, file, storageManager, assetManager);
+        return cached != null ? cached.metadata : null;
     }
 
     /**
@@ -219,25 +298,11 @@ public class IITC_PluginManager {
     }
 
     /**
-     * Read plugin content (always reads fresh, no caching)
+     * Read plugin content with caching for file-based plugins
      */
     public String readPluginContent(Plugin plugin, IITC_StorageManager storageManager, AssetManager assetManager) {
-        try {
-            InputStream stream;
-
-            if (plugin.isAsset()) {
-                stream = assetManager.open("plugins/" + plugin.filename);
-            } else {
-                // DEV or USER plugin
-                stream = storageManager.openPluginInputStream(plugin.file);
-            }
-
-            return IITC_FileManager.readStream(stream);
-
-        } catch (IOException e) {
-            Log.e("Failed to read plugin content: " + plugin.filename, e);
-            return "";
-        }
+        CachedPlugin cached = getCachedPluginData(plugin.filename, plugin.type, plugin.file, storageManager, assetManager);
+        return cached != null ? cached.content : "";
     }
 
     /**
@@ -301,5 +366,6 @@ public class IITC_PluginManager {
      */
     public void clear() {
         plugins.clear();
+        pluginCache.clear();
     }
 }
