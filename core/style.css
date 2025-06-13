@@ -444,17 +444,6 @@ mark {
   color: transparent;
 }
 
-/* divider */
-summary {
-  color: #bbb;
-  display: inline-block;
-  height: 16px;
-  overflow: hidden;
-  padding: 0 2px;
-  white-space: nowrap;
-  width: 100%;
-}
-
 #chatinput {
   position: absolute;
   bottom: 0;
