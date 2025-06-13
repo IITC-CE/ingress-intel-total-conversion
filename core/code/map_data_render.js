@@ -588,6 +588,8 @@ window.Render.prototype.rescalePortalMarkers = function () {
     // NOTE: we're not calling this because it resets highlights - we're calling it as it
     // resets the style (inc size) of all portal markers, applying the new scale
     window.resetHighlightedPortals();
+
+    window.ornaments.reload();    
   }
 };
 
