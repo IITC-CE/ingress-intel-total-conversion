@@ -9,13 +9,15 @@ import java.util.ArrayList;
 public abstract class Compass
 {
     public static Compass getDefaultCompass(final Context context) {
-        final Sensor gyro = ((SensorManager) context.getSystemService(Context.SENSOR_SERVICE))
-                .getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        final SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 
-        if (gyro != null)
-            return new GyroCompass(context);
-        else
-            return new AccMagCompass(context);
+        final Sensor rotationVector = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        if (rotationVector != null) {
+            return new RotationVectorCompass(context);
+        }
+
+        // No compass available on this device
+        return null;
     }
 
     private final ArrayList<CompassListener> mListeners = new ArrayList<CompassListener>();
