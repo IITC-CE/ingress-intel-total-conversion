@@ -106,74 +106,6 @@ window.runOnSmartphonesBeforeBoot = function () {
 };
 
 /**
- * Updates the mobile information bar with portal details when a portal is selected.
- * This function is hooked to the 'portalSelected' event and is specific to the smartphone layout.
- *
- * @function smartphoneInfo
- * @param {Object} selectedPortalData - The object containing details about the selected portal.
- */
-window.smartphoneInfo = function (selectedPortalData) {
-  var guid = selectedPortalData.selectedPortalGuid;
-  if (!window.portals[guid]) return;
-
-  var data = window.portals[window.selectedPortal].options.data;
-  if (typeof data.title === 'undefined') return;
-
-  var details = window.portalDetail.get(guid);
-
-  var lvl = data.level;
-  let t;
-  if (data.team === 'N' || data.team === 'NEUTRAL') t = '<span class="portallevel">L0</span>';
-  else t = '<span class="portallevel" style="background: ' + window.COLORS_LVL[lvl] + ';">L' + lvl + '</span>';
-
-  var percentage = data.health;
-  if (details) {
-    var totalEnergy = window.getTotalPortalEnergy(details);
-    if (window.getTotalPortalEnergy(details) > 0) {
-      percentage = Math.floor((window.getCurrentPortalEnergy(details) / totalEnergy) * 100);
-    }
-  }
-  t += ' ' + percentage + '% ';
-  t += data.title;
-
-  if (details) {
-    var l, v, max, perc;
-    var eastAnticlockwiseToNorthClockwise = [2, 1, 0, 7, 6, 5, 4, 3];
-
-    for (var ind = 0; ind < 8; ind++) {
-      let slot, reso;
-      if (details.resonators.length === 8) {
-        slot = eastAnticlockwiseToNorthClockwise[ind];
-        reso = details.resonators[slot];
-      } else {
-        slot = null;
-        reso = ind < details.resonators.length ? details.resonators[ind] : null;
-      }
-
-      var className = window.TEAM_TO_CSS[window.getTeam(details)];
-      if (slot !== null && window.OCTANTS[slot] === 'N') className += ' north';
-      if (reso) {
-        l = parseInt(reso.level);
-        v = parseInt(reso.energy);
-        max = window.RESO_NRG[l];
-        perc = (v / max) * 100;
-      } else {
-        l = 0;
-        v = 0;
-        max = 0;
-        perc = 0;
-      }
-
-      t += '<div class="resonator ' + className + '" style="border-top-color: ' + window.COLORS_LVL[l] + ';left: ' + (100 * ind) / 8.0 + '%;">';
-      t += '<div class="filllevel" style="width:' + perc + '%;"></div>';
-      t += '</div>';
-    }
-  }
-
-  $('#mobileinfo').html(t);
-};
-
-/**
  * Performs setup tasks for IITC on smartphones after the IITC boot process.
  * This includes initializing mobile info display, adjusting UI elements for mobile compatibility,
  * and setting event handlers for mobile-specific interactions.
@@ -185,18 +117,6 @@ window.runOnSmartphonesAfterBoot = function () {
   log.warn('running smartphone post boot stuff');
 
   window.show('map');
-
-  // add a div/hook for updating mobile info
-  $('#updatestatus').prepend('<div id="mobileinfo" onclick="show(\'info\')"></div>');
-  window.addHook('portalSelected', window.smartphoneInfo);
-  window.addHook('portalDetailLoaded', (data) => {
-    if (data.success && data.guid === window.selectedPortal) {
-      window.smartphoneInfo({ selectedPortalGuid: data.guid });
-    }
-  });
-
-  // init msg of status bar. hint for the user that a tap leads to the info screen
-  $('#mobileinfo').html('<div style="text-align: center"><b>tap here for info screen</b></div>');
 
   // replace img full view handler
   $('#portaldetails')
