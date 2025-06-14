@@ -91,11 +91,6 @@ public class IITC_WebViewClient extends WebViewClient {
             scripts.add("plugin" + DOMAIN + "/" + plugin.filename);
         }
 
-        // Inject user location script if enabled
-        if (Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0")) != 0) {
-            scripts.add("script" + DOMAIN + "/user-location.user.js");
-        }
-
         scripts.add("script" + DOMAIN + "/total-conversion-build.user.js");
 
         final String js = "(function(){['" + TextUtils.join("','", scripts) + "'].forEach(function(src) {" +
