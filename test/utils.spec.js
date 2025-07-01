@@ -183,7 +183,7 @@ describe('IITC.utils.unixTimeToString', () => {
     const timestamp = now.getTime();
     const timeString = IITC.utils.unixTimeToString(timestamp);
 
-    const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    const timeFormatter = new Intl.DateTimeFormat('sv-SE', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
