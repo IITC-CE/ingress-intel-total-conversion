@@ -60,6 +60,18 @@ public class IITC_MigrationHelper {
             }
         }
 
+        // Sync user-location plugin with location settings
+        // This ensures that when user-location becomes a standard plugin,
+        // it matches the user's location preference setting
+        String locationMode = prefs.getString("pref_user_location_mode", "0");
+        boolean locationEnabled = !locationMode.equals("0");
+        boolean userLocationPluginEnabled = prefs.getBoolean("user-location.user.js", false);
+        
+        if (locationEnabled && !userLocationPluginEnabled) {
+            Log.d("Migration", "Enabling user-location plugin to match location settings");
+            editor.putBoolean("user-location.user.js", true);
+        }
+
         editor.putBoolean("saf_plugins_migrated", true);
         editor.apply();
 
