@@ -56,6 +56,7 @@ public class IITC_WebView extends WebView {
         mSettings.setDomStorageEnabled(true);
         mSettings.setAllowFileAccess(true);
         mSettings.setGeolocationEnabled(true);
+        mSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         setSupportPopup(true);
         setWebViewZoom(Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1")));

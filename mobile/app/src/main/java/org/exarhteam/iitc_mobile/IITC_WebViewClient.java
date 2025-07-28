@@ -32,12 +32,10 @@ public class IITC_WebViewClient extends WebViewClient {
 
     private final IITC_Mobile mIitc;
     private boolean mIitcInjected = false;
-    private final IITC_TileManager mTileManager;
     private final SharedPreferences mSharedPrefs;
 
     public IITC_WebViewClient(final IITC_Mobile iitc) {
         mIitc = iitc;
-        mTileManager = new IITC_TileManager(mIitc);
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mIitc);
     }
 
@@ -206,23 +204,6 @@ public class IITC_WebViewClient extends WebViewClient {
      */
     @Override
     public WebResourceResponse shouldInterceptRequest(final WebView view, final String url) {
-        // if any tiles are requested, handle it with IITC_TileManager
-        if (url.matches(".*tile.*jpg.*") // mapquest tiles | ovi tiles
-                || url.matches(".*tile.*png.*") // cloudmade tiles
-                || url.matches(".*mts.*googleapis.*") // google tiles
-                || url.matches(".*khms.*googleapis.*") // google satellite tiles
-                || url.matches(".*tile.*jpeg.*") // bing tiles
-                || url.matches(".*maps.*yandex.*tiles.*") // yandex maps
-                || url.matches(".*cartocdn.*png.*") // cartoDB tiles
-        ) {
-            try {
-                return mTileManager.getTile(url);
-            } catch (final Exception e) {
-                Log.w(e);
-                return super.shouldInterceptRequest(view, url);
-            }
-        }
-
         if (url.contains("/css/common.css")) {
             // return custom stylesheet
             return new WebResourceResponse("text/css", "UTF-8", STYLE);
