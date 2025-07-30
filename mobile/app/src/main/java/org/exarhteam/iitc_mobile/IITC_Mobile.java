@@ -1267,6 +1267,14 @@ public class IITC_Mobile extends AppCompatActivity
         return mUserLocation;
     }
 
+    public String getIntelUrl() {
+        return mIntelUrl;
+    }
+
+    public String getDefaultUserAgent() {
+        return mIITCDefaultUA;
+    }
+
     public interface ResponseHandler {
         void onActivityResult(int resultCode, Intent data);
     }
