@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 
 import org.exarhteam.iitc_mobile.IITC_Mobile;
 import org.exarhteam.iitc_mobile.Log;
+import org.exarhteam.iitc_mobile.TileHttpHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,51 +31,15 @@ public class TileValidationChecker extends AsyncTask<String, Void, Boolean> {
             URL tileUrl = new URL(urls[0]);
             HttpURLConnection conn = (HttpURLConnection) tileUrl.openConnection();
 
-            String host = tileUrl.getHost();
-            String userAgent = mIitc.getUserAgentForHostname(host);
-
-            // Fallback to IITC default User-Agent for unknown hosts
-            if (userAgent == null) {
-                userAgent = mIitc.getDefaultUserAgent();
-            }
-
-            String referer = mIitc.getIntelUrl();
-
-            conn.setRequestProperty("User-Agent", userAgent);
-            conn.setRequestProperty("Referer", referer);
-            conn.setRequestMethod("HEAD"); // Use HEAD request - only get headers, not content
-            conn.setConnectTimeout(10000); // 10 seconds
-            conn.setReadTimeout(5000);     // 5 seconds for HEAD
+            TileHttpHelper.setTileHeadRequestHeaders(conn, mIitc, urls[0]);
             
             final File file = new File(mFilePath);
             if (!file.exists()) {
                 return true; // File doesn't exist, nothing to validate
             }
 
-            // Get modification times
-            final long urlLM = conn.getLastModified();
-            final long fileLM = file.lastModified();
-            
-            // some tiles don't have the lastModified header field set
-            // ...update tile every two month
-            final long updateTime = 2 * 30 * 24 * 60 * 60 * 1000L;
-            final long systemTime = System.currentTimeMillis();
-            
-            boolean shouldInvalidate = false;
-            
-            if (urlLM != 0) {
-                // Server provided Last-Modified header
-                if (urlLM > fileLM) {
-                    shouldInvalidate = true;
-                    Log.d("Tile outdated by server timestamp: " + file.toString());
-                }
-            } else {
-                // No Last-Modified header - use 2 month rule
-                if (fileLM <= systemTime - updateTime) {
-                    shouldInvalidate = true;
-                    Log.d("Tile outdated by age (>2 months): " + file.toString());
-                }
-            }
+            final long serverLastModified = conn.getLastModified();
+            boolean shouldInvalidate = TileHttpHelper.shouldUpdateTile(file, serverLastModified);
             
             if (shouldInvalidate) {
                 // Remove outdated tile from cache

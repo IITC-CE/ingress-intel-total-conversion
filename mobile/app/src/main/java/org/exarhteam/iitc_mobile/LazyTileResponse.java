@@ -49,36 +49,14 @@ public class LazyTileResponse extends WebResourceResponse {
         URL tileUrl = new URL(url);
         URLConnection conn = tileUrl.openConnection();
 
-        // Add proper headers like WebView does
-        String host = tileUrl.getHost();
-        String userAgent = iitc.getUserAgentForHostname(host);
-
-        // Fallback to IITC default User-Agent for unknown hosts
-        if (userAgent == null) {
-            userAgent = iitc.getDefaultUserAgent();
-        }
-
-        String referer = iitc.getIntelUrl();
-        String accept = "image/webp,image/apng,image/*,*/*;q=0.8";
-
-        conn.setRequestProperty("User-Agent", userAgent);
-        conn.setRequestProperty("Referer", referer);
-        conn.setRequestProperty("Accept", accept);
-        conn.setConnectTimeout(10000); // 10 seconds
-        conn.setReadTimeout(30000);    // 30 seconds
+        TileHttpHelper.setTileGetRequestHeaders(conn, iitc, url);
 
         // Check if we need to update
         final File file = new File(cachePath);
-        final long updateTime = 2 * 30 * 24 * 60 * 60 * 1000L;
-        final long systemTime = System.currentTimeMillis();
-        final long urlLM = conn.getLastModified();
-        final long fileLM = file.lastModified();
+        final long serverLastModified = conn.getLastModified();
 
         // If file exists and is not outdated, return from cache instead
-        if (file.exists() && urlLM != 0 && urlLM <= fileLM) {
-            return new BufferedInputStream(new FileInputStream(file));
-        }
-        if (file.exists() && urlLM == 0 && (fileLM > systemTime - updateTime)) {
+        if (!TileHttpHelper.shouldUpdateTile(file, serverLastModified)) {
             return new BufferedInputStream(new FileInputStream(file));
         }
         

@@ -41,16 +41,7 @@ public class IITC_TileManager {
 
         // do the tile management
         File file = new File(path);
-        if (file.exists() && file.length() > 0) {
-            // Check if tile is too old (>2 months) - if so, force refresh
-            final long updateTime = 2 * 30 * 24 * 60 * 60 * 1000L; // 2 months
-            final long systemTime = System.currentTimeMillis();
-            final long fileLM = file.lastModified();
-            
-            if (fileLM <= systemTime - updateTime) {
-                return new LazyTileResponse(url, path, mIitc);
-            }
-
+        if (TileHttpHelper.isTileValidForCache(file)) {
             // File exists and is not too old - return immediately
             // Also start background validation to check server's Last-Modified
             new TileValidationChecker(path, mIitc).execute(url);
@@ -58,7 +49,7 @@ public class IITC_TileManager {
             InputStream in = new BufferedInputStream(new FileInputStream(file));
             return new WebResourceResponse(TYPE, ENCODING, in);
         } else {
-            // file doesn't exist or is corrupted - use lazy loading
+            // file doesn't exist, is corrupted, or too old - use lazy loading
             return new LazyTileResponse(url, path, mIitc);
         }
     }
