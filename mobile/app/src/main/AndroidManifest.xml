@@ -78,9 +78,8 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-                <data android:host="intel.ingress.com"/>
+                <data android:scheme="http" android:host="intel.ingress.com"/>
+                <data android:scheme="https" android:host="intel.ingress.com"/>
             </intent-filter>
 
             <!-- Handles the implicit intent to VIEW legacy [www.]ingress.com/intel URI -->
@@ -90,11 +89,10 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-                <data android:host="ingress.com"/>
-                <data android:host="www.ingress.com"/>
-                <data android:pathPrefix="/intel"/>
+                <data android:scheme="http" android:host="ingress.com" android:pathPrefix="/intel"/>
+                <data android:scheme="https" android:host="ingress.com" android:pathPrefix="/intel"/>
+                <data android:scheme="http" android:host="www.ingress.com" android:pathPrefix="/intel"/>
+                <data android:scheme="https" android:host="www.ingress.com" android:pathPrefix="/intel"/>
             </intent-filter>
 
             <!-- Handles geo: URIs -->
@@ -105,6 +103,16 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data android:scheme="geo"/>
+            </intent-filter>
+
+            <!-- Handles iitc: URIs -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="iitc"/>
             </intent-filter>
 
             <!-- Points to searchable meta data. -->
@@ -143,9 +151,8 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-                <data android:host="*" android:pathPattern=".*\\.user.js"/>
+                <data android:scheme="http" android:pathPattern=".*\\.user\\.js"/>
+                <data android:scheme="https" android:pathPattern=".*\\.user\\.js"/>
             </intent-filter>
         </activity>
 
