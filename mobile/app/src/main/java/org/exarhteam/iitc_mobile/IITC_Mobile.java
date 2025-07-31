@@ -178,6 +178,14 @@ public class IITC_Mobile extends AppCompatActivity
         mIITCDefaultUA = sanitizeUserAgent(mIITCOriginalUA);
         final String googleUA = mIITCDefaultUA;
 
+        // IITC-Mobile User-Agent for tile servers with strip build details after first dash
+        String version = BuildConfig.VERSION_NAME;
+        int dashIndex = version.indexOf('-');
+        if (dashIndex != -1) {
+            version = version.substring(0, dashIndex);
+        }
+        final String iitcMobileUA = "IITC-Mobile/" + version + " (https://github.com/IITC-CE/ingress-intel-total-conversion)";
+        
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
         mAllowedHostnames.put("google.com", googleUA);
         mAllowedHostnames.put("youtube.com", googleUA);
@@ -185,6 +193,8 @@ public class IITC_Mobile extends AppCompatActivity
         mAllowedHostnames.put("appleid.apple.com", mIITCDefaultUA);
         mAllowedHostnames.put("signin.nianticlabs.com", mIITCDefaultUA);
         mAllowedHostnames.put("signin.nianticspatial.com", mIITCDefaultUA);
+        mAllowedHostnames.put("openstreetmap.org", iitcMobileUA);
+        mAllowedHostnames.put("openstreetmap.fr", iitcMobileUA);
 
         // enable progress bar above action bar
         // must be called BEFORE calling parent method
