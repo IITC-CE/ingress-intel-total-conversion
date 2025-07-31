@@ -301,23 +301,34 @@ IITC.statusbar.map = {
  */
 IITC.statusbar.portal = {
   _data: null,
+  _lastSentData: null, // Keep last sent data to avoid sending empty info
 
   /**
    * Gets detailed data about a specific portal.
    *
    * @function IITC.statusbar.portal.getData
    * @param {string} guid - The portal's globally unique identifier
-   * @returns {Object|null} Structured portal data including team, level, health, and resonators,
+   * @returns {Object|null} Structured portal data including team, level, health, resonators, and loading state,
    *                        or null if the portal is not found
    */
   getData(guid) {
-    if (!guid || !window.portals[guid]) return null;
+    if (!guid) {
+      this._lastSentData = null;
+      return null;
+    }
+
+    // If portal doesn't exist or has no basic data, return previous data with loading state
+    if (!window.portals[guid]) {
+      return this._lastSentData ? { ...this._lastSentData, isLoading: true } : null;
+    }
 
     const portal = window.portals[guid];
     const data = portal.options.data;
 
-    // Early return if we don't have the basic data
-    if (typeof data.title === 'undefined') return null;
+    // If we don't have basic data, return previous data with loading state
+    if (typeof data.title === 'undefined') {
+      return this._lastSentData ? { ...this._lastSentData, isLoading: true } : null;
+    }
 
     // Get portal details object if available
     const details = window.portalDetail.get(guid);
@@ -334,6 +345,11 @@ IITC.statusbar.portal = {
     // Determine if portal is neutral
     const isNeutral = data.team === 'N' || data.team === 'NEUTRAL';
 
+    // Determine if we have complete portal details
+    // For neutral portals, having details object is enough (they don't have resonators)
+    // For occupied portals, we need details with resonators
+    const hasCompleteDetails = details && (isNeutral || (details.resonators && details.resonators.length > 0));
+
     // Build structured result data
     const result = {
       guid,
@@ -344,10 +360,11 @@ IITC.statusbar.portal = {
       health: healthPct,
       resonators: [],
       levelColor: !isNeutral ? window.COLORS_LVL[data.level] : null,
+      isLoading: !hasCompleteDetails, // True until we have complete portal details
     };
 
-    // Process resonators if available
-    if (details && details.resonators && details.resonators.length > 0) {
+    // Process resonators if available (only for non-neutral portals)
+    if (hasCompleteDetails && !isNeutral && details.resonators && details.resonators.length > 0) {
       // Create empty array with placeholders for all 8 positions
       result.resonators = COMPASS_DIRECTIONS.map((direction, index) => ({
         direction,
@@ -400,6 +417,7 @@ IITC.statusbar.portal = {
       }
     }
 
+    this._lastSentData = result;
     this._data = result;
     return result;
   },
@@ -474,9 +492,9 @@ IITC.statusbar.portal = {
 
     if (window.isApp && window.app.setPortalStatus) {
       if (data) {
-        window.app.setPortalStatus(data.guid, data.team, data.level, data.title, data.health, data.resonators, data.levelColor);
+        window.app.setPortalStatus(data.guid, data.team, data.level, data.title, data.health, data.resonators, data.levelColor, data.isLoading);
       } else {
-        window.app.setPortalStatus(null, null, null, null, null, null, null);
+        window.app.setPortalStatus(null, null, null, null, null, null, null, false);
       }
     }
 
@@ -485,6 +503,11 @@ IITC.statusbar.portal = {
       const mobileinfo = document.getElementById('mobileinfo');
       if (mobileinfo) {
         mobileinfo.innerHTML = this.render(data);
+        if (data && data.isLoading) {
+          mobileinfo.classList.add('loading');
+        } else {
+          mobileinfo.classList.remove('loading');
+        }
       }
     }
   },
