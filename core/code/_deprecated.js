@@ -187,3 +187,27 @@ window.androidCopy = function () {
 window.getTeam = function (details) {
   return IITC.utils.getTeamId(details.team);
 };
+
+/**
+ * Renders the status bar. This function updates the status bar with information about the current
+ * zoom level (portal levels and link lengths), map data loading progress, and any pending requests or failed requests.
+ * It schedules the update to the next event loop to improve performance and ensure smoother rendering.
+ *
+ * @deprecated
+ * @function renderUpdateStatus
+ */
+window.renderUpdateStatus = function () {
+  return IITC.statusbar.map.update();
+};
+
+/**
+ * Updates the mobile information bar with portal details when a portal is selected.
+ * This function is hooked to the 'portalSelected' event and is specific to the smartphone layout.
+ *
+ * @deprecated
+ * @function smartphoneInfo
+ * @param {Object} selectedPortalData - The object containing details about the selected portal.
+ */
+window.smartphoneInfo = function (selectedPortalData) {
+  return IITC.statusbar.portal.update(selectedPortalData);
+};
