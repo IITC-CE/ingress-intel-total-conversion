@@ -453,6 +453,14 @@ public class IITC_Mobile extends AppCompatActivity
                     return;
                 }
             }
+            
+            if (uri.getScheme().equals("iitc")) {
+                // Convert iitc:// scheme to https://intel.ingress.com/ URL
+                String convertedUrl = mIntelUrl + uri.getSchemeSpecificPart();
+                Log.d("loading iitc deep link: " + uri.toString() + " -> " + convertedUrl);
+                loadUrl(convertedUrl);
+                return;
+            }
 
             if (uri.getScheme().equals("geo")) {
                 try {
