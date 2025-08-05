@@ -1285,7 +1285,7 @@ public class IITC_Mobile extends AppCompatActivity
         return mUserLocation;
     }
 
-    public String getIntelUrl() {
+    public static String getIntelUrl() {
         return mIntelUrl;
     }
 

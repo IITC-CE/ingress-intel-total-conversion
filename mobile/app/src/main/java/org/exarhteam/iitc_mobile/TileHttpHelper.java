@@ -33,7 +33,7 @@ public class TileHttpHelper {
             userAgent = iitc.getDefaultUserAgent();
         }
         
-        String referer = iitc.getIntelUrl();
+        String referer = IITC_Mobile.getIntelUrl();
         
         // Set headers
         conn.setRequestProperty("User-Agent", userAgent);
