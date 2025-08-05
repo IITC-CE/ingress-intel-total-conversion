@@ -36,6 +36,14 @@
             <data android:scheme="geo" />
         </intent>
 
+        <!-- Intel Map links for default handler checking -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="intel.ingress.com" />
+        </intent>
+
         <!-- Ingress Prime -->
         <package android:name="com.nianticproject.ingress" />
     </queries>

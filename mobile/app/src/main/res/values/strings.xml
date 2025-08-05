@@ -303,4 +303,12 @@
     <string name="migration_saf_message">IITC Mobile has been updated to use a more secure folder access system. Instead of accessing your entire storage, the app now only requests access to the IITC_Mobile folder.\n\nSince you have user plugins enabled, please grant access to the IITC_Mobile folder to continue using them.</string>
     <string name="migration_saf_button_grant">Grant Access</string>
     <string name="migration_saf_button_later">Later</string>
+
+    <!-- Deep link permission strings -->
+    <string name="pref_deep_link_permission">Open Intel links in IITC Mobile</string>
+    <string name="pref_deep_link_permission_summary">Configure IITC Mobile to handle Intel Map links</string>
+    <string name="deep_link_permission_dialog_title">Open links in IITC Mobile?</string>
+    <string name="deep_link_permission_dialog_message">You can set IITC Mobile to automatically open Intel Map links instead of using a browser</string>
+    <string name="deep_link_permission_dialog_enable">Enable</string>
+    <string name="deep_link_permission_dialog_skip">Skip</string>
 </resources>
