@@ -353,9 +353,10 @@ const escapeJS = function (str) {
  * @memberof IITC.utils
  * @function escapeHtml
  * @param {string} str - The string to escape.
+ * @param {string[]} [allowedTags] - Optional array of allowed HTML tags that should not be escaped.
  * @returns {string} The escaped string.
  */
-const escapeHtml = function (str) {
+const escapeHtml = function (str, allowedTags = []) {
   const escapeMap = {
     '&amp;': '&amp;amp;',
     '&lt;': '&amp;lt;',
@@ -363,7 +364,27 @@ const escapeHtml = function (str) {
     '"': '&amp;quot;',
     "'": '&amp;#39;',
   };
-  return str.replace(/[&amp;&lt;>"']/g, (char) => escapeMap[char]);
+
+  if (allowedTags.length === 0) {
+    return str.replace(/[&amp;&lt;>"']/g, (char) => escapeMap[char]);
+  }
+
+  // Create pattern for allowed tags (self-closing and paired)
+  const allowedTagsPattern = new RegExp(`(&lt;\\/?(?:${allowedTags.join('|')})>)`, 'g');
+
+  // Split text by allowed tags to preserve them
+  const parts = str.split(allowedTagsPattern);
+
+  return parts
+    .map((part) => {
+      // If part matches allowed tags pattern, keep as is
+      if (allowedTagsPattern.test(part)) {
+        return part;
+      }
+      // Otherwise, escape HTML
+      return part.replace(/[&amp;&lt;>"']/g, (char) => escapeMap[char]);
+    })
+    .join('');
 };
 
 /**
@@ -437,7 +458,7 @@ const textToTable = function (text) {
   for (const row of rows) {
     let rowHtml = '&lt;tr>';
     for (let k = 0; k &lt; row.length; k++) {
-      const cell = IITC.utils.escapeHtml(row[k]);
+      const cell = IITC.utils.escapeHtml(row[k], ['hr', 'br', 'b', 'i', 'strong', 'em']);
       const colspan = k === 0 &amp;&amp; row.length &lt; columnCount ? ` colspan="${columnCount - row.length + 1}"` : '';
       rowHtml += `&lt;td${colspan}>${cell}&lt;/td>`;
     }
