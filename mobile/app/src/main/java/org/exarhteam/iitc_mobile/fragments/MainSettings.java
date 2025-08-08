@@ -18,6 +18,7 @@ import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.prefs.AboutDialogPreference;
+import org.exarhteam.iitc_mobile.prefs.DeepLinkPermissionPreference;
 import org.exarhteam.iitc_mobile.prefs.ShareDebugInfoPreference;
 
 public class MainSettings extends PreferenceFragment {
@@ -78,6 +79,18 @@ public class MainSettings extends PreferenceFragment {
             Preference updateCheckPref = findPreference("pref_check_for_updates");
             PreferenceCategory mCategory = (PreferenceCategory) findPreference("pref_mics");
             mCategory.removePreference(updateCheckPref);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        // Notify deep link preference about activity resume
+        DeepLinkPermissionPreference deepLinkPref = 
+            (DeepLinkPermissionPreference) findPreference("pref_deep_link_permission");
+        if (deepLinkPref != null) {
+            deepLinkPref.onActivityResumed();
         }
     }
 
