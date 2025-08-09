@@ -132,20 +132,29 @@ var setup = function () {
 
   // Hook for draw-tools plugin events
   if (window.plugin.drawTools) {
-    // This function will redraw circles for all markers currently on the map.
-    // It's used for initial load and for events that change multiple markers.
-    const syncAllDrawnMarkers = function () {
-      // 1. Remove all existing circles that belong to markers
-      for (const layerId in window.plugin.wayfarerrange.markerLayers) {
-        window.plugin.wayfarerrange.removeMarker(layerId);
-      }
+    // Sync function that only updates changed markers
+    const syncDrawnMarkers = function () {
+      const currentMarkers = new Set();
 
-      // 2. Add circles for all current markers
+      // Collect all current marker IDs
       window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
         if (layer instanceof L.Marker) {
-          window.plugin.wayfarerrange.setupWayfarerForMarker(layer);
+          const layerId = L.stamp(layer);
+          currentMarkers.add(layerId);
+
+          // Add circle if not already present
+          if (!window.plugin.wayfarerrange.markerLayers[layerId]) {
+            window.plugin.wayfarerrange.setupWayfarerForMarker(layer);
+          }
         }
       });
+
+      // Remove circles for markers that no longer exist
+      for (const layerId in window.plugin.wayfarerrange.markerLayers) {
+        if (!currentMarkers.has(parseInt(layerId))) {
+          window.plugin.wayfarerrange.removeMarker(layerId);
+        }
+      }
     };
 
     window.addHook('pluginDrawTools', function (e) {
@@ -160,14 +169,14 @@ var setup = function () {
         case 'layersEdited':
         case 'layersDeleted':
         case 'clear':
-          // For any other event, it's safest to just resync everything.
-          syncAllDrawnMarkers();
+          // Sync only updates what's changed
+          syncDrawnMarkers();
           break;
       }
     });
 
     // Initial sync for any markers that were loaded before this plugin.
-    syncAllDrawnMarkers();
+    syncDrawnMarkers();
   }
 
   // --- Initial State ---
