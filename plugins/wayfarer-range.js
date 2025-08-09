@@ -95,6 +95,14 @@ window.plugin.wayfarerrange.setupWayfarerForMarker = function (marker) {
   marker.on('remove', function () {
     window.plugin.wayfarerrange.removeMarker(layerId);
   });
+
+  // Set up listener for real-time circle updates during drag
+  marker.on('drag', function () {
+    var circle = window.plugin.wayfarerrange.markerLayers[layerId];
+    if (circle) {
+      circle.setLatLng(this.getLatLng());
+    }
+  });
 };
 
 window.plugin.wayfarerrange.showOrHide = function () {
@@ -133,7 +141,7 @@ var setup = function () {
   // Hook for draw-tools plugin events
   if (window.plugin.drawTools) {
     // Sync function that only updates changed markers
-    const syncDrawnMarkers = function () {
+    const syncDrawnMarkers = function (forceRecreate = false) {
       const currentMarkers = new Set();
 
       // Collect all current marker IDs
@@ -142,8 +150,11 @@ var setup = function () {
           const layerId = L.stamp(layer);
           currentMarkers.add(layerId);
 
-          // Add circle if not already present
-          if (!window.plugin.wayfarerrange.markerLayers[layerId]) {
+          // Add circle if not already present, or force recreate
+          if (!window.plugin.wayfarerrange.markerLayers[layerId] || forceRecreate) {
+            if (forceRecreate) {
+              window.plugin.wayfarerrange.removeMarker(layerId);
+            }
             window.plugin.wayfarerrange.setupWayfarerForMarker(layer);
           }
         }
@@ -165,8 +176,14 @@ var setup = function () {
             window.plugin.wayfarerrange.setupWayfarerForMarker(e.layer);
           }
           break;
-        case 'import':
         case 'layersEdited':
+          // Handled by direct draw:edited event listener above
+          break;
+        case 'layersSnappedToPortals':
+          // When markers are snapped to portals, force recreate all circles
+          syncDrawnMarkers(true);
+          break;
+        case 'import':
         case 'layersDeleted':
         case 'clear':
           // Sync only updates what's changed
