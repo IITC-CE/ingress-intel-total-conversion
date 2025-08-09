@@ -20,7 +20,8 @@ var changelog = [
 
 // use own namespace for plugin
 window.plugin.wayfarerrange = function () {};
-window.plugin.wayfarerrange.wayfarerLayers = {};
+window.plugin.wayfarerrange.portalLayers = {};
+window.plugin.wayfarerrange.markerLayers = {};
 window.plugin.wayfarerrange.MIN_MAP_ZOOM = 16;
 
 window.plugin.wayfarerrange.CIRCLE_OPTIONS = {
@@ -40,16 +41,23 @@ window.plugin.wayfarerrange.portalAdded = function (data) {
   });
 
   data.portal.on('remove', function () {
-    window.plugin.wayfarerrange.remove(this.options.guid, this.options.team);
+    window.plugin.wayfarerrange.removePortal(this.options.guid);
   });
 };
 
-// guid can be a portal guid or a marker's internal leaflet layer ID
-window.plugin.wayfarerrange.remove = function (guid) {
-  var previousLayer = window.plugin.wayfarerrange.wayfarerLayers[guid];
+window.plugin.wayfarerrange.removePortal = function (guid) {
+  const previousLayer = window.plugin.wayfarerrange.portalLayers[guid];
   if (previousLayer) {
     window.plugin.wayfarerrange.wayfarerCircleHolderGroup.removeLayer(previousLayer);
-    delete window.plugin.wayfarerrange.wayfarerLayers[guid];
+    delete window.plugin.wayfarerrange.portalLayers[guid];
+  }
+};
+
+window.plugin.wayfarerrange.removeMarker = function (layerId) {
+  const previousLayer = window.plugin.wayfarerrange.markerLayers[layerId];
+  if (previousLayer) {
+    window.plugin.wayfarerrange.wayfarerCircleHolderGroup.removeLayer(previousLayer);
+    delete window.plugin.wayfarerrange.markerLayers[layerId];
   }
 };
 
@@ -61,10 +69,9 @@ window.plugin.wayfarerrange.draw = function (guid) {
   var circle = new L.Circle(latlng, window.plugin.wayfarerrange.RANGE_METERS, window.plugin.wayfarerrange.CIRCLE_OPTIONS);
 
   circle.addTo(window.plugin.wayfarerrange.wayfarerCircleHolderGroup);
-  window.plugin.wayfarerrange.wayfarerLayers[guid] = circle;
+  window.plugin.wayfarerrange.portalLayers[guid] = circle;
 };
 
-// This function replaces the old 'drawMarker'
 window.plugin.wayfarerrange.drawMarker = function (layerId) {
   // Use the marker's internal Leaflet ID to retrieve it
   var marker = window.plugin.drawTools.drawnItems.getLayer(layerId);
@@ -72,22 +79,21 @@ window.plugin.wayfarerrange.drawMarker = function (layerId) {
     return;
   }
 
-  var latlng = marker.getLatLng(); // Use the public getLatLng() method
+  var latlng = marker.getLatLng();
 
   var circle = new L.Circle(latlng, window.plugin.wayfarerrange.RANGE_METERS, window.plugin.wayfarerrange.CIRCLE_OPTIONS);
 
   circle.addTo(window.plugin.wayfarerrange.wayfarerCircleHolderGroup);
-  window.plugin.wayfarerrange.wayfarerLayers[layerId] = circle;
+  window.plugin.wayfarerrange.markerLayers[layerId] = circle;
 };
 
-// This is a new helper function to avoid duplicating code
 window.plugin.wayfarerrange.setupWayfarerForMarker = function (marker) {
   var layerId = L.stamp(marker); // L.stamp gets the unique Leaflet ID for a layer
   window.plugin.wayfarerrange.drawMarker(layerId);
 
   // Set up a listener to remove the circle when the marker is deleted
   marker.on('remove', function () {
-    window.plugin.wayfarerrange.remove(layerId);
+    window.plugin.wayfarerrange.removeMarker(layerId);
   });
 };
 
@@ -128,14 +134,10 @@ var setup = function () {
   if (window.plugin.drawTools) {
     // This function will redraw circles for all markers currently on the map.
     // It's used for initial load and for events that change multiple markers.
-    var syncAllDrawnMarkers = function () {
+    const syncAllDrawnMarkers = function () {
       // 1. Remove all existing circles that belong to markers
-      for (var guid in window.plugin.wayfarerrange.wayfarerLayers) {
-        // Portal GUIDs are 32-char hex strings. Leaflet layer IDs are numbers.
-        // A simple check is to see if it's NOT a known portal.
-        if (!window.portals[guid]) {
-          window.plugin.wayfarerrange.remove(guid);
-        }
+      for (const layerId in window.plugin.wayfarerrange.markerLayers) {
+        window.plugin.wayfarerrange.removeMarker(layerId);
       }
 
       // 2. Add circles for all current markers
