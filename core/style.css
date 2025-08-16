@@ -994,6 +994,10 @@ h3.title {
   padding: 4px 0.2em;
 }
 
+#innerstatus .failed-request {
+  color: #f66;
+}
+
 /* Dialogs
  */
 .ui-tooltip, .ui-dialog {
