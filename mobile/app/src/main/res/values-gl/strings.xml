@@ -18,7 +18,7 @@
     <string name="pref_about_title">Acerca do IITC Mobile</string>
     <string name="activity_share_to_clipboard">Copiar ao portapapeis</string>
     <string name="activity_settings">Axustes de IITC Mobile</string>
-    <string name="install_dialog_msg">&lt;p&gt;Solicitóuselle ao IITCm que instalase o seguinte ficheiro javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ten coidado:&lt;/b&gt; Javascript de fontes externas pode conter código malicioso (spyware, etc.)! &lt;p&gt;Seguro que queres continuar\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;Solicitóuselle ao IITCm que instalase o seguinte ficheiro javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ten coidado:&lt;/b&gt; Javascript de fontes externas pode conter código malicioso (spyware, etc.)! &lt;p&gt;Seguro que queres continuar?</string>
     <string name="install_dialog_top">Instalar plugin externo\?</string>
     <string name="label_overlay_layers">Capas superpostas</string>
     <string name="label_base_layer">Capa base</string>

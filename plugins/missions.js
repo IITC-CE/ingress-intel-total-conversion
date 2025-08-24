@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.3.4
+// @version        0.3.5
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.5',
+    changes: ['Fix mission link missing from sidebar'],
+  },
   {
     version: '0.3.4',
     changes: ['Refactoring: fix eslint'],

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="install_dialog_msg">&lt;p&gt;Poproszono IITCm o zainstalowanie następującego pliku javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Zachowaj ostrożność:&lt;/b&gt; JavaScript ze źródeł zewnętrznych może zawierać szkodliwy kod (oprogramowanie szpiegujące itp.)! &lt;p&gt;Czy na pewno chcesz kontynuować\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;Poproszono IITCm o zainstalowanie następującego pliku javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Zachowaj ostrożność:&lt;/b&gt; JavaScript ze źródeł zewnętrznych może zawierać szkodliwy kod (oprogramowanie szpiegujące itp.)! &lt;p&gt;Czy na pewno chcesz kontynuować?</string>
     <string name="install_dialog_top">Zainstalować wtyczkę zewnętrzną\?</string>
     <string name="label_overlay_layers">Dodatkowe warstwy</string>
     <string name="label_base_layer">Warstwa podstawowa</string>
@@ -143,7 +143,6 @@
     <string name="pref_check_for_updates_summary">Sprawdź aktualizacje po uruchomieniu</string>
     <string name="ok">OK</string>
     <string name="update_notifications_title">Dostępna jest nowa wersja mobilna IITC</string>
-    <string name="appintro_nfc_title">Uprawnienia NFC</string>
     <string name="update_notifications_action_hide_forever">Ukryj na zawsze</string>
     <string name="menu_share_plugin_file">Udostępnij plik wtyczki</string>
     <string name="appintro_welcome_description">To jest mobilna wersja niezbędnego pomocnika dla gracza Ingress.
@@ -165,9 +164,6 @@
     <string name="appintro_location_description">IITC-CE Mobile wymaga pozwolenia na dostęp do Twojej lokalizacji w celu łatwej nawigacji.
 \n
 \n Ale nie martw się: nigdzie nie wysyłamy danych o Twojej lokalizacji.</string>
-    <string name="appintro_nfc_description">Możesz szybko wysłać bieżący link do portalu/link bezpośredni do innego urządzenia, jeśli oba urządzenia obsługują NFC.
-\n
-\n Przytrzymaj oba urządzenia jeden po drugim i dotknij ekranu, aby przesłać mapę do drugiego urządzenia.</string>
     <string name="appintro_navigation_description"> Przesuń palcem od lewej krawędzi ekranu (lub kliknij ikonę menu), aby wywołać <i>Szufladę nawigacji</i>.
 \n Kliknij ikonę Wstecz, aby powrócić do mapy.
 \n
