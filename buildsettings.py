@@ -57,6 +57,7 @@ builds = {  # every build entry extends common defaults
         'url_dist_base': 'http://localhost:8000',
         'update_file': '.user.js',
         'version_timestamp': True,
+        'post_build': ['web_meta_gen.py']
     },
 
     # use no-inject wrapper for easy breakpoints (Tampermonkey only!)

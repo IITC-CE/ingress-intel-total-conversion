@@ -1,0 +1,27 @@
+#bookmarkInDrawer,
+#bookmarkInDrawer p,
+#bookmarkInDrawer a
+{
+	display:block;
+	padding: 2px;
+	margin:0;
+}
+
+#bookmarkInDrawer .bookmarkFolder{
+	margin-bottom:4px;
+	border:1px solid #20a8b1;
+}
+#bookmarkInDrawer .bookmarkFolder div{
+	border-top:1px solid #20a8b1;
+	padding:2px 0;
+	background:rgba(0,0,0,0.3);
+}
+#bookmarkInDrawer .bookmarkLabel{
+	background:#069;
+	color:#fff;
+}
+
+#bookmarkInDrawer .selected {
+      background: #fff; /* White background */
+  color: #069;
+}
