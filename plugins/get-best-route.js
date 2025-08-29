@@ -8,6 +8,12 @@
 
 /* global IITC -- eslint */
 
+/**
+ * @typedef {Object} Portal
+ * @property {{lat: number, lng: number}} coordinates
+ * @property {string} name
+ */
+
 var changelog = [
   {
     version: '0.0.1',
@@ -19,9 +25,44 @@ var changelog = [
 const pluginName = 'getRoutes';
 window.plugin.travelingAgent = {};
 
-window.plugin.travelingAgent.dialogLoadList = function () {
-  var r = 'The "<a href="' + '@url_homepage@' + '" target="_BLANK"><strong>Draw Tools</strong></a>" plugin is required.</span>';
+/**
+ * @param {string} id The ID of the bookmark
+ */
+function getBookmarkById(id) {
+  return JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]).portals[id];
+}
 
+/**
+ * @param {Portal} origin
+ * @param {Portal[]} neighbors
+ * @returns {Portal} The closest neighbor
+ */
+function getNearestNeighbor(origin, neighbors) {
+  console.log(origin, neighbors);
+  return '1231';
+}
+
+/**
+ * @param {Array.<Portal>} nodes - The nodes to construct the route with
+ */
+function TSP(nodes) {
+  return getNearestNeighbor(nodes[0], nodes[1]);
+}
+
+window.plugin.travelingAgent.draw = function () {
+  $('#bookmarkInDrawer a.bookmarkLabel.selected').each(function (_, element) {
+    console.log(element.innerText);
+    console.log($(element).data('id'));
+    const portals = getBookmarkById($(element).data('id')).bkmrk;
+    console.log(portals);
+    for (const { label, latlng } of Object.values(portals)) {
+      console.log(label, latlng);
+    }
+    TSP(portals);
+  });
+};
+
+window.plugin.travelingAgent.dialogLoadList = function () {
   var portalsList = JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]);
   var element = '';
   var elementTemp = '';
@@ -32,8 +73,7 @@ window.plugin.travelingAgent.dialogLoadList = function () {
   for (var idFolders in list) {
     var folders = list[idFolders];
 
-    // Create a label and a anchor for the sortable
-    var folderLabel = `<a class="bookmarkLabel "onclick="$(this).toggleClass('selected')">${folders['label']}</a>`;
+    var folderLabel = `<a class="bookmarkLabel" data-id="${idFolders}" onclick="$(this).toggleClass('selected');$('.bookmarkLabel').not(this).removeClass('selected')">${folders['label']}</a>`;
 
     elementTemp = `<div class="bookmarkFolder" id="${idFolders}">${folderLabel}</div>`;
 
@@ -53,8 +93,14 @@ window.plugin.travelingAgent.openDialog = function () {
     dialogClass: 'ui-dialog-autodrawer',
     id: 'hello_world',
     title: 'What',
+    buttons: {
+      DRAW: function () {
+        window.plugin.travelingAgent.draw();
+      },
+    },
   });
 };
+
 window.plugin.travelingAgent.setupCSS = function () {
   $('<style>').prop('type', 'text/css').html('@include_css:get-best-route.css@').appendTo('head');
 };

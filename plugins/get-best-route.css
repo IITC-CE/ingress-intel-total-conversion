@@ -22,6 +22,7 @@
 }
 
 #bookmarkInDrawer .selected {
-      background: #fff; /* White background */
-  color: #069;
+    background: #008AD2; /* A slightly lighter blue */
+    font-weight: bold;
+
 }
