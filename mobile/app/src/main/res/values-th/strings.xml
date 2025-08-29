@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm ได้รับการร้องขอให้ติดตั้งไฟล์จาวาสคริปต์ต่อไปนี้: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;ระวัง:&lt;/b&gt; จาวาสคริปต์จากแหล่งภายนอก อาจมีรหัสที่เป็นอันตราย (สปายแวร์ ฯลฯ )! &lt;p&gt;คุณแน่ใจหรือว่าต้องการดำเนินการต่อ\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm ได้รับการร้องขอให้ติดตั้งไฟล์จาวาสคริปต์ต่อไปนี้: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;ระวัง:&lt;/b&gt; จาวาสคริปต์จากแหล่งภายนอก อาจมีรหัสที่เป็นอันตราย (สปายแวร์ ฯลฯ )! &lt;p&gt;คุณแน่ใจหรือว่าต้องการดำเนินการต่อ?</string>
     <string name="install_dialog_top">ติดตั้งปลั๊กอินจากภายนอกหรือไม่\?</string>
     <string name="pref_plugins_sum">ปลั๊กอินขยาย/แก้ไขประสบการณ์ IITC ปลั๊กอินส่วนใหญ่ที่รู้จักจาก IITC สำหรับเดสก์ทอป สามารถค้นหาได้ที่นี่</string>
     <string name="tab_browser">Intel</string>
@@ -113,9 +113,6 @@
 \n
 \n ปลั๊กอินบางตัว (เช่น <i> รายการพอร์ทัล </i> และ <i> บุ๊กมาร์ก </i>) จะปรากฏใน <i> ลิ้นชักการนำทาง </i> เพื่อการเข้าถึงที่รวดเร็ว
 \n จะไม่ปรากฏในบานหน้าต่างข้อมูลอีกต่อไป </string>
-    <string name="appintro_nfc_description">คุณสามารถส่งลิงค์พอร์ทัลปัจจุบัน/ลิงก์ถาวร ไปยังอุปกรณ์อื่นได้อย่างรวดเร็วหากอุปกรณ์ทั้งสองรองรับ NFC
-\n
-\n ถืออุปกรณ์ทั้งสอง ด้านหลังชนกัน แล้วแตะหน้าจอเพื่อส่งแผนที่ไปยังอุปกรณ์อีกเครื่อง</string>
     <string name="appintro_location_description">IITC-CE Mobile ต้องได้รับอนุญาตในการเข้าถึงตำแหน่งของคุณ เพื่อความสะดวกในการนำทาง
 \n
 \n แต่ไม่ต้องกังวล เราจะไม่ส่งข้อมูลเกี่ยวกับตำแหน่งของคุณไปยังที่ใดก็ตาม</string>
@@ -124,7 +121,6 @@
 \n ที่นี่คุณสามารถเปลี่ยนบริการแผนที่ออนไลน์ หรือเปิด/ปิดการแสดงองค์ประกอบที่จำเป็นบนแผนที่ </string>
     <string name="appintro_layers_title">เลเยอร์/ไฮไลท์</string>
     <string name="appintro_navigation_title">การนำทาง</string>
-    <string name="appintro_nfc_title">การขออนุญาตใช้งาน NFC</string>
     <string name="appintro_location_title">การขออนุญาตใช้ตำแหน่งที่ตั้ง</string>
     <string name="appintro_welcome_description">นี่คือเวอร์ชันมือถือ ตัวช่วยที่ขาดไม่ได้สำหรับผู้เล่น Ingress
 \n
