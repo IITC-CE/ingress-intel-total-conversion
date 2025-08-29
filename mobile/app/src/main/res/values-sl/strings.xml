@@ -54,7 +54,7 @@
     <string name="login_failed">Prijava ni uspela.</string>
     <string name="choose_account_to_login">Izberi račun za prijavo</string>
     <string name="menu_delete">Izbriši</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm je bil pozvan, da namesti naslednjo datoteko javascript: &lt;p&gt; %1$s &lt;p&gt; &lt;b&gt; Previdno: &lt;/b&gt; Javascript iz zunanjih virov lahko vsebuje škodljivo kodo (vohunske programske opreme itd.)! &lt;p&gt; Ali si prepričan, da želiš nadaljevati\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm je bil pozvan, da namesti naslednjo datoteko javascript: &lt;p&gt; %1$s &lt;p&gt; &lt;b&gt; Previdno: &lt;/b&gt; Javascript iz zunanjih virov lahko vsebuje škodljivo kodo (vohunske programske opreme itd.)! &lt;p&gt; Ali si prepričan, da želiš nadaljevati?</string>
     <string name="install_dialog_top">Želiš namestiti zunanji vtičnik\?</string>
     <string name="label_overlay_layers">Prekrivne plasti</string>
     <string name="label_base_layer">Osnovni sloj</string>
@@ -92,10 +92,6 @@
 \n Nekateri vtičniki (npr. <i> seznam portalov </i> in <i> zaznamki </i>) so zdaj prikazani v <i> Predalu za krmarjenje </i> za hiter dostop.
 \n Ne bodo več prikazani v podoknu z informacijami. </string>
     <string name="appintro_navigation_title">Navigacija</string>
-    <string name="appintro_nfc_description">Če obe napravi podpirata NFC, lahko trenutno povezavo / trajno povezavo do portala hitro pošljete na drugo napravo.
-\n
-\n Držite obe napravi hrbtno stran in tapnite zaslon, da zemljevid preusmerite na drugo napravo.</string>
-    <string name="appintro_nfc_title">Dovoljenje NFC</string>
     <string name="appintro_location_description">Za enostavno navigacijo IITC-CE Mobile potrebuje dovoljenje za dostop do vaše lokacije.
 \n
 \n A brez skrbi: podatkov o vaši lokaciji ne pošiljamo nikamor.</string>
