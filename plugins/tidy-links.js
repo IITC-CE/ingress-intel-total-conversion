@@ -183,6 +183,10 @@ function loadDelaunay() {
     // eslint-disable-next-line
     '@include_raw:external/delaunay.js@';
 
+    if (typeof window.Delaunay === 'undefined') {
+      window.Delaunay = Delaunay; // eslint-disable-line no-undef
+    }
+
     return window.Delaunay;
   } catch (e) {
     console.error('delaunay.js loading failed');
