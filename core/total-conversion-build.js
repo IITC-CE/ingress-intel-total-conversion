@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.40.0
+// @version        0.41.0
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -16,6 +16,17 @@ window.IITC = IITC;
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.41.0',
+    changes: [
+      'Fix RegionScore tooltip HTML rendering with selective HTML escaping',
+      'Update MODs display colors to match Ingress Prime',
+      'Fix ornament rescaling at different zoom levels',
+      'Enhance hack cooldown time calculations',
+      'Improve permalink generation using document.location.pathname',
+      'Convert toolbar to flexbox layout',
+    ],
+  },
   {
     version: '0.40.0',
     changes: [
