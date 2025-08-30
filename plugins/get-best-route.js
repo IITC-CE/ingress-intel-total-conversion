@@ -11,7 +11,6 @@
 /**
  * @typedef {Object} Portal
  * @property {L.LatLng} coordinates
- * @property {boolean} visited - Whether the node is already in the route
  * @property {string} name
  */
 
@@ -26,6 +25,13 @@ var changelog = [
 const pluginName = 'getRoutes';
 window.plugin.travelingAgent = {};
 
+/**
+ * @param {string} id The ID of the bookmark
+ */
+function getBookmarkById(id) {
+  return JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]).portals[id];
+}
+
 function drawLayer(steps) {
   const layer = L.geodesicPolyline(steps, window.plugin.drawTools.lineOptions);
   window.map.fire('draw:created', {
@@ -37,79 +43,35 @@ function drawLayer(steps) {
 /**
  * @param {Portal[]} nodes
  */
-function getGoogleRequest(nodes) {
+async function getBestRoute(nodes) {
   const service = new window.google.maps.DirectionsService();
   const origin = new window.google.maps.LatLng({ lat: nodes[0].coordinates.lat, lng: nodes[0].coordinates.lng });
   const request = {
     origin: origin,
     destination: origin,
-    waypoints: [
-      ...nodes.slice(1).map((x) => {
-        return { location: new window.google.maps.LatLng({ lat: x.coordinates.lat, lng: x.coordinates.lng }), stopover: true };
-      }),
-    ],
+    waypoints: nodes.slice(1).map((x) => {
+      return { location: new window.google.maps.LatLng({ lat: x.coordinates.lat, lng: x.coordinates.lng }), stopover: true };
+    }),
     optimizeWaypoints: true,
     travelMode: window.google.maps.TravelMode.DRIVING,
     unitSystem: window.google.maps.UnitSystem.METRIC,
     avoidHighways: false,
     avoidTolls: false,
   };
-  // service.route(request).then((response) => response.routes[0].legs[10].steps[0].path);
-  service.route(request).then((response) => console.log(response));
-  // service.route(request).then((response) => console.log(response.routes[0].legs[0].steps[0].path[0].lat()));
-  service
-    .route(request)
-    .then((response) => response.routes[0].legs.reduce((acc, cur) => [...acc, cur.steps.map((x) => x.path.map((y) => [y.lat(), y.lng()]))], []))
-    .then((x) => console.log(x));
-}
-
-/**
- * @param {string} id The ID of the bookmark
- */
-function getBookmarkById(id) {
-  return JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]).portals[id];
-}
-
-/**
- * @param {Portal[]} portals
- * @returns {Portal[]} Portals that have not been visited
- */
-function getUnvisited(portals) {
-  return portals.filter(function ({ visited }) {
-    return visited === false;
-  });
-}
-
-/**
- * @param {Portal} origin
- * @param {Portal[]} neighbors
- * @returns {Portal} The closest neighbor
- */
-function getNearestNeighbor(origin, neighbors) {
-  return getUnvisited(neighbors).sort((a, b) => origin.coordinates.distanceTo(a.coordinates) - origin.coordinates.distanceTo(b.coordinates))[0];
-}
-
-/**
- * @param {Portal[]} nodes - The nodes to construct the route with
- */
-function TSP(nodes) {
-  console.log(nodes.map((x) => `${x.coordinates.lat}, ${x.coordinates.lng}`));
-  const route = [nodes[0]];
-  let current = route[0];
-  while (getUnvisited(nodes).length > 1) {
-    current.visited = true;
-    const nearestNeighbor = getNearestNeighbor(current, nodes);
-    console.log(nearestNeighbor);
-    route.push(nearestNeighbor);
-    current = nearestNeighbor;
-  }
-  route.push(route[0]);
-  console.log(route);
-  return route;
+  window.plugin.drawTools.setDrawColor('#FF0000');
+  const results = await service.route(request);
+  const routeLayer = results.routes[0].overview_path.map((x) => L.latLng(x.lat(), x.lng()));
+  drawLayer(routeLayer);
+  /**
+   * @type {Portal[]}
+   */
+  const path = [nodes[0]];
+  results.routes[0].waypoint_order.forEach((wayPointIndex) => path.push(nodes[wayPointIndex + 1]));
+  return path;
 }
 
 window.plugin.travelingAgent.draw = function () {
-  $('#bookmarkInDrawer a.bookmarkLabel.selected').each(function (_, element) {
+  $('#bookmarkInDrawer a.bookmarkLabel.selected').each(async function (_, element) {
     console.log(element.innerText);
     console.log($(element).data('id'));
     const bookmarkContent = getBookmarkById($(element).data('id')).bkmrk;
@@ -119,11 +81,10 @@ window.plugin.travelingAgent.draw = function () {
     const portals = [];
     for (const { label, latlng } of Object.values(bookmarkContent)) {
       const parsedLatLng = latlng.split(',');
-      portals.push({ name: label, coordinates: L.latLng(parsedLatLng), visited: false });
+      portals.push({ name: label, coordinates: L.latLng(parsedLatLng) });
     }
-    const route = TSP(portals);
-    drawLayer(route.map((x) => x.coordinates));
-    getGoogleRequest(route);
+    const googlePortals = await getBestRoute(portals);
+    console.log(googlePortals);
   });
 };
 
