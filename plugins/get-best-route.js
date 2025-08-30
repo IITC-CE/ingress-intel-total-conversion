@@ -11,6 +11,7 @@
 /**
  * @typedef {Object} Portal
  * @property {{lat: number, lng: number}} coordinates
+ * @property {boolean} visited - Whether the node is already in the route
  * @property {string} name
  */
 
@@ -38,27 +39,30 @@ function getBookmarkById(id) {
  * @returns {Portal} The closest neighbor
  */
 function getNearestNeighbor(origin, neighbors) {
-  console.log(origin, neighbors);
-  return '1231';
+  for (const neighbor of neighbors) {
+  }
 }
 
 /**
- * @param {Array.<Portal>} nodes - The nodes to construct the route with
+ * @param {Portal[]} nodes - The nodes to construct the route with
  */
 function TSP(nodes) {
-  return getNearestNeighbor(nodes[0], nodes[1]);
+  return getNearestNeighbor(nodes[0], nodes.slice(1));
 }
 
 window.plugin.travelingAgent.draw = function () {
   $('#bookmarkInDrawer a.bookmarkLabel.selected').each(function (_, element) {
     console.log(element.innerText);
     console.log($(element).data('id'));
-    const portals = getBookmarkById($(element).data('id')).bkmrk;
-    console.log(portals);
-    for (const { label, latlng } of Object.values(portals)) {
-      console.log(label, latlng);
+    const bookmarkContent = getBookmarkById($(element).data('id')).bkmrk;
+    /**
+     * @type {Portal[]}
+     */
+    const portals = [];
+    for (const { label, latlng } of Object.values(bookmarkContent)) {
+      portals.push({ name: label, latlng: L.latlng(latlng), visited: false });
     }
-    TSP(portals);
+    console.log(TSP(portals));
   });
 };
 
