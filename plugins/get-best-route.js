@@ -6,11 +6,11 @@
 
 /* exported setup, changelog --eslint */
 
-/* global IITC -- eslint */
+/* global IITC, L -- eslint */
 
 /**
  * @typedef {Object} Portal
- * @property {{lat: number, lng: number}} coordinates
+ * @property {L.latLng} coordinates
  * @property {boolean} visited - Whether the node is already in the route
  * @property {string} name
  */
@@ -34,30 +34,41 @@ function getBookmarkById(id) {
 }
 
 /**
+ * @param {Portal[]} portals
+ * @returns {Portal[]} Portals that have not been visited
+ */
+function getUnvisited(portals) {
+  return portals.filter(function ({ visited }) {
+    return visited === false;
+  });
+}
+
+/**
  * @param {Portal} origin
  * @param {Portal[]} neighbors
  * @returns {Portal} The closest neighbor
  */
 function getNearestNeighbor(origin, neighbors) {
-  const validNeighbors = neighbors.filter(function ({ visited }) {
-    return visited === false;
-  });
-  let closestNeighbor;
-  let minDistance = Number.MAX_SAFE_INTEGER;
-  for (const neighbor of validNeighbors) {
-    if (origin.latlng.distanceTo(neighbor.latlng) < minDistance) {
-      minDistance = origin.latlng.distanceTo(neighbor.latlng);
-      closestNeighbor = neighbor;
-    }
-  }
-  return closestNeighbor;
+  return getUnvisited(neighbors).sort((a, b) => origin.coordinates.distanceTo(a.coordinates) - origin.coordinates.distanceTo(b.coordinates))[0];
 }
 
 /**
  * @param {Portal[]} nodes - The nodes to construct the route with
  */
 function TSP(nodes) {
-  return getNearestNeighbor(nodes[0], nodes.slice(1));
+  console.log(nodes.map((x) => `${x.coordinates.lat}, ${x.coordinates.lng}`));
+  const route = [nodes[0]];
+  let current = route[0];
+  while (getUnvisited(nodes).length > 1) {
+    current.visited = true;
+    const nearestNeighbor = getNearestNeighbor(current, nodes);
+    console.log(nearestNeighbor);
+    route.push(nearestNeighbor);
+    current = nearestNeighbor;
+  }
+  route.push(route[0]);
+  console.log(nodes);
+  return route.map((x) => x?.name).join('->');
 }
 
 window.plugin.travelingAgent.draw = function () {
@@ -70,7 +81,8 @@ window.plugin.travelingAgent.draw = function () {
      */
     const portals = [];
     for (const { label, latlng } of Object.values(bookmarkContent)) {
-      portals.push({ name: label, latlng: L.latlng(latlng), visited: false });
+      const parsedLatLng = latlng.split(',');
+      portals.push({ name: label, coordinates: L.latLng(parsedLatLng), visited: false });
     }
     console.log(TSP(portals));
   });
