@@ -23,6 +23,7 @@ var changelog = [
 
 // use own namespace for plugin
 const pluginName = 'getRoutes';
+const playerLocationKey = 'traveling-agent-player-location';
 window.plugin.travelingAgent = {};
 
 /**
@@ -117,11 +118,14 @@ window.plugin.travelingAgent.openDialog = function () {
   window.dialog({
     html: window.plugin.travelingAgent.dialogLoadList,
     dialogClass: 'ui-dialog-autodrawer',
-    id: 'hello_world',
-    title: 'What',
+    id: 'TSP_dialog',
+    title: 'There and Back Again',
     buttons: {
       DRAW: function () {
         window.plugin.travelingAgent.draw();
+      },
+      'SET LOCATION & DRAW': function () {
+        console.log('NO');
       },
     },
   });
@@ -136,6 +140,7 @@ function setup() {
     alert(`'${pluginName}' requires 'bookmarks'`);
     return;
   }
+  window.plugin.travelingAgent.playerLocation = L.latLng(JSON.parse(localStorage.getItem(playerLocationKey)));
   window.plugin.travelingAgent.setupCSS();
   IITC.toolbox.addButton({
     label: 'Draw Route',

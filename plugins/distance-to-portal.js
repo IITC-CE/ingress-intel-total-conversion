@@ -99,8 +99,6 @@ window.plugin.distanceToPortal.setLocation = function () {
   });
 
   window.plugin.distanceToPortal.currentLocMarker.on('drag', function () {
-    window.plugin.distanceToPortal.currentLoc = window.plugin.distanceToPortal.currentLocMarker.getLatLng();
-
     localStorage['plugin-distance-to-portal'] = JSON.stringify({
       lat: window.plugin.distanceToPortal.currentLoc.lat,
       lng: window.plugin.distanceToPortal.currentLoc.lng,
