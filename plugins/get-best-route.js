@@ -39,8 +39,18 @@ function getBookmarkById(id) {
  * @returns {Portal} The closest neighbor
  */
 function getNearestNeighbor(origin, neighbors) {
-  for (const neighbor of neighbors) {
+  const validNeighbors = neighbors.filter(function ({ visited }) {
+    return visited === false;
+  });
+  let closestNeighbor;
+  let minDistance = Number.MAX_SAFE_INTEGER;
+  for (const neighbor of validNeighbors) {
+    if (origin.latlng.distanceTo(neighbor.latlng) < minDistance) {
+      minDistance = origin.latlng.distanceTo(neighbor.latlng);
+      closestNeighbor = neighbor;
+    }
   }
+  return closestNeighbor;
 }
 
 /**
