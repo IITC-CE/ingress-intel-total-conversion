@@ -10,7 +10,7 @@
 
 /**
  * @typedef {Object} Portal
- * @property {L.latLng} coordinates
+ * @property {L.LatLng} coordinates
  * @property {boolean} visited - Whether the node is already in the route
  * @property {string} name
  */
@@ -25,6 +25,43 @@ var changelog = [
 // use own namespace for plugin
 const pluginName = 'getRoutes';
 window.plugin.travelingAgent = {};
+
+function drawLayer(steps) {
+  const layer = L.geodesicPolyline(steps, window.plugin.drawTools.lineOptions);
+  window.map.fire('draw:created', {
+    layer: layer,
+    layerType: 'polyline',
+  });
+}
+
+/**
+ * @param {Portal[]} nodes
+ */
+function getGoogleRequest(nodes) {
+  const service = new window.google.maps.DirectionsService();
+  const origin = new window.google.maps.LatLng({ lat: nodes[0].coordinates.lat, lng: nodes[0].coordinates.lng });
+  const request = {
+    origin: origin,
+    destination: origin,
+    waypoints: [
+      ...nodes.slice(1).map((x) => {
+        return { location: new window.google.maps.LatLng({ lat: x.coordinates.lat, lng: x.coordinates.lng }), stopover: true };
+      }),
+    ],
+    optimizeWaypoints: true,
+    travelMode: window.google.maps.TravelMode.DRIVING,
+    unitSystem: window.google.maps.UnitSystem.METRIC,
+    avoidHighways: false,
+    avoidTolls: false,
+  };
+  // service.route(request).then((response) => response.routes[0].legs[10].steps[0].path);
+  service.route(request).then((response) => console.log(response));
+  // service.route(request).then((response) => console.log(response.routes[0].legs[0].steps[0].path[0].lat()));
+  service
+    .route(request)
+    .then((response) => response.routes[0].legs.reduce((acc, cur) => [...acc, cur.steps.map((x) => x.path.map((y) => [y.lat(), y.lng()]))], []))
+    .then((x) => console.log(x));
+}
 
 /**
  * @param {string} id The ID of the bookmark
@@ -67,8 +104,8 @@ function TSP(nodes) {
     current = nearestNeighbor;
   }
   route.push(route[0]);
-  console.log(nodes);
-  return route.map((x) => x?.name).join('->');
+  console.log(route);
+  return route;
 }
 
 window.plugin.travelingAgent.draw = function () {
@@ -84,7 +121,9 @@ window.plugin.travelingAgent.draw = function () {
       const parsedLatLng = latlng.split(',');
       portals.push({ name: label, coordinates: L.latLng(parsedLatLng), visited: false });
     }
-    console.log(TSP(portals));
+    const route = TSP(portals);
+    drawLayer(route.map((x) => x.coordinates));
+    getGoogleRequest(route);
   });
 };
 
