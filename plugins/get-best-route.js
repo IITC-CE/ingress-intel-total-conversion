@@ -30,12 +30,9 @@ window.plugin.travelingAgent.setLocation = function () {
   if (window.plugin.travelingAgent.locationMarker) {
     window.map.removeLayer(window.plugin.travelingAgent.locationMarker);
     window.plugin.travelingAgent.locationMarker = null;
-    return;
   }
 
-  if (!window.plugin.travelingAgent.playerLocation) {
-    window.plugin.travelingAgent.playerLocation = window.map.getCenter();
-  }
+  window.plugin.travelingAgent.playerLocation = window.map.getCenter();
 
   window.plugin.travelingAgent.locationMarker = L.marker(window.plugin.travelingAgent.playerLocation, {
     icon: L.divIcon.coloredSvg('#4FA3AB'),
@@ -44,12 +41,12 @@ window.plugin.travelingAgent.setLocation = function () {
   });
 
   window.plugin.travelingAgent.locationMarker.on('drag', function () {
+    window.plugin.travelingAgent.playerLocation = L.latLng(window.plugin.travelingAgent.locationMarker.getLatLng());
     localStorage[playerLocationKey] = JSON.stringify({
       lat: window.plugin.travelingAgent.playerLocation.lat,
       lng: window.plugin.travelingAgent.playerLocation.lng,
     });
   });
-
   window.map.addLayer(window.plugin.travelingAgent.locationMarker);
   window.plugin.travelingAgent.draw();
 };
@@ -62,10 +59,11 @@ function getBookmarkById(id) {
 }
 
 function drawLayer(steps) {
-  const layer = L.geodesicPolyline(steps, window.plugin.drawTools.lineOptions);
+  window.plugin.travelingAgent.routePolyline = L.geodesicPolyline(steps, window.plugin.drawTools.lineOptions);
   window.map.fire('draw:created', {
-    layer: layer,
+    layer: window.plugin.travelingAgent.routePolyline,
     layerType: 'polyline',
+    layerName: 'oved',
   });
 }
 
@@ -91,6 +89,9 @@ async function getBestRoute(nodes) {
   const results = await service.route(request);
   console.log(results);
   const routeLayer = results.routes[0].overview_path.map((x) => L.latLng(x.lat(), x.lng()));
+  if (window.plugin.travelingAgent.routePolyline !== undefined) {
+    window.map.removeLayer(window.plugin.travelingAgent.routePolyline);
+  }
   drawLayer(routeLayer);
   /**
    * @type {Portal[]}
@@ -102,14 +103,13 @@ async function getBestRoute(nodes) {
 }
 
 window.plugin.travelingAgent.draw = function () {
-  if (localStorage.getItem(playerLocationKey) === null) {
+  if (window.plugin.travelingAgent.playerLocation === null) {
     alert('Player location not set');
     window.plugin.travelingAgent.setLocation();
     return;
   }
   $('#bookmarkInDrawer a.bookmarkLabel.selected').each(async function (_, element) {
     console.log(element.innerText);
-    console.log($(element).data('id'));
     const bookmarkContent = getBookmarkById($(element).data('id')).bkmrk;
     /**
      * @type {Portal[]}
@@ -179,7 +179,16 @@ function setup() {
     alert(`'${pluginName}' requires 'drawTools'`);
     return;
   }
-  window.plugin.travelingAgent.playerLocation = L.latLng(JSON.parse(localStorage.getItem(playerLocationKey)));
+  try {
+    window.plugin.travelingAgent.playerLocation = L.latLng(JSON.parse(localStorage[playerLocationKey]));
+    window.plugin.travelingAgent.locationMarker = L.marker(window.plugin.travelingAgent.playerLocation, {
+      icon: L.divIcon.coloredSvg('#4FA3AB'),
+      draggable: true,
+      title: 'Drag to change current location',
+    });
+  } catch {
+    window.plugin.travelingAgent.playerLocation = null;
+  }
   window.plugin.travelingAgent.setupCSS();
   IITC.toolbox.addButton({
     label: 'Draw Route',
