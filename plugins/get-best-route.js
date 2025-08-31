@@ -26,6 +26,34 @@ const pluginName = 'getRoutes';
 const playerLocationKey = 'traveling-agent-player-location';
 window.plugin.travelingAgent = {};
 
+window.plugin.travelingAgent.setLocation = function () {
+  if (window.plugin.travelingAgent.locationMarker) {
+    window.map.removeLayer(window.plugin.travelingAgent.locationMarker);
+    window.plugin.travelingAgent.locationMarker = null;
+    return;
+  }
+
+  if (!window.plugin.travelingAgent.playerLocation) {
+    window.plugin.travelingAgent.playerLocation = window.map.getCenter();
+  }
+
+  window.plugin.travelingAgent.locationMarker = L.marker(window.plugin.travelingAgent.playerLocation, {
+    icon: L.divIcon.coloredSvg('#4FA3AB'),
+    draggable: true,
+    title: 'Drag to change current location',
+  });
+
+  window.plugin.travelingAgent.locationMarker.on('drag', function () {
+    localStorage[playerLocationKey] = JSON.stringify({
+      lat: window.plugin.travelingAgent.playerLocation.lat,
+      lng: window.plugin.travelingAgent.playerLocation.lng,
+    });
+  });
+
+  window.map.addLayer(window.plugin.travelingAgent.locationMarker);
+  window.plugin.travelingAgent.draw();
+};
+
 /**
  * @param {string} id The ID of the bookmark
  */
@@ -61,6 +89,7 @@ async function getBestRoute(nodes) {
   };
   window.plugin.drawTools.setDrawColor('#FF0000');
   const results = await service.route(request);
+  console.log(results);
   const routeLayer = results.routes[0].overview_path.map((x) => L.latLng(x.lat(), x.lng()));
   drawLayer(routeLayer);
   /**
@@ -68,10 +97,16 @@ async function getBestRoute(nodes) {
    */
   const path = [nodes[0]];
   results.routes[0].waypoint_order.forEach((wayPointIndex) => path.push(nodes[wayPointIndex + 1]));
+  alert(path.map((x) => x.name).join('\n'));
   return path;
 }
 
 window.plugin.travelingAgent.draw = function () {
+  if (localStorage.getItem(playerLocationKey) === null) {
+    alert('Player location not set');
+    window.plugin.travelingAgent.setLocation();
+    return;
+  }
   $('#bookmarkInDrawer a.bookmarkLabel.selected').each(async function (_, element) {
     console.log(element.innerText);
     console.log($(element).data('id'));
@@ -79,7 +114,7 @@ window.plugin.travelingAgent.draw = function () {
     /**
      * @type {Portal[]}
      */
-    const portals = [];
+    const portals = [{ name: 'Player Location', coordinates: window.plugin.travelingAgent.playerLocation }];
     for (const { label, latlng } of Object.values(bookmarkContent)) {
       const parsedLatLng = latlng.split(',');
       portals.push({ name: label, coordinates: L.latLng(parsedLatLng) });
@@ -125,7 +160,7 @@ window.plugin.travelingAgent.openDialog = function () {
         window.plugin.travelingAgent.draw();
       },
       'SET LOCATION & DRAW': function () {
-        console.log('NO');
+        window.plugin.travelingAgent.setLocation();
       },
     },
   });
@@ -138,6 +173,10 @@ window.plugin.travelingAgent.setupCSS = function () {
 function setup() {
   if (window.plugin.bookmarks === undefined) {
     alert(`'${pluginName}' requires 'bookmarks'`);
+    return;
+  }
+  if (window.plugin.drawTools === undefined) {
+    alert(`'${pluginName}' requires 'drawTools'`);
     return;
   }
   window.plugin.travelingAgent.playerLocation = L.latLng(JSON.parse(localStorage.getItem(playerLocationKey)));
