@@ -1,8 +1,8 @@
 // @author         yavidor
-// @name           Noder
+// @name           Traveling Agent
 // @category       Misc
-// @version        0.0.1
-// @description    Does Neders
+// @version        0.0.2
+// @description    Calculates the best route between the player's location and a series of portals
 
 /* exported setup, changelog --eslint */
 
@@ -19,6 +19,10 @@ var changelog = [
     version: '0.0.1',
     changes: ['Nothing yet'],
   },
+  {
+    version: '0.0.2',
+    changes: ['Calculates route through google maps API', "Set player's location", 'Draw route', 'Return sorted list of portals'],
+  },
 ];
 
 // use own namespace for plugin
@@ -26,9 +30,20 @@ const pluginName = 'getRoutes';
 const playerLocationKey = 'traveling-agent-player-location';
 window.plugin.travelingAgent = {};
 
+window.plugin.travelingAgent.createLayer = function () {
+  window.plugin.travelingAgent.routeLayer = new L.LayerGroup();
+  window.layerChooser.addOverlay(window.plugin.travelingAgent.routeLayer, 'Portal Routes');
+
+  window.map.on('layerremove', function (obj) {
+    if (obj.layer === window.plugin.travelingAgent.routeLayer) {
+      window.plugin.travelingAgent.routeLayer.clearLayers();
+    }
+  });
+};
+
 window.plugin.travelingAgent.setLocation = function () {
   if (window.plugin.travelingAgent.locationMarker) {
-    window.map.removeLayer(window.plugin.travelingAgent.locationMarker);
+    window.plugin.travelingAgent.routeLayer.removeLayer(window.plugin.travelingAgent.locationMarker);
     window.plugin.travelingAgent.locationMarker = null;
   }
 
@@ -39,6 +54,10 @@ window.plugin.travelingAgent.setLocation = function () {
     draggable: true,
     title: 'Drag to change current location',
   });
+  localStorage[playerLocationKey] = JSON.stringify({
+    lat: window.plugin.travelingAgent.playerLocation.lat,
+    lng: window.plugin.travelingAgent.playerLocation.lng,
+  });
 
   window.plugin.travelingAgent.locationMarker.on('drag', function () {
     window.plugin.travelingAgent.playerLocation = L.latLng(window.plugin.travelingAgent.locationMarker.getLatLng());
@@ -47,7 +66,7 @@ window.plugin.travelingAgent.setLocation = function () {
       lng: window.plugin.travelingAgent.playerLocation.lng,
     });
   });
-  window.map.addLayer(window.plugin.travelingAgent.locationMarker);
+  window.plugin.travelingAgent.routeLayer.addLayer(window.plugin.travelingAgent.locationMarker);
   window.plugin.travelingAgent.draw();
 };
 
@@ -59,12 +78,9 @@ function getBookmarkById(id) {
 }
 
 function drawLayer(steps) {
-  window.plugin.travelingAgent.routePolyline = L.geodesicPolyline(steps, window.plugin.drawTools.lineOptions);
-  window.map.fire('draw:created', {
-    layer: window.plugin.travelingAgent.routePolyline,
-    layerType: 'polyline',
-    layerName: 'oved',
-  });
+  window.plugin.travelingAgent.routeLayer.clearLayers();
+  window.plugin.travelingAgent.routePolyline = L.geodesicPolyline(steps, { name: 'routePolyline', ...window.plugin.drawTools.lineOptions });
+  window.plugin.travelingAgent.routeLayer.addLayer(window.plugin.travelingAgent.routePolyline);
 }
 
 /**
@@ -89,16 +105,19 @@ async function getBestRoute(nodes) {
   const results = await service.route(request);
   console.log(results);
   const routeLayer = results.routes[0].overview_path.map((x) => L.latLng(x.lat(), x.lng()));
-  if (window.plugin.travelingAgent.routePolyline !== undefined) {
-    window.map.removeLayer(window.plugin.travelingAgent.routePolyline);
+  if (window.plugin.travelingAgent.routePolyline !== undefined && window.plugin.travelingAgent.routePolyline !== null) {
+    window.plugin.travelingAgent.routeLayer.removeLayer(window.plugin.travelingAgent.routePolyline);
   }
   drawLayer(routeLayer);
+  window.plugin.drawTools.setDrawColor('#a24ac3');
+  console.log('Hello');
   /**
    * @type {Portal[]}
    */
   const path = [nodes[0]];
+  console.log(path, 'Hello');
   results.routes[0].waypoint_order.forEach((wayPointIndex) => path.push(nodes[wayPointIndex + 1]));
-  alert(path.map((x) => x.name).join('\n'));
+  alert(path.map((step, index) => `${index}: ${step.name}`).join('\n'));
   return path;
 }
 
@@ -179,6 +198,7 @@ function setup() {
     alert(`'${pluginName}' requires 'drawTools'`);
     return;
   }
+  window.plugin.travelingAgent.createLayer();
   try {
     window.plugin.travelingAgent.playerLocation = L.latLng(JSON.parse(localStorage[playerLocationKey]));
     window.plugin.travelingAgent.locationMarker = L.marker(window.plugin.travelingAgent.playerLocation, {
@@ -186,7 +206,17 @@ function setup() {
       draggable: true,
       title: 'Drag to change current location',
     });
-  } catch {
+    window.plugin.travelingAgent.routeLayer.addLayer(window.plugin.travelingAgent.locationMarker);
+    window.plugin.travelingAgent.locationMarker.on('drag', function () {
+      window.plugin.travelingAgent.playerLocation = L.latLng(window.plugin.travelingAgent.locationMarker.getLatLng());
+      localStorage[playerLocationKey] = JSON.stringify({
+        lat: window.plugin.travelingAgent.playerLocation.lat,
+        lng: window.plugin.travelingAgent.playerLocation.lng,
+      });
+    });
+    console.log(window.plugin.travelingAgent.playerLocation);
+  } catch (e) {
+    console.error(e);
     window.plugin.travelingAgent.playerLocation = null;
   }
   window.plugin.travelingAgent.setupCSS();
