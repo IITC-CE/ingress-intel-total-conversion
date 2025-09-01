@@ -26,7 +26,7 @@ var changelog = [
 ];
 
 // use own namespace for plugin
-const pluginName = 'getRoutes';
+const pluginName = 'travelingAgent';
 const playerLocationKey = 'traveling-agent-player-location';
 window.plugin.travelingAgent = {};
 
@@ -81,6 +81,7 @@ function drawLayer(steps) {
   window.plugin.travelingAgent.routeLayer.clearLayers();
   window.plugin.travelingAgent.routePolyline = L.geodesicPolyline(steps, { name: 'routePolyline', ...window.plugin.drawTools.lineOptions });
   window.plugin.travelingAgent.routeLayer.addLayer(window.plugin.travelingAgent.routePolyline);
+  window.plugin.travelingAgent.routeLayer.addLayer(window.plugin.travelingAgent.locationMarker);
 }
 
 /**
@@ -103,19 +104,16 @@ async function getBestRoute(nodes) {
   };
   window.plugin.drawTools.setDrawColor('#FF0000');
   const results = await service.route(request);
-  console.log(results);
   const routeLayer = results.routes[0].overview_path.map((x) => L.latLng(x.lat(), x.lng()));
   if (window.plugin.travelingAgent.routePolyline !== undefined && window.plugin.travelingAgent.routePolyline !== null) {
     window.plugin.travelingAgent.routeLayer.removeLayer(window.plugin.travelingAgent.routePolyline);
   }
   drawLayer(routeLayer);
   window.plugin.drawTools.setDrawColor('#a24ac3');
-  console.log('Hello');
   /**
    * @type {Portal[]}
    */
   const path = [nodes[0]];
-  console.log(path, 'Hello');
   results.routes[0].waypoint_order.forEach((wayPointIndex) => path.push(nodes[wayPointIndex + 1]));
   alert(path.map((step, index) => `${index}: ${step.name}`).join('\n'));
   return path;
@@ -128,7 +126,6 @@ window.plugin.travelingAgent.draw = function () {
     return;
   }
   $('#bookmarkInDrawer a.bookmarkLabel.selected').each(async function (_, element) {
-    console.log(element.innerText);
     const bookmarkContent = getBookmarkById($(element).data('id')).bkmrk;
     /**
      * @type {Portal[]}
@@ -139,7 +136,6 @@ window.plugin.travelingAgent.draw = function () {
       portals.push({ name: label, coordinates: L.latLng(parsedLatLng) });
     }
     const googlePortals = await getBestRoute(portals);
-    console.log(googlePortals);
   });
 };
 
@@ -214,7 +210,6 @@ function setup() {
         lng: window.plugin.travelingAgent.playerLocation.lng,
       });
     });
-    console.log(window.plugin.travelingAgent.playerLocation);
   } catch (e) {
     console.error(e);
     window.plugin.travelingAgent.playerLocation = null;
