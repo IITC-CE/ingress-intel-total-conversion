@@ -3,7 +3,7 @@
     <string name="clear_log">נקה יומן</string>
     <string name="debug_run">הפעל</string>
     <string name="toggle_map">החלף את נראות המפה</string>
-    <string name="install_dialog_msg">&lt;p&gt;אייאייטיסי לניידהתבקש להתקין את קובץ הג\'אווה סקריפט הבא:&lt;p&gt;%1$s&lt;p&gt;&lt;b&gt;הזהר:&lt;/ b&gt;ג\'אווה סקריפט ממקורות חיצוניים עשוי להכיל קוד מזיק (תוכנות ריגול וכו \')!&lt;p&gt; האם אתה בטוח שברצונך להמשיך\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;אייאייטיסי לניידהתבקש להתקין את קובץ הג\'אווה סקריפט הבא:&lt;p&gt;%1$s&lt;p&gt;&lt;b&gt;הזהר:&lt;/ b&gt;ג\'אווה סקריפט ממקורות חיצוניים עשוי להכיל קוד מזיק (תוכנות ריגול וכו \')!&lt;p&gt; האם אתה בטוח שברצונך להמשיך?</string>
     <string name="appintro_welcome_description">זו הגרסה הניידת של העוזר החיוני לשחקן אינגרס.
 \n
 \nאינגרס אינטל המרה מוחלטת (אייאייטיסי) הוא תוסף שעובד ככיסוי על מפת האינטל הרשמית של אינגרס.
@@ -12,9 +12,6 @@
     <string name="appintro_location_description">אייאייטיסי-סיאי דורשת הרשאת גישה למיקום שלך לצורכי ניווט בקלות.
 \n
 \nאבל אל דאגה: אנחנו לא שולחים נתונים על המיקום שלך לשום מקום.</string>
-    <string name="appintro_nfc_description">באפשרותך לשלוח במהירות קישור לפורטל הנוכחי/קישור קבוע למכשיר אחר אם שני המכשירים תומכים בתקשורת טווח אפס (NFC).
-\n
-\nהחזק את שני המכשירים גב אל גב והקש על המסך כדי להקרין את המפה למכשיר השני.</string>
     <string name="appintro_navigation_description"> החלק מהקצה השמאלי של המסך (או לחץ על סמל התפריט) כדי לעורר את <i>מגירת ניווט</i>.
 \nלחץ על סמל הגב כדי לחזור למפה.
 \n
@@ -106,7 +103,6 @@
     <string name="label_base_layer">שכבת בסיס</string>
     <string name="label_overlay_layers">שכבות כיסוי</string>
     <string name="install_dialog_top">להתקין תוסף חיצוני\?</string>
-    <string name="appintro_nfc_title">הרשאות לתקשורת טווח אפס (NFC)</string>
     <string name="appintro_location_title">הרשאת מיקום</string>
     <string name="appintro_navigation_title">ניווט</string>
     <string name="appintro_layers_title">שכבות/דגשים</string>

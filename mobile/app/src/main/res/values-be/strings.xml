@@ -108,7 +108,7 @@
     <string name="appintro_navigation_title">Навігацыя</string>
     <string name="activity_share">Падзяліцца праз…</string>
     <string name="pref_secure_updates_sum">Калі ўключана, апрацоўвацца будуць толькі абнаўленні праз https</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm усталёўвае наступны файл: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Будзьце асцярожнымі: &lt;/b&gt; Javascript, атрыманы са знешніх крыніц, можа ўтрымліваць шкоднасны код (шпіёнскае ПЗ і г. д.)! &lt;p&gt;Вы ўпэўненыя, што жадаеце працягнуць\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm усталёўвае наступны файл: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Будзьце асцярожнымі: &lt;/b&gt; Javascript, атрыманы са знешніх крыніц, можа ўтрымліваць шкоднасны код (шпіёнскае ПЗ і г. д.)! &lt;p&gt;Вы ўпэўненыя, што жадаеце працягнуць?</string>
     <string name="notice_sharing">&lt;p&gt;Праз кнопку &lt;em&gt;Падзяліцца парталам&lt;/em&gt; вы можаце: &lt;p&gt; • даслаць спасылку на партал іншым людзям&lt;br&gt; • паглядзець месцазнаходжанне партала ў іншай прыладзе&lt;br&gt; • адкрыць спасылку ў браўзеры&lt;br&gt; &lt;p&gt;Парада: абраўшы Google Maps, або іншую навігацыйную прыладу, вы можаце хутка перайсці да абранага партала. &lt;p&gt;Гэтыя парады таксама дзейнічаюць і на &lt;em&gt;пастаянныя спасылкі&lt;/em&gt;.</string>
     <string name="appintro_welcome_description">Гэта мабільная версія незаменнага памочніка гульца Ingress.
 \n
@@ -118,9 +118,6 @@
     <string name="appintro_location_description">IITC-CE Mobile патрабуе дазволу на доступ да вашага месцазнаходжання для зручнай навігацыі.
 \n
 \n Але не хвалюйцеся: мы нікуды не адпраўляем дадзеныя пра ваша месцазнаходжанне.</string>
-    <string name="appintro_nfc_description">Вы можаце хутка адправіць бягучую спасылку на партал на іншую прыладу, калі абедзве прылады падтрымліваюць NFC.
-\n
-\n Утрымлівайце абедзве прылады спіна да спіны і націсніце экран, каб перакінуць карту на іншую прыладу.</string>
     <string name="appintro_layers_title">Слаі/Падсветкі</string>
     <string name="appintro_layers_description"> Правядзіце пальцам ад правага краю экрана (альбо націсніце на значок выбару слаёў у панэлі дзеянняў), каб выклікаць <i>скрыню слаёў</i>.
 \n
@@ -145,5 +142,4 @@
     <string name="toast_press_twice_to_exit">Націсніце двойчы каб выйсці</string>
     <string name="plugins_permission_granted">Дазвол прадстаўлены. Калі ласка, паўтарыце.</string>
     <string name="appintro_location_title">Дазвол атрымліваць лакацыю</string>
-    <string name="appintro_nfc_title">Дазвол NFC</string>
 </resources>
