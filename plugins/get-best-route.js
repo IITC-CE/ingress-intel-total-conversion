@@ -104,6 +104,7 @@ async function getBestRoute(nodes) {
   };
   window.plugin.drawTools.setDrawColor('#FF0000');
   const results = await service.route(request);
+  console.log(results);
   const routeLayer = results.routes[0].overview_path.map((x) => L.latLng(x.lat(), x.lng()));
   if (window.plugin.travelingAgent.routePolyline !== undefined && window.plugin.travelingAgent.routePolyline !== null) {
     window.plugin.travelingAgent.routeLayer.removeLayer(window.plugin.travelingAgent.routePolyline);
@@ -115,8 +116,7 @@ async function getBestRoute(nodes) {
    */
   const path = [nodes[0]];
   results.routes[0].waypoint_order.forEach((wayPointIndex) => path.push(nodes[wayPointIndex + 1]));
-  alert(path.map((step, index) => `${index}: ${step.name}`).join('\n'));
-  return path;
+  alert(path.map((step, index) => `${index + 1}: ${step.name}`).join('\n'));
 }
 
 window.plugin.travelingAgent.draw = function () {
@@ -126,6 +126,7 @@ window.plugin.travelingAgent.draw = function () {
     return;
   }
   $('#bookmarkInDrawer a.bookmarkLabel.selected').each(async function (_, element) {
+    console.log(element.innerText);
     const bookmarkContent = getBookmarkById($(element).data('id')).bkmrk;
     /**
      * @type {Portal[]}
@@ -135,7 +136,7 @@ window.plugin.travelingAgent.draw = function () {
       const parsedLatLng = latlng.split(',');
       portals.push({ name: label, coordinates: L.latLng(parsedLatLng) });
     }
-    const googlePortals = await getBestRoute(portals);
+    await getBestRoute(portals);
   });
 };
 
@@ -210,6 +211,7 @@ function setup() {
         lng: window.plugin.travelingAgent.playerLocation.lng,
       });
     });
+    console.log(window.plugin.travelingAgent.playerLocation);
   } catch (e) {
     console.error(e);
     window.plugin.travelingAgent.playerLocation = null;
