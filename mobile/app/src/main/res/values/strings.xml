@@ -288,22 +288,19 @@
     </string>
     <string name="pref_check_for_updates">Update check</string>
     <string name="pref_check_for_updates_summary">Check for updates on startup</string>
-
     <!-- Storage Access Framework -->
-    <string name="plugins_folder_access_title">Select plugins folder</string>
+    <string name="plugins_folder_access_title">Select IITC_Mobile folder</string>
     <string name="plugins_folder_access_message">To install custom plugins, IITC Mobile needs access to a folder where plugins will be stored. Please select the IITC_Mobile folder or create a new one.</string>
     <string name="plugin_install_successful">Plugin installed successfully</string>
     <string name="plugin_install_failed">Failed to install plugin</string>
     <string name="plugin_delete_failed">Failed to delete plugin</string>
     <string name="export_not_supported">Export not supported on this device</string>
     <string name="export_failed">Failed to export file</string>
-
     <!-- Migration strings -->
     <string name="migration_saf_title">Plugin System Update</string>
     <string name="migration_saf_message">IITC Mobile has been updated to use a more secure folder access system. Instead of accessing your entire storage, the app now only requests access to the IITC_Mobile folder.\n\nSince you have user plugins enabled, please grant access to the IITC_Mobile folder to continue using them.</string>
     <string name="migration_saf_button_grant">Grant Access</string>
     <string name="migration_saf_button_later">Later</string>
-
     <!-- Deep link permission strings -->
     <string name="pref_deep_link_permission">Open Intel links in IITC Mobile</string>
     <string name="pref_deep_link_permission_summary">Configure IITC Mobile to handle Intel Map links</string>
