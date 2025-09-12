@@ -1,4 +1,4 @@
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 /**
  * @file Main code block that renders the portal details in the sidebar and
@@ -88,9 +88,9 @@ window.renderPortalDetails = function (guid, forceSelect) {
   if (!guid || !window.portals[guid]) {
     window.urlPortal = guid;
     $('#portaldetails').html('');
+    IITC.statusbar.portal.update();
     if (window.isSmartphone()) {
       $('.fullimg').remove();
-      $('#mobileinfo').html('<div style="text-align: center"><b>tap here for info screen</b></div>');
     }
     return;
   }

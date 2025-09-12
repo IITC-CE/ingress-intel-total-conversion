@@ -1,4 +1,4 @@
-/* global L, log -- eslint */
+/* global IITC, L, log -- eslint */
 
 /**
  * Class for managing map data requests from the Ingress servers, caching the data, and passing it to the renderer.
@@ -202,7 +202,7 @@ window.MapDataRequest.prototype.refreshOnTimeout = function (seconds) {
  */
 window.MapDataRequest.prototype.setStatus = function (short, long, progress) {
   this.status = { short: short, long: long, progress: progress };
-  window.renderUpdateStatus();
+  IITC.statusbar.map.update();
 };
 
 /**

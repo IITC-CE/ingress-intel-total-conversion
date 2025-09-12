@@ -662,7 +662,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         Log.d("configuration changed...restoring...reset idleTimer");
         mIitcWebView.loadUrl("javascript: window.idleTime = 0");
-        mIitcWebView.loadUrl("javascript: window.renderUpdateStatus()");
+        mIitcWebView.loadUrl("javascript: IITC.statusbar.map.update()");
     }
 
     @Override
