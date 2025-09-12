@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: ornaments | IITC-CE</title>
+    <title>Source: code/statusbar.js | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -43,1982 +45,538 @@
 
 
 
-
-<section>
-
-<header>
     
-        <h2>ornaments</h2>
-        
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
-        
-            
-                <div class="description"><p>Manages the overlay of additional images (ornaments) on portals, such as beacons, frackers,
-and anomaly markers.</p>
-<p>Added as part of the Ingress #Helios in 2014, ornaments are additional image overlays for portals.
-currently there are 6 known types of ornaments: <code>ap$x$suffix</code></p>
-<ul>
-<li><code>cluster portals</code> (without suffix)</li>
-<li><code>volatile portals</code> (_v)</li>
-<li><code>meeting points</code> (_start)</li>
-<li><code>finish points</code> (_end)</li>
-</ul>
-<p>Beacons and Frackers were introduced at the launch of the Ingress ingame store on November 1st, 2015</p>
-<ul>
-<li><code>Beacons</code> (pe$TAG - $NAME) ie: <code>peNIA - NIANTIC</code></li>
-<li><code>Frackers</code> ('peFRACK')
-(there are 7 different colors for each of them)</li>
-</ul>
-<p>Ornament IDs are dynamic. NIANTIC might change them at any time without prior notice.
-New ornamnent IDs found on the map will be recorded and saved to knownOrnaments from
-which the Ornaments dialog will be filled with checked checkboxes.
-To exclude a set of ornaments, even if they have not yet shown up on the map, the user
-can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
-future IDs. example: &quot;ap&quot; to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)</p></div>
-            
-
-            
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        <dl>
-            
-
-<dt>
-<h4 class="name" id=".excludedOrnaments">
-    <span class="type-signature"><span class="icon green">static</span> </span>excludedOrnaments<span class="type-signature"></span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line70">line 70</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>List of ornaments to be excluded.</p>
-    </div>
-    
-
-    <!--
-    
-    -->
-
-    
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>excludedOrnaments</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;string></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Patterns to be excluded from display.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        
-            
-
-<dt>
-<h4 class="name" id=".icon">
-    <span class="type-signature"><span class="icon green">static</span> </span>icon<span class="type-signature"></span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line64">line 64</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Object holding optional definitions for ornaments and beacons.
-The icon object holds optional definitions for the ornaments an beacons. The object shall
-be filled from a plugin</p>
-<pre class="prettyprint source"><code>'ornamentID' : {
-  name: 'meaningful name',     // shows up in dialog
-  layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
-                               // ornament will be in &quot;Ornaments&quot;
-  url: 'url',                  // from which the image will be taken, optional,
-                               // 84x84px is default, if not set, stock images will be
-                               // used
-  offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
-                               // dx (vertical)and dy )horizontal.
-                               // [0, 0.5] to place right above the portal.
-                               // default is [0, 0] to center
-  opacity: 0..1                // optional, default is 0.6
-}
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global IITC */
+
+/**
+ * Status bar module for IITC that displays both map and portal status information.
+ * Provides a template-based rendering system that can be customized by plugins.
+ *
+ * @memberof IITC
+ * @namespace statusbar
+ */
+
+// Compass directions in clockwise order, starting from North
+const COMPASS_DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+// Mapping from game octant to compass direction
+// Game uses East=0 as starting point, going counter-clockwise
+const GAME_OCTANTS = ['E', 'NE', 'N', 'NW', 'W', 'SW', 'S', 'SE'];
+
+// Fast lookup map for direction to index conversion (performance optimization)
+const DIRECTION_TO_INDEX = new Map(COMPASS_DIRECTIONS.map((dir, i) => [dir, i]));
+
+IITC.statusbar = {};
+
+/**
+ * Renders a template string by replacing placeholders with actual values.
+ *
+ * @function IITC.statusbar.renderTemplate
+ * @param {string} template - Template string with placeholders in format {{ name }}
+ * @param {Object} replacements - Key-value pairs where keys match placeholder names
+ * @returns {string} Rendered HTML with placeholders replaced by values
+ * @example
+ * // Returns: "&lt;span>Hello World&lt;/span>"
+ * IITC.statusbar.renderTemplate("&lt;span>{{ greeting }}&lt;/span>", { greeting: "Hello World" });
+ */
+IITC.statusbar.renderTemplate = (template, replacements) => {
+  let result = template;
+  for (const key in replacements) {
+    if (Object.hasOwn(replacements, key)) {
+      const value = replacements[key];
+      const replacement = value !== undefined &amp;&amp; value !== null ? value : '';
+      result = result.replace(`{{ ${key} }}`, replacement);
+    }
+  }
+  return result;
+};
+
+/**
+ * Templates for map status HTML elements
+ * @type {Object.&lt;string, string>}
+ */
+IITC.statusbar.mapTemplates = {
+  // Main container
+  main: '{{ portalLevels }} {{ mapStatus }}{{ requestsStatus }}',
+
+  // Portal levels information
+  portalLevels: '&lt;span class="help portallevel" title="Indicates portal levels/link lengths displayed. Zoom in to display more;">{{ content }}&lt;/span>',
+
+  // Map status information
+  mapStatus: '&lt;span class="map">&lt;b>map&lt;/b>: {{ content }}&lt;/span>',
+
+  // Links prefix text
+  linksPrefix: '&lt;b>links&lt;/b>: ',
+
+  // Help container with tooltip
+  helpContainer: '&lt;span class="help" title="{{ tooltip }}">{{ content }}&lt;/span>',
+
+  // Progress indicator
+  progressInfo: ' {{ progress }}%',
+
+  // Requests information
+  requestsInfo: ' {{ count }} requests',
+
+  // Failed requests information
+  failedRequests: ' &lt;span class="failed-request">{{ count }} failed&lt;/span>',
+};
+
+/**
+ * Templates for portal status HTML elements
+ * @type {Object.&lt;string, string>}
+ */
+IITC.statusbar.portalTemplates = {
+  // Default message
+  defaultMessage: '&lt;div style="text-align: center">&lt;b>tap here for info screen&lt;/b>&lt;/div>',
+
+  // Main portal information template
+  mainInfo: '{{ levelBadge }} {{ health }}% {{ title }} {{ resonators }}',
+
+  // Portal level badge
+  levelBadge: '&lt;span class="portallevel" style="{{ style }}">L{{ level }}&lt;/span>',
+
+  // Resonator template
+  resonator:
+    '&lt;div class="resonator {{ className }}" data-slot="{{ slot }}" style="--resonator-color: {{ borderColor }};">' +
+    '&lt;div class="filllevel" style="width:{{ percentage }}%;">&lt;/div>' +
+    '&lt;/div>',
+
+  // Empty resonator slot template
+  emptyResonator: '&lt;div class="resonator empty" data-slot="{{ slot }}">&lt;/div>',
+};
+
+/**
+ * Initializes the statusbar system
+ * Called after IITC boot process is complete
+ */
+IITC.statusbar.init = function () {
+  // Determine display modes for portal and map status
+  const usePortalApi = window.isApp &amp;&amp; window.app.setPortalStatus;
+  const useMapApi = window.isApp &amp;&amp; window.app.setMapStatus;
+
+  // Set display flags based on API availability
+  this.showHtmlPortalInfo = window.isSmartphone() &amp;&amp; !usePortalApi;
+  this.showHtmlMapInfo = !useMapApi;
+
+  // Create HTML elements only if needed
+  if (this.showHtmlPortalInfo) {
+    document.getElementById('updatestatus').insertAdjacentHTML('afterbegin', '&lt;div id="mobileinfo" onclick="show(\'info\')">&lt;/div>');
+  }
+
+  // Hide map status if using API for map
+  if (!this.showHtmlMapInfo) {
+    const innerstatus = document.getElementById('innerstatus');
+    if (innerstatus) {
+      innerstatus.style.display = 'none';
+    }
+  }
+
+  // Set up portal selection hook - initial update with basic data
+  window.addHook('portalSelected', (data) => {
+    IITC.statusbar.portal.update(data);
+  });
+
+  // Add hook for portal detail loaded - update with full details when available
+  window.addHook('portalDetailLoaded', (data) => {
+    if (data.success &amp;&amp; data.guid === window.selectedPortal) {
+      IITC.statusbar.portal.update({ selectedPortalGuid: data.guid });
+    }
+  });
+
+  // Initial update if needed
+  if (this.showHtmlPortalInfo) {
+    IITC.statusbar.portal.update();
+  }
+};
+
+/**
+ * Map status module - handles map status information
+ * @namespace IITC.statusbar.map
+ */
+IITC.statusbar.map = {
+  _timer: null,
+  _innerstatusElement: null,
+
+  /**
+   * Gets current map status data including portal levels, map loading progress, and active requests.
+   *
+   * @function IITC.statusbar.map.getData
+   * @returns {Object} Structured object containing:
+   *   - portalLevels: Information about visible portal levels and link lengths
+   *   - mapStatus: Current map loading status and progress
+   *   - requests: Active and failed request counts
+   */
+  getData() {
+    const tileParams = window.getDataZoomTileParameters();
+    const mapStatus = window.mapDataRequest ? window.mapDataRequest.getStatus() : null;
+    const minLinkLength = tileParams.minLinkLength;
+
+    // Build comprehensive status data object
+    return {
+      portalLevels: {
+        hasPortals: tileParams.hasPortals,
+        minLinkLength,
+        // Pre-format link length for display
+        formattedLength: minLinkLength > 1000 ? `${minLinkLength / 1000}km` : `${minLinkLength}m`,
+      },
+      mapStatus: {
+        short: mapStatus?.short || '...unknown...',
+        long: mapStatus?.long || null,
+        progress: mapStatus?.progress !== undefined ? mapStatus.progress : 1,
+        // Pre-calculate percentage for display
+        progressPercent: mapStatus?.progress !== undefined &amp;&amp; mapStatus.progress !== -1 ? Math.floor(mapStatus.progress * 100) : null,
+      },
+      requests: {
+        active: window.activeRequests.length,
+        failed: window.failedRequestCount,
+        // Pre-calculate boolean flags for conditional rendering
+        hasActive: window.activeRequests.length > 0,
+        hasFailed: window.failedRequestCount > 0,
+      },
+    };
+  },
+
+  /**
+   * Renders HTML for map status based on the provided data.
+   *
+   * @function IITC.statusbar.map.render
+   * @param {Object} data - Map status data from getData()
+   * @returns {string} HTML string representing the current map status
+   */
+  render(data) {
+    const templates = IITC.statusbar.mapTemplates;
+    const renderTemplate = IITC.statusbar.renderTemplate;
+
+    // Create portal levels / links section
+    let portalLevelsContent = '';
+    if (data.portalLevels.hasPortals) {
+      portalLevelsContent = 'portals';
+    } else {
+      // Space is valuable on mobile
+      let prefix = !window.isSmartphone() ? templates.linksPrefix : '';
+
+      let content = 'all links';
+      if (data.portalLevels.minLinkLength > 0) {
+        content = `&amp;gt;${data.portalLevels.formattedLength}`;
+      }
+
+      portalLevelsContent = prefix + content;
+    }
+
+    const portalLevels = renderTemplate(templates.portalLevels, {
+      content: portalLevelsContent,
+    });
+
+    // Create map status section
+    let mapStatusContent = '';
+    if (data.mapStatus.long) {
+      mapStatusContent = renderTemplate(templates.helpContainer, {
+        tooltip: data.mapStatus.long,
+        content: data.mapStatus.short,
+      });
+    } else {
+      mapStatusContent = data.mapStatus.short;
+    }
+
+    // Add progress information if available
+    if (data.mapStatus.progressPercent !== null) {
+      mapStatusContent += renderTemplate(templates.progressInfo, {
+        progress: data.mapStatus.progressPercent,
+      });
+    }
+
+    const mapStatus = renderTemplate(templates.mapStatus, {
+      content: mapStatusContent,
+    });
+
+    // Create requests status section
+    let requestsStatus = '';
+    if (data.requests.hasActive) {
+      requestsStatus += renderTemplate(templates.requestsInfo, {
+        count: data.requests.active,
+      });
+    }
+    if (data.requests.hasFailed) {
+      requestsStatus += renderTemplate(templates.failedRequests, {
+        count: data.requests.failed,
+      });
+    }
+
+    // Combine all elements
+    return renderTemplate(templates.main, {
+      portalLevels,
+      mapStatus,
+      requestsStatus,
+    });
+  },
+
+  /**
+   * Updates map status information in the UI and mobile app (if applicable).
+   * Throttles updates to the next event loop for better performance.
+   *
+   * @function IITC.statusbar.map.update
+   * @fires app.setMapStatus - When in app mode
+   * @fires app.setProgress - When in app mode
+   */
+  update() {
+    // Early exit if we don't need map status updates
+    if (!IITC.statusbar.showHtmlMapInfo &amp;&amp; !(window.isApp &amp;&amp; (window.app.setMapStatus || window.app.setProgress))) {
+      return;
+    }
+
+    if (this._timer) clearTimeout(this._timer);
+
+    this._timer = setTimeout(() => {
+      this._timer = undefined;
+
+      const data = this.getData();
+
+      if (window.isApp) {
+        if (window.app.setMapStatus) {
+          window.app.setMapStatus(data.portalLevels, data.mapStatus, data.requests);
+        }
+
+        if (window.app.setProgress) {
+          window.app.setProgress(data.mapStatus.progress);
+        }
+      }
+
+      if (IITC.statusbar.showHtmlMapInfo) {
+        if (!this._innerstatusElement) {
+          this._innerstatusElement = document.getElementById('innerstatus');
+        }
+
+        if (this._innerstatusElement) {
+          this._innerstatusElement.innerHTML = this.render(data);
+        }
+      }
+    }, 0);
+  },
+};
+
+/**
+ * Selected portal status module - handles information about the currently selected portal
+ * Provides data for both mobile display and app integration
+ * @namespace IITC.statusbar.portal
+ */
+IITC.statusbar.portal = {
+  _lastSentData: null, // Keep last sent data to avoid sending empty info
+  _mobileinfoElement: null,
+  _timer: null,
+
+  /**
+   * Gets detailed data about a specific portal.
+   *
+   * @function IITC.statusbar.portal.getData
+   * @param {string} guid - The portal's globally unique identifier
+   * @returns {Object|null} Structured portal data including team, level, health, resonators, and loading state,
+   *                        or null if the portal is not found
+   */
+  getData(guid) {
+    if (!guid) {
+      this._lastSentData = null;
+      return null;
+    }
+
+    // If portal doesn't exist or has no basic data, return previous data with loading state
+    if (!window.portals[guid]) {
+      return this._lastSentData ? { ...this._lastSentData, isLoading: true } : null;
+    }
+
+    const portal = window.portals[guid];
+    const data = portal.options.data;
+
+    // If we don't have basic data, return previous data with loading state
+    if (typeof data.title === 'undefined') {
+      return this._lastSentData ? { ...this._lastSentData, isLoading: true } : null;
+    }
+
+    // Get portal details object if available
+    const details = window.portalDetail.get(guid);
+    let healthPct = data.health;
+
+    // Calculate health percentage if we have detailed energy data
+    if (details) {
+      const totalEnergy = window.getTotalPortalEnergy(details);
+      if (totalEnergy > 0) {
+        healthPct = Math.floor((window.getCurrentPortalEnergy(details) / totalEnergy) * 100);
+      }
+    }
+
+    // Determine if portal is neutral
+    const isNeutral = data.team === 'N' || data.team === 'NEUTRAL';
+
+    // Determine if we have complete portal details
+    // For neutral portals, having details object is enough (they don't have resonators)
+    // For occupied portals, we need details with resonators
+    const hasCompleteDetails = details &amp;&amp; (isNeutral || (details.resonators &amp;&amp; details.resonators.length > 0));
+
+    // Build structured result data
+    const result = {
+      guid,
+      team: data.team,
+      level: data.level,
+      isNeutral,
+      title: data.title,
+      health: healthPct,
+      resonators: null,
+      levelColor: !isNeutral ? window.COLORS_LVL[data.level] : null,
+      isLoading: !hasCompleteDetails, // True until we have complete portal details
+    };
+
+    // Process resonators if available (only for non-neutral portals)
+    if (hasCompleteDetails &amp;&amp; !isNeutral &amp;&amp; details.resonators &amp;&amp; details.resonators.length > 0) {
+      // Create sparse array - only populate slots that have resonators
+      result.resonators = new Array(8).fill(null);
+
+      // Process each resonator
+      for (let i = 0; i &lt; details.resonators.length; i++) {
+        const reso = details.resonators[i];
+        if (!reso || parseInt(reso.energy) &lt;= 0) continue;
+
+        const level = parseInt(reso.level);
+        const energy = parseInt(reso.energy);
+        const maxEnergy = window.RESO_NRG[level] || 0;
+        const healthPct = maxEnergy > 0 ? (energy / maxEnergy) * 100 : 0;
+
+        let octant, direction, displayOrder;
+
+        if (details.resonators.length === 8) {
+          // For full deployments (8 resonators), the array index is the octant
+          octant = i;
+        } else {
+          // For partial deployments, we assume sequential from East (octant 0)
+          octant = i % 8;
+        }
+
+        // Convert octant to compass direction
+        direction = GAME_OCTANTS[octant];
+
+        // Get display position from compass direction
+        displayOrder = DIRECTION_TO_INDEX.get(direction);
+
+        // Update resonator at the correct position
+        if (displayOrder !== undefined) {
+          result.resonators[displayOrder] = {
+            direction,
+            level,
+            energy,
+            maxEnergy,
+            healthPct,
+            levelColor: window.COLORS_LVL[level],
+          };
+        }
+      }
+    }
+
+    this._lastSentData = result;
+    return result;
+  },
+
+  /**
+   * Renders HTML representation of portal status.
+   *
+   * @function IITC.statusbar.portal.render
+   * @param {Object} data - Portal data from getData()
+   * @returns {string} HTML string representing the portal status including level badge, health,
+   *                   title, and resonator visualization
+   */
+  render(data) {
+    const templates = IITC.statusbar.portalTemplates;
+    const renderTemplate = IITC.statusbar.renderTemplate;
+
+    // Default message when no portal is selected
+    if (!data) return templates.defaultMessage;
+
+    // Create level badge with appropriate team color
+    const levelBadge = renderTemplate(templates.levelBadge, {
+      style: data.levelColor ? `background: ${data.levelColor};` : '',
+      level: data.isNeutral ? '0' : data.level,
+    });
+
+    const teamCss = window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)] || '';
+
+    // Create resonator visualizations
+    let resonators = '';
+    if (data.resonators) {
+      data.resonators.forEach((reso, index) => {
+        if (reso &amp;&amp; reso.energy > 0) {
+          // Render filled resonator
+          resonators += renderTemplate(templates.resonator, {
+            className: `${teamCss}${reso.direction === 'N' ? ' north' : ''}`,
+            slot: index,
+            percentage: reso.healthPct,
+            borderColor: reso.levelColor,
+          });
+        } else {
+          // Render empty slot
+          resonators += renderTemplate(templates.emptyResonator, {
+            slot: index,
+          });
+        }
+      });
+    }
+
+    // Combine all elements
+    return renderTemplate(templates.mainInfo, {
+      levelBadge,
+      health: data.health,
+      title: data.title,
+      resonators,
+    });
+  },
+
+  /**
+   * Updates portal information in the UI and mobile app (if applicable).
+   *
+   * @function IITC.statusbar.portal.update
+   * @param {Object} [selectedPortalData] - Object containing the selectedPortalGuid
+   * @fires app.setPortalStatus - When in app mode
+   */
+  update(selectedPortalData) {
+    // Early exit if we don't need portal status (not in app and not smartphone)
+    if (!IITC.statusbar.showHtmlPortalInfo &amp;&amp; !(window.isApp &amp;&amp; window.app.setPortalStatus)) {
+      return;
+    }
+
+    if (this._timer) clearTimeout(this._timer);
+
+    this._timer = setTimeout(() => {
+      this._timer = undefined;
+
+      const guid = selectedPortalData ? selectedPortalData.selectedPortalGuid : undefined;
+      const data = this.getData(guid);
+
+      if (window.isApp &amp;&amp; window.app.setPortalStatus) {
+        if (data) {
+          window.app.setPortalStatus(data.guid, data.team, data.level, data.title, data.health, data.resonators, data.levelColor, data.isLoading);
+        } else {
+          window.app.setPortalStatus(null, null, null, null, null, null, null, false);
+        }
+      }
+
+      if (IITC.statusbar.showHtmlPortalInfo) {
+        if (!this._mobileinfoElement) {
+          this._mobileinfoElement = document.getElementById('mobileinfo');
+        }
+
+        if (this._mobileinfoElement) {
+          this._mobileinfoElement.innerHTML = this.render(data);
+          if (data &amp;&amp; data.isLoading) {
+            this._mobileinfoElement.classList.add('loading');
+          } else {
+            this._mobileinfoElement.classList.remove('loading');
+          }
+        }
+      }
+    }, 0);
+  },
+};
 </code></pre>
-    </div>
-    
-
-    <!--
-    
-    -->
-
-    
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>icon</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The icon object for ornaments and beacons.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        
-            
-
-<dt>
-<h4 class="name" id=".knownOrnaments">
-    <span class="type-signature"><span class="icon green">static</span> </span>knownOrnaments<span class="type-signature"></span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line76">line 76</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>List of known ornaments.</p>
-    </div>
-    
-
-    <!--
-    
-    -->
-
-    
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>knownOrnaments</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Object tracking known ornaments.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        
-            
-
-<dt>
-<h4 class="name" id=".OVERLAY_OPACITY">
-    <span class="type-signature"><span class="icon green">static</span>, <span class="icon green">constant</span> </span>OVERLAY_OPACITY<span class="type-signature"> :number</span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line40">line 40</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Default opacity for ornament.</p>
-    </div>
-    
-
-    <!--
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">number</span>
-
-
-            </li>
-        </ul>
-    
-    -->
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        
-            
-
-<dt>
-<h4 class="name" id=".OVERLAY_SIZE">
-    <span class="type-signature"><span class="icon green">static</span>, <span class="icon green">constant</span> </span>OVERLAY_SIZE<span class="type-signature"> :number</span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line33">line 33</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Default size for ornament.</p>
-    </div>
-    
-
-    <!--
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">number</span>
-
-
-            </li>
-        </ul>
-    
-    -->
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        </dl>
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-                
-
-<dt>
-    
-        <h4 class="name" id=".addPortal">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>addPortal<span class="signature">(portal)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line128">line 128</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Adds ornament overlays to the specified portal.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>portal</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal to which ornaments are added.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".createLayer">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>createLayer<span class="signature">(layerID)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line116">line 116</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Creates a new layer for a given ornament ID.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>layerID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The ID for the new layer.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".initOrnaments">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>initOrnaments<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line213">line 213</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Initializes known ornaments.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".load">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>load<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line224">line 224</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Loads ornament data from localStorage.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".onChangeHandler">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>onChangeHandler<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line332">line 332</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Handles changes in ornament options and updates the map accordingly.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".ornamentsList">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>ornamentsList<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line297">line 297</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Generates a list of ornaments for display in the options dialog.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">string</span>
-
-
-
-
-
-- <p>HTML string representing the list of ornaments.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".ornamentsOpt">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>ornamentsOpt<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line345">line 345</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Opens the dialog for ornament options, allowing users to manage ornament visibility.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".processInput">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>processInput<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line276">line 276</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Processes input data for managing ornaments.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".reload">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>reload<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line263">line 263</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Reloads all ornaments on the map.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".removePortal">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>removePortal<span class="signature">(portal)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line197">line 197</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Removes ornament overlays from the specified portal.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>portal</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal from which ornaments are removed.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".replaceOL">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>replaceOL<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line322">line 322</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Replaces the content of the ornaments list in the dialog.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".save">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>save<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line253">line 253</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Saves the current ornament configuration to localStorage.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".setup">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>setup<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line84">line 84</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets up the ornament layer and necessary event handlers.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            </dl>
-    
-
-    
-
-    
-</article>
-
-</section>
+        </article>
+    </section>
 
 
 
@@ -2035,7 +593,7 @@ be filled from a plugin</p>
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'window.ornaments_sub'.replace(/"/g, '_');
+        var id = '_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

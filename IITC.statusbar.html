@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: ornaments | IITC-CE</title>
+    <title>Namespace: statusbar | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,7 +48,8 @@
 
 <header>
     
-        <h2>ornaments</h2>
+        <h2>
+            <span class="ancestors"><a href="IITC.html">IITC</a>.</span>statusbar</h2>
         
     
 </header>
@@ -58,28 +59,8 @@
         <div class="container-overview">
         
             
-                <div class="description"><p>Manages the overlay of additional images (ornaments) on portals, such as beacons, frackers,
-and anomaly markers.</p>
-<p>Added as part of the Ingress #Helios in 2014, ornaments are additional image overlays for portals.
-currently there are 6 known types of ornaments: <code>ap$x$suffix</code></p>
-<ul>
-<li><code>cluster portals</code> (without suffix)</li>
-<li><code>volatile portals</code> (_v)</li>
-<li><code>meeting points</code> (_start)</li>
-<li><code>finish points</code> (_end)</li>
-</ul>
-<p>Beacons and Frackers were introduced at the launch of the Ingress ingame store on November 1st, 2015</p>
-<ul>
-<li><code>Beacons</code> (pe$TAG - $NAME) ie: <code>peNIA - NIANTIC</code></li>
-<li><code>Frackers</code> ('peFRACK')
-(there are 7 different colors for each of them)</li>
-</ul>
-<p>Ornament IDs are dynamic. NIANTIC might change them at any time without prior notice.
-New ornamnent IDs found on the map will be recorded and saved to knownOrnaments from
-which the Ornaments dialog will be filled with checked checkboxes.
-To exclude a set of ornaments, even if they have not yet shown up on the map, the user
-can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
-future IDs. example: &quot;ap&quot; to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)</p></div>
+                <div class="description"><p>Status bar module for IITC that displays both map and portal status information.
+Provides a template-based rendering system that can be customized by plugins.</p></div>
             
 
             
@@ -135,6 +116,34 @@ future IDs. example: &quot;ap&quot; to exclude all Ornaments for anomalies (ap1,
     
 
     
+        <h3 class="subsection-title">Namespaces</h3>
+        
+
+<dl>
+    
+        <dt>
+            <h4 class="name">
+                <a href="IITC.statusbar.map.html">map</a>
+                <div class="container-source members">
+                    <code><a href="IITC.statusbar.map.html">IITC.statusbar.map</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+        <dt>
+            <h4 class="name">
+                <a href="IITC.statusbar.portal.html">portal</a>
+                <div class="container-source members">
+                    <code><a href="IITC.statusbar.portal.html">IITC.statusbar.portal</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+</dl>
+
+    
 
     
         <h3 class="subsection-title">Members</h3>
@@ -143,12 +152,12 @@ future IDs. example: &quot;ap&quot; to exclude all Ornaments for anomalies (ap1,
             
 
 <dt>
-<h4 class="name" id=".excludedOrnaments">
-    <span class="type-signature"><span class="icon green">static</span> </span>excludedOrnaments<span class="type-signature"></span>
+<h4 class="name" id=".mapTemplates">
+    <span class="type-signature"><span class="icon green">static</span> </span>mapTemplates<span class="type-signature"> :Object.&lt;string, string></span>
     
     <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line70">line 70</a></code>
+        <code><a href="code_statusbar.js.html">code/statusbar.js</a></code>,
+        <code><a href="code_statusbar.js.html#line50">line 50</a></code>
     </div>
     
 </h4>
@@ -158,386 +167,7 @@ future IDs. example: &quot;ap&quot; to exclude all Ornaments for anomalies (ap1,
 <dd>
     
     <div class="description">
-        <p>List of ornaments to be excluded.</p>
-    </div>
-    
-
-    <!--
-    
-    -->
-
-    
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>excludedOrnaments</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;string></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Patterns to be excluded from display.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        
-            
-
-<dt>
-<h4 class="name" id=".icon">
-    <span class="type-signature"><span class="icon green">static</span> </span>icon<span class="type-signature"></span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line64">line 64</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Object holding optional definitions for ornaments and beacons.
-The icon object holds optional definitions for the ornaments an beacons. The object shall
-be filled from a plugin</p>
-<pre class="prettyprint source"><code>'ornamentID' : {
-  name: 'meaningful name',     // shows up in dialog
-  layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
-                               // ornament will be in &quot;Ornaments&quot;
-  url: 'url',                  // from which the image will be taken, optional,
-                               // 84x84px is default, if not set, stock images will be
-                               // used
-  offset: [dx,dy],             // optional, shift the ornament vertically or horizontally by
-                               // dx (vertical)and dy )horizontal.
-                               // [0, 0.5] to place right above the portal.
-                               // default is [0, 0] to center
-  opacity: 0..1                // optional, default is 0.6
-}
-</code></pre>
-    </div>
-    
-
-    <!--
-    
-    -->
-
-    
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>icon</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The icon object for ornaments and beacons.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        
-            
-
-<dt>
-<h4 class="name" id=".knownOrnaments">
-    <span class="type-signature"><span class="icon green">static</span> </span>knownOrnaments<span class="type-signature"></span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line76">line 76</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>List of known ornaments.</p>
-    </div>
-    
-
-    <!--
-    
-    -->
-
-    
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>knownOrnaments</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Object tracking known ornaments.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-    
-</dd>
-
-        
-            
-
-<dt>
-<h4 class="name" id=".OVERLAY_OPACITY">
-    <span class="type-signature"><span class="icon green">static</span>, <span class="icon green">constant</span> </span>OVERLAY_OPACITY<span class="type-signature"> :number</span>
-    
-    <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line40">line 40</a></code>
-    </div>
-    
-</h4>
-
-
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Default opacity for ornament.</p>
+        <p>Templates for map status HTML elements</p>
     </div>
     
 
@@ -547,7 +177,7 @@ be filled from a plugin</p>
         <ul>
             <li>
                 
-<span class="param-type">number</span>
+<span class="param-type">Object.&lt;string, string></span>
 
 
             </li>
@@ -601,12 +231,12 @@ be filled from a plugin</p>
             
 
 <dt>
-<h4 class="name" id=".OVERLAY_SIZE">
-    <span class="type-signature"><span class="icon green">static</span>, <span class="icon green">constant</span> </span>OVERLAY_SIZE<span class="type-signature"> :number</span>
+<h4 class="name" id=".portalTemplates">
+    <span class="type-signature"><span class="icon green">static</span> </span>portalTemplates<span class="type-signature"> :Object.&lt;string, string></span>
     
     <div class="container-source members">
-        <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-        <code><a href="code_ornaments.js.html#line33">line 33</a></code>
+        <code><a href="code_statusbar.js.html">code/statusbar.js</a></code>,
+        <code><a href="code_statusbar.js.html#line80">line 80</a></code>
     </div>
     
 </h4>
@@ -616,7 +246,7 @@ be filled from a plugin</p>
 <dd>
     
     <div class="description">
-        <p>Default size for ornament.</p>
+        <p>Templates for portal status HTML elements</p>
     </div>
     
 
@@ -626,7 +256,7 @@ be filled from a plugin</p>
         <ul>
             <li>
                 
-<span class="param-type">number</span>
+<span class="param-type">Object.&lt;string, string></span>
 
 
             </li>
@@ -687,14 +317,14 @@ be filled from a plugin</p>
 
 <dt>
     
-        <h4 class="name" id=".addPortal">
+        <h4 class="name" id=".init">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>addPortal<span class="signature">(portal)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>init<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line128">line 128</a></code>
+                <code><a href="code_statusbar.js.html">code/statusbar.js</a></code>,
+                <code><a href="code_statusbar.js.html#line104">line 104</a></code>
             </div>
             
         </h4>
@@ -706,7 +336,8 @@ be filled from a plugin</p>
 
     
     <div class="description">
-        <p>Adds ornament overlays to the specified portal.</p>
+        <p>Initializes the statusbar system
+Called after IITC boot process is complete</p>
     </div>
     
 
@@ -716,56 +347,6 @@ be filled from a plugin</p>
 
     
 
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>portal</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal to which ornaments are added.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
     
 
     
@@ -826,14 +407,14 @@ be filled from a plugin</p>
 
 <dt>
     
-        <h4 class="name" id=".createLayer">
+        <h4 class="name" id=".renderTemplate">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>createLayer<span class="signature">(layerID)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>renderTemplate<span class="signature">(template, replacements)</span><span class="type-signature"> &rarr; {string}</span>
                 
             
             <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line116">line 116</a></code>
+                <code><a href="code_statusbar.js.html">code/statusbar.js</a></code>,
+                <code><a href="code_statusbar.js.html#line23">line 23</a></code>
             </div>
             
         </h4>
@@ -845,7 +426,7 @@ be filled from a plugin</p>
 
     
     <div class="description">
-        <p>Creates a new layer for a given ornament ID.</p>
+        <p>Renders a template string by replacing placeholders with actual values.</p>
     </div>
     
 
@@ -881,7 +462,7 @@ be filled from a plugin</p>
 
         <tr>
             
-                <td class="name"><code>layerID</code></td>
+                <td class="name"><code>template</code></td>
             
 
             <td class="type">
@@ -897,7 +478,30 @@ be filled from a plugin</p>
 
             
 
-            <td class="description last"><p>The ID for the new layer.</p></td>
+            <td class="description last"><p>Template string with placeholders in format {{ name }}</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>replacements</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Key-value pairs where keys match placeholder names</p></td>
         </tr>
 
     
@@ -905,362 +509,6 @@ be filled from a plugin</p>
 </table>
 
     </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".initOrnaments">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>initOrnaments<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line213">line 213</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Initializes known ornaments.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".load">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>load<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line224">line 224</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Loads ornament data from localStorage.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".onChangeHandler">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>onChangeHandler<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line332">line 332</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Handles changes in ornament options and updates the map accordingly.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".ornamentsList">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>ornamentsList<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line297">line 297</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Generates a list of ornaments for display in the options dialog.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
     
 
     
@@ -1287,7 +535,7 @@ be filled from a plugin</p>
 
 
 
-- <p>HTML string representing the list of ornaments.</p>
+- <p>Rendered HTML with placeholders replaced by values</p>
 
 
 
@@ -1334,677 +582,10 @@ be filled from a plugin</p>
 
 
     
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".ornamentsOpt">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>ornamentsOpt<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line345">line 345</a></code>
-            </div>
-            
-        </h4>
-
+        <h5>Example</h5>
         
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Opens the dialog for ornament options, allowing users to manage ornament visibility.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".processInput">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>processInput<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line276">line 276</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Processes input data for managing ornaments.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".reload">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>reload<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line263">line 263</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Reloads all ornaments on the map.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".removePortal">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>removePortal<span class="signature">(portal)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line197">line 197</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Removes ornament overlays from the specified portal.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>portal</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The portal from which ornaments are removed.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".replaceOL">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>replaceOL<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line322">line 322</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Replaces the content of the ornaments list in the dialog.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".save">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>save<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line253">line 253</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Saves the current ornament configuration to localStorage.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".setup">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>setup<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_ornaments.js.html">code/ornaments.js</a></code>,
-                <code><a href="code_ornaments.js.html#line84">line 84</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets up the ornament layer and necessary event handlers.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
+    <pre class="prettyprint"><code>// Returns: "&lt;span>Hello World&lt;/span>"
+IITC.statusbar.renderTemplate("&lt;span>{{ greeting }}&lt;/span>", { greeting: "Hello World" });</code></pre>
 
     
 
@@ -2035,7 +616,7 @@ be filled from a plugin</p>
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'window.ornaments_sub'.replace(/"/g, '_');
+        var id = 'IITC.statusbar_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
