@@ -1,0 +1,76 @@
+name: Deploy to Google Play Store
+
+on:
+  workflow_run:
+    workflows: ['Build IITC and push artifacts']
+    types: [completed]
+
+jobs:
+  check-secret:
+    runs-on: ubuntu-latest
+    outputs:
+      secrets: ${{ steps.secret-check.outputs.defined }}
+    steps:
+      - name: Check for Google Play Account secret
+        id: secret-check
+        env:
+          GOOGLE_PLAY_ACCOUNT: ${{ secrets.GOOGLE_PLAY_ACCOUNT }}
+        shell: bash
+        run: |
+          if [ -n "$GOOGLE_PLAY_ACCOUNT" ]; then
+            echo "defined=true" >> $GITHUB_OUTPUT;
+          else
+            echo "defined=false" >> $GITHUB_OUTPUT;
+          fi
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [check-secret]
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      needs.check-secret.outputs.secrets == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1
+          bundler-cache: true
+
+      - name: Determine deployment track
+        run: |
+          if [[ "${{ github.event.workflow_run.head_branch }}" == refs/tags/v* ]]; then
+            echo "DEPLOY_TRACK=production" >> $GITHUB_ENV
+            echo "FASTLANE_LANE=deploy_production" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_TRACK=beta" >> $GITHUB_ENV
+            echo "FASTLANE_LANE=deploy_beta" >> $GITHUB_ENV
+          fi
+          echo "BUILD_TYPE=release" >> $GITHUB_ENV
+
+      - name: Download localbuildsettings.py
+        run: wget https://iitc.app/deploy/localbuildsettings.py
+
+      - name: Build release AAB for Google Play
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
+          ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
+        run: ./build.py release
+
+      - name: Deploy to Google Play Store
+        env:
+          GOOGLE_PLAY_ACCOUNT: ${{ secrets.GOOGLE_PLAY_ACCOUNT }}
+        run: bundle exec fastlane $FASTLANE_LANE
