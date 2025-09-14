@@ -758,6 +758,10 @@ public class IITC_Mobile extends AppCompatActivity
         return mDexRunning;
     }
 
+    public boolean isDebugging() {
+        return mDebugging;
+    }
+
     @Override
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_SEARCH) {
@@ -1069,6 +1073,8 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     private void updateViews() {
+        boolean wasDebugging = mViewDebug.getVisibility() == View.VISIBLE;
+        
         if (!mDebugging) {
             mViewDebug.setVisibility(View.GONE);
             mLayoutDebug.setVisibility(View.GONE);
@@ -1101,6 +1107,11 @@ public class IITC_Mobile extends AppCompatActivity
                 mIitcWebView.setVisibility(View.GONE);
                 mLayoutDebug.setVisibility(View.VISIBLE);
             }
+        }
+        
+        // Update safe area insets when debug mode changes
+        if (wasDebugging != mDebugging) {
+            mIitcWebView.applySafeAreaInsets();
         }
     }
 

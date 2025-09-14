@@ -199,6 +199,12 @@ public class WindowInsetsHelper {
                 systemBarBottom
             );
         }
+
+        // Update WebView safe area insets for CSS
+        org.exarhteam.iitc_mobile.IITC_WebView webView = activity.getWebView();
+        if (webView != null) {
+            webView.setSafeAreaInsets(statusBarHeight, systemBarRight, systemBarBottom, systemBarLeft);
+        }
     }
 
     /**
