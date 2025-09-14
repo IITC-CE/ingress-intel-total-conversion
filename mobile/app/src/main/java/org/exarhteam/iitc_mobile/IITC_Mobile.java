@@ -205,6 +205,10 @@ public class IITC_Mobile extends AppCompatActivity
         debugHistory = new IITC_DebugHistory(50);
 
         setContentView(R.layout.activity_main);
+
+        // Setup window insets for edge-to-edge display
+        WindowInsetsHelper.setupMainActivityInsets(this);
+
         debugScrollButton = findViewById(R.id.debugScrollButton);
 
         mImageLoading = findViewById(R.id.imageLoading);

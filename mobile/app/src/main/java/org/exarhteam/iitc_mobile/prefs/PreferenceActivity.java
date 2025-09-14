@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
 import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;
 
+import org.exarhteam.iitc_mobile.WindowInsetsHelper;
 import org.exarhteam.iitc_mobile.fragments.MainSettings;
 
 public class PreferenceActivity extends Activity implements OnLocaleChangedListener {
@@ -46,6 +47,9 @@ public class PreferenceActivity extends Activity implements OnLocaleChangedListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Setup window insets for edge-to-edge display
+        WindowInsetsHelper.setupPreferenceActivityInsets(this);
 
         MainSettings settings = new MainSettings();
 
