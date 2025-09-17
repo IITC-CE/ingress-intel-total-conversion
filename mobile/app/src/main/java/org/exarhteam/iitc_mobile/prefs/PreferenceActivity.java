@@ -48,6 +48,18 @@ public class PreferenceActivity extends Activity implements OnLocaleChangedListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Fix for proper ActionBar spacing
+        android.view.View contentView = findViewById(android.R.id.content);
+        if (contentView instanceof android.view.ViewGroup) {
+            android.view.ViewGroup content = (android.view.ViewGroup) contentView;
+            if (content.getChildCount() > 0 && content.getChildAt(0) instanceof android.widget.LinearLayout) {
+                android.widget.LinearLayout mainLayout = (android.widget.LinearLayout) content.getChildAt(0);
+                if (!mainLayout.getFitsSystemWindows()) {
+                    mainLayout.setFitsSystemWindows(true);
+                }
+            }
+        }
+
         // Setup window insets for edge-to-edge display
         WindowInsetsHelper.setupPreferenceActivityInsets(this);
 

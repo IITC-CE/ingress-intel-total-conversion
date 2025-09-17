@@ -17,23 +17,41 @@ public class WindowInsetsHelper {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             return;
         }
+        
         android.view.View rootView = activity.findViewById(android.R.id.content);
-        rootView.post(() -> {
-            ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, windowInsets) -> {
-                Insets systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, windowInsets) -> {
+            Insets systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
 
-                v.setPadding(
-                    systemBarsInsets.left,
-                    activity instanceof android.preference.PreferenceActivity ? 0 : systemBarsInsets.top, // PreferenceActivity handles status bar itself
-                    systemBarsInsets.right,
-                    systemBarsInsets.bottom
-                );
+            // Apply only side and top insets - let system handle bottom normally
+            v.setPadding(
+                systemBarsInsets.left,   // Handle side notches/bars
+                systemBarsInsets.top,    // Handle status bar
+                systemBarsInsets.right,  // Handle side notches/bars
+                0                        // Don't override bottom - standard behavior
+            );
 
-                return windowInsets;
+            // Configure ListView when fragment is loaded
+            v.post(() -> {
+                android.view.View listView = v.findViewById(android.R.id.list);
+                if (listView instanceof android.widget.ListView) {
+                    android.widget.ListView lv = (android.widget.ListView) listView;
+                    // Allow content to be visible behind system bars
+                    lv.setClipToPadding(false);
+                    
+                    // Also apply padding to ListView itself to ensure proper spacing
+                    lv.setPadding(
+                        lv.getPaddingLeft(),
+                        lv.getPaddingTop(),
+                        lv.getPaddingRight(),
+                        systemBarsInsets.bottom
+                    );
+                }
             });
 
-            ViewCompat.requestApplyInsets(rootView);
+            return windowInsets;
         });
+
+        ViewCompat.requestApplyInsets(rootView);
     }
 
     /**
@@ -83,10 +101,15 @@ public class WindowInsetsHelper {
         android.view.View dialogContentView = dialog.findViewById(android.R.id.content);
         if (dialogContentView != null) {
             ViewCompat.setOnApplyWindowInsetsListener(dialogContentView, (v, windowInsets) -> {
-                Insets statusBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
+                Insets systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
 
-                // Apply top padding to avoid overlapping with status bar
-                v.setPadding(v.getPaddingLeft(), statusBarsInsets.top, v.getPaddingRight(), v.getPaddingBottom());
+                // Apply insets to avoid overlapping with system bars
+                v.setPadding(
+                    systemBarsInsets.left,   // Handle side notches/bars in landscape
+                    systemBarsInsets.top,    // Handle status bar
+                    systemBarsInsets.right,  // Handle side notches/bars in landscape
+                    systemBarsInsets.bottom  // Handle navigation bar
+                );
 
                 return windowInsets;
             });
