@@ -1,4 +1,4 @@
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 /**
  * @file Main code block that renders the portal details in the sidebar and
@@ -88,9 +88,9 @@ window.renderPortalDetails = function (guid, forceSelect) {
   if (!guid || !window.portals[guid]) {
     window.urlPortal = guid;
     $('#portaldetails').html('');
+    IITC.statusbar.portal.update();
     if (window.isSmartphone()) {
       $('.fullimg').remove();
-      $('#mobileinfo').html('<div style="text-align: center"><b>tap here for info screen</b></div>');
     }
     return;
   }
@@ -190,13 +190,15 @@ window.renderPortalToSideBar = function (portal) {
 
   window.renderPortalUrl(lat, lng, title, guid);
 
-  // compatibility
-  var data = hasFullDetails ? window.getPortalSummaryData(details) : details;
-
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?
   if (hasFullDetails) {
+    // compatibility
+    var data = window.getPortalSummaryData(details);
+
     window.runHooks('portalDetailsUpdated', { guid: guid, portal: portal, portalDetails: details, portalData: data });
+
+    window.setPortalIndicators(portal);
   }
 };
 

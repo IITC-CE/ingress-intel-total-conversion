@@ -79,7 +79,7 @@
     <string name="intent_error">Adresse konnte nicht geöffnet werden</string>
     <string name="notice_extplugins">&lt;p&gt;Hinweis: &lt;p&gt;IITC Mobile kann auch externe Plugins laden! &lt;p&gt;Füge sie über das (+) Icon oben rechts hinzu. Die Pluin Datein müssen auf \'.user.js\' enden und werden nach &lt;b&gt;%1$s&lt;/b&gt; kopiert</string>
     <string name="menu_debug">Fehlersuche</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm wurde angewiesen folgende Javascript Datei zu installieren: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Achtung:&lt;/b&gt; Javascript aus externen Quellen kann schädlichen Code enthalten (Spyware etc.)! &lt;p&gt;Sind Sie sicher, dass sie fortfahren wollen\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm wurde angewiesen folgende Javascript Datei zu installieren: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Achtung:&lt;/b&gt; Javascript aus externen Quellen kann schädlichen Code enthalten (Spyware etc.)! &lt;p&gt;Sind Sie sicher, dass sie fortfahren wollen?</string>
     <string name="menu_send_screenshot">Screenshot verschicken</string>
     <string name="tab_browser">Intel</string>
     <string name="pref_fake_user_agent_sum">IITCm als Desktopbrowser für die Intelseite erscheinen lassen. Hinweis: Falls Sie nur den Desktopmodus benutzen wollen in den Einstellungen \'Desktopmodus erzwingen\' auswählen</string>
@@ -112,11 +112,7 @@
     <string name="appintro_location_description">IITC-CE benötigt die Erlaubnis deine Position (GPS) zu bestimmen um eine einfache Navigation zu ermöglichen.
 \n
 \nAber keine Sorge: Wir verschicken KEINE Daten über deine Position an Dritte.</string>
-    <string name="appintro_nfc_title">NFC Zugriff</string>
     <string name="appintro_navigation_title">Navigation</string>
-    <string name="appintro_nfc_description">Du kannst den Link/Permalink zum aktuellen Portal schnell an ein anderes Gerät senden, wenn beide NFC unterstützen.
-\n
-\nHaltet beide Geräte Rücken an Rücken und tippt auf das Display, um die Karte auf das andere Gerät zu senden.</string>
     <string name="appintro_navigation_description"> Wische vom linken Bildschirmrand (oder klicke auf das Menüsymbol), um die <i>Navigationsleiste</i> aufzurufen.
 \n Klicke auf das Zurück-Symbol, um zur Karte zurückzukehren.
 \n

@@ -43,6 +43,11 @@ body {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
+  transition: opacity 0.2s ease;
+}
+
+#mobileinfo.loading {
+  opacity: 0.6;
 }
 
 #mobileinfo .portallevel {
@@ -50,20 +55,36 @@ body {
   color: #FFF;
 }
 
-#mobileinfo .resonator {
-  position: absolute;
-  width: 12%; /* a little less that 1/8 to have a small distance */
-  height: 100%;
-  top: 0;
-  border-top: 3px solid red;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
+#mobileinfo .resonators-container {
 }
 
+#mobileinfo .resonator {
+  position: absolute;
+  width: 12%;
+  height: 100%;
+  top: 0;
+  border-top: 3px solid var(--resonator-color, #ccc);
+  box-sizing: border-box;
+}
+
+/* Position resonators based on their data-slot value */
+#mobileinfo .resonator[data-slot="0"] { left: 0%; }
+#mobileinfo .resonator[data-slot="1"] { left: 12.5%; }
+#mobileinfo .resonator[data-slot="2"] { left: 25%; }
+#mobileinfo .resonator[data-slot="3"] { left: 37.5%; }
+#mobileinfo .resonator[data-slot="4"] { left: 50%; }
+#mobileinfo .resonator[data-slot="5"] { left: 62.5%; }
+#mobileinfo .resonator[data-slot="6"] { left: 75%; }
+#mobileinfo .resonator[data-slot="7"] { left: 87.5%; }
+
+#mobileinfo .resonator.empty {
+  border-top-color: transparent;
+}
+
+/* Keep the north indicator (the dot above north resonators) */
 #mobileinfo .resonator.north:before {
   content: "";
-  background-color: red;
+  background-color: var(--resonator-color, red);
   border-radius: 100%;
   display: block;
   height: 6px;
@@ -72,7 +93,7 @@ body {
   top: -3px;
   margin-left: -3px;
   position: absolute;
-  z-index: -1;
+  z-index: 1;
 }
 
 #mobileinfo .filllevel {

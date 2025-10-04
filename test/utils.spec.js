@@ -183,7 +183,7 @@ describe('IITC.utils.unixTimeToString', () => {
     const timestamp = now.getTime();
     const timeString = IITC.utils.unixTimeToString(timestamp);
 
-    const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    const timeFormatter = new Intl.DateTimeFormat('sv-SE', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
@@ -452,6 +452,26 @@ describe('IITC.utils.escapeHtml', () => {
   it('should return the same string if there are no special characters', () => {
     const result = IITC.utils.escapeHtml('No special chars');
     expect(result).to.equal('No special chars');
+  });
+
+  it('should preserve allowed tags when provided', () => {
+    const result = IITC.utils.escapeHtml('<b>Bold</b> and <script>alert("XSS")</script>', ['b']);
+    expect(result).to.equal('<b>Bold</b> and &lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;');
+  });
+
+  it('should preserve multiple allowed tags', () => {
+    const result = IITC.utils.escapeHtml('<b>Bold</b>, <i>Italic</i>, and <script>alert("XSS")</script>', ['b', 'i']);
+    expect(result).to.equal('<b>Bold</b>, <i>Italic</i>, and &lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;');
+  });
+
+  it('should preserve self-closing tags like <hr>', () => {
+    const result = IITC.utils.escapeHtml('Text <hr> and <script>alert("XSS")</script>', ['hr']);
+    expect(result).to.equal('Text <hr> and &lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;');
+  });
+
+  it('should preserve closing tags correctly', () => {
+    const result = IITC.utils.escapeHtml('<strong>Strong</strong> and <div>unsafe</div>', ['strong']);
+    expect(result).to.equal('<strong>Strong</strong> and &lt;div&gt;unsafe&lt;/div&gt;');
   });
 });
 

@@ -16,7 +16,7 @@
     <string name="debug_run">Εκτέλεση</string>
     <string name="clear_log">Διαγραφή αρχείου καταγραφής</string>
     <string name="toggle_map">Εναλλαγή προβολής χάρτη</string>
-    <string name="install_dialog_msg">&lt;p&gt;Το IITCm κλήθηκε να εγκαταστήσει το ακόλουθο αρχείο javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Be careful:&lt;/b&gt; Το Javascript από εξωτερικές πηγές ενδέχεται να περιέχει επιβλαβές κώδικα (spyware κλπ.)! &lt;p&gt;Είστε βέβαιοι ότι θέλετε να προχωρήσετε\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;Το IITCm κλήθηκε να εγκαταστήσει το ακόλουθο αρχείο javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Be careful:&lt;/b&gt; Το Javascript από εξωτερικές πηγές ενδέχεται να περιέχει επιβλαβές κώδικα (spyware κλπ.)! &lt;p&gt;Είστε βέβαιοι ότι θέλετε να προχωρήσετε?</string>
     <string name="install_dialog_top">Εισαγωγή εξωτερικού πρόσθετου\?</string>
     <string name="label_overlay_layers">Επικάλυψη Στρώσεων</string>
     <string name="label_base_layer">Βασική Στρώση</string>

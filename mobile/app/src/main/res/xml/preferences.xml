@@ -79,6 +79,10 @@
             android:key="pref_persistent_zoom"
             android:summary="@string/pref_persistent_zoom_sum"
             android:title="@string/pref_persistent_zoom"/>
+        <org.exarhteam.iitc_mobile.prefs.DeepLinkPermissionPreference
+            android:key="pref_deep_link_permission"
+            android:title="@string/pref_deep_link_permission"
+            android:summary="@string/pref_deep_link_permission_summary"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_mics"

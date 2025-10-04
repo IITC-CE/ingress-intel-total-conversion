@@ -123,10 +123,6 @@
     <string name="appintro_navigation_title">ナビゲーション</string>
     <string name="plugins_official_plugins">公式プラグイン</string>
     <string name="plugins_user_plugins">ユーザープラグイン</string>
-    <string name="appintro_nfc_description">両デバイスでNFCがサポートされていれば簡単にポータルリンクを送ることができます。
-\n
-\n両デバイスの後ろと後ろを合わせてスクリーンをタップするとマップを相手デバイスに送信できます。</string>
-    <string name="appintro_nfc_title">NFC権限</string>
     <string name="pref_user_location_show_position_and_orientation">ユーザーの位置と方向を地図上に表示</string>
     <string name="pref_user_location_show_position">位置情報をマップに表示する</string>
     <string name="pref_user_location_dont_show">位置情報を表示しない</string>

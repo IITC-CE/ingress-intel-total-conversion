@@ -19,10 +19,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
 import android.net.Uri;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -80,7 +76,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IITC_Mobile extends AppCompatActivity
-        implements OnSharedPreferenceChangeListener, NfcAdapter.CreateNdefMessageCallback, OnLocaleChangedListener {
+        implements OnSharedPreferenceChangeListener, OnLocaleChangedListener {
     private static final String mIntelUrl = "https://intel.ingress.com/";
 
     private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
@@ -157,8 +153,7 @@ public class IITC_Mobile extends AppCompatActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         // enable webview debug for debug builds
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-                && 0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+        if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
@@ -181,8 +176,16 @@ public class IITC_Mobile extends AppCompatActivity
         // Define webview user agent for known external hosts
         mIITCOriginalUA = WebSettings.getDefaultUserAgent(this);
         mIITCDefaultUA = sanitizeUserAgent(mIITCOriginalUA);
-        final String googleUA = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? mDesktopUA : mIITCDefaultUA;
+        final String googleUA = mIITCDefaultUA;
 
+        // IITC-Mobile User-Agent for tile servers with strip build details after first dash
+        String version = BuildConfig.VERSION_NAME;
+        int dashIndex = version.indexOf('-');
+        if (dashIndex != -1) {
+            version = version.substring(0, dashIndex);
+        }
+        final String iitcMobileUA = "IITC-Mobile/" + version + " (https://github.com/IITC-CE/ingress-intel-total-conversion)";
+        
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
         mAllowedHostnames.put("google.com", googleUA);
         mAllowedHostnames.put("youtube.com", googleUA);
@@ -190,6 +193,8 @@ public class IITC_Mobile extends AppCompatActivity
         mAllowedHostnames.put("appleid.apple.com", mIITCDefaultUA);
         mAllowedHostnames.put("signin.nianticlabs.com", mIITCDefaultUA);
         mAllowedHostnames.put("signin.nianticspatial.com", mIITCDefaultUA);
+        mAllowedHostnames.put("openstreetmap.org", iitcMobileUA);
+        mAllowedHostnames.put("openstreetmap.fr", iitcMobileUA);
 
         // enable progress bar above action bar
         // must be called BEFORE calling parent method
@@ -273,6 +278,18 @@ public class IITC_Mobile extends AppCompatActivity
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
 
+        // Perform data migrations
+        IITC_MigrationHelper migrationHelper = new IITC_MigrationHelper(this);
+        migrationHelper.performMigrations();
+
+        // Initialize PluginManager
+        boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+        IITC_PluginManager.getInstance().loadAllPlugins(
+                mFileManager.getStorageManager(),
+                getAssets(),
+                devMode
+        );
+
         mUserLocation = new IITC_UserLocation(this);
         mUserLocation.setLocationMode(Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0")));
 
@@ -292,7 +309,13 @@ public class IITC_Mobile extends AppCompatActivity
         mDesktopFilter = new IntentFilter();
         mDesktopFilter.addAction("UiModeManager.SEM_ACTION_ENTER_KNOX_DESKTOP_MODE");
         mDesktopFilter.addAction("UiModeManager.SEM_ACTION_EXIT_KNOX_DESKTOP_MODE");
-        registerReceiver(mDesktopModeReceiver, mDesktopFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+            registerReceiver(mDesktopModeReceiver, mDesktopFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31-32
+            registerReceiver(mDesktopModeReceiver, mDesktopFilter, 0x00000001); // RECEIVER_NOT_EXPORTED
+        } else {
+            registerReceiver(mDesktopModeReceiver, mDesktopFilter);
+        }
 
         // Check for app updates
         if (BuildConfig.ENABLE_CHECK_APP_UPDATES) {
@@ -304,10 +327,14 @@ public class IITC_Mobile extends AppCompatActivity
 
         // receive downloadManagers downloadComplete intent
         // afterwards install iitc update
-        registerReceiver(mBroadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
-        final NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
-        if (nfc != null) nfc.setNdefPushMessageCallback(this, this);
+        IntentFilter downloadFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+            registerReceiver(mBroadcastReceiver, downloadFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31-32
+            registerReceiver(mBroadcastReceiver, downloadFilter, 0x00000001); // RECEIVER_NOT_EXPORTED
+        } else {
+            registerReceiver(mBroadcastReceiver, downloadFilter);
+        }
 
         this.firstTimeIntro();
 
@@ -326,6 +353,33 @@ public class IITC_Mobile extends AppCompatActivity
             final int mode = Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0"));
             if (mUserLocation.setLocationMode(mode))
                 mReloadNeeded = true;
+            
+            // Sync plugin checkbox state with location mode preference
+            boolean shouldBeEnabled = mode != 0;
+            boolean isCurrentlyEnabled = mSharedPrefs.getBoolean("user-location.user.js", false);
+            
+            if (shouldBeEnabled != isCurrentlyEnabled) {
+                SharedPreferences.Editor editor = mSharedPrefs.edit();
+                editor.putBoolean("user-location.user.js", shouldBeEnabled);
+                editor.apply();
+            }
+            return;
+        } else if (key.equals("user-location.user.js")) {
+            // Sync location mode preference when user-location plugin checkbox changes
+            boolean pluginEnabled = sharedPreferences.getBoolean(key, false);
+            String currentMode = mSharedPrefs.getString("pref_user_location_mode", "0");
+            
+            if (pluginEnabled && "0".equals(currentMode)) {
+                // Enable location mode when plugin is enabled (default to show position)
+                SharedPreferences.Editor editor = mSharedPrefs.edit();
+                editor.putString("pref_user_location_mode", "1");
+                editor.apply();
+            } else if (!pluginEnabled && !"0".equals(currentMode)) {
+                // Disable location mode when plugin is disabled
+                SharedPreferences.Editor editor = mSharedPrefs.edit();
+                editor.putString("pref_user_location_mode", "0");
+                editor.apply();
+            }
             return;
         } else if (key.equals("pref_language")) {
             final String lang = mSharedPrefs.getString("pref_language", this.getCurrentLanguage().toString());
@@ -354,6 +408,16 @@ public class IITC_Mobile extends AppCompatActivity
             final int interval = Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7"));
             mFileManager.setUpdateInterval(interval);
             return;
+        } else if (key.equals("pref_dev_checkbox")) {
+            // Reload PluginManager when dev mode changes
+            boolean devMode = sharedPreferences.getBoolean("pref_dev_checkbox", false);
+            IITC_PluginManager.getInstance().loadAllPlugins(
+                    mFileManager.getStorageManager(),
+                    getAssets(),
+                    devMode
+            );
+            mReloadNeeded = true;
+            return;
         } else if (key.equals("pref_press_twice_to_exit")
                 || key.equals("pref_share_selected_tab")
                 || key.equals("pref_messages")
@@ -377,7 +441,7 @@ public class IITC_Mobile extends AppCompatActivity
     // handles ingress intel url intents, search intents, geo intents and javascript file intents
     private void handleIntent(final Intent intent, final boolean onCreate) {
         final String action = intent.getAction();
-        if (Intent.ACTION_VIEW.equals(action) || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+        if (Intent.ACTION_VIEW.equals(action)) {
             final Uri uri = intent.getData();
             Log.d("intent received url: " + uri.toString());
 
@@ -388,6 +452,14 @@ public class IITC_Mobile extends AppCompatActivity
                     loadUrl(uri.toString());
                     return;
                 }
+            }
+            
+            if (uri.getScheme().equals("iitc")) {
+                // Convert iitc:// scheme to https://intel.ingress.com/ URL
+                String convertedUrl = mIntelUrl + uri.getSchemeSpecificPart();
+                Log.d("loading iitc deep link: " + uri.toString() + " -> " + convertedUrl);
+                loadUrl(convertedUrl);
+                return;
             }
 
             if (uri.getScheme().equals("geo")) {
@@ -423,10 +495,8 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         if (onCreate) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                CookieManager cookieManager = CookieManager.getInstance();
-                cookieManager.setAcceptThirdPartyCookies(mIitcWebView, true);
-            }
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptThirdPartyCookies(mIitcWebView, true);
             loadUrl(mIntelUrl);
         }
     }
@@ -592,7 +662,7 @@ public class IITC_Mobile extends AppCompatActivity
 
         Log.d("configuration changed...restoring...reset idleTimer");
         mIitcWebView.loadUrl("javascript: window.idleTime = 0");
-        mIitcWebView.loadUrl("javascript: window.renderUpdateStatus()");
+        mIitcWebView.loadUrl("javascript: IITC.statusbar.map.update()");
     }
 
     @Override
@@ -913,6 +983,35 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        // Handle folder selection for storage access
+        if (requestCode == IITC_StorageManager.REQUEST_FOLDER_ACCESS) {
+            if (resultCode == RESULT_OK && data != null) {
+                Uri treeUri = data.getData();
+                if (treeUri != null && mFileManager != null) {
+                    mFileManager.getStorageManager().handleFolderSelection(treeUri);
+
+                    // Reload PluginManager to pick up migrated plugins
+                    boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+                    IITC_PluginManager.getInstance().loadAllPlugins(
+                            mFileManager.getStorageManager(),
+                            getAssets(),
+                            devMode
+                    );
+
+                    // Check for pending plugin installation
+                    String pendingUri = mSharedPrefs.getString("pending_plugin_install", null);
+                    if (pendingUri != null) {
+                        mSharedPrefs.edit().remove("pending_plugin_install").apply();
+                        mFileManager.installPlugin(Uri.parse(pendingUri), false);
+                    }
+
+                    // Reload IITC to apply changes
+                    reloadIITC();
+                }
+            }
+            return;
+        }
+
         final int index = requestCode - RESULT_FIRST_USER;
 
         try {
@@ -1186,6 +1285,14 @@ public class IITC_Mobile extends AppCompatActivity
         return mUserLocation;
     }
 
+    public static String getIntelUrl() {
+        return mIntelUrl;
+    }
+
+    public String getDefaultUserAgent() {
+        return mIITCDefaultUA;
+    }
+
     public interface ResponseHandler {
         void onActivityResult(int resultCode, Intent data);
     }
@@ -1228,22 +1335,6 @@ public class IITC_Mobile extends AppCompatActivity
 
         }, 2000);
 
-    }
-
-    @Override
-    public NdefMessage createNdefMessage(final NfcEvent event) {
-        NdefRecord[] records;
-        if (mPermalink == null) { // no permalink yet, just provide AAR
-            records = new NdefRecord[] {
-                    NdefRecord.createApplicationRecord(getPackageName())
-            };
-        } else {
-            records = new NdefRecord[] {
-                    NdefRecord.createUri(mPermalink),
-                    NdefRecord.createApplicationRecord(getPackageName())
-            };
-        }
-        return new NdefMessage(records);
     }
 
     public void clipboardCopy(String msg) {

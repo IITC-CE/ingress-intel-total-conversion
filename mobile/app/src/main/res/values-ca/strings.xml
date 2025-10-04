@@ -2,7 +2,7 @@
 <resources>
     <string name="toggle_map">Canvia la visibilitat del mapa</string>
     <string name="clear_log">Esborra el registre</string>
-    <string name="install_dialog_msg">&lt;p&gt;S\'ha sol·licitat a l\'IITCm d\'instal·lar aquest fitxer javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Vés amb compte:&lt;/b&gt; el javascript de fonts externes pot contenir codi perillós (spyware etc.)! &lt;p&gt;Segur que vols continuar\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;S\'ha sol·licitat a l\'IITCm d\'instal·lar aquest fitxer javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Vés amb compte:&lt;/b&gt; el javascript de fonts externes pot contenir codi perillós (spyware etc.)! &lt;p&gt;Segur que vols continuar?</string>
     <string name="install_dialog_top">Vols instal·lar un plugin extern\?</string>
     <string name="label_overlay_layers">Capes addicionals</string>
     <string name="label_base_layer">Capa base</string>

@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.40.0
+// @version        0.41.0
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -16,6 +16,17 @@ window.IITC = IITC;
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.41.0',
+    changes: [
+      'Fix RegionScore tooltip HTML rendering with selective HTML escaping',
+      'Update MODs display colors to match Ingress Prime',
+      'Fix ornament rescaling at different zoom levels',
+      'Enhance hack cooldown time calculations',
+      'Improve permalink generation using document.location.pathname',
+      'Convert toolbar to flexbox layout',
+    ],
+  },
   {
     version: '0.40.0',
     changes: [
@@ -313,12 +324,12 @@ window.COLORS_LVL = ['#000', '#FECE5A', '#FFA630', '#FF7315', '#E40000', '#FD299
 /**
  * Colour values for displaying mods, consistent with Ingress. Very Rare also used for AXA shields and Ultra Links.
  * @type {object}
- * @property {string} VERY_RARE=#b08cff
- * @property {string} RARE=#73a8ff
- * @property {string} COMMON=#8cffbf
+ * @property {string} VERY_RARE=#F781FF
+ * @property {string} RARE=#B68BFF
+ * @property {string} COMMON=#49EBC3
  * @memberof config_options
  */
-window.COLORS_MOD = { VERY_RARE: '#b08cff', RARE: '#73a8ff', COMMON: '#8cffbf' };
+window.COLORS_MOD = { VERY_RARE: '#F781FF', RARE: '#B68BFF', COMMON: '#49EBC3' };
 
 /**
  * What colour should the hacking range circle be (the small circle that appears around a selected portal,
@@ -490,6 +501,7 @@ window.MAX_RESO_PER_PLAYER = [0, 8, 4, 4, 4, 2, 2, 1, 1];
  * @memberof ingress_constants
  */
 window.BASE_HACK_COOLDOWN = 300; // 5 mins - 300 seconds
+window.FACTION_HACK_COOLDOWN = 180; // 3 min - 180 seconds
 
 /**
  * Base value, how many times at most you can hack the portal.

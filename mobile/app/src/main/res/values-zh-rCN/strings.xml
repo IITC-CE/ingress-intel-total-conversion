@@ -115,10 +115,6 @@
 \n<i>导航抽屉</i>内会显示部分插件（例如<i>能量塔列表</i>和<i>书签</i>）以供快速访问。
 \n它们将不再于信息板中显示。 </string>
     <string name="appintro_navigation_title">导航</string>
-    <string name="appintro_nfc_description">如果您的设备支持 NFC，您可以将当前能量塔或位置的链接通过 NFC 发送给其它支持的设备。
-\n
-\n将两台设备贴在一起，并轻触屏幕以传送地图。</string>
-    <string name="appintro_nfc_title">NFC 权限</string>
     <string name="appintro_location_description">IITC-CE 移动版需要获取定位权限以进行导航。
 \n
 \n请不用担心，我们不会将您的定位发送到任何地方。</string>

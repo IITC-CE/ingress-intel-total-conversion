@@ -33,8 +33,7 @@ public class IITC_WebViewPopup extends WebView {
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            setWebContentsDebuggingEnabled(true);
+        setWebContentsDebuggingEnabled(true);
 
         setWebChromeClient(new WebChromeClient() {
             @Override

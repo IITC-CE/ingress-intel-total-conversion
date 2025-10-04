@@ -29,7 +29,7 @@
     <string name="install_dialog_top">Installer le plugin externe \?</string>
     <string name="tab_share">Partager</string>
     <string name="notice_extplugins">&lt;p&gt;Conseil : &lt;p&gt;IITC Mobile est aussi capable de charger des plugins externes ! &lt;p&gt;Ajoutez les en cliquant sur l\'icône (+) en haut à droite. Les fichiers des plugins doivent finir par \'.user.js\' et sont copiés dans &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="install_dialog_msg">&lt;p&gt;Il a été demandé à IITCm d\'installer le fichier javascript suivant : &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Attention : &lt;/b&gt; Du javascript venant d\'une source externe peut contenir du code malveillant (spyware etc.) ! &lt;p&gt;Êtes-vous sûr de vouloir continuer \?</string>
+    <string name="install_dialog_msg">&lt;p&gt;Il a été demandé à IITCm d\'installer le fichier javascript suivant : &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Attention : &lt;/b&gt; Du javascript venant d\'une source externe peut contenir du code malveillant (spyware etc.) ! &lt;p&gt;Êtes-vous sûr de vouloir continuer ?</string>
     <string name="pref_persistent_zoom_sum">Ne pas changer le niveau de zoom lors d\'un appui sur le bouton Localiser</string>
     <string name="pref_persistent_zoom">Niveau de zoom persistant</string>
     <string name="pref_user_zoom">Afficher le contrôle du zoom</string>
@@ -130,10 +130,6 @@
     <string name="appintro_location_description">IITC-CE Mobile requiert l\'autorisation d\'accéder à votre emplacement afin de faciliter la navigation.
 \n
 \nMais rassurez-vous : nous n\'envoyons vos données de localisation nulle part.</string>
-    <string name="appintro_nfc_title">Autorisation NFC</string>
-    <string name="appintro_nfc_description">Vous pouvez rapidement envoyer le lien/permalien du portail actuel vers un autre appareil si les deux appareils prennent en charge le NFC.
-\n
-\nTenez les deux appareils dos à dos et touchez l\'écran pour transmettre la carte à l\'autre appareil.</string>
     <string name="appintro_layers_title">Calques/Éléments mis en avant</string>
     <string name="appintro_layers_description"> Faites glisser votre doigt depuis le bord droit de votre écran (ou cliquez sur l\'icône du sélecteur de calques dans la barre d\'action) pour afficher le <i>Menu des calques</i>.
 \n

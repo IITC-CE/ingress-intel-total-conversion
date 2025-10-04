@@ -115,10 +115,6 @@
     <string name="appintro_location_description">本程式需要取得權限以標示您的準確位置。
 \n
 \n 請放心：我們不會外傳您的位置紀錄。</string>
-    <string name="appintro_nfc_title">NFC 使用權限</string>
-    <string name="appintro_nfc_description">您能夠將 portal 的連結快速傳送到另一個裝置上（雙方皆必須支援 NFC 功能）。
-\n
-\n 將兩台裝置背對背靠近，然後點擊螢幕，便可將地圖資訊傳送另一台裝置。</string>
     <string name="appintro_navigation_title">導航</string>
     <string name="appintro_layers_title">圖層/標記</string>
     <string name="appintro_layers_description"> 自螢幕右邊緣滑出（或是按下動作列的圖層選擇器圖示）以開啟<i>圖層繪製器</i>。

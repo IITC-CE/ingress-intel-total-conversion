@@ -94,12 +94,14 @@ public class IITC_UserLocation implements CompassListener, LocationListener {
             mLocationRegistered = false;
         }
 
-        if (useOrientation && !mOrientationRegistered) {
+        if (useOrientation && !mOrientationRegistered && mCompass != null) {
             mCompass.registerListener(this);
             mOrientationRegistered = true;
         }
-        if (!useOrientation && mOrientationRegistered) {
-            mCompass.unregisterListener(this);
+        if ((!useOrientation || mCompass == null) && mOrientationRegistered) {
+            if (mCompass != null) {
+                mCompass.unregisterListener(this);
+            }
             mOrientationRegistered = false;
         }
     }

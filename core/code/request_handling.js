@@ -1,3 +1,5 @@
+/* global IITC -- eslint */
+
 /**
  * @file This file contains functions and variables related to request handling in IITC.
  * Note: only meant for portal/links/fields request, everything else does not count towards “loading”
@@ -29,7 +31,7 @@ window.requests._lastRefreshTime = 0;
  */
 window.requests.add = function (ajax) {
   window.activeRequests.push(ajax);
-  window.renderUpdateStatus();
+  IITC.statusbar.map.update();
 };
 
 /**
@@ -40,7 +42,7 @@ window.requests.add = function (ajax) {
  */
 window.requests.remove = function (ajax) {
   window.activeRequests.splice(window.activeRequests.indexOf(ajax), 1);
-  window.renderUpdateStatus();
+  IITC.statusbar.map.update();
 };
 
 /**
@@ -56,7 +58,7 @@ window.requests.abort = function () {
   window.activeRequests = [];
   window.failedRequestCount = 0;
 
-  window.renderUpdateStatus();
+  IITC.statusbar.map.update();
 };
 
 /**
@@ -70,7 +72,7 @@ window.requests.abort = function () {
 window.startRefreshTimeout = function (override) {
   // may be required to remove 'paused during interaction' message in
   // status bar
-  window.renderUpdateStatus();
+  IITC.statusbar.map.update();
   if (window.refreshTimeout) clearTimeout(window.refreshTimeout);
   if (override === -1) return; // don't set a new timeout
 
@@ -91,7 +93,7 @@ window.startRefreshTimeout = function (override) {
   }
 
   window.refreshTimeout = setTimeout(window.requests._callOnRefreshFunctions, t);
-  window.renderUpdateStatus();
+  IITC.statusbar.map.update();
 };
 
 window.requests._onRefreshFunctions = [];
@@ -106,7 +108,7 @@ window.requests._callOnRefreshFunctions = function () {
   window.startRefreshTimeout();
 
   if (window.isIdle()) {
-    window.renderUpdateStatus();
+    IITC.statusbar.map.update();
     return;
   }
 

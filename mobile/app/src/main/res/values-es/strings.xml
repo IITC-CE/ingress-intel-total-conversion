@@ -23,7 +23,7 @@
     <string name="pref_user_location">Mostrar la ubicación del usuario en el mapa</string>
     <string name="pref_persistent_zoom">Nivel de zoom persistente</string>
     <string name="pref_user_zoom">Mostrar controles de zoom</string>
-    <string name="install_dialog_msg">&lt;p&gt;Se solicitó a IITCm que instalara el siguiente archivo javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ten cuidado:&lt;/b&gt; ¡Javascript de fuentes externas puede contener código dañino (spyware, etc.)! &lt;p&gt;¿Estas seguro de que deseas continuar\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;Se solicitó a IITCm que instalara el siguiente archivo javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ten cuidado:&lt;/b&gt; ¡Javascript de fuentes externas puede contener código dañino (spyware, etc.)! &lt;p&gt;¿Estas seguro de que deseas continuar?</string>
     <string name="install_dialog_top">¿Instalar plugin externo\?</string>
     <string name="label_overlay_layers">Capas Superpuestas</string>
     <string name="label_base_layer">Capa Base</string>
@@ -111,11 +111,7 @@
     <string name="appintro_location_description">IITC-CE Mobile requiere permiso para acceder a su ubicación para facilitar la navegación.
 \n
 \n Pero no se preocupe: no enviamos datos sobre su ubicación a ningún lado.</string>
-    <string name="appintro_nfc_title">Permisos NFC</string>
     <string name="bugtracker">Rastreador de bugs</string>
-    <string name="appintro_nfc_description">Puedes enviar rápidamente el enlace del portal actual a otro dispositivo si ambos dispositivos son compatibles con NFC.
-\n
-\nSujeta ambos dispositivos juntos por su parte posterior uno al lado del otro y toque la pantalla para transmitir el mapa al otro dispositivo.</string>
     <string name="appintro_navigation_title">Navegación</string>
     <string name="appintro_plugins_title">Complementos</string>
     <string name="appintro_layers_title">Capas/Resaltadores</string>

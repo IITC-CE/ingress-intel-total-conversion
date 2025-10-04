@@ -15,7 +15,7 @@
     <string name="clear_log">로그 지우기</string>
     <string name="pref_external_storage_sum">재시작이 필요합니다! 캐시를 SD카드 저장합니다. 외장 저장소가 설치되어있어야 합니다.</string>
     <string name="pref_persistent_zoom">부드러운 확대/축소</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITC모바일에 다음 외부 플러그인을 설치합니다: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;주의:&lt;/b&gt; 외부 소스의 자바스크립트에는 유해 코드가 포함될 수 있습니다 (스파이웨어 등)! &lt;p&gt;계속하시겠습니까\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITC모바일에 다음 외부 플러그인을 설치합니다: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;주의:&lt;/b&gt; 외부 소스의 자바스크립트에는 유해 코드가 포함될 수 있습니다 (스파이웨어 등)! &lt;p&gt;계속하시겠습니까?</string>
     <string name="label_overlay_layers">오버레이 레이어</string>
     <string name="label_base_layer">베이스 레이어</string>
     <string name="label_highlighter">하이라이터</string>
@@ -100,9 +100,6 @@
     <string name="appintro_location_description">IITC-CE 모바일은 손쉬운 탐색을 위해 사용자 위치 액세스 권한이 필요합니다.
 \n
 \n 하지만 걱정하지 마세요. 당사는 사용자의 위치에 대한 데이터를 어디에도 전송하지 않습니다.</string>
-    <string name="appintro_nfc_description">두 장치 모두 NFC를 지원하는 경우 현재 포털 링크/퍼머링크를 다른 장치로 빠르게 전송할 수 있습니다.
-\n
-\n 두 장치를 나란히 맞대고 화면을 탭하면 지도를 다른 장치로 전송할 수 있습니다.</string>
     <string name="appintro_navigation_description"> 화면 왼쪽 가장자리에서 스와이프(또는 메뉴 아이콘 클릭)하여 <i>탐색 창</i>을 불러옵니다.
 \n 지도로 돌아가려면 뒤로 아이콘을 클릭하세요.
 \n
@@ -134,7 +131,6 @@
 \n Ingress 인텔 토탈 컨버전(IITC)은 공식 인텔 Ingress 맵의 오버레이로 작동하는 애드온입니다.
 \n
 \n IITC는 맵 작업 방식을 완전히 바꾸고 하드웨어 가속을 적용하여 효율성을 크게 높이며 다양한 플러그인 사용을 통해 기능을 확장합니다.</string>
-    <string name="appintro_nfc_title">NFC 권한</string>
     <string name="pref_hide_fullscreen_status_bar">IITC 상태 바</string>
     <string name="pref_hide_fullscreen_navigation_bar">시스템 탐색 표시줄</string>
     <string name="pref_user_location_dont_show">사용자 위치 표시 안 함</string>

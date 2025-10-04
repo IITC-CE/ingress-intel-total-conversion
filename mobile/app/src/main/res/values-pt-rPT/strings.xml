@@ -89,7 +89,7 @@
     <string name="intent_error">Não foi possível abrir o endereço</string>
     <string name="msg_copied">Copiado para a área de transferência…</string>
     <string name="msg_prepare_screenshot">Em preparação…</string>
-    <string name="install_dialog_msg">&lt;p&gt;Foi solicitado ao IITCm a instalação do seguinte arquivo javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Seja cuidadoso: &lt;/b&gt; Javascript de fontes externas pode conter código nocivo (spyware etc.)! &lt;p&gt;Tem a certeza de que deseja continuar\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;Foi solicitado ao IITCm a instalação do seguinte arquivo javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Seja cuidadoso: &lt;/b&gt; Javascript de fontes externas pode conter código nocivo (spyware etc.)! &lt;p&gt;Tem a certeza de que deseja continuar?</string>
     <string name="pane_all">Todos</string>
     <string name="plugin_updated">Plugin atualizado</string>
     <string name="toast_press_twice_to_exit">Clique 2 vezes para sair</string>
@@ -116,10 +116,6 @@
 \nNão aparecem mais no Painel de Informações. </string>
     <string name="appintro_layers_title">Camadas/Destaques</string>
     <string name="appintro_navigation_title">Navegação</string>
-    <string name="appintro_nfc_description">Pode rapidamente enviar o link/permalink do portal selecionado para outro dispositivo se ambos suportarem NFC.
-\n
-\nSegure ambos os dispositivos costas com costas e selecione no ecrã para enviar o mapa para o outro dispositivo.</string>
-    <string name="appintro_nfc_title">Permissão de NFC</string>
     <string name="appintro_location_description">IITC-CE Mobile requer permissão para aceder à sua localização para uma navegação mais facilitada.
 \n
 \nMas não se preocupe: nós não enviamos estes dados sobre a sua localização a nada nem ninguém.</string>

@@ -382,7 +382,7 @@ var _requestRunning = {};
  */
 function requestChannel(channel, getOlderMsgs, isRetry) {
   if (_requestRunning[channel] && !isRetry) return;
-  if (window.isIdle()) return window.renderUpdateStatus();
+  if (window.isIdle()) return IITC.statusbar.map.update();
   _requestRunning[channel] = true;
   $("#chatcontrols a[data-channel='" + channel + "']").addClass('loading');
 

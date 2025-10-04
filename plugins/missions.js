@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.3.4
+// @version        0.3.5
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.5',
+    changes: ['Fix mission link missing from sidebar'],
+  },
   {
     version: '0.3.4',
     changes: ['Refactoring: fix eslint'],
@@ -136,19 +140,14 @@ window.plugin.missions = {
     '@include_img:images/mission-type-hidden.png@',
   ],
 
-  onPortalSelected: function () {
-    if (window.selectedPortal === null) {
+  onPortalDetailsUpdated: function (data) {
+    if (!data.portalDetails.mission && !data.portalDetails.mission50plus) {
       return;
     }
-    var portal = window.portals[window.selectedPortal];
-    if (!portal || (!portal.options.data.mission && !portal.options.data.mission50plus)) {
-      return;
-    }
-    // After select.
-    setTimeout(function () {
-      // #resodetails
-      $('.linkdetails').append('<aside><a tabindex="0" onclick="plugin.missions.openPortalMissions();" >Missions</a></aside>');
-    }, 0);
+    var missionHtml = $('<a>')
+      .click(this.openPortalMissions.bind(this))
+      .text('Missions');
+    $('.linkdetails').append($('<aside>').append(missionHtml));
   },
 
   openTopMissions: function (bounds) {
@@ -1296,7 +1295,7 @@ window.plugin.missions = {
     }
 
     // window.addPortalHighlighter('Mission start point', this.highlight.bind(this));
-    window.addHook('portalSelected', this.onPortalSelected.bind(this));
+    window.addHook('portalDetailsUpdated', this.onPortalDetailsUpdated.bind(this));
 
     window.addHook('search', this.onSearch.bind(this));
 

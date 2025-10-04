@@ -52,17 +52,13 @@
 \nIngress Intel Total Conversion (IITC), resmi Intel Ingress haritası için bir ek olarak çalışan bir katman olarak işlev görür.
 \n
 \nIITC harita ile çalışma şeklinizi tamamen değiştirir, donanım hızlandırması uygulayarak verimliliği önemli ölçüde artırır ve çeşitli eklentiler kullanarak yetenekleri genişletir.</string>
-    <string name="appintro_nfc_description">Her iki cihaz da NFC\'yi destekliyorsa, mevcut portal bağlantısını/daimi bağlantıyı hızlıca başka bir cihaza gönderebilirsiniz.
-\n
-\nHer iki cihazı da arka arkaya tutun ve haritayı diğer cihaza göndermek için ekrana dokunun.</string>
     <string name="appintro_location_title">Konum izni</string>
     <string name="appintro_location_description">IITC-CE Mobile, kolay navigasyon için konumunuza erişim izni gerektirir.
 \n
 \nAncak endişelenmeyin: konumunuzla ilgili verileri hiçbir yere göndermiyoruz.</string>
-    <string name="appintro_nfc_title">NFC izni</string>
     <string name="pref_press_twice_to_exit_sum">Kazara çıkışları önler</string>
     <string name="msg_prepare_screenshot">Hazırlanıyor…</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm aşağıdaki javascript dosyasını yüklemesi istendi: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Dikkatli olun:&lt;/b&gt; Harici kaynaklardan gelen javascriptler zararlı kodlar içerebilir (casus yazılım vb.)! &lt;p&gt;Devam etmek istediğinizden emin misiniz\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm aşağıdaki javascript dosyasını yüklemesi istendi: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Dikkatli olun:&lt;/b&gt; Harici kaynaklardan gelen javascriptler zararlı kodlar içerebilir (casus yazılım vb.)! &lt;p&gt;Devam etmek istediğinizden emin misiniz?</string>
     <string name="label_base_layer">Ana Katman</string>
     <string name="label_overlay_layers">Yerleştirme Katmanları</string>
     <string name="label_highlighter">Vurgulayıcı</string>

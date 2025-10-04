@@ -82,7 +82,7 @@
     <string name="clear_log">Limpar registro</string>
     <string name="menu_plugins_add">Adicionar plugins externos</string>
     <string name="tab_browser">Intel</string>
-    <string name="install_dialog_msg">&lt;p&gt;O IITCm foi solicitado a instalar o seguinte arquivo javascript:&lt;p&gt;%1$s&lt;p&gt;&lt;b&gt;Cuidado:&lt;/b&gt;Javascript de fontes externas pode conter código malicioso (spyware etc.)!&lt;p&gt;Tem certeza de que deseja continuar\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;O IITCm foi solicitado a instalar o seguinte arquivo javascript:&lt;p&gt;%1$s&lt;p&gt;&lt;b&gt;Cuidado:&lt;/b&gt;Javascript de fontes externas pode conter código malicioso (spyware etc.)!&lt;p&gt;Tem certeza de que deseja continuar?</string>
     <string name="drawer_close">Ocultar menu de navegação</string>
     <string name="pref_about_text">&lt;h1&gt;Ingress Intel Total Conversion Mobile&lt;/h1&gt; &lt;p&gt;&lt;b&gt;Versão da Build: ${build_version}&lt;/b&gt; &lt;br&gt;&lt;b&gt;Versão do IITC: ${iitc_version}&lt;/b&gt; &lt;p&gt;&lt;b&gt;por ${cradle_link}, ${fkloft_link} e colaboradores&lt;/b&gt; &lt;p&gt;&lt;b&gt;Icone por ${giuseppe_lucido_link}&lt;/b&gt; &lt;p&gt;&lt;b&gt;IITC Mobile&lt;/b&gt; é um navegador móvel otimizado para o &lt;i&gt;Ingress Intel Total Conversion (IITC)&lt;/i&gt; userscript. &lt;h3&gt;Comunidade:&lt;/h3&gt; • Visite o ${website_link} para novos lançamentos e a versão para desktop.&lt;br&gt; • Acompanhe o ${tg_iitc_news_link} canal de Telegram para anúncios e participe ${tg_iitc_group_link} do chat.&lt;br&gt; • Participe da ${reddit_iitc_link} Comunidade no Reddit - um lugar para pedir ajuda e discutir com outros usuários.&lt;br&gt; • Relatar problemas e propor melhorias em ${bugtracker_link}.&lt;br&gt; &lt;h3&gt;Desenvolvedores:&lt;/h3&gt; ${github_iitc_link} no Github. &lt;h3&gt;Licença do IITC:&lt;/h3&gt; ${ISC_license_text}</string>
     <string name="notice_sharing">&lt;p&gt;Com o &lt;em&gt;Compartilhar portal /em&gt;, você pode:&lt;p&gt; • enviar o link do portal para outras pessoas &lt;br&gt; • exibir a posição do portal selecionado em outro aplicativo&lt;br&gt; • abrir o link do portal em um navegador da web &lt;br&gt;&lt;p&gt;Dica: Ao selecionar o Google Maps (ou qualquer outro software de navegação instalado), você pode navegar rapidamente para o portal selecionado.&lt;p&gt; Essas dicas também se aplicam ao &lt;em&gt;link permanente&lt;/em&gt;.</string>
@@ -90,9 +90,6 @@
     <string name="pref_persistent_zoom_sum">Não altere o nível de zoom quando o botão localizar estiver pressionado</string>
     <string name="iitc_website">Site IITC</string>
     <string name="bugtracker">bugtracker</string>
-    <string name="appintro_nfc_description">Você pode enviar rapidamente o link/link permanente do portal atual para outro dispositivo se ambos os dispositivos suportarem NFC.
-\n
-\nSegure ambos os dispositivos costas com costas e toque na tela para enviar o mapa para o outro dispositivo.</string>
     <string name="plugins_permission_denied">Permissão negada. Você não pode adicionar plugins.</string>
     <string name="appintro_plugins_description">Você pode começar a usar o IITC-CE agora.
 \n
@@ -128,7 +125,6 @@
 \n Aqui você pode alterar o serviço de mapas online ou habilitar/desabilitar a exibição de elementos necessários no mapa. </string>
     <string name="appintro_layers_title">Camadas/Destaques</string>
     <string name="appintro_navigation_title">Navegação</string>
-    <string name="appintro_nfc_title">Permissão NFC</string>
     <string name="appintro_location_description">O IITC-CE Mobile requer permissão para acessar sua localização para facilitar a navegação.
 \n
 \n Mas não se preocupe: não enviamos dados sobre sua localização para lugar nenhum.</string>

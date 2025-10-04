@@ -81,7 +81,7 @@
     <string name="label_base_layer">Базовый слой</string>
     <string name="label_overlay_layers">Наложение слоев</string>
     <string name="install_dialog_top">Установить внешний плагин\?</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm было предложено установить следующий файл javascript: &lt;p&gt;%1$s &lt;p&gt; &lt;b&gt;Будьте осторожны:&lt;/b&gt; Javascript из внешних источников может содержать вредоносный код (шпионское ПО и т. д.)! &lt;p&gt;Вы уверены, что хотите продолжить\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm было предложено установить следующий файл javascript: &lt;p&gt;%1$s &lt;p&gt; &lt;b&gt;Будьте осторожны:&lt;/b&gt; Javascript из внешних источников может содержать вредоносный код (шпионское ПО и т. д.)! &lt;p&gt;Вы уверены, что хотите продолжить?</string>
     <string name="iitc_website">Вебсайт IITC</string>
     <string name="bugtracker">трекер ошибок</string>
     <string name="pane_map">Карта</string>
@@ -114,10 +114,6 @@
 \nНекоторые плагины (например, <i>portals list</i> и <i>bookmarks</i>) теперь отображаются в <i>навигационной панели</i> для быстрого доступа.
 \nОни больше не будут появляться в панели информации. </string>
     <string name="appintro_navigation_title">Навигация</string>
-    <string name="appintro_nfc_description">Вы можете быстро отправить ссылку на портал на другое устройство, если оба устройства поддерживают NFC.
-\n
-\nДержите оба устройства спина к спине и коснитесь экрана, чтобы передать карту на другое устройство.</string>
-    <string name="appintro_nfc_title">Разрешение для NFC</string>
     <string name="appintro_location_description">IITC-CE Mobile требуется разрешение для доступа к вашему местоположению для упрощения навигации.
 \n
 \nНо не волнуйтесь: мы никуда не отправляем данные о вашем местоположении.</string>

@@ -2,7 +2,7 @@ package org.exarhteam.iitc_mobile;
 
 import android.webkit.WebResourceResponse;
 
-import org.exarhteam.iitc_mobile.async.DownloadTile;
+import org.exarhteam.iitc_mobile.async.TileValidationChecker;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -41,16 +41,16 @@ public class IITC_TileManager {
 
         // do the tile management
         File file = new File(path);
-        if (file.exists()) {
-            // asynchronously download tile if outdated, ignore date if not connected to wifi
-            if (mIitc.getWebView().isConnectedToWifi()) new DownloadTile(path).execute(url);
-            // return tile from storage
+        if (TileHttpHelper.isTileValidForCache(file)) {
+            // File exists and is not too old - return immediately
+            // Also start background validation to check server's Last-Modified
+            new TileValidationChecker(path, mIitc).execute(url);
+
             InputStream in = new BufferedInputStream(new FileInputStream(file));
             return new WebResourceResponse(TYPE, ENCODING, in);
         } else {
-            // asynchronously download tile to cache and let webviewclient load the resource
-            new DownloadTile(path).execute(url);
-            return null;
+            // file doesn't exist, is corrupted, or too old - use lazy loading
+            return new LazyTileResponse(url, path, mIitc);
         }
     }
 }

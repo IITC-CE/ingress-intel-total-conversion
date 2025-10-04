@@ -15,13 +15,24 @@ public class PluginInfo extends HashMap<String, String> {
     private String key;
     private boolean userPlugin;
 
-    public PluginInfo() {
+    private PluginInfo() {
         super();
-        this.setId("unknown");
-        this.setVersion("not found");
-        this.setName("unknown");
-        this.setDescription("");
-        this.setCategory("Misc");
+    }
+
+    public PluginInfo(PluginInfo other) {
+        super(other);
+        this.key = other.key;
+        this.userPlugin = other.userPlugin;
+    }
+
+    public static PluginInfo createEmpty() {
+        PluginInfo info = new PluginInfo();
+        info.setId("unknown");
+        info.setVersion("not found");
+        info.setName("unknown");
+        info.setDescription("");
+        info.setCategory("Misc");
+        return info;
     }
 
     public void setId(String id) {

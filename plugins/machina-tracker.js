@@ -1,13 +1,17 @@
 // @name           Machina tracker
 // @author         McBen
 // @category       Layer
-// @version        1.1.0
+// @version        1.1.1
 // @description    Show locations of Machina activities
 
 /* exported setup, changelog --eslint */
 /* global IITC, L */
 
 var changelog = [
+  {
+    version: '1.1.1',
+    changes: ['Fix decayed messages attributed to Machina'],
+  },
   {
     version: '1.1.0',
     changes: ['Using `IITC.utils.formatAgo` instead of the plugin own function'],
@@ -133,7 +137,7 @@ machinaTracker.processNewData = function (data) {
   data.result.forEach((json) => {
     if (json[1] >= limit) {
       var newEvent = machinaTracker.createEvent(json);
-      if (newEvent.from && newEvent.to && [window.TEAM_MAC, window.TEAM_NONE].includes(window.teamStringToId(newEvent.team))) {
+      if (newEvent.from && newEvent.to && newEvent.team && [window.TEAM_MAC, window.TEAM_NONE].includes(window.teamStringToId(newEvent.team))) {
         var prevEvent = machinaTracker.events.find((e) => e.from.latLng.equals(newEvent.from.latLng));
         if (!prevEvent) {
           machinaTracker.events.push(newEvent);

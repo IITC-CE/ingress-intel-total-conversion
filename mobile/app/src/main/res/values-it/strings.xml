@@ -11,7 +11,7 @@
     <string name="pref_tweaks_cat">Tweaks</string>
     <string name="activity_share">Condividi con…</string>
     <string name="download_description">Scaricamento pacchetto intel più recente…</string>
-    <string name="install_dialog_msg">&lt;p&gt;A IITCm è stato richiesto di installare il seguente file javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Attenzione:&lt;/b&gt; I Javascript da fonti esterne possono contenere codice dannoso (come spyware, ecc)! &lt;p&gt;Sicuro di voler procedere\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;A IITCm è stato richiesto di installare il seguente file javascript: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Attenzione:&lt;/b&gt; I Javascript da fonti esterne possono contenere codice dannoso (come spyware, ecc)! &lt;p&gt;Sicuro di voler procedere?</string>
     <string name="install_dialog_top">Installare il plugin esterno\?</string>
     <string name="label_base_layer">Layer di base</string>
     <string name="tab_share">Condividi</string>
@@ -103,10 +103,6 @@
 \nIITC cambia completamente il modo in cui interagisci con la mappa, incrementa significativamente l\'efficenza semplicemente applicando un accelerazione hardware e espandendo le sue capacità tramite uso di vari plugins.</string>
     <string name="appintro_plugins_title">Plugins</string>
     <string name="appintro_navigation_title">Navigazione</string>
-    <string name="appintro_nfc_description">Puoi inviare rapidamente il link del portale/permalink corrente su un altro dispositivo se entrambi supportano NFC.
-\n 
-\nAvvicina la parte posteriore/parte di dietro di entrambi i dispositivi l\'un con l\'altro e clicca lo schermo per spedire la mappa verso l\'altro dispositivo.</string>
-    <string name="appintro_nfc_title">Permesso di NFC</string>
     <string name="appintro_location_description">IITC-CE Mobile chiede permesso di accedere alla tua posizione per facilitare la navigazione.
 \n
 \n Ma non preoccuparti: noi non inviamo informazioni riguardo la tua posizione a nessuno.</string>

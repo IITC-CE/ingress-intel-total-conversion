@@ -30,10 +30,6 @@
 \n Jotkin lisäosat (kuten <i>portals list</i> ja <i>bookmarks</i>) löytyvät nyt nopeasti <i>navigaatiovalikosta</i>.
 \n Ne eivät näy enää tietonäkymässä. </string>
     <string name="appintro_navigation_title">Navigointi</string>
-    <string name="appintro_nfc_description">Voit lähettää linkin nykyiseen portaaliin tai näkymään nopeasti toiseen laitteeseen, jos molemmat laitteet tukevat NFC:tä.
-\n
-\n Pidä laitteita selät vastakkain ja kosketa näyttöä lähettääksesi kartan toiseen laitteeseen.</string>
-    <string name="appintro_nfc_title">NFC-käyttöoikeus</string>
     <string name="appintro_location_description">IITC-CE Mobile vaatii pääsyn sijaintiisi helppoa navigointia varten.
 \n
 \n Älä huoli: emme lähetä tietoa sijainnistasi mihinkään.</string>
@@ -43,7 +39,7 @@
 \n Ingress Intel Total Conversion (IITC) is on lisäosa, joka laajentaa virallista Ingress Intel-karttaa.
 \n
 \n IITC muuttaa täysin tavan käyttää karttaa, tehostaa sen toimintaa huomattavasti laitteistokiihdytyksellä ja laajentaa sen kykyjä erilaisilla lisäosilla.</string>
-    <string name="install_dialog_msg">&lt;p&gt;IITCm:ää pyydettiin asentamaan seuraava javascript-tiedosto: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ole varovainen:&lt;/b&gt; Ulkoisista lähteistä peräisin oleva javascript-koodi voi olla haitallista (vakoiluohjelmat yms.)! &lt;p&gt;Haluatko varmasti jatkaa\?</string>
+    <string name="install_dialog_msg">&lt;p&gt;IITCm:ää pyydettiin asentamaan seuraava javascript-tiedosto: &lt;p&gt;%1$s &lt;p&gt;&lt;b&gt;Ole varovainen:&lt;/b&gt; Ulkoisista lähteistä peräisin oleva javascript-koodi voi olla haitallista (vakoiluohjelmat yms.)! &lt;p&gt;Haluatko varmasti jatkaa?</string>
     <string name="install_dialog_top">Asenna ulkoinen lisäosa\?</string>
     <string name="label_overlay_layers">Tasot</string>
     <string name="label_base_layer">Tausta</string>
