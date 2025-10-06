@@ -200,7 +200,7 @@ class Query {
       result.layer = L.layerGroup();
 
       if (result.position) {
-        L.marker(result.position, {
+        new L.Marker(result.position, {
           icon: new L.DivIcon.ColoredSvg('red'),
           title: result.title,
         }).addTo(result.layer);

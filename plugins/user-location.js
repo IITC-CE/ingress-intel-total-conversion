@@ -40,7 +40,7 @@ window.plugin.userLocation.setup = function () {
     html: `<div class="container ${cssClass} circle"><div class="outer"></div><div class="inner"></div></div>`,
   });
 
-  const marker = L.marker(latlng, {
+  const marker = new L.Marker(latlng, {
     icon: icon,
     zIndexOffset: 300,
     interactive: false,

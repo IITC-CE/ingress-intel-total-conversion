@@ -171,7 +171,7 @@ window.ornaments = {
           layer = this.layers['Excluded ornaments'];
         }
 
-        return L.marker(portal.getLatLng(), {
+        return new L.Marker(portal.getLatLng(), {
           icon: new L.Icon({
             iconUrl: iconUrl,
             iconSize: [size, size],

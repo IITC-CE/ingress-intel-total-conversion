@@ -278,7 +278,7 @@ window.plugin.drawTools.import = function (data) {
       case 'marker':
         var extraMarkerOpt = {};
         if (item.color) extraMarkerOpt.icon = window.plugin.drawTools.getMarkerIcon(item.color);
-        layer = L.marker(item.latLng, L.extend({}, window.plugin.drawTools.markerOptions, extraMarkerOpt));
+        layer = new L.Marker(item.latLng, L.extend({}, window.plugin.drawTools.markerOptions, extraMarkerOpt));
         window.registerMarkerForOMS(layer);
         break;
       default:

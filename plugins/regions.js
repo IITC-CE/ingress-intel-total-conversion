@@ -309,7 +309,7 @@ window.plugin.regions.drawCell = function (cell) {
     }
   }
 
-  var marker = L.marker(center, {
+  var marker = new L.Marker(center, {
     icon: new L.DivIcon({
       className: 'plugin-regions-name',
       iconAnchor: [100, 5],

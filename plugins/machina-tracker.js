@@ -203,7 +203,7 @@ machinaTracker.drawData = function () {
         .appendTo(linkList);
     });
 
-    var m = L.marker(position, { icon: icon, opacity: opacity, desc: popup[0], title: title });
+    var m = new L.Marker(position, { icon: icon, opacity: opacity, desc: popup[0], title: title });
     m.addEventListener('spiderfiedclick', machinaTracker.onClickListener);
 
     window.registerMarkerForOMS(m);
