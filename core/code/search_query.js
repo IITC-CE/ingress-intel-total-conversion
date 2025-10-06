@@ -201,7 +201,7 @@ class Query {
 
       if (result.position) {
         L.marker(result.position, {
-          icon: L.divIcon.coloredSvg('red'),
+          icon: new L.DivIcon.ColoredSvg('red'),
           title: result.title,
         }).addTo(result.layer);
       }

@@ -55,7 +55,7 @@ window.plugin.drawTools.getMarkerIcon = function (color) {
     console.warn('Color is not set (default #a24ac3 will be used)');
   }
   // todo: refactor to get rid of getMarkerIcon
-  return L.divIcon.coloredSvg(color);
+  return new L.DivIcon.ColoredSvg(color);
 };
 
 window.plugin.drawTools.currentColor = '#a24ac3';
@@ -549,8 +549,7 @@ window.plugin.drawTools.promptImport = function (promptAction) {
     } else {
       if (window.plugin.drawTools.merge.status) {
         promptAction =
-          typeof window.localStorage[window.plugin.drawTools.KEY_STORAGE] !== 'undefined' &&
-            window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
+          typeof window.localStorage[window.plugin.drawTools.KEY_STORAGE] !== 'undefined' && window.localStorage[window.plugin.drawTools.KEY_STORAGE].length > 4
             ? window.localStorage[window.plugin.drawTools.KEY_STORAGE].slice(0, -1) + ',' + promptAction.slice(1)
             : promptAction;
       }

@@ -93,7 +93,7 @@ window.plugin.distanceToPortal.setLocation = function () {
   }
 
   window.plugin.distanceToPortal.currentLocMarker = L.marker(window.plugin.distanceToPortal.currentLoc, {
-    icon: L.divIcon.coloredSvg('#444'),
+    icon: new L.DivIcon.ColoredSvg('#444'),
     draggable: true,
     title: 'Drag to change current location',
   });

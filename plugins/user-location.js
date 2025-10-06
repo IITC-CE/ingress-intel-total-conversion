@@ -33,7 +33,7 @@ window.plugin.userLocation.setup = function () {
 
   const latlng = new L.LatLng(0, 0);
 
-  const icon = L.divIcon({
+  const icon = new L.DivIcon({
     iconSize: L.point(32, 32),
     iconAnchor: L.point(16, 16),
     className: 'user-location',

@@ -79,7 +79,7 @@ function setupIngressMarkers() {
       // ^ (as it's inappropriately styled)
       svgTemplate: '<svg style="fill: {color}"><use xlink:href="#marker-icon"/></svg>',
       color: '#a24ac3', // for draw-tools:
-      // L.divIcon does not use the option `color`, but we store it here to
+      // L.DivIcon does not use the option `color`, but we store it here to
       // be able to simply retrieve the color for serializing markers
     },
     initialize: function (color, options) {
@@ -90,9 +90,6 @@ function setupIngressMarkers() {
       this.options.html = L.Util.template(this.options.svgTemplate, { color: this.options.color });
     },
   });
-  L.divIcon.coloredSvg = function (color, options) {
-    return new L.DivIcon.ColoredSvg(color, options);
-  };
 }
 
 /**

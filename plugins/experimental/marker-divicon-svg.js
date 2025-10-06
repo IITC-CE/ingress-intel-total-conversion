@@ -4,6 +4,7 @@
 // @version        0.1.0
 // @description    EXPERIMENTAL: draw markers using individual Leaflet DivIcons, as SVG
 
+/* global L -- eslint */
 
 // use own namespace for plugin
 window.plugin.markerDivIconSvg = function() {};
@@ -45,9 +46,9 @@ window.plugin.markerDivIconSvg.setup  = function() {
             + '<circle cx="'+anchor+'" cy="'+anchor+'" r="'+lvlRadius+'" stroke="'+COLORS[details.team]+'" stroke-width="'+lvlWeight+'" fill="'+COLORS[details.team]+'" fill-opacity="0.5" />'
             + '</svg>';
 
-    return L.divIcon({
-      iconSize: [size,size],
-      iconAnchor: [anchor,anchor],
+    return new L.DivIcon({
+      iconSize: [size, size],
+      iconAnchor: [anchor, anchor],
       className: 'portal-marker',
       html: svg
     });
