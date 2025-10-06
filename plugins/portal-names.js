@@ -131,7 +131,7 @@ window.plugin.portalNames.updatePortalLabels = function () {
       var point = portalPoints[guid];
       // the bounds used for testing are twice as wide as the portal name marker. this is so that there's no left/right
       // overlap between two different portals text
-      var largeBounds = L.bounds(
+      var largeBounds = new L.Bounds(
         point.subtract([window.plugin.portalNames.NAME_WIDTH, 0]),
         point.add([window.plugin.portalNames.NAME_WIDTH, window.plugin.portalNames.NAME_HEIGHT])
       );

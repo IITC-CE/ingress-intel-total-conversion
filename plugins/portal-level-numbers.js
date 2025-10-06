@@ -123,7 +123,7 @@ window.plugin.portalLevelNumbers.updatePortalLabels = function () {
       // overlap between two different portals text
       var southWest = point.subtract([SQUARE_SIZE, SQUARE_SIZE]);
       var northEast = point.add([SQUARE_SIZE, SQUARE_SIZE]);
-      var largeBounds = L.bounds(southWest, northEast);
+      var largeBounds = new L.Bounds(southWest, northEast);
 
       for (const otherGuid in bucketGuids) {
         // do not check portals already marked as covered
