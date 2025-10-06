@@ -112,7 +112,7 @@ window.plugin.portalNames.updatePortalLabels = function () {
   for (const guid in portalPoints) {
     const point = portalPoints[guid];
 
-    var bucketId = L.point([Math.floor(point.x / (window.plugin.portalNames.NAME_WIDTH * 2)), Math.floor(point.y / window.plugin.portalNames.NAME_HEIGHT)]);
+    var bucketId = new L.Point([Math.floor(point.x / (window.plugin.portalNames.NAME_WIDTH * 2)), Math.floor(point.y / window.plugin.portalNames.NAME_HEIGHT)]);
     // the guid is added to four buckets. this way, when testing for overlap we don't need to test
     // all 8 buckets surrounding the one around the particular portal, only the bucket it is in itself
     var bucketIds = [bucketId, bucketId.add([1, 0]), bucketId.add([0, 1]), bucketId.add([1, 1])];
