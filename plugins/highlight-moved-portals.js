@@ -29,7 +29,7 @@ var getLinkData = (lguid) => {
 };
 
 var toLatLng = (latE6, lngE6) => {
-  return L.latLng(latE6 / 1e6, lngE6 / 1e6);
+  return new L.LatLng(latE6 / 1e6, lngE6 / 1e6);
 };
 
 var getDLatLng = (lguid) => {

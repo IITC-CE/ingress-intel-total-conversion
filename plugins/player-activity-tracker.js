@@ -276,7 +276,7 @@ window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
     lngs += latlng[1];
   });
 
-  return L.latLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
+  return new L.LatLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
 };
 
 window.plugin.playerTracker.drawData = function () {

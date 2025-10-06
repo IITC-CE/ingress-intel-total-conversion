@@ -142,7 +142,7 @@ L.GeodesicCircle.addInitHook(function () { // todo check if this does not confli
 L.Edit.Circle.include({
 	_getResizeMarkerPoint: function (latlng) {
 		var bounds = this._shape.getBounds(); // geodesic circle stores precalculated bounds
-		return L.latLng(bounds.getNorth(), latlng.lng);
+		return new L.LatLng(bounds.getNorth(), latlng.lng);
 	}
 });
 

@@ -182,7 +182,7 @@ window.plugin.userLocation.locate = function (lat, lng, accuracy, persistentZoom
   const latAccuracy = (180 * accuracy) / 40075017;
   const lngAccuracy = latAccuracy / Math.cos((Math.PI / 180) * lat);
 
-  const bounds = L.latLngBounds([lat - latAccuracy, lng - lngAccuracy], [lat + latAccuracy, lng + lngAccuracy]);
+  const bounds = new L.LatLngBounds([lat - latAccuracy, lng - lngAccuracy], [lat + latAccuracy, lng + lngAccuracy]);
 
   // an extremely close view is pretty pointless (especially with maps that support zoom level 20+)
   // so limit to 17 (enough to see all portals)

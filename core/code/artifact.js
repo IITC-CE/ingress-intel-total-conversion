@@ -253,7 +253,7 @@ window.artifact.updateLayer = function () {
   window.artifact._layer.clearLayers();
 
   $.each(window.artifact.portalInfo, function (guid, data) {
-    var latlng = L.latLng([data._data.latE6 / 1e6, data._data.lngE6 / 1e6]);
+    var latlng = new L.LatLng([data._data.latE6 / 1e6, data._data.lngE6 / 1e6]);
 
     $.each(data, function (type) {
       // we'll construct the URL form the type - stock seems to do that now

@@ -600,7 +600,7 @@ window.plugin.bookmarks.onSearch = function (query) {
         title: window.escapeHtmlSpecialChars(bookmark.label),
         description: `Map in folder "${window.escapeHtmlSpecialChars(folder.label)}"`,
         icon: '@include_img:images/icon-bookmark-map.png@',
-        position: L.latLng(bookmark.latlng.split(',')),
+        position: new L.LatLng(...bookmark.latlng.split(',')),
         zoom: bookmark.z,
         onSelected: window.plugin.bookmarks.onSearchResultSelected,
       });
@@ -615,7 +615,7 @@ window.plugin.bookmarks.onSearch = function (query) {
         title: window.escapeHtmlSpecialChars(bookmark.label),
         description: `Bookmark in folder "${window.escapeHtmlSpecialChars(folder.label)}"`,
         icon: '@include_img:images/icon-bookmark.png@',
-        position: L.latLng(bookmark.latlng.split(',')),
+        position: new L.LatLng(...bookmark.latlng.split(',')),
         guid: bookmark.guid,
         onSelected: window.plugin.bookmarks.onSearchResultSelected,
       });
@@ -967,13 +967,13 @@ window.plugin.bookmarks.autoDrawOnSelect = function () {
   }
 
   if (latlngs.length === 2) {
-    var distance = L.latLng(latlngs[0]).distanceTo(latlngs[1]);
+    var distance = new L.LatLng(...latlngs[0]).distanceTo(latlngs[1]);
     text = 'Distance between portals: ' + distanceElement(distance);
     color = '';
   } else if (latlngs.length === 3) {
     var distances = latlngs.map(function (ll1, i, latlngs) {
       var ll2 = latlngs[(i + 1) % 3];
-      return distanceElement(L.latLng(ll1).distanceTo(ll2));
+      return distanceElement(new L.LatLng(...ll1).distanceTo(ll2));
     });
     text = 'Distances: ' + distances.join(', ');
     color = '';

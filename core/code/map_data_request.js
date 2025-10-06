@@ -266,7 +266,7 @@ window.MapDataRequest.prototype.refresh = function () {
   var y2 = window.latToTile(bounds.getSouth(), tileParams);
 
   // calculate the full bounds for the data - including the part of the tiles off the screen edge
-  var dataBounds = L.latLngBounds([
+  var dataBounds = new L.LatLngBounds([
     [window.tileToLat(y2 + 1, tileParams), window.tileToLng(x1, tileParams)],
     [window.tileToLat(y1, tileParams), window.tileToLng(x2 + 1, tileParams)],
   ]);
@@ -325,7 +325,7 @@ window.MapDataRequest.prototype.refresh = function () {
 
         var latCenter = (latNorth + latSouth) / 2;
         var lngCenter = (lngEast + lngWest) / 2;
-        var tileLatLng = L.latLng(latCenter, lngCenter);
+        var tileLatLng = new L.LatLng(latCenter, lngCenter);
 
         var tilePoint = window.map.project(tileLatLng, mapZoom);
 

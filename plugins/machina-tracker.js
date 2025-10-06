@@ -100,7 +100,7 @@ machinaTracker.discardOldData = function () {
 };
 
 machinaTracker.toLanLng = function (locationData) {
-  return L.latLng(locationData.latE6 / 1e6, locationData.lngE6 / 1e6);
+  return new L.LatLng(locationData.latE6 / 1e6, locationData.lngE6 / 1e6);
 };
 
 machinaTracker.createEvent = function (json) {
