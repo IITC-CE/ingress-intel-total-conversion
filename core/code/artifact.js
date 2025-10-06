@@ -265,7 +265,7 @@ window.artifact.updateLayer = function () {
         iconSize = 100 / 2;
         opacity = 1.0;
 
-        const icon = L.icon({
+        const icon = new L.Icon({
           iconUrl: iconUrl,
           iconSize: [iconSize, iconSize],
           iconAnchor: [iconSize / 2, iconSize / 2],
@@ -281,7 +281,7 @@ window.artifact.updateLayer = function () {
         iconSize = 60 / 2;
         opacity = 0.6;
 
-        const icon = L.icon({
+        const icon = new L.Icon({
           iconUrl: iconUrl,
           iconSize: [iconSize, iconSize],
           iconAnchor: [iconSize / 2, iconSize / 2],

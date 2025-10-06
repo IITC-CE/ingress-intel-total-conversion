@@ -44,7 +44,7 @@ machinaTracker.setup = () => {
 
   var iconImage = '@include_img:images/marker-machina.png@';
 
-  machinaTracker.icon = L.icon({
+  machinaTracker.icon = new L.Icon({
     iconUrl: iconImage,
     iconSize: [26, 32],
     iconAnchor: [12, 32],

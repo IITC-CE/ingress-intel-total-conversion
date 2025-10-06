@@ -82,10 +82,10 @@ window.plugin.markerIconCanvasUrl.setup  = function() {
 
     var dataurl = canvas.toDataURL();
 
-    return L.icon({
+    return new L.Icon({
       iconUrl: dataurl,
-      iconSize: [size,size],
-      iconAnchor: [anchor,anchor]
+      iconSize: [size, size],
+      iconAnchor: [anchor, anchor],
     });
 
   }

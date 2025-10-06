@@ -172,7 +172,7 @@ window.ornaments = {
         }
 
         return L.marker(portal.getLatLng(), {
-          icon: L.icon({
+          icon: new L.Icon({
             iconUrl: iconUrl,
             iconSize: [size, size],
             iconAnchor: anchor, // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4

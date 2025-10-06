@@ -1192,7 +1192,7 @@ window.plugin.bookmarks.resetAllStars = function () {
 window.plugin.bookmarks.addStar = function (guid, latlng, lbl) {
   var star = L.marker(latlng, {
     title: lbl,
-    icon: L.icon({
+    icon: new L.Icon({
       iconUrl: '@include_img:images/marker-star.png@',
       iconAnchor: [15, 40],
       iconSize: [30, 40],
