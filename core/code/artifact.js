@@ -271,7 +271,7 @@ window.artifact.updateLayer = function () {
           iconAnchor: [iconSize / 2, iconSize / 2],
         });
 
-        const marker = L.marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
+        const marker = new L.Marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
 
         window.artifact._layer.addLayer(marker);
       } else if (data[type].fragments) {
@@ -287,7 +287,7 @@ window.artifact.updateLayer = function () {
           iconAnchor: [iconSize / 2, iconSize / 2],
         });
 
-        const marker = L.marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
+        const marker = new L.Marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
 
         window.artifact._layer.addLayer(marker);
       }

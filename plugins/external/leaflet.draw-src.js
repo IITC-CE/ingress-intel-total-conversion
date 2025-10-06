@@ -570,7 +570,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			// also do not want to trigger any click handlers of objects we are clicking on
 			// while drawing.
 			if (!this._mouseMarker) {
-				this._mouseMarker = L.marker(this._map.getCenter(), {
+					this._mouseMarker = new L.Marker(this._map.getCenter(), {
 					icon: L.divIcon({
 						className: 'leaflet-mouse-marker',
 						iconAnchor: [20, 20],

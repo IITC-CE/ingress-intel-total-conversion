@@ -149,7 +149,7 @@ window.addHook('search', async (query) => {
             weight: 2,
             fill: false,
             pointToLayer: (featureData, latLng) =>
-              L.marker(latLng, {
+              new L.Marker(latLng, {
                 icon: new L.DivIcon.ColoredSvg('red'),
                 title: item.display_name,
               }),

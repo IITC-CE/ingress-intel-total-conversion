@@ -17,7 +17,7 @@ window.plugin.markerDivIconSvg.setup  = function() {
 
     var options = L.extend({}, data, { icon: icon });
 
-    var marker = L.marker (latlng, options);
+    var marker = new L.Marker(latlng, options);
     return marker;
 
   }
