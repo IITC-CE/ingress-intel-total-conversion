@@ -105,7 +105,7 @@ class Query {
   addPortalResult(data, guid) {
     const team = window.teamStringToId(data.team);
     const color = team === window.TEAM_NONE ? '#CCC' : window.COLORS[team];
-    const latLng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
+    const latLng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
     this.addResult({
       title: data.title,

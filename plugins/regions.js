@@ -182,7 +182,7 @@ window.plugin.regions.getSearchResult = function (match) {
 
   result.title = window.plugin.regions.regionName(cell);
   result.layer = L.geodesicPolygon(corners, { fill: false, color: 'red', interactive: false });
-  result.bounds = L.latLngBounds(corners);
+  result.bounds = new L.LatLngBounds(corners);
 
   return result;
 };
@@ -203,7 +203,7 @@ window.plugin.regions.update = function () {
 
       // is it on the screen?
       var corners = cell.getCornerLatLngs();
-      var cellBounds = L.latLngBounds([corners[0], corners[1]]).extend(corners[2]).extend(corners[3]);
+      var cellBounds = new L.LatLngBounds(corners);
 
       if (cellBounds.intersects(bounds)) {
         // on screen - draw it
@@ -298,7 +298,7 @@ window.plugin.regions.drawCell = function (cell) {
       var newlat = Math.max(Math.min(center.lat, namebounds.getNorth()), namebounds.getSouth());
       var newlng = Math.max(Math.min(center.lng, namebounds.getEast()), namebounds.getWest());
 
-      var newpos = L.latLng(newlat, newlng);
+      var newpos = new L.LatLng(newlat, newlng);
 
       // ensure the new position is still within the same cell
       var newposcell = window.S2.S2Cell.FromLatLng(newpos, 6);

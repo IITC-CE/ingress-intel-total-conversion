@@ -106,7 +106,7 @@ L.PortalMarker = L.CircleMarker.extend({
     if (this._details) {
       // portal has been moved
       if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6) {
-        this.setLatLng(L.latLng(details.latE6 / 1e6, details.lngE6 / 1e6));
+        this.setLatLng(new L.LatLng(details.latE6 / 1e6, details.lngE6 / 1e6));
       }
 
       // core data from a placeholder

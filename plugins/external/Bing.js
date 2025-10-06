@@ -119,7 +119,7 @@ L.BingLayer = L.TileLayer.extend({
 			if (options.retinaDpi && options.detectRetina && options.zoomOffset) {
 				this._url += '&dpi=' + options.retinaDpi;
 			}
-			this.fire('load', {meta: meta});
+			this.fire('load', { meta: meta });
 			if (this._map) { this._update(); }
 		});
 	},
@@ -127,7 +127,7 @@ L.BingLayer = L.TileLayer.extend({
 	_prepAttrBounds: function (providers) {
 		providers.forEach(function (provider) {
 			provider.coverageAreas.forEach(function (area) {
-				area.bounds = L.latLngBounds(
+				area.bounds = new L.LatLngBounds(
 					[area.bbox[0], area.bbox[1]],
 					[area.bbox[2], area.bbox[3]]
 				);
@@ -148,7 +148,7 @@ L.BingLayer = L.TileLayer.extend({
 			this._attributions = {}; return;
 		}
 		var bounds = this._map.getBounds();
-		bounds = L.latLngBounds(bounds.getSouthWest().wrap(), bounds.getNorthEast().wrap());
+		bounds = new L.LatLngBounds(bounds.getSouthWest().wrap(), bounds.getNorthEast().wrap());
 		var zoom = this._getZoomForUrl();
 		var attributions = this._providers.map(function (provider) {
 			return remove ? false : provider.coverageAreas.some(function (area) {
@@ -156,7 +156,7 @@ L.BingLayer = L.TileLayer.extend({
 					bounds.intersects(area.bounds);
 			});
 		});
-		attributions.forEach(function (a,i) {
+		attributions.forEach(function (a, i) {
 			if (a == this._attributions[i]) { // eslint-disable-line eqeqeq
 				return;
 			} else if (a) {
