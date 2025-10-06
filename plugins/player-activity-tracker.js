@@ -82,7 +82,7 @@ window.plugin.playerTracker.setup = function () {
     }
   });
 
-  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: L.point([1, -34]) });
+  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]) });
 
   window.addHook('publicChatDataAvailable', window.plugin.playerTracker.handleData);
 

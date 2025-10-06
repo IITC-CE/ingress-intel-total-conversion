@@ -34,8 +34,8 @@ window.plugin.userLocation.setup = function () {
   const latlng = new L.LatLng(0, 0);
 
   const icon = new L.DivIcon({
-    iconSize: L.point(32, 32),
-    iconAnchor: L.point(16, 16),
+    iconSize: new L.Point(32, 32),
+    iconAnchor: new L.Point(16, 16),
     className: 'user-location',
     html: `<div class="container ${cssClass} circle"><div class="outer"></div><div class="inner"></div></div>`,
   });

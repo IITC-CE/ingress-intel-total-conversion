@@ -50,7 +50,7 @@ machinaTracker.setup = () => {
     iconAnchor: [12, 32],
   });
 
-  machinaTracker.popup = new L.Popup({ offset: L.point([1, -34]) });
+  machinaTracker.popup = new L.Popup({ offset: new L.Point([1, -34]) });
   machinaTracker.drawnTraces = new L.LayerGroup([], { minZoom: machinaTracker.MACHINA_TRACKER_MIN_ZOOM });
   window.addLayerGroup('Machina Tracker', machinaTracker.drawnTraces, true);
 
