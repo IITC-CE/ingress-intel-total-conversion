@@ -70,7 +70,7 @@ window.plugin.portalNames.addLabel = function (guid, latLng) {
     var portalName = d.title;
 
     var label = L.marker(latLng, {
-      icon: L.divIcon({
+      icon: new L.DivIcon({
         className: 'plugin-portal-names',
         iconAnchor: [window.plugin.portalNames.NAME_WIDTH / 2, 0],
         iconSize: [window.plugin.portalNames.NAME_WIDTH, window.plugin.portalNames.NAME_HEIGHT],

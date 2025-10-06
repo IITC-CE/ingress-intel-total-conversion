@@ -25,7 +25,7 @@ L.Draw.Polyline.include({
 			// while drawing.
 			if (!this._mouseMarker) {
 				this._mouseMarker = L.marker(this._map.getCenter(), {
-					icon: L.divIcon({
+					icon: new L.DivIcon({
 						className: 'leaflet-mouse-marker',
 						iconAnchor: [20, 20],
 						iconSize: [40, 40]

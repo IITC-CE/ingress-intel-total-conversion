@@ -27,7 +27,7 @@ var changelog = [
 ];
 
 // use own namespace for plugin
-window.plugin.regions = function () {};
+window.plugin.regions = function () { };
 
 window.plugin.regions.setup = function () {
   '@include_raw:external/s2geometry.js@';
@@ -84,10 +84,10 @@ window.plugin.regions.CODE_WORDS = [
 // component is omitted, the 4x4 cell group is used.
 window.plugin.regions.REGEXP = new RegExp(
   '^(?:(?:(' +
-    window.plugin.regions.FACE_NAMES.join('|') +
-    ')-?)?((?:1[0-6])|(?:0?[1-9]))-?)?(' +
-    window.plugin.regions.CODE_WORDS.join('|') +
-    ')(?:-?((?:1[0-5])|(?:0?\\d)))?$',
+  window.plugin.regions.FACE_NAMES.join('|') +
+  ')-?)?((?:1[0-6])|(?:0?[1-9]))-?)?(' +
+  window.plugin.regions.CODE_WORDS.join('|') +
+  ')(?:-?((?:1[0-5])|(?:0?\\d)))?$',
   'i'
 );
 
@@ -310,7 +310,7 @@ window.plugin.regions.drawCell = function (cell) {
   }
 
   var marker = L.marker(center, {
-    icon: L.divIcon({
+    icon: new L.DivIcon({
       className: 'plugin-regions-name',
       iconAnchor: [100, 5],
       iconSize: [200, 10],
