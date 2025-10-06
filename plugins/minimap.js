@@ -59,7 +59,7 @@ function clone(layer) {
   } else if (layer instanceof L.TileLayer) {
     return L.tileLayer(layer._url, options);
   } else if (L.GridLayer.GoogleMutant && layer instanceof L.GridLayer.GoogleMutant) {
-    var gm = L.gridLayer.googleMutant(options);
+    var gm = new L.GridLayer.GoogleMutant(options);
     layer.whenReady(function () {
       for (var name in layer._subLayers) {
         gm.addGoogleLayer(name);
