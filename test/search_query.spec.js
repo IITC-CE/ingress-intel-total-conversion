@@ -4,57 +4,12 @@ import { expect } from 'chai';
 /* global IITC, L */
 /* eslint-disable no-unused-expressions */
 
-if (!globalThis.window) globalThis.window = {};
-if (!globalThis.L) globalThis.L = {};
-if (!globalThis.IITC) globalThis.IITC = {};
-if (!globalThis.IITC.search) globalThis.IITC.search = {};
-globalThis.IITC.search.Query = {};
 import('../core/code/search_query.js');
 
 describe('IITC.search.Query', () => {
   let query;
-  let fakeMap;
 
   beforeEach(() => {
-    // Mock objects and methods
-    fakeMap = {
-      addTo: () => {},
-      addLayer: () => {},
-    };
-
-    globalThis.window = {
-      ...globalThis.window,
-      ...{
-        map: fakeMap,
-        runHooks: () => {},
-        isSmartphone: () => false,
-        TEAM_SHORTNAMES: { NEUTRAL: 'NEU', ENLIGHTENED: 'ENL' },
-        COLORS: { NEUTRAL: '#CCC', ENLIGHTENED: '#008000' },
-        teamStringToId: (team) => (team === 'ENLIGHTENED' ? 'ENLIGHTENED' : 'NEUTRAL'),
-      },
-    };
-
-    globalThis.L = {
-      ...globalThis.L,
-      ...{
-        LatLng: class {},
-        latLng: (lat, lng) => new L.LatLng(lat, lng),
-        layerGroup: () => fakeMap,
-        marker: () => fakeMap,
-        divIcon: {
-          coloredSvg: () => {},
-        },
-      },
-    };
-
-    globalThis.IITC.search.QueryResultsView = class {
-      constructor(term, confirmed) {
-        this.term = term;
-        this.confirmed = confirmed;
-      }
-      renderResults() {}
-    };
-
     query = new IITC.search.Query('test', true);
   });
 
@@ -110,7 +65,7 @@ describe('IITC.search.Query', () => {
     const mockResult = { title: 'Hover Result', layer: null, position: new L.LatLng(0, 0) };
     let layerAdded = false;
 
-    fakeMap.addLayer = () => {
+    window.map.addLayer = () => {
       layerAdded = true;
     };
     query.onResultHoverStart(mockResult);
@@ -132,11 +87,11 @@ describe('IITC.search.Query', () => {
   });
 
   it('should remove hover interaction layer from map', () => {
-    const mockResult = { layer: fakeMap };
+    const mockResult = { layer: window.map };
     let layerRemoved = false;
 
     query.hoverResult = mockResult;
-    fakeMap.removeLayer = () => {
+    window.map.removeLayer = () => {
       layerRemoved = true;
     };
 
@@ -153,7 +108,7 @@ describe('IITC.search.Query', () => {
     };
     let viewSet = false;
 
-    fakeMap.setView = () => {
+    window.map.setView = () => {
       viewSet = true;
     };
     query.onResultSelected(mockResult, { type: 'click' });
@@ -166,7 +121,7 @@ describe('IITC.search.Query', () => {
     const mockResult = { title: 'Selected Result', onSelected: () => true };
     let viewSet = false;
 
-    fakeMap.setView = () => {
+    window.map.setView = () => {
       viewSet = true;
     };
     query.onResultSelected(mockResult, { type: 'click' });

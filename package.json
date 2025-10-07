@@ -24,6 +24,6 @@
     "build:local": "./build.py local",
     "build:mobile": "./build.py mobile",
     "fileserver": "./web_server_local.py local",
-    "test": "mocha --exit"
+    "test": "mocha -r test/_mocks.js --exit"
   }
 }
