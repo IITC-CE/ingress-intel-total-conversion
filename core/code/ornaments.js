@@ -83,7 +83,7 @@ window.ornaments = {
    */
   setup: function () {
     this._portals = {};
-    this.layerGroup = L.layerGroup;
+    this.layerGroup = () => new L.LayerGroup();
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
       this.layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });

@@ -1454,7 +1454,7 @@ var setup = function () {
   window.addPortalHighlighter('Bookmarked Portals', window.plugin.bookmarks.highlight);
 
   // Layer - Bookmarked portals
-  window.plugin.bookmarks.starLayerGroup = L.layerGroup();
+  window.plugin.bookmarks.starLayerGroup = new L.LayerGroup();
   window.layerChooser.addOverlay(window.plugin.bookmarks.starLayerGroup, 'Bookmarked Portals', { default: false });
   window.plugin.bookmarks.addAllStars();
   window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.editStar);

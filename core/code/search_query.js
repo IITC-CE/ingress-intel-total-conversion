@@ -197,7 +197,7 @@ class Query {
    */
   resultLayer(result) {
     if (!result.layer) {
-      result.layer = L.layerGroup();
+      result.layer = new L.LayerGroup();
 
       if (result.position) {
         new L.Marker(result.position, {

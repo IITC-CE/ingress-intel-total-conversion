@@ -217,7 +217,7 @@ showLinkedPortal.showPreview = function () {
   var remote = new L.LatLng(info.lat, info.lng);
   var local = window.portals[window.selectedPortal].getLatLng();
 
-  showLinkedPortal.preview = L.layerGroup().addTo(window.map);
+  showLinkedPortal.preview = new L.LayerGroup().addTo(window.map);
 
   L.circleMarker(remote, showLinkedPortal.previewOptions).addTo(showLinkedPortal.preview);
 

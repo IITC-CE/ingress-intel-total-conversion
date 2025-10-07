@@ -82,13 +82,13 @@ mapGaode.setup = function () {
   // add('Gaode Roads 8',     new GaodeLayer({ style: 8, site: 1 }));
   // add('Gaode Roads 8 [zh]',new GaodeLayer({ style: 8, site: 1, lang: 'zh_cn' }));
 
-  add('Gaode Roads + Traffic', L.layerGroup([Roads, new AmapTraffic({ opacity: 0.75 })]));
+  add('Gaode Roads + Traffic', new L.LayerGroup([Roads, new AmapTraffic({ opacity: 0.75 })]));
 
   var Satellite = add('Gaode Satellite', new GaodeLayer({ style: 6, type: 'satellite' }));
 
   // new GaodeLayer({ style: 8, type: 'roadnet', opacity: 0.75, lang: 'zh_cn', scl: 2 }), // (512*512 tile, w/o labels)
   // new GaodeLayer({ style: 8, type: 'labels', opacity: 0.75, lang: 'zh_cn', ltype: 4 }) // (feature mask) here: 2: roads, 4: labels)
-  add('Gaode Hybrid', L.layerGroup([Satellite, new GaodeLayer({ style: 8, type: 'roadnet', opacity: 0.75 })]));
+  add('Gaode Hybrid', new L.LayerGroup([Satellite, new GaodeLayer({ style: 8, type: 'roadnet', opacity: 0.75 })]));
 };
 
 function setup() {
