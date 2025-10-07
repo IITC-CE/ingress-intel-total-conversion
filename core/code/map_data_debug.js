@@ -41,7 +41,7 @@ window.RenderDebugTiles.prototype.create = function (id, bounds) {
   bounds = new L.LatLngBounds(bounds);
   bounds = bounds.pad(-0.02);
 
-  var l = L.rectangle(bounds, s);
+  var l = new L.Rectangle(bounds, s);
   this.debugTileToRectangle[id] = l;
   this.debugTileLayer.addLayer(l);
   if (window.map.hasLayer(this.debugTileLayer)) {
