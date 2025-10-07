@@ -8,7 +8,7 @@ window.RenderDebugTiles = function () {
   this.CLEAR_CHECK_TIME = 0.1;
   this.FADE_TIME = 1.0;
 
-  this.debugTileLayer = L.layerGroup();
+  this.debugTileLayer = new L.LayerGroup();
   window.layerChooser.addOverlay(this.debugTileLayer, 'DEBUG Data Tiles', { default: false });
 
   this.debugTileToRectangle = {};
