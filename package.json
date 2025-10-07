@@ -16,6 +16,7 @@
     "jsdoc": "^4.0.4",
     "mocha": "^10.1.0",
     "prettier": "^3.3.3",
+    "sinon": "^21.0.0",
     "taffydb": "^2.7.3",
     "tui-jsdoc-template": "^1.2.2"
   },

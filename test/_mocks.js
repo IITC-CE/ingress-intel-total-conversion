@@ -7,7 +7,7 @@ class Map {
 }
 
 // global objects
-globalThis.document = {};
+globalThis.document = { createElement: () => {} };
 globalThis.window = {
   location: {},
   map: new Map(),
@@ -32,6 +32,9 @@ globalThis.L = {
   marker: () => new L.Marker(),
   DivIcon: {
     ColoredSvg: class {},
+  },
+  divIcon: {
+    coloredSvg: () => new L.DivIcon.ColoredSvg(),
   },
 };
 

@@ -1,9 +1,9 @@
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 
 /* global IITC, L */
 /* eslint-disable no-unused-expressions */
-
 import('../core/code/search_query.js');
 
 describe('IITC.search.Query', () => {
@@ -11,6 +11,10 @@ describe('IITC.search.Query', () => {
 
   beforeEach(() => {
     query = new IITC.search.Query('test', true);
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   // Test for initialization
@@ -27,12 +31,10 @@ describe('IITC.search.Query', () => {
     expect(query.results).to.have.lengthOf(1);
     expect(query.results[0]).to.deep.equal(mockResult);
 
-    let renderCalled = false;
-    query.renderResults = () => {
-      renderCalled = true;
-    };
+    const spy = sinon.spy(query, 'renderResults');
+
     query.addResult(mockResult);
-    expect(renderCalled).to.be.true;
+    expect(spy.calledOnce).to.be.true;
   });
 
   // Test for the addPortalResult method
@@ -63,40 +65,33 @@ describe('IITC.search.Query', () => {
   // Test for hover interaction handling
   it('should start hover interaction and add layer to map', () => {
     const mockResult = { title: 'Hover Result', layer: null, position: new L.LatLng(0, 0) };
-    let layerAdded = false;
 
-    window.map.addLayer = () => {
-      layerAdded = true;
-    };
+    const spy = sinon.spy(window.map, 'addLayer');
+
     query.onResultHoverStart(mockResult);
 
-    expect(layerAdded).to.be.true;
+    expect(spy.calledOnce).to.be.true;
   });
 
   it('should handle Space key press for selecting a result', () => {
-    let eventHandled = false;
     const mockEvent = { key: ' ', preventDefault: () => {} };
     const result = { title: 'Test Result' };
 
-    query.onResultSelected = () => {
-      eventHandled = true;
-    };
+    const spy = sinon.spy(query, 'onResultSelected');
 
     query.handleKeyPress(mockEvent, result);
-    expect(eventHandled).to.be.true;
+    expect(spy.calledOnce).to.be.true;
   });
 
   it('should remove hover interaction layer from map', () => {
     const mockResult = { layer: window.map };
-    let layerRemoved = false;
+
+    const spy = sinon.spy(window.map, 'removeLayer');
 
     query.hoverResult = mockResult;
-    window.map.removeLayer = () => {
-      layerRemoved = true;
-    };
-
     query.removeHoverResult();
-    expect(layerRemoved).to.be.true;
+
+    expect(spy.calledOnce).to.be.true;
   });
 
   // Test for selecting a result
@@ -106,26 +101,21 @@ describe('IITC.search.Query', () => {
       position: new L.LatLng(0, 0),
       onSelected: () => false,
     };
-    let viewSet = false;
 
-    window.map.setView = () => {
-      viewSet = true;
-    };
+    const spy = sinon.spy(window.map, 'setView');
+
     query.onResultSelected(mockResult, { type: 'click' });
 
-    expect(viewSet).to.be.true;
+    expect(spy.calledOnce).to.be.true;
     expect(query.selectedResult).to.equal(mockResult);
   });
 
   it('should prevent map repositioning if onSelected returns true', () => {
     const mockResult = { title: 'Selected Result', onSelected: () => true };
-    let viewSet = false;
 
-    window.map.setView = () => {
-      viewSet = true;
-    };
+    const spy = sinon.spy(window.map, 'setView');
     query.onResultSelected(mockResult, { type: 'click' });
 
-    expect(viewSet).to.be.false;
+    expect(spy.called).to.be.false;
   });
 });
