@@ -1,61 +1,20 @@
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 
 /* global IITC, L */
 /* eslint-disable no-unused-expressions */
-
-if (!globalThis.window) globalThis.window = {};
-if (!globalThis.L) globalThis.L = {};
-if (!globalThis.IITC) globalThis.IITC = {};
-if (!globalThis.IITC.search) globalThis.IITC.search = {};
-globalThis.IITC.search.Query = {};
 import('../core/code/search_query.js');
 
 describe('IITC.search.Query', () => {
   let query;
-  let fakeMap;
 
   beforeEach(() => {
-    // Mock objects and methods
-    fakeMap = {
-      addTo: () => {},
-      addLayer: () => {},
-    };
-
-    globalThis.window = {
-      ...globalThis.window,
-      ...{
-        map: fakeMap,
-        runHooks: () => {},
-        isSmartphone: () => false,
-        TEAM_SHORTNAMES: { NEUTRAL: 'NEU', ENLIGHTENED: 'ENL' },
-        COLORS: { NEUTRAL: '#CCC', ENLIGHTENED: '#008000' },
-        teamStringToId: (team) => (team === 'ENLIGHTENED' ? 'ENLIGHTENED' : 'NEUTRAL'),
-      },
-    };
-
-    globalThis.L = {
-      ...globalThis.L,
-      ...{
-        LatLng: class {},
-        latLng: (lat, lng) => new L.LatLng(lat, lng),
-        layerGroup: () => fakeMap,
-        marker: () => fakeMap,
-        divIcon: {
-          coloredSvg: () => {},
-        },
-      },
-    };
-
-    globalThis.IITC.search.QueryResultsView = class {
-      constructor(term, confirmed) {
-        this.term = term;
-        this.confirmed = confirmed;
-      }
-      renderResults() {}
-    };
-
     query = new IITC.search.Query('test', true);
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   // Test for initialization
@@ -72,12 +31,10 @@ describe('IITC.search.Query', () => {
     expect(query.results).to.have.lengthOf(1);
     expect(query.results[0]).to.deep.equal(mockResult);
 
-    let renderCalled = false;
-    query.renderResults = () => {
-      renderCalled = true;
-    };
+    const spy = sinon.spy(query, 'renderResults');
+
     query.addResult(mockResult);
-    expect(renderCalled).to.be.true;
+    expect(spy.calledOnce).to.be.true;
   });
 
   // Test for the addPortalResult method
@@ -108,40 +65,33 @@ describe('IITC.search.Query', () => {
   // Test for hover interaction handling
   it('should start hover interaction and add layer to map', () => {
     const mockResult = { title: 'Hover Result', layer: null, position: new L.LatLng(0, 0) };
-    let layerAdded = false;
 
-    fakeMap.addLayer = () => {
-      layerAdded = true;
-    };
+    const spy = sinon.spy(window.map, 'addLayer');
+
     query.onResultHoverStart(mockResult);
 
-    expect(layerAdded).to.be.true;
+    expect(spy.calledOnce).to.be.true;
   });
 
   it('should handle Space key press for selecting a result', () => {
-    let eventHandled = false;
     const mockEvent = { key: ' ', preventDefault: () => {} };
     const result = { title: 'Test Result' };
 
-    query.onResultSelected = () => {
-      eventHandled = true;
-    };
+    const spy = sinon.spy(query, 'onResultSelected');
 
     query.handleKeyPress(mockEvent, result);
-    expect(eventHandled).to.be.true;
+    expect(spy.calledOnce).to.be.true;
   });
 
   it('should remove hover interaction layer from map', () => {
-    const mockResult = { layer: fakeMap };
-    let layerRemoved = false;
+    const mockResult = { layer: window.map };
+
+    const spy = sinon.spy(window.map, 'removeLayer');
 
     query.hoverResult = mockResult;
-    fakeMap.removeLayer = () => {
-      layerRemoved = true;
-    };
-
     query.removeHoverResult();
-    expect(layerRemoved).to.be.true;
+
+    expect(spy.calledOnce).to.be.true;
   });
 
   // Test for selecting a result
@@ -151,26 +101,21 @@ describe('IITC.search.Query', () => {
       position: new L.LatLng(0, 0),
       onSelected: () => false,
     };
-    let viewSet = false;
 
-    fakeMap.setView = () => {
-      viewSet = true;
-    };
+    const spy = sinon.spy(window.map, 'setView');
+
     query.onResultSelected(mockResult, { type: 'click' });
 
-    expect(viewSet).to.be.true;
+    expect(spy.calledOnce).to.be.true;
     expect(query.selectedResult).to.equal(mockResult);
   });
 
   it('should prevent map repositioning if onSelected returns true', () => {
     const mockResult = { title: 'Selected Result', onSelected: () => true };
-    let viewSet = false;
 
-    fakeMap.setView = () => {
-      viewSet = true;
-    };
+    const spy = sinon.spy(window.map, 'setView');
     query.onResultSelected(mockResult, { type: 'click' });
 
-    expect(viewSet).to.be.false;
+    expect(spy.called).to.be.false;
   });
 });

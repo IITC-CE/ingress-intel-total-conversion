@@ -16,6 +16,7 @@
     "jsdoc": "^4.0.4",
     "mocha": "^10.1.0",
     "prettier": "^3.3.3",
+    "sinon": "^21.0.0",
     "taffydb": "^2.7.3",
     "tui-jsdoc-template": "^1.2.2"
   },
@@ -24,6 +25,6 @@
     "build:local": "./build.py local",
     "build:mobile": "./build.py mobile",
     "fileserver": "./web_server_local.py local",
-    "test": "mocha --exit"
+    "test": "mocha -r test/_mocks.js --exit"
   }
 }

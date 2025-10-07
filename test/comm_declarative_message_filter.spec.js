@@ -4,8 +4,6 @@ import { expect } from 'chai';
 /* global IITC */
 /* eslint-disable no-unused-expressions */
 
-if (!globalThis.IITC) globalThis.IITC = {};
-globalThis.IITC.comm = {};
 import('../core/code/comm_declarative_message_filter.js');
 
 // Define test messages

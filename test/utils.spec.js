@@ -4,11 +4,6 @@ import { expect } from 'chai';
 /* global IITC */
 /* eslint-disable no-unused-expressions */
 
-if (!globalThis.document) globalThis.document = {};
-if (!globalThis.window) globalThis.window = {};
-globalThis.window.location = {};
-if (!globalThis.IITC) globalThis.IITC = {};
-globalThis.IITC.utils = {};
 import('../core/code/utils.js');
 
 describe('IITC.utils.getURLParam', () => {
