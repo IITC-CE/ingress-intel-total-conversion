@@ -257,7 +257,7 @@ window.MapDataRequest.prototype.refresh = function () {
   // DEBUG: resize the bounds so we only retrieve some data
   // bounds = bounds.pad(-0.4);
 
-  // var debugrect = L.rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
+  // var debugrect = new L.Rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
   // setTimeout (function(){ map.removeLayer(debugrect); }, 10*1000);
 
   var x1 = window.lngToTile(bounds.getWest(), tileParams);
@@ -270,7 +270,7 @@ window.MapDataRequest.prototype.refresh = function () {
     [window.tileToLat(y2 + 1, tileParams), window.tileToLng(x1, tileParams)],
     [window.tileToLat(y1, tileParams), window.tileToLng(x2 + 1, tileParams)],
   ]);
-  // var debugrect2 = L.rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
+  // var debugrect2 = new L.Rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
   // setTimeout (function(){ map.removeLayer(debugrect2); }, 10*1000);
 
   // store the parameters used for fetching the data. used to prevent unneeded refreshes after move/zoom

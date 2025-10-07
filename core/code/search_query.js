@@ -207,7 +207,7 @@ class Query {
       }
 
       if (result.bounds) {
-        L.rectangle(result.bounds, {
+        new L.Rectangle(result.bounds, {
           title: result.title,
           interactive: false,
           color: 'red',
