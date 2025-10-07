@@ -121,6 +121,7 @@ window.plugin.bookmarks.upgradeToNewStorage = function () {
     var oldStor_1 = JSON.parse(localStorage['plugin-bookmarks-maps-data']);
     var oldStor_2 = JSON.parse(localStorage['plugin-bookmarks-portals-data']);
 
+    window.plugin.bookmarks.bkmrksObj = {};
     window.plugin.bookmarks.bkmrksObj.maps = oldStor_1.bkmrk_maps;
     window.plugin.bookmarks.bkmrksObj.portals = oldStor_2.bkmrk_portals;
     window.plugin.bookmarks.saveStorage();
@@ -133,11 +134,13 @@ window.plugin.bookmarks.upgradeToNewStorage = function () {
 
 window.plugin.bookmarks.createStorage = function () {
   if (!localStorage[window.plugin.bookmarks.KEY_STORAGE]) {
+    window.plugin.bookmarks.bkmrksObj = {};
     window.plugin.bookmarks.bkmrksObj.maps = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
     window.plugin.bookmarks.bkmrksObj.portals = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
     window.plugin.bookmarks.saveStorage();
   }
   if (!localStorage[window.plugin.bookmarks.KEY_STATUS_BOX]) {
+    window.plugin.bookmarks.statusBox = {};
     window.plugin.bookmarks.statusBox.show = 1;
     window.plugin.bookmarks.statusBox.page = 0;
     window.plugin.bookmarks.statusBox.pos = { x: 100, y: 100 };
