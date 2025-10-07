@@ -374,8 +374,8 @@ flyLinks.Triangle = function (a, b, c, depth) {
 };
 
 function setup() {
-  flyLinks.linksLayerGroup = L.layerGroup();
-  flyLinks.fieldsLayerGroup = L.layerGroup();
+  flyLinks.linksLayerGroup = new L.LayerGroup();
+  flyLinks.fieldsLayerGroup = new L.LayerGroup();
 
   function update() {
     if (!window.map.hasLayer(flyLinks.linksLayerGroup) || !window.map.hasLayer(flyLinks.fieldsLayerGroup)) {

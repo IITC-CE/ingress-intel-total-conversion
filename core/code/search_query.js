@@ -105,7 +105,7 @@ class Query {
   addPortalResult(data, guid) {
     const team = window.teamStringToId(data.team);
     const color = team === window.TEAM_NONE ? '#CCC' : window.COLORS[team];
-    const latLng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
+    const latLng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
     this.addResult({
       title: data.title,
@@ -197,17 +197,17 @@ class Query {
    */
   resultLayer(result) {
     if (!result.layer) {
-      result.layer = L.layerGroup();
+      result.layer = new L.LayerGroup();
 
       if (result.position) {
-        L.marker(result.position, {
-          icon: L.divIcon.coloredSvg('red'),
+        new L.Marker(result.position, {
+          icon: new L.DivIcon.ColoredSvg('red'),
           title: result.title,
         }).addTo(result.layer);
       }
 
       if (result.bounds) {
-        L.rectangle(result.bounds, {
+        new L.Rectangle(result.bounds, {
           title: result.title,
           interactive: false,
           color: 'red',

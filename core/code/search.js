@@ -11,7 +11,7 @@
  * window.addHook('search', function(query) {
  *   query.addResult({
  *     title: 'My Result',
- *     position: L.latLng(0, 0)
+ *     position: new L.LatLng(0, 0)
  *   });
  * });
  *

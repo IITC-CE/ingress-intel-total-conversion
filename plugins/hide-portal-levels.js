@@ -36,7 +36,7 @@ var changelog = [
 function setup() {
   var ctrl = window.layerChooser;
 
-  hideLevels.portals = L.layerGroup();
+  hideLevels.portals = new L.LayerGroup();
 
   var levels = ctrl._layers.filter(function (data) {
     return data.overlay && (data.name === 'Unclaimed/Placeholder Portals' || data.name.match(hideLevels.layerFilterRegexp));

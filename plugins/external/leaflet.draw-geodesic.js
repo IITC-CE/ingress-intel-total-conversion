@@ -24,8 +24,8 @@ L.Draw.Polyline.include({
 			// also do not want to trigger any click handlers of objects we are clicking on
 			// while drawing.
 			if (!this._mouseMarker) {
-				this._mouseMarker = L.marker(this._map.getCenter(), {
-					icon: L.divIcon({
+				this._mouseMarker = new L.Marker(this._map.getCenter(), {
+					icon: new L.DivIcon({
 						className: 'leaflet-mouse-marker',
 						iconAnchor: [20, 20],
 						iconSize: [40, 40]
@@ -142,7 +142,7 @@ L.GeodesicCircle.addInitHook(function () { // todo check if this does not confli
 L.Edit.Circle.include({
 	_getResizeMarkerPoint: function (latlng) {
 		var bounds = this._shape.getBounds(); // geodesic circle stores precalculated bounds
-		return L.latLng(bounds.getNorth(), latlng.lng);
+		return new L.LatLng(bounds.getNorth(), latlng.lng);
 	}
 });
 

@@ -390,7 +390,7 @@ window.plugin.missions = {
         return [waypoint.portal.latE6 / 1e6, waypoint.portal.lngE6 / 1e6];
       });
 
-    return L.latLngBounds(latlngs);
+    return new L.LatLngBounds(latlngs);
   },
 
   loadMissionsInBounds: function (bounds, callback, errorcallback) {
@@ -571,7 +571,7 @@ window.plugin.missions = {
           return !!waypoint.portal;
         })
         .map(function (waypoint) {
-          return L.latLng(waypoint.portal.latE6 / 1e6, waypoint.portal.lngE6 / 1e6);
+          return new L.LatLng(waypoint.portal.latE6 / 1e6, waypoint.portal.lngE6 / 1e6);
         })
         .map(function (latlng1, i, latlngs) {
           if (i === 0) return 0;
@@ -656,7 +656,7 @@ window.plugin.missions = {
         return !!waypoint.portal;
       })
       .map(function (waypoint) {
-        var position = L.latLng(waypoint.portal.latE6 / 1e6, waypoint.portal.lngE6 / 1e6);
+        var position = new L.LatLng(waypoint.portal.latE6 / 1e6, waypoint.portal.lngE6 / 1e6);
         var distance = position.distanceTo(window.plugin.distanceToPortal.currentLoc);
         return {
           waypoint: waypoint,
@@ -1038,7 +1038,7 @@ window.plugin.missions = {
         return;
       }
 
-      this.markedStarterPortals[guid] = L.circleMarker(L.latLng(portal.options.data.latE6 / 1e6, portal.options.data.lngE6 / 1e6), {
+      this.markedStarterPortals[guid] = L.circleMarker(new L.LatLng(portal.options.data.latE6 / 1e6, portal.options.data.lngE6 / 1e6), {
         radius: portal.options.radius + Math.ceil(portal.options.radius / 2),
         weight: 3,
         opacity: 1,
