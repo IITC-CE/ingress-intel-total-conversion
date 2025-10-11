@@ -211,16 +211,3 @@ window.renderUpdateStatus = function () {
 window.smartphoneInfo = function (selectedPortalData) {
   return IITC.statusbar.portal.update(selectedPortalData);
 };
-
-/**
- * Leaflet v2 backwards compability
- */
-/** @deprecated use: d = new L.DivIcon() */
-L.divIcon = function (options) {
-  return new L.DivIcon(options);
-};
-
-/** @deprecated use: d = new L.DivIcon.ColoredSvg() */
-L.divIcon.coloredSvg = function (color, options) {
-  return new L.DivIcon.ColoredSvg(color, options);
-};

@@ -90,6 +90,17 @@ function setupIngressMarkers() {
       this.options.html = L.Util.template(this.options.svgTemplate, { color: this.options.color });
     },
   });
+
+  // Leaflet v2 backwards compability
+  /** @deprecated use: d = new L.DivIcon() */
+  L.divIcon = function (options) {
+    return new L.DivIcon(options);
+  };
+
+  /** @deprecated use: d = new L.DivIcon.ColoredSvg() */
+  L.divIcon.coloredSvg = function (color, options) {
+    return new L.DivIcon.ColoredSvg(color, options);
+  };
 }
 
 /**
