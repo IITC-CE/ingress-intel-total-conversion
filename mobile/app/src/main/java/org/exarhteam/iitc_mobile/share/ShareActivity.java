@@ -19,6 +19,7 @@ import androidx.viewpager.widget.ViewPager;
 import org.exarhteam.iitc_mobile.BuildConfig;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
+import org.exarhteam.iitc_mobile.WindowInsetsHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -121,6 +122,9 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share);
+
+        // Setup window insets for edge-to-edge display
+        WindowInsetsHelper.setupPreferenceActivityInsets(this);
 
         mComparator = new IntentComparator(this);
         mGenerator = new IntentGenerator(this);
