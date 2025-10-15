@@ -82,7 +82,7 @@ window.plugin.playerTracker.setup = function () {
     }
   });
 
-  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: L.point([1, -34]) });
+  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]) });
 
   window.addHook('publicChatDataAvailable', window.plugin.playerTracker.handleData);
 
@@ -276,7 +276,7 @@ window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
     lngs += latlng[1];
   });
 
-  return L.latLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
+  return new L.LatLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
 };
 
 window.plugin.playerTracker.drawData = function () {
@@ -371,7 +371,7 @@ window.plugin.playerTracker.drawData = function () {
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
     const markerPos = gllfe(last);
-    var m = L.marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
+    var m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
     m.addEventListener('spiderfiedclick', window.plugin.playerTracker.onClickListener);
 
     // m.bindPopup(title);

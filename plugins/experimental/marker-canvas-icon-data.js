@@ -4,6 +4,7 @@
 // @version        0.1.0
 // @description    EXPERIMENTAL: draw markers using individual Leaflet Icons, created from canvas elements converted to data: URLs
 
+/* global L -- eslint */
 
 // use own namespace for plugin
 window.plugin.markerIconCanvasUrl = function() {};
@@ -16,11 +17,10 @@ window.plugin.markerIconCanvasUrl.setup  = function() {
 
     var options = L.extend({}, data, { icon: icon });
 
-    var marker = L.marker (latlng, options);
-    marker.bringToFront = function(){}; //TEMP - until the rest of IITC code is changed to take account of non-path markers
+    var marker = new L.Marker(latlng, options);
+    marker.bringToFront = function () {}; // TEMP - until the rest of IITC code is changed to take account of non-path markers
     return marker;
-
-  }
+  };
 
   window.setMarkerStyle = function(marker, selected) {
     var icon = createMarkerIcon(marker.options,selected);
@@ -82,10 +82,10 @@ window.plugin.markerIconCanvasUrl.setup  = function() {
 
     var dataurl = canvas.toDataURL();
 
-    return L.icon({
+    return new L.Icon({
       iconUrl: dataurl,
-      iconSize: [size,size],
-      iconAnchor: [anchor,anchor]
+      iconSize: [size, size],
+      iconAnchor: [anchor, anchor],
     });
 
   }

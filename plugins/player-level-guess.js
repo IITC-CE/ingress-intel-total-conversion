@@ -301,7 +301,7 @@ window.plugin.guessPlayerLevels.handleAttackData = function (nick, latlngs) {
   }
 
   // circle.range is useless, because it is calculated in degrees (simplified algorithm!)
-  var latlng = L.latLng(circle.y, circle.x);
+  var latlng = new L.LatLng(circle.y, circle.x);
   var range = 0;
   for (let i = 0; i < latlngs.length; i++) {
     var d = latlng.distanceTo([latlngs[i].y, latlngs[i].x]);

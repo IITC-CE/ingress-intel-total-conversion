@@ -42,7 +42,7 @@ grayGMaps.addLayer = function () {
     ],
   };
 
-  var grayGMaps = L.gridLayer.googleMutant(grayGMapsOptions);
+  var grayGMaps = new L.GridLayer.GoogleMutant(grayGMapsOptions);
 
   window.layerChooser.addBaseLayer(grayGMaps, 'Google Gray');
 };

@@ -36,7 +36,7 @@
         (sinLat1CosLat2 * Math.sin(iLng-lng2) - sinLat2CosLat1 * Math.sin(iLng-lng1))
           / cosLat1CosLat2SinDLng
       );
-      convertedPoints.push(L.latLng(iLat*r2d, iLng*r2d));
+      convertedPoints.push(new L.LatLng(iLat * r2d, iLng * r2d));
     }
   }
 
@@ -71,14 +71,14 @@
 
     // points are wrapped after being offset relative to the first point coordinate, so they're
     // within +-180 degrees
-    latlngs = latlngs.map(function (a) { return L.latLng(a.lat, a.lng-lngOffset).wrap(); });
+    latlngs = latlngs.map(function (a) { return new L.LatLng(a.lat, a.lng - lngOffset).wrap(); });
 
     var geodesiclatlngs = this._processPoly(latlngs,this._geodesicConvertLine);
 
     // now add back the offset subtracted above. no wrapping here - the drawing code handles
     // things better when there's no sudden jumps in coordinates. yes, lines will extend
     // beyond +-180 degrees - but they won't be 'broken'
-    geodesiclatlngs = geodesiclatlngs.map(function (a) { return L.latLng(a.lat, a.lng+lngOffset); });
+    geodesiclatlngs = geodesiclatlngs.map(function (a) { return new L.LatLng(a.lat, a.lng + lngOffset); });
 
     return geodesiclatlngs;
   }
@@ -111,7 +111,7 @@
     },
 
     _setLatLngs: function (latlngs) {
-      this._bounds = L.latLngBounds();
+      this._bounds = new L.LatLngBounds();
       this._latlngsinit = this._convertLatLngs(latlngs);
     },
 
@@ -142,14 +142,14 @@
         // Backwards compatibility with 0.7.x factory (latlng, radius, options?)
         options = L.extend({}, legacyOptions, {radius: options});
       }
-      this._latlng = L.latLng(latlng);
+      this._latlng = latlng.clone();
       this._radius = options.radius; // note: https://github.com/Leaflet/Leaflet/issues/6656
       var points = this._calcPoints();
       L.Polygon.prototype.initialize.call(this, points, options);
     },
 
     setLatLng: function (latlng) {
-      this._latlng = L.latLng(latlng);
+      this._latlng = latlng.clone();
       var points = this._calcPoints();
       this.setLatLngs(points);
     },
@@ -187,7 +187,7 @@
         var lat = Math.asin(sinCentreLat*cosRadRadius + cosCentreLat*sinRadRadius*Math.cos(angle));
         var lng = centreLng + Math.atan2(Math.sin(angle)*sinRadRadius*cosCentreLat, cosRadRadius-sinCentreLat*Math.sin(lat));
 
-        return L.latLng(lat * r2d,lng * r2d);
+        return new L.LatLng(lat * r2d, lng * r2d);
       };
 
       var o = this.options;

@@ -24,7 +24,7 @@ L.Yandex = L.Layer.extend({
 		options = L.Util.setOptions(this, options);
 		if (type) { options.type = type; }
 		this._isOverlay = options.type.indexOf('overlay') !== -1 ||
-		                  options.type.indexOf('skeleton') !== -1;
+			options.type.indexOf('skeleton') !== -1;
 		this._animatedElements = [];
 	},
 
@@ -41,7 +41,7 @@ L.Yandex = L.Layer.extend({
 		if (opacity) {
 			L.DomUtil.setOpacity(_container, opacity);
 		}
-		var auto = {width: '100%', height: '100%'};
+		var auto = { width: '100%', height: '100%' };
 		this._setStyle(parentEl, auto);   // need to set this explicitly,
 		this._setStyle(_container, auto); // otherwise ymaps fails to follow container size changes
 		return _container;
@@ -100,21 +100,21 @@ L.Yandex = L.Layer.extend({
 		var map = this._map;
 		var center = map.getCenter();
 		this._yandex.setCenter([center.lat, center.lng], map.getZoom());
-		var offset = L.point(0,0).subtract(L.DomUtil.getPosition(map.getPane('mapPane')));
+		var offset = new L.Point(0, 0).subtract(L.DomUtil.getPosition(map.getPane('mapPane')));
 		L.DomUtil.setPosition(this._container, offset); // move to visible part of pane
 	},
 
 	_resyncView: function () { // for use in addons
 		if (!this._map) { return; }
 		var ymap = this._yandex;
-		this._map.setView(ymap.getCenter(), ymap.getZoom(), {animate: false});
+		this._map.setView(ymap.getCenter(), ymap.getZoom(), { animate: false });
 	},
 
 	_animateZoom: function (e) {
 		var map = this._map;
 		var viewHalf = map.getSize()._divideBy(2);
 		var topLeft = map.project(e.center, e.zoom)._subtract(viewHalf)._round();
-                var offset = map.project(map.getBounds().getNorthWest(), e.zoom)._subtract(topLeft);
+		var offset = map.project(map.getBounds().getNorthWest(), e.zoom)._subtract(topLeft);
 		var scale = map.getZoomScale(e.zoom);
 		this._animatedElements.length = 0;
 		this._yandex.panes._array.forEach(function (el) {
@@ -124,7 +124,7 @@ L.Yandex = L.Layer.extend({
 				L.DomUtil.setTransform(element, offset, scale);
 				this._animatedElements.push(element);
 			}
-		},this);
+		}, this);
 	},
 
 	_animateZoomEnd: function () {
