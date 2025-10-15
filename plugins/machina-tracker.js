@@ -42,13 +42,17 @@ machinaTracker.events = [];
 machinaTracker.setup = () => {
   $('<style>').prop('type', 'text/css').html('@include_string:machina-tracker.css@').appendTo('head');
 
-  var iconImage = '@include_img:images/marker-machina.png@';
+  var iconImage = '@include_img:images/marker-machina.svg@';
 
-  machinaTracker.icon = L.icon({
-    iconUrl: iconImage,
-    iconSize: [26, 32],
-    iconAnchor: [12, 32],
-  });
+  machinaTracker.icon = new (L.Icon.Default.extend({
+    options: {
+      iconUrl: iconImage,
+      iconRetinaUrl: iconImage,
+      iconSize: [26, 32],
+      iconAnchor: [12, 32],
+      shadowAnchor: [12, 41],
+    },
+  }))();
 
   machinaTracker.popup = new L.Popup({ offset: L.point([1, -34]) });
   machinaTracker.drawnTraces = new L.LayerGroup([], { minZoom: machinaTracker.MACHINA_TRACKER_MIN_ZOOM });
