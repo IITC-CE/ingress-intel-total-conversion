@@ -114,7 +114,7 @@ showLinkedPortal.portalDetail = function (data) {
     var lat = link[key + 'LatE6'] / 1e6;
     var lng = link[key + 'LngE6'] / 1e6;
 
-    var length = L.latLng(link.oLatE6 / 1e6, link.oLngE6 / 1e6).distanceTo([link.dLatE6 / 1e6, link.dLngE6 / 1e6]);
+    var length = new L.LatLng(link.oLatE6 / 1e6, link.oLngE6 / 1e6).distanceTo([link.dLatE6 / 1e6, link.dLngE6 / 1e6]);
     var info = {
       guid: guid,
       lat: lat,
@@ -169,7 +169,7 @@ showLinkedPortal.renderPortalDetails = function (ev) {
 
   var info = $(this).data();
 
-  var position = L.latLng(info.lat, info.lng);
+  var position = new L.LatLng(info.lat, info.lng);
   if (!window.map.getBounds().contains(position)) {
     window.map.panInside(position);
   }
@@ -203,7 +203,7 @@ showLinkedPortal.showLinkOnMap = function () {
   }
 
   var info = $(this).data();
-  var position = L.latLng(info.lat, info.lng);
+  var position = new L.LatLng(info.lat, info.lng);
   if (!window.map.getBounds().contains(position)) {
     var targetBounds = [position, window.portals[window.selectedPortal].getLatLng()];
     window.map.fitBounds(targetBounds, { padding: [15, 15], maxZoom: window.map.getZoom() });
@@ -214,10 +214,10 @@ showLinkedPortal.showPreview = function () {
   showLinkedPortal.removePreview();
 
   var info = $(this).data();
-  var remote = L.latLng(info.lat, info.lng);
+  var remote = new L.LatLng(info.lat, info.lng);
   var local = window.portals[window.selectedPortal].getLatLng();
 
-  showLinkedPortal.preview = L.layerGroup().addTo(window.map);
+  showLinkedPortal.preview = new L.LayerGroup().addTo(window.map);
 
   L.circleMarker(remote, showLinkedPortal.previewOptions).addTo(showLinkedPortal.preview);
 

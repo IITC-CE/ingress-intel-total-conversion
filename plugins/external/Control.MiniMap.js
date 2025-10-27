@@ -93,8 +93,8 @@
 			}
 
 			this._miniMap.whenReady(L.Util.bind(function () {
-				this._aimingRect = L.rectangle(this._mainMap.getBounds(), this.options.aimingRectOptions).addTo(this._miniMap);
-				this._shadowRect = L.rectangle(this._mainMap.getBounds(), this.options.shadowRectOptions).addTo(this._miniMap);
+				this._aimingRect = new L.Rectangle(this._mainMap.getBounds(), this.options.aimingRectOptions).addTo(this._miniMap);
+				this._shadowRect = new L.Rectangle(this._mainMap.getBounds(), this.options.shadowRectOptions).addTo(this._miniMap);
 				this._mainMap.on('moveend', this._onMainMapMoved, this);
 				this._mainMap.on('move', this._onMainMapMoving, this);
 				this._miniMap.on('movestart', this._onMiniMapMoveStarted, this);

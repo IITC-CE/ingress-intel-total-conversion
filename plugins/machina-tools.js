@@ -139,7 +139,7 @@ machinaTools.goToSeed = function (portalGuid) {
 };
 
 function toLatLng(latE6, lngE6) {
-  return L.latLng(latE6 / 1e6, lngE6 / 1e6);
+  return new L.LatLng(latE6 / 1e6, lngE6 / 1e6);
 }
 
 machinaTools.getOLatLng = function (link) {
@@ -724,7 +724,10 @@ machinaTools.refreshLinkLengths = function () {
     machinaTools.removeLinkLengths();
     machinaTools._maxLinks[0] = 0;
     machinaTools._maxLinks = Object.values(window.links)
-      .filter((l) => l.options.team === window.TEAM_MAC && window.map.getBounds().contains(L.latLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6)))
+      .filter((l) => {
+        const ll = new L.LatLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6);
+        return l.options.team === window.TEAM_MAC && window.map.getBounds().contains(ll);
+      })
       .reduce((previousValue, link) => {
         var origin = window.portals[link.options.data.oGuid];
         if (origin && origin.options.data.resCount === 8) {

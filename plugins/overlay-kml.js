@@ -99,10 +99,10 @@ overlayKML.layerOptions = {
         var style = overlayKML.layerOptions.style;
         color = style && style.defaults && style.defaults['marker-color'];
       }
-      icon = L.divIcon.coloredSvg(color, overlayKML.iconSizes);
+      icon = new L.DivIcon.ColoredSvg(color, overlayKML.iconSizes);
     }
     // old icon: new L.Icon.Default(overlayKML.iconSizes);
-    return L.marker(latlng, { icon: icon });
+    return new L.Marker(latlng, { icon: icon });
   },
 
   // https://leafletjs.com/reference.html#geojson-oneachfeature

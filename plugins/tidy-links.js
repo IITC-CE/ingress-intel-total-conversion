@@ -134,7 +134,7 @@ function setup() {
   tidyLinks.Delaunay = loadDelaunay();
 
   map = window.map;
-  tidyLinks.layer = L.layerGroup([])
+  tidyLinks.layer = new L.LayerGroup([])
     .on('add', function () {
       tidyLinks.update();
       window.addHook('mapDataRefreshEnd', tidyLinks.update);

@@ -83,7 +83,7 @@ window.ornaments = {
    */
   setup: function () {
     this._portals = {};
-    this.layerGroup = L.layerGroup;
+    this.layerGroup = () => new L.LayerGroup();
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
       this.layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
@@ -171,8 +171,8 @@ window.ornaments = {
           layer = this.layers['Excluded ornaments'];
         }
 
-        return L.marker(portal.getLatLng(), {
-          icon: L.icon({
+        return new L.Marker(portal.getLatLng(), {
+          icon: new L.Icon({
             iconUrl: iconUrl,
             iconSize: [size, size],
             iconAnchor: anchor, // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4

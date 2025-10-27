@@ -69,8 +69,8 @@ window.plugin.keysOnMap.renderKey = function (guid, latLng) {
 
   var keyCount = window.plugin.keys.keys[guid];
   if (keyCount > 0) {
-    var key = L.marker(latLng, {
-      icon: L.divIcon({
+    var key = new L.Marker(latLng, {
+      icon: new L.DivIcon({
         className: 'plugin-keys-on-map-key',
         iconAnchor: [6, 7],
         iconSize: [12, 10],

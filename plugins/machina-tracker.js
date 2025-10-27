@@ -44,13 +44,13 @@ machinaTracker.setup = () => {
 
   var iconImage = '@include_img:images/marker-machina.png@';
 
-  machinaTracker.icon = L.icon({
+  machinaTracker.icon = new L.Icon({
     iconUrl: iconImage,
     iconSize: [26, 32],
     iconAnchor: [12, 32],
   });
 
-  machinaTracker.popup = new L.Popup({ offset: L.point([1, -34]) });
+  machinaTracker.popup = new L.Popup({ offset: new L.Point([1, -34]) });
   machinaTracker.drawnTraces = new L.LayerGroup([], { minZoom: machinaTracker.MACHINA_TRACKER_MIN_ZOOM });
   window.addLayerGroup('Machina Tracker', machinaTracker.drawnTraces, true);
 
@@ -100,7 +100,7 @@ machinaTracker.discardOldData = function () {
 };
 
 machinaTracker.toLanLng = function (locationData) {
-  return L.latLng(locationData.latE6 / 1e6, locationData.lngE6 / 1e6);
+  return new L.LatLng(locationData.latE6 / 1e6, locationData.lngE6 / 1e6);
 };
 
 machinaTracker.createEvent = function (json) {
@@ -203,7 +203,7 @@ machinaTracker.drawData = function () {
         .appendTo(linkList);
     });
 
-    var m = L.marker(position, { icon: icon, opacity: opacity, desc: popup[0], title: title });
+    var m = new L.Marker(position, { icon: icon, opacity: opacity, desc: popup[0], title: title });
     m.addEventListener('spiderfiedclick', machinaTracker.onClickListener);
 
     window.registerMarkerForOMS(m);

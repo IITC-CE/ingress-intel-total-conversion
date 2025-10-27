@@ -67,7 +67,7 @@ window.Render.prototype.clearLinksOutsideBounds = function (bounds) {
     // NOTE: our geodesic lines can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on start+end point will be good enough for this check
     var lls = l.getLatLngs();
-    var linkBounds = L.latLngBounds(lls);
+    var linkBounds = new L.LatLngBounds(lls);
 
     if (!bounds.intersects(linkBounds)) {
       this.deleteLinkEntity(guid);
@@ -89,7 +89,7 @@ window.Render.prototype.clearFieldsOutsideBounds = function (bounds) {
     // NOTE: our geodesic polys can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on corner points will be good enough for this check
     var lls = f.getLatLngs();
-    var fieldBounds = L.latLngBounds([lls[0], lls[1]]).extend(lls[2]);
+    var fieldBounds = new L.LatLngBounds([lls[0], lls[1]]).extend(lls[2]);
 
     if (!bounds.intersects(fieldBounds)) {
       this.deleteFieldEntity(guid);
@@ -378,7 +378,7 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     previousData = $.extend(true, {}, p.getDetails());
   }
 
-  var latlng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
+  var latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
   window.pushPortalGuidPositionCache(data.guid, data.latE6, data.lngE6);
 
@@ -481,9 +481,9 @@ window.Render.prototype.createFieldEntity = function (ent) {
 
   var team = window.teamStringToId(ent[2][1]);
   var latlngs = [
-    L.latLng(data.points[0].latE6 / 1e6, data.points[0].lngE6 / 1e6),
-    L.latLng(data.points[1].latE6 / 1e6, data.points[1].lngE6 / 1e6),
-    L.latLng(data.points[2].latE6 / 1e6, data.points[2].lngE6 / 1e6),
+    new L.LatLng(data.points[0].latE6 / 1e6, data.points[0].lngE6 / 1e6),
+    new L.LatLng(data.points[1].latE6 / 1e6, data.points[1].lngE6 / 1e6),
+    new L.LatLng(data.points[2].latE6 / 1e6, data.points[2].lngE6 / 1e6),
   ];
 
   var poly = L.geodesicPolygon(latlngs, {
@@ -552,7 +552,7 @@ window.Render.prototype.createLinkEntity = function (ent) {
   }
 
   var team = window.teamStringToId(ent[2][1]);
-  var latlngs = [L.latLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), L.latLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
+  var latlngs = [new L.LatLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), new L.LatLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
   var poly = L.geodesicPolyline(latlngs, {
     color: window.COLORS[team],
     opacity: 1,
@@ -589,7 +589,7 @@ window.Render.prototype.rescalePortalMarkers = function () {
     // resets the style (inc size) of all portal markers, applying the new scale
     window.resetHighlightedPortals();
 
-    window.ornaments.reload();    
+    window.ornaments.reload();
   }
 };
 

@@ -120,7 +120,7 @@ function createDefaultBaseMapLayers() {
   baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all' });
 
   // Google Maps - including ingress default (using the stock-intel API-key)
-  baseLayers['Google Default Ingress Map'] = L.gridLayer.googleMutant({
+  baseLayers['Google Default Ingress Map'] = new L.GridLayer.GoogleMutant({
     type: 'roadmap',
     backgroundColor: '#0e3d4e',
     styles: [
@@ -131,16 +131,16 @@ function createDefaultBaseMapLayers() {
       { featureType: 'road', elementType: 'labels.icon', stylers: [{ invert_lightness: !0 }] },
     ],
   });
-  baseLayers['Google Roads'] = L.gridLayer.googleMutant({ type: 'roadmap' });
-  var trafficMutant = L.gridLayer.googleMutant({ type: 'roadmap' });
+  baseLayers['Google Roads'] = new L.GridLayer.GoogleMutant({ type: 'roadmap' });
+  var trafficMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap' });
   trafficMutant.addGoogleLayer('TrafficLayer');
   baseLayers['Google Roads + Traffic'] = trafficMutant;
-  var transitMutant = L.gridLayer.googleMutant({ type: 'roadmap' });
+  var transitMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap' });
   transitMutant.addGoogleLayer('TransitLayer');
   baseLayers['Google Roads + Transit'] = transitMutant;
-  baseLayers['Google Satellite'] = L.gridLayer.googleMutant({ type: 'satellite' });
-  baseLayers['Google Hybrid'] = L.gridLayer.googleMutant({ type: 'hybrid' });
-  baseLayers['Google Terrain'] = L.gridLayer.googleMutant({ type: 'terrain' });
+  baseLayers['Google Satellite'] = new L.GridLayer.GoogleMutant({ type: 'satellite' });
+  baseLayers['Google Hybrid'] = new L.GridLayer.GoogleMutant({ type: 'hybrid' });
+  baseLayers['Google Terrain'] = new L.GridLayer.GoogleMutant({ type: 'terrain' });
 
   return baseLayers;
 }

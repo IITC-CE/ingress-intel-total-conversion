@@ -59,7 +59,7 @@ window.addHook('search', (query) => {
     query.addResult({
       title: latLngString,
       description: 'geo coordinates',
-      position: L.latLng(lat, lng),
+      position: new L.LatLng(lat, lng),
       onSelected: (result) => {
         for (const [guid, portal] of Object.entries(window.portals)) {
           const { lat: pLat, lng: pLng } = portal.getLatLng();
@@ -137,7 +137,7 @@ window.addHook('search', async (query) => {
         const result = {
           title: item.display_name,
           description: `Type: ${item.type}`,
-          position: L.latLng(parseFloat(item.lat), parseFloat(item.lon)),
+          position: new L.LatLng(parseFloat(item.lat), parseFloat(item.lon)),
           icon: item.icon,
         };
 
@@ -149,8 +149,8 @@ window.addHook('search', async (query) => {
             weight: 2,
             fill: false,
             pointToLayer: (featureData, latLng) =>
-              L.marker(latLng, {
-                icon: L.divIcon.coloredSvg('red'),
+              new L.Marker(latLng, {
+                icon: new L.DivIcon.ColoredSvg('red'),
                 title: item.display_name,
               }),
           });
@@ -158,7 +158,7 @@ window.addHook('search', async (query) => {
 
         if (item.boundingbox) {
           const [south, north, west, east] = item.boundingbox;
-          result.bounds = new L.LatLngBounds(L.latLng(parseFloat(south), parseFloat(west)), L.latLng(parseFloat(north), parseFloat(east)));
+          result.bounds = new L.LatLngBounds(new L.LatLng(parseFloat(south), parseFloat(west)), new L.LatLng(parseFloat(north), parseFloat(east)));
         }
 
         query.addResult(result);
