@@ -520,7 +520,7 @@ const clampLatLng = function (latlng) {
 const clampLatLngBounds = function (bounds) {
   var SW = bounds.getSouthWest(),
     NE = bounds.getNorthEast();
-  return L.latLngBounds(window.clampLatLng(SW), window.clampLatLng(NE));
+  return new L.LatLngBounds(window.clampLatLng(SW), window.clampLatLng(NE));
 };
 
 /**

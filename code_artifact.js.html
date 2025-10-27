@@ -303,7 +303,7 @@ window.artifact.updateLayer = function () {
   window.artifact._layer.clearLayers();
 
   $.each(window.artifact.portalInfo, function (guid, data) {
-    var latlng = L.latLng([data._data.latE6 / 1e6, data._data.lngE6 / 1e6]);
+    var latlng = new L.LatLng([data._data.latE6 / 1e6, data._data.lngE6 / 1e6]);
 
     $.each(data, function (type) {
       // we'll construct the URL form the type - stock seems to do that now
@@ -315,13 +315,13 @@ window.artifact.updateLayer = function () {
         iconSize = 100 / 2;
         opacity = 1.0;
 
-        const icon = L.icon({
+        const icon = new L.Icon({
           iconUrl: iconUrl,
           iconSize: [iconSize, iconSize],
           iconAnchor: [iconSize / 2, iconSize / 2],
         });
 
-        const marker = L.marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
+        const marker = new L.Marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
 
         window.artifact._layer.addLayer(marker);
       } else if (data[type].fragments) {
@@ -331,13 +331,13 @@ window.artifact.updateLayer = function () {
         iconSize = 60 / 2;
         opacity = 0.6;
 
-        const icon = L.icon({
+        const icon = new L.Icon({
           iconUrl: iconUrl,
           iconSize: [iconSize, iconSize],
           iconAnchor: [iconSize / 2, iconSize / 2],
         });
 
-        const marker = L.marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
+        const marker = new L.Marker(latlng, { icon: icon, interactive: false, keyboard: false, opacity: opacity });
 
         window.artifact._layer.addLayer(marker);
       }

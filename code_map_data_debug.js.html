@@ -58,7 +58,7 @@ window.RenderDebugTiles = function () {
   this.CLEAR_CHECK_TIME = 0.1;
   this.FADE_TIME = 1.0;
 
-  this.debugTileLayer = L.layerGroup();
+  this.debugTileLayer = new L.LayerGroup();
   window.layerChooser.addOverlay(this.debugTileLayer, 'DEBUG Data Tiles', { default: false });
 
   this.debugTileToRectangle = {};
@@ -91,7 +91,7 @@ window.RenderDebugTiles.prototype.create = function (id, bounds) {
   bounds = new L.LatLngBounds(bounds);
   bounds = bounds.pad(-0.02);
 
-  var l = L.rectangle(bounds, s);
+  var l = new L.Rectangle(bounds, s);
   this.debugTileToRectangle[id] = l;
   this.debugTileLayer.addLayer(l);
   if (window.map.hasLayer(this.debugTileLayer)) {
