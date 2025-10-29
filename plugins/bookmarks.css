@@ -424,17 +424,21 @@
 /**********************************************
 	MOBILE
 **********************************************/
-#bookmarksBox.mobile{
-	position:absolute !important;
-	width: 100% !important;
-	height: 100% !important;
-	top: 0 !important;
-	left: 0 !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	border: 0 !important;
-	background: transparent !important;
-	overflow:auto !important;
+#bookmarksBox.mobile {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: auto !important;
+  box-sizing: border-box;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
 }
 #bookmarksBox.mobile .bookmarkList ul,
 #bookmarksBox.mobile .bookmarkList ul li,

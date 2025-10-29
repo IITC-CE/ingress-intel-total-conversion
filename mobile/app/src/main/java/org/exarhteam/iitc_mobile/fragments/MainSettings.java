@@ -17,6 +17,7 @@ import org.exarhteam.iitc_mobile.BuildConfig;
 import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
+import org.exarhteam.iitc_mobile.WindowInsetsHelper;
 import org.exarhteam.iitc_mobile.prefs.AboutDialogPreference;
 import org.exarhteam.iitc_mobile.prefs.DeepLinkPermissionPreference;
 import org.exarhteam.iitc_mobile.prefs.ShareDebugInfoPreference;
@@ -87,7 +88,7 @@ public class MainSettings extends PreferenceFragment {
         super.onResume();
         
         // Notify deep link preference about activity resume
-        DeepLinkPermissionPreference deepLinkPref = 
+        DeepLinkPermissionPreference deepLinkPref =
             (DeepLinkPermissionPreference) findPreference("pref_deep_link_permission");
         if (deepLinkPref != null) {
             deepLinkPref.onActivityResumed();
@@ -116,6 +117,9 @@ public class MainSettings extends PreferenceFragment {
 
         if (dialog != null) {
             if (dialog.getActionBar() != null) dialog.getActionBar().setDisplayHomeAsUpEnabled(true);
+
+            // Setup window insets for the dialog
+            WindowInsetsHelper.setupDialogInsets(dialog);
 
             final View homeBtn = dialog.findViewById(android.R.id.home);
 
