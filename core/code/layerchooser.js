@@ -53,7 +53,8 @@ var LayerChooser = L.Control.Layers.extend({
       }
     }
     this._mapToAdd = options && options.map;
-    this.lastBaseLayerName = localStorage['iitc-base-map'];
+    this.lastBaseLayerName = localStorage['iitc-base-map'] || null;
+    this._earlyRestoreDone = false;
     this._lastPriority = -1000; // initial layers get priority <0
     L.Control.Layers.prototype.initialize.apply(this, arguments);
     this._lastPriority = 0; // any following gets >0
@@ -108,9 +109,7 @@ var LayerChooser = L.Control.Layers.extend({
     }
     var map = this._map || this._mapToAdd;
     if (!data.persistent) {
-      if (!data.overlay) {
-        return;
-      }
+      if (!data.overlay) return;
       if ('enable' in options ? options.enable : data.default) {
         layer.addTo(map);
       }
@@ -134,13 +133,23 @@ var LayerChooser = L.Control.Layers.extend({
         }
       }
     } else {
+      // Persist base-layer selection whenever it becomes active.
       data.statusTracking = function () {
         localStorage['iitc-base-map'] = data.name;
       };
-      layer.on('add', data.statusTracking);
+      layer.on('add', data.statusTracking, this);
+      // --- Early restore of saved basemap (handles late-loading providers) ---
+      try {
+        var saved = this.lastBaseLayerName || localStorage['iitc-base-map'];
+        if (!this._earlyRestoreDone && map && saved && name === saved) {
+          this._earlyRestoreDone = true;
+          this.showLayer(layer, true);
+        }
+      } catch (e) {
+        if (window.debug) log.warn('LayerChooser early-restore failed:', e);
+      }
     }
   },
-
   _addItem: function (obj) {
     var labelEl = L.Control.Layers.prototype._addItem.call(this, {
       layer: obj.layer,
