@@ -108,6 +108,7 @@ public class IITC_WebViewClient extends WebViewClient {
                 return;
             Log.d("injecting iitc..");
             loadScripts((IITC_WebView) view);
+            ((IITC_WebView) view).applySafeAreaInsets();
             mIitcInjected = true;
         }
         super.onPageFinished(view, url);

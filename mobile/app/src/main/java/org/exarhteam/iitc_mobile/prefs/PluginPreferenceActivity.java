@@ -27,6 +27,7 @@ import org.exarhteam.iitc_mobile.IITC_PluginManager;
 import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
+import org.exarhteam.iitc_mobile.WindowInsetsHelper;
 import org.exarhteam.iitc_mobile.fragments.PluginsFragment;
 
 import java.util.ArrayList;
@@ -90,6 +91,18 @@ public class PluginPreferenceActivity extends PreferenceActivity {
             mFileManager.installPlugin(uri, true);
         }
         super.onCreate(savedInstanceState);
+
+        // Fix for legacy PreferenceActivity not setting fitsSystemWindows on some devices
+        android.view.View contentView = findViewById(android.R.id.content);
+        if (contentView instanceof android.view.ViewGroup) {
+            android.view.ViewGroup content = (android.view.ViewGroup) contentView;
+            if (content.getChildCount() > 0 && content.getChildAt(0) instanceof android.widget.LinearLayout) {
+                android.widget.LinearLayout mainLayout = (android.widget.LinearLayout) content.getChildAt(0);
+                if (!mainLayout.getFitsSystemWindows()) {
+                    mainLayout.setFitsSystemWindows(true);
+                }
+            }
+        }
     }
 
     private boolean mLastFolderAccessState = false;
