@@ -13,22 +13,25 @@
 default_platform(:android)
 
 platform :android do
-  desc "Deploy of beta version to Google Play"
+  desc "Deploy beta version to Google Play Store"
   lane :deploy_beta do
-    upload_to_play_store(track: "beta",
-           package_name: "org.exarhteam.iitc_mobile",
-           aab: "build/beta/IITC_Mobile-beta.aab",
-           json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'])
+    upload_to_play_store(
+      track: "beta",
+      package_name: "org.exarhteam.iitc_mobile",
+      aab: "build/release/IITC_Mobile-release.aab",
+      json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'],
+      skip_upload_apk: true
+    )
   end
 
-  desc "Deploy of release to Google Play"
-  lane :deploy_release do
-    upload_to_play_store(track: "release",
-           package_name: "org.exarhteam.iitc_mobile",
-           aab: "build/release/IITC_Mobile-release.aab",
-           json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'])
+  desc "Deploy production version to Google Play Store"
+  lane :deploy_production do
+    upload_to_play_store(
+      track: "production",
+      package_name: "org.exarhteam.iitc_mobile",
+      aab: "build/release/IITC_Mobile-release.aab",
+      json_key_data: ENV['GOOGLE_PLAY_ACCOUNT'],
+      skip_upload_apk: true
+    )
   end
 end
-
-
-
