@@ -1,13 +1,14 @@
 // @author         ZasoGD
 // @name           Zaprange
 // @category       Layer
-// @version        0.1.8
+// @version        0.1.9
 // @description    Shows the maximum range of attack by the portals.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.1.9', changes: ['Fix range circle not updating when portals change'] },
   {
     version: '0.1.8',
     changes: ['Refactoring: fix eslint'],

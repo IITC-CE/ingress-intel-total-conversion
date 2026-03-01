@@ -1,13 +1,14 @@
 // @author         breunigs
 // @name           Player activity tracker
 // @category       Layer
-// @version        0.14.0
+// @version        0.14.1
 // @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.14.1', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.14.0',
     changes: ['Using `IITC.utils.formatAgo` instead of the plugin own function', 'Refactoring to make it easier to extend plugin functions'],

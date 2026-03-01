@@ -1,13 +1,14 @@
 // @author         Fly33
 // @name           Fly Links
 // @category       Draw
-// @version        0.5.3
+// @version        0.5.4
 // @description    Calculate how to link the portals to create the largest tidy set of nested fields. Enable from the layer chooser.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.5.4', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.5.3',
     changes: ['Refactoring: fix eslint'],

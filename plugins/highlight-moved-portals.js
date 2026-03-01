@@ -1,13 +1,14 @@
 // @author         screach
 // @name           Highlight moved portals
 // @category       Highlighter
-// @version        0.1.1
+// @version        0.1.2
 // @description    Highlights portals with links with different location data
 
 /* exported setup, changelog --eslint */
 /* global L */
 
 var changelog = [
+  { version: '0.1.2', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],

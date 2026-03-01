@@ -1,13 +1,14 @@
 // @author         jacob1123
 // @name           Gray Google map
 // @category       Map Tiles
-// @version        0.1.7
+// @version        0.1.8
 // @description    Add a simplified gray Version of Google map tiles as an optional layer.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.1.8', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.7',
     changes: ['Refactoring: fix eslint'],

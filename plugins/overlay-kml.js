@@ -1,13 +1,14 @@
 // @author         danielatkins
 // @name           Overlay KML / GPX / GeoJSON
 // @category       Layer
-// @version        0.3.3
+// @version        0.3.4
 // @description    Allow users to overlay their own KML / GPX / GeoJSON files on top of IITC.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.3.4', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.32',
     changes: ['Refactoring: fix eslint'],

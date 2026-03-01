@@ -1,7 +1,7 @@
 // @author         johnd0e
 // @name           Hide portal levels
 // @category       Layer
-// @version        0.1.3
+// @version        0.1.4
 // @description    Replace all levels with single layerChooser's entry; reverting on longclick
 
 /* exported setup, changelog --eslint */
@@ -15,6 +15,7 @@ hideLevels.layerFilterRegexp = new RegExp(/Level \d* Portals/);
 hideLevels.initCollapsed = true;
 
 var changelog = [
+  { version: '0.1.4', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.3',
     changes: ['Refactoring: fix eslint'],

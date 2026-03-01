@@ -1,13 +1,14 @@
 // @author         ZasoGD
 // @name           Bookmarks for maps and portals
 // @category       Controls
-// @version        0.4.6
+// @version        0.4.7
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync. Supports Multi-Project-Extension
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.4.7', changes: ['Fix data reset issue'] },
   {
     version: '0.4.6',
     changes: ['Refactoring: fix eslint'],

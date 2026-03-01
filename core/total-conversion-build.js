@@ -18,7 +18,13 @@ window.script_info = plugin_info;
 window.script_info.changelog = [
   {
     version: '0.42.0',
-    changes: ['Update and supplement ingress constants for access points'],
+    changes: [
+      'Introduce IITC.statusbar API with modular template-based rendering for map and portal status',
+      'Add safe-area support for edge-to-edge displays on Android 15+ and iOS 11+',
+      'Fix portal range circles not updating after portal detail load',
+      'Fix restoring saved map layer for plugins loaded after map initialization',
+      'Update and supplement ingress constants for access points',
+    ],
   },
   {
     version: '0.41.0',

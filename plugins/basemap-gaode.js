@@ -1,13 +1,14 @@
 ﻿// @author         johnd0e
 // @name           Gaode (高德地图) / AutoNavi map
 // @category       Map Tiles
-// @version        0.1.4
+// @version        0.1.5
 // @description    Map layers from AutoNavi / Gaode (高德地图)
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.1.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.4',
     changes: ['Refactoring: fix eslint'],

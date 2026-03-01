@@ -1,13 +1,14 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.3.5
+// @version        0.3.6
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.3.6', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.5',
     changes: ['Fix mission link missing from sidebar'],

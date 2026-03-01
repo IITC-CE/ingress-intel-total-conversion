@@ -1,13 +1,14 @@
 // @name           Machina tracker
 // @author         McBen
 // @category       Layer
-// @version        1.1.1
+// @version        1.1.2
 // @description    Show locations of Machina activities
 
 /* exported setup, changelog --eslint */
 /* global IITC, L */
 
 var changelog = [
+  { version: '1.1.2', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '1.1.1',
     changes: ['Fix decayed messages attributed to Machina'],
