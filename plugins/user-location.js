@@ -1,13 +1,14 @@
 // @author         cradle
 // @name           User Location
 // @category       Tweaks
-// @version        0.3.0
+// @version        0.3.1
 // @description    Show user location marker on map
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 const changelog = [
+  { version: '0.3.1', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.0',
     changes: ['Add browser geolocation and compass support'],

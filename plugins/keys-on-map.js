@@ -1,13 +1,14 @@
 // @author         xelio
 // @name           Keys on map
 // @category       Layer
-// @version        0.3.4
+// @version        0.3.5
 // @description    Show the manually entered key counts from the 'keys' plugin on the map.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.3.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.4',
     changes: ['Refactoring: fix eslint'],

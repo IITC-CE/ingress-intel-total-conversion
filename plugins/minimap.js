@@ -1,13 +1,14 @@
 // @author         johnd0e
 // @name           Mini map
 // @category       Controls
-// @version        0.4.4
+// @version        0.4.5
 // @description    Show a mini map on the corner of the map.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.4.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.4.4',
     changes: ['Refactoring: fix eslint'],

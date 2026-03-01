@@ -1,13 +1,14 @@
 // @author         breunigs
 // @name           Player level guess
 // @category       Info
-// @version        0.5.11
+// @version        0.5.12
 // @description    Try to determine player levels from the data available in the current view.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.5.12', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.5.11',
     changes: ['Refactoring: fix eslint'],

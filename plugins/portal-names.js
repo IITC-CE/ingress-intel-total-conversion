@@ -1,13 +1,14 @@
 // @author         ZasoGD
 // @name           Portal Names
 // @category       Layer
-// @version        0.2.4
+// @version        0.2.5
 // @description    Show portal names on the map.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.2.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.2.4',
     changes: ['Refactoring: fix eslint'],

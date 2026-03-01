@@ -1,13 +1,14 @@
 // @author         fstopienski
 // @name           Linked portals
 // @category       Portal Info
-// @version        0.4.3
+// @version        0.4.4
 // @description    Try to show the linked portals (image, name and link direction) in portal detail view and jump to linked portal on click.  Some details may not be available if the linked portal is not in the current view.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.4.4', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.4.3',
     changes: ['Refactoring: fix eslint'],

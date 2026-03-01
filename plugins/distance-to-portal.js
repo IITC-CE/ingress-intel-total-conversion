@@ -1,13 +1,14 @@
 // @author         jonatkins
 // @name           Distance to portal
 // @category       Portal Info
-// @version        0.2.3
+// @version        0.2.4
 // @description    Allows your current location to be set manually, then shows the distance to the selected portal. Useful when managing portal keys.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.2.4', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.2.3',
     changes: ['Refactoring: fix eslint'],
