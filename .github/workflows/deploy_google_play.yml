@@ -23,12 +23,30 @@ jobs:
             echo "defined=false" >> $GITHUB_OUTPUT;
           fi
 
+  check-release-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      is_release: ${{ steps.check.outputs.is_release }}
+    steps:
+      - name: Skip beta deploy if this is a release commit on master
+        id: check
+        env:
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          COMMIT_MSG: ${{ github.event.workflow_run.head_commit.message }}
+        run: |
+          if [[ "$BRANCH" == "master" ]] && echo "$COMMIT_MSG" | grep -q "^Release v"; then
+            echo "is_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_release=false" >> $GITHUB_OUTPUT
+          fi
+
   deploy:
     runs-on: ubuntu-latest
-    needs: [check-secret]
+    needs: [check-secret, check-release-commit]
     if: |
       github.event.workflow_run.conclusion == 'success' &&
-      needs.check-secret.outputs.secrets == 'true'
+      needs.check-secret.outputs.secrets == 'true' &&
+      needs.check-release-commit.outputs.is_release == 'false'
 
     steps:
       - uses: actions/checkout@v4
