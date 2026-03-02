@@ -69,7 +69,7 @@ jobs:
 
       - name: Determine deployment track
         run: |
-          if [[ "${{ github.event.workflow_run.head_branch }}" == refs/tags/v* ]]; then
+          if [[ "${{ github.event.workflow_run.head_branch }}" == v* ]]; then
             echo "DEPLOY_TRACK=production" >> $GITHUB_ENV
             echo "FASTLANE_LANE=deploy_production" >> $GITHUB_ENV
           else
