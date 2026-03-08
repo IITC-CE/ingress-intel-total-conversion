@@ -142,14 +142,14 @@
         // Backwards compatibility with 0.7.x factory (latlng, radius, options?)
         options = L.extend({}, legacyOptions, {radius: options});
       }
-      this._latlng = latlng.clone();
+      this._latlng = new L.LatLng(latlng.lat, latlng.lng);
       this._radius = options.radius; // note: https://github.com/Leaflet/Leaflet/issues/6656
       var points = this._calcPoints();
       L.Polygon.prototype.initialize.call(this, points, options);
     },
 
     setLatLng: function (latlng) {
-      this._latlng = latlng.clone();
+      this._latlng = new L.LatLng(latlng.lat, latlng.lng);
       var points = this._calcPoints();
       this.setLatLngs(points);
     },
