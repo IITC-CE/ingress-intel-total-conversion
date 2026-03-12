@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles data migrations between app versions
@@ -25,6 +28,7 @@ public class IITC_MigrationHelper {
      */
     public void performMigrations() {
         migrateToSafPlugins();
+        migrateFullscreenNavbarDefault();
     }
 
     /**
@@ -82,6 +86,27 @@ public class IITC_MigrationHelper {
                 showMigrationDialog(activity);
             }
         }
+    }
+
+    /**
+     * Adds FS_NAVBAR (16) to fullscreen defaults for users who never changed the setting
+     * Previously the default was {2, 4}; now it is {2, 4, 16}
+     */
+    private void migrateFullscreenNavbarDefault() {
+        if (prefs.getBoolean("fullscreen_navbar_migrated", false)) {
+            return;
+        }
+
+        Set<String> oldDefault = new HashSet<>(Arrays.asList("2", "4"));
+        Set<String> stored = prefs.getStringSet("pref_fullscreen", null);
+
+        if (stored != null && stored.equals(oldDefault)) {
+            Set<String> newValue = new HashSet<>(stored);
+            newValue.add("16");
+            prefs.edit().putStringSet("pref_fullscreen", newValue).apply();
+        }
+
+        prefs.edit().putBoolean("fullscreen_navbar_migrated", true).apply();
     }
 
     /**
