@@ -197,6 +197,8 @@ public class IITC_WebView extends WebView {
             attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
             mIitc.getNavigationHelper().showActionBar();
             loadUrl("javascript: $('#updatestatus').show();");
+            getHandler().removeCallbacks(mNavHider);
+            super.setSystemUiVisibility(SYSTEM_UI_FLAG_VISIBLE);
         }
         mIitc.getWindow().setAttributes(attrs);
         mIitc.invalidateOptionsMenu();

@@ -276,15 +276,15 @@ public class IITC_Mobile extends AppCompatActivity
             }
         }
 
-        // get fullscreen status from settings
-        mIitcWebView.updateFullscreenStatus();
-
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
 
         // Perform data migrations
         IITC_MigrationHelper migrationHelper = new IITC_MigrationHelper(this);
         migrationHelper.performMigrations();
+
+        // get fullscreen status from settings
+        mIitcWebView.updateFullscreenStatus();
 
         // Initialize PluginManager
         boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
@@ -394,7 +394,7 @@ public class IITC_Mobile extends AppCompatActivity
             return;
         } else if (key.equals("pref_fullscreen")) {
             mIitcWebView.updateFullscreenStatus();
-            mNavigationHelper.onPrefChanged();
+            if (mNavigationHelper != null) mNavigationHelper.onPrefChanged();
             return;
         } else if (key.equals("pref_android_menu_options")) {
             final String[] menuDefaults = getResources().getStringArray(R.array.pref_android_menu_default);

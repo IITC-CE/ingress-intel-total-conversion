@@ -15,6 +15,7 @@
     <string-array name="pref_hide_fullscreen_defaults">
         <item>2</item>
         <item>4</item>
+        <item>16</item>
     </string-array>
 
     <string-array name="pref_android_menu_titles">
