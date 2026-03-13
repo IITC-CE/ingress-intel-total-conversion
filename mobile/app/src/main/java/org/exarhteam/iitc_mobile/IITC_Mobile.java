@@ -44,6 +44,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
 import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;

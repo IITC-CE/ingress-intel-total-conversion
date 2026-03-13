@@ -2,6 +2,7 @@ package org.exarhteam.iitc_mobile;
 
 import android.app.Activity;
 import android.os.Build;
+import android.view.WindowManager;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
@@ -63,12 +64,16 @@ public class WindowInsetsHelper {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             return;
         }
-        
+
+        // Disable automatic keyboard adjustments so we can handle IME insets manually
+        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+
         android.view.View drawerLayout = activity.findViewById(R.id.drawer_layout);
         drawerLayout.post(() -> {
             ViewCompat.setOnApplyWindowInsetsListener(drawerLayout, (v, windowInsets) -> {
                 Insets systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
                 Insets displayCutoutInsets = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
+                Insets imeInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
                 // Combine system bars and display cutout insets to handle both system buttons and camera
                 int leftInset = Math.max(systemBarsInsets.left, displayCutoutInsets.left);
@@ -76,7 +81,7 @@ public class WindowInsetsHelper {
                 int topInset = Math.max(systemBarsInsets.top, displayCutoutInsets.top);
                 int bottomInset = Math.max(systemBarsInsets.bottom, displayCutoutInsets.bottom);
 
-                applyMainActivityInsets(activity, topInset, leftInset, rightInset, bottomInset);
+                applyMainActivityInsets(activity, topInset, leftInset, rightInset, bottomInset, imeInsets.bottom);
                 return windowInsets;
             });
 
@@ -120,7 +125,8 @@ public class WindowInsetsHelper {
      * Apply window insets to all views in the main activity
      */
     private static void applyMainActivityInsets(IITC_Mobile activity, int statusBarHeight,
-                                               int systemBarLeft, int systemBarRight, int systemBarBottom) {
+                                               int systemBarLeft, int systemBarRight, int systemBarBottom,
+                                               int imeBottom) {
         // Handle toolbar - add top padding for status bar height
         androidx.appcompat.widget.Toolbar toolbar = activity.findViewById(R.id.iitc_toolbar);
         if (toolbar != null) {
@@ -132,14 +138,14 @@ public class WindowInsetsHelper {
             );
         }
 
-        // Handle debug panel - add side and bottom padding for system bars
+        // Handle debug panel - add side and bottom padding for system bars or keyboard
         android.view.View debugPanel = activity.findViewById(R.id.viewDebug);
         if (debugPanel != null) {
             debugPanel.setPadding(
                 systemBarLeft,
                 debugPanel.getPaddingTop(),
                 systemBarRight,
-                systemBarBottom
+                Math.max(systemBarBottom, imeBottom)
             );
         }
 
