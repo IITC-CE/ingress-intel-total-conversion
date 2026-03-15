@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.42.1
+// @version        0.42.2
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -16,6 +16,10 @@ window.IITC = IITC;
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.42.2',
+    changes: ['Fix LatLng instantiation in artifacts'],
+  },
   {
     version: '0.42.1',
     changes: ['Fix drawn circles disappearing on refresh and failing to import'],
