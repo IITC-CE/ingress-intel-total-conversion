@@ -510,7 +510,7 @@ window.plugin.missions = {
     // Natural Alphanumeric Sort
     const collator = new Intl.Collator(undefined, {
       numeric: true,
-      sensitivity: 'base'
+      sensitivity: 'base',
     });
     missions.sort((a,b) => collator.compare(a.title,b.title));
 
