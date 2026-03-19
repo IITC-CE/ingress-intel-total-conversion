@@ -512,7 +512,7 @@ window.plugin.missions = {
       numeric: true,
       sensitivity: 'base',
     });
-    missions.sort((a,b) => collator.compare(a.title,b.title));
+    missions.sort((a, b) => collator.compare(a.title, b.title));
 
     missions.forEach(function (mission) {
       container.appendChild(this.renderMissionSummary(mission));
