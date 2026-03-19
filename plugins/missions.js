@@ -507,18 +507,12 @@ window.plugin.missions = {
   renderMissionList: function (missions) {
     var container = document.createElement('div');
 
-    // Sort by name
-    function compare(a, b) {
-      if (a.title < b.title) {
-        return -1;
-      }
-      if (a.title > b.title) {
-        return 1;
-      }
-      return 0;
-    }
-
-    missions.sort(compare);
+    // Natural Alphanumeric Sort
+    const collator = new Intl.Collator(undefined, {
+      numeric: true,
+      sensitivity: 'base'
+    });
+    missions.sort((a,b) => collator.compare(a.title,b.title));
 
     missions.forEach(function (mission) {
       container.appendChild(this.renderMissionSummary(mission));
