@@ -331,8 +331,17 @@ window.CHAT_REQUEST_SCROLL_TOP = 200;
  * Controls height of chat when chat is collapsed, in pixels, default 60
  * @type {number}
  * @memberof config_options
+ * @deprecated Use CSS value `--chat-shrinked`
  */
-window.CHAT_SHRINKED = 60;
+Object.defineProperty(window, 'CHAT_SHRINKED', {
+  get: function () {
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--chat-shrinked'), 10);
+  },
+  set: function (value) {
+    document.documentElement.style.setProperty('--chat-shrinked', value + 'px');
+  },
+  configurable: true,
+});
 
 /**
  * What colour should the selected portal be, string(css hex code), default ‘#f0f’ (hot pink)

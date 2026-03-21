@@ -36,8 +36,6 @@ window.setupStyles = function () {
         '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
         '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
         '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
-        '#chatcontrols { bottom: ' + (window.CHAT_SHRINKED + 22) + 'px; }',
-        '#chat { height: ' + window.CHAT_SHRINKED + 'px; } ',
       ].join('\n') +
       '</style>'
   );
