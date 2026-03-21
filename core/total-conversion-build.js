@@ -287,37 +287,6 @@ window.REFRESH_GAME_SCORE = 15 * 60;
  */
 window.MAX_IDLE_TIME = 15 * 60;
 
-/**
- * How much space to leave for scrollbars, in pixels, default 20.
- * @type {number}
- * @memberof config_options
- * @deprecated Use CSS value `--hidden-scrollbar-width` instead
- */
-Object.defineProperty(window, 'HIDDEN_SCROLLBAR_ASSUMED_WIDTH', {
-  get: function () {
-    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hidden-scrollbar-width'), 10);
-  },
-  set: function (value) {
-    document.documentElement.style.setProperty('--hidden-scrollbar-width', value + 'px');
-  },
-  configurable: true,
-});
-
-/**
- * How wide should the sidebar be, in pixels, default 300.
- * @type {number}
- * @memberof config_options
- * @deprecated Use CSS value `--sidebar-width`
- */
-Object.defineProperty(window, 'SIDEBAR_WIDTH', {
-  get: function () {
-    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width'), 10);
-  },
-  set: function (value) {
-    document.documentElement.style.setProperty('--sidebar-width', value + 'px');
-  },
-  configurable: true,
-});
 
 /**
  * Controls requesting chat data based on the pixel distance from the line currently in view
@@ -327,21 +296,6 @@ Object.defineProperty(window, 'SIDEBAR_WIDTH', {
  */
 window.CHAT_REQUEST_SCROLL_TOP = 200;
 
-/**
- * Controls height of chat when chat is collapsed, in pixels, default 60
- * @type {number}
- * @memberof config_options
- * @deprecated Use CSS value `--chat-shrinked`
- */
-Object.defineProperty(window, 'CHAT_SHRINKED', {
-  get: function () {
-    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--chat-shrinked'), 10);
-  },
-  set: function (value) {
-    document.documentElement.style.setProperty('--chat-shrinked', value + 'px');
-  },
-  configurable: true,
-});
 
 /**
  * What colour should the selected portal be, string(css hex code), default ‘#f0f’ (hot pink)

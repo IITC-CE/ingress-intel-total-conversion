@@ -211,3 +211,51 @@ window.renderUpdateStatus = function () {
 window.smartphoneInfo = function (selectedPortalData) {
   return IITC.statusbar.portal.update(selectedPortalData);
 };
+
+/**
+ * How much space to leave for scrollbars, in pixels, default 20.
+ * @type {number}
+ * @memberof config_options
+ * @deprecated Use CSS variable `--hidden-scrollbar-width` instead
+ */
+Object.defineProperty(window, 'HIDDEN_SCROLLBAR_ASSUMED_WIDTH', {
+  get: function () {
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hidden-scrollbar-width'), 10);
+  },
+  set: function (value) {
+    document.documentElement.style.setProperty('--hidden-scrollbar-width', value + 'px');
+  },
+  configurable: true,
+});
+
+/**
+ * How wide should the sidebar be, in pixels, default 300.
+ * @type {number}
+ * @memberof config_options
+ * @deprecated Use CSS variable `--sidebar-width` instead
+ */
+Object.defineProperty(window, 'SIDEBAR_WIDTH', {
+  get: function () {
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width'), 10);
+  },
+  set: function (value) {
+    document.documentElement.style.setProperty('--sidebar-width', value + 'px');
+  },
+  configurable: true,
+});
+
+/**
+ * Controls height of chat when chat is collapsed, in pixels, default 60.
+ * @type {number}
+ * @memberof config_options
+ * @deprecated Use CSS variable `--chat-shrinked` instead
+ */
+Object.defineProperty(window, 'CHAT_SHRINKED', {
+  get: function () {
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--chat-shrinked'), 10);
+  },
+  set: function (value) {
+    document.documentElement.style.setProperty('--chat-shrinked', value + 'px');
+  },
+  configurable: true,
+});
