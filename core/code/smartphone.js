@@ -86,7 +86,7 @@ window.runOnSmartphonesBeforeBoot = function () {
   $('#chatcontrols').append(window.smartphone.mapButton).append(window.smartphone.sideButton);
 
   if (!window.useAppPanes()) {
-    document.body.classList.add('show_controls');
+    document.body.classList.add('show-controls');
   }
 
   window.addHook('portalDetailsUpdated', function () {
