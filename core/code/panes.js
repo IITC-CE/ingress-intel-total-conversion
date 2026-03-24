@@ -1,3 +1,5 @@
+/* global IITC */
+
 /**
  * @file Manages the display of different panes of the IITC interface.
  * @module panes
@@ -45,7 +47,8 @@ window.show = function (id) {
  * @function hideall
  */
 window.hideall = function () {
-  $('#chatcontrols, #chat, #chatinput, #sidebartoggle, #scrollwrapper, #updatestatus, #portal_highlight_select').hide();
+  $('#chatcontrols, #chat, #chatinput, #sidebartoggle, #scrollwrapper, #portal_highlight_select').hide();
+  IITC.statusbar.hide();
   $('#farm_level_select').hide();
   $('#map').css({ visibility: 'hidden', opacity: '0' });
   $('.ui-tooltip').remove();

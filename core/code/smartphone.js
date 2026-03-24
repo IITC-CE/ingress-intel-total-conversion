@@ -1,4 +1,4 @@
-/* global log -- eslint */
+/* global IITC, log -- eslint */
 
 /**
  * @file This file provides functions and utilities specifically for the smartphone layout of IITC.
@@ -70,7 +70,7 @@ window.runOnSmartphonesBeforeBoot = function () {
   window.smartphone.mapButton = $('<a>map</a>').click(function () {
     window.show('map');
     $('#map').css({ visibility: 'visible', opacity: '1' });
-    $('#updatestatus').show();
+    IITC.statusbar.show();
     $('#chatcontrols a.active').removeClass('active');
     $("#chatcontrols a:contains('map')").addClass('active');
   });

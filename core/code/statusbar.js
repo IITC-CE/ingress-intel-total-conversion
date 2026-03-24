@@ -43,6 +43,69 @@ IITC.statusbar.renderTemplate = (template, replacements) => {
   return result;
 };
 
+// Visibility state
+IITC.statusbar._htmlEnabled = true; // whether HTML element has content to display
+IITC.statusbar._paneVisible = true; // whether current pane wants statusbar visible
+
+/**
+ * Updates the actual visibility of the statusbar element.
+ * Visible only when both HTML is enabled and current pane wants it shown.
+ *
+ * @function IITC.statusbar._updateVisibility
+ * @private
+ */
+IITC.statusbar._updateVisibility = function () {
+  const el = document.getElementById('updatestatus');
+  if (!el) return;
+  el.style.display = this._htmlEnabled && this._paneVisible ? '' : 'none';
+};
+
+/**
+ * Enables the HTML statusbar element on the page.
+ * Plugins can call this to display custom content in the statusbar
+ * even when the app handles default status information.
+ *
+ * @function IITC.statusbar.enableHtml
+ */
+IITC.statusbar.enableHtml = function () {
+  this._htmlEnabled = true;
+  this._updateVisibility();
+};
+
+/**
+ * Disables the HTML statusbar element on the page.
+ * Called automatically when the app handles all status information via native APIs.
+ * The statusbar module continues to work (sending data to app), only the HTML block is hidden.
+ *
+ * @function IITC.statusbar.disableHtml
+ */
+IITC.statusbar.disableHtml = function () {
+  this._htmlEnabled = false;
+  this._updateVisibility();
+};
+
+/**
+ * Shows the statusbar (pane-level visibility).
+ * Called by pane-switching code when the map view is active.
+ *
+ * @function IITC.statusbar.show
+ */
+IITC.statusbar.show = function () {
+  this._paneVisible = true;
+  this._updateVisibility();
+};
+
+/**
+ * Hides the statusbar (pane-level visibility).
+ * Called by pane-switching code when switching away from the map view.
+ *
+ * @function IITC.statusbar.hide
+ */
+IITC.statusbar.hide = function () {
+  this._paneVisible = false;
+  this._updateVisibility();
+};
+
 /**
  * Templates for map status HTML elements
  * @type {Object.<string, string>}
@@ -121,6 +184,11 @@ IITC.statusbar.init = function () {
     if (innerstatus) {
       innerstatus.style.display = 'none';
     }
+  }
+
+  // Disable HTML statusbar when app handles all status information
+  if (!this.showHtmlPortalInfo && !this.showHtmlMapInfo) {
+    this.disableHtml();
   }
 
   // Set up portal selection hook - initial update with basic data

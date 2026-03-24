@@ -344,9 +344,9 @@ chat.toggle = function () {
  */
 chat.show = function (name) {
   if (window.isSmartphone()) {
-    $('#updatestatus').hide();
+    IITC.statusbar.hide();
   } else {
-    $('#updatestatus').show();
+    IITC.statusbar.show();
   }
   $('#chat, #chatinput').show();
 
