@@ -131,6 +131,13 @@
                 android:key="pref_update_plugins"
                 android:title="@string/pref_update_plugins_cat">
                 <ListPreference
+                    android:defaultValue="1"
+                    android:entries="@array/pref_update_plugins_interval_titles"
+                    android:entryValues="@array/pref_update_plugins_interval_values"
+                    android:key="pref_channel_update_interval"
+                    android:title="@string/pref_channel_update_interval"
+                    android:summary="@string/pref_channel_update_interval_sum"/>
+                <ListPreference
                     android:defaultValue="7"
                     android:entries="@array/pref_update_plugins_interval_titles"
                     android:entryValues="@array/pref_update_plugins_interval_values"

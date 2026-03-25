@@ -338,36 +338,46 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         // Background sync for remote channel
-        if (mChannelManager.getCurrentChannel().isRemote()
-                && mSharedPrefs.getBoolean("pref_check_for_updates", true)) {
-            new Thread(() -> {
-                if (mChannelManager.checkForUpdates()) {
-                    Log.d("Channel update available, syncing...");
-                    mChannelManager.syncChannel(new org.exarhteam.iitc_mobile.channel.ChannelDownloader.Callback() {
-                        @Override
-                        public void onProgress(int current, int total) {}
+        if (mChannelManager.getCurrentChannel().isRemote()) {
+            int channelInterval = Integer.parseInt(mSharedPrefs.getString("pref_channel_update_interval", "1"));
+            if (channelInterval > 0) {
+                long lastSync = mSharedPrefs.getLong("pref_last_channel_sync", 0);
+                long now = System.currentTimeMillis();
+                long intervalMs = 1000L * 60 * 60 * 24 * channelInterval;
+                if (now - lastSync >= intervalMs) {
+                    new Thread(() -> {
+                        if (mChannelManager.checkForUpdates()) {
+                            Log.d("Channel update available, syncing...");
+                            mChannelManager.syncChannel(new org.exarhteam.iitc_mobile.channel.ChannelDownloader.Callback() {
+                                @Override
+                                public void onProgress(int current, int total) {}
 
-                        @Override
-                        public void onComplete() {
-                            Log.d("Channel sync complete");
-                            runOnUiThread(() -> {
-                                boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
-                                IITC_PluginManager.getInstance().loadAllPlugins(
-                                        mFileManager.getStorageManager(),
-                                        getAssets(),
-                                        devMode,
-                                        mChannelManager
-                                );
+                                @Override
+                                public void onComplete() {
+                                    Log.d("Channel sync complete");
+                                    mSharedPrefs.edit()
+                                            .putLong("pref_last_channel_sync", System.currentTimeMillis())
+                                            .apply();
+                                    runOnUiThread(() -> {
+                                        boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+                                        IITC_PluginManager.getInstance().loadAllPlugins(
+                                                mFileManager.getStorageManager(),
+                                                getAssets(),
+                                                devMode,
+                                                mChannelManager
+                                        );
+                                    });
+                                }
+
+                                @Override
+                                public void onError(String message) {
+                                    Log.w("Channel sync failed: " + message);
+                                }
                             });
                         }
-
-                        @Override
-                        public void onError(String message) {
-                            Log.w("Channel sync failed: " + message);
-                        }
-                    });
+                    }).start();
                 }
-            }).start();
+            }
         }
 
         // receive downloadManagers downloadComplete intent

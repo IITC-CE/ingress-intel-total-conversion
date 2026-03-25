@@ -113,10 +113,10 @@
     <string name="pref_android_menu">Configure IITCm menu</string>
     <string name="pref_android_menu_sum">Toggle visibility of IITCm menu entries</string>
     <string name="pref_update_plugins_cat">User plugin updates</string>
-    <string name="pref_update_plugins_interval">Configure plugin update interval</string>
-    <string name="pref_update_plugins_interval_sum">How often IITCm should search for new plugin versions</string>
-    <string name="pref_force_plugin_update">Force plugin update</string>
-    <string name="pref_force_plugin_update_sum">Update all enabled user plugins</string>
+    <string name="pref_update_plugins_interval">Third-party plugin update interval</string>
+    <string name="pref_update_plugins_interval_sum">How often to check for new versions of user-installed plugins</string>
+    <string name="pref_force_plugin_update">Force third-party plugin update</string>
+    <string name="pref_force_plugin_update_sum">Update all enabled user-installed plugins</string>
     <string name="pref_secure_updates">Require secure updates</string>
     <string name="pref_secure_updates_sum">If enabled, only https updates are handled</string>
     <string name="pref_hide_fullscreen_notification_bar">System Notification Bar</string>
@@ -300,6 +300,8 @@
     <string name="channel_downloading">Downloading scripts…</string>
     <string name="channel_download_failed">Failed to download channel data</string>
     <string name="channel_download_complete">Channel updated successfully</string>
+    <string name="pref_channel_update_interval">Channel update interval</string>
+    <string name="pref_channel_update_interval_sum">How often to check for new IITC scripts in the selected channel</string>
     <!-- Storage Access Framework -->
     <string name="plugins_folder_access_title">Select IITC_Mobile folder</string>
     <string name="plugins_folder_access_message">To install custom plugins, IITC Mobile needs access to a folder where plugins will be stored. Please select the IITC_Mobile folder or create a new one.</string>
