@@ -337,6 +337,39 @@ public class IITC_Mobile extends AppCompatActivity
             updateChecker.checkForUpdates();
         }
 
+        // Background sync for remote channel
+        if (mChannelManager.getCurrentChannel().isRemote()
+                && mSharedPrefs.getBoolean("pref_check_for_updates", true)) {
+            new Thread(() -> {
+                if (mChannelManager.checkForUpdates()) {
+                    Log.d("Channel update available, syncing...");
+                    mChannelManager.syncChannel(new org.exarhteam.iitc_mobile.channel.ChannelDownloader.Callback() {
+                        @Override
+                        public void onProgress(int current, int total) {}
+
+                        @Override
+                        public void onComplete() {
+                            Log.d("Channel sync complete");
+                            runOnUiThread(() -> {
+                                boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+                                IITC_PluginManager.getInstance().loadAllPlugins(
+                                        mFileManager.getStorageManager(),
+                                        getAssets(),
+                                        devMode,
+                                        mChannelManager
+                                );
+                            });
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            Log.w("Channel sync failed: " + message);
+                        }
+                    });
+                }
+            }).start();
+        }
+
         // receive downloadManagers downloadComplete intent
         // afterwards install iitc update
         IntentFilter downloadFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);

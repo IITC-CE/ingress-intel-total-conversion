@@ -159,6 +159,10 @@ public class MainSettings extends PreferenceFragment {
 
                 @Override
                 public void onComplete() {
+                    android.preference.PreferenceManager.getDefaultSharedPreferences(getActivity())
+                            .edit()
+                            .putLong("pref_last_channel_sync", System.currentTimeMillis())
+                            .apply();
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
                             progress.dismiss();
