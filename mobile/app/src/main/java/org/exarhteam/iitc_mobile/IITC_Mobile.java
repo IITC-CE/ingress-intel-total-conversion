@@ -55,6 +55,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
+import org.exarhteam.iitc_mobile.channel.ChannelManager;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.exarhteam.iitc_mobile.prefs.PreferenceActivity;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
@@ -84,6 +85,7 @@ public class IITC_Mobile extends AppCompatActivity
     private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
     private SharedPreferences mSharedPrefs;
     private IITC_FileManager mFileManager;
+    private ChannelManager mChannelManager;
     private IITC_WebView mIitcWebView;
     private IITC_UserLocation mUserLocation;
     private IITC_NavigationHelper mNavigationHelper;
@@ -278,8 +280,11 @@ public class IITC_Mobile extends AppCompatActivity
             }
         }
 
+        mChannelManager = new ChannelManager(this);
+
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
+        mFileManager.setChannelManager(mChannelManager);
 
         // Perform data migrations
         IITC_MigrationHelper migrationHelper = new IITC_MigrationHelper(this);
@@ -293,7 +298,8 @@ public class IITC_Mobile extends AppCompatActivity
         IITC_PluginManager.getInstance().loadAllPlugins(
                 mFileManager.getStorageManager(),
                 getAssets(),
-                devMode
+                devMode,
+                mChannelManager
         );
 
         mUserLocation = new IITC_UserLocation(this);
@@ -420,7 +426,19 @@ public class IITC_Mobile extends AppCompatActivity
             IITC_PluginManager.getInstance().loadAllPlugins(
                     mFileManager.getStorageManager(),
                     getAssets(),
-                    devMode
+                    devMode,
+                    mChannelManager
+            );
+            mReloadNeeded = true;
+            return;
+        } else if (key.equals("pref_update_channel")) {
+            // Reload PluginManager when channel changes
+            boolean devMode = sharedPreferences.getBoolean("pref_dev_checkbox", false);
+            IITC_PluginManager.getInstance().loadAllPlugins(
+                    mFileManager.getStorageManager(),
+                    getAssets(),
+                    devMode,
+                    mChannelManager
             );
             mReloadNeeded = true;
             return;
@@ -1292,6 +1310,10 @@ public class IITC_Mobile extends AppCompatActivity
 
     public IITC_FileManager getFileManager() {
         return mFileManager;
+    }
+
+    public ChannelManager getChannelManager() {
+        return mChannelManager;
     }
 
     public SharedPreferences getPrefs() {
