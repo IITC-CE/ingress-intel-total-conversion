@@ -11,6 +11,16 @@
   #portal_highlight_select { display: none !important; }
 }
 
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  --safe-area-inset-left: env(safe-area-inset-left);
+  --safe-area-inset-right: env(safe-area-inset-right);
+  --sidebar-width: 300px; /* How wide should the sidebar be, in pixels */
+  --hidden-scrollbar-width: 20px; /* How much space to leave for scrollbars, in pixels */
+  --chat-shrinked: 60px; /* Height of chat when chat is collapsed, in pixels */
+}
+
 .text-overflow-ellipsis {
   display: inline-block;
   overflow: hidden;
@@ -60,10 +70,10 @@ i.large { font-size: 6rem; }
   overflow-x: hidden;
   overflow-y: auto;
   position: fixed;
-  right: -38px;
-  top: 0;
-  width: 340px;
-  bottom: 45px;
+  right: calc(-2 * var(--hidden-scrollbar-width) + 2px + var(--safe-area-inset-right));
+  top: var(--safe-area-inset-top);
+  width: calc(var(--sidebar-width) + 2 * var(--hidden-scrollbar-width));
+  bottom: calc(var(--safe-area-inset-bottom) + 45px);
   z-index: 3001;
   pointer-events: none;
 }
@@ -75,6 +85,7 @@ i.large { font-size: 6rem; }
   position: relative;
   left: 0;
   top: 0;
+  width: calc(var(--sidebar-width) + var(--hidden-scrollbar-width) + 1px);
   max-height: 100%;
   overflow-y:scroll;
   overflow-x:hidden;
@@ -87,7 +98,7 @@ i.large { font-size: 6rem; }
   margin-top: -31px; /* -(toggle height / 2) */
   line-height: 10px;
   position: absolute;
-  top: 108px;
+  top: calc(var(--safe-area-inset-top) + 108px);
   z-index: 3002;
   background-color: rgba(8, 48, 78, 0.9);
   color: #FFCE00;
@@ -95,7 +106,10 @@ i.large { font-size: 6rem; }
   border-right: none;
   border-radius: 5px 0 0 5px;
   text-decoration: none;
-  right: -50px; /* overwritten later by the script with SIDEBAR_WIDTH */
+  right: var(--safe-area-inset-right);
+}
+body.sidebar-open #sidebartoggle {
+  right: calc(var(--sidebar-width) + 1px + var(--safe-area-inset-right));
 }
 
 .enl {
@@ -129,7 +143,7 @@ a:hover {
 }
 
 .leaflet-control {
-  user-select: none; 
+  user-select: none;
 }
 
 .leaflet-control-container .leaflet-top.leaflet-left {
@@ -195,15 +209,22 @@ a:hover {
 
 .leaflet-top {
   top: 10px;
+  margin-top: var(--safe-area-inset-top);
 }
 .leaflet-right {
   right: 10px;
+  margin-right: var(--safe-area-inset-right);
+}
+body.sidebar-open .leaflet-right {
+  margin-right: calc(var(--sidebar-width) + 1px + var(--safe-area-inset-right));
 }
 .leaflet-bottom {
   bottom: 10px;
+  margin-bottom: calc(22px + var(--safe-area-inset-bottom));
 }
 .leaflet-left {
   left: 10px;
+  margin-left: var(--safe-area-inset-left);
 }
 
 .help {
@@ -233,14 +254,15 @@ a:hover {
   color: #FFCE00;
   background: rgba(8, 48, 78, 0.9);
   position: absolute;
-  left: 0;
+  bottom: calc(var(--chat-shrinked) + var(--safe-area-inset-bottom) + 22px);
+  left: var(--safe-area-inset-left);
   z-index: 3000;
   height: 26px;
   padding-left:1px;
 }
 
 #chatcontrols.expand {
-  top: 0;
+  top: var(--safe-area-inset-top);
   bottom: auto;
 }
 
@@ -314,7 +336,10 @@ a:hover {
 #chat {
   position: absolute;
   width: 708px;
-  bottom: 23px;
+  max-width: 100vw;
+  height: var(--chat-shrinked);
+  bottom: calc(var(--safe-area-inset-bottom) + 23px);
+  padding-left: var(--safe-area-inset-left);
   left: 0;
   z-index: 3000;
   background: rgba(8, 48, 78, 0.9);
@@ -322,8 +347,6 @@ a:hover {
   color: #eee;
   border: 1px solid #20A8B1;
   border-bottom: 0;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -334,7 +357,7 @@ em {
 
 #chat.expand {
   height:auto;
-  top: 25px;
+  top: calc(var(--safe-area-inset-top) + 25px);
 }
 
 
@@ -451,12 +474,13 @@ mark {
   padding: 0 2px;
   background: rgba(8, 48, 78, 0.9);
   width: 708px;
-  height: 23px;
+  max-width: 100vw;
+  height: calc(var(--safe-area-inset-bottom) + 23px);
   border: 1px solid #20A8B1;
   z-index: 3001;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
 }
 
 #chatinput td {
@@ -485,6 +509,7 @@ mark {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  width: calc(var(--sidebar-width) + 1px);
 }
 
 
@@ -963,6 +988,7 @@ h3.title {
 
 /* update status */
 #updatestatus {
+  width: var(--sidebar-width);
   background-color: rgba(8, 48, 78, 0.9);
   border-bottom: 0;
   border-top: 1px solid #20A8B1;
@@ -971,11 +997,10 @@ h3.title {
   color: #ffce00;
   font-size:13px;
   padding: 4px;
+  padding-bottom: var(--safe-area-inset-bottom);
   position: fixed;
-  right: 0;
+  right: var(--safe-area-inset-right);
   z-index: 3002;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 

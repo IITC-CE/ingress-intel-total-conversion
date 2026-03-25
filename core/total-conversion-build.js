@@ -287,19 +287,6 @@ window.REFRESH_GAME_SCORE = 15 * 60;
  */
 window.MAX_IDLE_TIME = 15 * 60;
 
-/**
- * How much space to leave for scrollbars, in pixels, default 20.
- * @type {number}
- * @memberof config_options
- */
-window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH = 20;
-
-/**
- * How wide should the sidebar be, in pixels, default 300.
- * @type {number}
- * @memberof config_options
- */
-window.SIDEBAR_WIDTH = 300;
 
 /**
  * Controls requesting chat data based on the pixel distance from the line currently in view
@@ -309,12 +296,6 @@ window.SIDEBAR_WIDTH = 300;
  */
 window.CHAT_REQUEST_SCROLL_TOP = 200;
 
-/**
- * Controls height of chat when chat is collapsed, in pixels, default 60
- * @type {number}
- * @memberof config_options
- */
-window.CHAT_SHRINKED = 60;
 
 /**
  * What colour should the selected portal be, string(css hex code), default ‘#f0f’ (hot pink)

@@ -36,16 +36,6 @@ window.setupStyles = function () {
         '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
         '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
         '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
-        '#chatcontrols { bottom: ' + (window.CHAT_SHRINKED + 22) + 'px; }',
-        '#chat { height: ' + window.CHAT_SHRINKED + 'px; } ',
-        '.leaflet-right { margin-right: ' + (window.SIDEBAR_WIDTH + 1) + 'px } ',
-        '#updatestatus { width:' + (window.SIDEBAR_WIDTH + 2) + 'px;  } ',
-        '#sidebar { width:' + (window.SIDEBAR_WIDTH + window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1) /* border*/ + 'px;  } ',
-        '#sidebartoggle { right:' + (window.SIDEBAR_WIDTH + 1) + 'px;  } ',
-        `#scrollwrapper  { width:${window.SIDEBAR_WIDTH + 2 * window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH}px; right:-${
-          2 * window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH - 2
-        }px } `,
-        '#sidebar > * { width:' + (window.SIDEBAR_WIDTH + 1) + 'px;  }',
       ].join('\n') +
       '</style>'
   );
@@ -129,20 +119,19 @@ window.setupPlayerStat = function () {
  * @function setupSidebarToggle
  */
 function setupSidebarToggle() {
+  $('body').addClass('sidebar-open');
   $('#sidebartoggle').on('click', function () {
     var toggle = $('#sidebartoggle');
     var sidebar = $('#scrollwrapper');
     if (sidebar.is(':visible')) {
       sidebar.hide();
-      $('.leaflet-right').css('margin-right', '0');
+      $('body').removeClass('sidebar-open');
       toggle.html('<span class="toggle open"></span>');
-      toggle.css('right', '0');
     } else {
       sidebar.show();
       window.resetScrollOnNewPortal();
-      $('.leaflet-right').css('margin-right', window.SIDEBAR_WIDTH + 1 + 'px');
+      $('body').addClass('sidebar-open');
       toggle.html('<span class="toggle close"></span>');
-      toggle.css('right', window.SIDEBAR_WIDTH + 1 + 'px');
     }
     $('.ui-tooltip').remove();
   });
