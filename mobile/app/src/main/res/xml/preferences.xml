@@ -53,6 +53,13 @@
     <PreferenceCategory
         android:key="pref_tweaks_cat"
         android:title="@string/pref_tweaks_cat">
+        <ListPreference
+            android:key="pref_update_channel"
+            android:title="@string/pref_update_channel"
+            android:summary="%s"
+            android:entries="@array/pref_update_channel_titles"
+            android:entryValues="@array/pref_update_channel_values"
+            android:defaultValue="builtin" />
         <PreferenceScreen
             android:fragment="org.exarhteam.iitc_mobile.fragments.PluginsFragment"
             android:key="pref_plugins"

@@ -288,6 +288,18 @@
     </string>
     <string name="pref_check_for_updates">Update check</string>
     <string name="pref_check_for_updates_summary">Check for updates on startup</string>
+    <!-- Update channel -->
+    <string name="pref_update_channel">Update channel</string>
+    <string name="pref_update_channel_sum">Source for IITC scripts</string>
+    <string name="pref_custom_channel_url">Custom channel URL</string>
+    <string name="pref_custom_channel_url_sum">Base URL for custom channel scripts</string>
+    <string name="channel_builtin">Built-in</string>
+    <string name="channel_release">Release</string>
+    <string name="channel_beta">Beta</string>
+    <string name="channel_custom">Custom</string>
+    <string name="channel_downloading">Downloading scripts…</string>
+    <string name="channel_download_failed">Failed to download channel data</string>
+    <string name="channel_download_complete">Channel updated successfully</string>
     <!-- Storage Access Framework -->
     <string name="plugins_folder_access_title">Select IITC_Mobile folder</string>
     <string name="plugins_folder_access_message">To install custom plugins, IITC Mobile needs access to a folder where plugins will be stored. Please select the IITC_Mobile folder or create a new one.</string>

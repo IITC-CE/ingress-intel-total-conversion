@@ -118,6 +118,19 @@
         <item>th</item>
     </string-array>
 
+    <string-array name="pref_update_channel_titles">
+        <item>@string/channel_builtin</item>
+        <item>@string/channel_release</item>
+        <item>@string/channel_beta</item>
+        <item>@string/channel_custom</item>
+    </string-array>
+    <string-array name="pref_update_channel_values">
+        <item>builtin</item>
+        <item>release</item>
+        <item>beta</item>
+        <item>custom</item>
+    </string-array>
+
     <string-array name="pref_webview_zoom">
         <item>@string/pref_webview_zoom_defaultValue</item>
         <item>200%</item>

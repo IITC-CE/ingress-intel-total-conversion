@@ -1,20 +1,28 @@
 package org.exarhteam.iitc_mobile.fragments;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.*;
+import android.text.InputType;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import org.exarhteam.iitc_mobile.BuildConfig;
 import org.exarhteam.iitc_mobile.IntroActivity;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.WindowInsetsHelper;
+import org.exarhteam.iitc_mobile.channel.Channel;
+import org.exarhteam.iitc_mobile.channel.ChannelDownloader;
+import org.exarhteam.iitc_mobile.channel.ChannelManager;
 import org.exarhteam.iitc_mobile.prefs.AboutDialogPreference;
 import org.exarhteam.iitc_mobile.prefs.DeepLinkPermissionPreference;
 import org.exarhteam.iitc_mobile.prefs.ShareDebugInfoPreference;
@@ -78,7 +86,102 @@ public class MainSettings extends PreferenceFragment {
             PreferenceCategory mCategory = (PreferenceCategory) findPreference("pref_mics");
             mCategory.removePreference(updateCheckPref);
         }
+
+        // Update channel preference
+        final ListPreference pref_channel = (ListPreference) findPreference("pref_update_channel");
+        if (pref_channel != null) {
+            pref_channel.setOnPreferenceChangeListener((preference, newValue) -> {
+                String channelKey = (String) newValue;
+                Channel channel = Channel.fromKey(channelKey);
+
+                if (channel == Channel.CUSTOM) {
+                    showCustomChannelUrlDialog(() -> syncChannel());
+                    return true;
+                }
+
+                if (channel.isRemote()) {
+                    syncChannel();
+                }
+                return true;
+            });
+        }
     }
+
+    private void showCustomChannelUrlDialog(Runnable onConfirm) {
+        ChannelManager channelManager = ChannelManager.getInstance();
+        if (channelManager == null || getActivity() == null) return;
+
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        input.setText(channelManager.getCustomChannelUrl());
+        input.setHint("https://");
+
+        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.pref_custom_channel_url)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (d, which) -> {
+                    String url = input.getText().toString().trim();
+                    channelManager.setCustomChannelUrl(url);
+                    if (onConfirm != null) onConfirm.run();
+                })
+                .setNeutralButton("PR", null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
+            input.setText("https://iitc.app/build/artifact/PR");
+            input.setSelection(input.getText().length());
+            input.requestFocus();
+        });
+    }
+
+    private void syncChannel() {
+        ChannelManager channelManager = ChannelManager.getInstance();
+        if (channelManager == null || getActivity() == null) return;
+
+        final ProgressDialog progress = new ProgressDialog(getActivity());
+        progress.setMessage(getString(R.string.channel_downloading));
+        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progress.setCancelable(false);
+        progress.show();
+
+        new Thread(() -> {
+            channelManager.syncChannel(new ChannelDownloader.Callback() {
+                @Override
+                public void onProgress(int current, int total) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            progress.setMax(total);
+                            progress.setProgress(current);
+                        });
+                    }
+                }
+
+                @Override
+                public void onComplete() {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            progress.dismiss();
+                            Toast.makeText(getActivity(), R.string.channel_download_complete,
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            progress.dismiss();
+                            Toast.makeText(getActivity(), R.string.channel_download_failed,
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        }).start();
+    }
+
 
     @Override
     public void onResume() {
