@@ -144,6 +144,10 @@
                     android:key="pref_update_plugins_interval"
                     android:title="@string/pref_update_plugins_interval"
                     android:summary="@string/pref_update_plugins_interval_sum"/>
+                <Preference
+                    android:key="pref_force_channel_update"
+                    android:title="@string/pref_force_channel_update"
+                    android:summary="@string/pref_force_channel_update_sum"/>
                 <org.exarhteam.iitc_mobile.prefs.ForceUpdatePreference
                     android:key="pref_force_plugin_update"
                     android:title="@string/pref_force_plugin_update"

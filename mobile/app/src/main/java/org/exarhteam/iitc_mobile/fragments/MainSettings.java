@@ -105,6 +105,20 @@ public class MainSettings extends PreferenceFragment {
                 return true;
             });
         }
+
+        // Force channel update button
+        Preference pref_force_channel = findPreference("pref_force_channel_update");
+        if (pref_force_channel != null) {
+            pref_force_channel.setOnPreferenceClickListener(preference -> {
+                ChannelManager channelManager = ChannelManager.getInstance();
+                if (channelManager != null && channelManager.getCurrentChannel().isRemote()) {
+                    syncChannel();
+                } else {
+                    Toast.makeText(getActivity(), R.string.channel_builtin, Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            });
+        }
     }
 
     private void showCustomChannelUrlDialog(Runnable onConfirm) {
