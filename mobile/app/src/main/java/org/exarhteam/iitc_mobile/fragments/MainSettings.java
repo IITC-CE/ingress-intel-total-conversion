@@ -9,9 +9,6 @@ import android.os.Bundle;
 import android.preference.*;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import org.exarhteam.iitc_mobile.BuildConfig;
 import org.exarhteam.iitc_mobile.IntroActivity;
@@ -86,7 +83,7 @@ public class MainSettings extends PreferenceFragment {
     @Override
     public void onResume() {
         super.onResume();
-        
+
         // Notify deep link preference about activity resume
         DeepLinkPermissionPreference deepLinkPref =
             (DeepLinkPermissionPreference) findPreference("pref_deep_link_permission");
@@ -121,33 +118,30 @@ public class MainSettings extends PreferenceFragment {
             // Setup window insets for the dialog
             WindowInsetsHelper.setupDialogInsets(dialog);
 
-            final View homeBtn = dialog.findViewById(android.R.id.home);
-
-            if (homeBtn != null) {
-                final View.OnClickListener dismissDialogClickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        dialog.dismiss();
-                    }
-                };
-
-                final ViewParent homeBtnContainer = homeBtn.getParent();
-
-                // The home button is an ImageView inside a FrameLayout
-                if (homeBtnContainer instanceof FrameLayout) {
-                    final ViewGroup containerParent = (ViewGroup) homeBtnContainer.getParent();
-
-                    if (containerParent instanceof LinearLayout) {
-                        // This view also contains the title text, set the whole view as clickable
-                        ((LinearLayout) containerParent).setOnClickListener(dismissDialogClickListener);
-                    } else {
-                        // Just set it on the home button
-                        ((FrameLayout) homeBtnContainer).setOnClickListener(dismissDialogClickListener);
-                    }
-                } else {
-                    homeBtn.setOnClickListener(dismissDialogClickListener);
+            // PreferenceScreen opens as a Dialog whose action bar uses a Toolbar.
+            // Toolbar handles navigation clicks via setNavigationOnClickListener.
+            // Find the Toolbar after layout and attach a dismiss listener.
+            dialog.getWindow().getDecorView().post(() -> {
+                android.widget.Toolbar toolbar = findToolbar(
+                        (ViewGroup) dialog.getWindow().getDecorView());
+                if (toolbar != null) {
+                    toolbar.setNavigationOnClickListener(v -> dialog.dismiss());
                 }
+            });
+        }
+    }
+
+    private static android.widget.Toolbar findToolbar(ViewGroup group) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child instanceof android.widget.Toolbar) {
+                return (android.widget.Toolbar) child;
+            }
+            if (child instanceof ViewGroup) {
+                android.widget.Toolbar toolbar = findToolbar((ViewGroup) child);
+                if (toolbar != null) return toolbar;
             }
         }
+        return null;
     }
 }
