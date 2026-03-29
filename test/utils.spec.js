@@ -468,6 +468,36 @@ describe('IITC.utils.escapeHtml', () => {
     const result = IITC.utils.escapeHtml('<strong>Strong</strong> and <div>unsafe</div>', ['strong']);
     expect(result).to.equal('<strong>Strong</strong> and &lt;div&gt;unsafe&lt;/div&gt;');
   });
+
+  it('should preserve allowed tags with class attribute', () => {
+    const result = IITC.utils.escapeHtml('<span class="nickname">player</span>', ['span']);
+    expect(result).to.equal('<span class="nickname">player</span>');
+  });
+
+  it('should preserve allowed tags with multiple classes', () => {
+    const result = IITC.utils.escapeHtml('<mark class="nickname help">text</mark>', ['mark']);
+    expect(result).to.equal('<mark class="nickname help">text</mark>');
+  });
+
+  it('should escape non-allowed tags even with class attribute', () => {
+    const result = IITC.utils.escapeHtml('<div class="evil">text</div>', ['span']);
+    expect(result).to.equal('&lt;div class=&quot;evil&quot;&gt;text&lt;/div&gt;');
+  });
+
+  it('should escape style attribute on allowed tags', () => {
+    const result = IITC.utils.escapeHtml('<span style="color:red">text</span>', ['span']);
+    expect(result).to.equal('&lt;span style=&quot;color:red&quot;&gt;text</span>');
+  });
+
+  it('should escape event handler attributes on allowed tags', () => {
+    const result = IITC.utils.escapeHtml('<span onclick="alert(1)">text</span>', ['span']);
+    expect(result).to.equal('&lt;span onclick=&quot;alert(1)&quot;&gt;text</span>');
+  });
+
+  it('should preserve allowed tag without attributes alongside one with class', () => {
+    const result = IITC.utils.escapeHtml('<b>bold</b> <span class="nick">player</span>', ['b', 'span']);
+    expect(result).to.equal('<b>bold</b> <span class="nick">player</span>');
+  });
 });
 
 describe('IITC.utils.prettyEnergy', () => {
