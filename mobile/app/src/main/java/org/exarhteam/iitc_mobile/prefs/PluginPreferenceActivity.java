@@ -115,7 +115,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
         // Check if folder access state has changed since last check
         boolean currentFolderAccess = mFileManager.getStorageManager().hasPluginsFolderAccess();
-        
+
         if (!mFolderAccessStateInitialized) {
             // First time - store the state
             mLastFolderAccessState = currentFolderAccess;
@@ -150,6 +150,12 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     .remove("pending_plugin_install").apply();
             mFileManager.installPlugin(Uri.parse(pendingUri), true);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        getActionBar().setTitle(R.string.activity_plugins);
     }
 
     @Override
