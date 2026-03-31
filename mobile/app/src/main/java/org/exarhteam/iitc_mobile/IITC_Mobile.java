@@ -55,6 +55,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
+import org.exarhteam.iitc_mobile.channel.ChannelManager;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.exarhteam.iitc_mobile.prefs.PreferenceActivity;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
@@ -84,6 +85,7 @@ public class IITC_Mobile extends AppCompatActivity
     private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
     private SharedPreferences mSharedPrefs;
     private IITC_FileManager mFileManager;
+    private ChannelManager mChannelManager;
     private IITC_WebView mIitcWebView;
     private IITC_UserLocation mUserLocation;
     private IITC_NavigationHelper mNavigationHelper;
@@ -278,8 +280,11 @@ public class IITC_Mobile extends AppCompatActivity
             }
         }
 
+        mChannelManager = new ChannelManager(this);
+
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
+        mFileManager.setChannelManager(mChannelManager);
 
         // Perform data migrations
         IITC_MigrationHelper migrationHelper = new IITC_MigrationHelper(this);
@@ -293,7 +298,8 @@ public class IITC_Mobile extends AppCompatActivity
         IITC_PluginManager.getInstance().loadAllPlugins(
                 mFileManager.getStorageManager(),
                 getAssets(),
-                devMode
+                devMode,
+                mChannelManager
         );
 
         mUserLocation = new IITC_UserLocation(this);
@@ -329,6 +335,49 @@ public class IITC_Mobile extends AppCompatActivity
             int currentVersionCode = BuildConfig.VERSION_CODE;
             UpdateChecker updateChecker = new UpdateChecker(this, buildType, currentVersionCode);
             updateChecker.checkForUpdates();
+        }
+
+        // Background sync for remote channel
+        if (mChannelManager.getCurrentChannel().isRemote()) {
+            int channelInterval = Integer.parseInt(mSharedPrefs.getString("pref_channel_update_interval", "1"));
+            if (channelInterval > 0) {
+                long lastSync = mSharedPrefs.getLong("pref_last_channel_sync", 0);
+                long now = System.currentTimeMillis();
+                long intervalMs = 1000L * 60 * 60 * 24 * channelInterval;
+                if (now - lastSync >= intervalMs) {
+                    new Thread(() -> {
+                        if (mChannelManager.checkForUpdates()) {
+                            Log.d("Channel update available, syncing...");
+                            mChannelManager.syncChannel(new org.exarhteam.iitc_mobile.channel.ChannelDownloader.Callback() {
+                                @Override
+                                public void onProgress(int current, int total) {}
+
+                                @Override
+                                public void onComplete() {
+                                    Log.d("Channel sync complete");
+                                    mSharedPrefs.edit()
+                                            .putLong("pref_last_channel_sync", System.currentTimeMillis())
+                                            .apply();
+                                    runOnUiThread(() -> {
+                                        boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+                                        IITC_PluginManager.getInstance().loadAllPlugins(
+                                                mFileManager.getStorageManager(),
+                                                getAssets(),
+                                                devMode,
+                                                mChannelManager
+                                        );
+                                    });
+                                }
+
+                                @Override
+                                public void onError(String message) {
+                                    Log.w("Channel sync failed: " + message);
+                                }
+                            });
+                        }
+                    }).start();
+                }
+            }
         }
 
         // receive downloadManagers downloadComplete intent
@@ -420,7 +469,19 @@ public class IITC_Mobile extends AppCompatActivity
             IITC_PluginManager.getInstance().loadAllPlugins(
                     mFileManager.getStorageManager(),
                     getAssets(),
-                    devMode
+                    devMode,
+                    mChannelManager
+            );
+            mReloadNeeded = true;
+            return;
+        } else if (key.equals("pref_update_channel")) {
+            // Reload PluginManager when channel changes
+            boolean devMode = sharedPreferences.getBoolean("pref_dev_checkbox", false);
+            IITC_PluginManager.getInstance().loadAllPlugins(
+                    mFileManager.getStorageManager(),
+                    getAssets(),
+                    devMode,
+                    mChannelManager
             );
             mReloadNeeded = true;
             return;
@@ -1292,6 +1353,10 @@ public class IITC_Mobile extends AppCompatActivity
 
     public IITC_FileManager getFileManager() {
         return mFileManager;
+    }
+
+    public ChannelManager getChannelManager() {
+        return mChannelManager;
     }
 
     public SharedPreferences getPrefs() {
