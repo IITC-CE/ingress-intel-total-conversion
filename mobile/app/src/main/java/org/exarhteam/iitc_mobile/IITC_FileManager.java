@@ -20,6 +20,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 import org.exarhteam.iitc_mobile.IITC_Mobile.ResponseHandler;
 import org.exarhteam.iitc_mobile.async.UpdateScript;
+import org.exarhteam.iitc_mobile.channel.ChannelManager;
 import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.json.JSONObject;
@@ -59,6 +60,7 @@ public class IITC_FileManager {
     private final SharedPreferences mPrefs;
     private final IITC_StorageManager mStorageManager;
     private final IITC_PluginManager mPluginManager;
+    private ChannelManager mChannelManager;
 
     public IITC_FileManager(final Activity activity) {
         mActivity = activity;
@@ -66,6 +68,10 @@ public class IITC_FileManager {
         mAssetManager = mActivity.getAssets();
         mStorageManager = new IITC_StorageManager(activity);
         mPluginManager = IITC_PluginManager.getInstance();
+    }
+
+    public void setChannelManager(ChannelManager channelManager) {
+        mChannelManager = channelManager;
     }
 
     /**
@@ -148,7 +154,17 @@ public class IITC_FileManager {
             }
         }
 
-        // load plugins from asset folder
+        // Try channel cache for core script when a remote channel is active
+        if (mChannelManager != null
+                && mChannelManager.getCurrentChannel().isRemote()
+                && mChannelManager.isChannelReady()) {
+            String content = mChannelManager.readCore();
+            if (content != null) {
+                return new ByteArrayInputStream(content.getBytes());
+            }
+        }
+
+        // Fall back to asset folder
         return mAssetManager.open(filename);
     }
 

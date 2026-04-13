@@ -5,6 +5,8 @@ import android.content.res.AssetManager;
 import android.os.Build;
 import androidx.documentfile.provider.DocumentFile;
 
+import org.exarhteam.iitc_mobile.channel.ChannelManager;
+import org.exarhteam.iitc_mobile.channel.ChannelMetaData;
 import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 
 import java.io.IOException;
@@ -25,9 +27,10 @@ public class IITC_PluginManager {
     private static IITC_PluginManager instance;
 
     public enum PluginType {
-        ASSET,  // Built-in plugins from assets (lowest priority)
-        DEV,    // Development override plugins (medium priority)
-        USER    // User-installed plugins (highest priority)
+        ASSET,   // Built-in plugins from assets (lowest priority)
+        CHANNEL, // Plugins from remote channel (overrides assets)
+        DEV,     // Development override plugins (medium priority)
+        USER     // User-installed plugins (highest priority)
     }
 
     public static class Plugin {
@@ -47,6 +50,10 @@ public class IITC_PluginManager {
             return type == PluginType.ASSET;
         }
 
+        public boolean isChannel() {
+            return type == PluginType.CHANNEL;
+        }
+
         public boolean isDev() {
             return type == PluginType.DEV;
         }
@@ -56,8 +63,11 @@ public class IITC_PluginManager {
         }
     }
 
-    // Main registry: ID -> Plugin (highest priority only)
+    // Main registry: filename -> Plugin (highest priority only)
     private final Map<String, Plugin> plugins = new HashMap<>();
+
+    // Reference to ChannelManager for reading channel plugin content
+    private ChannelManager channelManager;
     
     // Plugin cache with modification time tracking
     private static class CachedPlugin {
@@ -94,9 +104,23 @@ public class IITC_PluginManager {
      * Load and register all plugins from available sources
      */
     public void loadAllPlugins(IITC_StorageManager storageManager, AssetManager assetManager, boolean devMode) {
+        loadAllPlugins(storageManager, assetManager, devMode, null);
+    }
+
+    /**
+     * Load and register all plugins from available sources, with optional channel support
+     * Load order: assets -> channel (overrides assets) -> dev -> user
+     */
+    public void loadAllPlugins(IITC_StorageManager storageManager, AssetManager assetManager,
+                               boolean devMode, ChannelManager channelManager) {
         plugins.clear();
+        this.channelManager = channelManager;
 
         loadAssetPlugins(assetManager);
+
+        if (channelManager != null) {
+            loadChannelPlugins(channelManager);
+        }
 
         if (devMode) {
             loadDevPlugins(storageManager);
@@ -127,6 +151,32 @@ public class IITC_PluginManager {
         } catch (IOException e) {
             Log.e("Failed to list asset plugins", e);
         }
+    }
+
+    /**
+     * Load plugins from remote channel cache
+     * Channel plugins override asset plugins with the same filename
+     */
+    private void loadChannelPlugins(ChannelManager channelManager) {
+        if (!channelManager.getCurrentChannel().isRemote()) return;
+        if (!channelManager.isChannelReady()) return;
+
+        ChannelMetaData meta = channelManager.getMetaData();
+        if (meta == null) return;
+
+        for (ChannelMetaData.PluginMeta pluginMeta : meta.getAllPlugins()) {
+            String content = channelManager.readPlugin(pluginMeta.filename);
+            if (content == null || content.isEmpty()) continue;
+
+            PluginInfo info = IITC_FileManager.getScriptInfo(content);
+            if (!isExcludedCategory(info.getCategory())) {
+                Plugin plugin = new Plugin(pluginMeta.filename, PluginType.CHANNEL, info, null);
+                plugins.put(pluginMeta.filename, plugin); // overrides ASSET if same filename
+            }
+        }
+
+        // Remove asset plugins not present in the channel
+        plugins.values().removeIf(p -> p.type == PluginType.ASSET);
     }
 
     /**
@@ -189,6 +239,15 @@ public class IITC_PluginManager {
      */
     private CachedPlugin getCachedPluginData(String filename, PluginType type, DocumentFile file, 
                                             IITC_StorageManager storageManager, AssetManager assetManager) {
+        // Channel plugins - read from ChannelManager
+        if (type == PluginType.CHANNEL) {
+            if (channelManager == null) return null;
+            String content = channelManager.readPlugin(filename);
+            if (content == null || content.isEmpty()) return null;
+            PluginInfo metadata = IITC_FileManager.getScriptInfo(content);
+            return new CachedPlugin(content, metadata, 0);
+        }
+
         // Asset plugins - no caching needed (fast access), read directly
         if (type == PluginType.ASSET) {
             try {
