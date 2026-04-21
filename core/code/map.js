@@ -371,7 +371,6 @@ window.setupMap = function () {
 
   // create the map data requester
   window.mapDataRequest = new window.MapDataRequest();
-  window.mapDataRequest.start();
 
   // start the refresh process with a small timeout, so the first data request happens quickly
   // (the code originally called the request function directly, and triggered a normal delay for the next refresh.
@@ -406,6 +405,9 @@ window.setupMap = function () {
     map.on('baselayerchange', function () {
       map.setZoom(map.getZoom());
     });
+
+    // Start map refresh (after Map location is set)
+    window.mapDataRequest.start();
   });
 
   /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
