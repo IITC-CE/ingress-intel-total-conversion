@@ -31,8 +31,8 @@ window.MapDataRequest = function () {
   this.MAX_TILE_RETRIES = 5;
 
   // refresh timers
-  this.MOVE_REFRESH = 3; // time, after a map move (pan/zoom) before starting the refresh processing
-  this.STARTUP_REFRESH = 3; // refresh time used on first load of IITC
+  this.MOVE_REFRESH = 0.4; // time, after a map move (pan/zoom) before starting the refresh processing
+  this.STARTUP_REFRESH = 0.1; // refresh time used on first load of IITC
   this.IDLE_RESUME_REFRESH = 5; // refresh time used after resuming from idle
 
   // after one of the above, there's an additional delay between preparing the refresh (clearing out of bounds,
