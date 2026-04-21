@@ -361,7 +361,7 @@ public class IITC_FileManager {
                     mActivity.runOnUiThread(() ->
                             Toast.makeText(mActivity, R.string.plugin_install_successful, Toast.LENGTH_SHORT).show()
                     );
-                } catch (final IOException e) {
+                } catch (IOException | SecurityException e) {
                     Log.w(e);
                     mActivity.runOnUiThread(() ->
                             Toast.makeText(mActivity, R.string.plugin_install_failed, Toast.LENGTH_SHORT).show()
