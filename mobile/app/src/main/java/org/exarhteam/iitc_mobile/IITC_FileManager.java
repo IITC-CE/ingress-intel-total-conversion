@@ -330,6 +330,7 @@ public class IITC_FileManager {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                boolean success = false;
                 try {
                     final String url = uri.toString();
                     InputStream is;
@@ -356,6 +357,7 @@ public class IITC_FileManager {
                         throw new IOException("Failed to create plugin file");
                     }
 
+                    success = true;
                     mActivity.runOnUiThread(() ->
                             Toast.makeText(mActivity, R.string.plugin_install_successful, Toast.LENGTH_SHORT).show()
                     );
@@ -365,17 +367,14 @@ public class IITC_FileManager {
                             Toast.makeText(mActivity, R.string.plugin_install_failed, Toast.LENGTH_SHORT).show()
                     );
                 }
+                if (success && invalidateHeaders && mActivity instanceof PluginPreferenceActivity) {
+                    mActivity.runOnUiThread(() ->
+                            ((PluginPreferenceActivity) mActivity).invalidateHeaders()
+                    );
+                }
             }
         });
         thread.start();
-        if (invalidateHeaders) {
-            try {
-                thread.join();
-                ((PluginPreferenceActivity) mActivity).invalidateHeaders();
-            } catch (final InterruptedException e) {
-                Log.w(e);
-            }
-        }
     }
 
     public void updatePlugins(final boolean force) {
