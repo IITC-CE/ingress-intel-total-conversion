@@ -45,8 +45,10 @@ public class PluginsFragment extends PreferenceFragment {
 
             // add plugin checkbox preferences
             PreferenceScreen preferenceScreen = getPreferenceScreen();
-            for (PluginInfo pluginInfo : prefs) {
-                preferenceScreen.addPreference(createPluginPreference(prefs, preferenceScreen, pluginInfo));
+            if (prefs != null) {
+                for (PluginInfo pluginInfo : prefs) {
+                    preferenceScreen.addPreference(createPluginPreference(prefs, preferenceScreen, pluginInfo));
+                }
             }
 
             // set action bar stuff
