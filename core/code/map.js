@@ -409,29 +409,4 @@ window.setupMap = function () {
     // Start map refresh (after Map location is set)
     window.mapDataRequest.start();
   });
-
-  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
-  // on zoomend, check to see the zoom level is an int, and reset the view if not
-  // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
-  map.on('zoomend', function() {
-    var z = map.getZoom();
-    if (z != parseInt(z))
-    {
-      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
-      map.setZoom(parseInt(z), {animate:false});
-    }
-  });
-  */
-
-  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
-  // Fix Leaflet: handle touchcancel events in Draggable
-  L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
-  L.Draggable.prototype._onDown = function(e) {
-    L.Draggable.prototype._onDownOrig.apply(this, arguments);
-
-    if(e.type === "touchstart") {
-      L.DomEvent.on(document, "touchcancel", this._onUp, this);
-    }
-  };
-  */
 };
