@@ -58,30 +58,31 @@ window.portalDetail.remove = function (guid) {
   return cache.remove(guid);
 };
 
-var handleResponse = function (deferred, guid, data, success) {
+var handleResponseSuccess = function (deferred, guid, data) {
   if (!data || data.error || !data.result) {
-    success = false;
+    handleResponseFailure(deferred, guid, data);
+    return;
   }
 
-  if (success) {
-    // Parse portal details
-    var dict = window.decodeArray.portal(data.result, 'detailed');
-    cache.store(guid, dict);
+  // Parse portal details
+  var dict = window.decodeArray.portal(data.result, 'detailed');
+  cache.store(guid, dict);
 
-    // entity format, as used in map data
-    var ent = [guid, data.result[13], data.result];
-    var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
+  // entity format, as used in map data
+  var ent = [guid, data.result[13], data.result];
+  var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
-    deferred.resolve(portal.options.data);
-    window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: portal.options.data, ent: ent, portal: portal });
+  deferred.resolve(portal.options.data);
+  window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal });
+};
+
+var handleResponseFailure = function (deferred, guid, data) {
+  if (data && data.error === 'RETRY') {
+    // server asked us to try again
+    doRequest(deferred, guid);
   } else {
-    if (data && data.error === 'RETRY') {
-      // server asked us to try again
-      doRequest(deferred, guid);
-    } else {
-      deferred.reject();
-      window.runHooks('portalDetailLoaded', { guid: guid, success: success });
-    }
+    deferred.reject();
+    window.runHooks('portalDetailLoaded', { guid: guid, success: false });
   }
 };
 
@@ -90,10 +91,10 @@ var doRequest = function (deferred, guid) {
     'getPortalDetails',
     { guid: guid },
     function (data) {
-      handleResponse(deferred, guid, data, true);
+      handleResponseSuccess(deferred, guid, data);
     },
     function () {
-      handleResponse(deferred, guid, undefined, false);
+      handleResponseFailure(deferred, guid);
     }
   );
 };
