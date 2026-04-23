@@ -58,7 +58,7 @@ window.portalDetail.remove = function (guid) {
   return cache.remove(guid);
 };
 
-var handleResponseSuccess = function (deferred, guid, data) {
+var handleResponseSuccess = function (deferred, guid, data, prefetch) {
   if (!data || data.error || !data.result) {
     handleResponseFailure(deferred, guid, data);
     return;
@@ -74,6 +74,11 @@ var handleResponseSuccess = function (deferred, guid, data) {
 
   deferred.resolve(portal.options.data);
   window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal });
+
+  // prefetch portal image
+  if (prefetch && portal.options.data.image) {
+      (new Image()).src = portal.options.data.image;
+  }  
 };
 
 var handleResponseFailure = function (deferred, guid, data) {
@@ -86,12 +91,12 @@ var handleResponseFailure = function (deferred, guid, data) {
   }
 };
 
-var doRequest = function (deferred, guid) {
+var doRequest = function (deferred, guid, prefetch) {
   window.postAjax(
     'getPortalDetails',
     { guid: guid },
     function (data) {
-      handleResponseSuccess(deferred, guid, data);
+      handleResponseSuccess(deferred, guid, data, prefetch);
     },
     function () {
       handleResponseFailure(deferred, guid);
@@ -107,7 +112,7 @@ var doRequest = function (deferred, guid) {
  * @param {string} guid - The Global Unique Identifier of the portal.
  * @returns {Promise} A promise that resolves with the portal details upon successful retrieval or rejection on failure.
  */
-window.portalDetail.request = function (guid) {
+window.portalDetail.request = function (guid, prefetch = false) {
   if (!requestQueue[guid]) {
     var deferred = $.Deferred();
     requestQueue[guid] = deferred.promise();
@@ -115,7 +120,7 @@ window.portalDetail.request = function (guid) {
       delete requestQueue[guid];
     });
 
-    doRequest(deferred, guid);
+    doRequest(deferred, guid, prefetch);
   }
 
   return requestQueue[guid];
