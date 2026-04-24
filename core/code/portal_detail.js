@@ -60,7 +60,7 @@ window.portalDetail.remove = function (guid) {
 
 var handleResponseSuccess = function (deferred, guid, data, prefetch) {
   if (!data || data.error || !data.result) {
-    handleResponseFailure(deferred, guid, data);
+    handleResponseFailure(deferred, guid, data, prefetch);
     return;
   }
 
@@ -73,18 +73,18 @@ var handleResponseSuccess = function (deferred, guid, data, prefetch) {
   var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
   deferred.resolve(portal.options.data);
-  window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal });
+  window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal, prefetch: !!prefetch });
 
   // prefetch portal image
   if (prefetch && portal.options.data.image) {
       (new Image()).src = portal.options.data.image;
-  }  
+  }
 };
 
-var handleResponseFailure = function (deferred, guid, data) {
+var handleResponseFailure = function (deferred, guid, data, prefetch) {
   if (data && data.error === 'RETRY') {
     // server asked us to try again
-    doRequest(deferred, guid);
+    doRequest(deferred, guid, prefetch);
   } else {
     deferred.reject();
     window.runHooks('portalDetailLoaded', { guid: guid, success: false });
