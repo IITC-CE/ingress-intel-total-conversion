@@ -5,6 +5,8 @@
  * @module portal_marker
  */
 
+const PREFETCH_TIME = 200; // if the mouse stays these miliseconds on the marker prefetch portal details
+
 // portal hooks
 function handler_portal_click(e) {
   window.selectPortal(e.target.options.guid, e.type);
@@ -24,6 +26,23 @@ function handler_portal_contextmenu(e) {
     window.show('info');
   } else if (!$('#scrollwrapper').is(':visible')) {
     $('#sidebartoggle').click();
+  }
+}
+
+function handler_portal_mouse_enter(e) {
+  window.clearTimeout(e.target.options.prefetchTimer);
+  e.target.options.prefetchTimer = window.setTimeout(() => do_prefetch(e), PREFETCH_TIME);
+}
+
+function handler_portal_mouse_leave(e) {
+  window.clearTimeout(e.target.options.prefetchTimer);
+}
+
+function do_prefetch(e) {
+  const guid = e.target.options.guid;
+  if (guid && !window.portalDetail.isFresh(guid)) {
+    log.debug(`prefetch portal details ${guid}`);
+    window.portalDetail.request(guid, true);
   }
 }
 
@@ -57,6 +76,8 @@ L.PortalMarker = L.CircleMarker.extend({
     this.on('click', handler_portal_click);
     this.on('dblclick', handler_portal_dblclick);
     this.on('contextmenu', handler_portal_contextmenu);
+    this.on('mouseover', handler_portal_mouse_enter);
+    this.on('mouseout', handler_portal_mouse_leave);
   },
 
   willUpdate: function (details) {
