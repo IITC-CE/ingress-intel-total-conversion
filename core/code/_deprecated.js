@@ -259,3 +259,13 @@ Object.defineProperty(window, 'CHAT_SHRINKED', {
   },
   configurable: true,
 });
+
+/**
+ * @deprecated only valid with Unique-Plugin
+ */
+window.findPortalGuidByPositionE6 ??= () => null;
+
+/**
+ * @deprecated only valid with Unique-Plugin
+ */
+window.pushPortalGuidPositionCache ??= () => {};
