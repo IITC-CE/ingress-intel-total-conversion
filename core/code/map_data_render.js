@@ -380,8 +380,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
   var latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
-  window.pushPortalGuidPositionCache(data.guid, data.latE6, data.lngE6);
-
   // check for URL links to portal, and select it if this is the one
   if (window.urlPortalLL && window.urlPortalLL[0] === latlng.lat && window.urlPortalLL[1] === latlng.lng) {
     // URL-passed portal found via pll parameter - set the guid-based parameter
@@ -430,7 +428,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
     window.portals[data.guid] = marker;
   }
-
 
   window.ornaments.addPortal(marker);
 
