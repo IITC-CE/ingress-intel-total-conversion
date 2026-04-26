@@ -391,14 +391,7 @@ window.setupMap = function () {
     }
     map.setView(pos.center, pos.zoom, { reset: true });
 
-    // read here ONCE, so the URL is only evaluated one time after the
-    // necessary data has been loaded.
-    var pll = window.getURLParam('pll');
-    if (pll) {
-      pll = pll.split(',');
-      window.urlPortalLL = normLL(pll[0], pll[1]).center;
-    }
-    window.urlPortal = window.getURLParam('pguid');
+    parseURLParameters();
 
     // todo check
     // leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here
@@ -409,4 +402,21 @@ window.setupMap = function () {
     // Start map refresh (after Map location is set)
     window.mapDataRequest.start();
   });
+};
+
+const parseURLParameters = () => {
+  // read here ONCE, so the URL is only evaluated one time after the
+  // necessary data has been loaded.
+  var pll = window.getURLParam('pll');
+  if (pll) {
+    pll = pll.split(',');
+    const center = normLL(pll[0], pll[1]).center;
+    const latLng = new L.LatLng(center[0], center[1]);
+    window.selectPortalWhenLoadedByLatLng(latLng);
+  }
+
+  const urlPGuid = window.getURLParam('pguid');
+  if (urlPGuid) {
+    window.selectPortalWhenLoadedByGuid(urlPGuid);
+  }
 };
