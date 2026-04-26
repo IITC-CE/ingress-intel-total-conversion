@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -63,6 +64,15 @@ public class IITC_WebView extends WebView {
 
         setSupportPopup(true);
         setWebViewZoom(Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1")));
+
+        // Set _ncc cookie to disable Niantic's cookie consent banner
+        try {
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptCookie(true);
+            cookieManager.setCookie("https://signin.nianticspatial.com", "_ncc=0; Path=/; Domain=.nianticspatial.com");
+        } catch (Exception e) {
+            Log.w("Could not set _ncc cookie: " + e.getMessage());
+        }
 
         // enable mixed content (http on https...needed for some map tiles) mode
         setWebContentsDebuggingEnabled(true);
