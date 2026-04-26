@@ -1,4 +1,4 @@
-/* global L -- eslint */
+/* global L, log -- eslint */
 
 /**
  * @file Contain misc functions to get portal info
@@ -87,7 +87,7 @@ window.zoomToAndShowPortal = function (guid, latlng) {
   // if the data is available, render it immediately. Otherwise defer
   // until it becomes available.
   if (window.portals[guid]) window.renderPortalDetails(guid);
-  else window.urlPortal = guid;
+  else window.selectPortalWhenLoadedByGuid(guid);
 };
 
 /**
@@ -115,8 +115,66 @@ window.selectPortalByLatLng = function (lat, lng) {
   }
 
   // not currently visible
-  window.urlPortalLL = [lat, lng];
-  window.map.setView(window.urlPortalLL, window.DEFAULT_ZOOM);
+  const ll = new L.LatLng(lat, lng);
+  window.selectPortalWhenLoadedByLatLng(ll);
+  window.map.setView(ll, window.DEFAULT_ZOOM);
+};
+
+let urlPortalLL;
+/**
+ * Select a portal when it appears on the map
+ *
+ * @function
+ * @name selectPortalWhenLoadedByLatLng
+ * @param {L.LatLng} latLng - the location of the portal
+ */
+window.selectPortalWhenLoadedByLatLng = (latLng) => {
+  if (urlPortalLL === undefined) {
+    window.addHook('portalAdded', testPortalLagLng);
+  }
+
+  urlPortalLL = latLng;
+  window.urlPortalLL = latLng;
+};
+
+const testPortalLagLng = (data) => {
+  if (data.portal.getLatLng().equals(urlPortalLL)) {
+    log.log(`urlPortalLL ${urlPortalLL.toString()} matches portal GUID ${data.portal.options.guid}`);
+    window.selectedPortal = data.portal.options.guid;
+    console.assert(window.portals[window.selectedPortal], 'no portal data');
+    window.renderPortalDetails(window.selectedPortal, true);
+    urlPortalLL = undefined;
+  }
+
+  if (!urlPortalLL) window.removeHook('portalAdded', testPortalLagLng);
+};
+
+let urlPortal;
+/**
+ * Select a portal when it appears on the map
+ *
+ * @function
+ * @name selectPortalWhenLoadedByGuid
+ * @param {string} guid - the guid of the portal
+ */
+window.selectPortalWhenLoadedByGuid = (guid) => {
+  if (urlPortal === undefined) {
+    window.addHook('portalAdded', testPortalGuid);
+  }
+
+  urlPortal = guid;
+};
+
+const testPortalGuid = (data) => {
+  if (data.portal.options.guid === urlPortal) {
+    log.log(`urlPortal GUID ${window.urlPortal} found - selecting...`);
+    window.selectedPortal = urlPortal;
+    console.assert(window.portals[urlPortal], 'no portal data');
+    window.renderPortalDetails(window.selectedPortal, true);
+    urlPortal = undefined;
+  }
+
+  if (!urlPortal) window.removeHook('portalAdded', testPortalGuid);
 };
 
 (function () {

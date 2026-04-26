@@ -382,21 +382,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
   window.pushPortalGuidPositionCache(data.guid, data.latE6, data.lngE6);
 
-  // check for URL links to portal, and select it if this is the one
-  if (window.urlPortalLL && window.urlPortalLL[0] === latlng.lat && window.urlPortalLL[1] === latlng.lng) {
-    // URL-passed portal found via pll parameter - set the guid-based parameter
-    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + window.urlPortalLL[1] + ' matches portal GUID ' + data.guid);
-
-    window.urlPortal = data.guid;
-    window.urlPortalLL = undefined; // clear the URL parameter so it's not matched again
-  }
-  if (window.urlPortal === data.guid) {
-    // URL-passed portal found via guid parameter - set it as the selected portal
-    log.log('urlPortal GUID ' + window.urlPortal + ' found - selecting...');
-    window.selectedPortal = data.guid;
-    window.urlPortal = undefined; // clear the URL parameter so it's not matched again
-  }
-
   let marker = undefined;
   if (oldPortal) {
     // update marker style/highlight and layer
@@ -430,7 +415,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
     window.portals[data.guid] = marker;
   }
-
 
   window.ornaments.addPortal(marker);
 
