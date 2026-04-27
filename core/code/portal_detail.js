@@ -58,42 +58,48 @@ window.portalDetail.remove = function (guid) {
   return cache.remove(guid);
 };
 
-var handleResponse = function (deferred, guid, data, success) {
+var handleResponseSuccess = function (deferred, guid, data, prefetch) {
   if (!data || data.error || !data.result) {
-    success = false;
+    handleResponseFailure(deferred, guid, data, prefetch);
+    return;
   }
 
-  if (success) {
-    // Parse portal details
-    var dict = window.decodeArray.portal(data.result, 'detailed');
-    cache.store(guid, dict);
+  // Parse portal details
+  var dict = window.decodeArray.portal(data.result, 'detailed');
+  cache.store(guid, dict);
 
-    // entity format, as used in map data
-    var ent = [guid, data.result[13], data.result];
-    var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
+  // entity format, as used in map data
+  var ent = [guid, data.result[13], data.result];
+  var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
-    deferred.resolve(portal.options.data);
-    window.runHooks('portalDetailLoaded', { guid: guid, success: success, details: portal.options.data, ent: ent, portal: portal });
-  } else {
-    if (data && data.error === 'RETRY') {
-      // server asked us to try again
-      doRequest(deferred, guid);
-    } else {
-      deferred.reject();
-      window.runHooks('portalDetailLoaded', { guid: guid, success: success });
-    }
+  deferred.resolve(portal.options.data);
+  window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal, prefetch: !!prefetch });
+
+  // prefetch portal image
+  if (prefetch && portal.options.data.image) {
+      (new Image()).src = portal.options.data.image;
   }
 };
 
-var doRequest = function (deferred, guid) {
+var handleResponseFailure = function (deferred, guid, data, prefetch) {
+  if (data && data.error === 'RETRY') {
+    // server asked us to try again
+    doRequest(deferred, guid, prefetch);
+  } else {
+    deferred.reject();
+    window.runHooks('portalDetailLoaded', { guid: guid, success: false });
+  }
+};
+
+var doRequest = function (deferred, guid, prefetch) {
   window.postAjax(
     'getPortalDetails',
     { guid: guid },
     function (data) {
-      handleResponse(deferred, guid, data, true);
+      handleResponseSuccess(deferred, guid, data, prefetch);
     },
     function () {
-      handleResponse(deferred, guid, undefined, false);
+      handleResponseFailure(deferred, guid);
     }
   );
 };
@@ -106,7 +112,7 @@ var doRequest = function (deferred, guid) {
  * @param {string} guid - The Global Unique Identifier of the portal.
  * @returns {Promise} A promise that resolves with the portal details upon successful retrieval or rejection on failure.
  */
-window.portalDetail.request = function (guid) {
+window.portalDetail.request = function (guid, prefetch = false) {
   if (!requestQueue[guid]) {
     var deferred = $.Deferred();
     requestQueue[guid] = deferred.promise();
@@ -114,7 +120,7 @@ window.portalDetail.request = function (guid) {
       delete requestQueue[guid];
     });
 
-    doRequest(deferred, guid);
+    doRequest(deferred, guid, prefetch);
   }
 
   return requestQueue[guid];
