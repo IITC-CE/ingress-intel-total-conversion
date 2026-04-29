@@ -287,16 +287,42 @@ Object.defineProperty(window, 'CHAT_SHRINKED', {
 
 /**
  * Portal GUID if the original URL had it.
+ * @name urlPortal
  * @type {string|null}
  * @memberof storage_variables
- * @deprecated use window.selectPortalWhenLoadedByLatLng(latLng: L.LatLng);
+ * @deprecated use window.selectPortalWhenLoadedByGuid(guid: PortalGUID) - (since v0.43.0)
  */
-window.urlPortal = null;
+Object.defineProperty(window, 'urlPortal', {
+  get: function () {
+    DEPRECATED('var urlPortal', 'use window.selectPortalWhenLoadedByGuid');
+    return urlPortalOld;
+  },
+  set: function (value) {
+    DEPRECATED('var urlPortal', 'use window.selectPortalWhenLoadedByGuid');
+    urlPortalOld = value;
+    if (urlPortalOld) window.selectPortalWhenLoadedByGuid(urlPortalOld);
+  },
+  configurable: true,
+});
+let urlPortalOld;
 
 /**
  * Portal lng/lat if the orignial URL had it.
+ * @name urlPortalLL
  * @type {object|null}
  * @memberof storage_variables
- * @deprecated use window.selectPortalWhenLoadedByGuid(guid: PortalGUID);
+ * @deprecated use window.selectPortalWhenLoadedByLatLng(latLng: L.LatLng) - (since v0.43.0)
  */
-window.urlPortalLL = null;
+Object.defineProperty(window, 'urlPortalLL', {
+  get: function () {
+    DEPRECATED('var urlPortalLL', 'use window.selectPortalWhenLoadedByLatLng');
+    return urlPortalLLOld;
+  },
+  set: function (value) {
+    DEPRECATED('var urlPortalLL', 'use window.selectPortalWhenLoadedByLatLng');
+    urlPortalLLOld = value;
+    if (urlPortalLLOld) window.selectPortalWhenLoadedByLatLng(new L.LatLng(urlPortalLLOld));
+  },
+  configurable: true,
+});
+let urlPortalLLOld;
