@@ -36,11 +36,10 @@ window.portalDetail.get = function (guid) {
  * @function window.portalDetail.store
  * @param {string} guid - The Global Unique Identifier of the portal.
  * @param {object} dict - The portal detail data.
- * @param {number} freshtime - Optional freshness time for cache.
  * @returns Result of cache storage operation.
  */
-window.portalDetail.store = function (guid, dict, freshtime) {
-  return cache.store(guid, dict, freshtime);
+window.portalDetail.store = function (guid, dict) {
+  return cache.store(guid, dict);
 };
 
 /**
