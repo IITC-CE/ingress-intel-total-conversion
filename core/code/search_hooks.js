@@ -68,7 +68,8 @@ window.addHook('search', (query) => {
             return;
           }
         }
-        window.urlPortalLL = [result.position.lat, result.position.lng];
+
+        window.selectPortalWhenLoadedByLatLng(result.position);
       },
     });
   };

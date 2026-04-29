@@ -686,20 +686,6 @@ window.TEAM_CODE_MAC = window.TEAM_CODES[window.TEAM_MAC];
 window.refreshTimeout = undefined;
 
 /**
- * Portal GUID if the original URL had it.
- * @type {string|null}
- * @memberof storage_variables
- */
-window.urlPortal = null;
-
-/**
- * Portal lng/lat if the orignial URL had it.
- * @type {object|null}
- * @memberof storage_variables
- */
-window.urlPortalLL = null;
-
-/**
  * Stores the GUID of the selected portal, or is `null` if there is none.
  * @type {string|null}
  * @memberof storage_variables

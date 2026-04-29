@@ -259,3 +259,19 @@ Object.defineProperty(window, 'CHAT_SHRINKED', {
   },
   configurable: true,
 });
+
+/**
+ * Portal GUID if the original URL had it.
+ * @type {string|null}
+ * @memberof storage_variables
+ * @deprecated use window.selectPortalWhenLoadedByLatLng(latLng: L.LatLng);
+ */
+window.urlPortal = null;
+
+/**
+ * Portal lng/lat if the orignial URL had it.
+ * @type {object|null}
+ * @memberof storage_variables
+ * @deprecated use window.selectPortalWhenLoadedByGuid(guid: PortalGUID);
+ */
+window.urlPortalLL = null;
