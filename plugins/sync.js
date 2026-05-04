@@ -1,13 +1,17 @@
 // @author         xelio
 // @name           Sync
 // @category       Misc
-// @version        0.6.0
-// @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
+// @version        0.6.1
+// @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques, Draw Tools). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.6.1',
+    changes: ['Note Draw Tools as a synced plugin in the description'],
+  },
   {
     version: '0.6.0',
     changes: ['Add sign-out button and display logged-in account email'],
