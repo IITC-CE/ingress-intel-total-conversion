@@ -1,7 +1,7 @@
 // @author         xelio
 // @name           Sync
 // @category       Misc
-// @version        0.5.4
+// @version        0.6.0
 // @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 /* exported setup, changelog --eslint */
@@ -9,7 +9,7 @@
 
 var changelog = [
   {
-    version: '0.5.4',
+    version: '0.6.0',
     changes: ['Add sign-out button and display logged-in account email'],
   },
   {
@@ -696,7 +696,7 @@ window.plugin.sync.generateUUID = function () {
   } else {
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (d + Math.random() * 16) % 16 | 0;
+      var r = ((d + Math.random() * 16) % 16) | 0;
       d = Math.floor(d / 16);
       return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
@@ -758,7 +758,7 @@ window.plugin.sync.updateAccountInfo = function () {
     try {
       var profile = window.gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
       accountDiv.text('Signed in as: ' + profile.getEmail());
-    } catch (e) {
+    } catch {
       accountDiv.text('Signed in');
     }
   } else {
@@ -767,22 +767,25 @@ window.plugin.sync.updateAccountInfo = function () {
 };
 
 window.plugin.sync.signOut = function () {
-  window.gapi.auth2.getAuthInstance().signOut().then(function () {
-    window.plugin.sync.authorizer.authorized = false;
-    window.plugin.sync.authorizer.authorizing = false;
+  window.gapi.auth2
+    .getAuthInstance()
+    .signOut()
+    .then(function () {
+      window.plugin.sync.authorizer.authorized = false;
+      window.plugin.sync.authorizer.authorizing = false;
 
-    window.plugin.sync.stopAllIntervals();
+      window.plugin.sync.stopAllIntervals();
 
-    window.plugin.sync.parentFolderID = null;
-    window.plugin.sync.parentFolderIDrequested = false;
+      window.plugin.sync.parentFolderID = null;
+      window.plugin.sync.parentFolderIDrequested = false;
 
-    window.plugin.sync.toggleAuthButton();
-    window.plugin.sync.toggleDialogLink();
-    window.plugin.sync.updateAccountInfo();
+      window.plugin.sync.toggleAuthButton();
+      window.plugin.sync.toggleDialogLink();
+      window.plugin.sync.updateAccountInfo();
 
-    window.plugin.sync.logger.log('all', 'Signed out');
-    window.plugin.sync.updateLog(window.plugin.sync.logger.getLogs());
-  });
+      window.plugin.sync.logger.log('all', 'Signed out');
+      window.plugin.sync.updateLog(window.plugin.sync.logger.getLogs());
+    });
 };
 
 window.plugin.sync.stopAllIntervals = function () {
