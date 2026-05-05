@@ -136,11 +136,6 @@ public class IITC_JSInterface {
     }
 
     @JavascriptInterface
-    public void updateIitc(final String fileUrl) {
-        mIitc.runOnUiThread(() -> mIitc.updateIitc(fileUrl));
-    }
-
-    @JavascriptInterface
     public void addPane(final String name, final String label, final String icon) {
         mIitc.runOnUiThread(() -> mIitc.getNavigationHelper().addPane(name, label, icon));
     }

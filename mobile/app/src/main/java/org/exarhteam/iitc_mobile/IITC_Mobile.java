@@ -129,13 +129,6 @@ public class IITC_Mobile extends AppCompatActivity
     private Pane mCurrentPane = Pane.MAP;
     private boolean mBackButtonPressed = false;
 
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            ((IITC_Mobile) context).installIitcUpdate();
-        }
-    };
-
     // Setup receiver to detect if Samsung DeX mode has been changed
 	private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
 		@Override
@@ -378,17 +371,6 @@ public class IITC_Mobile extends AppCompatActivity
                     }).start();
                 }
             }
-        }
-
-        // receive downloadManagers downloadComplete intent
-        // afterwards install iitc update
-        IntentFilter downloadFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
-            registerReceiver(mBroadcastReceiver, downloadFilter, Context.RECEIVER_NOT_EXPORTED);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31-32
-            registerReceiver(mBroadcastReceiver, downloadFilter, 0x00000001); // RECEIVER_NOT_EXPORTED
-        } else {
-            registerReceiver(mBroadcastReceiver, downloadFilter);
         }
 
         this.firstTimeIntro();
@@ -716,7 +698,6 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(mBroadcastReceiver);
         unregisterReceiver(mDesktopModeReceiver);
         super.onDestroy();
     }
@@ -1274,49 +1255,6 @@ public class IITC_Mobile extends AppCompatActivity
         return pos;
     }
 
-    /**
-     * onClick handler for R.id.btnDebugLeft, assigned in activity_main.xml
-     */
-    public void onDebugCursorMoveRight(final View v)
-    {
-        mEditCommand.setSelection(debugCursorMove(true));
-    }
-
-    /**
-     * onClick handler for R.id.btnDebugRight, assigned in activity_main.xml
-     */
-    public void onDebugCursorMoveLeft(final View v)
-    {
-        mEditCommand.setSelection(debugCursorMove(false));
-    }
-
-    private void deleteUpdateFile() {
-        final File file = new File(getExternalFilesDir(null).toString() + "/iitcUpdate.apk");
-        if (file != null) file.delete();
-    }
-
-    public void updateIitc(final String url) {
-        final DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setDescription(getString(R.string.download_description));
-        request.setTitle("IITCm Update");
-        request.allowScanningByMediaScanner();
-        final Uri fileUri = Uri.parse("file://" + getExternalFilesDir(null).toString() + "/iitcUpdate.apk");
-        request.setDestinationUri(fileUri);
-        // remove old update file...we don't want to spam the external storage
-        deleteUpdateFile();
-        // get download service and enqueue file
-        final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
-    }
-
-    private void installIitcUpdate() {
-        final String iitcUpdatePath = getExternalFilesDir(null).toString() + "/iitcUpdate.apk";
-        final Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(iitcUpdatePath)), "application/vnd.android.package-archive");
-        startActivity(intent);
-        // finish app, because otherwise it gets killed on update
-        finish();
-    }
 
     public boolean isLoading() {
         return mIsLoading;
