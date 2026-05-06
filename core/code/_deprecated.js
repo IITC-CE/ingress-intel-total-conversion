@@ -275,3 +275,16 @@ window.urlPortal = null;
  * @deprecated use window.selectPortalWhenLoadedByGuid(guid: PortalGUID);
  */
 window.urlPortalLL = null;
+
+/**
+ * Pushes a portal GUID and its position into a cache.
+ *
+ * @function
+ * @name pushPortalGuidPositionCache
+ * @param {string} guid - The GUID of the portal.
+ * @param {number} latE6 - The latitude in E6 format.
+ * @param {number} lngE6 - The longitude in E6 format.
+ *
+ * @deprecated GUIDs are no longer cached.
+ */
+window.pushPortalGuidPositionCache = function () {};
