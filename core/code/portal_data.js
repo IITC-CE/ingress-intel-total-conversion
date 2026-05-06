@@ -179,8 +179,8 @@ const testPortalGuid = (data) => {
 };
 
 /**
- * Finds a portal GUID by its position. Searches through currently rendered portals, fields, and links.
- * If the portal is not found in the current render, it checks a cache of recently seen portals.
+ * Finds a portal GUID by its position. Searches through currently rendered portals.
+ * Note: this includes fields and links.
  *
  * @function
  * @name findPortalGuidByPositionE6
@@ -189,28 +189,6 @@ const testPortalGuid = (data) => {
  * @returns {string|null} The GUID of the portal at the specified location, or null if not found.
  */
 window.findPortalGuidByPositionE6 = function (latE6, lngE6) {
-  // now try searching through currently rendered portals
-  for (var guid in window.portals) {
-    var data = window.portals[guid].options.data;
-    if (data.latE6 === latE6 && data.lngE6 === lngE6) return guid;
-  }
-
-  // now try searching through fields
-  for (var fguid in window.fields) {
-    var points = window.fields[fguid].options.data.points;
-
-    for (var i in points) {
-      var point = points[i];
-      if (point.latE6 === latE6 && point.lngE6 === lngE6) return point.guid;
-    }
-  }
-
-  // and finally search through links
-  for (var lguid in window.links) {
-    var l = window.links[lguid].options.data;
-    if (l.oLatE6 === latE6 && l.oLngE6 === lngE6) return l.oGuid;
-    if (l.dLatE6 === latE6 && l.dLngE6 === lngE6) return l.dGuid;
-  }
-
-  return null;
+  const portal = Object.values(window.portals).find((p) => p.options.data.latE6 === latE6 && p.options.data.lngE6 === lngE6);
+  return portal?.options.data.guid ?? null;
 };
