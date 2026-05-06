@@ -7,10 +7,21 @@
  */
 
 /**
+ * Helper to show deprecated warning in console
+ */
+const DEPRECATED = (funcion_name, message) => {
+  if (deprecated_display.has(funcion_name)) return;
+  deprecated_display.add(funcion_name);
+
+  console.warn(`"${funcion_name}" is deprecated. ${message ?? ''}`);
+};
+const deprecated_display = new Set();
+
+/**
  * Calculates the potential AP gain for capturing or destroying a portal, based on the number of resonators,
  * links, and fields. It does not account for AP gained from resonator upgrades or mod deployment.
  *
- * @deprecated
+ * @deprecated since v0.38.0
  * @function portalApGainMaths
  * @param {number} resCount - The number of resonators on the portal.
  * @param {number} linkCount - The number of links connected to the portal.
@@ -20,6 +31,7 @@
  *                   AP for destroying and capturing.
  */
 window.portalApGainMaths = function (resCount, linkCount, fieldCount) {
+  DEPRECATED('portalApGainMaths');
   var deployAp = (8 - resCount) * window.DEPLOY_RESONATOR;
   if (resCount === 0) deployAp += window.CAPTURE_PORTAL;
   if (resCount !== 8) deployAp += window.COMPLETION_BONUS;
@@ -46,12 +58,13 @@ window.portalApGainMaths = function (resCount, linkCount, fieldCount) {
  * Estimates the AP gain from a portal, based only on summary data from portals, links, and fields.
  * Not entirely accurate - but available for all portals on the screen
  *
- * @deprecated
+ * @deprecated since v0.38.0
  * @function getPortalApGain
  * @param {string} guid - The GUID of the portal.
  * @returns {Object|undefined} An object containing various AP gain values, or undefined if the portal is not found.
  */
 window.getPortalApGain = function (guid) {
+  DEPRECATED('getPortalApGain');
   var p = window.portals[guid];
   if (p) {
     var data = p.options.data;
@@ -69,12 +82,13 @@ window.getPortalApGain = function (guid) {
 /**
  * Calculates the potential level a player can upgrade a portal to.
  *
- * @deprecated
+ * @deprecated since v0.38.0
  * @function potentialPortalLevel
  * @param {Object} d - The portal detail object containing resonator and ownership information.
  * @returns {number} The potential level to which the player can upgrade the portal.
  */
 window.potentialPortalLevel = function (d) {
+  DEPRECATED('potentialPortalLevel');
   var current_level = window.getPortalLevel(d);
   var potential_level = current_level;
 
@@ -121,12 +135,13 @@ window.potentialPortalLevel = function (d) {
  * Finds the latitude and longitude for a portal using all available data sources.
  * This includes the list of portals, cached portal details, and information from links and fields.
  *
- * @deprecated
+ * @deprecated since v0.38.0
  * @function findPortalLatLng
  * @param {string} guid - The GUID of the portal.
  * @returns {L.LatLng|undefined} The LatLng location of the portal, or undefined if not found.
  */
 window.findPortalLatLng = function (guid) {
+  DEPRECATED('findPortalLatLng');
   if (window.portals[guid]) {
     return window.portals[guid].getLatLng();
   }
@@ -168,10 +183,11 @@ window.findPortalLatLng = function (guid) {
  * Finds the latitude and longitude for a portal using all available data sources.
  * This includes the list of portals, cached portal details, and information from links and fields.
  *
- * @deprecated
+ * @deprecated since v0.40.0
  * @function androidCopy
  */
 window.androidCopy = function () {
+  DEPRECATED('findPortalLatLng');
   return true; // i.e. execute other actions
 };
 
@@ -179,12 +195,13 @@ window.androidCopy = function () {
  * Given the entity detail data, returns the team the entity belongs to.
  * Uses TEAM_* enum values.
  *
- * @deprecated
+ * @deprecated since v0.40.0
  * @function getTeam
  * @param {Object} details - The details hash of an entity.
  * @returns {number} The team ID the entity belongs to.
  */
 window.getTeam = function (details) {
+  DEPRECATED('findPortalLatLng', 'Use IITC.utils.getTeamId');
   return IITC.utils.getTeamId(details.team);
 };
 
@@ -193,10 +210,11 @@ window.getTeam = function (details) {
  * zoom level (portal levels and link lengths), map data loading progress, and any pending requests or failed requests.
  * It schedules the update to the next event loop to improve performance and ensure smoother rendering.
  *
- * @deprecated
+ * @deprecated since v0.42.0
  * @function renderUpdateStatus
  */
 window.renderUpdateStatus = function () {
+  DEPRECATED('renderUpdateStatus', 'Use IITC.statusbar.map.update');
   return IITC.statusbar.map.update();
 };
 
@@ -204,11 +222,12 @@ window.renderUpdateStatus = function () {
  * Updates the mobile information bar with portal details when a portal is selected.
  * This function is hooked to the 'portalSelected' event and is specific to the smartphone layout.
  *
- * @deprecated
+ * @deprecated since v0.42.0
  * @function smartphoneInfo
  * @param {Object} selectedPortalData - The object containing details about the selected portal.
  */
 window.smartphoneInfo = function (selectedPortalData) {
+  DEPRECATED('smartphoneInfo', 'Use IITC.statusbar.portal.update');
   return IITC.statusbar.portal.update(selectedPortalData);
 };
 
@@ -216,13 +235,15 @@ window.smartphoneInfo = function (selectedPortalData) {
  * How much space to leave for scrollbars, in pixels, default 20.
  * @type {number}
  * @memberof config_options
- * @deprecated Use CSS variable `--hidden-scrollbar-width` instead
+ * @deprecated Use CSS variable `--hidden-scrollbar-width` instead - (since v0.43.0)
  */
 Object.defineProperty(window, 'HIDDEN_SCROLLBAR_ASSUMED_WIDTH', {
   get: function () {
+    DEPRECATED('var HIDDEN_SCROLLBAR_ASSUMED_WIDTH', 'Use CSS variable `--hidden-scrollbar-width` instead');
     return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hidden-scrollbar-width'), 10);
   },
   set: function (value) {
+    DEPRECATED('HIDDEN_SCROLLBAR_ASSUMED_WIDTH', 'Use CSS variable `--hidden-scrollbar-width` instead');
     document.documentElement.style.setProperty('--hidden-scrollbar-width', value + 'px');
   },
   configurable: true,
@@ -232,13 +253,15 @@ Object.defineProperty(window, 'HIDDEN_SCROLLBAR_ASSUMED_WIDTH', {
  * How wide should the sidebar be, in pixels, default 300.
  * @type {number}
  * @memberof config_options
- * @deprecated Use CSS variable `--sidebar-width` instead
+ * @deprecated Use CSS variable `--sidebar-width` instead - (since v0.43.0)
  */
 Object.defineProperty(window, 'SIDEBAR_WIDTH', {
   get: function () {
+    DEPRECATED('var SIDEBAR_WIDTH', 'Use CSS variable `--sidebar-width` instead');
     return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width'), 10);
   },
   set: function (value) {
+    DEPRECATED('var SIDEBAR_WIDTH', 'Use CSS variable `--sidebar-width` instead');
     document.documentElement.style.setProperty('--sidebar-width', value + 'px');
   },
   configurable: true,
@@ -248,13 +271,15 @@ Object.defineProperty(window, 'SIDEBAR_WIDTH', {
  * Controls height of chat when chat is collapsed, in pixels, default 60.
  * @type {number}
  * @memberof config_options
- * @deprecated Use CSS variable `--chat-shrinked` instead
+ * @deprecated Use CSS variable `--chat-shrinked` instead - (since v0.43.0)
  */
 Object.defineProperty(window, 'CHAT_SHRINKED', {
   get: function () {
+    DEPRECATED('var CHAT_SHRINKED', 'Use CSS variable `--chat-shrinked` instead');
     return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--chat-shrinked'), 10);
   },
   set: function (value) {
+    DEPRECATED('var CHAT_SHRINKED', 'Use CSS variable `--chat-shrinked` instead');
     document.documentElement.style.setProperty('--chat-shrinked', value + 'px');
   },
   configurable: true,
@@ -262,16 +287,42 @@ Object.defineProperty(window, 'CHAT_SHRINKED', {
 
 /**
  * Portal GUID if the original URL had it.
+ * @name urlPortal
  * @type {string|null}
  * @memberof storage_variables
- * @deprecated use window.selectPortalWhenLoadedByLatLng(latLng: L.LatLng);
+ * @deprecated use window.selectPortalWhenLoadedByGuid(guid: PortalGUID) - (since v0.43.0)
  */
-window.urlPortal = null;
+Object.defineProperty(window, 'urlPortal', {
+  get: function () {
+    DEPRECATED('var urlPortal', 'use window.selectPortalWhenLoadedByGuid');
+    return urlPortalOld;
+  },
+  set: function (value) {
+    DEPRECATED('var urlPortal', 'use window.selectPortalWhenLoadedByGuid');
+    urlPortalOld = value;
+    if (urlPortalOld) window.selectPortalWhenLoadedByGuid(urlPortalOld);
+  },
+  configurable: true,
+});
+let urlPortalOld;
 
 /**
  * Portal lng/lat if the orignial URL had it.
+ * @name urlPortalLL
  * @type {object|null}
  * @memberof storage_variables
- * @deprecated use window.selectPortalWhenLoadedByGuid(guid: PortalGUID);
+ * @deprecated use window.selectPortalWhenLoadedByLatLng(latLng: L.LatLng) - (since v0.43.0)
  */
-window.urlPortalLL = null;
+Object.defineProperty(window, 'urlPortalLL', {
+  get: function () {
+    DEPRECATED('var urlPortalLL', 'use window.selectPortalWhenLoadedByLatLng');
+    return urlPortalLLOld;
+  },
+  set: function (value) {
+    DEPRECATED('var urlPortalLL', 'use window.selectPortalWhenLoadedByLatLng');
+    urlPortalLLOld = value;
+    if (urlPortalLLOld) window.selectPortalWhenLoadedByLatLng(new L.LatLng(urlPortalLLOld));
+  },
+  configurable: true,
+});
+let urlPortalLLOld;
