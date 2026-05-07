@@ -44,7 +44,7 @@
     <string name="pref_force_desktop_sum">Gut für Tablets, schlecht für Smartphones</string>
     <string name="pref_dex_desktop">Unterstützung für Samsung DeX Modus</string>
     <string name="pref_dex_desktop_sum">Desktopmodus erzwingen wenn DeX Modus aktiviert wurde</string>
-    <string name="pref_external_storage_sum">Neustart benötigt! Cahce auf SD Karte schreiben. Externer Speicher muss eingehängt werden.</string>
+    <string name="pref_external_storage_sum">Neustart benötigt! Cache auf SD Karte schreiben. Externer Speicher muss eingehängt werden.</string>
     <string name="pref_fake_user_agent">User Agent vortäuschen</string>
     <string name="pref_force_plugin_update_sum">Alle aktivierten Nutzerplugins updaten</string>
     <string name="pref_secure_updates">Gesicherte Updates vorraussetzen</string>
