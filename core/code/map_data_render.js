@@ -380,8 +380,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
   var latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
-  window.pushPortalGuidPositionCache(data.guid, data.latE6, data.lngE6);
-
   let marker = undefined;
   if (oldPortal) {
     // update marker style/highlight and layer

@@ -94,7 +94,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function (data) {
     ) {
       // search for "x deployed an Ly Resonator on z"
       var portal = markup[4][1];
-      var guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+      var guid = findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
       if (guid) window.plugin.uniques.setPortalVisited(guid);
     } else if (
       plext.plextType === 'SYSTEM_BROADCAST' &&
@@ -107,7 +107,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function (data) {
     ) {
       // search for "x deployed a Resonator on z"
       const portal = markup[2][1];
-      const guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+      const guid = findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
       if (guid) window.plugin.uniques.setPortalVisited(guid);
     } else if (
       plext.plextType === 'SYSTEM_BROADCAST' &&
@@ -120,7 +120,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function (data) {
     ) {
       // search for "x captured y"
       const portal = markup[2][1];
-      const guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+      const guid = findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
       if (guid) window.plugin.uniques.setPortalCaptured(guid);
     } else if (
       plext.plextType === 'SYSTEM_BROADCAST' &&
@@ -136,7 +136,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function (data) {
     ) {
       // search for "x linked y to z"
       const portal = markup[2][1];
-      const guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+      const guid = findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
       if (guid) window.plugin.uniques.setPortalVisited(guid);
     } else if (
       plext.plextType === 'SYSTEM_NARROWCAST' &&
@@ -153,7 +153,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function (data) {
     ) {
       // search for "Your Lx Resonator on y was destroyed by z"
       const portal = markup[3][1];
-      const guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+      const guid = findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
       if (guid) window.plugin.uniques.setPortalVisited(guid);
     } else if (
       plext.plextType === 'SYSTEM_NARROWCAST' &&
@@ -169,7 +169,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function (data) {
     ) {
       // search for "Your Lx Resonator on y has decayed"
       const portal = markup[3][1];
-      const guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+      const guid = findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
       if (guid) window.plugin.uniques.setPortalVisited(guid);
     } else if (
       plext.plextType === 'SYSTEM_NARROWCAST' &&
@@ -184,7 +184,7 @@ window.plugin.uniques.onPublicChatDataAvailable = function (data) {
       // search for "Your Portal x neutralized by y"
       // search for "Your Portal x is under attack by y"
       const portal = markup[1][1];
-      const guid = window.findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
+      const guid = findPortalGuidByPositionE6(portal.latE6, portal.lngE6);
       if (guid) window.plugin.uniques.setPortalVisited(guid);
     }
   });
@@ -597,6 +597,7 @@ var setup = function () {
   window.addPortalHighlighter('Uniques', window.plugin.uniques.highlighter);
   window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
   window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
+  window.addHook('portalAdded', storeGUID);
   window.plugin.uniques.registerFieldForSyncing();
 
   // to mark mission portals as visited
@@ -606,4 +607,59 @@ var setup = function () {
   if (window.plugin.portalslist) {
     window.plugin.uniques.setupPortalsList();
   }
+};
+
+const storeGUID = (hookData) => {
+  pushPortalGuidPositionCache(hookData.portal.options.guid, hookData.portal.options.data.latE6, hookData.portal.options.data.lngE6);
+};
+
+var cache = {};
+var cache_level = 0;
+var GC_LIMIT = 15000; // run garbage collector when cache has more that LIMIT items
+var GC_KEEP = 10000; // how much items to keep
+
+/**
+ * Pushes a portal GUID and its position into a cache.
+ *
+ * @function
+ * @name pushPortalGuidPositionCache
+ * @param {string} guid - The GUID of the portal.
+ * @param {number} latE6 - The latitude in E6 format.
+ * @param {number} lngE6 - The longitude in E6 format.
+ */
+const pushPortalGuidPositionCache = function (guid, latE6, lngE6) {
+  cache[latE6 + ',' + lngE6] = [guid, Date.now()];
+  cache_level += 1;
+
+  if (cache_level > GC_LIMIT) {
+    Object.keys(cache) // get all latlngs
+      .map(function (latlng) {
+        return [latlng, cache[latlng][1]];
+      }) // map them to [latlng, timestamp]
+      .sort(function (a, b) {
+        return b[1] - a[1];
+      }) // sort them
+      .slice(GC_KEEP) // drop the least recently added
+      .forEach(function (item) {
+        delete cache[item[0]];
+      }); // delete the rest
+    cache_level = Object.keys(cache).length;
+  }
+};
+
+/**
+ * Finds a portal GUID by its position. Searches through currently rendered portals, fields, and links.
+ * If the portal is not found in the current render, it checks a cache of recently seen portals.
+ *
+ * @function
+ * @name findPortalGuidByPositionE6
+ * @param {number} latE6 - The latitude in E6 format.
+ * @param {number} lngE6 - The longitude in E6 format.
+ * @returns {string|null} The GUID of the portal at the specified location, or null if not found.
+ */
+const findPortalGuidByPositionE6 = function (latE6, lngE6) {
+  var item = cache[latE6 + ',' + lngE6];
+  if (item) return item[0];
+
+  return window.findPortalGuidByPositionE6(latE6, lngE6);
 };
