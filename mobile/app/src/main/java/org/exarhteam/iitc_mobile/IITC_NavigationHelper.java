@@ -2,6 +2,8 @@ package org.exarhteam.iitc_mobile;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -41,12 +44,16 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     private final ListView mDrawerLeft;
     private final View mDrawerRight;
     private final IITC_NotificationHelper mNotificationHelper;
+    private final Toolbar mToolbar;
 
     private boolean mDexRunning = false;
     private boolean mDexDesktopMode = true;
     private boolean mDesktopMode = false;
     private Pane mPane = Pane.MAP;
     private String mHighlighter = null;
+    // null = none shown yet, true = hamburger shown, false = arrow shown
+    private Boolean mIconIsMenu = null;
+    private float mLastDrawerSlideOffset = 0f;
 
     public IITC_NavigationHelper(final IITC_Mobile iitc, final ActionBar bar, Toolbar toolbar) {
         super(iitc, (DrawerLayout) iitc.findViewById(R.id.drawer_layout),
@@ -54,6 +61,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
 
         mIitc = iitc;
         mActionBar = bar;
+        mToolbar = toolbar;
         mDrawerLeft = (ListView) iitc.findViewById(R.id.left_drawer);
         mDrawerRight = iitc.findViewById(R.id.right_drawer);
         mDrawerLayout = (DrawerLayout) iitc.findViewById(R.id.drawer_layout);
@@ -72,16 +80,35 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
 
         onPrefChanged(); // also calls updateActionBar()
 
-        // workaround for not working home-button on v7 toolbar
-        setToolbarNavigationClickListener(new View.OnClickListener() {
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mIitc.switchToPane(Pane.MAP);
+                if (mPane == Pane.MAP) {
+                    if (mDrawerLayout.isDrawerOpen(mDrawerLeft)) {
+                        mDrawerLayout.closeDrawer(mDrawerLeft);
+                    } else {
+                        mDrawerLayout.openDrawer(mDrawerLeft);
+                    }
+                } else {
+                    mIitc.switchToPane(Pane.MAP);
+                }
             }
         });
     }
 
+    private void setNavigationIconAnimated(final int resId) {
+        final Drawable avd = AppCompatResources.getDrawable(mIitc, resId);
+        mToolbar.setNavigationIcon(avd);
+        if (avd instanceof Animatable) {
+            ((Animatable) avd).start();
+        }
+    }
+
     private void updateViews() {
+        updateViews(false);
+    }
+
+    private void updateViews(final boolean animate) {
         final int position = mNavigationAdapter.getPosition(mPane);
         if (position >= 0 && position < mNavigationAdapter.getCount()) {
             mDrawerLeft.setItemChecked(position, true);
@@ -89,31 +116,37 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
             mDrawerLeft.setItemChecked(mDrawerLeft.getCheckedItemPosition(), false);
         }
 
+        // Never use setDrawerIndicatorEnabled(true) - DrawerArrowDrawable uses hardware layers
+        // that cause BLASTBufferQueue sync issues with the WebView compositor on Android 12+
+        setDrawerIndicatorEnabled(false);
+
         if (isDesktopActive()) {
             mActionBar.setDisplayHomeAsUpEnabled(false); // Hide "up" indicator
             mActionBar.setHomeButtonEnabled(false); // Make icon unclickable
             mActionBar.setTitle(mIitc.getString(R.string.app_name));
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, mDrawerLeft);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, mDrawerRight);
-            setDrawerIndicatorEnabled(false);
+            mToolbar.setNavigationIcon(null);
+            mIconIsMenu = null;
         } else {
             if (mIitc.isLoading()) {
                 mActionBar.setDisplayHomeAsUpEnabled(false); // Hide "up" indicator
-                mActionBar.setHomeButtonEnabled(false);// Make icon unclickable
+                mActionBar.setHomeButtonEnabled(false);
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                setDrawerIndicatorEnabled(false);
+                mToolbar.setNavigationIcon(null);
+                mIconIsMenu = null;
             } else {
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mActionBar.setDisplayHomeAsUpEnabled(false);
+                mActionBar.setHomeButtonEnabled(false);
 
-                if (mPane == Pane.MAP || mDrawerLayout.isDrawerOpen(mDrawerLeft)) {
-                    mActionBar.setDisplayHomeAsUpEnabled(false); // Hide"up" indicator
-                    mActionBar.setHomeButtonEnabled(false);// Make icon unclickable
-                    setDrawerIndicatorEnabled(true);
+                final boolean wantMenu = mPane == Pane.MAP && !mDrawerLayout.isDrawerOpen(mDrawerLeft);
+                if (animate && mIconIsMenu != null && mIconIsMenu != wantMenu) {
+                    setNavigationIconAnimated(wantMenu ? R.drawable.ic_arrow_anim : R.drawable.ic_menu_anim);
                 } else {
-                    setDrawerIndicatorEnabled(false);
-                    mActionBar.setHomeButtonEnabled(true);// Make icon clickable
-                    mActionBar.setDisplayHomeAsUpEnabled(true); // Show "up" indicator
+                    mToolbar.setNavigationIcon(AppCompatResources.getDrawable(mIitc, wantMenu ? R.drawable.ic_menu_anim : R.drawable.ic_arrow_anim));
                 }
+                mIconIsMenu = wantMenu;
             }
 
             if (mDrawerLayout.isDrawerOpen(mDrawerLeft) || mPane == Pane.MAP) {
@@ -173,8 +206,10 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     @Override
     public void onDrawerClosed(final View drawerView) {
         super.onDrawerClosed(drawerView);
+        if (drawerView == mDrawerLeft) {
+            mLastDrawerSlideOffset = 0f;
+        }
 
-        mIitc.getWebView().onWindowFocusChanged(true);
         // delay invalidating to prevent flickering in case another drawer is opened
         (new Handler()).postDelayed(new Runnable() {
             @Override
@@ -188,10 +223,28 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     @Override
     public void onDrawerOpened(final View drawerView) {
         super.onDrawerOpened(drawerView);
-        mIitc.getWebView().onWindowFocusChanged(false);
+        if (drawerView == mDrawerLeft) {
+            mLastDrawerSlideOffset = 1f;
+        }
         mIitc.invalidateOptionsMenu();
         updateViews();
         mDrawerLayout.closeDrawer(drawerView.equals(mDrawerLeft) ? mDrawerRight : mDrawerLeft);
+    }
+
+    @Override
+    public void onDrawerSlide(final View drawerView, final float slideOffset) {
+        super.onDrawerSlide(drawerView, slideOffset);
+        if (drawerView != mDrawerLeft) return;
+        if (slideOffset == mLastDrawerSlideOffset) return;
+        final boolean opening = slideOffset > mLastDrawerSlideOffset;
+        mLastDrawerSlideOffset = slideOffset;
+        if (opening && Boolean.TRUE.equals(mIconIsMenu)) {
+            setNavigationIconAnimated(R.drawable.ic_menu_anim);
+            mIconIsMenu = false;
+        } else if (!opening && mPane == Pane.MAP && Boolean.FALSE.equals(mIconIsMenu)) {
+            setNavigationIconAnimated(R.drawable.ic_arrow_anim);
+            mIconIsMenu = true;
+        }
     }
 
     @Override
@@ -265,7 +318,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
         mPane = pane;
 
         if (pane.equals(Pane.INFO)) mNotificationHelper.showNotice(IITC_NotificationHelper.NOTICE_SHARING);
-        updateViews();
+        updateViews(true);
     }
 
     private class NavigationAdapter extends ArrayAdapter<Pane> {
@@ -320,7 +373,7 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
             this.label_resource = label_resource;
             this.icon = icon;
         }
-        
+
         public Pane(final String name, final String label, final int icon) {
             this.name = name;
             this.label = label;
