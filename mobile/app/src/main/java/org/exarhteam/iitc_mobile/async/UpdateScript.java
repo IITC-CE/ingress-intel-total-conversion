@@ -105,7 +105,7 @@ public class UpdateScript extends AsyncTask<String, Void, Boolean> {
             Log.d("Updating plugin file...");
 
             // Write updated script
-            try (OutputStream stream = mContext.getContentResolver().openOutputStream(file.getUri())) {
+            try (OutputStream stream = mContext.getContentResolver().openOutputStream(file.getUri(), "wt")) {
                 stream.write(updatedScript.getBytes());
             }
 
