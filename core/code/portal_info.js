@@ -5,7 +5,9 @@
  */
 
 /**
- * Calculates the displayed level of a portal, which is always rounded down from the actual float value.
+ * Calculates the resonator-based level of a portal as a fractional value (sum of resonator levels / 8).
+ * Returns 0 for a portal with no resonators. Note this is not clamped to the minimum displayed level of 1;
+ * callers that need the in-game minimum (e.g. link range) must apply it themselves.
  *
  * @function getPortalLevel
  * @param {Object} d - The portal detail object containing resonator information.
@@ -19,7 +21,7 @@ window.getPortalLevel = function (d) {
     lvl += parseInt(reso.level);
     hasReso = true;
   });
-  return hasReso ? Math.max(1, lvl / 8) : 0;
+  return hasReso ? lvl / 8 : 0;
 };
 
 /**
@@ -87,7 +89,7 @@ window.getPortalRange = function (d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
   var range = {
-    base: window.teamStringToId(d.team) === window.TEAM_MAC ? window.LINK_RANGE_MAC[d.level + 1] : 160 * Math.pow(window.getPortalLevel(d), 4),
+    base: window.teamStringToId(d.team) === window.TEAM_MAC ? window.LINK_RANGE_MAC[d.level + 1] : 160 * Math.pow(Math.max(1, window.getPortalLevel(d)), 4),
     boost: window.getLinkAmpRangeBoost(d),
   };
 
