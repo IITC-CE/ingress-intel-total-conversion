@@ -345,7 +345,7 @@ window.getPortalHackDetails = function (d) {
   var effectivenessReduction = [1, 0.5, 0.5, 0.5];
 
   var isFriendly = window.teamStringToId(d.team) === window.teamStringToId(window.PLAYER.team);
-  var cooldownTime = isFriendly ? FACTION_HACK_COOLDOWN : window.BASE_HACK_COOLDOWN;
+  var cooldownTime = isFriendly ? window.FACTION_HACK_COOLDOWN : window.BASE_HACK_COOLDOWN;
 
   $.each(heatsinks, function (index, mod) {
     var hackSpeed = parseInt(mod.stats.HACK_SPEED) / 1000000;
