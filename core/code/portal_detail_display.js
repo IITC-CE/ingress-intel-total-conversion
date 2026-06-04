@@ -132,7 +132,7 @@ window.renderPortalToSideBar = function (portal) {
     var portalLevel = window.getPortalLevel(details); // resonator-based fractional level
     levelDetails = portalLevel;
     if (levelInt !== 8) {
-      const req_reso_levels = 8 * (levelInt + 1- portalLevel);
+      const req_reso_levels = 8 * (levelInt + 1 - portalLevel);
       levelDetails += '\n' + req_reso_levels + ' resonator level(s) needed for next portal level';
     } else {
       levelDetails += '\nfully upgraded';
