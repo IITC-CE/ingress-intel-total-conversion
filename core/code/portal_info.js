@@ -14,7 +14,7 @@
  */
 window.getPortalLevel = function (d) {
   if (!d.resonators) return 0;
-  return d.resonators.reduce((sum, reso) => sum + reso.level, 0) / 8;
+  return d.resonators.reduce((sum, reso) => sum + (parseInt(reso?.level) || 0), 0) / 8;
 };
 
 /**
