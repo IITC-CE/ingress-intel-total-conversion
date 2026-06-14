@@ -55,21 +55,16 @@
  */
 
 /**
- * Calculates the displayed level of a portal, which is always rounded down from the actual float value.
+ * Calculates the resonator-based level of a portal.
+ * This includes a decimal part and is not clamped to the minimum level of 1
  *
  * @function getPortalLevel
  * @param {Object} d - The portal detail object containing resonator information.
  * @returns {number} The calculated portal level.
  */
 window.getPortalLevel = function (d) {
-  var lvl = 0;
-  var hasReso = false;
-  $.each(d.resonators, function (ind, reso) {
-    if (!reso) return true;
-    lvl += parseInt(reso.level);
-    hasReso = true;
-  });
-  return hasReso ? Math.max(1, lvl / 8) : 0;
+  if (!d.resonators) return 0;
+  return d.resonators.reduce((sum, reso) => sum + (parseInt(reso?.level) || 0), 0) / 8;
 };
 
 /**
@@ -399,8 +394,8 @@ window.getPortalHackDetails = function (d) {
   // first mod of type is fully effective, the others are only 50% effective
   var effectivenessReduction = [1, 0.5, 0.5, 0.5];
 
-  var isFriendly = window.teamStringToId(d.team) === window.teamStringToId(window.PLAYER.team); 
-  var cooldownTime = isFriendly ? FACTION_HACK_COOLDOWN : window.BASE_HACK_COOLDOWN; 
+  var isFriendly = window.teamStringToId(d.team) === window.teamStringToId(window.PLAYER.team);
+  var cooldownTime = isFriendly ? window.FACTION_HACK_COOLDOWN : window.BASE_HACK_COOLDOWN;
 
   $.each(heatsinks, function (index, mod) {
     var hackSpeed = parseInt(mod.stats.HACK_SPEED) / 1000000;
