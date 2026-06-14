@@ -242,10 +242,10 @@ window.dialog = function (options) {
     // ui-modal includes overrides for modal dialogs
     dialog.parent().addClass('ui-modal');
   } else {
-    const baseElement = dialog.dialog().parents('.ui-dialog');
-    baseElement.draggable('option', 'snap', true); // Enable snapping
-    baseElement.draggable('option', 'scroll', false); // Disable map scroll while dragging
-    baseElement.draggable('option', 'containment', 'window'); // prevent dragging outside of the window
+    const $wrapper = dialog.dialog('widget');
+    $wrapper.draggable('option', 'snap', true); // Enable snapping
+    $wrapper.draggable('option', 'scroll', false); // Disable map scroll while dragging
+    $wrapper.draggable('option', 'containment', 'window'); // prevent dragging outside of the window
   }
 
   // Run it
