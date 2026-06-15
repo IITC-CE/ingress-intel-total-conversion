@@ -336,7 +336,7 @@ try {
   })({}).exports(L);
 
   // eslint-disable-next-line
-  '@include_raw:external/jquery-3.6.0.min.js@';
+  '@include_raw:external/jquery-4.0.0.min.js@';
   // eslint-disable-next-line
   '@include_raw:external/jquery-ui-1.14.2.min.js@';
   // eslint-disable-next-line
