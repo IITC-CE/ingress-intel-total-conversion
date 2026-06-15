@@ -184,7 +184,7 @@ document.head.innerHTML =
   '<title>Ingress Intel Map</title>' +
   '<link rel="shortcut icon" href="/img/favicon.ico" />' +
   '<style>' +
-  '@include_css:external/jquery-ui-1.12.1-resizable.css@' +
+  '@include_css:external/jquery-ui-1.14.2-resizable.css@' +
   '</style>' +
   '<style>' +
   '@include_css:external/leaflet.css@' +
