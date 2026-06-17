@@ -30,6 +30,9 @@ window.setupTooltips = function (element) {
       // ensure all other tooltips are closed
       $('.ui-tooltip').not(ui.tooltip).remove();
     },
+    close: function () {
+      $('.ui-helper-hidden-accessible > *:not(:last)').remove();
+    },
     content: function () {
       var title = $(this).attr('title');
       return window.convertTextToTableMagic(title);
@@ -40,6 +43,7 @@ window.setupTooltips = function (element) {
     window.tooltipClearerHasBeenSetup = true;
     $(document).on('click', '.ui-tooltip', function () {
       $(this).remove();
+      $('.ui-helper-hidden-accessible > *:not(:last)').remove();
     });
   }
 };
@@ -336,9 +340,9 @@ try {
   })({}).exports(L);
 
   // eslint-disable-next-line
-  '@include_raw:external/jquery-3.6.0.min.js@';
+  '@include_raw:external/jquery-4.0.0.min.js@';
   // eslint-disable-next-line
-  '@include_raw:external/jquery-ui-1.12.1.min.js@';
+  '@include_raw:external/jquery-ui-1.14.2.min.js@';
   // eslint-disable-next-line
   '@include_raw:external/taphold.js@';
   // eslint-disable-next-line
