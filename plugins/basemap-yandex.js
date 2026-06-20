@@ -28,12 +28,15 @@ var mapYandex = {};
 mapYandex.types = {
   map: {
     type: 'map',
+    isDark: false,
   },
   satellite: {
     type: 'satellite',
+    isDark: true,
   },
   hybrid: {
     type: 'hybrid',
+    isDark: true,
   },
 };
 
@@ -47,7 +50,7 @@ function setup() {
 
   for (var name in mapYandex.types) {
     var options = L.extend({}, mapYandex.options, mapYandex.types[name]);
-    window.layerChooser.addBaseLayer(L.yandex(options), 'Yandex ' + name);
+    window.layerChooser.addBaseLayer(L.yandex(options), 'Yandex ' + name, { isDark: options.isDark });
   }
 }
 
