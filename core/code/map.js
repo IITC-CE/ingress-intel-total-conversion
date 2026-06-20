@@ -116,12 +116,13 @@ function createDefaultBaseMapLayers() {
   var cartoAttr =
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
   var cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png';
-  baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all' });
-  baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all' });
+  baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all', isDark: true });
+  baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all', isDark: false });
 
   // Google Maps - including ingress default (using the stock-intel API-key)
   baseLayers['Google Default Ingress Map'] = new L.GridLayer.GoogleMutant({
     type: 'roadmap',
+    isDark: true,
     backgroundColor: '#0e3d4e',
     styles: [
       { featureType: 'all', elementType: 'all', stylers: [{ visibility: 'on' }, { hue: '#131c1c' }, { saturation: '-50' }, { invert_lightness: true }] },
@@ -131,16 +132,16 @@ function createDefaultBaseMapLayers() {
       { featureType: 'road', elementType: 'labels.icon', stylers: [{ invert_lightness: !0 }] },
     ],
   });
-  baseLayers['Google Roads'] = new L.GridLayer.GoogleMutant({ type: 'roadmap' });
-  var trafficMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap' });
+  baseLayers['Google Roads'] = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
+  var trafficMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
   trafficMutant.addGoogleLayer('TrafficLayer');
   baseLayers['Google Roads + Traffic'] = trafficMutant;
-  var transitMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap' });
+  var transitMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
   transitMutant.addGoogleLayer('TransitLayer');
   baseLayers['Google Roads + Transit'] = transitMutant;
-  baseLayers['Google Satellite'] = new L.GridLayer.GoogleMutant({ type: 'satellite' });
-  baseLayers['Google Hybrid'] = new L.GridLayer.GoogleMutant({ type: 'hybrid' });
-  baseLayers['Google Terrain'] = new L.GridLayer.GoogleMutant({ type: 'terrain' });
+  baseLayers['Google Satellite'] = new L.GridLayer.GoogleMutant({ type: 'satellite', isDark: true });
+  baseLayers['Google Hybrid'] = new L.GridLayer.GoogleMutant({ type: 'hybrid', isDark: true });
+  baseLayers['Google Terrain'] = new L.GridLayer.GoogleMutant({ type: 'terrain', isDark: false });
 
   return baseLayers;
 }
@@ -397,7 +398,11 @@ window.setupMap = function () {
     // leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here
     map.on('baselayerchange', function () {
       map.setZoom(map.getZoom());
+      layerChooser.notifyBaseLayerChange();
     });
+
+    // also fire for the initial base layer
+    layerChooser.notifyBaseLayerChange();
 
     // Start map refresh (after Map location is set)
     window.mapDataRequest.start();
