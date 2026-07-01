@@ -103,6 +103,8 @@ Called after each map data request is finished. Argument is {success: boolean}.<
 Parameters are guid, success, details.</li>
 <li><code>paneChanged</code>: Called when the current pane has changed. On desktop, this changes the current chat pane;
 on mobile, it also switches between map, info, and other panes defined by plugins.</li>
+<li><code>baseLayerChanged</code>: Called when the active base map layer changes, and once on initial load.
+Provides <code>{ name, layer, isDark }</code>, where <code>isDark</code> tells whether the map is dark-themed.</li>
 <li><code>artifactsUpdated</code>: Called when the set of artifacts (including targets) has changed.
 Parameters are old, new.</li>
 <li><code>nicknameClicked</code>: Event triggered when a player's nickname is clicked.</li>
@@ -216,7 +218,7 @@ Parameters are old, new.</li>
             
             <div class="container-source members">
                 <code><a href="code_hooks.js.html">code/hooks.js</a></code>,
-                <code><a href="code_hooks.js.html#line93">line 93</a></code>
+                <code><a href="code_hooks.js.html#line95">line 95</a></code>
             </div>
             
         </h4>
@@ -378,7 +380,7 @@ Parameters are old, new.</li>
             
             <div class="container-source members">
                 <code><a href="code_hooks.js.html">code/hooks.js</a></code>,
-                <code><a href="code_hooks.js.html#line112">line 112</a></code>
+                <code><a href="code_hooks.js.html#line114">line 114</a></code>
             </div>
             
         </h4>
@@ -541,7 +543,7 @@ Callback must the SAME function to be unregistered.</p>
             
             <div class="container-source members">
                 <code><a href="code_hooks.js.html">code/hooks.js</a></code>,
-                <code><a href="code_hooks.js.html#line63">line 63</a></code>
+                <code><a href="code_hooks.js.html#line65">line 65</a></code>
             </div>
             
         </h4>

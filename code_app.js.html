@@ -187,6 +187,13 @@ window.runOnAppBeforeBoot = function () {
     });
   }
 
+  // forward the base map theme (light/dark) to the app
+  if (window.app.setMapDarkMode) {
+    window.addHook('baseLayerChanged', function (data) {
+      window.app.setMapDarkMode(data.isDark);
+    });
+  }
+
   // overwrite some functions **************************************************
   if (window.app.copy) {
     window.androidCopy = function (text) {
