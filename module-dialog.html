@@ -251,7 +251,7 @@
             
             <div class="container-source members">
                 <code><a href="code_dialog.js.html">code/dialog.js</a></code>,
-                <code><a href="code_dialog.js.html#line257">line 257</a></code>
+                <code><a href="code_dialog.js.html#line264">line 264</a></code>
             </div>
             
         </h4>
@@ -709,7 +709,7 @@ Text is auto-converted to HTML.</p></td>
             
 
             <td class="description last"><p>Whether to open a modal dialog. Implies draggable=false;
-dialogClass='ui-dialog-modal'. Note that modal dialogs hijack
+class set to 'ui-dialog-modal'. Note that modal dialogs hijack
 the entire screen and should only be used in specific cases.
 If IITC is running on mobile, modal will always be true.</p></td>
         </tr>
@@ -1058,9 +1058,12 @@ Receives a boolean argument <code>collapsing</code>.</p></td>
     <dt class="tag-see">See:</dt>
     <dd class="tag-see">
         <ul>
-            <li><a href="http://docs.jquery.com/UI/API/1.8/Dialog">http://docs.jquery.com/UI/API/1.8/Dialog</a> for a list of all jQuery UI Dialog options.
+            <li><p><a href="http://docs.jquery.com/UI/API/1.8/Dialog">http://docs.jquery.com/UI/API/1.8/Dialog</a> for a list of all jQuery UI Dialog options.
 If you previously applied a class to your dialog after creating it with alert(),
-dialogClass may be particularly useful.</li>
+classes may be particularly useful.</p>
+<p>NOTE:
+options.dialogClass is deprecated!
+use options.classes['ui-dialog'] = &quot;myclass&quot;</p></li>
         </ul>
     </dd>
     
