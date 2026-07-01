@@ -1171,13 +1171,7 @@ h3.title {
 }
 
 .ui-dialog {
-  max-width: calc(100vw - 2px);
-}
-
-@media (min-width: 700px) {
-  .ui-dialog {
-    max-width: 600px;
-  }
+  max-width: calc(100vw - 1rem);
 }
 
 .ui-dialog-content-hidden {
