@@ -30,8 +30,8 @@ mapTileBlank.addLayer = function () {
   var blankWhite = new L.TileLayer('@include_img:images/basemap-blank-tile-white.png@', blankOpt);
   var blankBlack = new L.TileLayer('@include_img:images/basemap-blank-tile-black.png@', blankOpt);
 
-  window.layerChooser.addBaseLayer(blankWhite, 'Blank Map (White)');
-  window.layerChooser.addBaseLayer(blankBlack, 'Blank Map (Black)');
+  window.layerChooser.addBaseLayer(blankWhite, 'Blank Map (White)', { isDark: false });
+  window.layerChooser.addBaseLayer(blankBlack, 'Blank Map (Black)', { isDark: true });
 };
 
 function setup() {

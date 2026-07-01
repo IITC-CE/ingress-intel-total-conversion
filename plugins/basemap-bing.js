@@ -28,15 +28,19 @@ var mapBing = {};
 mapBing.sets = {
   Road: {
     imagerySet: 'RoadOnDemand',
+    isDark: false,
   },
   Dark: {
     imagerySet: 'CanvasDark',
+    isDark: true,
   },
   Aerial: {
     imagerySet: 'Aerial',
+    isDark: true,
   },
   Hybrid: {
     imagerySet: 'AerialWithLabelsOnDemand',
+    isDark: true,
   },
 };
 
@@ -50,7 +54,7 @@ function setup() {
 
   for (var name in mapBing.sets) {
     var options = L.extend({}, mapBing.options, mapBing.sets[name]);
-    window.layerChooser.addBaseLayer(L.bingLayer(options), 'Bing ' + name);
+    window.layerChooser.addBaseLayer(L.bingLayer(options), 'Bing ' + name, { isDark: options.isDark });
   }
 }
 

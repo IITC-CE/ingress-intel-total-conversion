@@ -45,7 +45,7 @@ grayGMaps.addLayer = function () {
 
   var grayGMaps = new L.GridLayer.GoogleMutant(grayGMapsOptions);
 
-  window.layerChooser.addBaseLayer(grayGMaps, 'Google Gray');
+  window.layerChooser.addBaseLayer(grayGMaps, 'Google Gray', { isDark: false });
 };
 
 function setup() {
