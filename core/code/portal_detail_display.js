@@ -147,28 +147,80 @@ window.renderPortalToSideBar = function (portal) {
       $('<h3>', { class: 'title' })
         .text(title)
         .prepend(
-          $('<svg><use xlink:href="#ic_place_24px"/><title>Click to move to portal</title></svg>')
+          $('<svg><use xlink:href="#ic_place_24px"/></svg>')
             .attr({
-              class: 'material-icons icon-button',
+              class: 'material-icons0 icon-button',
               style: 'float: left',
+              title: 'Click to move to portal',
             })
             .click(function () {
               window.zoomToAndShowPortal(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
               if (window.isSmartphone()) {
                 window.show('map');
               }
-            })
+            }),
+          $('<span>')
+            .text('place')
+            .attr({
+              class: 'material-icons icon-button',
+              style: 'float: left',
+              title: 'old style material icon',
+            }),
+          $('<span>')
+            .text('location_on')
+            .attr({
+              class: 'material-symbols-outlined icon-button',
+              style: 'float: left; font-variation-settings: "FILL" 1;',
+              title: 'new style material symbol (filled)',
+            }),
+          $('<span>')
+            .text('location_on')
+            .attr({
+              class: 'material-symbols-outlined icon-button',
+              style: 'float: left; font-variation-settings: "FILL" 0;',
+              title: 'new style material symbol (open)',
+            }),
         ),
 
       $('<span>')
-        .attr({
+        .append(
+          $('<span>')
+            .text('close_small')
+            .attr({
+              class: 'material-symbols-outlined',
+              style: 'font-size: revert;',
+              title: 'new style material symbol (small)',
+            }),
+          $('<span>')
+            .text('close')
+            .attr({
+              class: 'material-symbols-outlined',
+              style: 'font-size: revert;',
+              title: 'new style material symbol',
+            }),
+          $('<span>')
+            .text('close')
+            .attr({
+              class: 'material-icons',
+              style: 'font-size: revert;',
+              title: 'old style material icon',
+            }),
+          $('<span>')
+            .text('x')
+            .attr({
+              title: 'small x',
+            }),
+          $('<span>')
+            .text('X')
+            .attr({
+              title: 'Close [w]',
+              accesskey: 'w',
+            })
+            .click(function () {
+              window.renderPortalDetails(null);
+            })
+        ).attr({
           class: 'close',
-          title: 'Close [w]',
-          accesskey: 'w',
-        })
-        .text('X')
-        .click(function () {
-          window.renderPortalDetails(null);
         }),
 
       // help cursor via ".imgpreview img"

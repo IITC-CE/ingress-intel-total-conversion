@@ -47,6 +47,7 @@ window.setupStyles = function () {
  * @function setupIcons
  */
 function setupIcons() {
+  // TODO: Delete this function as this icon would no longer be needed.
   $(
     [
       '<svg>',

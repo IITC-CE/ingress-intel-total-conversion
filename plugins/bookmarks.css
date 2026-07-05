@@ -291,6 +291,12 @@
 	overflow:hidden;
 	background-repeat:no-repeat;
 }
+#bmrksStarWip {
+    color: #fff;
+}
+#bmrksStarWip.favorite {
+    color: #ffce00;
+}
 .bkmrksStar span, .bkmrksStar.favorite:focus span{
 	background-position:left top;
 }

@@ -358,6 +358,7 @@ window.plugin.bookmarks.onPortalSelected = function () {
 window.plugin.bookmarks.updateStarPortal = function () {
   var guid = window.selectedPortal;
   $('.bkmrksStar').removeClass('favorite');
+  $('#bmrksStarWip').removeClass('favorite');
   $('.bkmrk a.bookmarksLink.selected').removeClass('selected');
 
   // If current portal is into bookmarks: select bookmark portal from portals list and select the star
@@ -366,6 +367,7 @@ window.plugin.bookmarks.updateStarPortal = function () {
     if (bkmrkData) {
       $('.bkmrk#' + bkmrkData['id_bookmark'] + ' a.bookmarksLink').addClass('selected');
       $('.bkmrksStar').addClass('favorite');
+      $('#bmrksStarWip').addClass('favorite');
     }
   }
 };
@@ -1315,7 +1317,13 @@ window.plugin.bookmarks.setupContent = function () {
 
   window.plugin.bookmarks.htmlDisabledMessage = '<div title="Your browser do not support localStorage">Plugin Bookmarks disabled*.</div>';
   window.plugin.bookmarks.htmlStar =
-    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><span></span></a>';
+    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><span></span>' +
+    '<foo id="bmrksStarWip">' +
+    '<bar class="material-icons" style="float: left">star</bar>' +
+    '<bar class="material-symbols-outlined" style="float: left; font-variation-settings: \'FILL\' 1;">star</bar>' +
+    '<bar class="material-symbols-outlined" style="float: left; font-variation-settings: \'FILL\' 1;">bookmark_star</bar>' +
+    '</foo>' +
+    '</a>';
   window.plugin.bookmarks.htmlMoveBtn =
     '<a id="bookmarksMove" class="btn" onclick="window.plugin.bookmarks.moveMode();return false;">Show/Hide "Move" button</a>';
 
