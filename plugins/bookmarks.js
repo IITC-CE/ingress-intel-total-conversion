@@ -1319,7 +1319,6 @@ window.plugin.bookmarks.setupContent = function () {
   window.plugin.bookmarks.htmlStar =
     '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><span></span>' +
     '<foo id="bmrksStarWip">' +
-    '<bar class="material-icons" style="float: left">star</bar>' +
     '<bar class="material-symbols-outlined" style="float: left; font-variation-settings: \'FILL\' 1;">star</bar>' +
     '<bar class="material-symbols-outlined" style="float: left; font-variation-settings: \'FILL\' 1;">bookmark_star</bar>' +
     '</foo>' +

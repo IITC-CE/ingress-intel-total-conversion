@@ -160,13 +160,6 @@ window.renderPortalToSideBar = function (portal) {
               }
             }),
           $('<span>')
-            .text('place')
-            .attr({
-              class: 'material-icons icon-button',
-              style: 'float: left',
-              title: 'old style material icon',
-            }),
-          $('<span>')
             .text('location_on')
             .attr({
               class: 'material-symbols-outlined icon-button',
@@ -197,13 +190,6 @@ window.renderPortalToSideBar = function (portal) {
               class: 'material-symbols-outlined',
               style: 'font-size: revert;',
               title: 'new style material symbol',
-            }),
-          $('<span>')
-            .text('close')
-            .attr({
-              class: 'material-icons',
-              style: 'font-size: revert;',
-              title: 'old style material icon',
             }),
           $('<span>')
             .text('x')
