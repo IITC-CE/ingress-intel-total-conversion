@@ -147,10 +147,11 @@ window.renderPortalToSideBar = function (portal) {
       $('<h3>', { class: 'title' })
         .text(title)
         .prepend(
-          $('<svg><use xlink:href="#ic_place_24px"/></svg>')
+          $('<span>')
+            .text('location_on')
             .attr({
-              class: 'material-icons0 icon-button',
-              style: 'float: left',
+              class: 'material-symbols-outlined icon-button',
+              style: 'float: left; font-variation-settings: "FILL" 1;',
               title: 'Click to move to portal',
             })
             .click(function () {
@@ -158,47 +159,16 @@ window.renderPortalToSideBar = function (portal) {
               if (window.isSmartphone()) {
                 window.show('map');
               }
-            }),
-          $('<span>')
-            .text('location_on')
-            .attr({
-              class: 'material-symbols-outlined icon-button',
-              style: 'float: left; font-variation-settings: "FILL" 1;',
-              title: 'new style material symbol (filled)',
-            }),
-          $('<span>')
-            .text('location_on')
-            .attr({
-              class: 'material-symbols-outlined icon-button',
-              style: 'float: left; font-variation-settings: "FILL" 0;',
-              title: 'new style material symbol (open)',
-            }),
+            })
         ),
 
       $('<span>')
         .append(
           $('<span>')
-            .text('close_small')
-            .attr({
-              class: 'material-symbols-outlined',
-              style: 'font-size: revert;',
-              title: 'new style material symbol (small)',
-            }),
-          $('<span>')
             .text('close')
             .attr({
               class: 'material-symbols-outlined',
               style: 'font-size: revert;',
-              title: 'new style material symbol',
-            }),
-          $('<span>')
-            .text('x')
-            .attr({
-              title: 'small x',
-            }),
-          $('<span>')
-            .text('X')
-            .attr({
               title: 'Close [w]',
               accesskey: 'w',
             })
