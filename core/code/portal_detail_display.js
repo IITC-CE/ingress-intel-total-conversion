@@ -147,11 +147,11 @@ window.renderPortalToSideBar = function (portal) {
       $('<h3>', { class: 'title' })
         .text(title)
         .prepend(
-          $('<span>')
-            .text('location_on')
+          $('<mat-icon>')
+            .text('place')
             .attr({
-              class: 'material-symbols-outlined icon-button',
-              style: 'float: left; font-variation-settings: "FILL" 1;',
+              class: 'mat-fill icon-button',
+              style: 'float: left;',
               title: 'Click to move to portal',
             })
             .click(function () {
@@ -164,10 +164,9 @@ window.renderPortalToSideBar = function (portal) {
 
       $('<span>')
         .append(
-          $('<span>')
+          $('<mat-icon>')
             .text('close')
             .attr({
-              class: 'material-symbols-outlined',
               style: 'font-size: revert;',
               title: 'Close [w]',
               accesskey: 'w',
