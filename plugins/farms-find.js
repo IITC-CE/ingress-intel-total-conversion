@@ -269,8 +269,8 @@ window.plugin.farmFind.setupCSS = function () {
       '' +
         '#farm_level_select {' +
         ' position: absolute;' +
-        ' top: 5px;' +
-        ' left:180px;' +
+        ' top: calc(var(--safe-area-inset-top) + 5px);' +
+        ' left: calc(var(--safe-area-inset-left) + 180px);' +
         ' z-index: 2500;' +
         ' font-size:11px;' +
         ' font-family: "coda",arial,helvetica,sans-serif;' +
@@ -284,7 +284,19 @@ window.plugin.farmFind.setupCSS = function () {
 window.plugin.farmFind.setupSmartCSS = function () {
   $('<style>')
     .prop('type', 'text/css')
-    .html('#farm_level_select { top: 0px !important; right: 0px; left: auto !important; margin-right: 0; }\n')
+    .html(
+      '' +
+        '#farm_level_select {' +
+        ' top: var(--safe-area-inset-top) !important;' +
+        ' right: var(--safe-area-inset-right);' +
+        ' left: auto !important;' +
+        ' margin-right: 0;' +
+        '}\n' +
+        'body.show-controls #farm_level_select {' +
+        ' top: calc(var(--safe-area-inset-top) + var(--top-controls-height) + 10px) !important;' +
+        ' right: calc(var(--safe-area-inset-right) + 60px);' +
+        '}\n'
+    )
     .appendTo('head');
 };
 
