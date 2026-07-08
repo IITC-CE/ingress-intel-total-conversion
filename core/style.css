@@ -729,7 +729,7 @@ input[type="search"], input[type="url"] {
 
 /* portal title and image */
 h3.title {
-  padding-right: 40px; /* to not overlap with close button */
+  padding-right: 17px; /* to not overlap with close button */
   margin: 2px 0;
   line-height: 24px;
   overflow: hidden;
