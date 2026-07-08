@@ -270,38 +270,22 @@
 #bkmrksTrigger:hover{
 	margin-top:0;
 }
-.portal-list-bookmark span {
-	display:inline-block;
-	margin: -3px;
-	width:16px;
-	height:15px;
-	overflow:hidden;
-	background-repeat:no-repeat;
-	cursor:pointer;
-}
-#bkmrksTrigger, .bkmrksStar span, .portal-list-bookmark span {
-	background-image:url(images/bookmarks-img.png);
-}
-.bkmrksStar span{
-	display:inline-block;
-	float:left;
-	margin:3px 1px 0 4px;
-	width:16px;
-	height:15px;
-	overflow:hidden;
-	background-repeat:no-repeat;
-}
-#bmrksStarWip {
+
+.bkmrksStar {
     color: #fff;
 }
-#bmrksStarWip.favorite {
+.bkmrksStar.favorite, .portal-list-bookmark.favorite > * {
     color: #ffce00;
 }
-.bkmrksStar span, .bkmrksStar.favorite:focus span{
-	background-position:left top;
+
+.portal-list-bookmark > * {
+        font-size: larger;
+	overflow:hidden;
+	cursor:pointer;
 }
-.bkmrksStar:focus span, .bkmrksStar.favorite span, .portal-list-bookmark.favorite span{
-	background-position:right top;
+
+#bkmrksTrigger {
+	background-image:url(images/bookmarks-img.png);
 }
 #bookmarksBox .bookmarkList .bookmarkFolder{
 	overflow:hidden;
@@ -564,12 +548,6 @@
 #bookmarksBox.mobile .bookmarkList li.bookmarkFolder ul{
 	display:none !important;
 	min-height:37px !important;
-}
-#updatestatus .bkmrksStar{
-	float:left;
-	margin:-19px 0 0 -5px;
-	padding:0 3px 1px 4px;
-	background:#262c32;
 }
 #bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel .bookmarksAnchor span,
 #bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel > span,
