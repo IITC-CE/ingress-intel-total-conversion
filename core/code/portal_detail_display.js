@@ -161,7 +161,10 @@ window.renderPortalToSideBar = function (portal) {
                 window.show('map');
               }
             }),
-          $('<span>', { class: 'value' })
+          $('<span>')
+            .attr({
+              class: 'value',
+            })
             .text(title),
           $('<span>')
             .attr({
@@ -172,7 +175,7 @@ window.renderPortalToSideBar = function (portal) {
             .text('X')
             .click(function () {
               window.renderPortalDetails(null);
-            }),
+            })
         ),
 
       // help cursor via ".imgpreview img"
