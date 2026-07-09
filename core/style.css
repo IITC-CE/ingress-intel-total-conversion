@@ -732,17 +732,28 @@ input[type="search"], input[type="url"] {
   padding: 0;
 }
 
-
-/* portal title and image */
-h3.title {
-  padding-right: 17px; /* to not overlap with close button */
+#portaltitle {
+  display: flex;
   margin: 2px 0;
   line-height: 24px;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+#portaltitle .value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+#portaltitle .close {
+  margin-right: 2px;
+  margin-top: -2px;
+  cursor: pointer;
+  color: #FFCE00;
+  font-weight: normal;
+}
+
+/* portal image */
 .imgpreview {
   height: 190px;
   background: no-repeat center center;
@@ -957,16 +968,6 @@ h3.title {
 
 #portaldetails {
   min-height: 63px;
-  position: relative; /* so the below '#portaldetails .close' is relative to this */
-}
-
-#portaldetails .close {
-  position: absolute;
-  top: -2px;
-  right: 2px;
-  cursor: pointer;
-  color: #FFCE00;
-  font-size: 16px;
 }
 
 /* history details */
