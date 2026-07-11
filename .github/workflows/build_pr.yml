@@ -4,8 +4,6 @@ name: Build PR
 # no access to secrets
 on:
   pull_request:
-    paths-ignore:
-      - '!.github/**'
 
 jobs:
   build:
