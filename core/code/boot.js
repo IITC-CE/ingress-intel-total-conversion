@@ -270,6 +270,33 @@ function updateControlBarZIndex() {
   });
 }
 
+function setupWebComponents() {
+
+  class MaterialSymbolIcon extends HTMLElement {
+    // This could be used to implement a fallback if necessary.
+    static #ready = false;
+
+    connectedCallback() {
+      console.log('ready', this.constructor.#ready);
+      this.classList.add('material-symbols-outlined', 'mat-resolved');
+    }
+
+    static {
+      document.fonts.ready.then((fontSet) => {
+        fontSet.forEach((font) => {
+          if (font.family === '"Material Symbols Outlined"') {
+            font.loaded.then(() => {
+              MaterialSymbolIcon.#ready = true;
+            });
+          }
+        });
+      });
+    }
+
+  }
+
+  customElements.define('mat-icon', MaterialSymbolIcon);
+}
 
 /**
  * The main boot function that initializes IITC. It is responsible for setting up the map,
@@ -287,6 +314,7 @@ function boot() {
   var loadPlugins = prepPluginsToLoad();
   loadPlugins('boot');
 
+  setupWebComponents();
   window.setupDialogs();
   checkingIntelURL();
   setupIngressMarkers();

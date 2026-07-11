@@ -147,10 +147,12 @@ window.renderPortalToSideBar = function (portal) {
       $('<h3>', { class: 'title' })
         .text(title)
         .prepend(
-          $('<svg><use xlink:href="#ic_place_24px"/><title>Click to move to portal</title></svg>')
+          $('<mat-icon>')
+            .text('place')
             .attr({
-              class: 'material-icons icon-button',
-              style: 'float: left',
+              class: 'mat-fill icon-button',
+              style: 'float: left;',
+              title: 'Click to move to portal',
             })
             .click(function () {
               window.zoomToAndShowPortal(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
@@ -161,14 +163,19 @@ window.renderPortalToSideBar = function (portal) {
         ),
 
       $('<span>')
-        .attr({
+        .append(
+          $('<mat-icon>')
+            .text('close')
+            .attr({
+              style: 'font-size: revert;',
+              title: 'Close [w]',
+              accesskey: 'w',
+            })
+            .click(function () {
+              window.renderPortalDetails(null);
+            })
+        ).attr({
           class: 'close',
-          title: 'Close [w]',
-          accesskey: 'w',
-        })
-        .text('X')
-        .click(function () {
-          window.renderPortalDetails(null);
         }),
 
       // help cursor via ".imgpreview img"

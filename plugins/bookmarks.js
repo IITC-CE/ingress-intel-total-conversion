@@ -358,6 +358,7 @@ window.plugin.bookmarks.onPortalSelected = function () {
 window.plugin.bookmarks.updateStarPortal = function () {
   var guid = window.selectedPortal;
   $('.bkmrksStar').removeClass('favorite');
+  $('#bmrksStarWip').removeClass('favorite');
   $('.bkmrk a.bookmarksLink.selected').removeClass('selected');
 
   // If current portal is into bookmarks: select bookmark portal from portals list and select the star
@@ -366,6 +367,7 @@ window.plugin.bookmarks.updateStarPortal = function () {
     if (bkmrkData) {
       $('.bkmrk#' + bkmrkData['id_bookmark'] + ' a.bookmarksLink').addClass('selected');
       $('.bkmrksStar').addClass('favorite');
+      $('#bmrksStarWip').addClass('favorite');
     }
   }
 };
@@ -1263,7 +1265,11 @@ window.plugin.bookmarks.setupPortalsList = function () {
       $(cell).addClass('portal-list-bookmark').attr('data-list-bookmark', guid);
 
       // for some reason, jQuery removes event listeners when the list is sorted. Therefore we use DOM's addEventListener
-      $('<span>')
+      $('<mat-icon>')
+        .text('star')
+        .attr({
+          class: 'mat-fill',
+        })
         .appendTo(cell)[0]
         .addEventListener(
           'click',
@@ -1315,7 +1321,9 @@ window.plugin.bookmarks.setupContent = function () {
 
   window.plugin.bookmarks.htmlDisabledMessage = '<div title="Your browser do not support localStorage">Plugin Bookmarks disabled*.</div>';
   window.plugin.bookmarks.htmlStar =
-    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><span></span></a>';
+    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]">' +
+    '<mat-icon class="mat-fill" style="float: left;">star</bar>' +
+    '</a>';
   window.plugin.bookmarks.htmlMoveBtn =
     '<a id="bookmarksMove" class="btn" onclick="window.plugin.bookmarks.moveMode();return false;">Show/Hide "Move" button</a>';
 

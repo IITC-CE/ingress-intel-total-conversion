@@ -192,8 +192,22 @@ document.head.innerHTML =
   '<style>' +
   '@include_string:style.css@' +
   '</style>' +
+  '<style>' +
+  '  :root {' +
+  '    --mat-fill: 0;' +
+  '  }' +
+  '  .mat-fill {' +
+  '    --mat-fill: 1;' +
+  '  }' +
+  '  .mat-resolved {' +
+  '    font-variation-settings: "FILL" var(--mat-fill);' +
+  '    text-transform: capitalize;' +
+  '  }' +
+  '</style>' +
   // note: smartphone.css injection moved into code/smartphone.js
+  '<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1"/>' +
   '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
+
 
 // remove body element entirely to remove event listeners
 document.body = document.createElement('body');
