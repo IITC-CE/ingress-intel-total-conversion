@@ -14,6 +14,36 @@
 const IITC = {};
 window.IITC = IITC;
 
+/**
+ * Registers backward-compatibility aliases on `window` for functions that have moved into an `IITC.*` namespace.
+ *
+ * For each `[oldName, newName]` pair it ensures `namespace[newName]` exists and defines a getter/setter
+ * on `window[oldName]` that stays in sync with `namespace[newName]`. This keeps legacy code that reads
+ * or overrides the old global working after a function has been moved into a namespace.
+ *
+ * @memberof IITC
+ * @function registerLegacyAliases
+ * @param {Object} namespace - Target namespace object holding the functions under their new names.
+ * @param {Object.<string, string>} mappings - Map of legacy global name to the new name within `namespace`.
+ */
+IITC.registerLegacyAliases = function (namespace, mappings) {
+  Object.entries(mappings).forEach(([oldName, newName]) => {
+    // Initialize the target so the alias is usable even before the module assigns the real function
+    namespace[newName] = namespace[newName] || function () {};
+
+    // Define a getter/setter on `window` to synchronize with the namespace
+    Object.defineProperty(window, oldName, {
+      get() {
+        return namespace[newName];
+      },
+      set(newFunc) {
+        namespace[newName] = newFunc;
+      },
+      configurable: true,
+    });
+  });
+};
+
 window.script_info = plugin_info;
 window.script_info.changelog = [
   {
@@ -287,7 +317,6 @@ window.REFRESH_GAME_SCORE = 15 * 60;
  */
 window.MAX_IDLE_TIME = 15 * 60;
 
-
 /**
  * Controls requesting chat data based on the pixel distance from the line currently in view
  * and the top of history, in pixels, default 200
@@ -295,7 +324,6 @@ window.MAX_IDLE_TIME = 15 * 60;
  * @memberof config_options
  */
 window.CHAT_REQUEST_SCROLL_TOP = 200;
-
 
 /**
  * What colour should the selected portal be, string(css hex code), default ‘#f0f’ (hot pink)

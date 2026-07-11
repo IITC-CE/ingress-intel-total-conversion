@@ -125,15 +125,7 @@ IITC.search.setup = function () {
 };
 
 // Redirect all window.search access to IITC.search
-Object.defineProperty(window, 'search', {
-  get() {
-    return IITC.search;
-  },
-  set(value) {
-    IITC.search = value;
-  },
-  configurable: true,
-});
+IITC.registerLegacyAliases(IITC, { search: 'search' });
 
 /*
  * @deprecated - use query.addPortalResult
