@@ -25,6 +25,7 @@
     "build:local": "./build.py local",
     "build:mobile": "./build.py mobile",
     "fileserver": "./web_server_local.py local",
+    "docs": "jsdoc -c jsdoc-conf.json -R README.md -d ./docs",
     "test": "mocha -r test/_mocks.js --exit"
   }
 }
