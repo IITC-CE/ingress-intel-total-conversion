@@ -4,8 +4,6 @@ name: reviewdog
 # no access to secrets
 on:
   pull_request:
-    paths-ignore:
-      - '!.github/**'
 
 jobs:
   eslint:
@@ -17,7 +15,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: reviewdog/action-eslint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

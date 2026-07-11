@@ -8,7 +8,8 @@ local*.py
 .pydevproject
 .DS_Store
 
-node_modules
+node_modules/
+docs/
 
 ### JetBrains IDE Ignores ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm

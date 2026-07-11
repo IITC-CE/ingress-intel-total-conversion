@@ -9,20 +9,20 @@ name: Tests
 
 jobs:
   test:
-    name: 'Node.js v18'
+    name: 'Node.js LTS'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: 'lts/*'
       - name: 'Cache node_modules'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-18-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-18-
+            ${{ runner.os }}-node-
       - name: Install Dependencies
         run: npm install
       - name: Run All Node.js Tests

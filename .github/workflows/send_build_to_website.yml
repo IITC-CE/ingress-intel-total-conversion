@@ -11,10 +11,12 @@ on:
 jobs:
   upload:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: 'Download artifact'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         if: ${{ env.WEBSITE_REPO != '' }}
@@ -52,17 +54,22 @@ jobs:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         if: ${{ env.WEBSITE_REPO != '' && github.event.workflow_run.event == 'pull_request' }}
         run: |
-          echo "PR_NUMBER=$(cat ./.metadata/pr_number)" >> "$GITHUB_ENV"
-          echo "COMMIT_HASH=$(cat ./.metadata/commit)" >> "$GITHUB_ENV"
-          echo "BUILD_APK_FILENAME=$(cat ./.metadata/apk_filename)" >> "$GITHUB_ENV"
-          echo "BUILD_ZIP_FILENAME=$(cat ./.metadata/zip_filename)" >> "$GITHUB_ENV"
-          echo "BUILDSTAMP=$(cat ./.metadata/buildstamp)" >> "$GITHUB_ENV"
+          # metadata comes from an untrusted PR build artifact; keep only the
+          # first line of each value so it cannot inject extra GITHUB_ENV vars
+          read_meta() { head -n1 "$1" | tr -d '\r\n'; }
+          {
+            echo "PR_NUMBER=$(read_meta ./.metadata/pr_number)"
+            echo "COMMIT_HASH=$(read_meta ./.metadata/commit)"
+            echo "BUILD_APK_FILENAME=$(read_meta ./.metadata/apk_filename)"
+            echo "BUILD_ZIP_FILENAME=$(read_meta ./.metadata/zip_filename)"
+            echo "BUILDSTAMP=$(read_meta ./.metadata/buildstamp)"
+          } >> "$GITHUB_ENV"
 
       - name: Comment with build url for PR
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         if: ${{ env.WEBSITE_REPO != '' && github.event.workflow_run.event == 'pull_request' }}
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: pr_release
           number: ${{ env.PR_NUMBER }}
@@ -79,7 +86,7 @@ jobs:
         env:
           WEBSITE_REPO: ${{ secrets.WEBSITE_REPO }}
         if: ${{ env.WEBSITE_REPO != '' }}
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           repository: ${{ env.WEBSITE_REPO }}

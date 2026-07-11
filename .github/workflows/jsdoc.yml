@@ -5,27 +5,28 @@ on:
     branches:
       - master
   pull_request:
-    paths-ignore:
-      - '!.github/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Build
-        uses: zhennann/jsdoc-action@v1
-        with:
-          output_dir: ./out
-          config_file: jsdoc-conf.json
-          template: tui-jsdoc-template
-          front_page: README.md
+        run: npm run docs
 
       - name: Deploy
         if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_dir: ./out
+          publish_dir: ./docs

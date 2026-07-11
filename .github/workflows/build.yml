@@ -10,16 +10,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.9'
 
@@ -63,7 +65,7 @@ jobs:
         with:
           allowUpdates: true
           artifactErrorsFailBuild: true
-          artifacts: "./build/${{ env.BUILD_TYPE }}/*.zip,./build/${{ env.BUILD_TYPE }}/*.apk"
+          artifacts: './build/${{ env.BUILD_TYPE }}/*.zip,./build/${{ env.BUILD_TYPE }}/*.apk'
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Send APK to Telegram
@@ -88,7 +90,7 @@ jobs:
           echo $( ls ./artifact/build/ | grep '.zip' ) > ./artifact/.metadata/zip_filename
           echo $(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./artifact/build/total-conversion-build.user.js)") > ./artifact/.metadata/buildstamp
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: build
           include-hidden-files: true
