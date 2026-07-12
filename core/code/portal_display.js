@@ -1,18 +1,19 @@
 /* global IITC, L -- eslint */
 
 /**
- * @file Main code block that renders the portal details in the sidebar and
- * methods that highlight the portal in the map view.
- * @module portal_detail_display
+ * Namespace that renders portal details in the sidebar and highlights the selected portal on the map.
+ *
+ * @memberof IITC.portal
+ * @namespace display
  */
 
 /**
  * Resets the scroll position of the sidebar when a new portal is selected.
  *
- * @function resetScrollOnNewPortal
+ * @memberof IITC.portal.display
  */
-window.resetScrollOnNewPortal = function () {
-  if (window.selectedPortal !== window.renderPortalDetails.lastVisible) {
+const resetScroll = function () {
+  if (window.selectedPortal !== IITC.portal.display.renderDetails.lastVisible) {
     // another portal selected so scroll position become irrelevant to new portal details
     $('#sidebar').scrollTop(0); // NB: this works ONLY when #sidebar:visible
   }
@@ -23,19 +24,19 @@ window.resetScrollOnNewPortal = function () {
  * This includes a permalink for the portal, a link for Ingress Prime, and links to alternative maps.
  * Function is overwritten in `app.js`
  *
- * @function renderPortalUrl
+ * @memberof IITC.portal.display
  * @param {number} lat - The latitude of the portal.
  * @param {number} lng - The longitude of the portal.
  * @param {string} title - The title of the portal.
  * @param {string} guid - The GUID of the portal.
  */
-window.renderPortalUrl = function (lat, lng, title, guid) {
+const renderUrl = function (lat, lng, title, guid) {
   var linkDetails = $('.linkdetails');
 
   // a permalink for the portal
   var permaHtml = $('<a>')
     .attr({
-      href: window.makePermalink([lat, lng]),
+      href: IITC.portal.display.makePermalink([lat, lng]),
       title: 'Create a URL link to this portal',
     })
     .text('Portal link');
@@ -43,7 +44,7 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
 
   var scannerLink = $('<a>')
     .attr({
-      href: window.makePrimeLink(guid, lat, lng),
+      href: IITC.portal.display.makePrimeLink(guid, lat, lng),
       title: 'Copy link to this portal for Ingress Prime',
     })
     .click(function (event) {
@@ -60,33 +61,33 @@ window.renderPortalUrl = function (lat, lng, title, guid) {
       title: 'Link to alternative maps (Google, etc)',
     })
     .text('Map links')
-    .click(window.showPortalPosLinks.bind(this, lat, lng, title));
+    .click(IITC.portal.display.tools.showPosLinks.bind(this, lat, lng, title));
   linkDetails.append($('<aside>').append(mapHtml));
 };
 
 /**
  * Selects a portal, refresh its data and renders the details of the portal in the sidebar.
  *
- * @function renderPortalDetails
+ * @memberof IITC.portal.display
  * @param {string|null} guid - The globally unique identifier of the portal to display details for.
  * @param {boolean} [forceSelect=false] - If true, forces the portal to be selected even if it's already the current portal.
  */
-window.renderPortalDetails = function (guid, forceSelect) {
+const renderDetails = function (guid, forceSelect) {
   if (forceSelect || window.selectedPortal !== guid) {
-    window.selectPortal(guid && window.portals[guid] ? guid : null, 'renderPortalDetails');
+    IITC.portal.display.select(guid && window.portals[guid] ? guid : null, 'renderPortalDetails');
   }
 
   if ($('#sidebar').is(':visible')) {
-    window.resetScrollOnNewPortal();
-    window.renderPortalDetails.lastVisible = guid;
+    IITC.portal.display.resetScroll();
+    IITC.portal.display.renderDetails.lastVisible = guid;
   }
 
-  if (guid && !window.portalDetail.isFresh(guid)) {
-    window.portalDetail.request(guid);
+  if (guid && !IITC.portal.details.isFresh(guid)) {
+    IITC.portal.details.request(guid);
   }
 
   if (!guid || !window.portals[guid]) {
-    window.selectPortalWhenLoadedByGuid(guid);
+    IITC.portal.selectWhenLoadedByGuid(guid);
     $('#portaldetails').html('');
     IITC.statusbar.portal.update();
     if (window.isSmartphone()) {
@@ -95,29 +96,29 @@ window.renderPortalDetails = function (guid, forceSelect) {
     return;
   }
 
-  window.renderPortalToSideBar(window.portals[guid]);
+  IITC.portal.display.renderToSidebar(window.portals[guid]);
 };
 
 /**
  * Renders the details of a portal in the sidebar.
  *
- * @function renderPortalToSideBar
+ * @memberof IITC.portal.display
  * @param {L.PortalMarker} portal - The portal marker object holding portal details.
  */
-window.renderPortalToSideBar = function (portal) {
+const renderToSidebar = function (portal) {
   var guid = portal.options.guid;
   var details = portal.getDetails();
   var hasFullDetails = portal.hasFullDetails();
-  var historyDetails = window.getPortalHistoryDetails(details);
+  var historyDetails = IITC.portal.display.tools.getHistoryDetails(details);
 
-  var modDetails = hasFullDetails ? '<div class="mods">' + window.getModDetails(details) + '</div>' : '';
-  var miscDetails = hasFullDetails ? window.getPortalMiscDetails(guid, details) : '';
-  var resoDetails = hasFullDetails ? window.getResonatorDetails(details) : '';
+  var modDetails = hasFullDetails ? '<div class="mods">' + IITC.portal.display.tools.getModDetails(details) + '</div>' : '';
+  var miscDetails = hasFullDetails ? IITC.portal.display.getMiscDetails(guid, details) : '';
+  var resoDetails = hasFullDetails ? IITC.portal.display.tools.getResonatorDetails(details) : '';
 
   // TODO? other status details...
   var statusDetails = hasFullDetails ? '' : '<div id="portalStatus">Loading details...</div>';
 
-  var img = window.fixPortalImageUrl(details.image);
+  var img = IITC.portal.fixImageUrl(details.image);
   var title = details.title || 'null';
 
   var lat = details.latE6 / 1e6;
@@ -129,7 +130,7 @@ window.renderPortalToSideBar = function (portal) {
   var levelInt = portal.options.level;
   var levelDetails = levelInt;
   if (hasFullDetails) {
-    var portalLevel = window.getPortalLevel(details); // resonator-based fractional level
+    var portalLevel = IITC.portal.getLevel(details); // resonator-based fractional level
     levelDetails = portalLevel;
     if (levelInt !== 8) {
       const req_reso_levels = 8 * (levelInt + 1 - portalLevel);
@@ -156,7 +157,7 @@ window.renderPortalToSideBar = function (portal) {
               class: 'material-icons icon-button',
             })
             .click(function () {
-              window.zoomToAndShowPortal(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
+              IITC.portal.zoomToAndShow(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
               if (window.isSmartphone()) {
                 window.show('map');
               }
@@ -174,7 +175,7 @@ window.renderPortalToSideBar = function (portal) {
             })
             .text('X')
             .click(function () {
-              window.renderPortalDetails(null);
+              IITC.portal.display.renderDetails(null);
             })
         ),
 
@@ -195,35 +196,35 @@ window.renderPortalToSideBar = function (portal) {
       historyDetails
     );
 
-  window.renderPortalUrl(lat, lng, title, guid);
+  IITC.portal.display.renderUrl(lat, lng, title, guid);
 
   // only run the hooks when we have a portalDetails object - most plugins rely on the extended data
   // TODO? another hook to call always, for any plugins that can work with less data?
   if (hasFullDetails) {
     // compatibility
-    var data = window.getPortalSummaryData(details);
+    var data = IITC.portal.getSummaryData(details);
 
     window.runHooks('portalDetailsUpdated', { guid: guid, portal: portal, portalDetails: details, portalData: data });
 
-    window.setPortalIndicators(portal);
+    IITC.portal.display.setIndicators(portal);
   }
 };
 
 /**
  * Gets miscellaneous details for a specified portal.
  *
- * @function getPortalMiscDetails
+ * @memberof IITC.portal.display
  * @param {string} guid - The GUID of the portal.
  * @param {Object} d - The portal detail object containing various properties of the portal.
  * @returns {string} HTML string representing the miscellaneous details of the portal.
  */
-window.getPortalMiscDetails = function (guid, d) {
+const getMiscDetails = function (guid, d) {
   var randDetails;
 
   if (d) {
     // collect some random data that’s not worth to put in an own method
-    var linkInfo = window.getPortalLinks(guid);
-    var maxOutgoing = window.getMaxOutgoingLinks(d);
+    var linkInfo = IITC.portal.getLinks(guid);
+    var maxOutgoing = IITC.portal.getMaxOutgoingLinks(d);
     var linkCount = linkInfo.in.length + linkInfo.out.length;
     var links = { incoming: linkInfo.in.length, outgoing: linkInfo.out.length };
 
@@ -237,13 +238,13 @@ window.getPortalMiscDetails = function (guid, d) {
     var player = d.owner ? '<span class="nickname">' + d.owner + '</span>' : '-';
     var playerText = ['owner', player];
 
-    var fieldCount = window.getPortalFieldsCount(guid);
+    var fieldCount = IITC.portal.getFieldsCount(guid);
 
     var fieldsText = ['fields', fieldCount];
 
-    var apGainText = window.getAttackApGainText(d, fieldCount, linkCount);
+    var apGainText = IITC.portal.display.tools.getAttackApGainText(d, fieldCount, linkCount);
 
-    var attackValues = window.getPortalAttackValues(d);
+    var attackValues = IITC.portal.getAttackValues(d);
 
     // collect and html-ify random data
 
@@ -252,14 +253,14 @@ window.getPortalMiscDetails = function (guid, d) {
       // maybe check if portal is captured and remove?
       // But this makes the info panel look rather empty for unclaimed portals
       playerText,
-      window.getRangeText(d),
+      IITC.portal.display.tools.getRangeText(d),
       linksText,
       fieldsText,
-      window.getMitigationText(d, linkCount),
-      window.getEnergyText(d),
+      IITC.portal.display.tools.getMitigationText(d, linkCount),
+      IITC.portal.display.tools.getEnergyText(d),
       // and these have some use, even for uncaptured portals
       apGainText,
-      window.getHackDetailsText(d),
+      IITC.portal.display.tools.getHackDetailsText(d),
     ];
 
     if (attackValues.attack_frequency !== 0) {
@@ -303,10 +304,10 @@ window.getPortalMiscDetails = function (guid, d) {
  * The function adds circles indicating the hack range and link range of the portal.
  * If the portal object are null, the indicators are removed.
  *
- * @function setPortalIndicators
+ * @memberof IITC.portal.display
  * @param {Object} p - The portal object for which to set the indicators.
  */
-window.setPortalIndicators = function (p) {
+const setIndicators = function (p) {
   if (window.portalRangeIndicator) window.map.removeLayer(window.portalRangeIndicator);
   window.portalRangeIndicator = null;
   if (window.portalAccessIndicator) window.map.removeLayer(window.portalAccessIndicator);
@@ -320,9 +321,9 @@ window.setPortalIndicators = function (p) {
     // range is only known for sure if we have portal details
     // TODO? render a min range guess until details are loaded..?
 
-    var d = window.portalDetail.get(p.options.guid);
+    var d = IITC.portal.details.get(p.options.guid);
     if (d) {
-      var range = window.getPortalRange(d);
+      var range = IITC.portal.getRange(d);
       window.portalRangeIndicator = (
         range.range > 0
           ? L.geodesicCircle(coord, range.range, {
@@ -348,11 +349,11 @@ window.setPortalIndicators = function (p) {
 /**
  * Highlights the selected portal on the map and clears the highlight from the previously selected portal.
  *
- * @function selectPortal
+ * @memberof IITC.portal.display
  * @param {string} guid - The GUID of the portal to select.
  * @returns {boolean} True if the same portal is re-selected (just an update), false if a different portal is selected.
  */
-window.selectPortal = function (guid, event) {
+const select = function (guid, event) {
   var update = window.selectedPortal === guid;
   var oldPortalGuid = window.selectedPortal;
   window.selectedPortal = guid;
@@ -366,7 +367,7 @@ window.selectPortal = function (guid, event) {
   // Change style of selected portal
   if (newPortal) newPortal.setSelected(true);
 
-  window.setPortalIndicators(newPortal);
+  IITC.portal.display.setIndicators(newPortal);
 
   window.runHooks('portalSelected', {
     selectedPortalGuid: guid,
@@ -379,9 +380,9 @@ window.selectPortal = function (guid, event) {
 /**
  * Changes the coordinates and map scale to show the range for portal links.
  *
- * @function rangeLinkClick
+ * @memberof IITC.portal.display
  */
-window.rangeLinkClick = function () {
+const rangeLinkClick = function () {
   if (window.portalRangeIndicator) window.map.fitBounds(window.portalRangeIndicator.getBounds());
   if (window.isSmartphone()) window.show('map');
 };
@@ -392,13 +393,13 @@ window.rangeLinkClick = function () {
  * It is using Firebase's Dynamic Links feature.
  * https://firebase.google.com/docs/dynamic-links/create-manually
  *
- * @function makePrimeLink
+ * @memberof IITC.portal.display
  * @param {string} guid - The globally unique identifier of the portal.
  * @param {number} lat - The latitude of the portal.
  * @param {number} lng - The longitude of the portal.
  * @returns {string} The Ingress Prime link for the portal
  */
-window.makePrimeLink = function (guid, lat, lng) {
+const makePrimeLink = function (guid, lat, lng) {
   const base = 'https://link.ingress.com/';
   const link = {
     'link': `https://intel.ingress.com/portal/${guid}`,
@@ -424,6 +425,7 @@ window.makePrimeLink = function (guid, lat, lng) {
 /**
  * Generates a permalink URL based on the specified latitude and longitude and additional options.
  *
+ * @memberof IITC.portal.display
  * @param {L.LatLng|number[]} [latlng] - The latitude and longitude for the permalink.
  *                              Can be omitted to create mapview-only permalink.
  * @param {Object} [options] - Additional options for permalink generation.
@@ -431,7 +433,7 @@ window.makePrimeLink = function (guid, lat, lng) {
  * @param {boolean} [options.fullURL] - Generate a fully qualified URL (default: relative link).
  * @returns {string} The generated permalink URL.
  */
-window.makePermalink = function (latlng, options) {
+const makePermalink = function (latlng, options) {
   options = options || {};
 
   function round(l) {
@@ -456,3 +458,32 @@ window.makePermalink = function (latlng, options) {
   url += document.location.pathname;
   return url + '?' + args.join('&');
 };
+
+IITC.portal.display = {
+  resetScroll,
+  renderUrl,
+  renderDetails,
+  renderToSidebar,
+  getMiscDetails,
+  setIndicators,
+  select,
+  rangeLinkClick,
+  makePrimeLink,
+  makePermalink,
+};
+
+// Map of legacy global names to their new names within IITC.portal.display
+const legacyDisplayMappings = {
+  resetScrollOnNewPortal: 'resetScroll',
+  renderPortalUrl: 'renderUrl',
+  renderPortalDetails: 'renderDetails',
+  renderPortalToSideBar: 'renderToSidebar',
+  getPortalMiscDetails: 'getMiscDetails',
+  setPortalIndicators: 'setIndicators',
+  selectPortal: 'select',
+  rangeLinkClick: 'rangeLinkClick',
+  makePrimeLink: 'makePrimeLink',
+  makePermalink: 'makePermalink',
+};
+
+IITC.registerLegacyAliases(IITC.portal.display, legacyDisplayMappings);

@@ -1,19 +1,20 @@
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 /**
- * @file Hand any of these functions the details-hash of a portal, and they
- * will return pretty, displayable HTML or parts thereof.
- * @module portal_detail_display_tools
+ * Namespace with helpers that turn portal detail data into displayable HTML or parts thereof.
+ *
+ * @memberof IITC.portal.display
+ * @namespace tools
  */
 
 /**
  * Provides historical details about a portal including visitation, capture, and scout control status.
  *
- * @function getPortalHistoryDetails
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing the history properties.
  * @returns {string} HTML string representing the historical details of the portal.
  */
-window.getPortalHistoryDetails = function (d) {
+const getHistoryDetails = function (d) {
   if (!d.history) {
     return '<div id="historydetails" class="missing">History missing</div>';
   }
@@ -35,12 +36,12 @@ window.getPortalHistoryDetails = function (d) {
 /**
  * Returns displayable text and link about portal range including base range, link amp boost, and total range.
  *
- * @function getRangeText
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing range information.
  * @returns {Array} An array containing the range label, HTML content, and a tooltip title.
  */
-window.getRangeText = function (d) {
-  var range = window.getPortalRange(d);
+const getRangeText = function (d) {
+  var range = IITC.portal.getRange(d);
 
   var title = `Base range:\t${window.digits(Math.floor(range.base))}m\nLink amp boost:\t×${range.boost}\nRange:\t${window.digits(Math.floor(range.range))}m`;
 
@@ -60,11 +61,11 @@ window.getRangeText = function (d) {
 /**
  * Given portal details, returns HTML code to display mod details.
  *
- * @function getModDetails
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing mod information.
  * @returns {string} HTML string representing the mod details of the portal.
  */
-window.getModDetails = function (d) {
+const getModDetails = function (d) {
   var mods = [];
   var modsTitle = [];
   var modsColor = [];
@@ -143,13 +144,13 @@ window.getModDetails = function (d) {
 /**
  * Generates text representing the current and total energy of a portal.
  *
- * @function getEnergyText
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing energy information.
  * @returns {Array} An array containing the energy label, formatted energy values, and a tooltip title.
  */
-window.getEnergyText = function (d) {
-  var currentNrg = window.getCurrentPortalEnergy(d);
-  var totalNrg = window.getTotalPortalEnergy(d);
+const getEnergyText = function (d) {
+  var currentNrg = IITC.portal.getCurrentEnergy(d);
+  var totalNrg = IITC.portal.getTotalEnergy(d);
   var title = currentNrg + ' / ' + totalNrg;
   var fill = window.prettyEnergy(currentNrg) + ' / ' + window.prettyEnergy(totalNrg);
   return ['energy', fill, title];
@@ -158,11 +159,11 @@ window.getEnergyText = function (d) {
 /**
  * Generates HTML details for resonators deployed on a portal.
  *
- * @function getResonatorDetails
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing resonator information.
  * @returns {string} HTML string representing the resonator details of the portal.
  */
-window.getResonatorDetails = function (d) {
+const getResonatorDetails = function (d) {
   var resoDetails = [];
   // octant=slot: 0=E, 1=NE, 2=N, 3=NW, 4=W, 5=SW, 6=S, SE=7
   // resos in the display should be ordered like this:
@@ -183,7 +184,7 @@ window.getResonatorDetails = function (d) {
       owner = reso.owner;
     }
 
-    resoDetails.push(window.renderResonatorDetails(slot, lvl, nrg, owner));
+    resoDetails.push(IITC.portal.display.tools.renderResonatorDetails(slot, lvl, nrg, owner));
   };
 
   // if all 8 resonators are deployed, we know which is in which slot
@@ -206,7 +207,7 @@ window.getResonatorDetails = function (d) {
 /**
  * Helper function that renders the HTML for a given resonator.
  *
- * @function renderResonatorDetails
+ * @memberof IITC.portal.display.tools
  * @param {number} slot - The slot number where the resonator is deployed. Starts with 0 (east) and rotates clockwise.
  *                        So, last one is 7 (southeast).
  * @param {number} level - The level of the resonator.
@@ -214,7 +215,7 @@ window.getResonatorDetails = function (d) {
  * @param {string|null} nick - The nickname of the owner of the resonator, or null if not applicable.
  * @returns {Array} An array containing the HTML content of the resonator and the owner's nickname.
  */
-window.renderResonatorDetails = function (slot, level, nrg, nick) {
+const renderResonatorDetails = function (slot, level, nrg, nick) {
   const className = window.OCTANTS[slot] === 'N' ? 'meter north' : 'meter';
 
   var max = window.RESO_NRG[level];
@@ -241,14 +242,14 @@ window.renderResonatorDetails = function (slot, level, nrg, nick) {
 /**
  * Calculates the AP gain from destroying and then capturing a portal by deploying resonators.
  *
- * @function getAttackApGainText
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing portal information.
  * @param {number} fieldCount - The number of fields linked to the portal.
  * @param {number} linkCount - The number of links connected to the portal.
  * @returns {Array} An array containing the label 'AP Gain', total AP gain, and a breakdown tooltip.
  */
-window.getAttackApGainText = function (d, fieldCount, linkCount) {
-  var breakdown = window.getAttackApGain(d, fieldCount, linkCount);
+const getAttackApGainText = function (d, fieldCount, linkCount) {
+  var breakdown = IITC.portal.getAttackApGain(d, fieldCount, linkCount);
   var totalGain = breakdown.enemyAp;
 
   var t = '';
@@ -269,12 +270,12 @@ window.getAttackApGainText = function (d, fieldCount, linkCount) {
 /**
  * Provides details about the hack count and cooldown time of a portal.
  *
- * @function getHackDetailsText
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing hack information.
  * @returns {Array} An array containing the label 'hacks', short hack info, and a detailed tooltip.
  */
-window.getHackDetailsText = function (d) {
-  var hackDetails = window.getPortalHackDetails(d);
+const getHackDetailsText = function (d) {
+  var hackDetails = IITC.portal.getHackDetails(d);
 
   var shortHackInfo = hackDetails.hacks + ' @ ' + window.formatInterval(hackDetails.cooldown);
 
@@ -290,13 +291,13 @@ window.getHackDetailsText = function (d) {
 /**
  * Generates text representing the total mitigation provided by shields and links on a portal.
  *
- * @function getMitigationText
+ * @memberof IITC.portal.display.tools
  * @param {Object} d - The portal detail object containing mitigation information.
  * @param {number} linkCount - The number of links connected to the portal.
  * @returns {Array} An array containing the label 'shielding', short mitigation info, and a detailed tooltip.
  */
-window.getMitigationText = function (d, linkCount) {
-  var mitigationDetails = window.getPortalMitigationDetails(d, linkCount);
+const getMitigationText = function (d, linkCount) {
+  var mitigationDetails = IITC.portal.getMitigationDetails(d, linkCount);
 
   var mitigationShort = mitigationDetails.total;
   if (mitigationDetails.excess) mitigationShort += ' (+' + mitigationDetails.excess + ')';
@@ -315,12 +316,12 @@ window.getMitigationText = function (d, linkCount) {
 /**
  * Displays a dialog with links to show the specified location on various map services.
  *
- * @function showPortalPosLinks
+ * @memberof IITC.portal.display.tools
  * @param {number} lat - Latitude of the location.
  * @param {number} lng - Longitude of the location.
  * @param {string} name - Name of the location.
  */
-window.showPortalPosLinks = function (lat, lng, name) {
+const showPosLinks = function (lat, lng, name) {
   var encoded_name = encodeURIComponent(name);
   var qrcode = '<div id="qrcode"></div>';
   var script = "<script>$('#qrcode').qrcode({text:'GEO:" + lat + ',' + lng + "'});</script>";
@@ -335,3 +336,32 @@ window.showPortalPosLinks = function (lat, lng, name) {
     id: 'poslinks',
   });
 };
+
+IITC.portal.display.tools = {
+  getHistoryDetails,
+  getRangeText,
+  getModDetails,
+  getEnergyText,
+  getResonatorDetails,
+  renderResonatorDetails,
+  getAttackApGainText,
+  getHackDetailsText,
+  getMitigationText,
+  showPosLinks,
+};
+
+// Map of legacy global names to their new names within IITC.portal.display.tools
+const legacyToolsMappings = {
+  getPortalHistoryDetails: 'getHistoryDetails',
+  getRangeText: 'getRangeText',
+  getModDetails: 'getModDetails',
+  getEnergyText: 'getEnergyText',
+  getResonatorDetails: 'getResonatorDetails',
+  renderResonatorDetails: 'renderResonatorDetails',
+  getAttackApGainText: 'getAttackApGainText',
+  getHackDetailsText: 'getHackDetailsText',
+  getMitigationText: 'getMitigationText',
+  showPortalPosLinks: 'showPosLinks',
+};
+
+IITC.registerLegacyAliases(IITC.portal.display.tools, legacyToolsMappings);
