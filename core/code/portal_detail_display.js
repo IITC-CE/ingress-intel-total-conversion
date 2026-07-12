@@ -144,32 +144,39 @@ window.renderPortalToSideBar = function (portal) {
     .html('') // to ensure it's clear
     .attr('class', window.TEAM_TO_CSS[window.teamStringToId(details.team)])
     .append(
-      $('<h3>', { class: 'title' })
-        .text(title)
-        .prepend(
+      // h3.title is kept for supporting plugins that reference it.
+      $('<h3>')
+        .attr({
+          id: 'portaltitle',
+          class: 'title',
+        })
+        .append(
           $('<svg><use xlink:href="#ic_place_24px"/><title>Click to move to portal</title></svg>')
             .attr({
               class: 'material-icons icon-button',
-              style: 'float: left',
             })
             .click(function () {
               window.zoomToAndShowPortal(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
               if (window.isSmartphone()) {
                 window.show('map');
               }
+            }),
+          $('<span>')
+            .attr({
+              class: 'value',
+            })
+            .text(title),
+          $('<span>')
+            .attr({
+              class: 'close',
+              title: 'Close [w]',
+              accesskey: 'w',
+            })
+            .text('X')
+            .click(function () {
+              window.renderPortalDetails(null);
             })
         ),
-
-      $('<span>')
-        .attr({
-          class: 'close',
-          title: 'Close [w]',
-          accesskey: 'w',
-        })
-        .text('X')
-        .click(function () {
-          window.renderPortalDetails(null);
-        }),
 
       // help cursor via ".imgpreview img"
       $('<div>')
