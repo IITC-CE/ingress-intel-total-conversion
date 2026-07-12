@@ -1,19 +1,21 @@
+/* global IITC -- eslint */
+
 /**
- * @file Provides functionality to handle portal details, including caching and server requests.
- * @namespace window.portalDetail
+ * Namespace providing portal detail retrieval with caching and request de-duplication.
+ *
+ * @memberof IITC.portal
+ * @namespace details
  */
 
 var cache;
 var requestQueue = {};
 
-window.portalDetail = function () {};
-
 /**
  * Sets up the portal detail handler, initializing the cache.
  *
- * @function window.portalDetail.setup
+ * @memberof IITC.portal.details
  */
-window.portalDetail.setup = function () {
+const setup = function () {
   cache = new window.DataCache();
 
   cache.startExpireInterval(20);
@@ -22,42 +24,42 @@ window.portalDetail.setup = function () {
 /**
  * Retrieves portal details from cache by GUID.
  *
- * @function window.portalDetail.get
+ * @memberof IITC.portal.details
  * @param {string} guid - The Global Unique Identifier of the portal.
  * @returns Cached portal details if available.
  */
-window.portalDetail.get = function (guid) {
+const get = function (guid) {
   return cache.get(guid);
 };
 
 /**
  * Stores portal details in the cache.
  *
- * @function window.portalDetail.store
+ * @memberof IITC.portal.details
  * @param {string} guid - The Global Unique Identifier of the portal.
  * @param {object} dict - The portal detail data.
  * @returns Result of cache storage operation.
  */
-window.portalDetail.store = function (guid, dict) {
+const store = function (guid, dict) {
   return cache.store(guid, dict);
 };
 
 /**
  * Checks if portal details are fresh in the cache.
  *
- * @function window.portalDetail.isFresh
+ * @memberof IITC.portal.details
  * @param {string} guid - The Global Unique Identifier of the portal.
  * @returns {boolean} True if details are fresh, false otherwise.
  */
-window.portalDetail.isFresh = function (guid) {
+const isFresh = function (guid) {
   return cache.isFresh(guid);
 };
 
-window.portalDetail.remove = function (guid) {
+const remove = function (guid) {
   return cache.remove(guid);
 };
 
-var handleResponseSuccess = function (deferred, guid, data, prefetch) {
+const handleResponseSuccess = function (deferred, guid, data, prefetch) {
   if (!data || data.error || !data.result) {
     handleResponseFailure(deferred, guid, data);
     return;
@@ -80,7 +82,7 @@ var handleResponseSuccess = function (deferred, guid, data, prefetch) {
   }
 };
 
-var handleResponseFailure = function (deferred, guid, data) {
+const handleResponseFailure = function (deferred, guid, data) {
   if (data && data.error === 'RETRY') {
     // server asked us to try again
     doRequest(deferred, guid);
@@ -90,7 +92,7 @@ var handleResponseFailure = function (deferred, guid, data) {
   }
 };
 
-var doRequest = function (deferred, guid, prefetch) {
+const doRequest = function (deferred, guid, prefetch) {
   window.postAjax(
     'getPortalDetails',
     { guid: guid },
@@ -107,11 +109,11 @@ var doRequest = function (deferred, guid, prefetch) {
  * Requests detailed information for a specific portal. If the information is not already being requested,
  * it initiates a new request. Returns a promise that resolves with the portal details.
  *
- * @function window.portalDetail.request
+ * @memberof IITC.portal.details
  * @param {string} guid - The Global Unique Identifier of the portal.
  * @returns {Promise} A promise that resolves with the portal details upon successful retrieval or rejection on failure.
  */
-window.portalDetail.request = function (guid, prefetch = false) {
+const request = function (guid, prefetch = false) {
   if (!requestQueue[guid]) {
     var deferred = $.Deferred();
     requestQueue[guid] = deferred.promise();
@@ -124,3 +126,14 @@ window.portalDetail.request = function (guid, prefetch = false) {
 
   return requestQueue[guid];
 };
+
+IITC.portal.details = {
+  setup,
+  get,
+  store,
+  isFresh,
+  remove,
+  request,
+};
+
+IITC.registerLegacyAliases(IITC.portal, { portalDetail: 'details' });
