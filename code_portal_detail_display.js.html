@@ -194,32 +194,39 @@ window.renderPortalToSideBar = function (portal) {
     .html('') // to ensure it's clear
     .attr('class', window.TEAM_TO_CSS[window.teamStringToId(details.team)])
     .append(
-      $('&lt;h3>', { class: 'title' })
-        .text(title)
-        .prepend(
+      // h3.title is kept for supporting plugins that reference it.
+      $('&lt;h3>')
+        .attr({
+          id: 'portaltitle',
+          class: 'title',
+        })
+        .append(
           $('&lt;svg>&lt;use xlink:href="#ic_place_24px"/>&lt;title>Click to move to portal&lt;/title>&lt;/svg>')
             .attr({
               class: 'material-icons icon-button',
-              style: 'float: left',
             })
             .click(function () {
               window.zoomToAndShowPortal(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
               if (window.isSmartphone()) {
                 window.show('map');
               }
+            }),
+          $('&lt;span>')
+            .attr({
+              class: 'value',
+            })
+            .text(title),
+          $('&lt;span>')
+            .attr({
+              class: 'close',
+              title: 'Close [w]',
+              accesskey: 'w',
+            })
+            .text('X')
+            .click(function () {
+              window.renderPortalDetails(null);
             })
         ),
-
-      $('&lt;span>')
-        .attr({
-          class: 'close',
-          title: 'Close [w]',
-          accesskey: 'w',
-        })
-        .text('X')
-        .click(function () {
-          window.renderPortalDetails(null);
-        }),
 
       // help cursor via ".imgpreview img"
       $('&lt;div>')

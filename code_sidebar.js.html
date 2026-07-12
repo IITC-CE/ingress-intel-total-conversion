@@ -195,7 +195,7 @@ function setupSidebarToggle() {
  * @function setupLargeImagePreview
  */
 function setupLargeImagePreview() {
-  $('#portaldetails').on('click', '.imgpreview', function (e) {
+  $('#portaldetails').on('click', '.imgpreview', function () {
     var img = this.querySelector('img');
     // dialogs have 12px padding around the content
     var dlgWidth = Math.max(img.naturalWidth + 24, 500);
@@ -208,7 +208,7 @@ function setupLargeImagePreview() {
     var preview = new Image(img.width, img.height);
     preview.src = img.src;
     preview.style = 'margin: auto; display: block';
-    var title = e.delegateTarget.querySelector('.title').innerText;
+    const title = document.querySelector('#portaltitle .value')?.innerText || '';
     window.dialog({
       html: preview,
       title: title,
