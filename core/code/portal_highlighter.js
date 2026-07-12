@@ -1,6 +1,10 @@
+/* global IITC -- eslint */
+
 /**
- * @file These functions handle portal highlighters
- * @module portal_highlighter
+ * Namespace for portal highlighters: registering, switching and applying portal highlight styles.
+ *
+ * @memberof IITC.portal
+ * @namespace highlighter
  */
 
 // an object mapping highlighter names to the object containing callback functions
@@ -14,12 +18,12 @@ window._no_highlighter = 'No Highlights';
 /**
  * Adds a new portal highlighter to map. The highlighter is a function that will be called for each portal.
  *
- * @function addPortalHighlighter
+ * @memberof IITC.portal.highlighter
  * @param {string} name - The name of the highlighter.
  * @param {Function} data - The callback function for the highlighter.
  *                          This function receives data about the portal and decides how to highlight it.
  */
-window.addPortalHighlighter = function (name, data) {
+const add = function (name, data) {
   if (window._highlighters === null) {
     window._highlighters = {};
   }
@@ -45,15 +49,15 @@ window.addPortalHighlighter = function (name, data) {
       window._highlighters[window._current_highlighter].setSelected(true);
     }
   }
-  window.updatePortalHighlighterControl();
+  IITC.portal.highlighter.updateControl();
 };
 
 /**
  * Updates the portal highlighter dropdown list, recreating the dropdown list of available highlighters.
  *
- * @function updatePortalHighlighterControl
+ * @memberof IITC.portal.highlighter
  */
-window.updatePortalHighlighterControl = function () {
+const updateControl = function () {
   if (window.isApp && window.app.addPortalHighlighter) {
     $('#portal_highlight_select').remove();
     return;
@@ -63,7 +67,7 @@ window.updatePortalHighlighterControl = function () {
     if ($('#portal_highlight_select').length === 0) {
       $('body').append("<select id='portal_highlight_select'></select>");
       $('#portal_highlight_select').change(function () {
-        window.changePortalHighlights($(this).val());
+        IITC.portal.highlighter.change($(this).val());
       });
       $('.leaflet-top.leaflet-left').css('padding-top', '20px');
       $('.leaflet-control-scale-line').css('margin-top', '25px');
@@ -83,10 +87,10 @@ window.updatePortalHighlighterControl = function () {
 /**
  * Changes the current portal highlights based on the selected highlighter.
  *
- * @function changePortalHighlights
+ * @memberof IITC.portal.highlighter
  * @param {string} name - The name of the highlighter to be applied.
  */
-window.changePortalHighlights = function (name) {
+const change = function (name) {
   // first call any previous highlighter select callback
   if (window._current_highlighter && window._highlighters[window._current_highlighter] && window._highlighters[window._current_highlighter].setSelected) {
     window._highlighters[window._current_highlighter].setSelected(false);
@@ -100,7 +104,7 @@ window.changePortalHighlights = function (name) {
     window._highlighters[window._current_highlighter].setSelected(true);
   }
 
-  window.resetHighlightedPortals();
+  IITC.portal.highlighter.resetAll();
   localStorage.portal_highlighter = name;
 };
 
@@ -108,10 +112,10 @@ window.changePortalHighlights = function (name) {
  * Applies the currently active highlighter to a specific portal.
  * This function is typically called for each portal on the map.
  *
- * @function highlightPortal
+ * @memberof IITC.portal.highlighter
  * @param {Object} p - The portal object to be highlighted.
  */
-window.highlightPortal = function (p) {
+const highlight = function (p) {
   if (window._highlighters !== null && window._highlighters[window._current_highlighter] !== undefined) {
     return window._highlighters[window._current_highlighter].highlight({ portal: p });
   }
@@ -120,10 +124,29 @@ window.highlightPortal = function (p) {
 /**
  * Resets the highlighting of all portals, returning them to their default style.
  *
- * @function resetHighlightedPortals
+ * @memberof IITC.portal.highlighter
  */
-window.resetHighlightedPortals = function () {
+const resetAll = function () {
   $.each(window.portals, function (guid, portal) {
-    window.setMarkerStyle(portal, guid === window.selectedPortal);
+    IITC.portal.marker.setStyle(portal, guid === window.selectedPortal);
   });
 };
+
+IITC.portal.highlighter = {
+  add,
+  updateControl,
+  change,
+  highlight,
+  resetAll,
+};
+
+// Map of legacy global names to their new names within IITC.portal.highlighter
+const legacyHighlighterMappings = {
+  addPortalHighlighter: 'add',
+  updatePortalHighlighterControl: 'updateControl',
+  changePortalHighlights: 'change',
+  highlightPortal: 'highlight',
+  resetHighlightedPortals: 'resetAll',
+};
+
+IITC.registerLegacyAliases(IITC.portal.highlighter, legacyHighlighterMappings);
