@@ -14,7 +14,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.9.0",
     "jsdoc": "^4.0.4",
-    "mocha": "^10.1.0",
+    "mocha": "^11.7.6",
     "prettier": "^3.3.3",
     "sinon": "^21.0.0",
     "taffydb": "^2.7.3",
