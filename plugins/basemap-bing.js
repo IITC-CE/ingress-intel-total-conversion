@@ -46,7 +46,7 @@ mapBing.sets = {
 
 mapBing.options = {
   // set this to your API key
-  key: 'ArR2hTa2C9cRQZT-RmgrDkfvh3PwEVRl0gB34OO4wJI7vQNElg3DDWvbo5lfUs3p',
+  key: '',
 };
 
 function setup() {
