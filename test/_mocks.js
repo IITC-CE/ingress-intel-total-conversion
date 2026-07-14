@@ -72,8 +72,33 @@ function jqueryEach(collection, cb) {
 }
 globalThis.$ = { each: jqueryEach };
 
+// jQuery.Deferred: minimal implementation for request/promise flows (resolve/reject fire always() callbacks)
+globalThis.$.Deferred = function () {
+  const always = [];
+  const promise = {};
+  const deferred = {
+    promise: () => promise,
+    always(cb) {
+      always.push(cb);
+      return deferred;
+    },
+    resolve() {
+      always.forEach((cb) => cb());
+      return deferred;
+    },
+    reject() {
+      always.forEach((cb) => cb());
+      return deferred;
+    },
+  };
+  return deferred;
+};
+
 // ulog stub (each bundled core module receives a `log` instance)
 globalThis.log = { log() {}, debug() {}, info() {}, warn() {}, error() {} };
+
+// browser storage stub
+globalThis.localStorage = {};
 
 // leaflet
 globalThis.L = {
@@ -94,6 +119,27 @@ globalThis.L = {
   },
   divIcon: {
     coloredSvg: () => new L.DivIcon.ColoredSvg(),
+  },
+};
+globalThis.L.extend = (dest, ...sources) => Object.assign(dest, ...sources);
+globalThis.L.Browser = { mobile: false };
+globalThis.L.Util = { template: (str, data) => str.replace(/\{(\w+)\}/g, (_, key) => data[key]) };
+globalThis.L.CircleMarker = {
+  prototype: {
+    initialize() {},
+    setStyle() {
+      return this;
+    },
+  },
+  // mirror of Leaflet's Class.extend: copies prototype props and hoists `statics` onto the constructor
+  extend(props) {
+    function Ctor(...args) {
+      if (typeof this.initialize === 'function') this.initialize(...args);
+    }
+    Ctor.prototype = Object.create(L.CircleMarker.prototype);
+    Object.assign(Ctor.prototype, props);
+    if (props.statics) Object.assign(Ctor, props.statics);
+    return Ctor;
   },
 };
 
