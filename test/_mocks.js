@@ -1,4 +1,7 @@
 /* global L */
+import { JSDOM } from 'jsdom';
+import { jQueryFactory } from 'jquery/factory';
+
 class Map {
   addTo() {}
   addLayer() {}
@@ -7,8 +10,23 @@ class Map {
   fitBounds() {}
 }
 
-// global objects
-globalThis.document = { createElement: () => {} };
+// real jsdom DOM bound to the same window as jQuery, so specs build/inspect it natively;
+// the url backs document.location / baseURI used when building permalinks
+const { window: domWindow } = new JSDOM('<!DOCTYPE html><html><body></body></html>', { url: 'https://intel.ingress.com/intel' });
+globalThis.document = domWindow.document;
+globalThis.$ = jQueryFactory(domWindow);
+
+// keep a simple string-backed cookie the utils specs rely on (jsdom's real document.cookie
+// drops expires/path on read and ignores empty-string resets)
+let cookieJar = '';
+Object.defineProperty(globalThis.document, 'cookie', {
+  get: () => cookieJar,
+  set: (value) => {
+    cookieJar = value;
+  },
+  configurable: true,
+});
+
 globalThis.window = {
   location: { protocol: 'https:' },
   map: new Map(),
@@ -55,43 +73,6 @@ globalThis.window = {
     const id = globalThis.window.TEAM_CODENAMES.indexOf(team);
     return id >= 0 ? id : globalThis.window.TEAM_NONE;
   },
-};
-
-// jQuery (minimal): $.each follows jQuery semantics (returning false breaks the loop, any other value continues)
-function jqueryEach(collection, cb) {
-  if (Array.isArray(collection)) {
-    for (let i = 0; i < collection.length; i++) {
-      if (cb.call(collection[i], i, collection[i]) === false) break;
-    }
-  } else {
-    for (const key in collection) {
-      if (cb.call(collection[key], key, collection[key]) === false) break;
-    }
-  }
-  return collection;
-}
-globalThis.$ = { each: jqueryEach };
-
-// jQuery.Deferred: minimal implementation for request/promise flows (resolve/reject fire always() callbacks)
-globalThis.$.Deferred = function () {
-  const always = [];
-  const promise = {};
-  const deferred = {
-    promise: () => promise,
-    always(cb) {
-      always.push(cb);
-      return deferred;
-    },
-    resolve() {
-      always.forEach((cb) => cb());
-      return deferred;
-    },
-    reject() {
-      always.forEach((cb) => cb());
-      return deferred;
-    },
-  };
-  return deferred;
 };
 
 // ulog stub (each bundled core module receives a `log` instance)
