@@ -1,4 +1,4 @@
-import { describe, it, before, afterEach } from 'mocha';
+import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -10,6 +10,9 @@ function resonators(levels, owner = 'me') {
   return levels.map((level) => (level === null ? null : { level, energy: window.RESO_NRG[level], owner }));
 }
 
+// captured before other specs overwrite the renderPortalDetails alias with a bare spy
+let realRenderDetails;
+
 before(async () => {
   await import('../core/code/utils.js');
   await import('../core/code/portal.js');
@@ -17,7 +20,7 @@ before(async () => {
   await import('../core/code/portal_display.js');
   await import('../core/code/portal_display_tools.js');
 
-  globalThis.document.location = { pathname: '/intel' };
+  realRenderDetails = IITC.portal.display.renderDetails;
 });
 
 afterEach(() => sinon.restore());
@@ -207,5 +210,169 @@ describe('IITC.portal.display.rangeLinkClick', () => {
     const fitBounds = sinon.stub(window.map, 'fitBounds');
     IITC.portal.display.rangeLinkClick();
     expect(fitBounds.called).to.be.false;
+  });
+});
+
+describe('IITC.portal.display.resetScroll', () => {
+  it('scrolls the sidebar to the top when a different portal became visible', () => {
+    document.body.innerHTML = '<div id="sidebar"></div>';
+    const sidebar = document.getElementById('sidebar');
+    sidebar.scrollTop = 50;
+
+    IITC.portal.display.renderDetails.lastVisible = 'old';
+    window.selectedPortal = 'new';
+    IITC.portal.display.resetScroll();
+
+    expect(sidebar.scrollTop).to.equal(0);
+  });
+
+  it('keeps the scroll position when the same portal is still visible', () => {
+    document.body.innerHTML = '<div id="sidebar"></div>';
+    const sidebar = document.getElementById('sidebar');
+    sidebar.scrollTop = 50;
+
+    IITC.portal.display.renderDetails.lastVisible = 'same';
+    window.selectedPortal = 'same';
+    IITC.portal.display.resetScroll();
+
+    expect(sidebar.scrollTop).to.equal(50);
+  });
+});
+
+describe('IITC.portal.display.renderUrl', () => {
+  it('renders permalink, scanner and map-links entries into .linkdetails', () => {
+    document.body.innerHTML = '<div class="linkdetails"></div>';
+
+    IITC.portal.display.renderUrl(1.5, 2.5, 'My Portal', 'GUID123');
+
+    expect(document.querySelector('.linkdetails').innerHTML).to.equal(
+      '<aside><a href="/intel?pll=1.5,2.5" title="Create a URL link to this portal">Portal link</a></aside>' +
+        '<aside><a href="https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fportal%2FGUID123' +
+        '&amp;apn=com.nianticproject.ingress&amp;isi=576505181&amp;ibi=com.google.ingress' +
+        '&amp;ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181' +
+        '&amp;ofl=https%3A%2F%2Fintel.ingress.com%2Fintel%3Fpll%3D1.5%2C2.5" ' +
+        'title="Copy link to this portal for Ingress Prime">Copy scanner link</a></aside>' +
+        '<aside><a title="Link to alternative maps (Google, etc)">Map links</a></aside>'
+    );
+  });
+});
+
+describe('IITC.portal.display.renderDetails', () => {
+  beforeEach(() => {
+    IITC.portal.display.renderDetails = realRenderDetails; // undo the alias overwrite from other specs
+    window.portals = {};
+    window.selectedPortal = undefined;
+    IITC.statusbar = { portal: { update: sinon.spy() } };
+    sinon.stub(IITC.portal.display, 'select');
+    sinon.stub(IITC.portal.display, 'renderToSidebar');
+    sinon.stub(IITC.portal.details, 'isFresh').returns(true);
+    sinon.stub(IITC.portal.details, 'request');
+    sinon.stub(IITC.portal, 'selectWhenLoadedByGuid');
+  });
+
+  it('selects and renders a portal that is already loaded', () => {
+    window.portals = { g: { options: { guid: 'g' } } };
+    IITC.portal.display.renderDetails('g');
+    expect(IITC.portal.display.select.calledOnceWithExactly('g', 'renderPortalDetails')).to.be.true;
+    expect(IITC.portal.display.renderToSidebar.calledOnceWithExactly(window.portals.g)).to.be.true;
+    expect(IITC.portal.selectWhenLoadedByGuid.called).to.be.false;
+  });
+
+  it('clears the panel and defers selection when the portal is not loaded', () => {
+    document.body.innerHTML = '<div id="portaldetails">stale</div>';
+    IITC.portal.display.renderDetails('missing');
+    expect(IITC.portal.display.select.calledOnceWithExactly(null, 'renderPortalDetails')).to.be.true;
+    expect(IITC.portal.selectWhenLoadedByGuid.calledOnceWithExactly('missing')).to.be.true;
+    expect(document.getElementById('portaldetails').innerHTML).to.equal('');
+    expect(IITC.statusbar.portal.update.calledOnce).to.be.true;
+    expect(IITC.portal.display.renderToSidebar.called).to.be.false;
+  });
+
+  it('requests fresh data for a loaded portal whose details are stale', () => {
+    window.portals = { g: { options: { guid: 'g' } } };
+    IITC.portal.details.isFresh.returns(false);
+    IITC.portal.display.renderDetails('g');
+    expect(IITC.portal.details.request.calledOnceWithExactly('g')).to.be.true;
+  });
+
+  it('skips re-selecting the already-selected portal without forceSelect', () => {
+    window.portals = { g: { options: { guid: 'g' } } };
+    window.selectedPortal = 'g';
+    IITC.portal.display.renderDetails('g');
+    expect(IITC.portal.display.select.called).to.be.false;
+  });
+});
+
+describe('IITC.portal.display.renderToSidebar', () => {
+  const makePortal = (overrides = {}) => ({
+    options: { guid: 'g', level: 8 },
+    getDetails: () => ({
+      title: 'My Portal',
+      team: 'ENLIGHTENED',
+      image: 'img.png',
+      latE6: 1000000,
+      lngE6: 2000000,
+      resonators: resonators([8, 8, 8, 8, 8, 8, 8, 8]),
+      mods: [],
+    }),
+    hasFullDetails: () => true,
+    ...overrides,
+  });
+
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="portaldetails"></div>';
+    window.runHooks = sinon.spy();
+    // isolate the panel assembly from the individually-tested detail generators and collaborators
+    sinon.stub(IITC.portal.display.tools, 'getHistoryDetails').returns('<div id="historydetails"></div>');
+    sinon.stub(IITC.portal.display.tools, 'getModDetails').returns('MODS');
+    sinon.stub(IITC.portal.display.tools, 'getResonatorDetails').returns('<table id="resodetails"></table>');
+    sinon.stub(IITC.portal.display, 'getMiscDetails').returns('<table id="randdetails"></table>');
+    sinon.stub(IITC.portal.display, 'renderUrl');
+    sinon.stub(IITC.portal.display, 'setIndicators');
+  });
+
+  it('assembles the panel and fires the update hook for a full-details portal', () => {
+    IITC.portal.display.renderToSidebar(makePortal());
+
+    expect(document.getElementById('portaldetails').innerHTML).to.equal(
+      '<h3 id="portaltitle" class="title"><svg class="material-icons icon-button">' +
+        '<use xlink:href="#ic_place_24px"></use><title>Click to move to portal</title></svg>' +
+        '<span class="value">My Portal</span><span class="close" title="Close [w]" accesskey="w">X</span></h3>' +
+        '<div class="imgpreview" title="My Portal\n\nClick to show full image." style="background-image: url(&quot;img.png&quot;)">' +
+        '<span id="level" title="Level 8\nfully upgraded">8</span><img class="hide" src="img.png"></div>' +
+        '<div class="mods">MODS</div>' +
+        '<table id="randdetails"></table>' +
+        '<table id="resodetails"></table>' +
+        '<div class="linkdetails"></div>' +
+        '<div id="historydetails"></div>'
+    );
+
+    expect(IITC.portal.display.renderUrl.calledOnceWithExactly(1, 2, 'My Portal', 'g')).to.be.true;
+    expect(window.runHooks.calledWith('portalDetailsUpdated')).to.be.true;
+    expect(IITC.portal.display.setIndicators.calledOnce).to.be.true;
+  });
+
+  it('shows a loading placeholder and skips the hook when details are incomplete', () => {
+    const portal = makePortal({
+      hasFullDetails: () => false,
+      getDetails: () => ({ title: 'P', team: 'NEUTRAL', image: '', latE6: 0, lngE6: 0 }),
+    });
+    portal.options.level = 0;
+
+    IITC.portal.display.renderToSidebar(portal);
+
+    expect(document.getElementById('portaldetails').innerHTML).to.equal(
+      '<h3 id="portaltitle" class="title"><svg class="material-icons icon-button">' +
+        '<use xlink:href="#ic_place_24px"></use><title>Click to move to portal</title></svg>' +
+        '<span class="value">P</span><span class="close" title="Close [w]" accesskey="w">X</span></h3>' +
+        '<div class="imgpreview" title="P\n\nClick to show full image." style="background-image: url(&quot;default.png&quot;)">' +
+        '<span id="level" title="Level 0">0</span><img class="hide" src="default.png"></div>' +
+        '<div id="portalStatus">Loading details...</div>' +
+        '<div class="linkdetails"></div>' +
+        '<div id="historydetails"></div>'
+    );
+
+    expect(window.runHooks.called).to.be.false;
+    expect(IITC.portal.display.setIndicators.called).to.be.false;
   });
 });

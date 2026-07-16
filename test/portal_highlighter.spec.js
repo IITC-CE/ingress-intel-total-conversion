@@ -1,4 +1,4 @@
-import { describe, it, before, afterEach } from 'mocha';
+import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -102,5 +102,47 @@ describe('IITC.portal.highlighter.resetAll', () => {
     expect(setStyle.calledWith(window.portals.a, false)).to.be.true;
     expect(setStyle.calledWith(window.portals.b, false)).to.be.true;
     expect(setStyle.calledWith(window.portals.sel, true)).to.be.true;
+  });
+});
+
+describe('IITC.portal.highlighter.updateControl', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    window.isApp = false;
+  });
+
+  it('builds a select listing "No Highlights" plus every highlighter, sorted by name', () => {
+    window._highlighters = { Zebra: {}, Alpha: {} };
+    window._current_highlighter = 'Alpha';
+
+    IITC.portal.highlighter.updateControl();
+
+    expect(document.body.innerHTML).to.equal(
+      '<select id="portal_highlight_select">' +
+        '<option value="No Highlights">No Highlights</option>' +
+        '<option value="Alpha">Alpha</option>' +
+        '<option value="Zebra">Zebra</option>' +
+        '</select>'
+    );
+    // the active highlighter is reflected as the select value (a property, not serialized markup)
+    expect(document.getElementById('portal_highlight_select').value).to.equal('Alpha');
+  });
+
+  it('adds no control when no highlighters are registered', () => {
+    window._highlighters = null;
+    IITC.portal.highlighter.updateControl();
+    expect(document.body.innerHTML).to.equal('');
+  });
+
+  it('rebuilds the options without creating a second select on repeated calls', () => {
+    window._highlighters = { A: {} };
+    window._current_highlighter = 'A';
+
+    IITC.portal.highlighter.updateControl();
+    IITC.portal.highlighter.updateControl();
+
+    expect(document.body.innerHTML).to.equal(
+      '<select id="portal_highlight_select">' + '<option value="No Highlights">No Highlights</option>' + '<option value="A">A</option>' + '</select>'
+    );
   });
 });
