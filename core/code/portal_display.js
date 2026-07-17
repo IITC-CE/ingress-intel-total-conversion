@@ -8,6 +8,62 @@
  */
 
 /**
+ * Template of the "move to portal" icon shown next to the portal title
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let moveToPortalIconTemplate = '<svg class="material-icons icon-button"><use xlink:href="#ic_place_24px"></use><title>Click to move to portal</title></svg>';
+
+/**
+ * Template wrapping the #randdetails table (owner, range, links, fields, shielding, energy, AP, hacks)
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let randDetailsTemplate = '<table id="randdetails">{rows}</table>';
+
+/**
+ * Template of the artifact target portal note
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let artifactTargetTemplate = '<div id="artifact_target">Target portal: {targets}</div>';
+
+/**
+ * Template of the artifact shards note
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let artifactFragmentsTemplate = '<div id="artifact_fragments">Shards: {name} #{fragments}</div>';
+
+/**
+ * Template wrapping the portal mods block
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let modsWrapperTemplate = '<div class="mods">{mods}</div>';
+
+/**
+ * Template shown while full portal details are still loading
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let loadingStatusTemplate = '<div id="portalStatus">Loading details...</div>';
+
+/**
+ * Template of the container that holds the portal links (permalink, scanner, map links)
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let linkDetailsTemplate = '<div class="linkdetails"></div>';
+
+/**
+ * Template of a label that truncates with an ellipsis (e.g. "attack frequency", "force amplifier")
+ * @type {String}
+ * @memberof IITC.portal.display
+ */
+let ellipsisLabelTemplate = '<span title="{label}" class="text-overflow-ellipsis">{label}</span>';
+
+/**
  * Resets the scroll position of the sidebar when a new portal is selected.
  *
  * @memberof IITC.portal.display
@@ -15,7 +71,8 @@
 const resetScroll = function () {
   if (window.selectedPortal !== IITC.portal.display.renderDetails.lastVisible) {
     // another portal selected so scroll position become irrelevant to new portal details
-    $('#sidebar').scrollTop(0); // NB: this works ONLY when #sidebar:visible
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.scrollTop = 0; // NB: this works ONLY when #sidebar:visible
   }
 };
 
@@ -31,38 +88,38 @@ const resetScroll = function () {
  * @param {string} guid - The GUID of the portal.
  */
 const renderUrl = function (lat, lng, title, guid) {
-  var linkDetails = $('.linkdetails');
+  const linkDetails = document.querySelector('.linkdetails');
+
+  const appendAside = (anchor) => {
+    const aside = document.createElement('aside');
+    aside.append(anchor);
+    linkDetails.append(aside);
+  };
 
   // a permalink for the portal
-  var permaHtml = $('<a>')
-    .attr({
-      href: IITC.portal.display.makePermalink([lat, lng]),
-      title: 'Create a URL link to this portal',
-    })
-    .text('Portal link');
-  linkDetails.append($('<aside>').append(permaHtml));
+  const permaLink = document.createElement('a');
+  permaLink.setAttribute('href', IITC.portal.display.makePermalink([lat, lng]));
+  permaLink.setAttribute('title', 'Create a URL link to this portal');
+  permaLink.textContent = 'Portal link';
+  appendAside(permaLink);
 
-  var scannerLink = $('<a>')
-    .attr({
-      href: IITC.portal.display.makePrimeLink(guid, lat, lng),
-      title: 'Copy link to this portal for Ingress Prime',
-    })
-    .click(function (event) {
-      navigator.clipboard.writeText(event.target.href).then();
-      event.stopPropagation();
-      return false;
-    })
-    .text('Copy scanner link');
-  linkDetails.append($('<aside>').append(scannerLink));
+  const scannerLink = document.createElement('a');
+  scannerLink.setAttribute('href', IITC.portal.display.makePrimeLink(guid, lat, lng));
+  scannerLink.setAttribute('title', 'Copy link to this portal for Ingress Prime');
+  scannerLink.textContent = 'Copy scanner link';
+  scannerLink.addEventListener('click', function (event) {
+    navigator.clipboard.writeText(event.target.href).then();
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  appendAside(scannerLink);
 
   // and a map link popup dialog
-  var mapHtml = $('<a>')
-    .attr({
-      title: 'Link to alternative maps (Google, etc)',
-    })
-    .text('Map links')
-    .click(IITC.portal.display.tools.showPosLinks.bind(this, lat, lng, title));
-  linkDetails.append($('<aside>').append(mapHtml));
+  const mapLink = document.createElement('a');
+  mapLink.setAttribute('title', 'Link to alternative maps (Google, etc)');
+  mapLink.textContent = 'Map links';
+  mapLink.addEventListener('click', () => IITC.portal.display.tools.showPosLinks(lat, lng, title));
+  appendAside(mapLink);
 };
 
 /**
@@ -77,7 +134,9 @@ const renderDetails = function (guid, forceSelect) {
     IITC.portal.display.select(guid && window.portals[guid] ? guid : null, 'renderPortalDetails');
   }
 
-  if ($('#sidebar').is(':visible')) {
+  const sidebar = document.getElementById('sidebar');
+  // equivalent of jQuery ':visible'
+  if (sidebar && (sidebar.offsetWidth > 0 || sidebar.offsetHeight > 0 || sidebar.getClientRects().length > 0)) {
     IITC.portal.display.resetScroll();
     IITC.portal.display.renderDetails.lastVisible = guid;
   }
@@ -88,10 +147,11 @@ const renderDetails = function (guid, forceSelect) {
 
   if (!guid || !window.portals[guid]) {
     IITC.portal.selectWhenLoadedByGuid(guid);
-    $('#portaldetails').html('');
+    const portalDetails = document.getElementById('portaldetails');
+    if (portalDetails) portalDetails.innerHTML = '';
     IITC.statusbar.portal.update();
     if (window.isSmartphone()) {
-      $('.fullimg').remove();
+      document.querySelectorAll('.fullimg').forEach((el) => el.remove());
     }
     return;
   }
@@ -106,31 +166,31 @@ const renderDetails = function (guid, forceSelect) {
  * @param {L.PortalMarker} portal - The portal marker object holding portal details.
  */
 const renderToSidebar = function (portal) {
-  var guid = portal.options.guid;
-  var details = portal.getDetails();
-  var hasFullDetails = portal.hasFullDetails();
-  var historyDetails = IITC.portal.display.tools.getHistoryDetails(details);
+  const guid = portal.options.guid;
+  const details = portal.getDetails();
+  const hasFullDetails = portal.hasFullDetails();
+  const historyDetails = IITC.portal.display.tools.getHistoryDetails(details);
 
-  var modDetails = hasFullDetails ? '<div class="mods">' + IITC.portal.display.tools.getModDetails(details) + '</div>' : '';
-  var miscDetails = hasFullDetails ? IITC.portal.display.getMiscDetails(guid, details) : '';
-  var resoDetails = hasFullDetails ? IITC.portal.display.tools.getResonatorDetails(details) : '';
+  const modDetails = hasFullDetails ? L.Util.template(IITC.portal.display.modsWrapperTemplate, { mods: IITC.portal.display.tools.getModDetails(details) }) : '';
+  const miscDetails = hasFullDetails ? IITC.portal.display.getMiscDetails(guid, details) : '';
+  const resoDetails = hasFullDetails ? IITC.portal.display.tools.getResonatorDetails(details) : '';
 
   // TODO? other status details...
-  var statusDetails = hasFullDetails ? '' : '<div id="portalStatus">Loading details...</div>';
+  const statusDetails = hasFullDetails ? '' : IITC.portal.display.loadingStatusTemplate;
 
-  var img = IITC.portal.fixImageUrl(details.image);
-  var title = details.title || 'null';
+  const img = IITC.portal.fixImageUrl(details.image);
+  const title = details.title || 'null';
 
-  var lat = details.latE6 / 1e6;
-  var lng = details.lngE6 / 1e6;
+  const lat = details.latE6 / 1e6;
+  const lng = details.lngE6 / 1e6;
 
-  var imgTitle = title + '\n\nClick to show full image.';
+  const imgTitle = title + '\n\nClick to show full image.';
 
   // portal level. start with basic data - then extend with fractional info in tooltip if available
-  var levelInt = portal.options.level;
-  var levelDetails = levelInt;
+  const levelInt = portal.options.level;
+  let levelDetails = levelInt;
   if (hasFullDetails) {
-    var portalLevel = IITC.portal.getLevel(details); // resonator-based fractional level
+    const portalLevel = IITC.portal.getLevel(details); // resonator-based fractional level
     levelDetails = portalLevel;
     if (levelInt !== 8) {
       const req_reso_levels = 8 * (levelInt + 1 - portalLevel);
@@ -141,60 +201,59 @@ const renderToSidebar = function (portal) {
   }
   levelDetails = 'Level ' + levelDetails;
 
-  $('#portaldetails')
-    .html('') // to ensure it's clear
-    .attr('class', window.TEAM_TO_CSS[window.teamStringToId(details.team)])
-    .append(
-      // h3.title is kept for supporting plugins that reference it.
-      $('<h3>')
-        .attr({
-          id: 'portaltitle',
-          class: 'title',
-        })
-        .append(
-          $('<svg><use xlink:href="#ic_place_24px"/><title>Click to move to portal</title></svg>')
-            .attr({
-              class: 'material-icons icon-button',
-            })
-            .click(function () {
-              IITC.portal.zoomToAndShow(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
-              if (window.isSmartphone()) {
-                window.show('map');
-              }
-            }),
-          $('<span>')
-            .attr({
-              class: 'value',
-            })
-            .text(title),
-          $('<span>')
-            .attr({
-              class: 'close',
-              title: 'Close [w]',
-              accesskey: 'w',
-            })
-            .text('X')
-            .click(function () {
-              IITC.portal.display.renderDetails(null);
-            })
-        ),
+  const portalDetails = document.getElementById('portaldetails');
+  portalDetails.innerHTML = ''; // to ensure it's clear
+  portalDetails.setAttribute('class', window.TEAM_TO_CSS[window.teamStringToId(details.team)]);
 
-      // help cursor via ".imgpreview img"
-      $('<div>')
-        .attr({
-          class: 'imgpreview',
-          title: imgTitle,
-          style: 'background-image: url("' + img + '")',
-        })
-        .append($('<span>', { id: 'level', title: levelDetails }).text(levelInt), $('<img>', { class: 'hide', src: img })),
+  // h3.title is kept for supporting plugins that reference it.
+  const header = document.createElement('h3');
+  header.setAttribute('id', 'portaltitle');
+  header.setAttribute('class', 'title');
+  header.innerHTML = IITC.portal.display.moveToPortalIconTemplate;
+  header.firstElementChild.addEventListener('click', function () {
+    IITC.portal.zoomToAndShow(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
+    if (window.isSmartphone()) {
+      window.show('map');
+    }
+  });
 
-      modDetails,
-      miscDetails,
-      resoDetails,
-      statusDetails,
-      $('<div>', { class: 'linkdetails' }),
-      historyDetails
-    );
+  const titleValue = document.createElement('span');
+  titleValue.setAttribute('class', 'value');
+  titleValue.textContent = title;
+  header.append(titleValue);
+
+  const closeButton = document.createElement('span');
+  closeButton.setAttribute('class', 'close');
+  closeButton.setAttribute('title', 'Close [w]');
+  closeButton.setAttribute('accesskey', 'w');
+  closeButton.textContent = 'X';
+  closeButton.addEventListener('click', function () {
+    IITC.portal.display.renderDetails(null);
+  });
+  header.append(closeButton);
+
+  // help cursor via ".imgpreview img"
+  const imgPreview = document.createElement('div');
+  imgPreview.setAttribute('class', 'imgpreview');
+  imgPreview.setAttribute('title', imgTitle);
+  imgPreview.setAttribute('style', 'background-image: url("' + img + '")');
+
+  const levelSpan = document.createElement('span');
+  levelSpan.setAttribute('id', 'level');
+  levelSpan.setAttribute('title', levelDetails);
+  levelSpan.textContent = levelInt;
+
+  const fullImg = document.createElement('img');
+  fullImg.setAttribute('class', 'hide');
+  fullImg.setAttribute('src', img);
+
+  imgPreview.append(levelSpan, fullImg);
+
+  portalDetails.append(header, imgPreview);
+  portalDetails.insertAdjacentHTML(
+    'beforeend',
+    modDetails + miscDetails + resoDetails + statusDetails + IITC.portal.display.linkDetailsTemplate + historyDetails
+  );
 
   IITC.portal.display.renderUrl(lat, lng, title, guid);
 
@@ -202,7 +261,7 @@ const renderToSidebar = function (portal) {
   // TODO? another hook to call always, for any plugins that can work with less data?
   if (hasFullDetails) {
     // compatibility
-    var data = IITC.portal.getSummaryData(details);
+    const data = IITC.portal.getSummaryData(details);
 
     window.runHooks('portalDetailsUpdated', { guid: guid, portal: portal, portalDetails: details, portalData: data });
 
@@ -219,36 +278,36 @@ const renderToSidebar = function (portal) {
  * @returns {string} HTML string representing the miscellaneous details of the portal.
  */
 const getMiscDetails = function (guid, d) {
-  var randDetails;
+  let randDetails;
 
   if (d) {
     // collect some random data that’s not worth to put in an own method
-    var linkInfo = IITC.portal.getLinks(guid);
-    var maxOutgoing = IITC.portal.getMaxOutgoingLinks(d);
-    var linkCount = linkInfo.in.length + linkInfo.out.length;
-    var links = { incoming: linkInfo.in.length, outgoing: linkInfo.out.length };
+    const linkInfo = IITC.portal.getLinks(guid);
+    const maxOutgoing = IITC.portal.getMaxOutgoingLinks(d);
+    const linkCount = linkInfo.in.length + linkInfo.out.length;
+    const links = { incoming: linkInfo.in.length, outgoing: linkInfo.out.length };
 
-    var title =
+    const title =
       `at most ${maxOutgoing} outgoing links\n` +
       `${links.outgoing} links out\n` +
       `${links.incoming} links in\n` +
       `(${links.outgoing + links.incoming} total)`;
-    var linksText = ['links', links.outgoing + ' out / ' + links.incoming + ' in', title];
+    const linksText = ['links', links.outgoing + ' out / ' + links.incoming + ' in', title];
 
-    var player = d.owner ? '<span class="nickname">' + d.owner + '</span>' : '-';
-    var playerText = ['owner', player];
+    const player = d.owner ? L.Util.template(IITC.portal.display.tools.nicknameTemplate, { nick: d.owner }) : '-';
+    const playerText = ['owner', player];
 
-    var fieldCount = IITC.portal.getFieldsCount(guid);
+    const fieldCount = IITC.portal.getFieldsCount(guid);
 
-    var fieldsText = ['fields', fieldCount];
+    const fieldsText = ['fields', fieldCount];
 
-    var apGainText = IITC.portal.display.tools.getAttackApGainText(d, fieldCount, linkCount);
+    const apGainText = IITC.portal.display.tools.getAttackApGainText(d, fieldCount, linkCount);
 
-    var attackValues = IITC.portal.getAttackValues(d);
+    const attackValues = IITC.portal.getAttackValues(d);
 
     // collect and html-ify random data
 
-    var randDetailsData = [
+    const randDetailsData = [
       // these pieces of data are only relevant when the portal is captured
       // maybe check if portal is captured and remove?
       // But this makes the info panel look rather empty for unclaimed portals
@@ -264,36 +323,36 @@ const getMiscDetails = function (guid, d) {
     ];
 
     if (attackValues.attack_frequency !== 0) {
-      randDetailsData.push(['<span title="attack frequency" class="text-overflow-ellipsis">attack frequency</span>', '×' + attackValues.attack_frequency]);
+      const label = L.Util.template(IITC.portal.display.ellipsisLabelTemplate, { label: 'attack frequency' });
+      randDetailsData.push([label, '×' + attackValues.attack_frequency]);
     }
     if (attackValues.hit_bonus !== 0) {
       randDetailsData.push(['hit bonus', attackValues.hit_bonus + '%']);
     }
     if (attackValues.force_amplifier !== 0) {
-      randDetailsData.push(['<span title="force amplifier" class="text-overflow-ellipsis">force amplifier</span>', '×' + attackValues.force_amplifier]);
+      const label = L.Util.template(IITC.portal.display.ellipsisLabelTemplate, { label: 'force amplifier' });
+      randDetailsData.push([label, '×' + attackValues.force_amplifier]);
     }
 
-    randDetails = '<table id="randdetails">' + window.genFourColumnTable(randDetailsData) + '</table>';
+    randDetails = L.Util.template(IITC.portal.display.randDetailsTemplate, { rows: window.genFourColumnTable(randDetailsData) });
 
     // artifacts - tacked on after (but not as part of) the 'randdetails' table
     // instead of using the existing columns....
 
     if (d.artifactBrief && d.artifactBrief.target && Object.keys(d.artifactBrief.target).length > 0) {
-      var targets = Object.keys(d.artifactBrief.target);
+      const targets = Object.keys(d.artifactBrief.target);
       // currently (2015-07-10) we no longer know the team each target portal is for - so we'll just show the artifact type(s)
-      randDetails +=
-        '<div id="artifact_target">Target portal: ' +
-        targets
-          .map(function (x) {
-            return x.capitalize();
-          })
-          .join(', ') +
-        '</div>';
+      randDetails += L.Util.template(IITC.portal.display.artifactTargetTemplate, {
+        targets: targets.map((x) => x.capitalize()).join(', '),
+      });
     }
 
     // shards - taken directly from the portal details
     if (d.artifactDetail) {
-      randDetails += '<div id="artifact_fragments">Shards: ' + d.artifactDetail.displayName + ' #' + d.artifactDetail.fragments.join(', ') + '</div>';
+      randDetails += L.Util.template(IITC.portal.display.artifactFragmentsTemplate, {
+        name: d.artifactDetail.displayName,
+        fragments: d.artifactDetail.fragments.join(', '),
+      });
     }
   }
 
@@ -316,14 +375,14 @@ const setIndicators = function (p) {
   // if we have a portal...
 
   if (p) {
-    var coord = p.getLatLng();
+    const coord = p.getLatLng();
 
     // range is only known for sure if we have portal details
     // TODO? render a min range guess until details are loaded..?
 
-    var d = IITC.portal.details.get(p.options.guid);
+    const d = IITC.portal.details.get(p.options.guid);
     if (d) {
-      var range = IITC.portal.getRange(d);
+      const range = IITC.portal.getRange(d);
       window.portalRangeIndicator = (
         range.range > 0
           ? L.geodesicCircle(coord, range.range, {
@@ -354,12 +413,12 @@ const setIndicators = function (p) {
  * @returns {boolean} True if the same portal is re-selected (just an update), false if a different portal is selected.
  */
 const select = function (guid, event) {
-  var update = window.selectedPortal === guid;
-  var oldPortalGuid = window.selectedPortal;
+  const update = window.selectedPortal === guid;
+  const oldPortalGuid = window.selectedPortal;
   window.selectedPortal = guid;
 
-  var oldPortal = window.portals[oldPortalGuid];
-  var newPortal = window.portals[guid];
+  const oldPortal = window.portals[oldPortalGuid];
+  const newPortal = window.portals[guid];
 
   // Restore style of unselected portal
   if (!update && oldPortal) oldPortal.setSelected(false);
@@ -402,21 +461,21 @@ const rangeLinkClick = function () {
 const makePrimeLink = function (guid, lat, lng) {
   const base = 'https://link.ingress.com/';
   const link = {
-    'link': `https://intel.ingress.com/portal/${guid}`,
+    link: `https://intel.ingress.com/portal/${guid}`,
   };
   const android = {
-    'apn': 'com.nianticproject.ingress',
+    apn: 'com.nianticproject.ingress',
   };
   const ios = {
-    'isi': '576505181',
-    'ibi': 'com.google.ingress',
-    'ifl': 'https://apps.apple.com/app/ingress/id576505181',
+    isi: '576505181',
+    ibi: 'com.google.ingress',
+    ifl: 'https://apps.apple.com/app/ingress/id576505181',
   };
   const other = {
-    'ofl': `https://intel.ingress.com/intel?pll=${lat},${lng}`,
+    ofl: `https://intel.ingress.com/intel?pll=${lat},${lng}`,
   };
   const url = new URL(base);
-  for (const [key, value] of Object.entries({...link, ...android, ...ios, ...other})) {
+  for (const [key, value] of Object.entries({ ...link, ...android, ...ios, ...other })) {
     url.searchParams.set(key, value);
   }
   return url.toString();
@@ -436,13 +495,12 @@ const makePrimeLink = function (guid, lat, lng) {
 const makePermalink = function (latlng, options) {
   options = options || {};
 
-  function round(l) {
-    // ensures that lat,lng are with same precision as in stock intel permalinks
-    return Math.floor(l * 1e6) / 1e6;
-  }
-  var args = [];
+  // ensures that lat,lng are with same precision as in stock intel permalinks
+  const round = (l) => Math.floor(l * 1e6) / 1e6;
+
+  const args = [];
   if (!latlng || options.includeMapView) {
-    var c = window.map.getCenter();
+    const c = window.map.getCenter();
     args.push('ll=' + [round(c.lat), round(c.lng)].join(','), 'z=' + window.map.getZoom());
   }
   if (latlng) {
@@ -451,7 +509,7 @@ const makePermalink = function (latlng, options) {
     }
     args.push('pll=' + latlng.join(','));
   }
-  var url = '';
+  let url = '';
   if (options.fullURL) {
     url += new URL(document.baseURI).origin;
   }
@@ -470,6 +528,15 @@ IITC.portal.display = {
   rangeLinkClick,
   makePrimeLink,
   makePermalink,
+  // overridable HTML templates
+  moveToPortalIconTemplate,
+  randDetailsTemplate,
+  artifactTargetTemplate,
+  artifactFragmentsTemplate,
+  modsWrapperTemplate,
+  loadingStatusTemplate,
+  linkDetailsTemplate,
+  ellipsisLabelTemplate,
 };
 
 // Map of legacy global names to their new names within IITC.portal.display
