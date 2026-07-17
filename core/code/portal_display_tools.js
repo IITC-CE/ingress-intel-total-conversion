@@ -8,6 +8,96 @@
  */
 
 /**
+ * Template shown when a portal has no history data
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let historyMissingTemplate = '<div id="historydetails" class="missing">History missing</div>';
+
+/**
+ * Template of the portal history block (visited / captured / scout controlled)
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let historyTemplate =
+  '<div id="historydetails">History: ' +
+  '<span id="visited" {visited}>visited</span> | ' +
+  '<span id="captured" {captured}>captured</span> | ' +
+  '<span id="scout-controlled" {scoutControlled}>scout controlled</span>' +
+  '</div>';
+
+/**
+ * Template of the clickable portal range link
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let rangeLinkTemplate = '<a onclick="window.rangeLinkClick()"{strike}>{distance}</a>';
+
+/**
+ * Template of a single portal mod entry ({titleAttr} is a pre-built ` title="..."` attribute or empty)
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let modTemplate = '<span{titleAttr} style="color:{color}">{name}</span>';
+
+/**
+ * Template of an empty mod slot
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let modEmptyTemplate = '<span style="color:#000"></span>';
+
+/**
+ * Template of a resonator meter cell
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let resonatorMeterTemplate = '<span class="{className}" title="{inf}">{fill}{lbar}</span>';
+
+/**
+ * Template of the resonator fill bar
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let resonatorFillTemplate = '<span style="{style}"></span>';
+
+/**
+ * Template of the resonator level label
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let resonatorLevelTemplate = '<span class="meter-level" style="color: {color};"> L {level} </span>';
+
+/**
+ * Template wrapping the resonator details table
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let resoDetailsTemplate = '<table id="resodetails">{rows}</table>';
+
+/**
+ * Template of a player nickname span
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let nicknameTemplate = '<span class="nickname">{nick}</span>';
+
+/**
+ * Template of the map-service links dialog shown by showPosLinks
+ * ({text:'...'} is a literal script object, only lat/lng/encodedName are placeholders)
+ * @type {String}
+ * @memberof IITC.portal.display.tools
+ */
+let posLinksTemplate =
+  '<div style="text-align: center;">' +
+  '<div id="qrcode"></div>' +
+  "<script>$('#qrcode').qrcode({text:'GEO:{lat},{lng}'});</script>" +
+  '<a href="https://maps.google.com/maps?ll={lat},{lng}&q={lat},{lng}%20({encodedName})">Google Maps</a>; ' +
+  '<a href="https://www.bing.com/maps/?v=2&cp={lat}~{lng}&lvl=16&sp=Point.{lat}_{lng}_{encodedName}___">Bing Maps</a>; ' +
+  '<a href="https://www.openstreetmap.org/?mlat={lat}&mlon={lng}&zoom=16">OpenStreetMap</a>' +
+  '<br /><span>{lat},{lng}</span></div>';
+
+/**
  * Provides historical details about a portal including visitation, capture, and scout control status.
  *
  * @memberof IITC.portal.display.tools
@@ -16,21 +106,14 @@
  */
 const getHistoryDetails = function (d) {
   if (!d.history) {
-    return '<div id="historydetails" class="missing">History missing</div>';
+    return IITC.portal.display.tools.historyMissingTemplate;
   }
-  var classParts = {};
-  ['visited', 'captured', 'scoutControlled'].forEach(function (k) {
+  const classParts = {};
+  ['visited', 'captured', 'scoutControlled'].forEach((k) => {
     classParts[k] = d.history[k] ? 'class="completed"' : '';
   });
 
-  return L.Util.template(
-    '<div id="historydetails">History: ' +
-      '<span id="visited" {visited}>visited</span> | ' +
-      '<span id="captured" {captured}>captured</span> | ' +
-      '<span id="scout-controlled" {scoutControlled}>scout controlled</span>' +
-      '</div>',
-    classParts
-  );
+  return L.Util.template(IITC.portal.display.tools.historyTemplate, classParts);
 };
 
 /**
@@ -41,21 +124,18 @@ const getHistoryDetails = function (d) {
  * @returns {Array} An array containing the range label, HTML content, and a tooltip title.
  */
 const getRangeText = function (d) {
-  var range = IITC.portal.getRange(d);
+  const range = IITC.portal.getRange(d);
 
-  var title = `Base range:\t${window.digits(Math.floor(range.base))}m\nLink amp boost:\t×${range.boost}\nRange:\t${window.digits(Math.floor(range.range))}m`;
+  let title = `Base range:\t${window.digits(Math.floor(range.base))}m\nLink amp boost:\t×${range.boost}\nRange:\t${window.digits(Math.floor(range.range))}m`;
 
   if (!range.isLinkable) title += '\nPortal is missing resonators,\nno new links can be made';
 
-  return [
-    'range',
-    '<a onclick="window.rangeLinkClick()"' +
-      (range.isLinkable ? '' : ' style="text-decoration:line-through;"') +
-      '>' +
-      window.formatDistance(range.range) +
-      '</a>',
-    title,
-  ];
+  const link = L.Util.template(IITC.portal.display.tools.rangeLinkTemplate, {
+    strike: range.isLinkable ? '' : ' style="text-decoration:line-through;"',
+    distance: window.formatDistance(range.range),
+  });
+
+  return ['range', link, title];
 };
 
 /**
@@ -66,13 +146,13 @@ const getRangeText = function (d) {
  * @returns {string} HTML string representing the mod details of the portal.
  */
 const getModDetails = function (d) {
-  var mods = [];
-  var modsTitle = [];
-  var modsColor = [];
-  $.each(d.mods, function (ind, mod) {
-    var modName = '';
-    var modTooltip = '';
-    var modColor = '#000';
+  const mods = [];
+  const modsTitle = [];
+  const modsColor = [];
+  d.mods.forEach((mod) => {
+    let modName = '';
+    let modTooltip = '';
+    let modColor = '#000';
 
     if (mod) {
       // all mods seem to follow the same pattern for the data structure
@@ -91,9 +171,9 @@ const getModDetails = function (d) {
 
       if (mod.stats) {
         modTooltip += 'Stats:';
-        for (var key in mod.stats) {
+        for (const key in mod.stats) {
           if (!Object.hasOwn(mod.stats, key)) continue;
-          var val = mod.stats[key];
+          let val = mod.stats[key];
 
           // if (key === 'REMOVAL_STICKINESS' && val == 0) continue;  // stat on all mods recently - unknown meaning, not displayed in stock client
 
@@ -129,13 +209,17 @@ const getModDetails = function (d) {
     modsColor.push(modColor);
   });
 
-  var t = '';
+  let t = '';
   for (let i = 0; i < mods.length; i++) {
-    t += '<span' + (modsTitle[i].length ? ' title="' + modsTitle[i] + '"' : '') + ' style="color:' + modsColor[i] + '">' + mods[i] + '</span>';
+    t += L.Util.template(IITC.portal.display.tools.modTemplate, {
+      titleAttr: modsTitle[i].length ? ' title="' + modsTitle[i] + '"' : '',
+      color: modsColor[i],
+      name: mods[i],
+    });
   }
   // and add blank entries if we have less than 4 mods (as the server no longer returns all mod slots, but just the filled ones)
   for (let i = mods.length; i < 4; i++) {
-    t += '<span style="color:#000"></span>';
+    t += IITC.portal.display.tools.modEmptyTemplate;
   }
 
   return t;
@@ -149,10 +233,10 @@ const getModDetails = function (d) {
  * @returns {Array} An array containing the energy label, formatted energy values, and a tooltip title.
  */
 const getEnergyText = function (d) {
-  var currentNrg = IITC.portal.getCurrentEnergy(d);
-  var totalNrg = IITC.portal.getTotalEnergy(d);
-  var title = currentNrg + ' / ' + totalNrg;
-  var fill = window.prettyEnergy(currentNrg) + ' / ' + window.prettyEnergy(totalNrg);
+  const currentNrg = IITC.portal.getCurrentEnergy(d);
+  const totalNrg = IITC.portal.getTotalEnergy(d);
+  const title = currentNrg + ' / ' + totalNrg;
+  const fill = window.prettyEnergy(currentNrg) + ' / ' + window.prettyEnergy(totalNrg);
   return ['energy', fill, title];
 };
 
@@ -164,7 +248,7 @@ const getEnergyText = function (d) {
  * @returns {string} HTML string representing the resonator details of the portal.
  */
 const getResonatorDetails = function (d) {
-  var resoDetails = [];
+  const resoDetails = [];
   // octant=slot: 0=E, 1=NE, 2=N, 3=NW, 4=W, 5=SW, 6=S, SE=7
   // resos in the display should be ordered like this:
   //   N    NE         Since the view is displayed in rows, they
@@ -173,8 +257,8 @@ const getResonatorDetails = function (d) {
   //  SW    S
   // note: as of 2014-05-23 update, this is not true for portals with empty slots!
 
-  var processResonatorSlot = function (reso, slot) {
-    var lvl = 0,
+  const processResonatorSlot = (reso, slot) => {
+    let lvl = 0,
       nrg = 0,
       owner = null;
 
@@ -191,17 +275,17 @@ const getResonatorDetails = function (d) {
 
   if (d.resonators.length === 8) {
     // fully deployed - we can make assumptions about deployment slots
-    $.each([2, 1, 3, 0, 4, 7, 5, 6], function (ind, slot) {
+    [2, 1, 3, 0, 4, 7, 5, 6].forEach((slot) => {
       processResonatorSlot(d.resonators[slot], slot);
     });
   } else {
     // partially deployed portal - we can no longer find out which resonator is in which slot
-    for (var ind = 0; ind < 8; ind++) {
+    for (let ind = 0; ind < 8; ind++) {
       processResonatorSlot(ind < d.resonators.length ? d.resonators[ind] : null, null);
     }
   }
 
-  return '<table id="resodetails">' + window.genFourColumnTable(resoDetails) + '</table>';
+  return L.Util.template(IITC.portal.display.tools.resoDetailsTemplate, { rows: window.genFourColumnTable(resoDetails) });
 };
 
 /**
@@ -218,24 +302,24 @@ const getResonatorDetails = function (d) {
 const renderResonatorDetails = function (slot, level, nrg, nick) {
   const className = window.OCTANTS[slot] === 'N' ? 'meter north' : 'meter';
 
-  var max = window.RESO_NRG[level];
-  var fillGrade = level > 0 ? (nrg / max) * 100 : 0;
+  const max = window.RESO_NRG[level];
+  const fillGrade = level > 0 ? (nrg / max) * 100 : 0;
 
-  var inf =
+  const inf =
     (level > 0 ? 'energy:\t' + nrg + ' / ' + max + ' (' + Math.round(fillGrade) + '%)\n' + 'level:\t' + level + '\n' + 'owner:\t' + nick + '\n' : '') +
     (slot !== null ? 'octant:\t' + window.OCTANTS[slot] + ' ' + window.OCTANTS_ARROW[slot] : '');
 
-  var style = fillGrade ? 'width:' + fillGrade + '%; background:' + window.COLORS_LVL[level] + ';' : '';
+  const style = fillGrade ? 'width:' + fillGrade + '%; background:' + window.COLORS_LVL[level] + ';' : '';
 
-  var color = level < 3 ? '#9900FF' : '#FFFFFF';
+  const color = level < 3 ? '#9900FF' : '#FFFFFF';
 
-  var lbar = level > 0 ? '<span class="meter-level" style="color: ' + color + ';"> L ' + level + ' </span>' : '';
+  const lbar = level > 0 ? L.Util.template(IITC.portal.display.tools.resonatorLevelTemplate, { color: color, level: level }) : '';
 
-  var fill = '<span style="' + style + '"></span>';
+  const fill = L.Util.template(IITC.portal.display.tools.resonatorFillTemplate, { style: style });
 
-  var meter = '<span class="' + className + '" title="' + inf + '">' + fill + lbar + '</span>';
+  const meter = L.Util.template(IITC.portal.display.tools.resonatorMeterTemplate, { className: className, inf: inf, fill: fill, lbar: lbar });
 
-  nick = nick ? '<span class="nickname">' + nick + '</span>' : null;
+  nick = nick ? L.Util.template(IITC.portal.display.tools.nicknameTemplate, { nick: nick }) : null;
   return [meter, nick || ''];
 };
 
@@ -249,10 +333,10 @@ const renderResonatorDetails = function (slot, level, nrg, nick) {
  * @returns {Array} An array containing the label 'AP Gain', total AP gain, and a breakdown tooltip.
  */
 const getAttackApGainText = function (d, fieldCount, linkCount) {
-  var breakdown = IITC.portal.getAttackApGain(d, fieldCount, linkCount);
-  var totalGain = breakdown.enemyAp;
+  const breakdown = IITC.portal.getAttackApGain(d, fieldCount, linkCount);
+  let totalGain = breakdown.enemyAp;
 
-  var t = '';
+  let t = '';
   if (window.teamStringToId(window.PLAYER.team) === window.teamStringToId(d.team)) {
     totalGain = breakdown.friendlyAp;
     t += 'Friendly AP:\t' + breakdown.friendlyAp + '\n';
@@ -275,11 +359,11 @@ const getAttackApGainText = function (d, fieldCount, linkCount) {
  * @returns {Array} An array containing the label 'hacks', short hack info, and a detailed tooltip.
  */
 const getHackDetailsText = function (d) {
-  var hackDetails = IITC.portal.getHackDetails(d);
+  const hackDetails = IITC.portal.getHackDetails(d);
 
-  var shortHackInfo = hackDetails.hacks + ' @ ' + window.formatInterval(hackDetails.cooldown);
+  const shortHackInfo = hackDetails.hacks + ' @ ' + window.formatInterval(hackDetails.cooldown);
 
-  var title =
+  const title =
     `Hacks available every 4 hours\n` +
     `Hack count:\t${hackDetails.hacks}\n` +
     `Cooldown time:\t${window.formatInterval(hackDetails.cooldown)}\n` +
@@ -297,12 +381,12 @@ const getHackDetailsText = function (d) {
  * @returns {Array} An array containing the label 'shielding', short mitigation info, and a detailed tooltip.
  */
 const getMitigationText = function (d, linkCount) {
-  var mitigationDetails = IITC.portal.getMitigationDetails(d, linkCount);
+  const mitigationDetails = IITC.portal.getMitigationDetails(d, linkCount);
 
-  var mitigationShort = mitigationDetails.total;
+  let mitigationShort = mitigationDetails.total;
   if (mitigationDetails.excess) mitigationShort += ' (+' + mitigationDetails.excess + ')';
 
-  var title =
+  const title =
     `Total shielding:\t${mitigationDetails.shields + mitigationDetails.links}\n` +
     `- active:\t${mitigationDetails.total}\n` +
     `- excess:\t${mitigationDetails.excess}\n` +
@@ -322,16 +406,13 @@ const getMitigationText = function (d, linkCount) {
  * @param {string} name - Name of the location.
  */
 const showPosLinks = function (lat, lng, name) {
-  var encoded_name = encodeURIComponent(name);
-  var qrcode = '<div id="qrcode"></div>';
-  var script = "<script>$('#qrcode').qrcode({text:'GEO:" + lat + ',' + lng + "'});</script>";
-  var gmaps = '<a href="https://maps.google.com/maps?ll=' + lat + ',' + lng + '&q=' + lat + ',' + lng + '%20(' + encoded_name + ')">Google Maps</a>';
-  var bingmaps =
-    '<a href="https://www.bing.com/maps/?v=2&cp=' + lat + '~' + lng + '&lvl=16&sp=Point.' + lat + '_' + lng + '_' + encoded_name + '___">Bing Maps</a>';
-  var osm = '<a href="https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lng + '&zoom=16">OpenStreetMap</a>';
-  var latLng = '<span>' + lat + ',' + lng + '</span>';
+  const html = L.Util.template(IITC.portal.display.tools.posLinksTemplate, {
+    lat: lat,
+    lng: lng,
+    encodedName: encodeURIComponent(name),
+  });
   window.dialog({
-    html: '<div style="text-align: center;">' + qrcode + script + gmaps + '; ' + bingmaps + '; ' + osm + '<br />' + latLng + '</div>',
+    html: html,
     title: name,
     id: 'poslinks',
   });
@@ -348,6 +429,18 @@ IITC.portal.display.tools = {
   getHackDetailsText,
   getMitigationText,
   showPosLinks,
+  // overridable HTML templates
+  historyMissingTemplate,
+  historyTemplate,
+  rangeLinkTemplate,
+  modTemplate,
+  modEmptyTemplate,
+  resonatorMeterTemplate,
+  resonatorFillTemplate,
+  resonatorLevelTemplate,
+  resoDetailsTemplate,
+  nicknameTemplate,
+  posLinksTemplate,
 };
 
 // Map of legacy global names to their new names within IITC.portal.display.tools
