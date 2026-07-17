@@ -7,8 +7,8 @@
  * @namespace details
  */
 
-var cache;
-var requestQueue = {};
+let cache;
+const requestQueue = {};
 
 /**
  * Sets up the portal detail handler, initializing the cache.
@@ -66,12 +66,12 @@ const handleResponseSuccess = function (deferred, guid, data, prefetch) {
   }
 
   // Parse portal details
-  var dict = window.decodeArray.portal(data.result, 'detailed');
+  const dict = window.decodeArray.portal(data.result, 'detailed');
   cache.store(guid, dict);
 
   // entity format, as used in map data
-  var ent = [guid, data.result[13], data.result];
-  var portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
+  const ent = [guid, data.result[13], data.result];
+  const portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
   deferred.resolve(portal.options.data);
   window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal });
@@ -115,7 +115,7 @@ const doRequest = function (deferred, guid, prefetch) {
  */
 const request = function (guid, prefetch = false) {
   if (!requestQueue[guid]) {
-    var deferred = $.Deferred();
+    const deferred = $.Deferred();
     requestQueue[guid] = deferred.promise();
     deferred.always(function () {
       delete requestQueue[guid];
