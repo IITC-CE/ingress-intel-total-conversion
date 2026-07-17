@@ -20,10 +20,10 @@ let urlPortal;
  * @returns {Object} An object containing arrays of incoming ('in') and outgoing ('out') link GUIDs.
  */
 const getLinks = function (guid) {
-  var links = { in: [], out: [] };
+  const links = { in: [], out: [] };
 
-  $.each(window.links, function (g, l) {
-    var d = l.options.data;
+  for (const [g, l] of Object.entries(window.links)) {
+    const d = l.options.data;
 
     if (d.oGuid === guid) {
       links.out.push(g);
@@ -31,7 +31,7 @@ const getLinks = function (guid) {
     if (d.dGuid === guid) {
       links.in.push(g);
     }
-  });
+  }
 
   return links;
 };
@@ -44,7 +44,7 @@ const getLinks = function (guid) {
  * @returns {number} The total number of links for the portal.
  */
 const getLinksCount = function (guid) {
-  var links = IITC.portal.getLinks(guid);
+  const links = IITC.portal.getLinks(guid);
   return links.in.length + links.out.length;
 };
 
@@ -56,15 +56,15 @@ const getLinksCount = function (guid) {
  * @returns {Array} An array containing the GUIDs of fields associated with the portal.
  */
 const getFields = function (guid) {
-  var fields = [];
+  const fields = [];
 
-  $.each(window.fields, function (g, f) {
-    var d = f.options.data;
+  for (const [g, f] of Object.entries(window.fields)) {
+    const d = f.options.data;
 
     if (d.points[0].guid === guid || d.points[1].guid === guid || d.points[2].guid === guid) {
       fields.push(g);
     }
-  });
+  }
 
   return fields;
 };
@@ -77,7 +77,7 @@ const getFields = function (guid) {
  * @returns {number} The total number of fields associated with the portal.
  */
 const getFieldsCount = function (guid) {
-  var fields = IITC.portal.getFields(guid);
+  const fields = IITC.portal.getFields(guid);
   return fields.length;
 };
 
@@ -116,11 +116,11 @@ const getLevel = function (d) {
  * @returns {number} The total energy capacity of the portal.
  */
 const getTotalEnergy = function (d) {
-  var nrg = 0;
-  $.each(d.resonators, function (ind, reso) {
-    if (!reso) return true;
-    var level = parseInt(reso.level);
-    var max = window.RESO_NRG[level];
+  let nrg = 0;
+  d.resonators.forEach((reso) => {
+    if (!reso) return;
+    const level = parseInt(reso.level);
+    const max = window.RESO_NRG[level];
     nrg += max;
   });
   return nrg;
@@ -134,9 +134,9 @@ const getTotalEnergy = function (d) {
  * @returns {number} The current energy of the portal.
  */
 const getCurrentEnergy = function (d) {
-  var nrg = 0;
-  $.each(d.resonators, function (ind, reso) {
-    if (!reso) return true;
+  let nrg = 0;
+  d.resonators.forEach((reso) => {
+    if (!reso) return;
     nrg += parseInt(reso.energy);
   });
   return nrg;
@@ -151,8 +151,8 @@ const getCurrentEnergy = function (d) {
  *                   Returns 0 if the portal has no total energy.
  */
 const getHealth = function (d) {
-  var max = IITC.portal.getTotalEnergy(d);
-  var cur = IITC.portal.getCurrentEnergy(d);
+  const max = IITC.portal.getTotalEnergy(d);
+  const cur = IITC.portal.getCurrentEnergy(d);
 
   return max > 0 ? Math.floor((cur / max) * 100) : 0;
 };
@@ -169,7 +169,7 @@ const getHealth = function (d) {
 const getRange = function (d) {
   // formula by the great gals and guys at
   // http://decodeingress.me/2012/11/18/ingress-portal-levels-and-link-range/
-  var range = {
+  const range = {
     base: window.teamStringToId(d.team) === window.TEAM_MAC ? window.LINK_RANGE_MAC[d.level + 1] : 160 * Math.pow(IITC.portal.getLevel(d), 4),
     boost: IITC.portal.getLinkAmpRangeBoost(d),
   };
@@ -194,16 +194,16 @@ const getLinkAmpRangeBoost = function (d) {
   // additional range boost calculation
 
   // link amps scale: first is full, second a quarter, the last two an eighth
-  var scale = [1.0, 0.25, 0.125, 0.125];
+  const scale = [1.0, 0.25, 0.125, 0.125];
 
-  var boost = 0.0; // initial boost is 0.0 (i.e. no boost over standard range)
+  let boost = 0.0; // initial boost is 0.0 (i.e. no boost over standard range)
 
-  var linkAmps = IITC.portal.getModsByType(d, 'LINK_AMPLIFIER');
+  const linkAmps = IITC.portal.getModsByType(d, 'LINK_AMPLIFIER');
 
-  linkAmps.forEach(function (mod, i) {
+  linkAmps.forEach((mod, i) => {
     // link amp stat LINK_RANGE_MULTIPLIER is 2000 for rare, and gives 2x boost to the range
     // and very-rare is 7000 and gives 7x the range
-    var baseMultiplier = mod.stats.LINK_RANGE_MULTIPLIER / 1000;
+    const baseMultiplier = mod.stats.LINK_RANGE_MULTIPLIER / 1000;
     boost += baseMultiplier * scale[i];
   });
 
@@ -222,17 +222,17 @@ const getLinkAmpRangeBoost = function (d) {
 const getAttackApGain = function (d, fieldCount, linkCount) {
   if (!fieldCount) fieldCount = 0;
 
-  var resoCount = 0;
-  var maxResonators = window.MAX_RESO_PER_PLAYER.slice(0);
-  var curResonators = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  let resoCount = 0;
+  const maxResonators = window.MAX_RESO_PER_PLAYER.slice(0);
+  const curResonators = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   for (let n = window.PLAYER.level + 1; n < 9; n++) {
     maxResonators[n] = 0;
   }
-  $.each(d.resonators, function (ind, reso) {
-    if (!reso) return true;
+  d.resonators.forEach((reso) => {
+    if (!reso) return;
     resoCount += 1;
-    var reslevel = parseInt(reso.level);
+    const reslevel = parseInt(reso.level);
     if (reso.owner === window.PLAYER.nickname) {
       if (maxResonators[reslevel] > 0) {
         maxResonators[reslevel] -= 1;
@@ -242,16 +242,16 @@ const getAttackApGain = function (d, fieldCount, linkCount) {
     }
   });
 
-  var resoAp = resoCount * window.DESTROY_RESONATOR;
-  var linkAp = linkCount * window.DESTROY_LINK;
-  var fieldAp = fieldCount * window.DESTROY_FIELD;
-  var destroyAp = resoAp + linkAp + fieldAp;
-  var captureAp = window.CAPTURE_PORTAL + 8 * window.DEPLOY_RESONATOR + window.COMPLETION_BONUS;
-  var enemyAp = destroyAp + captureAp;
-  var deployCount = 8 - resoCount;
-  var completionAp = deployCount > 0 ? window.COMPLETION_BONUS : 0;
-  var upgradeCount = 0;
-  var upgradeAvailable = maxResonators[8];
+  const resoAp = resoCount * window.DESTROY_RESONATOR;
+  const linkAp = linkCount * window.DESTROY_LINK;
+  const fieldAp = fieldCount * window.DESTROY_FIELD;
+  const destroyAp = resoAp + linkAp + fieldAp;
+  const captureAp = window.CAPTURE_PORTAL + 8 * window.DEPLOY_RESONATOR + window.COMPLETION_BONUS;
+  const enemyAp = destroyAp + captureAp;
+  const deployCount = 8 - resoCount;
+  const completionAp = deployCount > 0 ? window.COMPLETION_BONUS : 0;
+  let upgradeCount = 0;
+  let upgradeAvailable = maxResonators[8];
   for (let n = 7; n >= 0; n--) {
     upgradeCount += curResonators[n];
     if (upgradeAvailable < upgradeCount) {
@@ -259,7 +259,7 @@ const getAttackApGain = function (d, fieldCount, linkCount) {
     }
     upgradeAvailable += maxResonators[n];
   }
-  var friendlyAp = deployCount * window.DEPLOY_RESONATOR + upgradeCount * window.UPGRADE_ANOTHERS_RESONATOR + completionAp;
+  const friendlyAp = deployCount * window.DEPLOY_RESONATOR + upgradeCount * window.UPGRADE_ANOTHERS_RESONATOR + completionAp;
   return {
     friendlyAp: friendlyAp,
     deployCount: deployCount,
@@ -298,9 +298,9 @@ const fixImageUrl = function (url) {
  * @returns {Array} An array of mods matching the specified type.
  */
 const getModsByType = function (d, type) {
-  var mods = [];
+  const mods = [];
 
-  var typeToStat = {
+  const typeToStat = {
     RES_SHIELD: 'MITIGATION',
     FORCE_AMP: 'FORCE_AMPLIFIER',
     TURRET: 'HIT_BONUS', // and/or ATTACK_FREQUENCY??
@@ -310,16 +310,14 @@ const getModsByType = function (d, type) {
     ULTRA_LINK_AMP: 'OUTGOING_LINKS_BONUS', // and/or LINK_DEFENSE_BOOST??
   };
 
-  var stat = typeToStat[type];
+  const stat = typeToStat[type];
 
-  $.each(d.mods || [], function (i, mod) {
+  (d.mods || []).forEach((mod) => {
     if (mod && Object.hasOwn(mod.stats, stat)) mods.push(mod);
   });
 
   // sorting mods by the stat keeps code simpler, when calculating combined mod effects
-  mods.sort(function (a, b) {
-    return b.stats[stat] - a.stats[stat];
-  });
+  mods.sort((a, b) => b.stats[stat] - a.stats[stat]);
 
   return mods;
 };
@@ -332,10 +330,10 @@ const getModsByType = function (d, type) {
  * @returns {number} The total mitigation value from all shields installed on the portal.
  */
 const getShieldMitigation = function (d) {
-  var shields = IITC.portal.getModsByType(d, 'RES_SHIELD');
+  const shields = IITC.portal.getModsByType(d, 'RES_SHIELD');
 
-  var mitigation = 0;
-  $.each(shields, function (i, s) {
+  let mitigation = 0;
+  shields.forEach((s) => {
     mitigation += parseInt(s.stats.MITIGATION);
   });
 
@@ -350,11 +348,11 @@ const getShieldMitigation = function (d) {
  * @returns {number} The total link defense boost factor.
  */
 const getLinkDefenseBoost = function (d) {
-  var ultraLinkAmps = IITC.portal.getModsByType(d, 'ULTRA_LINK_AMP');
+  const ultraLinkAmps = IITC.portal.getModsByType(d, 'ULTRA_LINK_AMP');
 
-  var linkDefenseBoost = 1;
+  let linkDefenseBoost = 1;
 
-  $.each(ultraLinkAmps, function (index, ultraLinkAmp) {
+  ultraLinkAmps.forEach((ultraLinkAmp) => {
     linkDefenseBoost *= parseInt(ultraLinkAmp.stats.LINK_DEFENSE_BOOST) / 1000;
   });
 
@@ -369,7 +367,7 @@ const getLinkDefenseBoost = function (d) {
  * @returns {number} The additional mitigation value provided by the links.
  */
 const getLinksMitigation = function (linkCount) {
-  var mitigation = Math.round((400 / 9) * Math.atan(linkCount / Math.E));
+  const mitigation = Math.round((400 / 9) * Math.atan(linkCount / Math.E));
   return mitigation;
 };
 
@@ -382,9 +380,9 @@ const getLinksMitigation = function (linkCount) {
  * @returns {Object} An object detailing various components of mitigation.
  */
 const getMitigationDetails = function (d, linkCount) {
-  var linkDefenseBoost = IITC.portal.getLinkDefenseBoost(d);
+  const linkDefenseBoost = IITC.portal.getLinkDefenseBoost(d);
 
-  var mitigation = {
+  const mitigation = {
     shields: IITC.portal.getShieldMitigation(d),
     links: IITC.portal.getLinksMitigation(linkCount) * linkDefenseBoost,
     linkDefenseBoost: linkDefenseBoost,
@@ -393,7 +391,7 @@ const getMitigationDetails = function (d, linkCount) {
   // mitigation is limited to 95% (as confirmed by Brandon Badger on G+)
   mitigation.total = Math.min(95, mitigation.shields + mitigation.links);
 
-  var excess = mitigation.shields + mitigation.links - mitigation.total;
+  const excess = mitigation.shields + mitigation.links - mitigation.total;
   mitigation.excess = Math.round(10 * excess) / 10;
 
   return mitigation;
@@ -407,11 +405,11 @@ const getMitigationDetails = function (d, linkCount) {
  * @returns {number} The maximum number of outgoing links.
  */
 const getMaxOutgoingLinks = function (d) {
-  var linkAmps = IITC.portal.getModsByType(d, 'ULTRA_LINK_AMP');
+  const linkAmps = IITC.portal.getModsByType(d, 'ULTRA_LINK_AMP');
 
-  var links = 8;
+  let links = 8;
 
-  linkAmps.forEach(function (mod) {
+  linkAmps.forEach((mod) => {
     links += parseInt(mod.stats.OUTGOING_LINKS_BONUS);
   });
 
@@ -426,24 +424,24 @@ const getMaxOutgoingLinks = function (d) {
  * @returns {Object} An object containing hack-related details like cooldown time, hack count, and burnout time.
  */
 const getHackDetails = function (d) {
-  var heatsinks = IITC.portal.getModsByType(d, 'HEATSINK');
-  var multihacks = IITC.portal.getModsByType(d, 'MULTIHACK');
+  const heatsinks = IITC.portal.getModsByType(d, 'HEATSINK');
+  const multihacks = IITC.portal.getModsByType(d, 'MULTIHACK');
 
   // first mod of type is fully effective, the others are only 50% effective
-  var effectivenessReduction = [1, 0.5, 0.5, 0.5];
+  const effectivenessReduction = [1, 0.5, 0.5, 0.5];
 
-  var isFriendly = window.teamStringToId(d.team) === window.teamStringToId(window.PLAYER.team);
-  var cooldownTime = isFriendly ? window.FACTION_HACK_COOLDOWN : window.BASE_HACK_COOLDOWN;
+  const isFriendly = window.teamStringToId(d.team) === window.teamStringToId(window.PLAYER.team);
+  let cooldownTime = isFriendly ? window.FACTION_HACK_COOLDOWN : window.BASE_HACK_COOLDOWN;
 
-  $.each(heatsinks, function (index, mod) {
-    var hackSpeed = parseInt(mod.stats.HACK_SPEED) / 1000000;
+  heatsinks.forEach((mod, index) => {
+    const hackSpeed = parseInt(mod.stats.HACK_SPEED) / 1000000;
     cooldownTime = Math.round(cooldownTime * (1 - hackSpeed * effectivenessReduction[index]));
   });
 
-  var hackCount = window.BASE_HACK_COUNT; // default hacks
+  let hackCount = window.BASE_HACK_COUNT; // default hacks
 
-  $.each(multihacks, function (index, mod) {
-    var extraHacks = parseInt(mod.stats.BURNOUT_INSULATION);
+  multihacks.forEach((mod, index) => {
+    const extraHacks = parseInt(mod.stats.BURNOUT_INSULATION);
     hackCount = hackCount + extraHacks * effectivenessReduction[index];
   });
 
@@ -459,18 +457,18 @@ const getHackDetails = function (d) {
  */
 const getSummaryData = function (d) {
   // NOTE: the summary data reports unclaimed portals as level 1 - not zero as elsewhere in IITC
-  var level = Math.floor(IITC.portal.getLevel(d));
+  let level = Math.floor(IITC.portal.getLevel(d));
   if (level === 0) level = 1; // niantic returns neutral portals as level 1, not 0 as used throughout IITC elsewhere
 
-  var resCount = 0;
+  let resCount = 0;
   if (d.resonators) {
-    for (var x in d.resonators) {
+    for (const x in d.resonators) {
       if (d.resonators[x]) resCount++;
     }
   }
-  var maxEnergy = IITC.portal.getTotalEnergy(d);
-  var curEnergy = IITC.portal.getCurrentEnergy(d);
-  var health = maxEnergy > 0 ? Math.floor((curEnergy / maxEnergy) * 100) : 0;
+  const maxEnergy = IITC.portal.getTotalEnergy(d);
+  const curEnergy = IITC.portal.getCurrentEnergy(d);
+  const health = maxEnergy > 0 ? Math.floor((curEnergy / maxEnergy) * 100) : 0;
 
   return {
     level: level,
@@ -493,8 +491,8 @@ const getSummaryData = function (d) {
  * @returns {Object} An object containing attack values such as hit bonus, force amplifier, and attack frequency.
  */
 const getAttackValues = function (d) {
-  var forceamps = IITC.portal.getModsByType(d, 'FORCE_AMP');
-  var turrets = IITC.portal.getModsByType(d, 'TURRET');
+  const forceamps = IITC.portal.getModsByType(d, 'FORCE_AMP');
+  const turrets = IITC.portal.getModsByType(d, 'TURRET');
 
   // at the time of writing, only rare force amps and turrets have been seen in the wild, so there's a little guesswork
   // at how the stats work and combine
@@ -504,23 +502,23 @@ const getAttackValues = function (d) {
   // note: scanner shows rounded values (adding a second FA shows: 2.5x+0.2x=2.8x, which should be 2.5x+0.25x=2.75x)
 
   // amplifier scale: first is full, second a quarter, the last two an eighth
-  var scale = [1.0, 0.25, 0.125, 0.125];
+  const scale = [1.0, 0.25, 0.125, 0.125];
 
-  var attackValues = {
+  const attackValues = {
     hit_bonus: 0,
     force_amplifier: 0,
     attack_frequency: 0,
   };
 
-  forceamps.forEach(function (mod, i) {
+  forceamps.forEach((mod, i) => {
     // force amp stat FORCE_AMPLIFIER is 2000 for rare, and gives 2x boost to the range
-    var baseMultiplier = mod.stats.FORCE_AMPLIFIER / 1000;
+    const baseMultiplier = mod.stats.FORCE_AMPLIFIER / 1000;
     attackValues.force_amplifier += baseMultiplier * scale[i];
   });
 
-  turrets.forEach(function (mod, i) {
+  turrets.forEach((mod, i) => {
     // turret stat ATTACK_FREQUENCY is 2000 for rare, and gives 2x boost to the range
-    var baseMultiplier = mod.stats.ATTACK_FREQUENCY / 1000;
+    const baseMultiplier = mod.stats.ATTACK_FREQUENCY / 1000;
     attackValues.attack_frequency += baseMultiplier * scale[i];
 
     attackValues.hit_bonus += mod.stats.HIT_BONUS / 10000;
@@ -560,8 +558,8 @@ const selectByLatLng = function (lat, lng) {
     lng = lat.lng;
     lat = lat.lat;
   }
-  for (var guid in window.portals) {
-    var latlng = window.portals[guid].getLatLng();
+  for (const guid in window.portals) {
+    const latlng = window.portals[guid].getLatLng();
     if (latlng.lat === lat && latlng.lng === lng) {
       window.renderPortalDetails(guid);
       return;
