@@ -59,28 +59,40 @@ const add = function (name, data) {
  */
 const updateControl = function () {
   if (window.isApp && window.app.addPortalHighlighter) {
-    $('#portal_highlight_select').remove();
+    document.getElementById('portal_highlight_select')?.remove();
     return;
   }
 
   if (window._highlighters !== null) {
-    if ($('#portal_highlight_select').length === 0) {
-      $('body').append("<select id='portal_highlight_select'></select>");
-      $('#portal_highlight_select').change(function () {
-        IITC.portal.highlighter.change($(this).val());
+    let select = document.getElementById('portal_highlight_select');
+    if (!select) {
+      select = document.createElement('select');
+      select.id = 'portal_highlight_select';
+      select.addEventListener('change', function () {
+        IITC.portal.highlighter.change(this.value);
       });
-      $('.leaflet-top.leaflet-left').css('padding-top', '20px');
-      $('.leaflet-control-scale-line').css('margin-top', '25px');
+      document.body.append(select);
+
+      const topLeft = document.querySelector('.leaflet-top.leaflet-left');
+      if (topLeft) topLeft.style.paddingTop = '20px';
+      const scaleLine = document.querySelector('.leaflet-control-scale-line');
+      if (scaleLine) scaleLine.style.marginTop = '25px';
     }
-    $('#portal_highlight_select').html('');
-    $('#portal_highlight_select').append($('<option>').attr('value', window._no_highlighter).text(window._no_highlighter));
-    var h_names = Object.keys(window._highlighters).sort();
+    select.innerHTML = '';
 
-    $.each(h_names, function (i, name) {
-      $('#portal_highlight_select').append($('<option>').attr('value', name).text(name));
-    });
+    const addOption = (value) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      select.append(option);
+    };
 
-    $('#portal_highlight_select').val(window._current_highlighter);
+    addOption(window._no_highlighter);
+    Object.keys(window._highlighters)
+      .sort()
+      .forEach((name) => addOption(name));
+
+    select.value = window._current_highlighter;
   }
 };
 
@@ -127,7 +139,7 @@ const highlight = function (p) {
  * @memberof IITC.portal.highlighter
  */
 const resetAll = function () {
-  $.each(window.portals, function (guid, portal) {
+  Object.entries(window.portals).forEach(([guid, portal]) => {
     IITC.portal.marker.setStyle(portal, guid === window.selectedPortal);
   });
 };
