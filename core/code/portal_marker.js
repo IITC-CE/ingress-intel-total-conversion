@@ -26,8 +26,13 @@ function handler_portal_contextmenu(e) {
   IITC.portal.display.renderDetails(e.target.options.guid);
   if (window.isSmartphone()) {
     window.show('info');
-  } else if (!$('#scrollwrapper').is(':visible')) {
-    $('#sidebartoggle').click();
+  } else {
+    const scrollwrapper = document.getElementById('scrollwrapper');
+    // equivalent of jQuery ':visible'
+    const visible = scrollwrapper && (scrollwrapper.offsetWidth > 0 || scrollwrapper.offsetHeight > 0 || scrollwrapper.getClientRects().length > 0);
+    if (!visible) {
+      document.getElementById('sidebartoggle')?.click();
+    }
   }
 }
 
@@ -144,7 +149,6 @@ L.PortalMarker = L.CircleMarker.extend({
         }
       } else if (this._details.timestamp === details.timestamp) {
         // we got more details (core/summary -> summary/detailed/extended)
-        var localThis = this;
         [
           'level',
           'health',
@@ -159,8 +163,8 @@ L.PortalMarker = L.CircleMarker.extend({
           'resonators',
           'owner',
           'artifactDetail',
-        ].forEach(function (prop) {
-          if (details[prop]) localThis._details[prop] = details[prop];
+        ].forEach((prop) => {
+          if (details[prop]) this._details[prop] = details[prop];
         });
         // smarter update for history (cause it's missing sometimes)
         if (details.history) {
@@ -171,8 +175,8 @@ L.PortalMarker = L.CircleMarker.extend({
               log.warn('new portal data has lost some history');
             }
             this._details.history._raw |= details.history._raw;
-            ['visited', 'captured', 'scoutControlled'].forEach(function (prop) {
-              localThis._details.history[prop] ||= details.history[prop];
+            ['visited', 'captured', 'scoutControlled'].forEach((prop) => {
+              this._details.history[prop] ||= details.history[prop];
             });
           }
         }
@@ -199,7 +203,7 @@ L.PortalMarker = L.CircleMarker.extend({
     }
 
     // compatibility
-    var dataOptions = {
+    const dataOptions = {
       guid: this._details.guid,
       level: this._level,
       team: this._team,
@@ -234,12 +238,12 @@ L.PortalMarker = L.CircleMarker.extend({
   },
 
   setMarkerStyle: function (style) {
-    var styleOptions = L.Util.extend(this._style(), style);
+    const styleOptions = L.Util.extend(this._style(), style);
     L.Util.setOptions(this, styleOptions);
 
     L.Util.setOptions(this, IITC.portal.highlighter.highlight(this));
 
-    var selected = L.extend({ radius: this.options.radius }, this._selected && { color: window.COLOR_SELECTED_PORTAL });
+    const selected = L.extend({ radius: this.options.radius }, this._selected && { color: window.COLOR_SELECTED_PORTAL });
     return L.CircleMarker.prototype.setStyle.call(this, selected);
   },
 
@@ -258,7 +262,7 @@ L.PortalMarker = L.CircleMarker.extend({
   },
 
   _style: function () {
-    var dashArray = null;
+    let dashArray = null;
     // dashed outline for placeholder portals
     if (this.isPlaceholder()) {
       dashArray = L.PortalMarker.placeholderStyle.dashArray;
@@ -272,12 +276,12 @@ L.PortalMarker = L.CircleMarker.extend({
   },
 
   _scale: function () {
-    var scale = IITC.portal.marker.scale();
+    const scale = IITC.portal.marker.scale();
 
-    var level = Math.floor(this._level || 0);
+    const level = Math.floor(this._level || 0);
 
-    var lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
-    var lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
+    let lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
+    const lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
 
     // thinner outline for placeholder portals
     if (this.isPlaceholder()) {
@@ -298,7 +302,7 @@ L.PortalMarker = L.CircleMarker.extend({
  * @returns {number} The scale factor for portal markers.
  */
 const scale = function () {
-  var zoom = window.map.getZoom();
+  const zoom = window.map.getZoom();
   if (L.Browser.mobile) return zoom >= 16 ? 1.5 : zoom >= 14 ? 1.2 : zoom >= 11 ? 1.0 : zoom >= 8 ? 0.65 : 0.5;
   else return zoom >= 14 ? 1 : zoom >= 11 ? 0.8 : zoom >= 8 ? 0.65 : 0.5;
 };
@@ -334,21 +338,21 @@ const setStyle = function (marker, selected) {
  * @returns {Object} Style options for the portal marker.
  */
 const getStyleOptions = function (details) {
-  var scale = IITC.portal.marker.scale();
+  const scale = IITC.portal.marker.scale();
 
-  var level = Math.floor(details.level || 0);
+  const level = Math.floor(details.level || 0);
 
-  var lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
-  var lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
+  let lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
+  const lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
 
-  var dashArray = null;
+  let dashArray = null;
   // thinner and dashed outline for placeholder portals
   if (details.team !== window.TEAM_NONE && level === 0) {
     lvlWeight = L.PortalMarker.placeholderStyle.weight;
     dashArray = L.PortalMarker.placeholderStyle.dashArray;
   }
 
-  var options = L.extend(
+  const options = L.extend(
     {
       radius: lvlRadius,
       weight: lvlWeight,
