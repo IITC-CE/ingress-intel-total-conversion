@@ -296,6 +296,28 @@ L.PortalMarker = L.CircleMarker.extend({
 });
 
 /**
+ * Zoom -> scale breakpoints for portal markers as `[minZoom, scale]` tiers, checked from the highest zoom down
+ *
+ * @memberof IITC.portal.marker
+ * @type {{mobile: number[][], desktop: number[][]}}
+ */
+const scaleSteps = {
+  mobile: [
+    [16, 1.5],
+    [14, 1.2],
+    [11, 1],
+    [8, 0.65],
+    [0, 0.5],
+  ],
+  desktop: [
+    [14, 1],
+    [11, 0.8],
+    [8, 0.65],
+    [0, 0.5],
+  ],
+};
+
+/**
  * Calculates the scale of portal markers based on the current zoom level of the map.
  *
  * @memberof IITC.portal.marker
@@ -303,8 +325,9 @@ L.PortalMarker = L.CircleMarker.extend({
  */
 const scale = function () {
   const zoom = window.map.getZoom();
-  if (L.Browser.mobile) return zoom >= 16 ? 1.5 : zoom >= 14 ? 1.2 : zoom >= 11 ? 1.0 : zoom >= 8 ? 0.65 : 0.5;
-  else return zoom >= 14 ? 1 : zoom >= 11 ? 0.8 : zoom >= 8 ? 0.65 : 0.5;
+  const steps = L.Browser.mobile ? IITC.portal.marker.scaleSteps.mobile : IITC.portal.marker.scaleSteps.desktop;
+  const step = steps.find(([minZoom]) => zoom >= minZoom);
+  return step ? step[1] : steps[steps.length - 1][1];
 };
 
 /**
@@ -370,6 +393,7 @@ const getStyleOptions = function (details) {
 
 IITC.portal.marker = {
   scale,
+  scaleSteps,
   create,
   setStyle,
   getStyleOptions,

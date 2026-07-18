@@ -46,6 +46,20 @@ describe('IITC.portal.marker.scale', () => {
     expect(IITC.portal.marker.scale()).to.equal(1.5);
     L.Browser.mobile = false;
   });
+
+  it('lets plugins override the breakpoints via scaleSteps', () => {
+    L.Browser.mobile = false;
+    const original = IITC.portal.marker.scaleSteps.desktop;
+    IITC.portal.marker.scaleSteps.desktop = [
+      [14, 3],
+      [0, 0.1],
+    ];
+    window.map.getZoom = () => 14;
+    expect(IITC.portal.marker.scale()).to.equal(3);
+    window.map.getZoom = () => 5;
+    expect(IITC.portal.marker.scale()).to.equal(0.1);
+    IITC.portal.marker.scaleSteps.desktop = original;
+  });
 });
 
 describe('IITC.portal.marker.getStyleOptions', () => {
