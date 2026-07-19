@@ -427,16 +427,16 @@ window.plugin.playerTracker.getPortalLink = function (data) {
     .text(window.chat.getChatPortalName(data))
     .prop({
       title: window.chat.getChatPortalName(data),
-      href: window.makePermalink(position),
+      href: IITC.portal.display.makePermalink(position),
     })
     .click(function (event) {
-      window.selectPortalByLatLng(position);
+      IITC.portal.selectByLatLng(position);
       event.preventDefault();
       return false;
     })
     .dblclick(function (event) {
       window.map.setView(position, window.DEFAULT_ZOOM);
-      window.selectPortalByLatLng(position);
+      IITC.portal.selectByLatLng(position);
       event.preventDefault();
       return false;
     });

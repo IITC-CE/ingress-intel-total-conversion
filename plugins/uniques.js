@@ -5,6 +5,7 @@
 // @description    Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
 
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
   {
@@ -203,7 +204,7 @@ window.plugin.uniques.updateCheckedAndHighlight = function (guid) {
 
   if (window.plugin.uniques.isHighlightActive) {
     if (window.portals[guid]) {
-      window.setMarkerStyle(window.portals[guid], guid === window.selectedPortal);
+      IITC.portal.marker.setStyle(window.portals[guid], guid === window.selectedPortal);
     }
   }
 };
@@ -339,7 +340,7 @@ window.plugin.uniques.syncCallback = function (pluginName, fieldName, e, fullUpd
       }
       // and also update all highlights, if needed
       if (window.plugin.uniques.isHighlightActive) {
-        window.resetHighlightedPortals();
+        IITC.portal.highlighter.resetAll();
       }
 
       window.runHooks('pluginUniquesRefreshAll');
@@ -594,7 +595,7 @@ var setup = function () {
   window.plugin.uniques.setupCSS();
   window.plugin.uniques.setupContent();
   window.plugin.uniques.loadLocal('uniques');
-  window.addPortalHighlighter('Uniques', window.plugin.uniques.highlighter);
+  IITC.portal.highlighter.add('Uniques', window.plugin.uniques.highlighter);
   window.addHook('portalDetailsUpdated', window.plugin.uniques.onPortalDetailsUpdated);
   window.addHook('publicChatDataAvailable', window.plugin.uniques.onPublicChatDataAvailable);
   window.addHook('portalAdded', storeGUID);
@@ -661,5 +662,5 @@ const findPortalGuidByPositionE6 = function (latE6, lngE6) {
   var item = cache[latE6 + ',' + lngE6];
   if (item) return item[0];
 
-  return window.findPortalGuidByPositionE6(latE6, lngE6);
+  return IITC.portal.findGuidByPositionE6(latE6, lngE6);
 };

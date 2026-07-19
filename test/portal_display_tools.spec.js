@@ -68,7 +68,7 @@ describe('IITC.portal.display.tools.getRangeText', () => {
   it('returns the label, clickable range link and tooltip', () => {
     expect(IITC.portal.display.tools.getRangeText(fullPortal())).to.deep.equal([
       'range',
-      '<a onclick="window.rangeLinkClick()">655km</a>',
+      '<a onclick="IITC.portal.display.rangeLinkClick()">655km</a>',
       `Base range:\t655${TS}360m\nLink amp boost:\t×1\nRange:\t655${TS}360m`,
     ]);
   });

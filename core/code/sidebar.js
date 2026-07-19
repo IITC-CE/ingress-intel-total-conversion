@@ -129,7 +129,7 @@ function setupSidebarToggle() {
       toggle.html('<span class="toggle open"></span>');
     } else {
       sidebar.show();
-      window.resetScrollOnNewPortal();
+      IITC.portal.display.resetScroll();
       $('body').addClass('sidebar-open');
       toggle.html('<span class="toggle close"></span>');
     }
@@ -176,7 +176,7 @@ function setupLargeImagePreview() {
  * @function setPermaLink
  */
 function setPermaLink() {
-  this.href = window.makePermalink(null, true);
+  this.href = IITC.portal.display.makePermalink(null, true);
 }
 
 /**
@@ -212,7 +212,7 @@ function setupAddons() {
  */
 function sidebarOnPortalAdded(data) {
   if (data.portal.options.guid === window.selectedPortal) {
-    window.renderPortalDetails(window.selectedPortal);
+    IITC.portal.display.renderDetails(window.selectedPortal);
   }
 }
 
@@ -223,6 +223,6 @@ function sidebarOnPortalAdded(data) {
  */
 function sidebarOnPortalDetailLoaded(data) {
   if (data.success && data.guid === window.selectedPortal) {
-    window.renderPortalToSideBar(data.portal);
+    IITC.portal.display.renderToSidebar(data.portal);
   }
 }

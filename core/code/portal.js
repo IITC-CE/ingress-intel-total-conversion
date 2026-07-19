@@ -538,7 +538,7 @@ const zoomToAndShow = function (guid, latlng) {
   window.map.setView(latlng, window.DEFAULT_ZOOM);
   // if the data is available, render it immediately. Otherwise defer
   // until it becomes available.
-  if (window.portals[guid]) window.renderPortalDetails(guid);
+  if (window.portals[guid]) IITC.portal.display.renderDetails(guid);
   else IITC.portal.selectWhenLoadedByGuid(guid);
 };
 
@@ -561,7 +561,7 @@ const selectByLatLng = function (lat, lng) {
   for (const guid in window.portals) {
     const latlng = window.portals[guid].getLatLng();
     if (latlng.lat === lat && latlng.lng === lng) {
-      window.renderPortalDetails(guid);
+      IITC.portal.display.renderDetails(guid);
       return;
     }
   }
@@ -591,7 +591,7 @@ const testPortalLatLng = (data) => {
   if (data.portal.getLatLng().equals(urlPortalLL)) {
     log.log(`urlPortalLL ${urlPortalLL.toString()} matches portal GUID ${data.portal.options.guid}`);
     window.selectedPortal = data.portal.options.guid;
-    window.renderPortalDetails(window.selectedPortal, true);
+    IITC.portal.display.renderDetails(window.selectedPortal, true);
     urlPortalLL = undefined;
     window.urlPortalLL = undefined; // @deprecated
   }
@@ -618,7 +618,7 @@ const testPortalGuid = (data) => {
   if (data.portal.options.guid === urlPortal) {
     log.log(`urlPortal GUID ${window.urlPortal} found - selecting...`);
     window.selectedPortal = urlPortal;
-    window.renderPortalDetails(window.selectedPortal, true);
+    IITC.portal.display.renderDetails(window.selectedPortal, true);
     urlPortal = undefined;
     window.urlPortal = undefined; // @deprecated
   }

@@ -716,7 +716,7 @@ window.plugin.missions = {
 
       var lat = waypoint.portal.latE6 / 1e6;
       var lng = waypoint.portal.lngE6 / 1e6;
-      var perma = window.makePermalink([lat, lng]);
+      var perma = IITC.portal.display.makePermalink([lat, lng]);
 
       title.href = perma;
       title.addEventListener(
@@ -725,7 +725,7 @@ window.plugin.missions = {
           if (window.isSmartphone()) {
             window.show('map');
           }
-          window.selectPortalByLatLng(lat, lng);
+          IITC.portal.selectByLatLng(lat, lng);
           ev.preventDefault();
           return false;
         },
@@ -737,7 +737,7 @@ window.plugin.missions = {
           if (window.isSmartphone()) {
             window.show('map');
           }
-          window.zoomToAndShowPortal(waypoint.portal.guid, [lat, lng]);
+          IITC.portal.zoomToAndShow(waypoint.portal.guid, [lat, lng]);
           ev.preventDefault();
           return false;
         },

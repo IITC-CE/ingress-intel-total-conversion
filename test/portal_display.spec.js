@@ -122,7 +122,7 @@ describe('IITC.portal.display.getMiscDetails', () => {
     expect(IITC.portal.display.getMiscDetails('G1', d)).to.equal(
       '<table id="randdetails">' +
         `<tr><td><span class="nickname">me</span></td><th>owner</th>` +
-        `<th title="${rangeTitle}">range</th><td title="${rangeTitle}"><a onclick="window.rangeLinkClick()">655km</a></td></tr>` +
+        `<th title="${rangeTitle}">range</th><td title="${rangeTitle}"><a onclick="IITC.portal.display.rangeLinkClick()">655km</a></td></tr>` +
         `<tr><td title="${linksTitle}">0 out / 0 in</td><th title="${linksTitle}">links</th><th>fields</th><td>0</td></tr>` +
         `<tr><td title="${shieldTitle}">0</td><th title="${shieldTitle}">shielding</th><th title="${energyTitle}">energy</th><td title="${energyTitle}">48k / 48k</td></tr>` +
         `<tr><td title="${apTitle}">0</td><th title="${apTitle}">AP Gain</th><th title="${hackTitle}">hacks</th><td title="${hackTitle}">4 @ 3m</td></tr>` +

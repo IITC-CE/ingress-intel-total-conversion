@@ -17,6 +17,7 @@ before(async () => {
   Object.assign(globalThis.window, { links: {}, fields: {}, portals: {} });
 
   await import('../core/code/portal.js');
+  await import('../core/code/portal_display.js');
 });
 
 describe('IITC.portal namespace', () => {

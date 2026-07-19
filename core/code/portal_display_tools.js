@@ -31,7 +31,7 @@ let historyTemplate =
  * @type {String}
  * @memberof IITC.portal.display.tools
  */
-let rangeLinkTemplate = '<a onclick="window.rangeLinkClick()"{strike}>{distance}</a>';
+let rangeLinkTemplate = '<a onclick="IITC.portal.display.rangeLinkClick()"{strike}>{distance}</a>';
 
 /**
  * Template of a single portal mod entry ({titleAttr} is a pre-built ` title="..."` attribute or empty)

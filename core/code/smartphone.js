@@ -78,7 +78,7 @@ window.runOnSmartphonesBeforeBoot = function () {
   window.smartphone.sideButton = $('<a>info</a>').click(function () {
     window.show('info');
     $('#scrollwrapper').show();
-    window.resetScrollOnNewPortal();
+    IITC.portal.display.resetScroll();
     $('#chatcontrols a.active').removeClass('active');
     $("#chatcontrols a:contains('info')").addClass('active');
   });

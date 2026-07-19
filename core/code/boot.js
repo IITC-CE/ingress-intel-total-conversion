@@ -301,7 +301,7 @@ function boot() {
   window.chat.setup();
   window.updateGameScore();
   window.search.setup();
-  window.portalDetail.setup();
+  IITC.portal.details.setup();
   window.setupRedeem();
   window.setupSidebar();
   IITC.statusbar.init();

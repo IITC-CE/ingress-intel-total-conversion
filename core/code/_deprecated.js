@@ -56,8 +56,8 @@ window.getPortalApGain = function (guid) {
   if (p) {
     var data = p.options.data;
 
-    var linkCount = window.getPortalLinksCount(guid);
-    var fieldCount = window.getPortalFieldsCount(guid);
+    var linkCount = IITC.portal.getLinksCount(guid);
+    var fieldCount = IITC.portal.getFieldsCount(guid);
 
     var result = window.portalApGainMaths(data.resCount, linkCount, fieldCount);
     return result;
@@ -75,7 +75,7 @@ window.getPortalApGain = function (guid) {
  * @returns {number} The potential level to which the player can upgrade the portal.
  */
 window.potentialPortalLevel = function (d) {
-  var current_level = window.getPortalLevel(d);
+  var current_level = IITC.portal.getLevel(d);
   var potential_level = current_level;
 
   if (window.PLAYER.team === d.team) {
@@ -132,7 +132,7 @@ window.findPortalLatLng = function (guid) {
   }
 
   // not found in portals - try the cached (and possibly stale) details - good enough for location
-  var details = window.portalDetail.get(guid);
+  var details = IITC.portal.details.get(guid);
   if (details) {
     return new L.LatLng(details.latE6 / 1e6, details.lngE6 / 1e6);
   }
@@ -264,7 +264,7 @@ Object.defineProperty(window, 'CHAT_SHRINKED', {
  * Portal GUID if the original URL had it.
  * @type {string|null}
  * @memberof storage_variables
- * @deprecated use window.selectPortalWhenLoadedByLatLng(latLng: L.LatLng);
+ * @deprecated use IITC.portal.selectWhenLoadedByLatLng(latLng: L.LatLng);
  */
 window.urlPortal = null;
 
@@ -272,7 +272,7 @@ window.urlPortal = null;
  * Portal lng/lat if the orignial URL had it.
  * @type {object|null}
  * @memberof storage_variables
- * @deprecated use window.selectPortalWhenLoadedByGuid(guid: PortalGUID);
+ * @deprecated use IITC.portal.selectWhenLoadedByGuid(guid: PortalGUID);
  */
 window.urlPortalLL = null;
 

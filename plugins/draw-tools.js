@@ -410,7 +410,7 @@ window.plugin.drawTools.optCopy = function () {
       }
     });
     var stockUrl =
-      window.makePermalink(null, {
+      IITC.portal.display.makePermalink(null, {
         includeMapView: true,
         fullURL: true,
       }) +

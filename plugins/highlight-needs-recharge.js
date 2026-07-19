@@ -6,7 +6,7 @@
 //                 Yellow: above 85%. Orange: above 70%. Red: above 15%. Magenta: below 15%.
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   {
@@ -82,5 +82,5 @@ function needsRecharge(data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Needs Recharge (Health)', needsRecharge);
+  IITC.portal.highlighter.add('Needs Recharge (Health)', needsRecharge);
 }
