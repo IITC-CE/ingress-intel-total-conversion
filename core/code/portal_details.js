@@ -106,8 +106,40 @@ const doRequest = function (deferred, guid, prefetch) {
 };
 
 /**
+ * Decorates a native promise with jQuery-Deferred-style `.done`/`.fail`/`.always` methods,
+ * so plugins can keep chaining `request(guid).done(...)` while core code uses `await`/`.then`
+ *
+ * Only these three consumption methods are provided (not `.state`/`.progress`/`.pipe`/`.promise`);
+ * each forwards the resolved value or rejection reason to its callbacks and returns the same promise,
+ * so calls can be chained as in jQuery
+ *
+ * @param {Promise} promise - Native promise to decorate
+ * @returns {Promise} The same promise instance, with `.done`, `.fail` and `.always` attached
+ */
+const withJQueryCallbacks = function (promise) {
+  promise.done = function (...callbacks) {
+    // keep the empty rejection handler: .done reacts only to fulfilment (as in jQuery)
+    // and must not turn a rejected request into an unhandled rejection
+    callbacks.forEach((cb) => promise.then(cb, () => {}));
+    return promise;
+  };
+  promise.fail = function (...callbacks) {
+    callbacks.forEach((cb) => promise.then(undefined, cb));
+    return promise;
+  };
+  promise.always = function (...callbacks) {
+    callbacks.forEach((cb) => promise.then(cb, cb));
+    return promise;
+  };
+  return promise;
+};
+
+/**
  * Requests detailed information for a specific portal. If the information is not already being requested,
  * it initiates a new request. Returns a promise that resolves with the portal details.
+ *
+ * The returned promise is native, additionally exposing jQuery-Deferred-style `.done`/`.fail`/`.always`
+ * methods for backward compatibility
  *
  * @memberof IITC.portal.details
  * @param {string} guid - The Global Unique Identifier of the portal.
@@ -115,13 +147,21 @@ const doRequest = function (deferred, guid, prefetch) {
  */
 const request = function (guid, prefetch = false) {
   if (!requestQueue[guid]) {
-    const deferred = $.Deferred();
-    requestQueue[guid] = deferred.promise();
-    deferred.always(function () {
+    let resolve;
+    let reject;
+    const promise = withJQueryCallbacks(
+      new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      })
+    );
+    // drop from the queue once settled so later calls trigger a fresh request
+    promise.always(function () {
       delete requestQueue[guid];
     });
+    requestQueue[guid] = promise;
 
-    doRequest(deferred, guid, prefetch);
+    doRequest({ resolve, reject }, guid, prefetch);
   }
 
   return requestQueue[guid];

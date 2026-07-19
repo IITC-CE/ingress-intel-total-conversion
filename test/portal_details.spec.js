@@ -106,4 +106,46 @@ describe('IITC.portal.details.request', () => {
 
     expect(window.runHooks.calledWith('portalDetailLoaded', sinon.match({ success: false }))).to.be.true;
   });
+
+  it('resolves a native promise and keeps jQuery-style .done() for compatibility', async () => {
+    IITC.portal.details.setup();
+    window.runHooks = sinon.spy();
+    window.postAjax = (action, params, success) => success({ result: new Array(14).fill(0) });
+
+    const promise = IITC.portal.details.request('DONE');
+
+    const doneData = await new Promise((resolve) => {
+      const returned = promise.done((data) => resolve(data));
+      expect(returned).to.equal(promise); // .done returns the same promise for chaining
+    });
+    expect(doneData).to.deep.equal({ guid: 'OK', image: null });
+
+    // the same value is available via a native await
+    expect(await promise).to.deep.equal({ guid: 'OK', image: null });
+  });
+
+  it('rejects and keeps jQuery-style .fail() for compatibility', async () => {
+    IITC.portal.details.setup();
+    window.runHooks = sinon.spy();
+    window.postAjax = (action, params, success, error) => error();
+
+    const promise = IITC.portal.details.request('FAILP');
+
+    const failed = await new Promise((resolve) => {
+      promise.fail(() => resolve(true));
+    });
+    expect(failed).to.be.true;
+  });
+
+  it('clears the queue after settling so a later call re-fetches', async () => {
+    IITC.portal.details.setup();
+    window.runHooks = sinon.spy();
+    const postAjax = sinon.stub().callsFake((action, params, success) => success({ result: new Array(14).fill(0) }));
+    window.postAjax = postAjax;
+
+    await IITC.portal.details.request('REFETCH');
+    await IITC.portal.details.request('REFETCH');
+
+    expect(postAjax.calledTwice).to.be.true;
+  });
 });
