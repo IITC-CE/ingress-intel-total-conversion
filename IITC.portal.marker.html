@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/extract_niantic_parameters.js | IITC-CE</title>
+    <title>Namespace: marker | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -45,130 +43,791 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* global log -- eslint */
+        <h2>
+            <span class="ancestors"><a href="IITC.html">IITC</a><a href="IITC.portal.html">.portal</a>.</span>marker</h2>
+        
+    
+</header>
 
-/**
- * Extract essential parameters and functions from the Ingress Intel site's minified JavaScript.
- * Necessary due to Niantic's minification and obfuscation of their Intel Map code.
- *
- * @module extract_niantic_parameters
- */
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>Namespace for creating, updating and styling portal markers on the map.</p></div>
+            
 
-/**
- * Main function to extract required parameters from the Ingress Intel site's JavaScript.
- * Throws an error and shows a dialog if it fails to find the necessary parameters.
- *
- * @function extractFromStock
- */
+            
 
-window.extractFromStock = function () {
-  window.niantic_params = {};
 
-  // extract the former nemesis.dashboard.config.CURRENT_VERSION from the code
-  var reVersion = new RegExp('"X-CSRFToken".*[a-z].v="([a-f0-9]{40})";');
+<dl class="details">
 
-  var minified = new RegExp('^[a-zA-Z$][a-zA-Z$0-9]?$');
+    
 
-  for (var topLevel in window) {
-    if (minified.test(topLevel)) {
-      // a minified object - check for minified prototype entries
+    
 
-      var topObject = window[topLevel];
-      if (topObject &amp;&amp; topObject.prototype) {
-        // the object has a prototype - iterate through the properties of that
-        for (var secLevel in topObject.prototype) {
-          if (minified.test(secLevel)) {
-            // looks like we've found an object of the format "XX.prototype.YY"...
-            var item = topObject.prototype[secLevel];
+    
 
-            if (item &amp;&amp; typeof item === 'function') {
-              // a function - test it against the relevant regular expressions
-              var funcStr = item.toString();
+    
 
-              var match = reVersion.exec(funcStr);
-              if (match) {
-                log.log('Found former CURRENT_VERSION in ' + topLevel + '.prototype.' + secLevel);
-                window.niantic_params.CURRENT_VERSION = match[1];
-              }
-            }
-          }
-        }
-      } // end 'if .prototype'
+    
 
-      if (topObject &amp;&amp; Array.isArray &amp;&amp; Array.isArray(topObject)) {
-        // find all non-zero length arrays containing just numbers
-        if (topObject.length > 0) {
-          var justInts = true;
-          for (var i = 0; i &lt; topObject.length; i++) {
-            if (typeof topObject[i] !== 'number' || topObject[i] !== parseInt(topObject[i])) {
-              justInts = false;
-              break;
-            }
-          }
-          if (justInts) {
-            // current lengths are: 17: ZOOM_TO_LEVEL, 14: TILES_PER_EDGE
-            // however, slightly longer or shorter are a possibility in the future
+    
 
-            if (topObject.length >= 12 &amp;&amp; topObject.length &lt;= 18) {
-              // a reasonable array length for tile parameters
-              // need to find two types:
-              // a. portal level limits. decreasing numbers, starting at 8
-              // b. tiles per edge. increasing numbers. current max is 36000, 9000 was the previous value - 18000 is a likely possibility too
+    
 
-              if (topObject[0] === 8) {
-                // check for tile levels
-                var decreasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] &lt; topObject[i]) {
-                    decreasing = false;
-                    break;
-                  }
-                }
-                if (decreasing) {
-                  window.niantic_params.ZOOM_TO_LEVEL = topObject;
-                }
-              } // end if (topObject[0] == 8)
+    
 
-              // 2015-06-25 - changed to top value of 64000, then to 32000 - allow for them to restore it just in case
-              if (topObject[topObject.length - 1] >= 9000 &amp;&amp; topObject[topObject.length - 1] &lt;= 64000) {
-                var increasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] > topObject[i]) {
-                    increasing = false;
-                    break;
-                  }
-                }
-                if (increasing) {
-                  window.niantic_params.TILES_PER_EDGE = topObject;
-                }
-              } // end if (topObject[topObject.length-1] == 9000) {
-            }
-          }
-        }
-      }
-    }
-  }
+    
 
-  if (window.niantic_params.CURRENT_VERSION === undefined) {
-    window.dialog({
-      title: 'IITC Broken',
-      html:
-        '&lt;p>IITC failed to extract the required parameters from the intel site&lt;/p>' +
-        '&lt;p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.&lt;/p>',
-    });
+    
 
-    log.log('Discovered parameters');
-    log.log(JSON.stringify(window.niantic_params, null, 2));
+    
 
-    throw new Error('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
-  }
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".scaleSteps">
+    <span class="type-signature"><span class="icon green">static</span>, <span class="icon green">constant</span> </span>scaleSteps<span class="type-signature"> :Object</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_marker.js.html">code/portal_marker.js</a></code>,
+        <code><a href="code_portal_marker.js.html#line304">line 304</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Zoom -&gt; scale breakpoints for portal markers as <code>[minZoom, scale]</code> tiers, checked from the highest zoom down</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id=".create">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>create<span class="signature">(latlng, data)</span><span class="type-signature"> &rarr; {L.PortalMarker}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_marker.js.html">code/portal_marker.js</a></code>,
+                <code><a href="code_portal_marker.js.html#line341">line 341</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates a new portal marker on the map.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>latlng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.LatLng</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The latitude and longitude where the marker will be placed.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The IITC-specific entity data to be stored in the marker options.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">L.PortalMarker</span>
+
+
+
+
+
+- <p>A Leaflet circle marker representing the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getStyleOptions">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getStyleOptions<span class="signature">(details)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_marker.js.html">code/portal_marker.js</a></code>,
+                <code><a href="code_portal_marker.js.html#line363">line 363</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Determines the style options for a portal marker based on its details.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>details</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Details of the portal, including team and level.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>Style options for the portal marker.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".scale">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>scale<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_marker.js.html">code/portal_marker.js</a></code>,
+                <code><a href="code_portal_marker.js.html#line326">line 326</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the scale of portal markers based on the current zoom level of the map.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The scale factor for portal markers.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setStyle">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setStyle<span class="signature">(marker, selected)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_marker.js.html">code/portal_marker.js</a></code>,
+                <code><a href="code_portal_marker.js.html#line352">line 352</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets the style of a portal marker, including options for when the portal is selected.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>marker</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.PortalMarker</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal marker whose style will be set.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>selected</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if the portal is selected.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -185,7 +844,7 @@ window.extractFromStock = function () {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'IITC.portal.marker_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

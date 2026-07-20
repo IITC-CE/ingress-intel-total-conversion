@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/extract_niantic_parameters.js | IITC-CE</title>
+    <title>Namespace: details | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -45,130 +43,838 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* global log -- eslint */
+        <h2>
+            <span class="ancestors"><a href="IITC.html">IITC</a><a href="IITC.portal.html">.portal</a>.</span>details</h2>
+        
+    
+</header>
 
-/**
- * Extract essential parameters and functions from the Ingress Intel site's minified JavaScript.
- * Necessary due to Niantic's minification and obfuscation of their Intel Map code.
- *
- * @module extract_niantic_parameters
- */
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>Namespace providing portal detail retrieval with caching and request de-duplication.</p></div>
+            
 
-/**
- * Main function to extract required parameters from the Ingress Intel site's JavaScript.
- * Throws an error and shows a dialog if it fails to find the necessary parameters.
- *
- * @function extractFromStock
- */
+            
 
-window.extractFromStock = function () {
-  window.niantic_params = {};
 
-  // extract the former nemesis.dashboard.config.CURRENT_VERSION from the code
-  var reVersion = new RegExp('"X-CSRFToken".*[a-z].v="([a-f0-9]{40})";');
+<dl class="details">
 
-  var minified = new RegExp('^[a-zA-Z$][a-zA-Z$0-9]?$');
+    
 
-  for (var topLevel in window) {
-    if (minified.test(topLevel)) {
-      // a minified object - check for minified prototype entries
+    
 
-      var topObject = window[topLevel];
-      if (topObject &amp;&amp; topObject.prototype) {
-        // the object has a prototype - iterate through the properties of that
-        for (var secLevel in topObject.prototype) {
-          if (minified.test(secLevel)) {
-            // looks like we've found an object of the format "XX.prototype.YY"...
-            var item = topObject.prototype[secLevel];
+    
 
-            if (item &amp;&amp; typeof item === 'function') {
-              // a function - test it against the relevant regular expressions
-              var funcStr = item.toString();
+    
 
-              var match = reVersion.exec(funcStr);
-              if (match) {
-                log.log('Found former CURRENT_VERSION in ' + topLevel + '.prototype.' + secLevel);
-                window.niantic_params.CURRENT_VERSION = match[1];
-              }
-            }
-          }
-        }
-      } // end 'if .prototype'
+    
 
-      if (topObject &amp;&amp; Array.isArray &amp;&amp; Array.isArray(topObject)) {
-        // find all non-zero length arrays containing just numbers
-        if (topObject.length > 0) {
-          var justInts = true;
-          for (var i = 0; i &lt; topObject.length; i++) {
-            if (typeof topObject[i] !== 'number' || topObject[i] !== parseInt(topObject[i])) {
-              justInts = false;
-              break;
-            }
-          }
-          if (justInts) {
-            // current lengths are: 17: ZOOM_TO_LEVEL, 14: TILES_PER_EDGE
-            // however, slightly longer or shorter are a possibility in the future
+    
 
-            if (topObject.length >= 12 &amp;&amp; topObject.length &lt;= 18) {
-              // a reasonable array length for tile parameters
-              // need to find two types:
-              // a. portal level limits. decreasing numbers, starting at 8
-              // b. tiles per edge. increasing numbers. current max is 36000, 9000 was the previous value - 18000 is a likely possibility too
+    
 
-              if (topObject[0] === 8) {
-                // check for tile levels
-                var decreasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] &lt; topObject[i]) {
-                    decreasing = false;
-                    break;
-                  }
-                }
-                if (decreasing) {
-                  window.niantic_params.ZOOM_TO_LEVEL = topObject;
-                }
-              } // end if (topObject[0] == 8)
+    
 
-              // 2015-06-25 - changed to top value of 64000, then to 32000 - allow for them to restore it just in case
-              if (topObject[topObject.length - 1] >= 9000 &amp;&amp; topObject[topObject.length - 1] &lt;= 64000) {
-                var increasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] > topObject[i]) {
-                    increasing = false;
-                    break;
-                  }
-                }
-                if (increasing) {
-                  window.niantic_params.TILES_PER_EDGE = topObject;
-                }
-              } // end if (topObject[topObject.length-1] == 9000) {
-            }
-          }
-        }
-      }
-    }
-  }
+    
 
-  if (window.niantic_params.CURRENT_VERSION === undefined) {
-    window.dialog({
-      title: 'IITC Broken',
-      html:
-        '&lt;p>IITC failed to extract the required parameters from the intel site&lt;/p>' +
-        '&lt;p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.&lt;/p>',
-    });
+    
 
-    log.log('Discovered parameters');
-    log.log(JSON.stringify(window.niantic_params, null, 2));
+    
 
-    throw new Error('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
-  }
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id=".get">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>get<span class="signature">(guid)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_details.js.html">code/portal_details.js</a></code>,
+                <code><a href="code_portal_details.js.html#line31">line 31</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Retrieves portal details from cache by GUID.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Global Unique Identifier of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+
+- <p>Cached portal details if available.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".isFresh">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>isFresh<span class="signature">(guid)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_details.js.html">code/portal_details.js</a></code>,
+                <code><a href="code_portal_details.js.html#line54">line 54</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Checks if portal details are fresh in the cache.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Global Unique Identifier of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if details are fresh, false otherwise.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".request">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>request<span class="signature">(guid)</span><span class="type-signature"> &rarr; {Promise}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_details.js.html">code/portal_details.js</a></code>,
+                <code><a href="code_portal_details.js.html#line148">line 148</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Requests detailed information for a specific portal. If the information is not already being requested,
+it initiates a new request. Returns a promise that resolves with the portal details.</p>
+<p>The returned promise is native, additionally exposing jQuery-Deferred-style <code>.done</code>/<code>.fail</code>/<code>.always</code>
+methods for backward compatibility</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Global Unique Identifier of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Promise</span>
+
+
+
+
+
+- <p>A promise that resolves with the portal details upon successful retrieval or rejection on failure.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setup">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setup<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_details.js.html">code/portal_details.js</a></code>,
+                <code><a href="code_portal_details.js.html#line18">line 18</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets up the portal detail handler, initializing the cache.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".store">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>store<span class="signature">(guid, dict)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_details.js.html">code/portal_details.js</a></code>,
+                <code><a href="code_portal_details.js.html#line43">line 43</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Stores portal details in the cache.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Global Unique Identifier of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dict</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail data.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+
+- <p>Result of cache storage operation.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -185,7 +891,7 @@ window.extractFromStock = function () {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'IITC.portal.details_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

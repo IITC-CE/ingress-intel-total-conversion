@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/extract_niantic_parameters.js | IITC-CE</title>
+    <title>Namespace: display | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -45,130 +43,2464 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* global log -- eslint */
+        <h2>
+            <span class="ancestors"><a href="IITC.html">IITC</a><a href="IITC.portal.html">.portal</a>.</span>display</h2>
+        
+    
+</header>
 
-/**
- * Extract essential parameters and functions from the Ingress Intel site's minified JavaScript.
- * Necessary due to Niantic's minification and obfuscation of their Intel Map code.
- *
- * @module extract_niantic_parameters
- */
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>Namespace that renders portal details in the sidebar and highlights the selected portal on the map.</p></div>
+            
 
-/**
- * Main function to extract required parameters from the Ingress Intel site's JavaScript.
- * Throws an error and shows a dialog if it fails to find the necessary parameters.
- *
- * @function extractFromStock
- */
+            
 
-window.extractFromStock = function () {
-  window.niantic_params = {};
 
-  // extract the former nemesis.dashboard.config.CURRENT_VERSION from the code
-  var reVersion = new RegExp('"X-CSRFToken".*[a-z].v="([a-f0-9]{40})";');
+<dl class="details">
 
-  var minified = new RegExp('^[a-zA-Z$][a-zA-Z$0-9]?$');
+    
 
-  for (var topLevel in window) {
-    if (minified.test(topLevel)) {
-      // a minified object - check for minified prototype entries
+    
 
-      var topObject = window[topLevel];
-      if (topObject &amp;&amp; topObject.prototype) {
-        // the object has a prototype - iterate through the properties of that
-        for (var secLevel in topObject.prototype) {
-          if (minified.test(secLevel)) {
-            // looks like we've found an object of the format "XX.prototype.YY"...
-            var item = topObject.prototype[secLevel];
+    
 
-            if (item &amp;&amp; typeof item === 'function') {
-              // a function - test it against the relevant regular expressions
-              var funcStr = item.toString();
+    
 
-              var match = reVersion.exec(funcStr);
-              if (match) {
-                log.log('Found former CURRENT_VERSION in ' + topLevel + '.prototype.' + secLevel);
-                window.niantic_params.CURRENT_VERSION = match[1];
-              }
-            }
-          }
-        }
-      } // end 'if .prototype'
+    
 
-      if (topObject &amp;&amp; Array.isArray &amp;&amp; Array.isArray(topObject)) {
-        // find all non-zero length arrays containing just numbers
-        if (topObject.length > 0) {
-          var justInts = true;
-          for (var i = 0; i &lt; topObject.length; i++) {
-            if (typeof topObject[i] !== 'number' || topObject[i] !== parseInt(topObject[i])) {
-              justInts = false;
-              break;
-            }
-          }
-          if (justInts) {
-            // current lengths are: 17: ZOOM_TO_LEVEL, 14: TILES_PER_EDGE
-            // however, slightly longer or shorter are a possibility in the future
+    
 
-            if (topObject.length >= 12 &amp;&amp; topObject.length &lt;= 18) {
-              // a reasonable array length for tile parameters
-              // need to find two types:
-              // a. portal level limits. decreasing numbers, starting at 8
-              // b. tiles per edge. increasing numbers. current max is 36000, 9000 was the previous value - 18000 is a likely possibility too
+    
 
-              if (topObject[0] === 8) {
-                // check for tile levels
-                var decreasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] &lt; topObject[i]) {
-                    decreasing = false;
-                    break;
-                  }
-                }
-                if (decreasing) {
-                  window.niantic_params.ZOOM_TO_LEVEL = topObject;
-                }
-              } // end if (topObject[0] == 8)
+    
 
-              // 2015-06-25 - changed to top value of 64000, then to 32000 - allow for them to restore it just in case
-              if (topObject[topObject.length - 1] >= 9000 &amp;&amp; topObject[topObject.length - 1] &lt;= 64000) {
-                var increasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] > topObject[i]) {
-                    increasing = false;
-                    break;
-                  }
-                }
-                if (increasing) {
-                  window.niantic_params.TILES_PER_EDGE = topObject;
-                }
-              } // end if (topObject[topObject.length-1] == 9000) {
-            }
-          }
-        }
-      }
-    }
-  }
+    
 
-  if (window.niantic_params.CURRENT_VERSION === undefined) {
-    window.dialog({
-      title: 'IITC Broken',
-      html:
-        '&lt;p>IITC failed to extract the required parameters from the intel site&lt;/p>' +
-        '&lt;p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.&lt;/p>',
-    });
+    
 
-    log.log('Discovered parameters');
-    log.log(JSON.stringify(window.niantic_params, null, 2));
+    
 
-    throw new Error('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
-  }
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Namespaces</h3>
+        
+
+<dl>
+    
+        <dt>
+            <h4 class="name">
+                <a href="IITC.portal.display.tools.html">tools</a>
+                <div class="container-source members">
+                    <code><a href="IITC.portal.display.tools.html">IITC.portal.display.tools</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+</dl>
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".artifactFragmentsTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>artifactFragmentsTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line36">line 36</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template of the artifact shards note</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".artifactTargetTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>artifactTargetTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line29">line 29</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template of the artifact target portal note</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".ellipsisLabelTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>ellipsisLabelTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line64">line 64</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template of a label that truncates with an ellipsis (e.g. &quot;attack frequency&quot;, &quot;force amplifier&quot;)</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".linkDetailsTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>linkDetailsTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line57">line 57</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template of the container that holds the portal links (permalink, scanner, map links)</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".loadingStatusTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>loadingStatusTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line50">line 50</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template shown while full portal details are still loading</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".modsWrapperTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>modsWrapperTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line43">line 43</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template wrapping the portal mods block</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".moveToPortalIconTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>moveToPortalIconTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line15">line 15</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template of the &quot;move to portal&quot; icon shown next to the portal title</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randDetailsTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>randDetailsTemplate<span class="type-signature"> :String</span>
+    
+    <div class="container-source members">
+        <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+        <code><a href="code_portal_display.js.html#line22">line 22</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template wrapping the #randdetails table (owner, range, links, fields, shielding, energy, AP, hacks)</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id=".getMiscDetails">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getMiscDetails<span class="signature">(guid, d)</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line280">line 280</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Gets miscellaneous details for a specified portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The GUID of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing various properties of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+
+
+
+
+
+- <p>HTML string representing the miscellaneous details of the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".makePermalink">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>makePermalink<span class="signature">(latlng<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line495">line 495</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Generates a permalink URL based on the specified latitude and longitude and additional options.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>latlng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.LatLng</span>
+|
+
+<span class="param-type">Array.&lt;number></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The latitude and longitude for the permalink.
+Can be omitted to create mapview-only permalink.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Additional options for permalink generation.</p>
+                <h6>Properties</h6>
+                
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>includeMapView</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Include current map view in the permalink.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fullURL</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Generate a fully qualified URL (default: relative link).</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+
+
+
+
+
+- <p>The generated permalink URL.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".makePrimeLink">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>makePrimeLink<span class="signature">(guid, lat, lng)</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line461">line 461</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates a link to open a specific portal in Ingress Prime.</p>
+<p>It is using Firebase's Dynamic Links feature.
+https://firebase.google.com/docs/dynamic-links/create-manually</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The globally unique identifier of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lat</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The latitude of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The longitude of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+
+
+
+
+
+- <p>The Ingress Prime link for the portal</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".rangeLinkClick">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>rangeLinkClick<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line444">line 444</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Changes the coordinates and map scale to show the range for portal links.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".renderDetails">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>renderDetails<span class="signature">(guid, forceSelect<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line132">line 132</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Selects a portal, refresh its data and renders the details of the portal in the sidebar.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">null</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The globally unique identifier of the portal to display details for.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>forceSelect</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>If true, forces the portal to be selected even if it's already the current portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".renderToSidebar">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>renderToSidebar<span class="signature">(portal)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line168">line 168</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders the details of a portal in the sidebar.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>portal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.PortalMarker</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal marker object holding portal details.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".renderUrl">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>renderUrl<span class="signature">(lat, lng, title, guid)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line90">line 90</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Generates and displays URLs related to the portal.
+This includes a permalink for the portal, a link for Ingress Prime, and links to alternative maps.
+Function is overwritten in <code>app.js</code></p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>lat</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The latitude of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The longitude of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>title</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The title of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The GUID of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".resetScroll">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>resetScroll<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line71">line 71</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Resets the scroll position of the sidebar when a new portal is selected.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".select">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>select<span class="signature">(guid)</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line415">line 415</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Highlights the selected portal on the map and clears the highlight from the previously selected portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The GUID of the portal to select.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">boolean</span>
+
+
+
+
+
+- <p>True if the same portal is re-selected (just an update), false if a different portal is selected.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".setIndicators">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>setIndicators<span class="signature">(p)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal_display.js.html">code/portal_display.js</a></code>,
+                <code><a href="code_portal_display.js.html#line369">line 369</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>The function adds circles indicating the hack range and link range of the portal.
+If the portal object are null, the indicators are removed.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>p</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal object for which to set the indicators.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -185,7 +2517,7 @@ window.extractFromStock = function () {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'IITC.portal.display_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

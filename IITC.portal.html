@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/extract_niantic_parameters.js | IITC-CE</title>
+    <title>Namespace: portal | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -45,130 +43,4417 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* global log -- eslint */
+        <h2>
+            <span class="ancestors"><a href="IITC.html">IITC</a>.</span>portal</h2>
+        
+    
+</header>
 
-/**
- * Extract essential parameters and functions from the Ingress Intel site's minified JavaScript.
- * Necessary due to Niantic's minification and obfuscation of their Intel Map code.
- *
- * @module extract_niantic_parameters
- */
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>Namespace for working with portal data: link/field lookups, detail computations and selection helpers.</p></div>
+            
 
-/**
- * Main function to extract required parameters from the Ingress Intel site's JavaScript.
- * Throws an error and shows a dialog if it fails to find the necessary parameters.
- *
- * @function extractFromStock
- */
+            
 
-window.extractFromStock = function () {
-  window.niantic_params = {};
 
-  // extract the former nemesis.dashboard.config.CURRENT_VERSION from the code
-  var reVersion = new RegExp('"X-CSRFToken".*[a-z].v="([a-f0-9]{40})";');
+<dl class="details">
 
-  var minified = new RegExp('^[a-zA-Z$][a-zA-Z$0-9]?$');
+    
 
-  for (var topLevel in window) {
-    if (minified.test(topLevel)) {
-      // a minified object - check for minified prototype entries
+    
 
-      var topObject = window[topLevel];
-      if (topObject &amp;&amp; topObject.prototype) {
-        // the object has a prototype - iterate through the properties of that
-        for (var secLevel in topObject.prototype) {
-          if (minified.test(secLevel)) {
-            // looks like we've found an object of the format "XX.prototype.YY"...
-            var item = topObject.prototype[secLevel];
+    
 
-            if (item &amp;&amp; typeof item === 'function') {
-              // a function - test it against the relevant regular expressions
-              var funcStr = item.toString();
+    
 
-              var match = reVersion.exec(funcStr);
-              if (match) {
-                log.log('Found former CURRENT_VERSION in ' + topLevel + '.prototype.' + secLevel);
-                window.niantic_params.CURRENT_VERSION = match[1];
-              }
-            }
-          }
-        }
-      } // end 'if .prototype'
+    
 
-      if (topObject &amp;&amp; Array.isArray &amp;&amp; Array.isArray(topObject)) {
-        // find all non-zero length arrays containing just numbers
-        if (topObject.length > 0) {
-          var justInts = true;
-          for (var i = 0; i &lt; topObject.length; i++) {
-            if (typeof topObject[i] !== 'number' || topObject[i] !== parseInt(topObject[i])) {
-              justInts = false;
-              break;
-            }
-          }
-          if (justInts) {
-            // current lengths are: 17: ZOOM_TO_LEVEL, 14: TILES_PER_EDGE
-            // however, slightly longer or shorter are a possibility in the future
+    
 
-            if (topObject.length >= 12 &amp;&amp; topObject.length &lt;= 18) {
-              // a reasonable array length for tile parameters
-              // need to find two types:
-              // a. portal level limits. decreasing numbers, starting at 8
-              // b. tiles per edge. increasing numbers. current max is 36000, 9000 was the previous value - 18000 is a likely possibility too
+    
 
-              if (topObject[0] === 8) {
-                // check for tile levels
-                var decreasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] &lt; topObject[i]) {
-                    decreasing = false;
-                    break;
-                  }
-                }
-                if (decreasing) {
-                  window.niantic_params.ZOOM_TO_LEVEL = topObject;
-                }
-              } // end if (topObject[0] == 8)
+    
 
-              // 2015-06-25 - changed to top value of 64000, then to 32000 - allow for them to restore it just in case
-              if (topObject[topObject.length - 1] >= 9000 &amp;&amp; topObject[topObject.length - 1] &lt;= 64000) {
-                var increasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] > topObject[i]) {
-                    increasing = false;
-                    break;
-                  }
-                }
-                if (increasing) {
-                  window.niantic_params.TILES_PER_EDGE = topObject;
-                }
-              } // end if (topObject[topObject.length-1] == 9000) {
-            }
-          }
-        }
-      }
-    }
-  }
+    
 
-  if (window.niantic_params.CURRENT_VERSION === undefined) {
-    window.dialog({
-      title: 'IITC Broken',
-      html:
-        '&lt;p>IITC failed to extract the required parameters from the intel site&lt;/p>' +
-        '&lt;p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.&lt;/p>',
-    });
+    
 
-    log.log('Discovered parameters');
-    log.log(JSON.stringify(window.niantic_params, null, 2));
+    
 
-    throw new Error('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
-  }
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Namespaces</h3>
+        
+
+<dl>
+    
+        <dt>
+            <h4 class="name">
+                <a href="IITC.portal.details.html">details</a>
+                <div class="container-source members">
+                    <code><a href="IITC.portal.details.html">IITC.portal.details</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+        <dt>
+            <h4 class="name">
+                <a href="IITC.portal.display.html">display</a>
+                <div class="container-source members">
+                    <code><a href="IITC.portal.display.html">IITC.portal.display</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+        <dt>
+            <h4 class="name">
+                <a href="IITC.portal.highlighter.html">highlighter</a>
+                <div class="container-source members">
+                    <code><a href="IITC.portal.highlighter.html">IITC.portal.highlighter</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+        <dt>
+            <h4 class="name">
+                <a href="IITC.portal.marker.html">marker</a>
+                <div class="container-source members">
+                    <code><a href="IITC.portal.marker.html">IITC.portal.marker</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+</dl>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
+
+<dt>
+    
+        <h4 class="name" id=".findGuidByPositionE6">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>findGuidByPositionE6<span class="signature">(latE6, lngE6)</span><span class="type-signature"> &rarr; {string|null}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line93">line 93</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Finds a portal GUID by its position. Searches through currently rendered portals.
+Note: this includes fields and links.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>latE6</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The latitude in E6 format.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lngE6</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The longitude in E6 format.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+
+
+- <p>The GUID of the portal at the specified location, or null if not found.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".fixImageUrl">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>fixImageUrl<span class="signature">(url)</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line281">line 281</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Corrects the portal image URL to match the current protocol (http/https).</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The original image URL.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+
+
+
+
+
+- <p>The corrected image URL.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getAttackApGain">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getAttackApGain<span class="signature">(d, fieldCount, linkCount)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line222">line 222</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the potential AP gain from attacking a portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing resonator and ownership information.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fieldCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The number of fields attached to the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>linkCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The number of links attached to the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>An object detailing various components of AP gain, including totals for friendly and enemy factions.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getAttackValues">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getAttackValues<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line493">line 493</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates various attack values of a portal, including hit bonus, force amplifier, and attack frequency.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>An object containing attack values such as hit bonus, force amplifier, and attack frequency.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getCurrentEnergy">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getCurrentEnergy<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line136">line 136</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the current energy of a portal based on its resonators.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing resonator information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The current energy of the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getFields">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getFields<span class="signature">(guid)</span><span class="type-signature"> &rarr; {Array}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line58">line 58</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Searches through the fields for all fields that reference a specified portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The GUID of the portal to search for fields.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Array</span>
+
+
+
+
+
+- <p>An array containing the GUIDs of fields associated with the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getFieldsCount">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getFieldsCount<span class="signature">(guid)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line79">line 79</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Counts the total number of fields associated with a specified portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The GUID of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The total number of fields associated with the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getHackDetails">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getHackDetails<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line426">line 426</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates hack-related details of a portal, such as hack cooldown and burnout time.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>An object containing hack-related details like cooldown time, hack count, and burnout time.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getHealth">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getHealth<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line153">line 153</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the health percentage of a portal based on its current and total energy.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing resonator information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The portal health as a percentage (0-100).
+Returns 0 if the portal has no total energy.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getLevel">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getLevel<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line106">line 106</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the resonator-based level of a portal.
+This includes a decimal part and is not clamped to the minimum level of 1</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing resonator information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The calculated portal level.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getLinkAmpRangeBoost">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getLinkAmpRangeBoost<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line190">line 190</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the boost in link range provided by installed Link Amps.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The total boost factor for the link range.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getLinkDefenseBoost">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getLinkDefenseBoost<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line350">line 350</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the link defense boost provided by installed Ultra Link Amps.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The total link defense boost factor.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getLinks">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getLinks<span class="signature">(guid)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line22">line 22</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Search through the links data for all that link from and to a portal. Returns an object with separate lists of in
+and out links. May or may not be as accurate as the portal details, depending on how much data the API returns.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The GUID of the portal to search for links.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>An object containing arrays of incoming ('in') and outgoing ('out') link GUIDs.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getLinksCount">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getLinksCount<span class="signature">(guid)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line46">line 46</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Counts the total number of links (both incoming and outgoing) for a specified portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The GUID of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The total number of links for the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getLinksMitigation">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getLinksMitigation<span class="signature">(linkCount)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line369">line 369</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the additional mitigation provided by links attached to a portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>linkCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The number of links attached to the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The additional mitigation value provided by the links.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getMaxOutgoingLinks">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getMaxOutgoingLinks<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line407">line 407</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the maximum number of outgoing links that can be created from a portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The maximum number of outgoing links.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getMitigationDetails">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getMitigationDetails<span class="signature">(d, linkCount)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line382">line 382</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates detailed mitigation information for a portal, including contributions from shields and links.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod and resonator information.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>linkCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The number of links attached to the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>An object detailing various components of mitigation.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getModsByType">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getModsByType<span class="signature">(d, type)</span><span class="type-signature"> &rarr; {Array}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line300">line 300</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Returns a list of portal mods filtered by a specific type.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The type of mods to filter (e.g., 'RES_SHIELD', 'LINK_AMPLIFIER').</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Array</span>
+
+
+
+
+
+- <p>An array of mods matching the specified type.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getRange">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getRange<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line169">line 169</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the range of a portal for creating links. The range depends on portal level and any installed Link Amps.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing details about the team and resonators.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>An object containing the base range (<code>base</code>), boost multiplier (<code>boost</code>),
+total range after applying the boost (<code>range</code>),
+and a boolean indicating if the portal is linkable (<code>isLinkable</code>).</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getShieldMitigation">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getShieldMitigation<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line332">line 332</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the total mitigation provided by shields installed on a portal.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing mod information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The total mitigation value from all shields installed on the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getSummaryData">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getSummaryData<span class="signature">(d)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line458">line 458</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Converts detailed portal information into a summary format similar to that seen in the map tile data.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The detailed portal data.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Object</span>
+
+
+
+
+
+- <p>A summary of the portal data, including level, title, image, resonator count, health, and team.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".getTotalEnergy">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>getTotalEnergy<span class="signature">(d)</span><span class="type-signature"> &rarr; {number}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line118">line 118</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculates the total energy capacity of a portal based on its resonators.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The portal detail object containing resonator information.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">number</span>
+
+
+
+
+
+- <p>The total energy capacity of the portal.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".selectByLatLng">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>selectByLatLng<span class="signature">(lat, lng<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line553">line 553</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Selects a portal by its latitude and longitude.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>lat</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">L.LatLng</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The latitude of the portal
+or an array or L.LatLng object containing both latitude and longitude.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The longitude of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".selectWhenLoadedByGuid">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>selectWhenLoadedByGuid<span class="signature">(guid)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line608">line 608</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Select a portal when it appears on the map</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the guid of the portal</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".selectWhenLoadedByLatLng">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>selectWhenLoadedByLatLng<span class="signature">(latLng)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line581">line 581</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Select a portal when it appears on the map</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>latLng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.LatLng</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the location of the portal</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".zoomToAndShow">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>zoomToAndShow<span class="signature">(guid, latlng)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_portal.js.html">code/portal.js</a></code>,
+                <code><a href="code_portal.js.html#line537">line 537</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Zooms the map to a specific portal and shows its details if available.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>guid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The globally unique identifier of the portal.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>latlng</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">L.LatLng</span>
+|
+
+<span class="param-type">Array.&lt;number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The latitude and longitude of the portal.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -185,7 +4470,7 @@ window.extractFromStock = function () {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'IITC.portal_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

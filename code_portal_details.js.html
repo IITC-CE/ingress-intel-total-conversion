@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: code/extract_niantic_parameters.js | IITC-CE</title>
+    <title>Source: code/portal_details.js | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,124 +48,185 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* global log -- eslint */
+            <pre class="prettyprint source linenums"><code>/* global IITC -- eslint */
 
 /**
- * Extract essential parameters and functions from the Ingress Intel site's minified JavaScript.
- * Necessary due to Niantic's minification and obfuscation of their Intel Map code.
+ * Namespace providing portal detail retrieval with caching and request de-duplication.
  *
- * @module extract_niantic_parameters
+ * @memberof IITC.portal
+ * @namespace details
  */
+
+let cache;
+const requestQueue = {};
 
 /**
- * Main function to extract required parameters from the Ingress Intel site's JavaScript.
- * Throws an error and shows a dialog if it fails to find the necessary parameters.
+ * Sets up the portal detail handler, initializing the cache.
  *
- * @function extractFromStock
+ * @memberof IITC.portal.details
  */
+const setup = function () {
+  cache = new window.DataCache();
 
-window.extractFromStock = function () {
-  window.niantic_params = {};
+  cache.startExpireInterval(20);
+};
 
-  // extract the former nemesis.dashboard.config.CURRENT_VERSION from the code
-  var reVersion = new RegExp('"X-CSRFToken".*[a-z].v="([a-f0-9]{40})";');
+/**
+ * Retrieves portal details from cache by GUID.
+ *
+ * @memberof IITC.portal.details
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @returns Cached portal details if available.
+ */
+const get = function (guid) {
+  return cache.get(guid);
+};
 
-  var minified = new RegExp('^[a-zA-Z$][a-zA-Z$0-9]?$');
+/**
+ * Stores portal details in the cache.
+ *
+ * @memberof IITC.portal.details
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @param {object} dict - The portal detail data.
+ * @returns Result of cache storage operation.
+ */
+const store = function (guid, dict) {
+  return cache.store(guid, dict);
+};
 
-  for (var topLevel in window) {
-    if (minified.test(topLevel)) {
-      // a minified object - check for minified prototype entries
+/**
+ * Checks if portal details are fresh in the cache.
+ *
+ * @memberof IITC.portal.details
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @returns {boolean} True if details are fresh, false otherwise.
+ */
+const isFresh = function (guid) {
+  return cache.isFresh(guid);
+};
 
-      var topObject = window[topLevel];
-      if (topObject &amp;&amp; topObject.prototype) {
-        // the object has a prototype - iterate through the properties of that
-        for (var secLevel in topObject.prototype) {
-          if (minified.test(secLevel)) {
-            // looks like we've found an object of the format "XX.prototype.YY"...
-            var item = topObject.prototype[secLevel];
+const remove = function (guid) {
+  return cache.remove(guid);
+};
 
-            if (item &amp;&amp; typeof item === 'function') {
-              // a function - test it against the relevant regular expressions
-              var funcStr = item.toString();
-
-              var match = reVersion.exec(funcStr);
-              if (match) {
-                log.log('Found former CURRENT_VERSION in ' + topLevel + '.prototype.' + secLevel);
-                window.niantic_params.CURRENT_VERSION = match[1];
-              }
-            }
-          }
-        }
-      } // end 'if .prototype'
-
-      if (topObject &amp;&amp; Array.isArray &amp;&amp; Array.isArray(topObject)) {
-        // find all non-zero length arrays containing just numbers
-        if (topObject.length > 0) {
-          var justInts = true;
-          for (var i = 0; i &lt; topObject.length; i++) {
-            if (typeof topObject[i] !== 'number' || topObject[i] !== parseInt(topObject[i])) {
-              justInts = false;
-              break;
-            }
-          }
-          if (justInts) {
-            // current lengths are: 17: ZOOM_TO_LEVEL, 14: TILES_PER_EDGE
-            // however, slightly longer or shorter are a possibility in the future
-
-            if (topObject.length >= 12 &amp;&amp; topObject.length &lt;= 18) {
-              // a reasonable array length for tile parameters
-              // need to find two types:
-              // a. portal level limits. decreasing numbers, starting at 8
-              // b. tiles per edge. increasing numbers. current max is 36000, 9000 was the previous value - 18000 is a likely possibility too
-
-              if (topObject[0] === 8) {
-                // check for tile levels
-                var decreasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] &lt; topObject[i]) {
-                    decreasing = false;
-                    break;
-                  }
-                }
-                if (decreasing) {
-                  window.niantic_params.ZOOM_TO_LEVEL = topObject;
-                }
-              } // end if (topObject[0] == 8)
-
-              // 2015-06-25 - changed to top value of 64000, then to 32000 - allow for them to restore it just in case
-              if (topObject[topObject.length - 1] >= 9000 &amp;&amp; topObject[topObject.length - 1] &lt;= 64000) {
-                var increasing = true;
-                for (let i = 1; i &lt; topObject.length; i++) {
-                  if (topObject[i - 1] > topObject[i]) {
-                    increasing = false;
-                    break;
-                  }
-                }
-                if (increasing) {
-                  window.niantic_params.TILES_PER_EDGE = topObject;
-                }
-              } // end if (topObject[topObject.length-1] == 9000) {
-            }
-          }
-        }
-      }
-    }
+const handleResponseSuccess = function (deferred, guid, data, prefetch) {
+  if (!data || data.error || !data.result) {
+    handleResponseFailure(deferred, guid, data);
+    return;
   }
 
-  if (window.niantic_params.CURRENT_VERSION === undefined) {
-    window.dialog({
-      title: 'IITC Broken',
-      html:
-        '&lt;p>IITC failed to extract the required parameters from the intel site&lt;/p>' +
-        '&lt;p>This can happen after Niantic update the standard intel site. A fix will be needed from the IITC developers.&lt;/p>',
-    });
+  // Parse portal details
+  const dict = window.decodeArray.portal(data.result, 'detailed');
+  cache.store(guid, dict);
 
-    log.log('Discovered parameters');
-    log.log(JSON.stringify(window.niantic_params, null, 2));
+  // entity format, as used in map data
+  const ent = [guid, data.result[13], data.result];
+  const portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
 
-    throw new Error('Error: IITC failed to extract CURRENT_VERSION string - cannot continue');
+  deferred.resolve(portal.options.data);
+  window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal });
+
+  // prefetch portal image
+  if (prefetch &amp;&amp; portal.options.data.image) {
+    new Image().src = portal.options.data.image;
   }
 };
+
+const handleResponseFailure = function (deferred, guid, data) {
+  if (data &amp;&amp; data.error === 'RETRY') {
+    // server asked us to try again
+    doRequest(deferred, guid);
+  } else {
+    deferred.reject();
+    window.runHooks('portalDetailLoaded', { guid: guid, success: false });
+  }
+};
+
+const doRequest = function (deferred, guid, prefetch) {
+  window.postAjax(
+    'getPortalDetails',
+    { guid: guid },
+    function (data) {
+      handleResponseSuccess(deferred, guid, data, prefetch);
+    },
+    function () {
+      handleResponseFailure(deferred, guid);
+    }
+  );
+};
+
+/**
+ * Decorates a native promise with jQuery-Deferred-style `.done`/`.fail`/`.always` methods,
+ * so plugins can keep chaining `request(guid).done(...)` while core code uses `await`/`.then`
+ *
+ * Only these three consumption methods are provided (not `.state`/`.progress`/`.pipe`/`.promise`);
+ * each forwards the resolved value or rejection reason to its callbacks and returns the same promise,
+ * so calls can be chained as in jQuery
+ *
+ * @param {Promise} promise - Native promise to decorate
+ * @returns {Promise} The same promise instance, with `.done`, `.fail` and `.always` attached
+ */
+const withJQueryCallbacks = function (promise) {
+  promise.done = function (...callbacks) {
+    // keep the empty rejection handler: .done reacts only to fulfilment (as in jQuery)
+    // and must not turn a rejected request into an unhandled rejection
+    callbacks.forEach((cb) => promise.then(cb, () => {}));
+    return promise;
+  };
+  promise.fail = function (...callbacks) {
+    callbacks.forEach((cb) => promise.then(undefined, cb));
+    return promise;
+  };
+  promise.always = function (...callbacks) {
+    callbacks.forEach((cb) => promise.then(cb, cb));
+    return promise;
+  };
+  return promise;
+};
+
+/**
+ * Requests detailed information for a specific portal. If the information is not already being requested,
+ * it initiates a new request. Returns a promise that resolves with the portal details.
+ *
+ * The returned promise is native, additionally exposing jQuery-Deferred-style `.done`/`.fail`/`.always`
+ * methods for backward compatibility
+ *
+ * @memberof IITC.portal.details
+ * @param {string} guid - The Global Unique Identifier of the portal.
+ * @returns {Promise} A promise that resolves with the portal details upon successful retrieval or rejection on failure.
+ */
+const request = function (guid, prefetch = false) {
+  if (!requestQueue[guid]) {
+    let resolve;
+    let reject;
+    const promise = withJQueryCallbacks(
+      new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      })
+    );
+    // drop from the queue once settled so later calls trigger a fresh request
+    promise.always(function () {
+      delete requestQueue[guid];
+    });
+    requestQueue[guid] = promise;
+
+    doRequest({ resolve, reject }, guid, prefetch);
+  }
+
+  return requestQueue[guid];
+};
+
+IITC.portal.details = {
+  setup,
+  get,
+  store,
+  isFresh,
+  remove,
+  request,
+};
+
+IITC.registerLegacyAliases(IITC.portal, { portalDetail: 'details' });
 </code></pre>
         </article>
     </section>
