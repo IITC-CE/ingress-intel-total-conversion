@@ -284,7 +284,7 @@ window.plugin.bookmarks.loadList = function (typeList) {
       // If it's a portal
       else if (typeList === 'portals') {
         var guid = bkmrk['guid'];
-        const bookmarks_onclick = `$('a.bookmarksLink.selected').removeClass('selected');${returnToMap}window.zoomToAndShowPortal('${guid}', [${latlng}]);return false;`;
+        const bookmarks_onclick = `$('a.bookmarksLink.selected').removeClass('selected');${returnToMap}IITC.portal.zoomToAndShow('${guid}', [${latlng}]);return false;`;
         btn_link = `<a class="bookmarksLink" onclick="${bookmarks_onclick}">${label}</a>`;
       }
       // Create the bookmark
@@ -628,9 +628,9 @@ window.plugin.bookmarks.onSearchResultSelected = function (result, event) {
   if (result.guid) {
     // portal
     var guid = result.guid;
-    if (event.type === 'dblclick') window.zoomToAndShowPortal(guid, result.position);
-    else if (window.portals[guid]) window.renderPortalDetails(guid);
-    else window.selectPortalByLatLng(result.position);
+    if (event.type === 'dblclick') IITC.portal.zoomToAndShow(guid, result.position);
+    else if (window.portals[guid]) IITC.portal.display.renderDetails(guid);
+    else IITC.portal.selectByLatLng(result.position);
   } else if (result.zoom) {
     // map
     window.map.setView(result.position, result.zoom);
@@ -1159,7 +1159,7 @@ window.plugin.bookmarks.highlightRefresh = function (data) {
       (data.target === 'all' && data.action === 'reset') ||
       (data.target === 'all' && data.action === 'MPEswitch')
     ) {
-      window.changePortalHighlights('Bookmarked Portals');
+      IITC.portal.highlighter.change('Bookmarked Portals');
     }
   }
 };
@@ -1201,7 +1201,7 @@ window.plugin.bookmarks.addStar = function (guid, latlng, lbl) {
   });
   window.registerMarkerForOMS(star);
   star.on('spiderfiedclick', function () {
-    window.renderPortalDetails(guid);
+    IITC.portal.display.renderDetails(guid);
   });
 
   window.plugin.bookmarks.starLayers[guid] = star;
@@ -1452,7 +1452,7 @@ var setup = function () {
   // Highlighter - bookmarked portals
   window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.highlightRefresh);
   window.addHook('pluginBkmrksSyncEnd', window.plugin.bookmarks.highlightRefresh);
-  window.addPortalHighlighter('Bookmarked Portals', window.plugin.bookmarks.highlight);
+  IITC.portal.highlighter.add('Bookmarked Portals', window.plugin.bookmarks.highlight);
 
   // Layer - Bookmarked portals
   window.plugin.bookmarks.starLayerGroup = new L.LayerGroup();

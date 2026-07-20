@@ -161,16 +161,16 @@ machinaTracker.createPortalLink = function (portal) {
     .text(portal.name)
     .prop({
       title: portal.name,
-      href: window.makePermalink(portal.latLng),
+      href: IITC.portal.display.makePermalink(portal.latLng),
     })
     .click((event) => {
-      window.selectPortalByLatLng(portal.latLng);
+      IITC.portal.selectByLatLng(portal.latLng);
       event.preventDefault();
       return false;
     })
     .dblclick((event) => {
       window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
-      window.selectPortalByLatLng(portal.latLng);
+      IITC.portal.selectByLatLng(portal.latLng);
       event.preventDefault();
       return false;
     });

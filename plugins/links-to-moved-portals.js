@@ -5,7 +5,7 @@
 // @description    Show links to portals with different location data
 
 /* exported setup, changelog --eslint */
-/* global L */
+/* global IITC, L */
 
 var changelog = [
   { version: '0.1.2', changes: ['Refactoring: update Leaflet API usage'] },
@@ -54,7 +54,7 @@ var findLayer = (lguid) => {
 
 plugin.portalLoaded = (data) => {
   if (!plugin.disabled) {
-    var portalLinks = window.getPortalLinks(data.guid);
+    var portalLinks = IITC.portal.getLinks(data.guid);
     addLinks([...portalLinks.in, ...portalLinks.out]);
   }
 };

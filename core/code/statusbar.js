@@ -412,14 +412,14 @@ IITC.statusbar.portal = {
     }
 
     // Get portal details object if available
-    const details = window.portalDetail.get(guid);
+    const details = IITC.portal.details.get(guid);
     let healthPct = data.health;
 
     // Calculate health percentage if we have detailed energy data
     if (details) {
-      const totalEnergy = window.getTotalPortalEnergy(details);
+      const totalEnergy = IITC.portal.getTotalEnergy(details);
       if (totalEnergy > 0) {
-        healthPct = Math.floor((window.getCurrentPortalEnergy(details) / totalEnergy) * 100);
+        healthPct = Math.floor((IITC.portal.getCurrentEnergy(details) / totalEnergy) * 100);
       }
     }
 

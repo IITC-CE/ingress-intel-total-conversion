@@ -7,6 +7,7 @@
 //                 May also highlight captured portals that are stuck and fail to decay every 24 hours.
 
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
   {
@@ -37,5 +38,5 @@ function highlightInactivePortals(data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Inactive Portals', highlightInactivePortals);
+  IITC.portal.highlighter.add('Inactive Portals', highlightInactivePortals);
 }

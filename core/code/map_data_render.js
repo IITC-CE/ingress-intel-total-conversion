@@ -125,7 +125,7 @@ window.Render.prototype.processDeletedGameEntityGuids = function (deleted) {
 
       if (guid === window.selectedPortal) {
         // the rare case of the selected portal being deleted. clear the details tab and deselect it
-        window.renderPortalDetails(null);
+        IITC.portal.display.renderDetails(null);
       }
 
       this.deleteEntity(guid);
@@ -386,24 +386,25 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     marker = window.portals[data.guid];
     marker.updateDetails(data);
 
-    if (window.portalDetail.isFresh(guid)) {
-      var oldDetails = window.portalDetail.get(guid);
+    if (IITC.portal.details.isFresh(guid)) {
+      var oldDetails = IITC.portal.details.get(guid);
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
-        window.portalDetail.remove(guid);
+        IITC.portal.details.remove(guid);
       }
     }
 
     window.runHooks('portalAdded', { portal: marker, previousData: previousData });
   } else {
-    marker = window.createMarker(latlng, data);
+    marker = IITC.portal.marker.create(latlng, data);
 
     // in case of incomplete data while having fresh details in cache, update the portal with those details
-    if (window.portalDetail.isFresh(guid)) {
-      var oldDetails = window.portalDetail.get(guid);
+    if (IITC.portal.details.isFresh(guid)) {
+      // eslint-disable-next-line no-redeclare
+      var oldDetails = IITC.portal.details.get(guid);
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
-        window.portalDetail.remove(guid);
+        IITC.portal.details.remove(guid);
       } else if (marker.willUpdate(oldDetails)) {
         marker.updateDetails(oldDetails);
       }
@@ -562,14 +563,14 @@ window.Render.prototype.createLinkEntity = function (ent) {
  * @memberof Render
  */
 window.Render.prototype.rescalePortalMarkers = function () {
-  if (this.portalMarkerScale === undefined || this.portalMarkerScale !== window.portalMarkerScale()) {
-    this.portalMarkerScale = window.portalMarkerScale();
+  if (this.portalMarkerScale === undefined || this.portalMarkerScale !== IITC.portal.marker.scale()) {
+    this.portalMarkerScale = IITC.portal.marker.scale();
 
-    log.log('Render: map zoom ' + window.map.getZoom() + ' changes portal scale to ' + window.portalMarkerScale() + ' - redrawing all portals');
+    log.log('Render: map zoom ' + window.map.getZoom() + ' changes portal scale to ' + IITC.portal.marker.scale() + ' - redrawing all portals');
 
     // NOTE: we're not calling this because it resets highlights - we're calling it as it
     // resets the style (inc size) of all portal markers, applying the new scale
-    window.resetHighlightedPortals();
+    IITC.portal.highlighter.resetAll();
 
     window.ornaments.reload();
   }

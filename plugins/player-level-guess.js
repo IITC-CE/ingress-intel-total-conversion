@@ -428,7 +428,7 @@ window.plugin.guessPlayerLevels.guess = function () {
   var playersRes = {};
   var playersEnl = {};
   $.each(window.portals, function (guid) {
-    var details = window.portalDetail.get(guid);
+    var details = IITC.portal.details.get(guid);
     if (details) {
       var r = details.resonators;
       $.each(r, function (ind, reso) {
@@ -508,7 +508,7 @@ window.plugin.guessPlayerLevels.guess = function () {
         window.plugin.guessPlayerLevels._nameToLevelCache = {};
         // now force all portals through the callback manually
         $.each(window.portals, function (guid) {
-          var details = window.portalDetail.get(guid);
+          var details = IITC.portal.details.get(guid);
           if (details) window.plugin.guessPlayerLevels.extractPortalData({ details: details, success: true });
         });
         // and re-open the dialog (on a minimal timeout - so it's not closed while processing this callback)

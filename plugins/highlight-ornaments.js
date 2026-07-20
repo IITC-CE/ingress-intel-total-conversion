@@ -6,6 +6,7 @@
 //                 e.g. Anomaly portals
 
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
   {
@@ -44,5 +45,5 @@ function ornamentshighlight(data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Ornaments (anomaly portals)', ornamentshighlight);
+  IITC.portal.highlighter.add('Ornaments (anomaly portals)', ornamentshighlight);
 }

@@ -417,11 +417,11 @@ const parseURLParameters = () => {
     pll = pll.split(',');
     const center = normLL(pll[0], pll[1]).center;
     const latLng = new L.LatLng(center[0], center[1]);
-    window.selectPortalWhenLoadedByLatLng(latLng);
+    IITC.portal.selectWhenLoadedByLatLng(latLng);
   }
 
   const urlPGuid = window.getURLParam('pguid');
   if (urlPGuid) {
-    window.selectPortalWhenLoadedByGuid(urlPGuid);
+    IITC.portal.selectWhenLoadedByGuid(urlPGuid);
   }
 };

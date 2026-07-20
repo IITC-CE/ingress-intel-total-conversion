@@ -52,7 +52,7 @@ function setupIcons() {
       '<svg>',
       // Material Icons
 
-      // portal_detail_display.js
+      // portal_display.js
       '<symbol id="ic_place_24px" viewBox="0 0 24 24">',
       '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
       '</symbol>',
@@ -129,7 +129,7 @@ function setupSidebarToggle() {
       toggle.html('<span class="toggle open"></span>');
     } else {
       sidebar.show();
-      window.resetScrollOnNewPortal();
+      IITC.portal.display.resetScroll();
       $('body').addClass('sidebar-open');
       toggle.html('<span class="toggle close"></span>');
     }
@@ -176,7 +176,7 @@ function setupLargeImagePreview() {
  * @function setPermaLink
  */
 function setPermaLink() {
-  this.href = window.makePermalink(null, true);
+  this.href = IITC.portal.display.makePermalink(null, true);
 }
 
 /**
@@ -212,7 +212,7 @@ function setupAddons() {
  */
 function sidebarOnPortalAdded(data) {
   if (data.portal.options.guid === window.selectedPortal) {
-    window.renderPortalDetails(window.selectedPortal);
+    IITC.portal.display.renderDetails(window.selectedPortal);
   }
 }
 
@@ -223,6 +223,6 @@ function sidebarOnPortalAdded(data) {
  */
 function sidebarOnPortalDetailLoaded(data) {
   if (data.success && data.guid === window.selectedPortal) {
-    window.renderPortalToSideBar(data.portal);
+    IITC.portal.display.renderToSidebar(data.portal);
   }
 }

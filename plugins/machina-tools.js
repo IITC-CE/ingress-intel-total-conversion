@@ -65,7 +65,7 @@ machinaTools.findParent = function (portalGuid) {
   var parent = undefined;
 
   if (portalGuid !== 'undefined') {
-    var linkGuids = window.getPortalLinks(portalGuid);
+    var linkGuids = IITC.portal.getLinks(portalGuid);
     $.each(linkGuids.in, function (i, lguid) {
       var l = window.links[lguid];
       var ld = l.options.data;
@@ -90,7 +90,7 @@ machinaTools.goToParent = function (portalGuid) {
   parent = machinaTools.findParent(portalGuid);
 
   if (parent !== undefined) {
-    window.zoomToAndShowPortal(parent.guid, [parent.lat, parent.lng]);
+    IITC.portal.zoomToAndShow(parent.guid, [parent.lat, parent.lng]);
   } else {
     window.dialog({
       html: $('<div id="no-machina-parent">No Parent found.</div>'),
@@ -135,7 +135,7 @@ machinaTools.goToSeed = function (portalGuid) {
   seed = machinaTools.findSeed(portalGuid);
 
   if (seed !== undefined) {
-    window.zoomToAndShowPortal(seed.guid, [seed.lat, seed.lng]);
+    IITC.portal.zoomToAndShow(seed.guid, [seed.lat, seed.lng]);
   }
 };
 
@@ -164,8 +164,8 @@ machinaTools.gatherMachinaPortalDetail = function (portalGuid, depth) {
       latlng: toLatLng(portal.options.data.latE6, portal.options.data.lngE6),
       level: Math.max(portal.options.level, ...(portal.options.data.resonators || []).map((r) => r.level)),
       name: portal.options.data.title,
-      children: window
-        .getPortalLinks(portalGuid)
+      children: IITC.portal
+        .getLinks(portalGuid)
         .out.map((lGuid) => {
           var l = window.links[lGuid];
           return {
@@ -233,7 +233,7 @@ function appendPortalLine(rc, portal) {
     title: portalName,
     html: portalName,
     click: (e) => {
-      window.renderPortalDetails(portal.guid);
+      IITC.portal.display.renderDetails(portal.guid);
       e.stopPropagation();
     },
   });
@@ -251,7 +251,7 @@ function createChildListItem(parent, childData, childPortal) {
     title: childName,
     html: childName,
     click: (e) => {
-      window.renderPortalDetails(childData.childGuid);
+      IITC.portal.display.renderDetails(childData.childGuid);
       e.stopPropagation();
     },
   });

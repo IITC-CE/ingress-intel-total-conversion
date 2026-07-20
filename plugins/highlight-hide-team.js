@@ -5,6 +5,7 @@
 // @description    Show all portals as neutral, as if uncaptured. Great for creating plans.
 
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
   {
@@ -22,10 +23,10 @@ var changelog = [
 ];
 
 function hideOwnership(data) {
-  var params = window.getMarkerStyleOptions({ team: window.TEAM_NONE, level: 0 });
+  var params = IITC.portal.marker.getStyleOptions({ team: window.TEAM_NONE, level: 0 });
   data.portal.setStyle(params);
 }
 
 function setup() {
-  window.addPortalHighlighter('Hide portal ownership', hideOwnership);
+  IITC.portal.highlighter.add('Hide portal ownership', hideOwnership);
 }

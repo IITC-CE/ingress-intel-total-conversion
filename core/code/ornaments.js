@@ -132,7 +132,7 @@ window.ornaments = {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
         var layer = this.layers['Ornaments'];
         var opacity = this.OVERLAY_OPACITY;
-        var size = this.OVERLAY_SIZE * window.portalMarkerScale();
+        var size = this.OVERLAY_SIZE * IITC.portal.marker.scale();
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 

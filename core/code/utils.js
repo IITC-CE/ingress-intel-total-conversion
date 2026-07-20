@@ -571,19 +571,4 @@ const legacyFunctionMappings = {
   teamStringToId: 'getTeamId',
 };
 
-// Set up synchronization between `window` and `IITC.utils` with new names
-Object.entries(legacyFunctionMappings).forEach(([oldName, newName]) => {
-  // Initialize IITC.utils[newName] if not already defined
-  window.IITC.utils[newName] = window.IITC.utils[newName] || function () {};
-
-  // Define a getter/setter on `window` to synchronize with `IITC.utils`
-  Object.defineProperty(window, oldName, {
-    get() {
-      return window.IITC.utils[newName];
-    },
-    set(newFunc) {
-      window.IITC.utils[newName] = newFunc;
-    },
-    configurable: true,
-  });
-});
+IITC.registerLegacyAliases(window.IITC.utils, legacyFunctionMappings);

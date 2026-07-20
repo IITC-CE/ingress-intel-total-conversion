@@ -75,7 +75,7 @@ function _initChannelData(id) {
  * @memberof IITC.comm
  */
 let portalTemplate =
-  '<a onclick="window.selectPortalByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="bidi-isolate help">{{ portal_name }}</a>';
+  '<a onclick="IITC.portal.selectByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="bidi-isolate help">{{ portal_name }}</a>';
 /**
  * Template for time cell.
  * @type {String}
@@ -536,7 +536,7 @@ function getChatPortalName(markup) {
 function renderPortal(portal) {
   const lat = portal.latE6 / 1e6;
   const lng = portal.lngE6 / 1e6;
-  const permalink = window.makePermalink([lat, lng]);
+  const permalink = IITC.portal.display.makePermalink([lat, lng]);
   const portalName = IITC.comm.getChatPortalName(portal);
 
   return IITC.comm.portalTemplate

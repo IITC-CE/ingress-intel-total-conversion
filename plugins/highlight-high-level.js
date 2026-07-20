@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote high level portals: Purple L8, Red L7, Orange L6
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   {
@@ -52,5 +52,5 @@ function highlightHighLevel(data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Higher Level Portals', highlightHighLevel);
+  IITC.portal.highlighter.add('Higher Level Portals', highlightHighLevel);
 }

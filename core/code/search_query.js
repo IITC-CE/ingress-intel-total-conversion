@@ -117,14 +117,14 @@ class Query {
         const { position } = result;
 
         if (event.type === 'dblclick') {
-          window.zoomToAndShowPortal(guid, latLng);
+          IITC.portal.zoomToAndShow(guid, latLng);
         } else if (window.portals[guid]) {
           if (!window.map.getBounds().contains(position)) {
             window.map.setView(position);
           }
-          window.renderPortalDetails(guid);
+          IITC.portal.display.renderDetails(guid);
         } else {
-          window.selectPortalByLatLng(latLng);
+          IITC.portal.selectByLatLng(latLng);
         }
         return true;
       },
