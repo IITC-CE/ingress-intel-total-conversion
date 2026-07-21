@@ -547,7 +547,7 @@ chat.setupTabs = function () {
    * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
    */
   chat.renderAlerts = function (oldMsgsWereAdded) {
-    return IITC.comm.renderChannel('allerts', oldMsgsWereAdded);
+    return IITC.comm.renderChannel('alerts', oldMsgsWereAdded);
   };
 };
 
