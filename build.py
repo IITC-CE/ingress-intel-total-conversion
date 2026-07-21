@@ -116,7 +116,7 @@ def watch(build_cb, *args, interval=1, **kwargs):
 
     Any other subsequent positional and/or keyword arguments will be passed to build_cb.
 
-    Every found dependancy (to be watched for changes) build_cb must append
+    Every found dependency (to be watched for changes) build_cb must append
     to deps_list, which is passed to it as additional keyword argument.
     """
     from time import ctime, sleep, time
