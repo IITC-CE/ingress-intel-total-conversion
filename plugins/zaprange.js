@@ -1,13 +1,14 @@
 // @author         ZasoGD
 // @name           Zaprange
 // @category       Layer
-// @version        0.1.8
+// @version        0.1.9
 // @description    Shows the maximum range of attack by the portals.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.1.9', changes: ['Fix range circle not updating when portals change'] },
   {
     version: '0.1.8',
     changes: ['Refactoring: fix eslint'],
@@ -28,6 +29,16 @@ window.plugin.zaprange.zapLayers = {};
 window.plugin.zaprange.MIN_MAP_ZOOM = 16;
 
 window.plugin.zaprange.portalAdded = function (data) {
+  // this is an update and not a new marker
+  if (data.previousData) {
+    const guid = data.portal.options.guid;
+    if (window.plugin.zaprange.zapLayers[guid]) {
+      window.plugin.zaprange.remove(guid, data.portal.options.team);
+      window.plugin.zaprange.draw(guid, data.portal.options.team);
+    }
+    return;
+  }
+
   data.portal.on('add', function () {
     window.plugin.zaprange.draw(this.options.guid, this.options.team);
   });

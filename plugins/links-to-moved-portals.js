@@ -1,13 +1,14 @@
 // @author         screach
 // @name           Links to moved portals
 // @category       Layer
-// @version        0.1.1
+// @version        0.1.2
 // @description    Show links to portals with different location data
 
 /* exported setup, changelog --eslint */
-/* global L */
+/* global IITC, L */
 
 var changelog = [
+  { version: '0.1.2', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -28,7 +29,7 @@ plugin.styles = {
 };
 
 var toLatLng = (latE6, lngE6) => {
-  return L.latLng(latE6 / 1e6, lngE6 / 1e6);
+  return new L.LatLng(latE6 / 1e6, lngE6 / 1e6);
 };
 
 var getDLatLng = (linkData) => {
@@ -53,7 +54,7 @@ var findLayer = (lguid) => {
 
 plugin.portalLoaded = (data) => {
   if (!plugin.disabled) {
-    var portalLinks = window.getPortalLinks(data.guid);
+    var portalLinks = IITC.portal.getLinks(data.guid);
     addLinks([...portalLinks.in, ...portalLinks.out]);
   }
 };

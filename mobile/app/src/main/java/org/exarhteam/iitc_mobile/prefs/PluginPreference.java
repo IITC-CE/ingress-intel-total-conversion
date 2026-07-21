@@ -2,6 +2,7 @@ package org.exarhteam.iitc_mobile.prefs;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -10,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import org.exarhteam.iitc_mobile.R;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
-
-import java.io.File;
 
 // multiline checkbox preference
 public class PluginPreference extends CheckBoxPreference {
@@ -56,7 +55,11 @@ public class PluginPreference extends CheckBoxPreference {
             }
             MenuItem sharePluginMenu = menu.add(R.string.menu_share_plugin_file);
             sharePluginMenu.setOnMenuItemClickListener(item -> {
-                getContext().startActivity(ShareActivity.forFile(getContext(), new File(getPluginInfo().getKey()), "application/javascript"));
+                String uriString = getPluginInfo().getDocumentFileUri();
+                if (uriString != null) {
+                    Uri uri = Uri.parse(uriString);
+                    getContext().startActivity(ShareActivity.forUri(getContext(), uri, "application/javascript"));
+                }
                 return true;
             });
             MenuItem deleteItem = menu.add(R.string.menu_delete_plugin);

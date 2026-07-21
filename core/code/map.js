@@ -116,12 +116,13 @@ function createDefaultBaseMapLayers() {
   var cartoAttr =
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
   var cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png';
-  baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all' });
-  baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all' });
+  baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all', isDark: true });
+  baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all', isDark: false });
 
   // Google Maps - including ingress default (using the stock-intel API-key)
-  baseLayers['Google Default Ingress Map'] = L.gridLayer.googleMutant({
+  baseLayers['Google Default Ingress Map'] = new L.GridLayer.GoogleMutant({
     type: 'roadmap',
+    isDark: true,
     backgroundColor: '#0e3d4e',
     styles: [
       { featureType: 'all', elementType: 'all', stylers: [{ visibility: 'on' }, { hue: '#131c1c' }, { saturation: '-50' }, { invert_lightness: true }] },
@@ -131,16 +132,16 @@ function createDefaultBaseMapLayers() {
       { featureType: 'road', elementType: 'labels.icon', stylers: [{ invert_lightness: !0 }] },
     ],
   });
-  baseLayers['Google Roads'] = L.gridLayer.googleMutant({ type: 'roadmap' });
-  var trafficMutant = L.gridLayer.googleMutant({ type: 'roadmap' });
+  baseLayers['Google Roads'] = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
+  var trafficMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
   trafficMutant.addGoogleLayer('TrafficLayer');
   baseLayers['Google Roads + Traffic'] = trafficMutant;
-  var transitMutant = L.gridLayer.googleMutant({ type: 'roadmap' });
+  var transitMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
   transitMutant.addGoogleLayer('TransitLayer');
   baseLayers['Google Roads + Transit'] = transitMutant;
-  baseLayers['Google Satellite'] = L.gridLayer.googleMutant({ type: 'satellite' });
-  baseLayers['Google Hybrid'] = L.gridLayer.googleMutant({ type: 'hybrid' });
-  baseLayers['Google Terrain'] = L.gridLayer.googleMutant({ type: 'terrain' });
+  baseLayers['Google Satellite'] = new L.GridLayer.GoogleMutant({ type: 'satellite', isDark: true });
+  baseLayers['Google Hybrid'] = new L.GridLayer.GoogleMutant({ type: 'hybrid', isDark: true });
+  baseLayers['Google Terrain'] = new L.GridLayer.GoogleMutant({ type: 'terrain', isDark: false });
 
   return baseLayers;
 }
@@ -371,7 +372,6 @@ window.setupMap = function () {
 
   // create the map data requester
   window.mapDataRequest = new window.MapDataRequest();
-  window.mapDataRequest.start();
 
   // start the refresh process with a small timeout, so the first data request happens quickly
   // (the code originally called the request function directly, and triggered a normal delay for the next refresh.
@@ -392,44 +392,36 @@ window.setupMap = function () {
     }
     map.setView(pos.center, pos.zoom, { reset: true });
 
-    // read here ONCE, so the URL is only evaluated one time after the
-    // necessary data has been loaded.
-    var pll = window.getURLParam('pll');
-    if (pll) {
-      pll = pll.split(',');
-      window.urlPortalLL = normLL(pll[0], pll[1]).center;
-    }
-    window.urlPortal = window.getURLParam('pguid');
+    parseURLParameters();
 
     // todo check
     // leaflet no longer ensures the base layer zoom is suitable for the map (a bug? feature change?), so do so here
     map.on('baselayerchange', function () {
       map.setZoom(map.getZoom());
+      layerChooser.notifyBaseLayerChange();
     });
+
+    // also fire for the initial base layer
+    layerChooser.notifyBaseLayerChange();
+
+    // Start map refresh (after Map location is set)
+    window.mapDataRequest.start();
   });
+};
 
-  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
-  // on zoomend, check to see the zoom level is an int, and reset the view if not
-  // (there's a bug on mobile where zoom levels sometimes end up as fractional levels. this causes the base map to be invisible)
-  map.on('zoomend', function() {
-    var z = map.getZoom();
-    if (z != parseInt(z))
-    {
-      log.warn('Non-integer zoom level at zoomend: '+z+' - trying to fix...');
-      map.setZoom(parseInt(z), {animate:false});
-    }
-  });
-  */
+const parseURLParameters = () => {
+  // read here ONCE, so the URL is only evaluated one time after the
+  // necessary data has been loaded.
+  var pll = window.getURLParam('pll');
+  if (pll) {
+    pll = pll.split(',');
+    const center = normLL(pll[0], pll[1]).center;
+    const latLng = new L.LatLng(center[0], center[1]);
+    IITC.portal.selectWhenLoadedByLatLng(latLng);
+  }
 
-  /* !!This block is commented out as it's unlikely that we still need this workaround in leaflet 1+
-  // Fix Leaflet: handle touchcancel events in Draggable
-  L.Draggable.prototype._onDownOrig = L.Draggable.prototype._onDown;
-  L.Draggable.prototype._onDown = function(e) {
-    L.Draggable.prototype._onDownOrig.apply(this, arguments);
-
-    if(e.type === "touchstart") {
-      L.DomEvent.on(document, "touchcancel", this._onUp, this);
-    }
-  };
-  */
+  const urlPGuid = window.getURLParam('pguid');
+  if (urlPGuid) {
+    IITC.portal.selectWhenLoadedByGuid(urlPGuid);
+  }
 };

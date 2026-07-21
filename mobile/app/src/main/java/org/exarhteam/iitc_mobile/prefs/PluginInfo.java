@@ -14,6 +14,7 @@ public class PluginInfo extends HashMap<String, String> {
 
     private String key;
     private boolean userPlugin;
+    private String documentFileUri;
 
     private PluginInfo() {
         super();
@@ -23,6 +24,7 @@ public class PluginInfo extends HashMap<String, String> {
         super(other);
         this.key = other.key;
         this.userPlugin = other.userPlugin;
+        this.documentFileUri = other.documentFileUri;
     }
 
     public static PluginInfo createEmpty() {
@@ -106,5 +108,13 @@ public class PluginInfo extends HashMap<String, String> {
 
     public boolean isUserPlugin() {
         return userPlugin;
+    }
+
+    public String getDocumentFileUri() {
+        return documentFileUri;
+    }
+
+    public void setDocumentFileUri(String documentFileUri) {
+        this.documentFileUri = documentFileUri;
     }
 }

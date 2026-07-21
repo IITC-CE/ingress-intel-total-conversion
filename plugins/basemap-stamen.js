@@ -49,14 +49,14 @@ mapStamen.setup = function () {
     },
   });
 
-  function addLayer(name, options) {
-    window.layerChooser.addBaseLayer(new L_StamenTileLayer(name, options), 'Stamen ' + name);
+  function addLayer(name, options, isDark) {
+    window.layerChooser.addBaseLayer(new L_StamenTileLayer(name, options), 'Stamen ' + name, { isDark: isDark });
   }
 
   var options = { minZoom: 0, maxNativeZoom: 20 };
-  addLayer('Toner', options);
-  addLayer('Toner Background', options);
-  addLayer('Toner Lite', options);
+  addLayer('Toner', options, false);
+  addLayer('Toner Background', options, false);
+  addLayer('Toner Lite', options, false);
   // transparent layers. could be useful over satellite imagery or similar
   // addLayer('Toner Hybrid',options);
   // addLayer('Toner Labels',options);
@@ -80,7 +80,7 @@ mapStamen.setup = function () {
       'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
     ].join(''),
   };
-  addLayer('Watercolor', options);
+  addLayer('Watercolor', options, false);
 };
 
 function setup() {

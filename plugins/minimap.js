@@ -1,13 +1,14 @@
 // @author         johnd0e
 // @name           Mini map
 // @category       Controls
-// @version        0.4.4
+// @version        0.4.5
 // @description    Show a mini map on the corner of the map.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.4.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.4.4',
     changes: ['Refactoring: fix eslint'],
@@ -59,7 +60,7 @@ function clone(layer) {
   } else if (layer instanceof L.TileLayer) {
     return L.tileLayer(layer._url, options);
   } else if (L.GridLayer.GoogleMutant && layer instanceof L.GridLayer.GoogleMutant) {
-    var gm = L.gridLayer.googleMutant(options);
+    var gm = new L.GridLayer.GoogleMutant(options);
     layer.whenReady(function () {
       for (var name in layer._subLayers) {
         gm.addGoogleLayer(name);
@@ -74,7 +75,7 @@ function clone(layer) {
     if (layers.length === 1) {
       return clone(layers[0]);
     } // unwrap layerGroup if it contains only 1 layer (e.g. Bing)
-    var group = L.layerGroup();
+    var group = new L.LayerGroup();
     for (var l in layers) {
       var cloned = clone(layers[l]);
       if (!cloned) {
@@ -140,7 +141,7 @@ function setup() {
   var baseLayer = layerChooser._layers.find(function (el) {
     return !el.overlay && map.hasLayer(el.layer);
   });
-  var current = baseLayer ? getLayerSafe(baseLayer) : L.layerGroup();
+  var current = baseLayer ? getLayerSafe(baseLayer) : new L.LayerGroup();
   miniMap.control = L.control.minimap(current, miniMap.options).addTo(map);
 
   map.on('baselayerchange', function (e) {

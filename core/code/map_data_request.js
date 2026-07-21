@@ -31,8 +31,8 @@ window.MapDataRequest = function () {
   this.MAX_TILE_RETRIES = 5;
 
   // refresh timers
-  this.MOVE_REFRESH = 3; // time, after a map move (pan/zoom) before starting the refresh processing
-  this.STARTUP_REFRESH = 3; // refresh time used on first load of IITC
+  this.MOVE_REFRESH = 0.4; // time, after a map move (pan/zoom) before starting the refresh processing
+  this.STARTUP_REFRESH = 0.1; // refresh time used on first load of IITC
   this.IDLE_RESUME_REFRESH = 5; // refresh time used after resuming from idle
 
   // after one of the above, there's an additional delay between preparing the refresh (clearing out of bounds,
@@ -257,7 +257,7 @@ window.MapDataRequest.prototype.refresh = function () {
   // DEBUG: resize the bounds so we only retrieve some data
   // bounds = bounds.pad(-0.4);
 
-  // var debugrect = L.rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
+  // var debugrect = new L.Rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
   // setTimeout (function(){ map.removeLayer(debugrect); }, 10*1000);
 
   var x1 = window.lngToTile(bounds.getWest(), tileParams);
@@ -266,11 +266,11 @@ window.MapDataRequest.prototype.refresh = function () {
   var y2 = window.latToTile(bounds.getSouth(), tileParams);
 
   // calculate the full bounds for the data - including the part of the tiles off the screen edge
-  var dataBounds = L.latLngBounds([
+  var dataBounds = new L.LatLngBounds([
     [window.tileToLat(y2 + 1, tileParams), window.tileToLng(x1, tileParams)],
     [window.tileToLat(y1, tileParams), window.tileToLng(x2 + 1, tileParams)],
   ]);
-  // var debugrect2 = L.rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
+  // var debugrect2 = new L.Rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
   // setTimeout (function(){ map.removeLayer(debugrect2); }, 10*1000);
 
   // store the parameters used for fetching the data. used to prevent unneeded refreshes after move/zoom
@@ -325,7 +325,7 @@ window.MapDataRequest.prototype.refresh = function () {
 
         var latCenter = (latNorth + latSouth) / 2;
         var lngCenter = (lngEast + lngWest) / 2;
-        var tileLatLng = L.latLng(latCenter, lngCenter);
+        var tileLatLng = new L.LatLng(latCenter, lngCenter);
 
         var tilePoint = window.map.project(tileLatLng, mapZoom);
 

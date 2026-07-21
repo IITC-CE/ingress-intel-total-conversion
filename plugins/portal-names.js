@@ -1,13 +1,14 @@
 // @author         ZasoGD
 // @name           Portal Names
 // @category       Layer
-// @version        0.2.4
+// @version        0.2.5
 // @description    Show portal names on the map.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.2.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.2.4',
     changes: ['Refactoring: fix eslint'],
@@ -69,8 +70,8 @@ window.plugin.portalNames.addLabel = function (guid, latLng) {
     var d = window.portals[guid].options.data;
     var portalName = d.title;
 
-    var label = L.marker(latLng, {
-      icon: L.divIcon({
+    var label = new L.Marker(latLng, {
+      icon: new L.DivIcon({
         className: 'plugin-portal-names',
         iconAnchor: [window.plugin.portalNames.NAME_WIDTH / 2, 0],
         iconSize: [window.plugin.portalNames.NAME_WIDTH, window.plugin.portalNames.NAME_HEIGHT],
@@ -112,7 +113,7 @@ window.plugin.portalNames.updatePortalLabels = function () {
   for (const guid in portalPoints) {
     const point = portalPoints[guid];
 
-    var bucketId = L.point([Math.floor(point.x / (window.plugin.portalNames.NAME_WIDTH * 2)), Math.floor(point.y / window.plugin.portalNames.NAME_HEIGHT)]);
+    var bucketId = new L.Point([Math.floor(point.x / (window.plugin.portalNames.NAME_WIDTH * 2)), Math.floor(point.y / window.plugin.portalNames.NAME_HEIGHT)]);
     // the guid is added to four buckets. this way, when testing for overlap we don't need to test
     // all 8 buckets surrounding the one around the particular portal, only the bucket it is in itself
     var bucketIds = [bucketId, bucketId.add([1, 0]), bucketId.add([0, 1]), bucketId.add([1, 1])];
@@ -131,7 +132,7 @@ window.plugin.portalNames.updatePortalLabels = function () {
       var point = portalPoints[guid];
       // the bounds used for testing are twice as wide as the portal name marker. this is so that there's no left/right
       // overlap between two different portals text
-      var largeBounds = L.bounds(
+      var largeBounds = new L.Bounds(
         point.subtract([window.plugin.portalNames.NAME_WIDTH, 0]),
         point.add([window.plugin.portalNames.NAME_WIDTH, window.plugin.portalNames.NAME_HEIGHT])
       );

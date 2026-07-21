@@ -19,6 +19,7 @@ import androidx.viewpager.widget.ViewPager;
 import org.exarhteam.iitc_mobile.BuildConfig;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
+import org.exarhteam.iitc_mobile.WindowInsetsHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,6 +39,14 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
         final Uri uri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
                 : Uri.fromFile(file);
+        return new Intent(context, ShareActivity.class)
+                .putExtra(EXTRA_TYPE, TYPE_FILE)
+                .putExtra("uri", uri)
+                .putExtra("type", type)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    public static Intent forUri(final Context context, final Uri uri, final String type) {
         return new Intent(context, ShareActivity.class)
                 .putExtra(EXTRA_TYPE, TYPE_FILE)
                 .putExtra("uri", uri)
@@ -121,6 +130,9 @@ public class ShareActivity extends FragmentActivity implements ActionBar.TabList
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share);
+
+        // Setup window insets for edge-to-edge display
+        WindowInsetsHelper.setupPreferenceActivityInsets(this);
 
         mComparator = new IntentComparator(this);
         mGenerator = new IntentGenerator(this);

@@ -31,7 +31,7 @@ def load(build_name, localfile=None):
         localsettings = run_path(localfile or config.localfile)
     except FileNotFoundError:
         if localfile:  # ignore for default file
-            raise      # but raise for explicitely specified
+            raise      # but raise for explicitly specified
         localfile = None
     else:
         localfile = localfile or config.localfile

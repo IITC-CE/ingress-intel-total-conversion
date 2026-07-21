@@ -20,6 +20,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 import org.exarhteam.iitc_mobile.IITC_Mobile.ResponseHandler;
 import org.exarhteam.iitc_mobile.async.UpdateScript;
+import org.exarhteam.iitc_mobile.channel.ChannelManager;
 import org.exarhteam.iitc_mobile.prefs.PluginInfo;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.json.JSONObject;
@@ -59,6 +60,7 @@ public class IITC_FileManager {
     private final SharedPreferences mPrefs;
     private final IITC_StorageManager mStorageManager;
     private final IITC_PluginManager mPluginManager;
+    private ChannelManager mChannelManager;
 
     public IITC_FileManager(final Activity activity) {
         mActivity = activity;
@@ -66,6 +68,10 @@ public class IITC_FileManager {
         mAssetManager = mActivity.getAssets();
         mStorageManager = new IITC_StorageManager(activity);
         mPluginManager = IITC_PluginManager.getInstance();
+    }
+
+    public void setChannelManager(ChannelManager channelManager) {
+        mChannelManager = channelManager;
     }
 
     /**
@@ -148,7 +154,17 @@ public class IITC_FileManager {
             }
         }
 
-        // load plugins from asset folder
+        // Try channel cache for core script when a remote channel is active
+        if (mChannelManager != null
+                && mChannelManager.getCurrentChannel().isRemote()
+                && mChannelManager.isChannelReady()) {
+            String content = mChannelManager.readCore();
+            if (content != null) {
+                return new ByteArrayInputStream(content.getBytes());
+            }
+        }
+
+        // Fall back to asset folder
         return mAssetManager.open(filename);
     }
 
@@ -314,6 +330,7 @@ public class IITC_FileManager {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                boolean success = false;
                 try {
                     final String url = uri.toString();
                     InputStream is;
@@ -340,26 +357,24 @@ public class IITC_FileManager {
                         throw new IOException("Failed to create plugin file");
                     }
 
+                    success = true;
                     mActivity.runOnUiThread(() ->
                             Toast.makeText(mActivity, R.string.plugin_install_successful, Toast.LENGTH_SHORT).show()
                     );
-                } catch (final IOException e) {
+                } catch (IOException | SecurityException e) {
                     Log.w(e);
                     mActivity.runOnUiThread(() ->
                             Toast.makeText(mActivity, R.string.plugin_install_failed, Toast.LENGTH_SHORT).show()
                     );
                 }
+                if (success && invalidateHeaders && mActivity instanceof PluginPreferenceActivity) {
+                    mActivity.runOnUiThread(() ->
+                            ((PluginPreferenceActivity) mActivity).invalidateHeaders()
+                    );
+                }
             }
         });
         thread.start();
-        if (invalidateHeaders) {
-            try {
-                thread.join();
-                ((PluginPreferenceActivity) mActivity).invalidateHeaders();
-            } catch (final InterruptedException e) {
-                Log.w(e);
-            }
-        }
     }
 
     public void updatePlugins(final boolean force) {

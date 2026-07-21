@@ -27,6 +27,7 @@ import org.exarhteam.iitc_mobile.IITC_PluginManager;
 import org.exarhteam.iitc_mobile.IITC_StorageManager;
 import org.exarhteam.iitc_mobile.Log;
 import org.exarhteam.iitc_mobile.R;
+import org.exarhteam.iitc_mobile.WindowInsetsHelper;
 import org.exarhteam.iitc_mobile.fragments.PluginsFragment;
 
 import java.util.ArrayList;
@@ -51,8 +52,9 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
     @Override
     public void setListAdapter(final ListAdapter adapter) {
-        if (adapter == null) {
-            super.setListAdapter(null);
+        // mHeaders is null on state restore (onBuildHeaders skipped); invalidateHeaders() in onCreate rebuilds
+        if (adapter == null || mHeaders == null) {
+            super.setListAdapter(adapter);
         } else {
             super.setListAdapter(new HeaderAdapter(this, mHeaders));
         }
@@ -60,13 +62,13 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
     @Override
     public void onBuildHeaders(final List<Header> target) {
+        mHeaders = target;
+
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         // notify about external plugins
         final IITC_NotificationHelper nh = new IITC_NotificationHelper(this);
         nh.showNotice(IITC_NotificationHelper.NOTICE_EXTPLUGINS);
-
-        mHeaders = target;
 
         // Always rebuild plugin data to catch new installations
         setUpPluginPreferenceScreen();
@@ -89,7 +91,31 @@ public class PluginPreferenceActivity extends PreferenceActivity {
         if (uri != null) {
             mFileManager.installPlugin(uri, true);
         }
+
+        // state restore re-creates fragments inside super.onCreate before onBuildHeaders runs;
+        // populate plugin data up front so fragments can read sAssetPlugins/sUserPlugins
+        if (savedInstanceState != null) {
+            setUpPluginPreferenceScreen();
+        }
+
         super.onCreate(savedInstanceState);
+
+        // state restore skips onBuildHeaders; force rebuild to populate mHeaders
+        if (mHeaders == null) {
+            invalidateHeaders();
+        }
+
+        // Fix for legacy PreferenceActivity not setting fitsSystemWindows on some devices
+        android.view.View contentView = findViewById(android.R.id.content);
+        if (contentView instanceof android.view.ViewGroup) {
+            android.view.ViewGroup content = (android.view.ViewGroup) contentView;
+            if (content.getChildCount() > 0 && content.getChildAt(0) instanceof android.widget.LinearLayout) {
+                android.widget.LinearLayout mainLayout = (android.widget.LinearLayout) content.getChildAt(0);
+                if (!mainLayout.getFitsSystemWindows()) {
+                    mainLayout.setFitsSystemWindows(true);
+                }
+            }
+        }
     }
 
     private boolean mLastFolderAccessState = false;
@@ -102,7 +128,7 @@ public class PluginPreferenceActivity extends PreferenceActivity {
 
         // Check if folder access state has changed since last check
         boolean currentFolderAccess = mFileManager.getStorageManager().hasPluginsFolderAccess();
-        
+
         if (!mFolderAccessStateInitialized) {
             // First time - store the state
             mLastFolderAccessState = currentFolderAccess;
@@ -137,6 +163,12 @@ public class PluginPreferenceActivity extends PreferenceActivity {
                     .remove("pending_plugin_install").apply();
             mFileManager.installPlugin(Uri.parse(pendingUri), true);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        getActionBar().setTitle(R.string.activity_plugins);
     }
 
     @Override

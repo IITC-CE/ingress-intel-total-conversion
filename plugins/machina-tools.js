@@ -1,13 +1,14 @@
 // @name           Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.9.2
+// @version        0.9.3
 // @description    Machina investigation tools - 2 new layers to see possible Machina spread and portal detail links to display Machina cluster information and to navigate to parent or seed Machina portal
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.9.3', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.9.2',
     changes: ['Refactoring: fix eslint'],
@@ -64,7 +65,7 @@ machinaTools.findParent = function (portalGuid) {
   var parent = undefined;
 
   if (portalGuid !== 'undefined') {
-    var linkGuids = window.getPortalLinks(portalGuid);
+    var linkGuids = IITC.portal.getLinks(portalGuid);
     $.each(linkGuids.in, function (i, lguid) {
       var l = window.links[lguid];
       var ld = l.options.data;
@@ -89,7 +90,7 @@ machinaTools.goToParent = function (portalGuid) {
   parent = machinaTools.findParent(portalGuid);
 
   if (parent !== undefined) {
-    window.zoomToAndShowPortal(parent.guid, [parent.lat, parent.lng]);
+    IITC.portal.zoomToAndShow(parent.guid, [parent.lat, parent.lng]);
   } else {
     window.dialog({
       html: $('<div id="no-machina-parent">No Parent found.</div>'),
@@ -134,12 +135,12 @@ machinaTools.goToSeed = function (portalGuid) {
   seed = machinaTools.findSeed(portalGuid);
 
   if (seed !== undefined) {
-    window.zoomToAndShowPortal(seed.guid, [seed.lat, seed.lng]);
+    IITC.portal.zoomToAndShow(seed.guid, [seed.lat, seed.lng]);
   }
 };
 
 function toLatLng(latE6, lngE6) {
-  return L.latLng(latE6 / 1e6, lngE6 / 1e6);
+  return new L.LatLng(latE6 / 1e6, lngE6 / 1e6);
 }
 
 machinaTools.getOLatLng = function (link) {
@@ -163,8 +164,8 @@ machinaTools.gatherMachinaPortalDetail = function (portalGuid, depth) {
       latlng: toLatLng(portal.options.data.latE6, portal.options.data.lngE6),
       level: Math.max(portal.options.level, ...(portal.options.data.resonators || []).map((r) => r.level)),
       name: portal.options.data.title,
-      children: window
-        .getPortalLinks(portalGuid)
+      children: IITC.portal
+        .getLinks(portalGuid)
         .out.map((lGuid) => {
           var l = window.links[lGuid];
           return {
@@ -232,7 +233,7 @@ function appendPortalLine(rc, portal) {
     title: portalName,
     html: portalName,
     click: (e) => {
-      window.renderPortalDetails(portal.guid);
+      IITC.portal.display.renderDetails(portal.guid);
       e.stopPropagation();
     },
   });
@@ -250,7 +251,7 @@ function createChildListItem(parent, childData, childPortal) {
     title: childName,
     html: childName,
     click: (e) => {
-      window.renderPortalDetails(childData.childGuid);
+      IITC.portal.display.renderDetails(childData.childGuid);
       e.stopPropagation();
     },
   });
@@ -724,7 +725,10 @@ machinaTools.refreshLinkLengths = function () {
     machinaTools.removeLinkLengths();
     machinaTools._maxLinks[0] = 0;
     machinaTools._maxLinks = Object.values(window.links)
-      .filter((l) => l.options.team === window.TEAM_MAC && window.map.getBounds().contains(L.latLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6)))
+      .filter((l) => {
+        const ll = new L.LatLng(l.options.data.oLatE6 / 1e6, l.options.data.oLngE6 / 1e6);
+        return l.options.team === window.TEAM_MAC && window.map.getBounds().contains(ll);
+      })
       .reduce((previousValue, link) => {
         var origin = window.portals[link.options.data.oGuid];
         if (origin && origin.options.data.resCount === 8) {

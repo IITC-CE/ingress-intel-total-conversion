@@ -113,10 +113,10 @@
     <string name="pref_android_menu">Configure IITCm menu</string>
     <string name="pref_android_menu_sum">Toggle visibility of IITCm menu entries</string>
     <string name="pref_update_plugins_cat">User plugin updates</string>
-    <string name="pref_update_plugins_interval">Configure plugin update interval</string>
-    <string name="pref_update_plugins_interval_sum">How often IITCm should search for new plugin versions</string>
-    <string name="pref_force_plugin_update">Force plugin update</string>
-    <string name="pref_force_plugin_update_sum">Update all enabled user plugins</string>
+    <string name="pref_update_plugins_interval">Third-party plugin update interval</string>
+    <string name="pref_update_plugins_interval_sum">How often to check for new versions of user-installed plugins</string>
+    <string name="pref_force_plugin_update">Force third-party plugin update</string>
+    <string name="pref_force_plugin_update_sum">Update all enabled user-installed plugins</string>
     <string name="pref_secure_updates">Require secure updates</string>
     <string name="pref_secure_updates_sum">If enabled, only https updates are handled</string>
     <string name="pref_hide_fullscreen_notification_bar">System Notification Bar</string>
@@ -288,22 +288,35 @@
     </string>
     <string name="pref_check_for_updates">Update check</string>
     <string name="pref_check_for_updates_summary">Check for updates on startup</string>
-
+    <!-- Update channel -->
+    <string name="pref_update_channel">Update channel</string>
+    <string name="pref_update_channel_sum">Source for IITC scripts</string>
+    <string name="pref_custom_channel_url">Custom channel URL</string>
+    <string name="pref_custom_channel_url_sum">Base URL for custom channel scripts</string>
+    <string name="channel_builtin">Built-in</string>
+    <string name="channel_release">Release</string>
+    <string name="channel_beta">Beta</string>
+    <string name="channel_custom">Custom</string>
+    <string name="channel_downloading">Downloading scripts…</string>
+    <string name="channel_download_failed">Failed to download channel data</string>
+    <string name="channel_download_complete">Channel updated successfully</string>
+    <string name="pref_channel_update_interval">Channel update interval</string>
+    <string name="pref_channel_update_interval_sum">How often to check for new IITC scripts in the selected channel</string>
+    <string name="pref_force_channel_update">Force channel update</string>
+    <string name="pref_force_channel_update_sum">Re-download all scripts from the selected channel</string>
     <!-- Storage Access Framework -->
-    <string name="plugins_folder_access_title">Select plugins folder</string>
+    <string name="plugins_folder_access_title">Select IITC_Mobile folder</string>
     <string name="plugins_folder_access_message">To install custom plugins, IITC Mobile needs access to a folder where plugins will be stored. Please select the IITC_Mobile folder or create a new one.</string>
     <string name="plugin_install_successful">Plugin installed successfully</string>
     <string name="plugin_install_failed">Failed to install plugin</string>
     <string name="plugin_delete_failed">Failed to delete plugin</string>
     <string name="export_not_supported">Export not supported on this device</string>
     <string name="export_failed">Failed to export file</string>
-
     <!-- Migration strings -->
     <string name="migration_saf_title">Plugin System Update</string>
     <string name="migration_saf_message">IITC Mobile has been updated to use a more secure folder access system. Instead of accessing your entire storage, the app now only requests access to the IITC_Mobile folder.\n\nSince you have user plugins enabled, please grant access to the IITC_Mobile folder to continue using them.</string>
     <string name="migration_saf_button_grant">Grant Access</string>
     <string name="migration_saf_button_later">Later</string>
-
     <!-- Deep link permission strings -->
     <string name="pref_deep_link_permission">Open Intel links in IITC Mobile</string>
     <string name="pref_deep_link_permission_summary">Configure IITC Mobile to handle Intel Map links</string>

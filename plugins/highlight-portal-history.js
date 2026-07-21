@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   {
@@ -113,8 +113,8 @@ function setup() {
   inherit('marked', ['captured', 'visitTarget', 'scoutControlled', 'scoutControllTarget']);
   inherit('commonOther', ['otherVC', 'otherNotVC', 'otherScout', 'otherNotScout']);
 
-  window.addPortalHighlighter('History: visited/captured', highlightPortalsHistoryVisited);
-  window.addPortalHighlighter('History: not visited/captured', highlightPortalsHistoryNotVisited);
-  window.addPortalHighlighter('History: scout controlled', highlightPortalsHistoryScoutControlled);
-  window.addPortalHighlighter('History: not scout controlled', highlightPortalsHistoryNotScoutControlled);
+  IITC.portal.highlighter.add('History: visited/captured', highlightPortalsHistoryVisited);
+  IITC.portal.highlighter.add('History: not visited/captured', highlightPortalsHistoryNotVisited);
+  IITC.portal.highlighter.add('History: scout controlled', highlightPortalsHistoryScoutControlled);
+  IITC.portal.highlighter.add('History: not scout controlled', highlightPortalsHistoryNotScoutControlled);
 }

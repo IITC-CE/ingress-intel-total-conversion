@@ -30,6 +30,9 @@ window.setupTooltips = function (element) {
       // ensure all other tooltips are closed
       $('.ui-tooltip').not(ui.tooltip).remove();
     },
+    close: function () {
+      $('.ui-helper-hidden-accessible > *:not(:last)').remove();
+    },
     content: function () {
       var title = $(this).attr('title');
       return window.convertTextToTableMagic(title);
@@ -40,6 +43,7 @@ window.setupTooltips = function (element) {
     window.tooltipClearerHasBeenSetup = true;
     $(document).on('click', '.ui-tooltip', function () {
       $(this).remove();
+      $('.ui-helper-hidden-accessible > *:not(:last)').remove();
     });
   }
 };
@@ -79,7 +83,7 @@ function setupIngressMarkers() {
       // ^ (as it's inappropriately styled)
       svgTemplate: '<svg style="fill: {color}"><use xlink:href="#marker-icon"/></svg>',
       color: '#a24ac3', // for draw-tools:
-      // L.divIcon does not use the option `color`, but we store it here to
+      // L.DivIcon does not use the option `color`, but we store it here to
       // be able to simply retrieve the color for serializing markers
     },
     initialize: function (color, options) {
@@ -90,6 +94,14 @@ function setupIngressMarkers() {
       this.options.html = L.Util.template(this.options.svgTemplate, { color: this.options.color });
     },
   });
+
+  // Leaflet v2 backwards compability
+  /** @deprecated use: d = new L.DivIcon() */
+  L.divIcon = function (options) {
+    return new L.DivIcon(options);
+  };
+
+  /** @deprecated use: d = new L.DivIcon.ColoredSvg() */
   L.divIcon.coloredSvg = function (color, options) {
     return new L.DivIcon.ColoredSvg(color, options);
   };
@@ -289,7 +301,7 @@ function boot() {
   window.chat.setup();
   window.updateGameScore();
   window.search.setup();
-  window.portalDetail.setup();
+  IITC.portal.details.setup();
   window.setupRedeem();
   window.setupSidebar();
   IITC.statusbar.init();
@@ -328,9 +340,9 @@ try {
   })({}).exports(L);
 
   // eslint-disable-next-line
-  '@include_raw:external/jquery-3.6.0.min.js@';
+  '@include_raw:external/jquery-4.0.0.min.js@';
   // eslint-disable-next-line
-  '@include_raw:external/jquery-ui-1.12.1.min.js@';
+  '@include_raw:external/jquery-ui-1.14.2.min.js@';
   // eslint-disable-next-line
   '@include_raw:external/taphold.js@';
   // eslint-disable-next-line

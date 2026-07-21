@@ -1,4 +1,4 @@
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 /**
  * @file This file contains the main JavaScript code for the app, including utility functions,
@@ -137,6 +137,13 @@ window.runOnAppBeforeBoot = function () {
     });
   }
 
+  // forward the base map theme (light/dark) to the app
+  if (window.app.setMapDarkMode) {
+    window.addHook('baseLayerChanged', function (data) {
+      window.app.setMapDarkMode(data.isDark);
+    });
+  }
+
   // overwrite some functions **************************************************
   if (window.app.copy) {
     window.androidCopy = function (text) {
@@ -152,7 +159,7 @@ window.runOnAppBeforeBoot = function () {
   }
 
   if (window.app.intentPosLink) {
-    window.renderPortalUrl = function (lat, lng, title, guid) {
+    IITC.portal.display.renderUrl = function (lat, lng, title, guid) {
       // one share link option - and the app provides an interface to share the URL,
       // share as a geo: intent (navigation via google maps), etc
 
@@ -183,7 +190,7 @@ window.runOnAppAfterBoot = function () {
   if (window.app.setPermalink) {
     var setAppPermalink = function () {
       var p = window.selectedPortal && window.portals[window.selectedPortal];
-      var href = window.makePermalink(p && p.getLatLng(), {
+      var href = IITC.portal.display.makePermalink(p && p.getLatLng(), {
         fullURL: true,
         includeMapView: true,
       });

@@ -44,6 +44,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate;
 import com.akexorcist.localizationactivity.core.OnLocaleChangedListener;
@@ -53,6 +55,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.exarhteam.iitc_mobile.IITC_NavigationHelper.Pane;
+import org.exarhteam.iitc_mobile.channel.ChannelManager;
 import org.exarhteam.iitc_mobile.prefs.PluginPreferenceActivity;
 import org.exarhteam.iitc_mobile.prefs.PreferenceActivity;
 import org.exarhteam.iitc_mobile.share.ShareActivity;
@@ -82,6 +85,7 @@ public class IITC_Mobile extends AppCompatActivity
     private LocalizationActivityDelegate localizationDelegate = new LocalizationActivityDelegate(this);
     private SharedPreferences mSharedPrefs;
     private IITC_FileManager mFileManager;
+    private ChannelManager mChannelManager;
     private IITC_WebView mIitcWebView;
     private IITC_UserLocation mUserLocation;
     private IITC_NavigationHelper mNavigationHelper;
@@ -124,13 +128,6 @@ public class IITC_Mobile extends AppCompatActivity
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
     private Pane mCurrentPane = Pane.MAP;
     private boolean mBackButtonPressed = false;
-
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            ((IITC_Mobile) context).installIitcUpdate();
-        }
-    };
 
     // Setup receiver to detect if Samsung DeX mode has been changed
 	private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
@@ -205,6 +202,10 @@ public class IITC_Mobile extends AppCompatActivity
         debugHistory = new IITC_DebugHistory(50);
 
         setContentView(R.layout.activity_main);
+
+        // Setup window insets for edge-to-edge display
+        WindowInsetsHelper.setupMainActivityInsets(this);
+
         debugScrollButton = findViewById(R.id.debugScrollButton);
 
         mImageLoading = findViewById(R.id.imageLoading);
@@ -272,22 +273,26 @@ public class IITC_Mobile extends AppCompatActivity
             }
         }
 
-        // get fullscreen status from settings
-        mIitcWebView.updateFullscreenStatus();
+        mChannelManager = new ChannelManager(this);
 
         mFileManager = new IITC_FileManager(this);
         mFileManager.setUpdateInterval(Integer.parseInt(mSharedPrefs.getString("pref_update_plugins_interval", "7")));
+        mFileManager.setChannelManager(mChannelManager);
 
         // Perform data migrations
         IITC_MigrationHelper migrationHelper = new IITC_MigrationHelper(this);
         migrationHelper.performMigrations();
+
+        // get fullscreen status from settings
+        mIitcWebView.updateFullscreenStatus();
 
         // Initialize PluginManager
         boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
         IITC_PluginManager.getInstance().loadAllPlugins(
                 mFileManager.getStorageManager(),
                 getAssets(),
-                devMode
+                devMode,
+                mChannelManager
         );
 
         mUserLocation = new IITC_UserLocation(this);
@@ -325,15 +330,47 @@ public class IITC_Mobile extends AppCompatActivity
             updateChecker.checkForUpdates();
         }
 
-        // receive downloadManagers downloadComplete intent
-        // afterwards install iitc update
-        IntentFilter downloadFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
-            registerReceiver(mBroadcastReceiver, downloadFilter, Context.RECEIVER_NOT_EXPORTED);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31-32
-            registerReceiver(mBroadcastReceiver, downloadFilter, 0x00000001); // RECEIVER_NOT_EXPORTED
-        } else {
-            registerReceiver(mBroadcastReceiver, downloadFilter);
+        // Background sync for remote channel
+        if (mChannelManager.getCurrentChannel().isRemote()) {
+            int channelInterval = Integer.parseInt(mSharedPrefs.getString("pref_channel_update_interval", "1"));
+            if (channelInterval > 0) {
+                long lastSync = mSharedPrefs.getLong("pref_last_channel_sync", 0);
+                long now = System.currentTimeMillis();
+                long intervalMs = 1000L * 60 * 60 * 24 * channelInterval;
+                if (now - lastSync >= intervalMs) {
+                    new Thread(() -> {
+                        if (mChannelManager.checkForUpdates()) {
+                            Log.d("Channel update available, syncing...");
+                            mChannelManager.syncChannel(new org.exarhteam.iitc_mobile.channel.ChannelDownloader.Callback() {
+                                @Override
+                                public void onProgress(int current, int total) {}
+
+                                @Override
+                                public void onComplete() {
+                                    Log.d("Channel sync complete");
+                                    mSharedPrefs.edit()
+                                            .putLong("pref_last_channel_sync", System.currentTimeMillis())
+                                            .apply();
+                                    runOnUiThread(() -> {
+                                        boolean devMode = mSharedPrefs.getBoolean("pref_dev_checkbox", false);
+                                        IITC_PluginManager.getInstance().loadAllPlugins(
+                                                mFileManager.getStorageManager(),
+                                                getAssets(),
+                                                devMode,
+                                                mChannelManager
+                                        );
+                                    });
+                                }
+
+                                @Override
+                                public void onError(String message) {
+                                    Log.w("Channel sync failed: " + message);
+                                }
+                            });
+                        }
+                    }).start();
+                }
+            }
         }
 
         this.firstTimeIntro();
@@ -390,7 +427,7 @@ public class IITC_Mobile extends AppCompatActivity
             return;
         } else if (key.equals("pref_fullscreen")) {
             mIitcWebView.updateFullscreenStatus();
-            mNavigationHelper.onPrefChanged();
+            if (mNavigationHelper != null) mNavigationHelper.onPrefChanged();
             return;
         } else if (key.equals("pref_android_menu_options")) {
             final String[] menuDefaults = getResources().getStringArray(R.array.pref_android_menu_default);
@@ -414,7 +451,19 @@ public class IITC_Mobile extends AppCompatActivity
             IITC_PluginManager.getInstance().loadAllPlugins(
                     mFileManager.getStorageManager(),
                     getAssets(),
-                    devMode
+                    devMode,
+                    mChannelManager
+            );
+            mReloadNeeded = true;
+            return;
+        } else if (key.equals("pref_update_channel")) {
+            // Reload PluginManager when channel changes
+            boolean devMode = sharedPreferences.getBoolean("pref_dev_checkbox", false);
+            IITC_PluginManager.getInstance().loadAllPlugins(
+                    mFileManager.getStorageManager(),
+                    getAssets(),
+                    devMode,
+                    mChannelManager
             );
             mReloadNeeded = true;
             return;
@@ -649,7 +698,6 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(mBroadcastReceiver);
         unregisterReceiver(mDesktopModeReceiver);
         super.onDestroy();
     }
@@ -752,6 +800,10 @@ public class IITC_Mobile extends AppCompatActivity
 
     public boolean isDexRunning() {
         return mDexRunning;
+    }
+
+    public boolean isDebugging() {
+        return mDebugging;
     }
 
     @Override
@@ -1065,6 +1117,8 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     private void updateViews() {
+        boolean wasDebugging = mViewDebug.getVisibility() == View.VISIBLE;
+        
         if (!mDebugging) {
             mViewDebug.setVisibility(View.GONE);
             mLayoutDebug.setVisibility(View.GONE);
@@ -1097,6 +1151,11 @@ public class IITC_Mobile extends AppCompatActivity
                 mIitcWebView.setVisibility(View.GONE);
                 mLayoutDebug.setVisibility(View.VISIBLE);
             }
+        }
+        
+        // Update safe area insets when debug mode changes
+        if (wasDebugging != mDebugging) {
+            mIitcWebView.applySafeAreaInsets();
         }
     }
 
@@ -1196,49 +1255,6 @@ public class IITC_Mobile extends AppCompatActivity
         return pos;
     }
 
-    /**
-     * onClick handler for R.id.btnDebugLeft, assigned in activity_main.xml
-     */
-    public void onDebugCursorMoveRight(final View v)
-    {
-        mEditCommand.setSelection(debugCursorMove(true));
-    }
-
-    /**
-     * onClick handler for R.id.btnDebugRight, assigned in activity_main.xml
-     */
-    public void onDebugCursorMoveLeft(final View v)
-    {
-        mEditCommand.setSelection(debugCursorMove(false));
-    }
-
-    private void deleteUpdateFile() {
-        final File file = new File(getExternalFilesDir(null).toString() + "/iitcUpdate.apk");
-        if (file != null) file.delete();
-    }
-
-    public void updateIitc(final String url) {
-        final DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setDescription(getString(R.string.download_description));
-        request.setTitle("IITCm Update");
-        request.allowScanningByMediaScanner();
-        final Uri fileUri = Uri.parse("file://" + getExternalFilesDir(null).toString() + "/iitcUpdate.apk");
-        request.setDestinationUri(fileUri);
-        // remove old update file...we don't want to spam the external storage
-        deleteUpdateFile();
-        // get download service and enqueue file
-        final DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
-    }
-
-    private void installIitcUpdate() {
-        final String iitcUpdatePath = getExternalFilesDir(null).toString() + "/iitcUpdate.apk";
-        final Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(iitcUpdatePath)), "application/vnd.android.package-archive");
-        startActivity(intent);
-        // finish app, because otherwise it gets killed on update
-        finish();
-    }
 
     public boolean isLoading() {
         return mIsLoading;
@@ -1275,6 +1291,10 @@ public class IITC_Mobile extends AppCompatActivity
 
     public IITC_FileManager getFileManager() {
         return mFileManager;
+    }
+
+    public ChannelManager getChannelManager() {
+        return mChannelManager;
     }
 
     public SharedPreferences getPrefs() {

@@ -1,29 +1,55 @@
 /* global IITC, L, log -- eslint */
 
 /**
- * @file This file contains the code related to creating and updating portal markers on the map.
- * @module portal_marker
+ * Namespace for creating, updating and styling portal markers on the map.
+ *
+ * @memberof IITC.portal
+ * @namespace marker
  */
+
+const PREFETCH_TIME = 200; // if the mouse stays these miliseconds on the marker prefetch portal details
 
 // portal hooks
 function handler_portal_click(e) {
-  window.selectPortal(e.target.options.guid, e.type);
-  window.renderPortalDetails(e.target.options.guid);
+  IITC.portal.display.select(e.target.options.guid, e.type);
+  IITC.portal.display.renderDetails(e.target.options.guid);
 }
 
 function handler_portal_dblclick(e) {
-  window.selectPortal(e.target.options.guid, e.type);
-  window.renderPortalDetails(e.target.options.guid);
+  IITC.portal.display.select(e.target.options.guid, e.type);
+  IITC.portal.display.renderDetails(e.target.options.guid);
   window.map.setView(e.target.getLatLng(), window.DEFAULT_ZOOM);
 }
 
 function handler_portal_contextmenu(e) {
-  window.selectPortal(e.target.options.guid, e.type);
-  window.renderPortalDetails(e.target.options.guid);
+  IITC.portal.display.select(e.target.options.guid, e.type);
+  IITC.portal.display.renderDetails(e.target.options.guid);
   if (window.isSmartphone()) {
     window.show('info');
-  } else if (!$('#scrollwrapper').is(':visible')) {
-    $('#sidebartoggle').click();
+  } else {
+    const scrollwrapper = document.getElementById('scrollwrapper');
+    // equivalent of jQuery ':visible'
+    const visible = scrollwrapper && (scrollwrapper.offsetWidth > 0 || scrollwrapper.offsetHeight > 0 || scrollwrapper.getClientRects().length > 0);
+    if (!visible) {
+      document.getElementById('sidebartoggle')?.click();
+    }
+  }
+}
+
+function handler_portal_mouse_enter(e) {
+  window.clearTimeout(e.target.options.prefetchTimer);
+  e.target.options.prefetchTimer = window.setTimeout(() => do_prefetch(e), PREFETCH_TIME);
+}
+
+function handler_portal_mouse_leave(e) {
+  window.clearTimeout(e.target.options.prefetchTimer);
+}
+
+function do_prefetch(e) {
+  const guid = e.target.options.guid;
+  if (guid && !IITC.portal.details.isFresh(guid)) {
+    log.debug(`prefetch portal details ${guid}`);
+    IITC.portal.details.request(guid, true);
   }
 }
 
@@ -57,6 +83,8 @@ L.PortalMarker = L.CircleMarker.extend({
     this.on('click', handler_portal_click);
     this.on('dblclick', handler_portal_dblclick);
     this.on('contextmenu', handler_portal_contextmenu);
+    this.on('mouseover', handler_portal_mouse_enter);
+    this.on('mouseout', handler_portal_mouse_leave);
   },
 
   willUpdate: function (details) {
@@ -106,7 +134,7 @@ L.PortalMarker = L.CircleMarker.extend({
     if (this._details) {
       // portal has been moved
       if (this._details.latE6 !== details.latE6 || this._details.lngE6 !== details.lngE6) {
-        this.setLatLng(L.latLng(details.latE6 / 1e6, details.lngE6 / 1e6));
+        this.setLatLng(new L.LatLng(details.latE6 / 1e6, details.lngE6 / 1e6));
       }
 
       // core data from a placeholder
@@ -121,7 +149,6 @@ L.PortalMarker = L.CircleMarker.extend({
         }
       } else if (this._details.timestamp === details.timestamp) {
         // we got more details (core/summary -> summary/detailed/extended)
-        var localThis = this;
         [
           'level',
           'health',
@@ -136,8 +163,8 @@ L.PortalMarker = L.CircleMarker.extend({
           'resonators',
           'owner',
           'artifactDetail',
-        ].forEach(function (prop) {
-          if (details[prop]) localThis._details[prop] = details[prop];
+        ].forEach((prop) => {
+          if (details[prop]) this._details[prop] = details[prop];
         });
         // smarter update for history (cause it's missing sometimes)
         if (details.history) {
@@ -148,8 +175,8 @@ L.PortalMarker = L.CircleMarker.extend({
               log.warn('new portal data has lost some history');
             }
             this._details.history._raw |= details.history._raw;
-            ['visited', 'captured', 'scoutControlled'].forEach(function (prop) {
-              localThis._details.history[prop] ||= details.history[prop];
+            ['visited', 'captured', 'scoutControlled'].forEach((prop) => {
+              this._details.history[prop] ||= details.history[prop];
             });
           }
         }
@@ -176,7 +203,7 @@ L.PortalMarker = L.CircleMarker.extend({
     }
 
     // compatibility
-    var dataOptions = {
+    const dataOptions = {
       guid: this._details.guid,
       level: this._level,
       team: this._team,
@@ -188,7 +215,7 @@ L.PortalMarker = L.CircleMarker.extend({
 
     this.setSelected();
     if (this.hasFullDetails()) {
-      window.portalDetail.store(this.options.guid, this._details);
+      IITC.portal.details.store(this.options.guid, this._details);
     }
   },
 
@@ -211,12 +238,12 @@ L.PortalMarker = L.CircleMarker.extend({
   },
 
   setMarkerStyle: function (style) {
-    var styleOptions = L.Util.extend(this._style(), style);
+    const styleOptions = L.Util.extend(this._style(), style);
     L.Util.setOptions(this, styleOptions);
 
-    L.Util.setOptions(this, window.highlightPortal(this));
+    L.Util.setOptions(this, IITC.portal.highlighter.highlight(this));
 
-    var selected = L.extend({ radius: this.options.radius }, this._selected && { color: window.COLOR_SELECTED_PORTAL });
+    const selected = L.extend({ radius: this.options.radius }, this._selected && { color: window.COLOR_SELECTED_PORTAL });
     return L.CircleMarker.prototype.setStyle.call(this, selected);
   },
 
@@ -235,7 +262,7 @@ L.PortalMarker = L.CircleMarker.extend({
   },
 
   _style: function () {
-    var dashArray = null;
+    let dashArray = null;
     // dashed outline for placeholder portals
     if (this.isPlaceholder()) {
       dashArray = L.PortalMarker.placeholderStyle.dashArray;
@@ -249,12 +276,12 @@ L.PortalMarker = L.CircleMarker.extend({
   },
 
   _scale: function () {
-    var scale = window.portalMarkerScale();
+    const scale = IITC.portal.marker.scale();
 
-    var level = Math.floor(this._level || 0);
+    const level = Math.floor(this._level || 0);
 
-    var lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
-    var lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
+    let lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
+    const lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
 
     // thinner outline for placeholder portals
     if (this.isPlaceholder()) {
@@ -269,63 +296,86 @@ L.PortalMarker = L.CircleMarker.extend({
 });
 
 /**
+ * Zoom -> scale breakpoints for portal markers as `[minZoom, scale]` tiers, checked from the highest zoom down
+ *
+ * @memberof IITC.portal.marker
+ * @type {{mobile: number[][], desktop: number[][]}}
+ */
+const scaleSteps = {
+  mobile: [
+    [16, 1.5],
+    [14, 1.2],
+    [11, 1],
+    [8, 0.65],
+    [0, 0.5],
+  ],
+  desktop: [
+    [14, 1],
+    [11, 0.8],
+    [8, 0.65],
+    [0, 0.5],
+  ],
+};
+
+/**
  * Calculates the scale of portal markers based on the current zoom level of the map.
  *
- * @function portalMarkerScale
+ * @memberof IITC.portal.marker
  * @returns {number} The scale factor for portal markers.
  */
-window.portalMarkerScale = function () {
-  var zoom = window.map.getZoom();
-  if (L.Browser.mobile) return zoom >= 16 ? 1.5 : zoom >= 14 ? 1.2 : zoom >= 11 ? 1.0 : zoom >= 8 ? 0.65 : 0.5;
-  else return zoom >= 14 ? 1 : zoom >= 11 ? 0.8 : zoom >= 8 ? 0.65 : 0.5;
+const scale = function () {
+  const zoom = window.map.getZoom();
+  const steps = L.Browser.mobile ? IITC.portal.marker.scaleSteps.mobile : IITC.portal.marker.scaleSteps.desktop;
+  const step = steps.find(([minZoom]) => zoom >= minZoom);
+  return step ? step[1] : steps[steps.length - 1][1];
 };
 
 /**
  * Creates a new portal marker on the map.
  *
- * @function createMarker
+ * @memberof IITC.portal.marker
  * @param {L.LatLng} latlng - The latitude and longitude where the marker will be placed.
  * @param {Object} data - The IITC-specific entity data to be stored in the marker options.
  * @returns {L.PortalMarker} A Leaflet circle marker representing the portal.
  */
-window.createMarker = function (latlng, data) {
+const create = function (latlng, data) {
   return new L.PortalMarker(latlng, data);
 };
 
 /**
  * Sets the style of a portal marker, including options for when the portal is selected.
  *
- * @function setMarkerStyle
+ * @memberof IITC.portal.marker
  * @param {L.PortalMarker} marker - The portal marker whose style will be set.
  * @param {boolean} selected - Indicates if the portal is selected.
  */
-window.setMarkerStyle = function (marker, selected) {
+const setStyle = function (marker, selected) {
   marker.setSelected(selected);
 };
 
 /**
  * Determines the style options for a portal marker based on its details.
  *
- * @function getMarkerStyleOptions
+ * @memberof IITC.portal.marker
  * @param {Object} details - Details of the portal, including team and level.
  * @returns {Object} Style options for the portal marker.
  */
-window.getMarkerStyleOptions = function (details) {
-  var scale = window.portalMarkerScale();
+const getStyleOptions = function (details) {
+  const scale = IITC.portal.marker.scale();
 
-  var level = Math.floor(details.level || 0);
+  const level = Math.floor(details.level || 0);
 
-  var lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
-  var lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
+  let lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
+  const lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
 
-  var dashArray = null;
+  let dashArray = null;
   // thinner and dashed outline for placeholder portals
   if (details.team !== window.TEAM_NONE && level === 0) {
     lvlWeight = L.PortalMarker.placeholderStyle.weight;
     dashArray = L.PortalMarker.placeholderStyle.dashArray;
   }
 
-  var options = L.extend(
+  const options = L.extend(
     {
       radius: lvlRadius,
       weight: lvlWeight,
@@ -340,3 +390,21 @@ window.getMarkerStyleOptions = function (details) {
 
   return options;
 };
+
+IITC.portal.marker = {
+  scale,
+  scaleSteps,
+  create,
+  setStyle,
+  getStyleOptions,
+};
+
+// Map of legacy global names to their new names within IITC.portal.marker
+const legacyMarkerMappings = {
+  portalMarkerScale: 'scale',
+  createMarker: 'create',
+  setMarkerStyle: 'setStyle',
+  getMarkerStyleOptions: 'getStyleOptions',
+};
+
+IITC.registerLegacyAliases(IITC.portal.marker, legacyMarkerMappings);

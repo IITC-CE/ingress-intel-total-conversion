@@ -1,13 +1,14 @@
 ﻿// @author         johnd0e
 // @name           Gaode (高德地图) / AutoNavi map
 // @category       Map Tiles
-// @version        0.1.4
+// @version        0.1.5
 // @description    Map layers from AutoNavi / Gaode (高德地图)
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.1.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.4',
     changes: ['Refactoring: fix eslint'],
@@ -69,26 +70,26 @@ mapGaode.setup = function () {
     maxNativeZoom: 17,
   });
 
-  function add(name, layer) {
-    window.layerChooser.addBaseLayer(layer, name);
+  function add(name, layer, isDark) {
+    window.layerChooser.addBaseLayer(layer, name, { isDark: isDark });
     return layer;
   }
 
   var Roads = // en, zh_en
-    add('Gaode Roads [zh]', new GaodeLayer({ style: 7, maxNativeZoom: 20, lang: 'zh_cn' }));
+    add('Gaode Roads [zh]', new GaodeLayer({ style: 7, maxNativeZoom: 20, lang: 'zh_cn' }), false);
 
   // add('Gaode Roads',       new GaodeLayer({ style: 7, maxNativeZoom: 20 }));
   // add('Gaode Roads 7',     new GaodeLayer({ style: 7, site: 1 }));
   // add('Gaode Roads 8',     new GaodeLayer({ style: 8, site: 1 }));
   // add('Gaode Roads 8 [zh]',new GaodeLayer({ style: 8, site: 1, lang: 'zh_cn' }));
 
-  add('Gaode Roads + Traffic', L.layerGroup([Roads, new AmapTraffic({ opacity: 0.75 })]));
+  add('Gaode Roads + Traffic', new L.LayerGroup([Roads, new AmapTraffic({ opacity: 0.75 })]), false);
 
-  var Satellite = add('Gaode Satellite', new GaodeLayer({ style: 6, type: 'satellite' }));
+  var Satellite = add('Gaode Satellite', new GaodeLayer({ style: 6, type: 'satellite' }), true);
 
   // new GaodeLayer({ style: 8, type: 'roadnet', opacity: 0.75, lang: 'zh_cn', scl: 2 }), // (512*512 tile, w/o labels)
   // new GaodeLayer({ style: 8, type: 'labels', opacity: 0.75, lang: 'zh_cn', ltype: 4 }) // (feature mask) here: 2: roads, 4: labels)
-  add('Gaode Hybrid', L.layerGroup([Satellite, new GaodeLayer({ style: 8, type: 'roadnet', opacity: 0.75 })]));
+  add('Gaode Hybrid', new L.LayerGroup([Satellite, new GaodeLayer({ style: 8, type: 'roadnet', opacity: 0.75 })]), true);
 };
 
 function setup() {

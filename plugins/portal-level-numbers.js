@@ -1,13 +1,14 @@
 // @author         rongou
 // @name           Portal Level Numbers
 // @category       Layer
-// @version        0.2.4
+// @version        0.2.5
 // @description    Show portal level numbers on map.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.2.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.2.4',
     changes: ['Refactoring: fix eslint'],
@@ -63,8 +64,8 @@ window.plugin.portalLevelNumbers.addLabel = function (guid, latLng) {
   // add portal level to layers
   var p = window.portals[guid];
   var levelNumber = p.options.level;
-  var level = L.marker(latLng, {
-    icon: L.divIcon({
+  var level = new L.Marker(latLng, {
+    icon: new L.DivIcon({
       className: 'plugin-portal-level-numbers',
       iconSize: [window.plugin.portalLevelNumbers.ICON_SIZE, window.plugin.portalLevelNumbers.ICON_SIZE],
       html: levelNumber,
@@ -102,7 +103,7 @@ window.plugin.portalLevelNumbers.updatePortalLabels = function () {
   for (const guid in portalPoints) {
     const point = portalPoints[guid];
 
-    var bucketId = L.point([Math.floor(point.x / (SQUARE_SIZE * 2)), Math.floor((point.y / SQUARE_SIZE) * 2)]);
+    var bucketId = new L.Point([Math.floor(point.x / (SQUARE_SIZE * 2)), Math.floor((point.y / SQUARE_SIZE) * 2)]);
     // the guid is added to four buckets. this way, when testing for overlap we don't need to test
     // all 8 buckets surrounding the one around the particular portal, only the bucket it is in itself
     var bucketIds = [bucketId, bucketId.add([1, 0]), bucketId.add([0, 1]), bucketId.add([1, 1])];
@@ -123,7 +124,7 @@ window.plugin.portalLevelNumbers.updatePortalLabels = function () {
       // overlap between two different portals text
       var southWest = point.subtract([SQUARE_SIZE, SQUARE_SIZE]);
       var northEast = point.add([SQUARE_SIZE, SQUARE_SIZE]);
-      var largeBounds = L.bounds(southWest, northEast);
+      var largeBounds = new L.Bounds(southWest, northEast);
 
       for (const otherGuid in bucketGuids) {
         // do not check portals already marked as covered

@@ -27,9 +27,9 @@ android {
     defaultConfig {
         applicationId "org.exarhteam.iitc_mobile"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode = getVersionCodeTimeStamps()
-        versionName "0.41.0"
+        versionName "0.42.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

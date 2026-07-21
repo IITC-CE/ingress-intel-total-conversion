@@ -36,16 +36,6 @@ window.setupStyles = function () {
         '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
         '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
         '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
-        '#chatcontrols { bottom: ' + (window.CHAT_SHRINKED + 22) + 'px; }',
-        '#chat { height: ' + window.CHAT_SHRINKED + 'px; } ',
-        '.leaflet-right { margin-right: ' + (window.SIDEBAR_WIDTH + 1) + 'px } ',
-        '#updatestatus { width:' + (window.SIDEBAR_WIDTH + 2) + 'px;  } ',
-        '#sidebar { width:' + (window.SIDEBAR_WIDTH + window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH + 1) /* border*/ + 'px;  } ',
-        '#sidebartoggle { right:' + (window.SIDEBAR_WIDTH + 1) + 'px;  } ',
-        `#scrollwrapper  { width:${window.SIDEBAR_WIDTH + 2 * window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH}px; right:-${
-          2 * window.HIDDEN_SCROLLBAR_ASSUMED_WIDTH - 2
-        }px } `,
-        '#sidebar > * { width:' + (window.SIDEBAR_WIDTH + 1) + 'px;  }',
       ].join('\n') +
       '</style>'
   );
@@ -62,7 +52,7 @@ function setupIcons() {
       '<svg>',
       // Material Icons
 
-      // portal_detail_display.js
+      // portal_display.js
       '<symbol id="ic_place_24px" viewBox="0 0 24 24">',
       '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
       '</symbol>',
@@ -129,20 +119,19 @@ window.setupPlayerStat = function () {
  * @function setupSidebarToggle
  */
 function setupSidebarToggle() {
+  $('body').addClass('sidebar-open');
   $('#sidebartoggle').on('click', function () {
     var toggle = $('#sidebartoggle');
     var sidebar = $('#scrollwrapper');
     if (sidebar.is(':visible')) {
       sidebar.hide();
-      $('.leaflet-right').css('margin-right', '0');
+      $('body').removeClass('sidebar-open');
       toggle.html('<span class="toggle open"></span>');
-      toggle.css('right', '0');
     } else {
       sidebar.show();
-      window.resetScrollOnNewPortal();
-      $('.leaflet-right').css('margin-right', window.SIDEBAR_WIDTH + 1 + 'px');
+      IITC.portal.display.resetScroll();
+      $('body').addClass('sidebar-open');
       toggle.html('<span class="toggle close"></span>');
-      toggle.css('right', window.SIDEBAR_WIDTH + 1 + 'px');
     }
     $('.ui-tooltip').remove();
   });
@@ -156,7 +145,7 @@ function setupSidebarToggle() {
  * @function setupLargeImagePreview
  */
 function setupLargeImagePreview() {
-  $('#portaldetails').on('click', '.imgpreview', function (e) {
+  $('#portaldetails').on('click', '.imgpreview', function () {
     var img = this.querySelector('img');
     // dialogs have 12px padding around the content
     var dlgWidth = Math.max(img.naturalWidth + 24, 500);
@@ -169,7 +158,7 @@ function setupLargeImagePreview() {
     var preview = new Image(img.width, img.height);
     preview.src = img.src;
     preview.style = 'margin: auto; display: block';
-    var title = e.delegateTarget.querySelector('.title').innerText;
+    const title = document.querySelector('#portaltitle .value')?.innerText || '';
     window.dialog({
       html: preview,
       title: title,
@@ -187,7 +176,7 @@ function setupLargeImagePreview() {
  * @function setPermaLink
  */
 function setPermaLink() {
-  this.href = window.makePermalink(null, true);
+  this.href = IITC.portal.display.makePermalink(null, true);
 }
 
 /**
@@ -223,7 +212,7 @@ function setupAddons() {
  */
 function sidebarOnPortalAdded(data) {
   if (data.portal.options.guid === window.selectedPortal) {
-    window.renderPortalDetails(window.selectedPortal);
+    IITC.portal.display.renderDetails(window.selectedPortal);
   }
 }
 
@@ -234,6 +223,6 @@ function sidebarOnPortalAdded(data) {
  */
 function sidebarOnPortalDetailLoaded(data) {
   if (data.success && data.guid === window.selectedPortal) {
-    window.renderPortalToSideBar(data.portal);
+    IITC.portal.display.renderToSidebar(data.portal);
   }
 }

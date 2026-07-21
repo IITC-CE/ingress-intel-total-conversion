@@ -272,6 +272,6 @@ public class IITC_StorageManager {
      * Open output stream for writing plugin content
      */
     public OutputStream openPluginOutputStream(DocumentFile plugin) throws IOException {
-        return context.getContentResolver().openOutputStream(plugin.getUri());
+        return context.getContentResolver().openOutputStream(plugin.getUri(), "wt");
     }
 }

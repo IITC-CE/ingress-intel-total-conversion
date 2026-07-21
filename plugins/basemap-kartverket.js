@@ -91,7 +91,7 @@ mapKartverket.setup = function () {
   var l, layer;
   for (layer in L.tileLayer.kartverket.getLayers()) {
     l = L.tileLayer.kartverket(layer);
-    window.layerChooser.addBaseLayer(l, l._name);
+    window.layerChooser.addBaseLayer(l, l._name, { isDark: false });
   }
 };
 

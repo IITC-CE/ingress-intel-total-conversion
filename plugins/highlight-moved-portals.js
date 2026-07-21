@@ -1,13 +1,14 @@
 // @author         screach
 // @name           Highlight moved portals
 // @category       Highlighter
-// @version        0.1.1
+// @version        0.1.2
 // @description    Highlights portals with links with different location data
 
 /* exported setup, changelog --eslint */
-/* global L */
+/* global IITC, L */
 
 var changelog = [
+  { version: '0.1.2', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.1',
     changes: ['Version upgrade due to a change in the wrapper: plugin icons are now vectorized'],
@@ -29,7 +30,7 @@ var getLinkData = (lguid) => {
 };
 
 var toLatLng = (latE6, lngE6) => {
-  return L.latLng(latE6 / 1e6, lngE6 / 1e6);
+  return new L.LatLng(latE6 / 1e6, lngE6 / 1e6);
 };
 
 var getDLatLng = (lguid) => {
@@ -46,12 +47,12 @@ movedPortals.highlightMovedPortals = (data) => {
   var portalData = data.portal.options.data;
   var latLng = toLatLng(portalData.latE6, portalData.lngE6);
 
-  var portalLinks = window.getPortalLinks(data.portal.options.guid);
+  var portalLinks = IITC.portal.getLinks(data.portal.options.guid);
   if (portalLinks.in.some((lguid) => !getDLatLng(lguid).equals(latLng)) || portalLinks.out.some((lguid) => !getOLatLng(lguid).equals(latLng))) {
     data.portal.setStyle(movedPortals.styles);
   }
 };
 
 var setup = () => {
-  window.addPortalHighlighter('Moved portals', movedPortals.highlightMovedPortals);
+  IITC.portal.highlighter.add('Moved portals', movedPortals.highlightMovedPortals);
 };

@@ -1,13 +1,14 @@
 // @author         xelio
 // @name           Keys on map
 // @category       Layer
-// @version        0.3.4
+// @version        0.3.5
 // @description    Show the manually entered key counts from the 'keys' plugin on the map.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  { version: '0.3.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.4',
     changes: ['Refactoring: fix eslint'],
@@ -69,8 +70,8 @@ window.plugin.keysOnMap.renderKey = function (guid, latLng) {
 
   var keyCount = window.plugin.keys.keys[guid];
   if (keyCount > 0) {
-    var key = L.marker(latLng, {
-      icon: L.divIcon({
+    var key = new L.Marker(latLng, {
+      icon: new L.DivIcon({
         className: 'plugin-keys-on-map-key',
         iconAnchor: [6, 7],
         iconSize: [12, 10],

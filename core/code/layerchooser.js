@@ -53,7 +53,8 @@ var LayerChooser = L.Control.Layers.extend({
       }
     }
     this._mapToAdd = options && options.map;
-    this.lastBaseLayerName = localStorage['iitc-base-map'];
+    this.lastBaseLayerName = localStorage['iitc-base-map'] || null;
+    this._earlyRestoreDone = false;
     this._lastPriority = -1000; // initial layers get priority <0
     L.Control.Layers.prototype.initialize.apply(this, arguments);
     this._lastPriority = 0; // any following gets >0
@@ -76,6 +77,12 @@ var LayerChooser = L.Control.Layers.extend({
       };
     } else {
       delete layer._chooser;
+    }
+    // base layer theme; `addBaseLayer` option wins over the layer's own options
+    if ('isDark' in options) {
+      data.isDark = options.isDark;
+    } else if (!('isDark' in data) && layer.options && 'isDark' in layer.options) {
+      data.isDark = layer.options.isDark;
     }
     // provide stable sort order
     if ('sortPriority' in options) {
@@ -108,9 +115,7 @@ var LayerChooser = L.Control.Layers.extend({
     }
     var map = this._map || this._mapToAdd;
     if (!data.persistent) {
-      if (!data.overlay) {
-        return;
-      }
+      if (!data.overlay) return;
       if ('enable' in options ? options.enable : data.default) {
         layer.addTo(map);
       }
@@ -134,13 +139,23 @@ var LayerChooser = L.Control.Layers.extend({
         }
       }
     } else {
+      // Persist base-layer selection whenever it becomes active.
       data.statusTracking = function () {
         localStorage['iitc-base-map'] = data.name;
       };
-      layer.on('add', data.statusTracking);
+      layer.on('add', data.statusTracking, this);
+      // --- Early restore of saved basemap (handles late-loading providers) ---
+      try {
+        var saved = this.lastBaseLayerName || localStorage['iitc-base-map'];
+        if (!this._earlyRestoreDone && map && saved && name === saved) {
+          this._earlyRestoreDone = true;
+          this.showLayer(layer, true);
+        }
+      } catch (e) {
+        if (window.debug) log.warn('LayerChooser early-restore failed:', e);
+      }
     }
   },
-
   _addItem: function (obj) {
     var labelEl = L.Control.Layers.prototype._addItem.call(this, {
       layer: obj.layer,
@@ -160,6 +175,8 @@ var LayerChooser = L.Control.Layers.extend({
    * @param {String} name - The name of the layer.
    * @param {Object} [options] - Additional options for the layer entry.
    * @param {Boolean} [options.persistent=true] - When set to `false`, the base layer's status is not tracked.
+   * @param {Boolean} [options.isDark] - Marks the base layer as dark- or light-themed, reported via the
+   *                                     `baseLayerChanged` hook. Defaults to dark when omitted.
    * @param {Number} [options.sortPriority] - Enforces a specific order in the control. Lower value means
    *                                          higher position in the list. If not specified, the value
    *                                          will be assigned implicitly in an increasing manner.
@@ -251,7 +268,7 @@ var LayerChooser = L.Control.Layers.extend({
   // Returns layer info by it's name in the control, or by layer object itself,
   // or label html element.
   // Info is internal data object with following properties:
-  // `layer`, `name`, `label`, `overlay`, `sortPriority`, `persistent`, `default`,
+  // `layer`, `name`, `label`, `overlay`, `isDark`, `sortPriority`, `persistent`, `default`,
   // `labelEl`, `inputEl`, `statusTracking`.
   /**
    * Retrieves layer info by its name in the control, or by the layer object itself, or its label HTML element.
@@ -316,6 +333,28 @@ var LayerChooser = L.Control.Layers.extend({
       map.removeLayer(data.layer);
     }
     return this;
+  },
+
+  /**
+   * Fires the `baseLayerChanged` hook for the currently active base layer, reporting its `name`,
+   * `layer` object and theme (`isDark`). Called on a basemap switch and once on initial load.
+   *
+   * @memberof LayerChooser
+   * @returns {void}
+   */
+  notifyBaseLayerChange: function () {
+    var map = this._map;
+    if (!map) {
+      return;
+    }
+    var active = this._layers.find(function (data) {
+      return !data.overlay && map.hasLayer(data.layer);
+    });
+    if (!active) {
+      return;
+    }
+    var isDark = active.isDark !== false; // default to dark
+    window.runHooks('baseLayerChanged', { name: active.name, layer: active.layer, isDark: isDark });
   },
 
   /**

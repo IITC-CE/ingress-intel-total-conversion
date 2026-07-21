@@ -5,6 +5,7 @@
 // @description    Use the portal fill color to denote if the portal is either at and above, or at and below your level.
 
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
   {
@@ -42,6 +43,6 @@ function colorLevel(below, data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Below My Level', belowMyLevel);
-  window.addPortalHighlighter('Above My Level', aboveMyLevel);
+  IITC.portal.highlighter.add('Below My Level', belowMyLevel);
+  IITC.portal.highlighter.add('Above My Level', aboveMyLevel);
 }

@@ -5,6 +5,7 @@
 // @description    Use the fill color of the portals to denote if the portal is weak. Stronger red indicates recharge required, missing resonators, or both.
 
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
   {
@@ -44,5 +45,5 @@ function weaknessHighlight(data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Portal Weakness', weaknessHighlight);
+  IITC.portal.highlighter.add('Portal Weakness', weaknessHighlight);
 }

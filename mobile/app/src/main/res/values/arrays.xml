@@ -15,6 +15,7 @@
     <string-array name="pref_hide_fullscreen_defaults">
         <item>2</item>
         <item>4</item>
+        <item>16</item>
     </string-array>
 
     <string-array name="pref_android_menu_titles">
@@ -115,6 +116,19 @@
         <item>es_419</item>
         <item>es</item>
         <item>th</item>
+    </string-array>
+
+    <string-array name="pref_update_channel_titles">
+        <item>@string/channel_builtin</item>
+        <item>@string/channel_release</item>
+        <item>@string/channel_beta</item>
+        <item>@string/channel_custom</item>
+    </string-array>
+    <string-array name="pref_update_channel_values">
+        <item>builtin</item>
+        <item>release</item>
+        <item>beta</item>
+        <item>custom</item>
     </string-array>
 
     <string-array name="pref_webview_zoom">

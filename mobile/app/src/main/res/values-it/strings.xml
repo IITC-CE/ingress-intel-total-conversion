@@ -143,4 +143,16 @@
     <string name="pref_webview_zoom_defaultValue">Default di sistema</string>
     <string name="pref_webview_zoom_sum">Influisce sulla grandezza di font/testi nel pannello delle informazioni, comm, finestre popup, etc…</string>
     <string name="menu_plugins_add_url">Aggiungi plugin tramite URL</string>
+    <string name="button_cancel_description">No</string>
+    <string name="button_confirm_description">Sì</string>
+    <string name="debug_info_dialog_copy_btn">Copia</string>
+    <string name="ok">OK</string>
+    <string name="pref_enabled">abilita</string>
+    <string name="pref_disabled">disabilita</string>
+    <string name="plugin_install_successful">Plugin installato con successo</string>
+    <string name="plugin_install_failed">Installazione plugins fallita</string>
+    <string name="plugin_delete_failed">Eliminazione plugin fallita</string>
+    <string name="export_not_supported">Esportazione non supportata da questo device</string>
+    <string name="export_failed">Esportazione file fallita</string>
+    <string name="plugins_folder_access_message">Per installare plugins personalizzati, IITC Mobile ha bisogno di aver accesso a una cartella dove memorizzare i plugins. Seleziona la cartella IITC_Mobile o creane una.</string>
 </resources>

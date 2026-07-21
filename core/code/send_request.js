@@ -27,6 +27,9 @@ window.postAjax = function (action, data, successCallback, errorCallback) {
   }
 
   var onError = function (jqXHR, textStatus, errorThrown) {
+    if (textStatus === 'parsererror' && errorThrown instanceof SyntaxError) {
+      window.userLoggedOutPrompt();
+    }
     window.requests.remove(jqXHR);
     window.failedRequestCount++;
 
@@ -111,6 +114,41 @@ window.outOfDateUserPrompt = function () {
         '<p>You need to reload the page to get the updated changes.</p>' +
         '<p>If you have just reloaded the page, then an old version of the standard site script is cached somewhere.' +
         'In this case, try clearing your cache, or waiting 15-30 minutes for the stale data to expire.</p>',
+      buttons: {
+        RELOAD: function () {
+          if (window.isApp && window.app.reloadIITC) {
+            window.app.reloadIITC();
+          } else {
+            window.location.reload();
+          }
+        },
+      },
+      close: function () {
+        delete window.blockOutOfDateRequests;
+      },
+    });
+  }
+};
+
+/**
+ * Displays a dialog prompt to the user when they appear to be logged out.
+ * Blocks all requests while the dialog is open.
+ *
+ * @function userLoggedOutPrompt
+ */
+window.userLoggedOutPrompt = function () {
+  // Block all requests while the dialog is open.
+  if (!window.blockOutOfDateRequests) {
+    window.blockOutOfDateRequests = true;
+
+    window.dialog({
+      title: 'Log into Intel',
+      html:
+        '<p>You appear to be logged out of Intel.</p>' +
+        '<p>You need to reload the page OR log in using' +
+        ' <a href="/" target="_blank">tab/window</a>.</p>' +
+        '<p>Dismiss this dialog if you have logged back in,' +
+        ' or you think this was a transient issue.</p>',
       buttons: {
         RELOAD: function () {
           if (window.isApp && window.app.reloadIITC) {

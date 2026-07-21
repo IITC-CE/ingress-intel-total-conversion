@@ -5,7 +5,7 @@
 // @description    Use the portal fill color to denote if the portal is missing resonators.
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   {
@@ -49,5 +49,5 @@ function missingResonators(data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Portals Missing Resonators', missingResonators);
+  IITC.portal.highlighter.add('Portals Missing Resonators', missingResonators);
 }

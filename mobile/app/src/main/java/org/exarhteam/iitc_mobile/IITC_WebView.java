@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -41,6 +42,10 @@ public class IITC_WebView extends WebView {
     private Runnable mNavHider;
     private boolean mDisableJs = false;
     private int defaultZoom;
+    private int mSafeAreaTopPx = 0;
+    private int mSafeAreaBottomPx = 0;
+    private int mSafeAreaLeftPx = 0;
+    private int mSafeAreaRightPx = 0;
 
 
     // init web view
@@ -59,6 +64,15 @@ public class IITC_WebView extends WebView {
 
         setSupportPopup(true);
         setWebViewZoom(Integer.parseInt(mSharedPrefs.getString("pref_webview_zoom", "-1")));
+
+        // Set _ncc cookie to disable Niantic's cookie consent banner
+        try {
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptCookie(true);
+            cookieManager.setCookie("https://signin.nianticspatial.com", "_ncc=0; Path=/; Domain=.nianticspatial.com");
+        } catch (Exception e) {
+            Log.w("Could not set _ncc cookie: " + e.getMessage());
+        }
 
         // enable mixed content (http on https...needed for some map tiles) mode
         setWebContentsDebuggingEnabled(true);
@@ -193,9 +207,14 @@ public class IITC_WebView extends WebView {
             attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
             mIitc.getNavigationHelper().showActionBar();
             loadUrl("javascript: $('#updatestatus').show();");
+            getHandler().removeCallbacks(mNavHider);
+            super.setSystemUiVisibility(SYSTEM_UI_FLAG_VISIBLE);
         }
         mIitc.getWindow().setAttributes(attrs);
         mIitc.invalidateOptionsMenu();
+
+        // Update safe area insets when fullscreen mode changes
+        applySafeAreaInsets();
     }
 
     void updateFullscreenStatus() {
@@ -223,6 +242,48 @@ public class IITC_WebView extends WebView {
 
     public IITC_JSInterface getJSInterface() {
         return mJsInterface;
+    }
+
+    /**
+     * Set CSS safe-area-inset values for web content
+     */
+    public void setSafeAreaInsets(int topPx, int rightPx, int bottomPx, int leftPx) {
+        mSafeAreaTopPx = topPx;
+        mSafeAreaRightPx = rightPx;
+        mSafeAreaBottomPx = bottomPx;
+        mSafeAreaLeftPx = leftPx;
+        applySafeAreaInsets();
+    }
+
+    /**
+     * Apply current safe area insets to CSS
+     */
+    public void applySafeAreaInsets() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            return;
+        }
+
+        // Convert pixels to CSS pixels (density-independent)
+        float density = getContext().getResources().getDisplayMetrics().density;
+
+        // Calculate effective values based on app state
+        boolean isFullscreen = isInFullscreen();
+        boolean isDebugging = mIitc.isDebugging();
+
+        int topCss = isFullscreen ? Math.round(mSafeAreaTopPx / density) : 0;
+        int rightCss = Math.round(mSafeAreaRightPx / density);
+        int bottomCss = isDebugging ? 0 : Math.round(mSafeAreaBottomPx / density);
+        int leftCss = Math.round(mSafeAreaLeftPx / density);
+
+        String safeAreaJs = String.format(
+            "document.documentElement.style.setProperty('--safe-area-inset-top', '%dpx');" +
+            "document.documentElement.style.setProperty('--safe-area-inset-right', '%dpx');" +
+            "document.documentElement.style.setProperty('--safe-area-inset-bottom', '%dpx');" +
+            "document.documentElement.style.setProperty('--safe-area-inset-left', '%dpx');",
+            topCss, rightCss, bottomCss, leftCss
+        );
+
+        loadJS(safeAreaJs);
     }
 
     public boolean isConnectedToWifi() {

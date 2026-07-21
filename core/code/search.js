@@ -11,7 +11,7 @@
  * window.addHook('search', function(query) {
  *   query.addResult({
  *     title: 'My Result',
- *     position: L.latLng(0, 0)
+ *     position: new L.LatLng(0, 0)
  *   });
  * });
  *
@@ -125,15 +125,7 @@ IITC.search.setup = function () {
 };
 
 // Redirect all window.search access to IITC.search
-Object.defineProperty(window, 'search', {
-  get() {
-    return IITC.search;
-  },
-  set(value) {
-    IITC.search = value;
-  },
-  configurable: true,
-});
+IITC.registerLegacyAliases(IITC, { search: 'search' });
 
 /*
  * @deprecated - use query.addPortalResult

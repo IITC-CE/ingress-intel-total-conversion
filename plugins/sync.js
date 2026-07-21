@@ -1,13 +1,17 @@
 // @author         xelio
 // @name           Sync
 // @category       Misc
-// @version        0.5.3
+// @version        0.6.0
 // @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.6.0',
+    changes: ['Add sign-out button and display logged-in account email'],
+  },
   {
     version: '0.5.3',
     changes: ['Refactoring: fix eslint'],
@@ -558,6 +562,7 @@ window.plugin.sync.Authorizer = function (options) {
   this.authCallback = options['authCallback'];
   this.authorizing = false;
   this.authorized = false;
+  this._userInitiatedAuth = false;
   this.isAuthed = this.isAuthed.bind(this);
   this.isAuthorizing = this.isAuthorizing.bind(this);
   this.authorize = this.authorize.bind(this);
@@ -601,13 +606,17 @@ window.plugin.sync.Authorizer.prototype.updateSigninStatus = function (self, isS
   } else {
     self.authorized = false;
     window.plugin.sync.logger.log('all', 'Not authorized');
-    window.gapi.auth2.getAuthInstance().signIn();
+    if (self._userInitiatedAuth) {
+      self._userInitiatedAuth = false;
+      window.gapi.auth2.getAuthInstance().signIn();
+    }
   }
 };
 
 window.plugin.sync.Authorizer.prototype.authorize = function () {
   this.authorizing = true;
   this.authorized = false;
+  this._userInitiatedAuth = true;
   const self = this;
 
   window.gapi.client
@@ -687,7 +696,7 @@ window.plugin.sync.generateUUID = function () {
   } else {
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (d + Math.random() * 16) % 16 | 0;
+      var r = ((d + Math.random() * 16) % 16) | 0;
       d = Math.floor(d / 16);
       return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
@@ -737,6 +746,72 @@ window.plugin.sync.toggleAuthButton = function () {
 
   $('#sync-authButton').attr('disabled', authed || authorizing);
   $('#sync-authButton').toggleClass('sync-authButton-dimmed', authed || authorizing);
+
+  $('#sync-signOutButton').toggle(authed === true);
+};
+
+window.plugin.sync.updateAccountInfo = function () {
+  var accountDiv = $('#sync-account');
+  if (accountDiv.length === 0) return;
+
+  if (window.plugin.sync.authorizer.isAuthed()) {
+    try {
+      var profile = window.gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
+      accountDiv.text('Signed in as: ' + profile.getEmail());
+    } catch {
+      accountDiv.text('Signed in');
+    }
+  } else {
+    accountDiv.text('');
+  }
+};
+
+window.plugin.sync.signOut = function () {
+  window.gapi.auth2
+    .getAuthInstance()
+    .signOut()
+    .then(function () {
+      window.plugin.sync.authorizer.authorized = false;
+      window.plugin.sync.authorizer.authorizing = false;
+
+      window.plugin.sync.stopAllIntervals();
+
+      window.plugin.sync.parentFolderID = null;
+      window.plugin.sync.parentFolderIDrequested = false;
+
+      window.plugin.sync.toggleAuthButton();
+      window.plugin.sync.toggleDialogLink();
+      window.plugin.sync.updateAccountInfo();
+
+      window.plugin.sync.logger.log('all', 'Signed out');
+      window.plugin.sync.updateLog(window.plugin.sync.logger.getLogs());
+    });
+};
+
+window.plugin.sync.stopAllIntervals = function () {
+  var fields = window.plugin.sync.registeredPluginsFields;
+  if (!fields || !fields.pluginsfields) return;
+
+  $.each(fields.pluginsfields, function (pluginName, fieldMap) {
+    $.each(fieldMap, function (fieldName, registeredMap) {
+      if (registeredMap.intervalID) {
+        clearInterval(registeredMap.intervalID);
+        registeredMap.intervalID = null;
+      }
+      registeredMap.initialized = false;
+      registeredMap.initializing = false;
+      registeredMap.failed = false;
+      registeredMap.forceFileSearch = true;
+    });
+  });
+
+  $.each(fields.pluginsfields, function (pluginName, fieldMap) {
+    $.each(fieldMap, function (fieldName, registeredMap) {
+      fields.waitingInitialize[registeredMap.getFileName()] = registeredMap;
+    });
+  });
+
+  fields.anyFail = false;
 };
 
 window.plugin.sync.toggleDialogLink = function () {
@@ -753,6 +828,7 @@ window.plugin.sync.showDialog = function () {
   window.dialog({ html: window.plugin.sync.dialogHTML, title: 'Sync', modal: true, id: 'sync-setting' });
   window.plugin.sync.toggleAuthButton();
   window.plugin.sync.toggleDialogLink();
+  window.plugin.sync.updateAccountInfo();
   window.plugin.sync.updateLog(window.plugin.sync.logger.getLogs());
 };
 
@@ -762,6 +838,9 @@ window.plugin.sync.setupDialog = function () {
     '<button id="sync-authButton" class="sync-authButton-dimmed" ' +
     'onclick="setTimeout(function(){window.plugin.sync.authorizer.authorize(true)}, 1)" ' +
     'disabled="disabled">Authorize</button>' +
+    '<button id="sync-signOutButton" style="display:none" ' +
+    'onclick="window.plugin.sync.signOut()">Sign Out</button>' +
+    '<div id="sync-account"></div>' +
     '<div id="sync-log"></div>' +
     '</div>';
   IITC.toolbox.addButton({
@@ -800,6 +879,15 @@ window.plugin.sync.setupCSS = function () {
           .sync-log-message {\
             margin: 0;\
             text-align: right;\
+          }\
+          #sync-signOutButton {\
+            margin-left: 0.5em;\
+          }\
+          #sync-account {\
+            margin: 0.5em 0;\
+            font-size: 0.9em;\
+            color: #ccc;\
+            word-break: break-all;\
           }'
     )
     .appendTo('head');
@@ -812,7 +900,7 @@ var setup = function () {
   window.plugin.sync.setupDialog();
 
   window.plugin.sync.authorizer = new window.plugin.sync.Authorizer({
-    authCallback: [window.plugin.sync.toggleAuthButton, window.plugin.sync.toggleDialogLink],
+    authCallback: [window.plugin.sync.toggleAuthButton, window.plugin.sync.toggleDialogLink, window.plugin.sync.updateAccountInfo],
   });
   window.plugin.sync.registeredPluginsFields = new window.plugin.sync.RegisteredPluginsFields({
     authorizer: window.plugin.sync.authorizer,

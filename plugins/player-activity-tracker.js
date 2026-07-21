@@ -1,13 +1,14 @@
 // @author         breunigs
 // @name           Player activity tracker
 // @category       Layer
-// @version        0.14.0
+// @version        0.14.1
 // @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.14.1', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.14.0',
     changes: ['Using `IITC.utils.formatAgo` instead of the plugin own function', 'Refactoring to make it easier to extend plugin functions'],
@@ -82,7 +83,7 @@ window.plugin.playerTracker.setup = function () {
     }
   });
 
-  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: L.point([1, -34]) });
+  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]) });
 
   window.addHook('publicChatDataAvailable', window.plugin.playerTracker.handleData);
 
@@ -276,7 +277,7 @@ window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
     lngs += latlng[1];
   });
 
-  return L.latLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
+  return new L.LatLng(lats / ev.latlngs.length, lngs / ev.latlngs.length);
 };
 
 window.plugin.playerTracker.drawData = function () {
@@ -371,7 +372,7 @@ window.plugin.playerTracker.drawData = function () {
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
     const markerPos = gllfe(last);
-    var m = L.marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
+    var m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
     m.addEventListener('spiderfiedclick', window.plugin.playerTracker.onClickListener);
 
     // m.bindPopup(title);
@@ -426,16 +427,16 @@ window.plugin.playerTracker.getPortalLink = function (data) {
     .text(window.chat.getChatPortalName(data))
     .prop({
       title: window.chat.getChatPortalName(data),
-      href: window.makePermalink(position),
+      href: IITC.portal.display.makePermalink(position),
     })
     .click(function (event) {
-      window.selectPortalByLatLng(position);
+      IITC.portal.selectByLatLng(position);
       event.preventDefault();
       return false;
     })
     .dblclick(function (event) {
       window.map.setView(position, window.DEFAULT_ZOOM);
-      window.selectPortalByLatLng(position);
+      IITC.portal.selectByLatLng(position);
       event.preventDefault();
       return false;
     });

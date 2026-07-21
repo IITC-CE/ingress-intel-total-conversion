@@ -4,22 +4,20 @@ name: Build PR
 # no access to secrets
 on:
   pull_request:
-    paths-ignore:
-      - '!.github/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.9'
 
@@ -46,7 +44,7 @@ jobs:
           echo $( ls ./build/build/ | grep '.zip' ) > ./build/.metadata/zip_filename
           echo $(date -u +'%Y-%m-%d_%H-%M' -d"$(stat -c %y ./build/build/total-conversion-build.user.js)") > ./build/.metadata/buildstamp
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: build
           include-hidden-files: true

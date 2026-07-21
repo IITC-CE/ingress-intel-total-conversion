@@ -1,13 +1,14 @@
 // @author         breunigs
 // @name           Player level guess
 // @category       Info
-// @version        0.5.11
+// @version        0.5.12
 // @description    Try to determine player levels from the data available in the current view.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.5.12', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.5.11',
     changes: ['Refactoring: fix eslint'],
@@ -301,7 +302,7 @@ window.plugin.guessPlayerLevels.handleAttackData = function (nick, latlngs) {
   }
 
   // circle.range is useless, because it is calculated in degrees (simplified algorithm!)
-  var latlng = L.latLng(circle.y, circle.x);
+  var latlng = new L.LatLng(circle.y, circle.x);
   var range = 0;
   for (let i = 0; i < latlngs.length; i++) {
     var d = latlng.distanceTo([latlngs[i].y, latlngs[i].x]);
@@ -427,7 +428,7 @@ window.plugin.guessPlayerLevels.guess = function () {
   var playersRes = {};
   var playersEnl = {};
   $.each(window.portals, function (guid) {
-    var details = window.portalDetail.get(guid);
+    var details = IITC.portal.details.get(guid);
     if (details) {
       var r = details.resonators;
       $.each(r, function (ind, reso) {
@@ -455,7 +456,7 @@ window.plugin.guessPlayerLevels.guess = function () {
   });
 
   var s = 'Players have at least the following level:\n\n';
-  s += 'Resistance:\t&nbsp;&nbsp;&nbsp;\tEnlightened:\t\n';
+  s += 'Resistance:\t\u00A0\u00A0\u00A0\tEnlightened:\t\n';
 
   var namesR = window.plugin.guessPlayerLevels.sort(playersRes);
   var namesE = window.plugin.guessPlayerLevels.sort(playersEnl);
@@ -466,10 +467,10 @@ window.plugin.guessPlayerLevels.guess = function () {
   function makeRow(nick, lvl, team) {
     if (!nick) return '\t';
 
-    var color = window.COLORS[team];
-    if (nick === window.PLAYER.nickname) color = '#fd6'; // highlight the player's name in a unique colour (similar to @player mentions from others in the chat text itself)
+    var teamClass = team === window.TEAM_ENL ? 'enl' : 'res';
+    if (nick === window.PLAYER.nickname) teamClass = 'self';
 
-    return `<mark class="nickname" style="color:${color}">${nick}</mark>\t${lvl}`;
+    return `<mark class="nickname ${teamClass}">${nick}</mark>\t${lvl}`;
   }
 
   var nick, lvl, lineE, lineR;
@@ -507,7 +508,7 @@ window.plugin.guessPlayerLevels.guess = function () {
         window.plugin.guessPlayerLevels._nameToLevelCache = {};
         // now force all portals through the callback manually
         $.each(window.portals, function (guid) {
-          var details = window.portalDetail.get(guid);
+          var details = IITC.portal.details.get(guid);
           if (details) window.plugin.guessPlayerLevels.extractPortalData({ details: details, success: true });
         });
         // and re-open the dialog (on a minimal timeout - so it's not closed while processing this callback)
@@ -529,6 +530,14 @@ window.plugin.guessPlayerLevels.sort = function (playerHash) {
 };
 
 var setup = function () {
+  var style = document.createElement('style');
+  style.textContent = `
+    .nickname.res { color: ${window.COLORS[window.TEAM_RES]}; }
+    .nickname.enl { color: ${window.COLORS[window.TEAM_ENL]}; }
+    .nickname.self { color: #fd6; }
+  `;
+  document.head.appendChild(style);
+
   window.plugin.guessPlayerLevels.setupCallback();
   window.plugin.guessPlayerLevels.setupChatNickHelper();
 };

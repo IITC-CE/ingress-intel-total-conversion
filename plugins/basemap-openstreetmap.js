@@ -63,6 +63,6 @@ function setup() {
 
   for (var entry of mapOpenStreetMap.LAYERS) {
     var layer = new L.TileLayer(entry.url, entry.options);
-    window.layerChooser.addBaseLayer(layer, entry.name);
+    window.layerChooser.addBaseLayer(layer, entry.name, { isDark: false });
   }
 }

@@ -5,6 +5,7 @@
 // @description    Use the portal fill color to denote the portal level by using the game level colors.
 
 /* exported setup, changelog --eslint */
+/* global IITC -- eslint */
 
 var changelog = [
   {
@@ -30,5 +31,5 @@ function highlightLevelColor(data) {
 }
 
 function setup() {
-  window.addPortalHighlighter('Level Color', highlightLevelColor);
+  IITC.portal.highlighter.add('Level Color', highlightLevelColor);
 }

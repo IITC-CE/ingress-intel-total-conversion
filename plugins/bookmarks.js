@@ -1,13 +1,14 @@
 // @author         ZasoGD
 // @name           Bookmarks for maps and portals
 // @category       Controls
-// @version        0.4.6
+// @version        0.4.7
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync. Supports Multi-Project-Extension
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.4.7', changes: ['Fix data reset issue'] },
   {
     version: '0.4.6',
     changes: ['Refactoring: fix eslint'],
@@ -121,6 +122,7 @@ window.plugin.bookmarks.upgradeToNewStorage = function () {
     var oldStor_1 = JSON.parse(localStorage['plugin-bookmarks-maps-data']);
     var oldStor_2 = JSON.parse(localStorage['plugin-bookmarks-portals-data']);
 
+    window.plugin.bookmarks.bkmrksObj = {};
     window.plugin.bookmarks.bkmrksObj.maps = oldStor_1.bkmrk_maps;
     window.plugin.bookmarks.bkmrksObj.portals = oldStor_2.bkmrk_portals;
     window.plugin.bookmarks.saveStorage();
@@ -133,11 +135,13 @@ window.plugin.bookmarks.upgradeToNewStorage = function () {
 
 window.plugin.bookmarks.createStorage = function () {
   if (!localStorage[window.plugin.bookmarks.KEY_STORAGE]) {
+    window.plugin.bookmarks.bkmrksObj = {};
     window.plugin.bookmarks.bkmrksObj.maps = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
     window.plugin.bookmarks.bkmrksObj.portals = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
     window.plugin.bookmarks.saveStorage();
   }
   if (!localStorage[window.plugin.bookmarks.KEY_STATUS_BOX]) {
+    window.plugin.bookmarks.statusBox = {};
     window.plugin.bookmarks.statusBox.show = 1;
     window.plugin.bookmarks.statusBox.page = 0;
     window.plugin.bookmarks.statusBox.pos = { x: 100, y: 100 };
@@ -280,7 +284,7 @@ window.plugin.bookmarks.loadList = function (typeList) {
       // If it's a portal
       else if (typeList === 'portals') {
         var guid = bkmrk['guid'];
-        const bookmarks_onclick = `$('a.bookmarksLink.selected').removeClass('selected');${returnToMap}window.zoomToAndShowPortal('${guid}', [${latlng}]);return false;`;
+        const bookmarks_onclick = `$('a.bookmarksLink.selected').removeClass('selected');${returnToMap}IITC.portal.zoomToAndShow('${guid}', [${latlng}]);return false;`;
         btn_link = `<a class="bookmarksLink" onclick="${bookmarks_onclick}">${label}</a>`;
       }
       // Create the bookmark
@@ -597,7 +601,7 @@ window.plugin.bookmarks.onSearch = function (query) {
         title: window.escapeHtmlSpecialChars(bookmark.label),
         description: `Map in folder "${window.escapeHtmlSpecialChars(folder.label)}"`,
         icon: '@include_img:images/icon-bookmark-map.png@',
-        position: L.latLng(bookmark.latlng.split(',')),
+        position: new L.LatLng(...bookmark.latlng.split(',')),
         zoom: bookmark.z,
         onSelected: window.plugin.bookmarks.onSearchResultSelected,
       });
@@ -612,7 +616,7 @@ window.plugin.bookmarks.onSearch = function (query) {
         title: window.escapeHtmlSpecialChars(bookmark.label),
         description: `Bookmark in folder "${window.escapeHtmlSpecialChars(folder.label)}"`,
         icon: '@include_img:images/icon-bookmark.png@',
-        position: L.latLng(bookmark.latlng.split(',')),
+        position: new L.LatLng(...bookmark.latlng.split(',')),
         guid: bookmark.guid,
         onSelected: window.plugin.bookmarks.onSearchResultSelected,
       });
@@ -624,9 +628,9 @@ window.plugin.bookmarks.onSearchResultSelected = function (result, event) {
   if (result.guid) {
     // portal
     var guid = result.guid;
-    if (event.type === 'dblclick') window.zoomToAndShowPortal(guid, result.position);
-    else if (window.portals[guid]) window.renderPortalDetails(guid);
-    else window.selectPortalByLatLng(result.position);
+    if (event.type === 'dblclick') IITC.portal.zoomToAndShow(guid, result.position);
+    else if (window.portals[guid]) IITC.portal.display.renderDetails(guid);
+    else IITC.portal.selectByLatLng(result.position);
   } else if (result.zoom) {
     // map
     window.map.setView(result.position, result.zoom);
@@ -964,13 +968,13 @@ window.plugin.bookmarks.autoDrawOnSelect = function () {
   }
 
   if (latlngs.length === 2) {
-    var distance = L.latLng(latlngs[0]).distanceTo(latlngs[1]);
+    var distance = new L.LatLng(...latlngs[0]).distanceTo(latlngs[1]);
     text = 'Distance between portals: ' + distanceElement(distance);
     color = '';
   } else if (latlngs.length === 3) {
     var distances = latlngs.map(function (ll1, i, latlngs) {
       var ll2 = latlngs[(i + 1) % 3];
-      return distanceElement(L.latLng(ll1).distanceTo(ll2));
+      return distanceElement(new L.LatLng(...ll1).distanceTo(ll2));
     });
     text = 'Distances: ' + distances.join(', ');
     color = '';
@@ -1155,7 +1159,7 @@ window.plugin.bookmarks.highlightRefresh = function (data) {
       (data.target === 'all' && data.action === 'reset') ||
       (data.target === 'all' && data.action === 'MPEswitch')
     ) {
-      window.changePortalHighlights('Bookmarked Portals');
+      IITC.portal.highlighter.change('Bookmarked Portals');
     }
   }
 };
@@ -1187,9 +1191,9 @@ window.plugin.bookmarks.resetAllStars = function () {
 };
 
 window.plugin.bookmarks.addStar = function (guid, latlng, lbl) {
-  var star = L.marker(latlng, {
+  var star = new L.Marker(latlng, {
     title: lbl,
-    icon: L.icon({
+    icon: new L.Icon({
       iconUrl: '@include_img:images/marker-star.png@',
       iconAnchor: [15, 40],
       iconSize: [30, 40],
@@ -1197,7 +1201,7 @@ window.plugin.bookmarks.addStar = function (guid, latlng, lbl) {
   });
   window.registerMarkerForOMS(star);
   star.on('spiderfiedclick', function () {
-    window.renderPortalDetails(guid);
+    IITC.portal.display.renderDetails(guid);
   });
 
   window.plugin.bookmarks.starLayers[guid] = star;
@@ -1448,10 +1452,10 @@ var setup = function () {
   // Highlighter - bookmarked portals
   window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.highlightRefresh);
   window.addHook('pluginBkmrksSyncEnd', window.plugin.bookmarks.highlightRefresh);
-  window.addPortalHighlighter('Bookmarked Portals', window.plugin.bookmarks.highlight);
+  IITC.portal.highlighter.add('Bookmarked Portals', window.plugin.bookmarks.highlight);
 
   // Layer - Bookmarked portals
-  window.plugin.bookmarks.starLayerGroup = L.layerGroup();
+  window.plugin.bookmarks.starLayerGroup = new L.LayerGroup();
   window.layerChooser.addOverlay(window.plugin.bookmarks.starLayerGroup, 'Bookmarked Portals', { default: false });
   window.plugin.bookmarks.addAllStars();
   window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.editStar);

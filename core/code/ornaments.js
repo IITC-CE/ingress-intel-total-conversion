@@ -83,7 +83,7 @@ window.ornaments = {
    */
   setup: function () {
     this._portals = {};
-    this.layerGroup = L.layerGroup;
+    this.layerGroup = () => new L.LayerGroup();
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
       this.layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
@@ -132,7 +132,7 @@ window.ornaments = {
       this._portals[portal.options.guid] = ornaments.map(function (ornament) {
         var layer = this.layers['Ornaments'];
         var opacity = this.OVERLAY_OPACITY;
-        var size = this.OVERLAY_SIZE * window.portalMarkerScale();
+        var size = this.OVERLAY_SIZE * IITC.portal.marker.scale();
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
@@ -171,8 +171,8 @@ window.ornaments = {
           layer = this.layers['Excluded ornaments'];
         }
 
-        return L.marker(portal.getLatLng(), {
-          icon: L.icon({
+        return new L.Marker(portal.getLatLng(), {
+          icon: new L.Icon({
             iconUrl: iconUrl,
             iconSize: [size, size],
             iconAnchor: anchor, // https://github.com/IITC-CE/Leaflet.Canvas-Markers/issues/4

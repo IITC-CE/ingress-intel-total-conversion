@@ -46,6 +46,8 @@
  *                         Parameters are guid, success, details.
  * - `paneChanged`: Called when the current pane has changed. On desktop, this changes the current chat pane;
  *                  on mobile, it also switches between map, info, and other panes defined by plugins.
+ * - `baseLayerChanged`: Called when the active base map layer changes, and once on initial load.
+ *                       Provides `{ name, layer, isDark }`, where `isDark` tells whether the map is dark-themed.
  * - `artifactsUpdated`: Called when the set of artifacts (including targets) has changed.
  *                       Parameters are old, new.
  * - `nicknameClicked`: Event triggered when a player's nickname is clicked.

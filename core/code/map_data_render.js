@@ -67,7 +67,7 @@ window.Render.prototype.clearLinksOutsideBounds = function (bounds) {
     // NOTE: our geodesic lines can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on start+end point will be good enough for this check
     var lls = l.getLatLngs();
-    var linkBounds = L.latLngBounds(lls);
+    var linkBounds = new L.LatLngBounds(lls);
 
     if (!bounds.intersects(linkBounds)) {
       this.deleteLinkEntity(guid);
@@ -89,7 +89,7 @@ window.Render.prototype.clearFieldsOutsideBounds = function (bounds) {
     // NOTE: our geodesic polys can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on corner points will be good enough for this check
     var lls = f.getLatLngs();
-    var fieldBounds = L.latLngBounds([lls[0], lls[1]]).extend(lls[2]);
+    var fieldBounds = new L.LatLngBounds([lls[0], lls[1]]).extend(lls[2]);
 
     if (!bounds.intersects(fieldBounds)) {
       this.deleteFieldEntity(guid);
@@ -125,7 +125,7 @@ window.Render.prototype.processDeletedGameEntityGuids = function (deleted) {
 
       if (guid === window.selectedPortal) {
         // the rare case of the selected portal being deleted. clear the details tab and deselect it
-        window.renderPortalDetails(null);
+        IITC.portal.display.renderDetails(null);
       }
 
       this.deleteEntity(guid);
@@ -378,24 +378,7 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     previousData = $.extend(true, {}, p.getDetails());
   }
 
-  var latlng = L.latLng(data.latE6 / 1e6, data.lngE6 / 1e6);
-
-  window.pushPortalGuidPositionCache(data.guid, data.latE6, data.lngE6);
-
-  // check for URL links to portal, and select it if this is the one
-  if (window.urlPortalLL && window.urlPortalLL[0] === latlng.lat && window.urlPortalLL[1] === latlng.lng) {
-    // URL-passed portal found via pll parameter - set the guid-based parameter
-    log.log('urlPortalLL ' + window.urlPortalLL[0] + ',' + window.urlPortalLL[1] + ' matches portal GUID ' + data.guid);
-
-    window.urlPortal = data.guid;
-    window.urlPortalLL = undefined; // clear the URL parameter so it's not matched again
-  }
-  if (window.urlPortal === data.guid) {
-    // URL-passed portal found via guid parameter - set it as the selected portal
-    log.log('urlPortal GUID ' + window.urlPortal + ' found - selecting...');
-    window.selectedPortal = data.guid;
-    window.urlPortal = undefined; // clear the URL parameter so it's not matched again
-  }
+  var latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
   let marker = undefined;
   if (oldPortal) {
@@ -403,24 +386,25 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
     marker = window.portals[data.guid];
     marker.updateDetails(data);
 
-    if (window.portalDetail.isFresh(guid)) {
-      var oldDetails = window.portalDetail.get(guid);
+    if (IITC.portal.details.isFresh(guid)) {
+      var oldDetails = IITC.portal.details.get(guid);
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
-        window.portalDetail.remove(guid);
+        IITC.portal.details.remove(guid);
       }
     }
 
     window.runHooks('portalAdded', { portal: marker, previousData: previousData });
   } else {
-    marker = window.createMarker(latlng, data);
+    marker = IITC.portal.marker.create(latlng, data);
 
     // in case of incomplete data while having fresh details in cache, update the portal with those details
-    if (window.portalDetail.isFresh(guid)) {
-      var oldDetails = window.portalDetail.get(guid);
+    if (IITC.portal.details.isFresh(guid)) {
+      // eslint-disable-next-line no-redeclare
+      var oldDetails = IITC.portal.details.get(guid);
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
-        window.portalDetail.remove(guid);
+        IITC.portal.details.remove(guid);
       } else if (marker.willUpdate(oldDetails)) {
         marker.updateDetails(oldDetails);
       }
@@ -430,7 +414,6 @@ window.Render.prototype.createPortalEntity = function (ent, details) {
 
     window.portals[data.guid] = marker;
   }
-
 
   window.ornaments.addPortal(marker);
 
@@ -481,9 +464,9 @@ window.Render.prototype.createFieldEntity = function (ent) {
 
   var team = window.teamStringToId(ent[2][1]);
   var latlngs = [
-    L.latLng(data.points[0].latE6 / 1e6, data.points[0].lngE6 / 1e6),
-    L.latLng(data.points[1].latE6 / 1e6, data.points[1].lngE6 / 1e6),
-    L.latLng(data.points[2].latE6 / 1e6, data.points[2].lngE6 / 1e6),
+    new L.LatLng(data.points[0].latE6 / 1e6, data.points[0].lngE6 / 1e6),
+    new L.LatLng(data.points[1].latE6 / 1e6, data.points[1].lngE6 / 1e6),
+    new L.LatLng(data.points[2].latE6 / 1e6, data.points[2].lngE6 / 1e6),
   ];
 
   var poly = L.geodesicPolygon(latlngs, {
@@ -552,7 +535,7 @@ window.Render.prototype.createLinkEntity = function (ent) {
   }
 
   var team = window.teamStringToId(ent[2][1]);
-  var latlngs = [L.latLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), L.latLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
+  var latlngs = [new L.LatLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), new L.LatLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
   var poly = L.geodesicPolyline(latlngs, {
     color: window.COLORS[team],
     opacity: 1,
@@ -580,16 +563,16 @@ window.Render.prototype.createLinkEntity = function (ent) {
  * @memberof Render
  */
 window.Render.prototype.rescalePortalMarkers = function () {
-  if (this.portalMarkerScale === undefined || this.portalMarkerScale !== window.portalMarkerScale()) {
-    this.portalMarkerScale = window.portalMarkerScale();
+  if (this.portalMarkerScale === undefined || this.portalMarkerScale !== IITC.portal.marker.scale()) {
+    this.portalMarkerScale = IITC.portal.marker.scale();
 
-    log.log('Render: map zoom ' + window.map.getZoom() + ' changes portal scale to ' + window.portalMarkerScale() + ' - redrawing all portals');
+    log.log('Render: map zoom ' + window.map.getZoom() + ' changes portal scale to ' + IITC.portal.marker.scale() + ' - redrawing all portals');
 
     // NOTE: we're not calling this because it resets highlights - we're calling it as it
     // resets the style (inc size) of all portal markers, applying the new scale
-    window.resetHighlightedPortals();
+    IITC.portal.highlighter.resetAll();
 
-    window.ornaments.reload();    
+    window.ornaments.reload();
   }
 };
 

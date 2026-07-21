@@ -319,11 +319,11 @@ const escapeHtml = function (str, allowedTags = []) {
     return str.replace(/[&<>"']/g, (char) => escapeMap[char]);
   }
 
-  // Create pattern for allowed tags (self-closing and paired)
-  const allowedTagsPattern = new RegExp(`(<\\/?(?:${allowedTags.join('|')})>)`, 'g');
+  // Create pattern for allowed tags (opening with optional class attribute, closing, and self-closing)
+  const allowedTagsPattern = new RegExp(`^<\\/?(?:${allowedTags.join('|')})(?:\\s+class="[^"]*")?>$`);
 
-  // Split text by allowed tags to preserve them
-  const parts = str.split(allowedTagsPattern);
+  // Split text by all HTML tags to process each part individually
+  const parts = str.split(/(<[^>]*>)/g);
 
   return parts
     .map((part) => {
@@ -408,7 +408,7 @@ const textToTable = function (text) {
   for (const row of rows) {
     let rowHtml = '<tr>';
     for (let k = 0; k < row.length; k++) {
-      const cell = IITC.utils.escapeHtml(row[k], ['hr', 'br', 'b', 'i', 'strong', 'em']);
+      const cell = IITC.utils.escapeHtml(row[k], ['hr', 'br', 'b', 'i', 'strong', 'em', 'span', 'mark']);
       const colspan = k === 0 && row.length < columnCount ? ` colspan="${columnCount - row.length + 1}"` : '';
       rowHtml += `<td${colspan}>${cell}</td>`;
     }
@@ -470,7 +470,7 @@ const clampLatLng = function (latlng) {
 const clampLatLngBounds = function (bounds) {
   var SW = bounds.getSouthWest(),
     NE = bounds.getNorthEast();
-  return L.latLngBounds(window.clampLatLng(SW), window.clampLatLng(NE));
+  return new L.LatLngBounds(window.clampLatLng(SW), window.clampLatLng(NE));
 };
 
 /**
@@ -571,19 +571,4 @@ const legacyFunctionMappings = {
   teamStringToId: 'getTeamId',
 };
 
-// Set up synchronization between `window` and `IITC.utils` with new names
-Object.entries(legacyFunctionMappings).forEach(([oldName, newName]) => {
-  // Initialize IITC.utils[newName] if not already defined
-  window.IITC.utils[newName] = window.IITC.utils[newName] || function () {};
-
-  // Define a getter/setter on `window` to synchronize with `IITC.utils`
-  Object.defineProperty(window, oldName, {
-    get() {
-      return window.IITC.utils[newName];
-    },
-    set(newFunc) {
-      window.IITC.utils[newName] = newFunc;
-    },
-    configurable: true,
-  });
-});
+IITC.registerLegacyAliases(window.IITC.utils, legacyFunctionMappings);

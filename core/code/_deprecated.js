@@ -56,8 +56,8 @@ window.getPortalApGain = function (guid) {
   if (p) {
     var data = p.options.data;
 
-    var linkCount = window.getPortalLinksCount(guid);
-    var fieldCount = window.getPortalFieldsCount(guid);
+    var linkCount = IITC.portal.getLinksCount(guid);
+    var fieldCount = IITC.portal.getFieldsCount(guid);
 
     var result = window.portalApGainMaths(data.resCount, linkCount, fieldCount);
     return result;
@@ -75,7 +75,7 @@ window.getPortalApGain = function (guid) {
  * @returns {number} The potential level to which the player can upgrade the portal.
  */
 window.potentialPortalLevel = function (d) {
-  var current_level = window.getPortalLevel(d);
+  var current_level = IITC.portal.getLevel(d);
   var potential_level = current_level;
 
   if (window.PLAYER.team === d.team) {
@@ -132,9 +132,9 @@ window.findPortalLatLng = function (guid) {
   }
 
   // not found in portals - try the cached (and possibly stale) details - good enough for location
-  var details = window.portalDetail.get(guid);
+  var details = IITC.portal.details.get(guid);
   if (details) {
-    return L.latLng(details.latE6 / 1e6, details.lngE6 / 1e6);
+    return new L.LatLng(details.latE6 / 1e6, details.lngE6 / 1e6);
   }
 
   // now try searching through fields
@@ -143,7 +143,7 @@ window.findPortalLatLng = function (guid) {
 
     for (var i in f.points) {
       if (f.points[i].guid === guid) {
-        return L.latLng(f.points[i].latE6 / 1e6, f.points[i].lngE6 / 1e6);
+        return new L.LatLng(f.points[i].latE6 / 1e6, f.points[i].lngE6 / 1e6);
       }
     }
   }
@@ -152,10 +152,10 @@ window.findPortalLatLng = function (guid) {
   for (var lguid in window.links) {
     var l = window.links[lguid].options.data;
     if (l.oGuid === guid) {
-      return L.latLng(l.oLatE6 / 1e6, l.oLngE6 / 1e6);
+      return new L.LatLng(l.oLatE6 / 1e6, l.oLngE6 / 1e6);
     }
     if (l.dGuid === guid) {
-      return L.latLng(l.dLatE6 / 1e6, l.dLngE6 / 1e6);
+      return new L.LatLng(l.dLatE6 / 1e6, l.dLngE6 / 1e6);
     }
   }
 
@@ -211,3 +211,80 @@ window.renderUpdateStatus = function () {
 window.smartphoneInfo = function (selectedPortalData) {
   return IITC.statusbar.portal.update(selectedPortalData);
 };
+
+/**
+ * How much space to leave for scrollbars, in pixels, default 20.
+ * @type {number}
+ * @memberof config_options
+ * @deprecated Use CSS variable `--hidden-scrollbar-width` instead
+ */
+Object.defineProperty(window, 'HIDDEN_SCROLLBAR_ASSUMED_WIDTH', {
+  get: function () {
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hidden-scrollbar-width'), 10);
+  },
+  set: function (value) {
+    document.documentElement.style.setProperty('--hidden-scrollbar-width', value + 'px');
+  },
+  configurable: true,
+});
+
+/**
+ * How wide should the sidebar be, in pixels, default 300.
+ * @type {number}
+ * @memberof config_options
+ * @deprecated Use CSS variable `--sidebar-width` instead
+ */
+Object.defineProperty(window, 'SIDEBAR_WIDTH', {
+  get: function () {
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width'), 10);
+  },
+  set: function (value) {
+    document.documentElement.style.setProperty('--sidebar-width', value + 'px');
+  },
+  configurable: true,
+});
+
+/**
+ * Controls height of chat when chat is collapsed, in pixels, default 60.
+ * @type {number}
+ * @memberof config_options
+ * @deprecated Use CSS variable `--chat-shrinked` instead
+ */
+Object.defineProperty(window, 'CHAT_SHRINKED', {
+  get: function () {
+    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--chat-shrinked'), 10);
+  },
+  set: function (value) {
+    document.documentElement.style.setProperty('--chat-shrinked', value + 'px');
+  },
+  configurable: true,
+});
+
+/**
+ * Portal GUID if the original URL had it.
+ * @type {string|null}
+ * @memberof storage_variables
+ * @deprecated use IITC.portal.selectWhenLoadedByLatLng(latLng: L.LatLng);
+ */
+window.urlPortal = null;
+
+/**
+ * Portal lng/lat if the orignial URL had it.
+ * @type {object|null}
+ * @memberof storage_variables
+ * @deprecated use IITC.portal.selectWhenLoadedByGuid(guid: PortalGUID);
+ */
+window.urlPortalLL = null;
+
+/**
+ * Pushes a portal GUID and its position into a cache.
+ *
+ * @function
+ * @name pushPortalGuidPositionCache
+ * @param {string} guid - The GUID of the portal.
+ * @param {number} latE6 - The latitude in E6 format.
+ * @param {number} lngE6 - The longitude in E6 format.
+ *
+ * @deprecated GUIDs are no longer cached.
+ */
+window.pushPortalGuidPositionCache = function () {};
