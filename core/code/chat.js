@@ -661,7 +661,7 @@ chat.postMsg = function () {
   var c = chat.getActive();
   var channel = chat.getChannelDesc(c);
 
-  var msg = $.trim($('#chatinput input').val());
+  var msg = ($('#chatinput input').val() || '').trim();
   if (!msg || msg === '') return;
 
   if (channel.sendMessage) {
