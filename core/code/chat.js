@@ -1,82 +1,16 @@
+/* global log, PLAYER, L, IITC, app */
+
 /**
- * @file Namespace for chat-related functionalities.
+ * Chat-panel UI framework: tabs, input, scrolling and the channel-registration API.
+ * The COMM data layer lives in comm.js
  *
- * @module chat
+ * @memberof IITC
+ * @namespace chat
  */
-var chat = function () {};
-window.chat = chat;
 
-// List of functions to track for synchronization between chat and comm
-const legacyFunctions = [
-  'genPostData',
-  'updateOldNewHash',
-  'parseMsgData',
-  'writeDataToHash',
-  'renderText',
-  'getChatPortalName',
-  'renderPortal',
-  'renderFactionEnt',
-  'renderPlayer',
-  'renderMarkupEntity',
-  'renderMarkup',
-  'renderTimeCell',
-  'renderNickCell',
-  'renderMsgCell',
-  'renderMsgRow',
-  'renderDivider',
-  'renderData',
-];
-const newCommApi = [
-  '_genPostData',
-  '_updateOldNewHash',
-  'parseMsgData',
-  '_writeDataToHash',
-  'renderText',
-  'getChatPortalName',
-  'renderPortal',
-  'renderFactionEnt',
-  'renderPlayer',
-  'renderMarkupEntity',
-  'renderMarkup',
-  'renderTimeCell',
-  'renderNickCell',
-  'renderMsgCell',
-  'renderMsgRow',
-  'renderDivider',
-  'renderData',
-];
-
-// Function to map legacy function names to their new names in comm
-function mapLegacyFunctionNameToCommApi(functionName) {
-  const index = legacyFunctions.indexOf(functionName);
-  return index !== -1 ? newCommApi[index] : functionName;
-}
-
-// Create a proxy for chat to ensure backward compatibility of migrated functions from chat to comm
-window.chat = new Proxy(window.chat, {
-  get(target, prop, receiver) {
-    if (prop in target) {
-      // Return the property from chat if it's defined
-      return target[prop];
-    } else if (legacyFunctions.includes(prop)) {
-      // Map the legacy function name to its new name in comm and return the corresponding function
-      const commProp = mapLegacyFunctionNameToCommApi(prop);
-      return window.IITC.comm[commProp];
-    }
-    // Return default value if the property is not found
-    return Reflect.get(target, prop, receiver);
-  },
-  set(target, prop, value) {
-    if (legacyFunctions.includes(prop)) {
-      // Map the legacy function name to its new name in comm and synchronize the function between chat and comm
-      const commProp = mapLegacyFunctionNameToCommApi(prop);
-      window.IITC.comm[commProp] = value;
-    }
-    // Update or add the property in chat
-    target[prop] = value;
-    return true; // Indicates that the assignment was successful
-  },
-});
+// Create the IITC.chat namespace holding the chat-panel UI framework
+IITC.chat = {};
+const chat = IITC.chat;
 
 //
 // common
@@ -85,7 +19,7 @@ window.chat = new Proxy(window.chat, {
 /**
  * Adds a nickname to the chat input.
  *
- * @function addNickname
+ * @memberof IITC.chat
  * @param {string} nick - The nickname to add.
  */
 chat.addNickname = function (nick) {
@@ -97,7 +31,7 @@ chat.addNickname = function (nick) {
 /**
  * Handles click events on nicknames in the chat.
  *
- * @function nicknameClicked
+ * @memberof IITC.chat
  * @param {Event} event - The click event.
  * @param {string} nickname - The clicked nickname.
  * @returns {boolean} Always returns false.
@@ -172,7 +106,7 @@ chat.channels = [];
 /**
  * Gets the name of the active chat tab.
  *
- * @function getActive
+ * @memberof IITC.chat
  * @returns {string} The name of the active chat tab.
  */
 chat.getActive = function () {
@@ -182,7 +116,7 @@ chat.getActive = function () {
 /**
  * Converts a chat tab name to its corresponding channel object.
  *
- * @function getChannelDesc
+ * @memberof IITC.chat
  * @param {string} tab - The name of the chat tab.
  * @returns {ChannelDescription} The corresponding channel name ('faction', 'alerts', or 'all').
  */
@@ -199,7 +133,7 @@ chat.getChannelDesc = function (tab) {
  * that need to process COMM data even when the user is not actively viewing the COMM channels.
  * It tracks the requested channels for each plugin instance and updates the global state accordingly.
  *
- * @function backgroundChannelData
+ * @memberof IITC.chat
  * @param {string} instance - A unique identifier for the plugin or instance requesting background COMM data.
  * @param {string} channel - The name of the COMM channel ('all', 'faction', or 'alerts').
  * @param {boolean} flag - Set to true to request data for the specified channel, false to stop requesting.
@@ -227,7 +161,7 @@ chat.backgroundChannelData = function (instance, channel, flag) {
  * Requests chat messages for the currently active chat tab and background channels.
  * It calls the appropriate request function based on the active tab or background channels.
  *
- * @function request
+ * @memberof IITC.chat
  */
 chat.request = function () {
   var channel = chat.getActive();
@@ -242,7 +176,7 @@ chat.request = function () {
  * Checks if the currently selected chat tab needs more messages.
  * This function is triggered by scroll events and loads older messages when the user scrolls to the top.
  *
- * @function needMoreMessages
+ * @memberof IITC.chat
  */
 chat.needMoreMessages = function () {
   var activeTab = chat.getActive();
@@ -263,7 +197,7 @@ chat.needMoreMessages = function () {
  * Chooses and activates a specified chat tab.
  * Also triggers an early refresh of the chat data when switching tabs.
  *
- * @function chooseTab
+ * @memberof IITC.chat
  * @param {string} tab - The name of the chat tab to activate ('all', 'faction', or 'alerts').
  */
 chat.chooseTab = function (tab) {
@@ -319,7 +253,7 @@ chat.chooseTab = function (tab) {
  * When expanded, the chat window covers a larger area of the screen.
  * This function also ensures that the chat is scrolled to the bottom when collapsed.
  *
- * @function toggle
+ * @memberof IITC.chat
  */
 chat.toggle = function () {
   var c = $('#chat, #chatcontrols');
@@ -339,7 +273,7 @@ chat.toggle = function () {
 /**
  * Displays the chat interface and activates a specified chat tab.
  *
- * @function show
+ * @memberof IITC.chat
  * @param {string} name - The name of the chat tab to show and activate.
  */
 chat.show = function (name) {
@@ -358,7 +292,7 @@ chat.show = function (name) {
  * This function is triggered by a click event on the chat tab. It reads the tab name from the event target
  * and activates the corresponding chat tab.
  *
- * @function chooser
+ * @memberof IITC.chat
  * @param {Event} event - The event triggered by clicking a chat tab.
  */
 chat.chooser = function (event) {
@@ -377,7 +311,7 @@ chat.chooser = function (event) {
  * This function is designed to keep the scroll position fixed when old messages are loaded, and to automatically scroll
  * to the bottom when new messages are added if the user is already at the bottom of the chat.
  *
- * @function keepScrollPosition
+ * @memberof IITC.chat
  * @param {jQuery} box - The jQuery object of the chat box.
  * @param {number} scrollBefore - The scroll position before new messages were added.
  * @param {boolean} isOldMsgs - Indicates if the added messages are older messages.
@@ -403,8 +337,6 @@ chat.keepScrollPosition = function (box, scrollBefore, isOldMsgs) {
 /**
  * Create and insert into the DOM/Mobile app the channel tab
  *
- * @function createChannelTab
- * @memberof chat
  * @param {ChannelDescription} channelDesc - channel description
  * @static
  */
@@ -440,7 +372,7 @@ var isTabsSetup = false;
  *
  * If tabs are already created, a tab is created for this channel as well
  *
- * @function addChannel
+ * @memberof IITC.chat
  * @param {ChannelDescription} channelDesc - channel description
  */
 chat.addChannel = function (channelDesc) {
@@ -469,7 +401,7 @@ chat.addChannel = function (channelDesc) {
 /**
  * Sets up all channels starting from intel COMM
  *
- * @function setupTabs
+ * @memberof IITC.chat
  */
 chat.setupTabs = function () {
   isTabsSetup = true;
@@ -490,7 +422,7 @@ chat.setupTabs = function () {
   /**
    * Initiates a request for public chat data.
    *
-   * @function requestPublic
+   * @memberof IITC.chat
    * @param {boolean} getOlderMsgs - Whether to retrieve older messages.
    * @param {boolean} [isRetry=false] - Whether the request is a retry.
    */
@@ -501,7 +433,7 @@ chat.setupTabs = function () {
   /**
    * Requests faction chat messages.
    *
-   * @function requestFaction
+   * @memberof IITC.chat
    * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
    * @param {boolean} [isRetry=false] - Flag to indicate if this is a retry attempt.
    */
@@ -512,7 +444,7 @@ chat.setupTabs = function () {
   /**
    * Initiates a request for alerts chat data.
    *
-   * @function requestAlerts
+   * @memberof IITC.chat
    * @param {boolean} getOlderMsgs - Whether to retrieve older messages.
    * @param {boolean} [isRetry=false] - Whether the request is a retry.
    */
@@ -523,7 +455,7 @@ chat.setupTabs = function () {
   /**
    * Renders public chat in the UI.
    *
-   * @function renderPublic
+   * @memberof IITC.chat
    * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
    */
   chat.renderPublic = function (oldMsgsWereAdded) {
@@ -533,7 +465,7 @@ chat.setupTabs = function () {
   /**
    * Renders faction chat.
    *
-   * @function renderFaction
+   * @memberof IITC.chat
    * @param {boolean} oldMsgsWereAdded - Indicates if old messages were added in the current rendering.
    */
   chat.renderFaction = function (oldMsgsWereAdded) {
@@ -543,7 +475,7 @@ chat.setupTabs = function () {
   /**
    * Renders alerts chat in the UI.
    *
-   * @function renderAlerts
+   * @memberof IITC.chat
    * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
    */
   chat.renderAlerts = function (oldMsgsWereAdded) {
@@ -554,7 +486,7 @@ chat.setupTabs = function () {
 /**
  * Sets up the chat interface.
  *
- * @function setup
+ * @memberof IITC.chat
  */
 chat.setup = function () {
   chat.setupTabs();
@@ -588,7 +520,7 @@ chat.setup = function () {
  * Sets up the time display in the chat input box.
  * This function updates the time displayed next to the chat input field every minute to reflect the current time.
  *
- * @function setupTime
+ * @memberof IITC.chat
  */
 chat.setupTime = function () {
   var inputTime = $('#chatinput time');
@@ -614,7 +546,7 @@ chat.setupTime = function () {
 /**
  * Handles tab completion in chat input.
  *
- * @function handleTabCompletion
+ * @memberof IITC.chat
  */
 chat.handleTabCompletion = function () {
   var el = $('#chatinput input');
@@ -655,7 +587,7 @@ chat.handleTabCompletion = function () {
 /**
  * Posts a chat message to the currently active chat tab.
  *
- * @function postMsg
+ * @memberof IITC.chat
  */
 chat.postMsg = function () {
   var c = chat.getActive();
@@ -673,7 +605,7 @@ chat.postMsg = function () {
 /**
  * Sets up the chat message posting functionality.
  *
- * @function setupPosting
+ * @memberof IITC.chat
  */
 chat.setupPosting = function () {
   if (!window.isSmartphone()) {
@@ -706,7 +638,7 @@ chat.setupPosting = function () {
  * Legacy function for rendering chat messages. Used for backward compatibility with plugins.
  *
  * @deprecated
- * @function renderMsg
+ * @memberof IITC.chat
  * @param {string} msg - The chat message.
  * @param {string} nick - The nickname of the player who sent the message.
  * @param {number} time - The timestamp of the message.
@@ -746,7 +678,7 @@ chat.renderMsg = function (msg, nick, time, team, msgToPlayer, systemNarrowcast)
  * Used for backward compatibility with plugins.
  *
  * @deprecated
- * @function tabToChannel
+ * @memberof IITC.chat
  * @param {string} tab - The name of the chat tab.
  * @returns {string} The corresponding channel name ('faction', 'alerts', or 'all').
  */
@@ -756,4 +688,74 @@ chat.tabToChannel = function (tab) {
   return 'all';
 };
 
-/* global log, PLAYER, L, IITC, app */
+// List of functions to track for synchronization between chat and comm
+const legacyFunctions = [
+  'genPostData',
+  'updateOldNewHash',
+  'parseMsgData',
+  'writeDataToHash',
+  'renderText',
+  'getChatPortalName',
+  'renderPortal',
+  'renderFactionEnt',
+  'renderPlayer',
+  'renderMarkupEntity',
+  'renderMarkup',
+  'renderTimeCell',
+  'renderNickCell',
+  'renderMsgCell',
+  'renderMsgRow',
+  'renderDivider',
+  'renderData',
+];
+const newCommApi = [
+  '_genPostData',
+  '_updateOldNewHash',
+  'parseMsgData',
+  '_writeDataToHash',
+  'renderText',
+  'getChatPortalName',
+  'renderPortal',
+  'renderFactionEnt',
+  'renderPlayer',
+  'renderMarkupEntity',
+  'renderMarkup',
+  'renderTimeCell',
+  'renderNickCell',
+  'renderMsgCell',
+  'renderMsgRow',
+  'renderDivider',
+  'renderData',
+];
+
+// Function to map legacy function names to their new names in comm
+function mapLegacyFunctionNameToCommApi(functionName) {
+  const index = legacyFunctions.indexOf(functionName);
+  return index !== -1 ? newCommApi[index] : functionName;
+}
+
+// Create a proxy for chat to ensure backward compatibility of migrated functions from chat to comm
+window.chat = new Proxy(chat, {
+  get(target, prop, receiver) {
+    if (prop in target) {
+      // Return the property from chat if it's defined
+      return target[prop];
+    } else if (legacyFunctions.includes(prop)) {
+      // Map the legacy function name to its new name in comm and return the corresponding function
+      const commProp = mapLegacyFunctionNameToCommApi(prop);
+      return window.IITC.comm[commProp];
+    }
+    // Return default value if the property is not found
+    return Reflect.get(target, prop, receiver);
+  },
+  set(target, prop, value) {
+    if (legacyFunctions.includes(prop)) {
+      // Map the legacy function name to its new name in comm and synchronize the function between chat and comm
+      const commProp = mapLegacyFunctionNameToCommApi(prop);
+      window.IITC.comm[commProp] = value;
+    }
+    // Update or add the property in chat
+    target[prop] = value;
+    return true; // Indicates that the assignment was successful
+  },
+});
