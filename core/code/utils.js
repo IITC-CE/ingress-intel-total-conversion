@@ -515,6 +515,21 @@ const getTeamId = (input) => {
   return window.TEAM_NONE;
 };
 
+/**
+ * Checks whether a DOM element is currently visible, matching jQuery's ':visible' semantics
+ * (the element occupies space in the layout). Uses an offset-based test rather than inspecting
+ * the element's own `display`, so an element hidden through a `display:none` ancestor is correctly
+ * reported as not visible.
+ *
+ * @memberof IITC.utils
+ * @private
+ * @param {Element} element - The DOM element to test.
+ * @returns {boolean} True if the element is visible, false otherwise.
+ */
+const _isVisible = (element) => {
+  return !!element && (element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0);
+};
+
 IITC.utils = {
   getURLParam,
   getCookie,
@@ -541,6 +556,7 @@ IITC.utils = {
   clampLatLngBounds,
   isPointInPolygon,
   getTeamId,
+  _isVisible,
 };
 
 // Map of legacy function names to their new names (or the same name if not renamed)
