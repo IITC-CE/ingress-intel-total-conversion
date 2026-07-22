@@ -1,3 +1,5 @@
+/* global log, map, chat, IITC, L */
+
 /**
  * Namespace for comm-related functionalities.
  *
@@ -54,7 +56,7 @@ var _channelsData = {};
 /**
  * Initialize the channel data.
  *
- * @function IITC.comm._initChannelData
+ * @memberof IITC.comm
  * @private
  * @param {chat.ChannelDescription} id - The channel id.
  */
@@ -75,42 +77,53 @@ function _initChannelData(id) {
  * @memberof IITC.comm
  */
 let portalTemplate =
-  '<a onclick="IITC.portal.selectByLatLng({{ lat }}, {{ lng }});return false" title="{{ title }}" href="{{ url }}" class="bidi-isolate help">{{ portal_name }}</a>';
+  '<a onclick="IITC.portal.selectByLatLng({lat}, {lng});return false" title="{title}" href="{url}" class="bidi-isolate help">{portal_name}</a>';
 /**
  * Template for time cell.
  * @type {String}
  * @memberof IITC.comm
  */
-let timeCellTemplate = '<td><time class="{{ class_names }}" title="{{ time_title }}" data-timestamp="{{ unixtime }}">{{ time }}</time></td>';
+let timeCellTemplate = '<td><time class="{class_names}" title="{time_title}" data-timestamp="{unixtime}">{time}</time></td>';
 /**
  * Template for player's nickname cell.
  * @type {String}
  * @memberof IITC.comm
  */
-let nickCellTemplate = '<td><span class="invisep">&lt;</span><mark class="{{ class_names }}">{{ nick }}</mark><span class="invisep">&gt;</span></td>';
+let nickCellTemplate = '<td><span class="invisep">&lt;</span><mark class="{class_names}">{nick}</mark><span class="invisep">&gt;</span></td>';
 /**
  * Template for chat message text cell.
  * @type {String}
  * @memberof IITC.comm
  */
-let msgCellTemplate = '<td class="{{ class_names }}">{{ msg }}</td>';
+let msgCellTemplate = '<td class="{class_names}">{msg}</td>';
 /**
  * Template for message row, includes cells for time, player nickname and message text.
  * @type {String}
  * @memberof IITC.comm
  */
-let msgRowTemplate = '<tr data-guid="{{ guid }}" class="{{ class_names }}">{{ time_cell }}{{ nick_cell }}{{ msg_cell }}</tr>';
+let msgRowTemplate = '<tr data-guid="{guid}" class="{class_names}">{time_cell}{nick_cell}{msg_cell}</tr>';
 /**
  * Template for message divider.
  * @type {String}
  * @memberof IITC.comm
  */
-let dividerTemplate = '<tr class="divider"><td><hr></td><td>{{ text }}</td><td><hr></td></tr>';
+let dividerTemplate = '<tr class="divider"><td><hr></td><td>{text}</td><td><hr></td></tr>';
+
+/**
+ * Fills a template with data, accepting both the modern `{key}` and the legacy `{{ key }}` placeholder
+ *
+ * @param {string} template - Template string with `{key}` (or legacy `{{ key }}`) placeholders
+ * @param {Object} data - Values keyed by placeholder name
+ * @returns {string} The filled template string
+ */
+function fillTemplate(template, data) {
+  return L.Util.template(template.replace(/\{\{\s*([\w-]+)\s*\}\}/g, '{$1}'), data);
+}
 
 /**
  * Returns the coordinates for the message to be sent, default is the center of the map.
  *
- * @function IITC.comm.getLatLngForSendingMessage
+ * @memberof IITC.comm
  * @returns {L.LatLng}
  */
 function getLatLngForSendingMessage() {
@@ -120,7 +133,7 @@ function getLatLngForSendingMessage() {
 /**
  * Updates the oldest and newest message timestamps and GUIDs in the chat storage.
  *
- * @function IITC.comm._updateOldNewHash
+ * @memberof IITC.comm
  * @private
  * @param {Object} newData - The new chat data received.
  * @param {Object} storageHash - The chat storage object.
@@ -161,7 +174,7 @@ function _updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder) 
 /**
  * Parses comm message data into a more convenient format.
  *
- * @function IITC.comm.parseMsgData
+ * @memberof IITC.comm
  * @param {Object} data - The raw comm message data.
  * @returns {Object} The parsed comm message data.
  */
@@ -219,7 +232,7 @@ function parseMsgData(data) {
 /**
  * Writes new chat data to the chat storage and manages the order of messages.
  *
- * @function IITC.comm._writeDataToHash
+ * @memberof IITC.comm
  * @private
  * @param {Object} newData - The new chat data received.
  * @param {Object} storageHash - The chat storage object.
@@ -250,7 +263,7 @@ function _writeDataToHash(newData, storageHash, isOlderMsgs, isAscendingOrder) {
 /**
  * Posts a chat message to intel comm context.
  *
- * @function IITC.comm.sendChatMessage
+ * @memberof IITC.comm
  * @param {string} tab intel tab name (either all or faction)
  * @param {string} msg message to be sent
  */
@@ -285,7 +298,7 @@ var _oldBBox = null;
 /**
  * Generates post data for chat requests.
  *
- * @function IITC.comm._genPostData
+ * @memberof IITC.comm
  * @private
  * @param {string} channel - The chat channel.
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
@@ -375,7 +388,7 @@ var _requestRunning = {};
 /**
  * Requests chat messages.
  *
- * @function IITC.comm.requestChannel
+ * @memberof IITC.comm
  * @param {string} channel - Comm Intel channel (all/faction/alerts)
  * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
  * @param {boolean} [isRetry=false] - Flag to indicate if this is a retry attempt.
@@ -407,7 +420,7 @@ function requestChannel(channel, getOlderMsgs, isRetry) {
 /**
  * Handles faction chat response.
  *
- * @function IITC.comm._handleChannel
+ * @memberof IITC.comm
  * @private
  * @param {string} channel - Comm Intel channel (all/faction/alerts)
  * @param {Object} data - Response data from server.
@@ -449,7 +462,7 @@ function _handleChannel(channel, data, olderMsgs, ascendingTimestampOrder) {
 /**
  * Renders intel chat.
  *
- * @function IITC.comm.renderChannel
+ * @memberof IITC.comm
  * @param {string} channel - Comm Intel channel (all/faction/alerts)
  * @param {boolean} oldMsgsWereAdded - Indicates if old messages were added in the current rendering.
  */
@@ -465,7 +478,7 @@ function renderChannel(channel, oldMsgsWereAdded) {
 /**
  * Renders text for the chat, converting plain text to HTML and adding links.
  *
- * @function IITC.comm.renderText
+ * @memberof IITC.comm
  * @param {Object} text - An object containing the plain text to render.
  * @returns {string} The rendered HTML string.
  */
@@ -512,7 +525,7 @@ const portalNameTransformations = [
  * Overrides portal names used repeatedly in chat, such as 'US Post Office', with more specific names.
  * Applies a series of transformations to the portal name based on the portal markup.
  *
- * @function IITC.comm.getChatPortalName
+ * @memberof IITC.comm
  * @param {Object} markup - An object containing portal markup, including the name and address.
  * @returns {string} The processed portal name.
  */
@@ -529,7 +542,7 @@ function getChatPortalName(markup) {
 /**
  * Renders a portal link for use in the chat.
  *
- * @function IITC.comm.renderPortal
+ * @memberof IITC.comm
  * @param {Object} portal - The portal data.
  * @returns {string} HTML string of the portal link.
  */
@@ -539,18 +552,19 @@ function renderPortal(portal) {
   const permalink = IITC.portal.display.makePermalink([lat, lng]);
   const portalName = IITC.comm.getChatPortalName(portal);
 
-  return IITC.comm.portalTemplate
-    .replace('{{ lat }}', lat.toString())
-    .replace('{{ lng }}', lng.toString())
-    .replace('{{ title }}', portal.address)
-    .replace('{{ url }}', permalink)
-    .replace('{{ portal_name }}', portalName);
+  return fillTemplate(IITC.comm.portalTemplate, {
+    lat: lat.toString(),
+    lng: lng.toString(),
+    title: portal.address,
+    url: permalink,
+    portal_name: portalName,
+  });
 }
 
 /**
  * Renders a faction entity for use in the chat.
  *
- * @function IITC.comm.renderFactionEnt
+ * @memberof IITC.comm
  * @param {Object} faction - The faction data.
  * @returns {string} HTML string representing the faction.
  */
@@ -564,7 +578,7 @@ function renderFactionEnt(faction) {
 /**
  * Renders a player's nickname in chat.
  *
- * @function IITC.comm.renderPlayer
+ * @memberof IITC.comm
  * @param {Object} player - The player object containing nickname and team.
  * @param {boolean} at - Whether to prepend '@' to the nickname.
  * @param {boolean} sender - Whether the player is the sender of a message.
@@ -591,7 +605,7 @@ function renderPlayer(player, at, sender) {
 /**
  * Renders a chat message entity based on its type.
  *
- * @function IITC.comm.renderMarkupEntity
+ * @memberof IITC.comm
  * @param {Array} ent - The entity array, where the first element is the type and the second element is the data.
  * @returns {string} The HTML string representing the chat message entity.
  */
@@ -619,7 +633,7 @@ function renderMarkupEntity(ent) {
 /**
  * Renders the markup of a chat message, converting special entities like player names, portals, etc., into HTML.
  *
- * @function IITC.comm.renderMarkup
+ * @memberof IITC.comm
  * @param {Array} markup - The markup array of a chat message.
  * @returns {string} The HTML string representing the complete rendered chat message.
  */
@@ -703,7 +717,7 @@ const messageTransformFunctions = [
  * Assumes all transformations return a new markup array.
  * May be used to build an entirely new markup to be rendered without altering the original one.
  *
- * @function IITC.comm.transformMessage
+ * @memberof IITC.comm
  * @param {Object} data - The data for the message, including time, player, and message content.
  * @returns {Object} The transformed markup array.
  */
@@ -723,7 +737,7 @@ const transformMessage = (data) => {
  * Renders a cell in the chat table to display the time a message was sent.
  * Formats the time and adds it to a <time> HTML element with a tooltip showing the full date and time.
  *
- * @function IITC.comm.renderTimeCell
+ * @memberof IITC.comm
  * @param {number} unixtime - The timestamp of the message.
  * @param {string} classNames - Additional class names to be added to the time cell.
  * @returns {string} The HTML string representing a table cell with the formatted time.
@@ -737,44 +751,45 @@ function renderTimeCell(unixtime, classNames) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
-  return IITC.comm.timeCellTemplate
-    .replace('{{ class_names }}', classNames)
-    .replace('{{ datetime }}', datetime)
-    .replace('{{ time_title }}', datetime_title)
-    .replace('{{ unixtime }}', unixtime.toString())
-    .replace('{{ time }}', time);
+  return fillTemplate(IITC.comm.timeCellTemplate, {
+    class_names: classNames,
+    datetime: datetime,
+    time_title: datetime_title,
+    unixtime: unixtime.toString(),
+    time: time,
+  });
 }
 
 /**
  * Renders a cell in the chat table for a player's nickname.
  * Wraps the nickname in <mark> HTML element for highlighting.
  *
- * @function IITC.comm.renderNickCell
+ * @memberof IITC.comm
  * @param {string} nick - The nickname of the player.
  * @param {string} classNames - Additional class names to be added to the nickname cell.
  * @returns {string} The HTML string representing a table cell with the player's nickname.
  */
 function renderNickCell(nick, classNames) {
-  return IITC.comm.nickCellTemplate.replace('{{ class_names }}', classNames).replace('{{ nick }}', nick);
+  return fillTemplate(IITC.comm.nickCellTemplate, { class_names: classNames, nick: nick });
 }
 
 /**
  * Renders a cell in the chat table for a chat message.
  * The message is inserted as inner HTML of the table cell.
  *
- * @function IITC.comm.renderMsgCell
+ * @memberof IITC.comm
  * @param {string} msg - The chat message to be displayed.
  * @param {string} classNames - Additional class names to be added to the message cell.
  * @returns {string} The HTML string representing a table cell with the chat message.
  */
 function renderMsgCell(msg, classNames) {
-  return IITC.comm.msgCellTemplate.replace('{{ class_names }}', classNames).replace('{{ msg }}', msg);
+  return fillTemplate(IITC.comm.msgCellTemplate, { class_names: classNames, msg: msg });
 }
 
 /**
  * Renders a row for a chat message including time, nickname, and message cells.
  *
- * @function IITC.comm.renderMsgRow
+ * @memberof IITC.comm
  * @param {Object} data - The data for the message, including time, player, and message content.
  * @returns {string} The HTML string representing a row in the chat table.
  */
@@ -806,29 +821,30 @@ function renderMsgRow(data) {
     className = 'faction';
   }
 
-  return IITC.comm.msgRowTemplate
-    .replace('{{ class_names }}', className)
-    .replace('{{ guid }}', data.guid)
-    .replace('{{ time_cell }}', timeCell)
-    .replace('{{ nick_cell }}', nickCell)
-    .replace('{{ msg_cell }}', msgCell);
+  return fillTemplate(IITC.comm.msgRowTemplate, {
+    class_names: className,
+    guid: data.guid,
+    time_cell: timeCell,
+    nick_cell: nickCell,
+    msg_cell: msgCell,
+  });
 }
 
 /**
  * Renders a divider row in the chat table.
  *
- * @function IITC.comm.renderDivider
+ * @memberof IITC.comm
  * @param {string} text - Text to display within the divider row.
  * @returns {string} The HTML string representing a divider row in the chat table.
  */
 function renderDivider(text) {
-  return IITC.comm.dividerTemplate.replace('{{ text }}', text);
+  return fillTemplate(IITC.comm.dividerTemplate, { text: text });
 }
 
 /**
  * Renders data from the data-hash to the element defined by the given ID.
  *
- * @function IITC.comm.renderData
+ * @memberof IITC.comm
  * @param {Object} data - Chat data to be rendered.
  * @param {string} element - ID of the DOM element to render the chat into.
  * @param {boolean} likelyWereOldMsgs - Flag indicating if older messages are likely to have been added.
@@ -928,5 +944,3 @@ IITC.comm = {
   _updateOldNewHash,
   _writeDataToHash,
 };
-
-/* global log, map, chat, IITC */
