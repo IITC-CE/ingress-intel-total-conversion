@@ -32,6 +32,7 @@ class Map {
 const { window: domWindow } = new JSDOM('<!DOCTYPE html><html><body></body></html>', { url: 'https://intel.ingress.com/intel' });
 globalThis.document = domWindow.document;
 globalThis.$ = jQueryFactory(domWindow);
+globalThis.jQuery = globalThis.$;
 
 // keep a simple string-backed cookie the utils specs rely on (jsdom's real document.cookie
 // drops expires/path on read and ignores empty-string resets)

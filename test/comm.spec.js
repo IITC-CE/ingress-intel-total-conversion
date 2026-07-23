@@ -351,6 +351,56 @@ describe('IITC.comm._writeDataToHash', () => {
   });
 });
 
+describe('IITC.comm.renderData', () => {
+  let origVisible;
+
+  beforeEach(() => {
+    origVisible = IITC.utils._isVisible;
+    IITC.utils._isVisible = () => true; // jsdom has no layout; force visible to exercise the body
+    document.body.innerHTML = '<div id="chatall"></div>';
+  });
+
+  afterEach(() => {
+    IITC.utils._isVisible = origVisible;
+    document.body.innerHTML = '';
+    sinon.restore();
+  });
+
+  it('early-returns without rendering when the target element is not visible', () => {
+    IITC.utils._isVisible = () => false;
+    const data = { a: [100, false, '<tr>A</tr>', 'nick', {}] };
+    IITC.comm.renderData(data, 'chatall', false, ['a']);
+    expect(document.getElementById('chatall').innerHTML).to.equal('');
+  });
+
+  it('renders rows into a table in the given GUID order', () => {
+    sinon.stub(IITC.comm.declarativeMessageFilter, 'filterMessage').returns(false);
+    const data = {
+      a: [100, false, '<tr data-guid="a"><td>A</td></tr>', 'nick', {}],
+      b: [200, false, '<tr data-guid="b"><td>B</td></tr>', 'nick', {}],
+    };
+    IITC.comm.renderData(data, 'chatall', false, ['a', 'b']);
+    const html = document.getElementById('chatall').innerHTML;
+    expect(html).to.match(/^<table>.*<\/table>$/s);
+    expect(html.indexOf('data-guid="a"')).to.be.lessThan(html.indexOf('data-guid="b"'));
+  });
+
+  it('sorts by timestamp and inserts a date divider across a day boundary when no GUID order is given', () => {
+    sinon.stub(IITC.comm.declarativeMessageFilter, 'filterMessage').returns(false);
+    const day1 = new Date('2026-01-01T10:00:00Z').getTime();
+    const day2 = new Date('2026-01-02T10:00:00Z').getTime();
+    const data = {
+      // deliberately out of insertion order to prove the legacy timestamp sort
+      later: [day2, false, '<tr data-guid="later"><td>L</td></tr>', 'nick', {}],
+      earlier: [day1, false, '<tr data-guid="earlier"><td>E</td></tr>', 'nick', {}],
+    };
+    IITC.comm.renderData(data, 'chatall', false);
+    const html = document.getElementById('chatall').innerHTML;
+    expect(html.indexOf('earlier')).to.be.lessThan(html.indexOf('later'));
+    expect(html).to.contain('class="divider"');
+  });
+});
+
 describe('IITC.comm._genPostData', () => {
   let origClamp;
   const bounds = {
@@ -457,7 +507,7 @@ describe('IITC.comm.requestChannel', () => {
   });
 
   beforeEach(() => {
-    // give renderChannel a (layout-less, i.e. jQuery-":hidden") element so renderData early-returns
+    // give renderChannel a layout-less element (IITC.utils._isVisible → false in jsdom) so renderData early-returns
     document.body.innerHTML = '<div id="chatall"></div>';
     IITC.comm._channelsData.all = undefined;
   });
