@@ -5,7 +5,7 @@
 // @description    Add a debug console tab
 
 /* exported setup, changelog --eslint */
-/* global L */
+/* global IITC, L */
 
 var changelog = [
   {
@@ -29,7 +29,7 @@ var debugTab = {};
 // meant to be used from browser debugger tools and the like.
 
 debugTab.create = function () {
-  window.chat.addChannel({
+  IITC.chat.addChannel({
     id: 'debug',
     name: 'Debug',
     inputPrompt: 'debug:',
@@ -175,7 +175,7 @@ debugTab.printStackTrace = function () {
 };
 
 debugTab.show = function () {
-  window.chat.show('debug');
+  IITC.chat.show('debug');
 };
 
 function setup() {
