@@ -298,3 +298,84 @@ describe('chat.chooser', () => {
     expect(show.calledWith('faction')).to.be.true;
   });
 });
+
+describe('chat.needMoreMessages', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    chat.channels.length = 0;
+    sinon.restore();
+  });
+
+  it('requests the active channel when its visible tab is scrolled to the top', () => {
+    document.body.innerHTML = '<div id="chatcontrols"><a class="active" data-channel="all"></a></div><div id="chat"><div id="chatall"></div></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(true); // jsdom has no layout, so the :visible equivalent needs a stub
+    const channel = { id: 'all', request: sinon.spy() };
+    chat.channels.push(channel);
+
+    chat.needMoreMessages();
+
+    expect(channel.request.calledWith('all', false)).to.be.true;
+  });
+
+  it('does nothing when no channel tab is visible', () => {
+    document.body.innerHTML = '<div id="chatcontrols"><a class="active" data-channel="all"></a></div><div id="chat"><div id="chatall"></div></div>';
+    const channel = { id: 'all', request: sinon.spy() };
+    chat.channels.push(channel);
+
+    chat.needMoreMessages();
+
+    expect(channel.request.called).to.be.false;
+  });
+
+  it('does nothing when there is no active tab', () => {
+    document.body.innerHTML = '<div id="chatcontrols"></div><div id="chat"><div id="chatall"></div></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(true);
+    const channel = { id: 'all', request: sinon.spy() };
+    chat.channels.push(channel);
+
+    chat.needMoreMessages();
+
+    expect(channel.request.called).to.be.false;
+  });
+});
+
+describe('chat.handleTabCompletion', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    sinon.restore();
+  });
+
+  const setup = (inputValue, caret) => {
+    document.body.innerHTML =
+      '<div id="chat"><div id="chatall"><mark>Alice</mark><mark>Alan</mark><mark>Bob</mark></div></div><div id="chatinput"><input></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(true); // gather nicks from the (jsdom-invisible) visible tab
+    const input = document.querySelector('#chatinput input');
+    input.value = inputValue;
+    input.setSelectionRange(caret, caret);
+    return input;
+  };
+
+  it('completes a unique nickname prefix and prepends @', () => {
+    const input = setup('bo', 2);
+
+    chat.handleTabCompletion();
+
+    expect(input.value).to.equal('@Bob ');
+  });
+
+  it('keeps an existing @ instead of doubling it', () => {
+    const input = setup('@bo', 3);
+
+    chat.handleTabCompletion();
+
+    expect(input.value).to.equal('@Bob ');
+  });
+
+  it('leaves the input untouched when the prefix is ambiguous', () => {
+    const input = setup('al', 2);
+
+    chat.handleTabCompletion();
+
+    expect(input.value).to.equal('al');
+  });
+});

@@ -1,4 +1,4 @@
-/* global log, PLAYER, L, IITC, app */
+/* global log, L, IITC, app */
 
 /**
  * Chat-panel UI framework: tabs, input, scrolling and the channel-registration API.
@@ -12,6 +12,22 @@
 IITC.chat = {};
 const chat = IITC.chat;
 
+/**
+ * Template of a channel tab link shown in the chat controls.
+ *
+ * @type {string}
+ * @memberof IITC.chat
+ */
+chat.channelTabTemplate = '<a data-channel="{id}" accesskey="{index}" title="[{index}]">{name}</a>';
+
+/**
+ * Template of a channel message container appended to the chat panel.
+ *
+ * @type {string}
+ * @memberof IITC.chat
+ */
+chat.channelContainerTemplate = '<div id="chat{id}"><table></table></div>';
+
 //
 // common
 //
@@ -22,9 +38,9 @@ const chat = IITC.chat;
  * @memberof IITC.chat
  * @param {string} nick - The nickname to add.
  */
-chat.addNickname = function (nick) {
-  var c = document.getElementById('chattext');
-  c.value = [c.value.trim(), nick].join(' ').trim() + ' ';
+chat.addNickname = (nick) => {
+  const c = document.getElementById('chattext');
+  c.value = `${[c.value.trim(), nick].join(' ').trim()} `;
   c.focus();
 };
 
@@ -36,15 +52,15 @@ chat.addNickname = function (nick) {
  * @param {string} nickname - The clicked nickname.
  * @returns {boolean} Always returns false.
  */
-chat.nicknameClicked = function (event, nickname) {
+chat.nicknameClicked = (event, nickname) => {
   // suppress @ if coming from chat
   if (nickname.startsWith('@')) {
     nickname = nickname.slice(1);
   }
-  var hookData = { event: event, nickname: nickname };
+  const hookData = { event: event, nickname: nickname };
 
   if (window.runHooks('nicknameClicked', hookData)) {
-    chat.addNickname('@' + nickname);
+    chat.addNickname(`@${nickname}`);
   }
 
   event.preventDefault();
@@ -56,7 +72,6 @@ chat.nicknameClicked = function (event, nickname) {
 // Channels
 //
 
-// WORK IN PROGRESS
 // 'all' 'faction' and 'alerts' channels are hard coded in several places (including mobile app)
 // dont change those channels since they refer to stock channels
 // you can add channels from another source provider (message relay, logging from plugins...)
@@ -99,7 +114,7 @@ chat.nicknameClicked = function (event, nickname) {
  * Holds channels infos.
  *
  * @type {ChannelDescription[]}
- * @memberof module:chat
+ * @memberof IITC.chat
  */
 chat.channels = [];
 
@@ -109,8 +124,8 @@ chat.channels = [];
  * @memberof IITC.chat
  * @returns {string} The name of the active chat tab.
  */
-chat.getActive = function () {
-  return $('#chatcontrols .active').data('channel');
+chat.getActive = () => {
+  return document.querySelector('#chatcontrols .active')?.dataset.channel;
 };
 
 /**
@@ -120,12 +135,8 @@ chat.getActive = function () {
  * @param {string} tab - The name of the chat tab.
  * @returns {ChannelDescription} The corresponding channel name ('faction', 'alerts', or 'all').
  */
-chat.getChannelDesc = function (tab) {
-  var channelObject = null;
-  chat.channels.forEach(function (entry) {
-    if (entry.id === tab) channelObject = entry;
-  });
-  return channelObject;
+chat.getChannelDesc = (tab) => {
+  return chat.channels.find((entry) => entry.id === tab) || null;
 };
 
 /**
@@ -138,7 +149,7 @@ chat.getChannelDesc = function (tab) {
  * @param {string} channel - The name of the COMM channel ('all', 'faction', or 'alerts').
  * @param {boolean} flag - Set to true to request data for the specified channel, false to stop requesting.
  */
-chat.backgroundChannelData = function (instance, channel, flag) {
+chat.backgroundChannelData = (instance, channel, flag) => {
   // first, store the state for this instance
   if (!chat.backgroundInstanceChannel) chat.backgroundInstanceChannel = {};
   if (!chat.backgroundInstanceChannel[instance]) chat.backgroundInstanceChannel[instance] = {};
@@ -148,11 +159,11 @@ chat.backgroundChannelData = function (instance, channel, flag) {
   // 1. clear existing overall flags
   chat.backgroundChannels = {};
   // 2. for each instance monitoring COMM...
-  $.each(chat.backgroundInstanceChannel, function (instance) {
+  Object.keys(chat.backgroundInstanceChannel).forEach((instance) => {
     // 3. and for each channel monitored by this instance...
-    $.each(chat.backgroundInstanceChannel[instance], function (channel, flag) {
+    Object.keys(chat.backgroundInstanceChannel[instance]).forEach((channel) => {
       // 4. if it's monitored, set the channel flag
-      if (flag) chat.backgroundChannels[channel] = true;
+      if (chat.backgroundInstanceChannel[instance][channel]) chat.backgroundChannels[channel] = true;
     });
   });
 };
@@ -163,9 +174,9 @@ chat.backgroundChannelData = function (instance, channel, flag) {
  *
  * @memberof IITC.chat
  */
-chat.request = function () {
-  var channel = chat.getActive();
-  chat.channels.forEach(function (entry) {
+chat.request = () => {
+  const channel = chat.getActive();
+  chat.channels.forEach((entry) => {
     if (channel === entry.id || (chat.backgroundChannels && chat.backgroundChannels[entry.id])) {
       if (entry.request) entry.request(entry.id, false);
     }
@@ -178,16 +189,16 @@ chat.request = function () {
  *
  * @memberof IITC.chat
  */
-chat.needMoreMessages = function () {
-  var activeTab = chat.getActive();
-  var channel = chat.getChannelDesc(activeTab);
+chat.needMoreMessages = () => {
+  const activeTab = chat.getActive();
+  const channel = chat.getChannelDesc(activeTab);
   if (!channel || !channel.request) return;
 
-  var activeChat = $('#chat > :visible');
-  if (activeChat.length === 0) return;
+  const activeChat = Array.from(document.querySelectorAll('#chat > *')).find((el) => IITC.utils._isVisible(el));
+  if (!activeChat) return;
 
-  var hasScrollbar = window.scrollBottom(activeChat) !== 0 || activeChat.scrollTop() !== 0;
-  var nearTop = activeChat.scrollTop() <= window.CHAT_REQUEST_SCROLL_TOP;
+  const hasScrollbar = window.scrollBottom(activeChat) !== 0 || activeChat.scrollTop !== 0;
+  const nearTop = activeChat.scrollTop <= window.CHAT_REQUEST_SCROLL_TOP;
   if (hasScrollbar && !nearTop) return;
 
   channel.request(channel.id, false);
@@ -200,51 +211,45 @@ chat.needMoreMessages = function () {
  * @memberof IITC.chat
  * @param {string} tab - The name of the chat tab to activate ('all', 'faction', or 'alerts').
  */
-chat.chooseTab = function (tab) {
-  if (
-    chat.channels.every(function (entry) {
-      return entry.id !== tab;
-    })
-  ) {
-    var tabsAvalaible = chat.channels
-      .map(function (entry) {
-        return '"' + entry.id + '"';
-      })
-      .join(', ');
-    log.warn('chat tab "' + tab + '" requested - but only ' + tabsAvalaible + ' are valid - assuming "all" wanted');
+chat.chooseTab = (tab) => {
+  if (chat.channels.every((entry) => entry.id !== tab)) {
+    const tabsAvalaible = chat.channels.map((entry) => `"${entry.id}"`).join(', ');
+    log.warn(`chat tab "${tab}" requested - but only ${tabsAvalaible} are valid - assuming "all" wanted`);
     tab = 'all';
   }
 
-  var oldTab = chat.getActive();
+  const oldTab = chat.getActive();
 
   localStorage['iitc-chat-tab'] = tab;
 
-  var oldChannel = chat.getChannelDesc(oldTab);
-  var channel = chat.getChannelDesc(tab);
+  const oldChannel = chat.getChannelDesc(oldTab);
+  const channel = chat.getChannelDesc(tab);
 
-  var chatInput = $('#chatinput');
-  if (oldChannel && oldChannel.inputClass) chatInput.removeClass(oldChannel.inputClass);
-  if (channel.inputClass) chatInput.addClass(channel.inputClass);
+  const chatInput = document.getElementById('chatinput');
+  if (oldChannel && oldChannel.inputClass) chatInput.classList.remove(oldChannel.inputClass);
+  if (channel.inputClass) chatInput.classList.add(channel.inputClass);
 
-  var mark = $('#chatinput mark');
-  mark.text(channel.inputPrompt || '');
+  chatInput.querySelector('mark').textContent = channel.inputPrompt || '';
 
-  $('#chatcontrols .active').removeClass('active');
-  $("#chatcontrols a[data-channel='" + tab + "']").addClass('active');
+  document.querySelector('#chatcontrols .active')?.classList.remove('active');
+  document.querySelector(`#chatcontrols a[data-channel='${tab}']`)?.classList.add('active');
 
   if (tab !== oldTab) window.startRefreshTimeout(0.1 * 1000); // only chat uses the refresh timer stuff, so a perfect way of forcing an early refresh after a tab change
 
-  $('#chat > div').hide();
+  document.querySelectorAll('#chat > div').forEach((div) => {
+    div.style.display = 'none';
+  });
 
-  var elm = $('#chat' + tab);
-  elm.show();
+  const elm = document.getElementById(`chat${tab}`);
+  elm.style.display = '';
 
   if (channel.render) channel.render(tab);
 
-  if (elm.data('needsScrollTop')) {
-    elm.data('ignoreNextScroll', true);
-    elm.scrollTop(elm.data('needsScrollTop'));
-    elm.data('needsScrollTop', null);
+  const $elm = $(elm);
+  if ($elm.data('needsScrollTop')) {
+    $elm.data('ignoreNextScroll', true);
+    elm.scrollTop = $elm.data('needsScrollTop');
+    $elm.data('needsScrollTop', null);
   }
 };
 
@@ -255,17 +260,26 @@ chat.chooseTab = function (tab) {
  *
  * @memberof IITC.chat
  */
-chat.toggle = function () {
-  var c = $('#chat, #chatcontrols');
-  if (c.hasClass('expand')) {
-    c.removeClass('expand');
-    var div = $('#chat > div:visible');
-    div.data('ignoreNextScroll', true);
-    div.scrollTop(99999999); // scroll to bottom
-    $('.leaflet-control').removeClass('chat-expand');
+chat.toggle = () => {
+  const chatEl = document.getElementById('chat');
+  const chatControls = document.getElementById('chatcontrols');
+  if (chatEl.classList.contains('expand') || chatControls.classList.contains('expand')) {
+    chatEl.classList.remove('expand');
+    chatControls.classList.remove('expand');
+    const div = Array.from(document.querySelectorAll('#chat > div')).find((el) => IITC.utils._isVisible(el));
+    if (div) {
+      $(div).data('ignoreNextScroll', true);
+      div.scrollTop = 99999999; // scroll to bottom
+    }
+    document.querySelectorAll('.leaflet-control').forEach((el) => {
+      el.classList.remove('chat-expand');
+    });
   } else {
-    c.addClass('expand');
-    $('.leaflet-control').addClass('chat-expand');
+    chatEl.classList.add('expand');
+    chatControls.classList.add('expand');
+    document.querySelectorAll('.leaflet-control').forEach((el) => {
+      el.classList.add('chat-expand');
+    });
     chat.needMoreMessages();
   }
 };
@@ -276,13 +290,14 @@ chat.toggle = function () {
  * @memberof IITC.chat
  * @param {string} name - The name of the chat tab to show and activate.
  */
-chat.show = function (name) {
+chat.show = (name) => {
   if (window.isSmartphone()) {
     IITC.statusbar.hide();
   } else {
     IITC.statusbar.show();
   }
-  $('#chat, #chatinput').show();
+  document.getElementById('chat').style.display = '';
+  document.getElementById('chatinput').style.display = '';
 
   chat.chooseTab(name);
 };
@@ -295,9 +310,8 @@ chat.show = function (name) {
  * @memberof IITC.chat
  * @param {Event} event - The event triggered by clicking a chat tab.
  */
-chat.chooser = function (event) {
-  var t = $(event.target);
-  var tab = t.data('channel');
+chat.chooser = (event) => {
+  const tab = event.target.dataset.channel;
 
   if (window.isSmartphone() && !window.useAppPanes()) {
     window.show(tab);
@@ -316,7 +330,7 @@ chat.chooser = function (event) {
  * @param {number} scrollBefore - The scroll position before new messages were added.
  * @param {boolean} isOldMsgs - Indicates if the added messages are older messages.
  */
-chat.keepScrollPosition = function (box, scrollBefore, isOldMsgs) {
+chat.keepScrollPosition = (box, scrollBefore, isOldMsgs) => {
   // If scrolled down completely, keep it that way so new messages can
   // be seen easily. If scrolled up, only need to fix scroll position
   // when old messages are added. New messages added at the bottom don’t
@@ -341,19 +355,23 @@ chat.keepScrollPosition = function (box, scrollBefore, isOldMsgs) {
  * @static
  */
 function createChannelTab(channelDesc) {
-  var chatControls = $('#chatcontrols');
-  var chatDiv = $('#chat');
-  var accessLink = L.Util.template('<a data-channel="{id}" accesskey="{index}" title="[{index}]">{name}</a>', channelDesc);
-  $(accessLink).appendTo(chatControls).click(chat.chooser);
+  const chatControls = document.getElementById('chatcontrols');
+  const chatDiv = document.getElementById('chat');
+  const accessLink = L.Util.template(chat.channelTabTemplate, channelDesc);
+  chatControls.insertAdjacentHTML('beforeend', accessLink);
+  chatControls.lastElementChild.addEventListener('click', chat.chooser);
 
-  var channelDiv = L.Util.template('<div id="chat{id}"><table></table></div>', channelDesc);
-  var elm = $(channelDiv).appendTo(chatDiv);
+  const channelDiv = L.Util.template(chat.channelContainerTemplate, channelDesc);
+  chatDiv.insertAdjacentHTML('beforeend', channelDiv);
+  const elm = chatDiv.lastElementChild;
   if (channelDesc.request) {
-    elm.scroll(function () {
-      var t = $(this);
-      if (t.data('ignoreNextScroll')) return t.data('ignoreNextScroll', false);
-      if (t.scrollTop() < window.CHAT_REQUEST_SCROLL_TOP) channelDesc.request(channelDesc.id, true);
-      if (window.scrollBottom(t) === 0) channelDesc.request(channelDesc.id, false);
+    elm.addEventListener('scroll', () => {
+      if ($(elm).data('ignoreNextScroll')) {
+        $(elm).data('ignoreNextScroll', false);
+        return;
+      }
+      if (elm.scrollTop < window.CHAT_REQUEST_SCROLL_TOP) channelDesc.request(channelDesc.id, true);
+      if (window.scrollBottom(elm) === 0) channelDesc.request(channelDesc.id, false);
     });
   }
 
@@ -366,7 +384,7 @@ function createChannelTab(channelDesc) {
   }
 }
 
-var isTabsSetup = false;
+let isTabsSetup = false;
 /**
  * Add to the channel list a new channel description
  *
@@ -375,14 +393,14 @@ var isTabsSetup = false;
  * @memberof IITC.chat
  * @param {ChannelDescription} channelDesc - channel description
  */
-chat.addChannel = function (channelDesc) {
+chat.addChannel = (channelDesc) => {
   // deny reserved name
   if (channelDesc.id === 'info' || channelDesc.id === 'map') {
-    log.warn('could not add channel "' + channelDesc.id + '": reserved');
+    log.warn(`could not add channel "${channelDesc.id}": reserved`);
     return false;
   }
   if (chat.getChannelDesc(channelDesc.id)) {
-    log.warn('could not add channel "' + channelDesc.id + '": already exist');
+    log.warn(`could not add channel "${channelDesc.id}": already exist`);
     return false;
   }
 
@@ -403,13 +421,13 @@ chat.addChannel = function (channelDesc) {
  *
  * @memberof IITC.chat
  */
-chat.setupTabs = function () {
+chat.setupTabs = () => {
   isTabsSetup = true;
 
   // insert at the begining the comm channels
   chat.channels.splice(0, 0, ...IITC.comm.channels);
 
-  chat.channels.forEach(function (entry, i) {
+  chat.channels.forEach((entry, i) => {
     entry.index = i + 1;
     createChannelTab(entry);
   });
@@ -426,7 +444,7 @@ chat.setupTabs = function () {
    * @param {boolean} getOlderMsgs - Whether to retrieve older messages.
    * @param {boolean} [isRetry=false] - Whether the request is a retry.
    */
-  chat.requestPublic = function (getOlderMsgs, isRetry) {
+  chat.requestPublic = (getOlderMsgs, isRetry) => {
     return IITC.comm.requestChannel('all', getOlderMsgs, isRetry);
   };
 
@@ -437,7 +455,7 @@ chat.setupTabs = function () {
    * @param {boolean} getOlderMsgs - Flag to determine if older messages are being requested.
    * @param {boolean} [isRetry=false] - Flag to indicate if this is a retry attempt.
    */
-  chat.requestFaction = function (getOlderMsgs, isRetry) {
+  chat.requestFaction = (getOlderMsgs, isRetry) => {
     return IITC.comm.requestChannel('faction', getOlderMsgs, isRetry);
   };
 
@@ -448,7 +466,7 @@ chat.setupTabs = function () {
    * @param {boolean} getOlderMsgs - Whether to retrieve older messages.
    * @param {boolean} [isRetry=false] - Whether the request is a retry.
    */
-  chat.requestAlerts = function (getOlderMsgs, isRetry) {
+  chat.requestAlerts = (getOlderMsgs, isRetry) => {
     return IITC.comm.requestChannel('alerts', getOlderMsgs, isRetry);
   };
 
@@ -458,7 +476,7 @@ chat.setupTabs = function () {
    * @memberof IITC.chat
    * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
    */
-  chat.renderPublic = function (oldMsgsWereAdded) {
+  chat.renderPublic = (oldMsgsWereAdded) => {
     return IITC.comm.renderChannel('all', oldMsgsWereAdded);
   };
 
@@ -468,7 +486,7 @@ chat.setupTabs = function () {
    * @memberof IITC.chat
    * @param {boolean} oldMsgsWereAdded - Indicates if old messages were added in the current rendering.
    */
-  chat.renderFaction = function (oldMsgsWereAdded) {
+  chat.renderFaction = (oldMsgsWereAdded) => {
     return IITC.comm.renderChannel('faction', oldMsgsWereAdded);
   };
 
@@ -478,7 +496,7 @@ chat.setupTabs = function () {
    * @memberof IITC.chat
    * @param {boolean} oldMsgsWereAdded - Indicates if older messages were added to the chat.
    */
-  chat.renderAlerts = function (oldMsgsWereAdded) {
+  chat.renderAlerts = (oldMsgsWereAdded) => {
     return IITC.comm.renderChannel('alerts', oldMsgsWereAdded);
   };
 };
@@ -488,19 +506,21 @@ chat.setupTabs = function () {
  *
  * @memberof IITC.chat
  */
-chat.setup = function () {
+chat.setup = () => {
   chat.setupTabs();
 
   if (localStorage['iitc-chat-tab']) {
     chat.chooseTab(localStorage['iitc-chat-tab']);
   }
 
-  $('#chatcontrols, #chat, #chatinput').show();
+  ['chatcontrols', 'chat', 'chatinput'].forEach((id) => {
+    document.getElementById(id).style.display = '';
+  });
 
-  $('#chatcontrols a:first').click(chat.toggle);
+  document.querySelector('#chatcontrols a').addEventListener('click', chat.toggle);
 
-  $('#chatinput').click(function () {
-    $('#chatinput input').focus();
+  document.getElementById('chatinput').addEventListener('click', () => {
+    document.querySelector('#chatinput input').focus();
   });
 
   chat.setupTime();
@@ -508,11 +528,12 @@ chat.setup = function () {
 
   window.requests.addRefreshFunction(chat.request);
 
-  var cls = PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
-  $('#chatinput mark').addClass(cls);
+  const cls = window.PLAYER.team === 'RESISTANCE' ? 'res' : 'enl';
+  document.querySelector('#chatinput mark').classList.add(cls);
 
-  $(document).on('click', '.nickname', function (event) {
-    return chat.nicknameClicked(event, $(this).text());
+  document.addEventListener('click', (event) => {
+    const nickname = event.target.closest('.nickname');
+    if (nickname) return chat.nicknameClicked(event, nickname.textContent);
   });
 };
 
@@ -522,16 +543,16 @@ chat.setup = function () {
  *
  * @memberof IITC.chat
  */
-chat.setupTime = function () {
-  var inputTime = $('#chatinput time');
-  var updateTime = function () {
+chat.setupTime = () => {
+  const inputTime = document.querySelector('#chatinput time');
+  const updateTime = () => {
     if (window.isIdle()) return;
-    var d = new Date();
-    var h = d.getHours() + '';
-    if (h.length === 1) h = '0' + h;
-    var m = d.getMinutes() + '';
-    if (m.length === 1) m = '0' + m;
-    inputTime.text(h + ':' + m);
+    const d = new Date();
+    let h = `${d.getHours()}`;
+    if (h.length === 1) h = `0${h}`;
+    let m = `${d.getMinutes()}`;
+    if (m.length === 1) m = `0${m}`;
+    inputTime.textContent = `${h}:${m}`;
     // update ON the minute (1ms after)
     setTimeout(updateTime, (60 - d.getSeconds()) * 1000 + 1);
   };
@@ -548,26 +569,29 @@ chat.setupTime = function () {
  *
  * @memberof IITC.chat
  */
-chat.handleTabCompletion = function () {
-  var el = $('#chatinput input');
-  var curPos = el.get(0).selectionStart;
-  var text = el.val();
-  var word = text
+chat.handleTabCompletion = () => {
+  const el = document.querySelector('#chatinput input');
+  const curPos = el.selectionStart;
+  const text = el.value;
+  const word = text
     .slice(0, curPos)
     .replace(/.*\b([a-z0-9-_])/, '$1')
     .toLowerCase();
 
-  var list = $('#chat > div:visible mark');
-  list = list.map(function (ind, mark) {
-    return $(mark).text();
+  let list = [];
+  document.querySelectorAll('#chat > div').forEach((div) => {
+    if (!IITC.utils._isVisible(div)) return;
+    div.querySelectorAll('mark').forEach((mark) => {
+      list.push(mark.textContent);
+    });
   });
   list = window.uniqueArray(list);
 
-  var nick = null;
-  for (var i = 0; i < list.length; i++) {
+  let nick = null;
+  for (let i = 0; i < list.length; i++) {
     if (!list[i].toLowerCase().startsWith(word)) continue;
     if (nick && nick !== list[i]) {
-      log.warn('More than one nick matches, aborting. (' + list[i] + ' vs ' + nick + ')');
+      log.warn(`More than one nick matches, aborting. (${list[i]} vs ${nick})`);
       return;
     }
     nick = list[i];
@@ -576,12 +600,12 @@ chat.handleTabCompletion = function () {
     return;
   }
 
-  var posStart = curPos - word.length;
-  var newText = text.substring(0, posStart);
-  var atPresent = text.substring(posStart - 1, posStart) === '@';
-  newText += (atPresent ? '' : '@') + nick + ' ';
+  const posStart = curPos - word.length;
+  let newText = text.substring(0, posStart);
+  const atPresent = text.substring(posStart - 1, posStart) === '@';
+  newText += `${atPresent ? '' : '@'}${nick} `;
   newText += text.substring(curPos);
-  el.val(newText);
+  el.value = newText;
 };
 
 /**
@@ -589,15 +613,16 @@ chat.handleTabCompletion = function () {
  *
  * @memberof IITC.chat
  */
-chat.postMsg = function () {
-  var c = chat.getActive();
-  var channel = chat.getChannelDesc(c);
+chat.postMsg = () => {
+  const c = chat.getActive();
+  const channel = chat.getChannelDesc(c);
 
-  var msg = ($('#chatinput input').val() || '').trim();
+  const input = document.querySelector('#chatinput input');
+  const msg = (input.value || '').trim();
   if (!msg || msg === '') return;
 
   if (channel.sendMessage) {
-    $('#chatinput input').val('');
+    input.value = '';
     return channel.sendMessage(c, msg);
   }
 };
@@ -607,11 +632,11 @@ chat.postMsg = function () {
  *
  * @memberof IITC.chat
  */
-chat.setupPosting = function () {
+chat.setupPosting = () => {
   if (!window.isSmartphone()) {
-    $('#chatinput input').keydown(function (event) {
+    document.querySelector('#chatinput input').addEventListener('keydown', (event) => {
       try {
-        var kc = event.keyCode ? event.keyCode : event.which;
+        const kc = event.keyCode ? event.keyCode : event.which;
         if (kc === 13) {
           // enter
           chat.postMsg();
@@ -628,7 +653,7 @@ chat.setupPosting = function () {
     });
   }
 
-  $('#chatinput').submit(function (event) {
+  document.getElementById('chatinput').addEventListener('submit', (event) => {
     event.preventDefault();
     chat.postMsg();
   });
@@ -647,10 +672,10 @@ chat.setupPosting = function () {
  * @param {boolean} systemNarrowcast - Flag indicating if the message is a system narrowcast.
  * @returns {string} The HTML string representing a chat message row.
  */
-chat.renderMsg = function (msg, nick, time, team, msgToPlayer, systemNarrowcast) {
+chat.renderMsg = (msg, nick, time, team, msgToPlayer, systemNarrowcast) => {
   // Imitating data usually derived from processing raw chat data
-  var fakeData = {
-    guid: 'legacyguid-' + Math.random(),
+  const fakeData = {
+    guid: `legacyguid-${Math.random()}`,
     time: time,
     public: !systemNarrowcast,
     secure: systemNarrowcast,
@@ -682,7 +707,7 @@ chat.renderMsg = function (msg, nick, time, team, msgToPlayer, systemNarrowcast)
  * @param {string} tab - The name of the chat tab.
  * @returns {string} The corresponding channel name ('faction', 'alerts', or 'all').
  */
-chat.tabToChannel = function (tab) {
+chat.tabToChannel = (tab) => {
   if (tab === 'faction') return 'faction';
   if (tab === 'alerts') return 'alerts';
   return 'all';
