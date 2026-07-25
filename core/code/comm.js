@@ -241,7 +241,7 @@ function parseMsgData(data) {
  * @param {boolean} isAscendingOrder - Whether the new data is in ascending order.
  */
 function _writeDataToHash(newData, storageHash, isOlderMsgs, isAscendingOrder) {
-  _updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
+  IITC.comm._updateOldNewHash(newData, storageHash, isOlderMsgs, isAscendingOrder);
 
   newData.result.forEach((json) => {
     // avoid duplicates
@@ -401,7 +401,7 @@ function requestChannel(channel, getOlderMsgs, isRetry) {
   _requestRunning[channel] = true;
   document.querySelector(`#chatcontrols a[data-channel='${channel}']`)?.classList.add('loading');
 
-  const d = _genPostData(channel, getOlderMsgs);
+  const d = IITC.comm._genPostData(channel, getOlderMsgs);
   window.postAjax(
     'getPlexts',
     d,
@@ -414,7 +414,7 @@ function requestChannel(channel, getOlderMsgs, isRetry) {
         }
       : (_, textStatus) => {
           if (textStatus === 'abort') _requestRunning[channel] = false;
-          else requestChannel(channel, getOlderMsgs, true);
+          else IITC.comm.requestChannel(channel, getOlderMsgs, true);
         }
   );
 }
@@ -450,7 +450,7 @@ function _handleChannel(channel, data, olderMsgs, ascendingTimestampOrder) {
 
   if (!_channelsData[channel]) _initChannelData(channel);
   const old = _channelsData[channel].oldestGUID;
-  _writeDataToHash(data, _channelsData[channel], olderMsgs, ascendingTimestampOrder);
+  IITC.comm._writeDataToHash(data, _channelsData[channel], olderMsgs, ascendingTimestampOrder);
   const oldMsgsWereAdded = old !== _channelsData[channel].oldestGUID;
 
   let hook = `${channel}ChatDataAvailable`;
@@ -461,7 +461,7 @@ function _handleChannel(channel, data, olderMsgs, ascendingTimestampOrder) {
   // generic hook
   window.runHooks('commDataAvailable', { channel: channel, raw: data, result: data.result, processed: _channelsData[channel].data });
 
-  renderChannel(channel, oldMsgsWereAdded);
+  IITC.comm.renderChannel(channel, oldMsgsWereAdded);
 }
 
 /**

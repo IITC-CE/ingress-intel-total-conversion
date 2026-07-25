@@ -814,9 +814,11 @@ window.chat = new Proxy(chat, {
   },
   set(target, prop, value) {
     if (legacyFunctions.includes(prop)) {
-      // Map the legacy function name to its new name in comm and synchronize the function between chat and comm
+      // Map the legacy function name to its new name in comm and redirect the assignment there,
+      // so IITC.chat (the proxy target) never gains its own copy of a comm-owned function
       const commProp = mapLegacyFunctionNameToCommApi(prop);
       window.IITC.comm[commProp] = value;
+      return true;
     }
     // Update or add the property in chat
     target[prop] = value;
