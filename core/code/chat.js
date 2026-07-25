@@ -68,6 +68,41 @@ chat.nicknameClicked = (event, nickname) => {
   return false;
 };
 
+// Per-channel-element UI flags (needsScrollTop, ignoreNextScroll, needsClearing)
+const _channelState = new WeakMap();
+
+/**
+ * Returns the per-channel-element UI flag store for the given channel DOM element.
+ * The native WeakMap store is the source of truth, but writes are mirrored into `$(el).data(key)`
+ * and reads fall back to it, so legacy plugins that access these flags via jQuery `.data()`
+ * keep working.
+ *
+ * @memberof IITC.chat
+ * @param {HTMLElement} el - The channel DOM element.
+ * @returns {Object} A proxy exposing the element's UI flags.
+ */
+chat.channelState = (el) => {
+  let state = _channelState.get(el);
+  if (!state) {
+    state = new Proxy(
+      {},
+      {
+        get(target, key) {
+          if (key in target) return target[key];
+          return $(el).data(key);
+        },
+        set(target, key, value) {
+          target[key] = value;
+          $(el).data(key, value);
+          return true;
+        },
+      }
+    );
+    _channelState.set(el, state);
+  }
+  return state;
+};
+
 //
 // Channels
 //
@@ -245,11 +280,11 @@ chat.chooseTab = (tab) => {
 
   if (channel.render) channel.render(tab);
 
-  const $elm = $(elm);
-  if ($elm.data('needsScrollTop')) {
-    $elm.data('ignoreNextScroll', true);
-    elm.scrollTop = $elm.data('needsScrollTop');
-    $elm.data('needsScrollTop', null);
+  const state = chat.channelState(elm);
+  if (state.needsScrollTop) {
+    state.ignoreNextScroll = true;
+    elm.scrollTop = state.needsScrollTop;
+    state.needsScrollTop = null;
   }
 };
 
@@ -268,7 +303,7 @@ chat.toggle = () => {
     chatControls.classList.remove('expand');
     const div = Array.from(document.querySelectorAll('#chat > div')).find((el) => IITC.utils._isVisible(el));
     if (div) {
-      $(div).data('ignoreNextScroll', true);
+      chat.channelState(div).ignoreNextScroll = true;
       div.scrollTop = 99999999; // scroll to bottom
     }
     document.querySelectorAll('.leaflet-control').forEach((el) => {
@@ -326,7 +361,7 @@ chat.chooser = (event) => {
  * to the bottom when new messages are added if the user is already at the bottom of the chat.
  *
  * @memberof IITC.chat
- * @param {jQuery} box - The jQuery object of the chat box.
+ * @param {HTMLElement|jQuery} box - The chat box element (a jQuery object is also accepted for legacy callers).
  * @param {number} scrollBefore - The scroll position before new messages were added.
  * @param {boolean} isOldMsgs - Indicates if the added messages are older messages.
  */
@@ -337,14 +372,17 @@ chat.keepScrollPosition = (box, scrollBefore, isOldMsgs) => {
   // change the view and enabling this would make the chat scroll down
   // for every added message, even if the user wants to read old stuff.
 
-  if (box.is(':hidden') && !isOldMsgs) {
-    box.data('needsScrollTop', 99999999);
+  const elm = box instanceof jQuery ? box[0] : box;
+  const state = chat.channelState(elm);
+
+  if (!IITC.utils._isVisible(elm) && !isOldMsgs) {
+    state.needsScrollTop = 99999999;
     return;
   }
 
   if (scrollBefore === 0 || isOldMsgs) {
-    box.data('ignoreNextScroll', true);
-    box.scrollTop(box.scrollTop() + (window.scrollBottom(box) - scrollBefore));
+    state.ignoreNextScroll = true;
+    elm.scrollTop = elm.scrollTop + (window.scrollBottom(elm) - scrollBefore);
   }
 };
 
@@ -366,8 +404,9 @@ function createChannelTab(channelDesc) {
   const elm = chatDiv.lastElementChild;
   if (channelDesc.request) {
     elm.addEventListener('scroll', () => {
-      if ($(elm).data('ignoreNextScroll')) {
-        $(elm).data('ignoreNextScroll', false);
+      const state = chat.channelState(elm);
+      if (state.ignoreNextScroll) {
+        state.ignoreNextScroll = false;
         return;
       }
       if (elm.scrollTop < window.CHAT_REQUEST_SCROLL_TOP) channelDesc.request(channelDesc.id, true);

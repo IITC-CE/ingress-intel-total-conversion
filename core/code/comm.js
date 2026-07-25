@@ -332,7 +332,8 @@ function _genPostData(channel, getOlderMsgs, ...args) {
     _channels.forEach((entry) => {
       if (entry.localBounds) {
         _initChannelData(entry.id);
-        $(`#chat${entry.id}`).data('needsClearing', true);
+        const el = document.getElementById(`chat${entry.id}`);
+        if (el) IITC.chat.channelState(el).needsClearing = true;
       }
     });
     _oldBBox = b;
@@ -437,12 +438,15 @@ function _handleChannel(channel, data, olderMsgs, ascendingTimestampOrder) {
     return log.warn(`${channel} comm error. Waiting for next auto-refresh.`);
   }
 
-  if (!data.result.length && !$(`#chat${channel}`).data('needsClearing')) {
+  const channelEl = document.getElementById(`chat${channel}`);
+  const channelState = channelEl ? IITC.chat.channelState(channelEl) : null;
+
+  if (!data.result.length && !channelState?.needsClearing) {
     // no new data and current data in comm._faction.data is already rendered
     return;
   }
 
-  $(`#chat${channel}`).data('needsClearing', null);
+  if (channelState) channelState.needsClearing = null;
 
   if (!_channelsData[channel]) _initChannelData(channel);
   const old = _channelsData[channel].oldestGUID;
@@ -884,17 +888,17 @@ function renderData(data, element, likelyWereOldMsgs, sortedGuids) {
   const scrollBefore = window.scrollBottom(elm);
   elm.innerHTML = `<table>${msgs}</table>`;
 
-  const $elm = $(elm);
+  const state = IITC.chat.channelState(elm);
   if (firstRender) {
-    $elm.data('needsScrollTop', 99999999);
+    state.needsScrollTop = 99999999;
   } else {
-    chat.keepScrollPosition($elm, scrollBefore, likelyWereOldMsgs);
+    IITC.chat.keepScrollPosition(elm, scrollBefore, likelyWereOldMsgs);
   }
 
-  if ($elm.data('needsScrollTop')) {
-    $elm.data('ignoreNextScroll', true);
-    elm.scrollTop = $elm.data('needsScrollTop');
-    $elm.data('needsScrollTop', null);
+  if (state.needsScrollTop) {
+    state.ignoreNextScroll = true;
+    elm.scrollTop = state.needsScrollTop;
+    state.needsScrollTop = null;
   }
 }
 

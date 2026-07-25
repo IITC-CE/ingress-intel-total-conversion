@@ -12,6 +12,8 @@ import sinon from 'sinon';
 // utils.js provides the real time formatters, portal_display.js the real makePermalink,
 // statusbar.js the real IITC.statusbar that requestChannel refreshes when idle.
 await import('../core/code/utils.js');
+// chat.js defines IITC.chat, which comm.js uses for channelState/keepScrollPosition
+await import('../core/code/chat.js');
 await import('../core/code/comm.js');
 await import('../core/code/portal.js');
 await import('../core/code/portal_display.js');

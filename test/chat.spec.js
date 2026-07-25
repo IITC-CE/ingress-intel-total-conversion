@@ -379,3 +379,79 @@ describe('chat.handleTabCompletion', () => {
     expect(input.value).to.equal('al');
   });
 });
+
+describe('chat.channelState', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('stores and reads flags on the native store', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    const state = chat.channelState(document.getElementById('chatall'));
+
+    expect(state.ignoreNextScroll).to.be.undefined;
+    state.ignoreNextScroll = true;
+    expect(state.ignoreNextScroll).to.be.true;
+  });
+
+  it('returns the same store for the same element', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    const el = document.getElementById('chatall');
+
+    expect(chat.channelState(el)).to.equal(chat.channelState(el));
+  });
+
+  it('mirrors writes into jQuery .data() so legacy plugins can still read them', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    const el = document.getElementById('chatall');
+
+    chat.channelState(el).needsClearing = true;
+
+    expect($(el).data('needsClearing')).to.be.true;
+  });
+
+  it('falls back to a jQuery .data() value written by a legacy plugin', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    const el = document.getElementById('chatall');
+    $(el).data('ignoreNextScroll', true);
+
+    expect(chat.channelState(el).ignoreNextScroll).to.be.true;
+  });
+});
+
+describe('chat.keepScrollPosition', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    sinon.restore();
+  });
+
+  it('defers scrolling via needsScrollTop when the box is hidden and messages are new', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(false);
+    const el = document.getElementById('chatall');
+
+    chat.keepScrollPosition(el, 0, false);
+
+    expect(chat.channelState(el).needsScrollTop).to.equal(99999999);
+  });
+
+  it('marks the next scroll to be ignored when at the bottom', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(true);
+    const el = document.getElementById('chatall');
+
+    chat.keepScrollPosition(el, 0, false);
+
+    expect(chat.channelState(el).ignoreNextScroll).to.be.true;
+  });
+
+  it('accepts a jQuery object as the box for legacy callers', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(true);
+    const el = document.getElementById('chatall');
+
+    chat.keepScrollPosition($(el), 0, false);
+
+    expect(chat.channelState(el).ignoreNextScroll).to.be.true;
+  });
+});
