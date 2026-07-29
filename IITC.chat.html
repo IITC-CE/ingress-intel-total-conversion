@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: window.artifact | IITC-CE</title>
+    <title>Namespace: chat | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,7 +48,8 @@
 
 <header>
     
-        <h2>window.artifact</h2>
+        <h2>
+            <span class="ancestors"><a href="IITC.html">IITC</a>.</span>chat</h2>
         
     
 </header>
@@ -58,16 +59,8 @@
         <div class="container-overview">
         
             
-                <div class="description"><p>Provides functions related to Ingress artifacts, including setup, data request, and processing functions.
-Added as part of the ingress #13magnus in november 2013, artifacts
-are additional game elements overlayed on the intel map</p>
-<p>currently there are only jarvis-related entities</p>
-<ul>
-<li><code>shards</code>: move between portals (along links) each hour. more than one can be at a portal.</li>
-<li><code>targets</code>: specific portals - one per team.</li>
-</ul>
-<p>The artifact data includes details for the specific portals, so can be useful.
-2014-02-06: intel site updates hint at new 'amar artifacts', likely following the same system as above</p></div>
+                <div class="description"><p>Chat-panel UI framework: tabs, input, scrolling and the channel-registration API.
+The COMM data layer lives in comm.js</p></div>
             
 
             
@@ -125,6 +118,247 @@ are additional game elements overlayed on the intel map</p>
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".chat.channelContainerTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>chat.channelContainerTemplate<span class="type-signature"> :string</span>
+    
+    <div class="container-source members">
+        <code><a href="code_chat.js.html">code/chat.js</a></code>,
+        <code><a href="code_chat.js.html#line29">line 29</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template of a channel message container appended to the chat panel.</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".chat.channelTabTemplate">
+    <span class="type-signature"><span class="icon green">static</span> </span>chat.channelTabTemplate<span class="type-signature"> :string</span>
+    
+    <div class="container-source members">
+        <code><a href="code_chat.js.html">code/chat.js</a></code>,
+        <code><a href="code_chat.js.html#line21">line 21</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Template of a channel tab link shown in the chat controls.</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".chat.channels">
+    <span class="type-signature"><span class="icon green">static</span> </span>chat.channels<span class="type-signature"> :Array.&lt;<a href="global.html#ChannelDescription">ChannelDescription</a>></span>
+    
+    <div class="container-source members">
+        <code><a href="code_chat.js.html">code/chat.js</a></code>,
+        <code><a href="code_chat.js.html#line154">line 154</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Holds channels infos.</p>
+    </div>
+    
+
+    <!--
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;<a href="global.html#ChannelDescription">ChannelDescription</a>></span>
+
+
+            </li>
+        </ul>
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -134,14 +368,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".clearData">
+        <h4 class="name" id=".chat.addChannel">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>clearData<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.addChannel<span class="signature">(channelDesc)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line119">line 119</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line435">line 435</a></code>
             </div>
             
         </h4>
@@ -153,96 +387,8 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Clears all stored artifact data.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".entityInject">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>entityInject<span class="signature">(data)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line212">line 212</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Inject artifact portals into render process</p>
+        <p>Add to the channel list a new channel description</p>
+<p>If tabs are already created, a tab is created for this channel as well</p>
     </div>
     
 
@@ -278,13 +424,13 @@ are additional game elements overlayed on the intel map</p>
 
         <tr>
             
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>channelDesc</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type"><a href="global.html#ChannelDescription">ChannelDescription</a></span>
 
 
             
@@ -294,7 +440,7 @@ are additional game elements overlayed on the intel map</p>
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>channel description</p></td>
         </tr>
 
     
@@ -362,14 +508,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".getArtifactEntities">
+        <h4 class="name" id=".chat.addNickname">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>getArtifactEntities<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.addNickname<span class="signature">(nick)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line197">line 197</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line41">line 41</a></code>
             </div>
             
         </h4>
@@ -381,338 +527,7 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Used to render portals that would otherwise be below the visible level.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">Array</span>
-
-
-
-
-
-- <p>array of Portal entities with shards or shard targets</p>
-<p>unused by IITC</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".getArtifactTypes">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>getArtifactTypes<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line178">line 178</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the types of artifacts currently known.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">Array</span>
-
-
-
-
-
-- <p>An array of artifact type strings.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".getInterestingPortals">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>getInterestingPortals<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line216">line 216</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Gets the portals that are relevant to the artifacts.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">Array</span>
-
-
-
-
-
-- <p>An array of portal GUIDs.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".getPortalData">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>getPortalData<span class="signature">(guid, artifactId)</span><span class="type-signature"> &rarr; {Object|false}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line235">line 235</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Retrieves the artifact data for a specified artifact id (e.g. 'jarvis'), if available.</p>
+        <p>Adds a nickname to the chat input.</p>
     </div>
     
 
@@ -748,7 +563,7 @@ are additional game elements overlayed on the intel map</p>
 
         <tr>
             
-                <td class="name"><code>guid</code></td>
+                <td class="name"><code>nick</code></td>
             
 
             <td class="type">
@@ -764,14 +579,155 @@ are additional game elements overlayed on the intel map</p>
 
             
 
-            <td class="description last"><p>The GUID of the portal.</p></td>
+            <td class="description last"><p>The nickname to add.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.backgroundChannelData">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.backgroundChannelData<span class="signature">(instance, channel, flag)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line187">line 187</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Allows plugins to request and monitor COMM data streams in the background. This is useful for plugins
+that need to process COMM data even when the user is not actively viewing the COMM channels.
+It tracks the requested channels for each plugin instance and updates the global state accordingly.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>instance</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A unique identifier for the plugin or instance requesting background COMM data.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>artifactId</code></td>
+                <td class="name"><code>channel</code></td>
             
 
             <td class="type">
@@ -787,7 +743,172 @@ are additional game elements overlayed on the intel map</p>
 
             
 
-            <td class="description last"><p>The ID of the artifact type.</p></td>
+            <td class="description last"><p>The name of the COMM channel ('all', 'faction', or 'alerts').</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>flag</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Set to true to request data for the specified channel, false to stop requesting.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.channelState">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.channelState<span class="signature">(el)</span><span class="type-signature"> &rarr; {Object}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line84">line 84</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Returns the per-channel-element UI flag store for the given channel DOM element.
+The native WeakMap store is the source of truth, but writes are mirrored into <code>$(el).data(key)</code>
+and reads fall back to it, so legacy plugins that access these flags via jQuery <code>.data()</code>
+keep working.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>el</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The channel DOM element.</p></td>
         </tr>
 
     
@@ -816,221 +937,773 @@ are additional game elements overlayed on the intel map</p>
 
 
 <span class="param-type">Object</span>
+
+
+
+
+
+- <p>A proxy exposing the element's UI flags.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.chooseTab">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.chooseTab<span class="signature">(tab)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line249">line 249</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Chooses and activates a specified chat tab.
+Also triggers an early refresh of the chat data when switching tabs.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tab</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the chat tab to activate ('all', 'faction', or 'alerts').</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.chooser">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.chooser<span class="signature">(event)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line348">line 348</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Chat tab chooser handler.
+This function is triggered by a click event on the chat tab. It reads the tab name from the event target
+and activates the corresponding chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The event triggered by clicking a chat tab.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.getActive">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.getActive<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line162">line 162</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Gets the name of the active chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+
+
+
+
+
+- <p>The name of the active chat tab.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.getChannelDesc">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.getChannelDesc<span class="signature">(tab)</span><span class="type-signature"> &rarr; {<a href="global.html#ChannelDescription">ChannelDescription</a>}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line173">line 173</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Converts a chat tab name to its corresponding channel object.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tab</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the chat tab.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type"><a href="global.html#ChannelDescription">ChannelDescription</a></span>
+
+
+
+
+
+- <p>The corresponding channel name ('faction', 'alerts', or 'all').</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.handleTabCompletion">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.handleTabCompletion<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line611">line 611</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Handles tab completion in chat input.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.keepScrollPosition">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.keepScrollPosition<span class="signature">(box, scrollBefore, isOldMsgs)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line368">line 368</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Maintains the scroll position of a chat box when new messages are added.
+This function is designed to keep the scroll position fixed when old messages are loaded, and to automatically scroll
+to the bottom when new messages are added if the user is already at the bottom of the chat.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>box</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">HTMLElement</span>
 |
 
-<span class="param-type">false</span>
-
-
-
-
-
-- <p>Artifact data for the specified portal and type, or undefined if not available.</p>
-<p>unused by IITC</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".handleFailure">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>handleFailure<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line90">line 90</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Handles failure in artifact data request. Schedules a new request after a short delay.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".handleSuccess">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>handleSuccess<span class="signature">(data)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line73">line 73</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Handles successful artifact data response from the server.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
+<span class="param-type">jQuery</span>
 
 
             
@@ -1040,7 +1713,53 @@ are additional game elements overlayed on the intel map</p>
 
             
 
-            <td class="description last"><p>Artifact data received from the server.</p></td>
+            <td class="description last"><p>The chat box element (a jQuery object is also accepted for legacy callers).</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scrollBefore</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The scroll position before new messages were added.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isOldMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if the added messages are older messages.</p></td>
         </tr>
 
     
@@ -1108,14 +1827,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".idleResume">
+        <h4 class="name" id=".chat.needMoreMessages">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>idleResume<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.needMoreMessages<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line62">line 62</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line227">line 227</a></code>
             </div>
             
         </h4>
@@ -1127,7 +1846,8 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Resumes artifact data requests when coming out of idle mode.</p>
+        <p>Checks if the currently selected chat tab needs more messages.
+This function is triggered by scroll events and loads older messages when the user scrolls to the top.</p>
     </div>
     
 
@@ -1197,14 +1917,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".isArtifact">
+        <h4 class="name" id=".chat.nicknameClicked">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>isArtifact<span class="signature">(type)</span><span class="type-signature"> &rarr; {boolean}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.nicknameClicked<span class="signature">(event, nickname)</span><span class="type-signature"> &rarr; {boolean}</span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line187">line 187</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line55">line 55</a></code>
             </div>
             
         </h4>
@@ -1216,7 +1936,7 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Determines if a given type is a knowable artifact.</p>
+        <p>Handles click events on nicknames in the chat.</p>
     </div>
     
 
@@ -1252,7 +1972,30 @@ are additional game elements overlayed on the intel map</p>
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The click event.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nickname</code></td>
             
 
             <td class="type">
@@ -1268,7 +2011,7 @@ are additional game elements overlayed on the intel map</p>
 
             
 
-            <td class="description last"><p>The type to check.</p></td>
+            <td class="description last"><p>The clicked nickname.</p></td>
         </tr>
 
     
@@ -1302,7 +2045,7 @@ are additional game elements overlayed on the intel map</p>
 
 
 
-- <p>True if the type is an artifact, false otherwise.</p>
+- <p>Always returns false.</p>
 
 
 
@@ -1357,14 +2100,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".isInterestingPortal">
+        <h4 class="name" id=".chat.postMsg">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>isInterestingPortal<span class="signature">(guid)</span><span class="type-signature"> &rarr; {boolean}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.postMsg<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line225">line 225</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line655">line 655</a></code>
             </div>
             
         </h4>
@@ -1376,7 +2119,96 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Quickly checks if a portal is relevant to any type of artifacts.</p>
+        <p>Posts a chat message to the currently active chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.renderAlerts">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.renderAlerts<span class="signature">(oldMsgsWereAdded)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line538">line 538</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders alerts chat in the UI.</p>
     </div>
     
 
@@ -1412,7 +2244,285 @@ are additional game elements overlayed on the intel map</p>
 
         <tr>
             
-                <td class="name"><code>guid</code></td>
+                <td class="name"><code>oldMsgsWereAdded</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if older messages were added to the chat.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.renderFaction">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.renderFaction<span class="signature">(oldMsgsWereAdded)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line528">line 528</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders faction chat.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>oldMsgsWereAdded</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Indicates if old messages were added in the current rendering.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.renderMsg">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.renderMsg<span class="signature">(msg, nick, time, team, msgToPlayer, systemNarrowcast)</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line714">line 714</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Legacy function for rendering chat messages. Used for backward compatibility with plugins.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>msg</code></td>
             
 
             <td class="type">
@@ -1428,7 +2538,122 @@ are additional game elements overlayed on the intel map</p>
 
             
 
-            <td class="description last"><p>The GUID of the portal to check.</p></td>
+            <td class="description last"><p>The chat message.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nick</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The nickname of the player who sent the message.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>time</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The timestamp of the message.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>team</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The team of the player who sent the message.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>msgToPlayer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Flag indicating if the message is directed to the player.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>systemNarrowcast</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Flag indicating if the message is a system narrowcast.</p></td>
         </tr>
 
     
@@ -1456,131 +2681,133 @@ are additional game elements overlayed on the intel map</p>
 
 
 
+<span class="param-type">string</span>
+
+
+
+
+
+- <p>The HTML string representing a chat message row.</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.renderPublic">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.renderPublic<span class="signature">(oldMsgsWereAdded)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line518">line 518</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renders public chat in the UI.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>oldMsgsWereAdded</code></td>
+            
+
+            <td class="type">
+            
+                
 <span class="param-type">boolean</span>
 
 
-
-
-
-- <p>True if the portal is involved in artifacts, false otherwise.</p>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".processData">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>processData<span class="signature">(data)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line98">line 98</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Processes artifact data. Clears previous data, processes new results, runs hooks, and updates the artifact layer.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
             
             </td>
 
@@ -1588,7 +2815,7 @@ are additional game elements overlayed on the intel map</p>
 
             
 
-            <td class="description last"><p>Artifact data to process.</p></td>
+            <td class="description last"><p>Indicates if older messages were added to the chat.</p></td>
         </tr>
 
     
@@ -1656,14 +2883,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".processResult">
+        <h4 class="name" id=".chat.request">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>processResult<span class="signature">(portals)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.request<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line130">line 130</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line212">line 212</a></code>
             </div>
             
         </h4>
@@ -1675,7 +2902,97 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Processes the results from artifact portal data. Extracts and stores portal data for each artifact type.</p>
+        <p>Requests chat messages for the currently active chat tab and background channels.
+It calls the appropriate request function based on the active tab or background channels.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.requestAlerts">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.requestAlerts<span class="signature">(getOlderMsgs, isRetry<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line508">line 508</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Initiates a request for alerts chat data.</p>
     </div>
     
 
@@ -1699,7 +3016,11 @@ are additional game elements overlayed on the intel map</p>
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1711,23 +3032,74 @@ are additional game elements overlayed on the intel map</p>
 
         <tr>
             
-                <td class="name"><code>portals</code></td>
+                <td class="name"><code>getOlderMsgs</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">boolean</span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
             
 
-            <td class="description last"><p>The artifact portal data.</p></td>
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether to retrieve older messages.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether the request is a retry.</p></td>
         </tr>
 
     
@@ -1795,14 +3167,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".requestData">
+        <h4 class="name" id=".chat.requestFaction">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>requestData<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.requestFaction<span class="signature">(getOlderMsgs, isRetry<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line50">line 50</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line497">line 497</a></code>
             </div>
             
         </h4>
@@ -1814,7 +3186,395 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Requests artifact data from the server. If the map is in idle mode, sets a flag instead of sending a request.</p>
+        <p>Requests faction chat messages.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>getOlderMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Flag to determine if older messages are being requested.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Flag to indicate if this is a retry attempt.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.requestPublic">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.requestPublic<span class="signature">(getOlderMsgs, isRetry<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line486">line 486</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Initiates a request for public chat data.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>getOlderMsgs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether to retrieve older messages.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>isRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether the request is a retry.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.setup">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.setup<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line548">line 548</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets up the chat interface.</p>
     </div>
     
 
@@ -1884,14 +3644,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".setup">
+        <h4 class="name" id=".chat.setupPosting">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>setup<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.setupPosting<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line20">line 20</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line674">line 674</a></code>
             </div>
             
         </h4>
@@ -1903,7 +3663,7 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Sets up artifact data fetching, layer creation, and UI elements.</p>
+        <p>Sets up the chat message posting functionality.</p>
     </div>
     
 
@@ -1973,14 +3733,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".showArtifactList">
+        <h4 class="name" id=".chat.setupTabs">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>showArtifactList<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.setupTabs<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line298">line 298</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line463">line 463</a></code>
             </div>
             
         </h4>
@@ -1992,7 +3752,7 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Displays a dialog listing all portals involved with artifacts, organized by artifact types.</p>
+        <p>Sets up all channels starting from intel COMM</p>
     </div>
     
 
@@ -2062,14 +3822,14 @@ are additional game elements overlayed on the intel map</p>
 
 <dt>
     
-        <h4 class="name" id=".updateLayer">
+        <h4 class="name" id=".chat.setupTime">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>updateLayer<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.setupTime<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_artifact.js.html">code/artifact.js</a></code>,
-                <code><a href="code_artifact.js.html#line248">line 248</a></code>
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line585">line 585</a></code>
             </div>
             
         </h4>
@@ -2081,7 +3841,401 @@ are additional game elements overlayed on the intel map</p>
 
     
     <div class="description">
-        <p>Updates the artifact layer on the map based on the current artifact data.</p>
+        <p>Sets up the time display in the chat input box.
+This function updates the time displayed next to the chat input field every minute to reflect the current time.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.show">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.show<span class="signature">(name)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line328">line 328</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Displays the chat interface and activates a specified chat tab.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the chat tab to show and activate.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.tabToChannel">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.tabToChannel<span class="signature">(tab)</span><span class="type-signature"> &rarr; {string}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line749">line 749</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Legacy function for converts a chat tab name to its corresponding COMM channel name.
+Used for backward compatibility with plugins.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tab</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the chat tab.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">string</span>
+
+
+
+
+
+- <p>The corresponding channel name ('faction', 'alerts', or 'all').</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".chat.toggle">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>chat.toggle<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="code_chat.js.html">code/chat.js</a></code>,
+                <code><a href="code_chat.js.html#line298">line 298</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Toggles the chat window between expanded and collapsed states.
+When expanded, the chat window covers a larger area of the screen.
+This function also ensures that the chat is scrolled to the bottom when collapsed.</p>
     </div>
     
 
@@ -2171,7 +4325,7 @@ are additional game elements overlayed on the intel map</p>
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'window.artifact_sub'.replace(/"/g, '_');
+        var id = 'IITC.chat_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
