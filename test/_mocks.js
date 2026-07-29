@@ -8,6 +8,23 @@ class Map {
   removeLayer() {}
   setView() {}
   fitBounds() {}
+  getCenter() {
+    return { lat: 0, lng: 0 };
+  }
+  // minimal bounds stub; comm specs override map.getBounds for _genPostData scenarios
+  getBounds() {
+    return {
+      pad() {
+        return this;
+      },
+      contains() {
+        return true;
+      },
+      getNorthEast: () => ({ lat: 1, lng: 1 }),
+      getSouthWest: () => ({ lat: 0, lng: 0 }),
+      toBBoxString: () => '0,0,1,1',
+    };
+  }
 }
 
 // real jsdom DOM bound to the same window as jQuery, so specs build/inspect it natively;
@@ -15,6 +32,7 @@ class Map {
 const { window: domWindow } = new JSDOM('<!DOCTYPE html><html><body></body></html>', { url: 'https://intel.ingress.com/intel' });
 globalThis.document = domWindow.document;
 globalThis.$ = jQueryFactory(domWindow);
+globalThis.jQuery = globalThis.$;
 
 // keep a simple string-backed cookie the utils specs rely on (jsdom's real document.cookie
 // drops expires/path on read and ignores empty-string resets)
@@ -33,6 +51,16 @@ globalThis.window = {
   runHooks: () => {},
   dialog: () => {},
   isSmartphone: () => false,
+  isIdle: () => false,
+  postAjax: () => {},
+  startRefreshTimeout: () => {},
+  addResumeFunction: () => {},
+  useAppPanes: () => false,
+  useAndroidPanes: () => false,
+  show: () => {},
+  requests: { addRefreshFunction: () => {} },
+  CHAT_REQUEST_SCROLL_TOP: 200,
+  failedRequestCount: 0,
 
   // game constants, mirrored from core/total-conversion-build.js (all indexed by numeric team id where relevant)
   TEAM_NONE: 0,
@@ -43,6 +71,7 @@ globalThis.window = {
   TEAM_CODENAMES: ['NEUTRAL', 'RESISTANCE', 'ENLIGHTENED', 'MACHINA'],
   TEAM_SHORTNAMES: ['NEU', 'RES', 'ENL', 'MAC'],
   TEAM_TO_CSS: ['none', 'res', 'enl', 'mac'],
+  TEAM_NAMES: ['Neutral', 'Resistance', 'Enlightened', '__MACHINA__'],
   COLORS: ['#FF6600', '#0088FF', '#03DC03', '#FF0028'],
   COLORS_LVL: ['#000', '#FECE5A', '#FFA630', '#FF7315', '#E40000', '#FD2992', '#EB26CD', '#C124E0', '#9627F4'],
   COLORS_MOD: { VERY_RARE: '#F781FF', RARE: '#B68BFF', COMMON: '#49EBC3' },
@@ -74,6 +103,13 @@ globalThis.window = {
     return id >= 0 ? id : globalThis.window.TEAM_NONE;
   },
 };
+
+// bare globals some core modules read unqualified via /* global map, PLAYER */
+globalThis.map = globalThis.window.map;
+globalThis.PLAYER = globalThis.window.PLAYER;
+
+// android app bridge stub
+globalThis.app = { addPane: () => {} };
 
 // ulog stub (each bundled core module receives a `log` instance)
 globalThis.log = { log() {}, debug() {}, info() {}, warn() {}, error() {} };
@@ -129,6 +165,15 @@ if (!String.prototype.capitalize) {
   Object.defineProperty(String.prototype, 'capitalize', {
     value: function () {
       return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+    },
+  });
+}
+
+// String.prototype.autoLink polyfill (from the external autolink library); identity keeps rendered output deterministic
+if (!String.prototype.autoLink) {
+  Object.defineProperty(String.prototype, 'autoLink', {
+    value: function () {
+      return this.toString();
     },
   });
 }

@@ -28,9 +28,7 @@ function handler_portal_contextmenu(e) {
     window.show('info');
   } else {
     const scrollwrapper = document.getElementById('scrollwrapper');
-    // equivalent of jQuery ':visible'
-    const visible = scrollwrapper && (scrollwrapper.offsetWidth > 0 || scrollwrapper.offsetHeight > 0 || scrollwrapper.getClientRects().length > 0);
-    if (!visible) {
+    if (!IITC.utils._isVisible(scrollwrapper)) {
       document.getElementById('sidebartoggle')?.click();
     }
   }

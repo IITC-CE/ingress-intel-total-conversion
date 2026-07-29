@@ -135,8 +135,7 @@ const renderDetails = function (guid, forceSelect) {
   }
 
   const sidebar = document.getElementById('sidebar');
-  // equivalent of jQuery ':visible'
-  if (sidebar && (sidebar.offsetWidth > 0 || sidebar.offsetHeight > 0 || sidebar.getClientRects().length > 0)) {
+  if (IITC.utils._isVisible(sidebar)) {
     IITC.portal.display.resetScroll();
     IITC.portal.display.renderDetails.lastVisible = guid;
   }

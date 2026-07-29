@@ -298,7 +298,7 @@ function boot() {
   window.ornaments.setup();
   window.layerChooser._lastPriority = 1000; // plugins overlays have priority >1000
   window.setupTooltips();
-  window.chat.setup();
+  IITC.chat.setup();
   window.updateGameScore();
   window.search.setup();
   IITC.portal.details.setup();

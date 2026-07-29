@@ -568,14 +568,7 @@ describe('IITC.utils.genFourColumnTable', () => {
   it('should generate a single row with two data cells for one block', () => {
     const blocks = [['Header1', 'Data1', 'Tooltip1']];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
-      `<tr>` +
-      `<td title="Tooltip1">Data1</td>` +
-      `<th title="Tooltip1">Header1</th>` +
-      `<td></td>` +
-      `<td></td>` +
-      `</tr>`;
+    const check = `<tr><td title="Tooltip1">Data1</td><th title="Tooltip1">Header1</th><td></td><td></td></tr>`;
     expect(result).to.equal(check);
   });
 
@@ -585,8 +578,8 @@ describe('IITC.utils.genFourColumnTable', () => {
       ['Header2', 'Data2', 'Tooltip2'],
     ];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
+    const check =
+      `` +
       `<tr>` +
       `<td title="Tooltip1">Data1</td>` +
       `<th title="Tooltip1">Header1</th>` +
@@ -603,8 +596,8 @@ describe('IITC.utils.genFourColumnTable', () => {
       ['Header3', 'Data3', 'Tooltip3'],
     ];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
+    const check =
+      `` +
       `<tr>` +
       `<td title="Tooltip1">Data1</td>` +
       `<th title="Tooltip1">Header1</th>` +
@@ -626,14 +619,7 @@ describe('IITC.utils.genFourColumnTable', () => {
       ['Header2', 'Data2'],
     ];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
-      `<tr>` +
-      `<td>Data1</td>` +
-      `<th>Header1</th>` +
-      `<th>Header2</th>` +
-      `<td>Data2</td>` +
-      `</tr>`;
+    const check = `<tr><td>Data1</td><th>Header1</th><th>Header2</th><td>Data2</td></tr>`;
     expect(result).to.equal(check);
   });
 });
@@ -648,15 +634,14 @@ describe('IITC.utils.textToTable', () => {
   it('should create a table with one row and two columns for a single tab-separated line', () => {
     const text = 'Cell1\tCell2';
     const result = IITC.utils.textToTable(text);
-    const check = `<table>` + `<tr><td>Cell1</td><td>Cell2</td></tr>` + `</table>`;
+    const check = `<table><tr><td>Cell1</td><td>Cell2</td></tr></table>`;
     expect(result).to.equal(check);
   });
 
   it('should create a table with multiple rows and columns for text with multiple lines and tabs', () => {
     const text = 'R1C1\tR1C2\nR2C1\tR2C2\nR3C1\tR3C2';
     const result = IITC.utils.textToTable(text);
-    const check =
-      `<table>` + `<tr><td>R1C1</td><td>R1C2</td></tr>` + `<tr><td>R2C1</td><td>R2C2</td></tr>` + `<tr><td>R3C1</td><td>R3C2</td></tr>` + `</table>`;
+    const check = `<table><tr><td>R1C1</td><td>R1C2</td></tr><tr><td>R2C1</td><td>R2C2</td></tr><tr><td>R3C1</td><td>R3C2</td></tr></table>`;
     expect(result).to.equal(check);
   });
 
@@ -681,7 +666,7 @@ describe('IITC.utils.textToTable', () => {
   it('should escape HTML special characters within cells', () => {
     const text = 'Cell1\tCell<2>\nCell&3\tCell"4"';
     const result = IITC.utils.textToTable(text);
-    const check = `<table>` + `<tr><td>Cell1</td><td>Cell&lt;2&gt;</td></tr>` + `<tr><td>Cell&amp;3</td><td>Cell&quot;4&quot;</td></tr>` + `</table>`;
+    const check = `<table><tr><td>Cell1</td><td>Cell&lt;2&gt;</td></tr><tr><td>Cell&amp;3</td><td>Cell&quot;4&quot;</td></tr></table>`;
     expect(result).to.equal(check);
   });
 });
@@ -791,5 +776,35 @@ describe('IITC.utils.getTeamId', () => {
       expect(IITC.utils.getTeamId(true)).to.equal(window.TEAM_NONE);
       expect(IITC.utils.getTeamId([])).to.equal(window.TEAM_NONE);
     });
+  });
+});
+
+describe('IITC.utils._isVisible', () => {
+  it('returns false for a null or missing element', () => {
+    expect(IITC.utils._isVisible(null)).to.be.false;
+    expect(IITC.utils._isVisible(undefined)).to.be.false;
+  });
+
+  it('returns false for an element that occupies no layout space', () => {
+    const el = document.createElement('div');
+    expect(IITC.utils._isVisible(el)).to.be.false;
+  });
+
+  it('returns true when the element has a non-zero offset width', () => {
+    const el = document.createElement('div');
+    Object.defineProperty(el, 'offsetWidth', { value: 100, configurable: true });
+    expect(IITC.utils._isVisible(el)).to.be.true;
+  });
+
+  it('returns true when the element has a non-zero offset height', () => {
+    const el = document.createElement('div');
+    Object.defineProperty(el, 'offsetHeight', { value: 20, configurable: true });
+    expect(IITC.utils._isVisible(el)).to.be.true;
+  });
+
+  it('returns true when the element reports client rects', () => {
+    const el = document.createElement('div');
+    el.getClientRects = () => [{ width: 10, height: 10 }];
+    expect(IITC.utils._isVisible(el)).to.be.true;
   });
 });
