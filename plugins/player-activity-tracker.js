@@ -424,9 +424,9 @@ window.plugin.playerTracker.getPortalLink = function (data) {
   return $('<a>')
     .addClass('text-overflow-ellipsis')
     .css('max-width', '15em')
-    .text(IITC.chat.getChatPortalName(data))
+    .text(IITC.comm.getChatPortalName(data))
     .prop({
-      title: IITC.chat.getChatPortalName(data),
+      title: IITC.comm.getChatPortalName(data),
       href: IITC.portal.display.makePermalink(position),
     })
     .click(function (event) {
