@@ -6,7 +6,7 @@ import sinon from 'sinon';
 /* eslint-disable no-unused-expressions */
 
 before(async () => {
-  await import('../core/code/data_cache.js');
+  await import('../core/code/map_cache.js');
 });
 
 describe('IITC.map.Cache', () => {

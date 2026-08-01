@@ -9,10 +9,10 @@ before(async () => {
   globalThis.window.layerChooser = { addOverlay() {} };
   globalThis.IITC.statusbar = { map: { update() {} } };
 
-  await import('../core/code/data_cache.js');
-  await import('../core/code/map_data_render.js');
-  await import('../core/code/map_data_debug.js');
-  await import('../core/code/map_data_request.js');
+  await import('../core/code/map_cache.js');
+  await import('../core/code/map_renderer.js');
+  await import('../core/code/map_debug.js');
+  await import('../core/code/map_request.js');
 });
 
 describe('IITC.map.Request', () => {

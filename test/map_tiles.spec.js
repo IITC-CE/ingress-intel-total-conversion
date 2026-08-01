@@ -6,7 +6,7 @@ import sinon from 'sinon';
 /* eslint-disable no-unused-expressions */
 
 before(async () => {
-  await import('../core/code/map_data_calc_tools.js');
+  await import('../core/code/map_tiles.js');
 });
 
 describe('IITC.map.tiles coordinate conversions', () => {
