@@ -1,9 +1,12 @@
 /* global IITC, L, log -- eslint */
 
 /**
- * @file This file provides functions for working with maps.
- * @module map
+ * Namespace for the Leaflet map: setup, map options and the live map data request instance.
+ *
+ * @memberof IITC
+ * @namespace map
  */
+IITC.map = {};
 
 function setupCRS() {
   // use the earth radius value from s2 geometry library
@@ -220,7 +223,7 @@ function createDefaultOverlays() {
 }
 
 // to be extended in app.js (or by plugins: `setup.priority = 'boot';`)
-window.mapOptions = {
+IITC.map.options = {
   preferCanvas: 'PREFER_CANVAS' in window ? window.PREFER_CANVAS : true, // default is TRUE
 };
 
@@ -238,9 +241,9 @@ window.mapOptions = {
  * - Manages cookies for map position and zoom level.
  * - Handles the 'iitcLoaded' hook to set the initial map view and evaluate URL parameters for portal selection.
  *
- * @function setupMap
+ * @memberof IITC.map
  */
-window.setupMap = function () {
+IITC.map.setup = function () {
   setupCRS();
 
   $('#map').text(''); // clear 'Loading, please wait'
@@ -260,7 +263,7 @@ window.setupMap = function () {
         maxBoundsViscosity: 0.7,
         worldCopyJump: true,
       },
-      window.mapOptions
+      IITC.map.options
     )
   );
   var max_lat = map.options.crs.projection.MAX_LATITUDE;
@@ -371,7 +374,7 @@ window.setupMap = function () {
   });
 
   // create the map data requester
-  window.mapDataRequest = new window.MapDataRequest();
+  IITC.map.request = new IITC.map.Request();
 
   // start the refresh process with a small timeout, so the first data request happens quickly
   // (the code originally called the request function directly, and triggered a normal delay for the next refresh.
@@ -405,7 +408,7 @@ window.setupMap = function () {
     layerChooser.notifyBaseLayerChange();
 
     // Start map refresh (after Map location is set)
-    window.mapDataRequest.start();
+    IITC.map.request.start();
   });
 };
 
@@ -425,3 +428,9 @@ const parseURLParameters = () => {
     IITC.portal.selectWhenLoadedByGuid(urlPGuid);
   }
 };
+
+IITC.registerLegacyAliases(IITC.map, {
+  setupMap: 'setup',
+  mapOptions: 'options',
+  mapDataRequest: 'request',
+});

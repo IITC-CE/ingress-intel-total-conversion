@@ -6,6 +6,7 @@ import sinon from 'sinon';
 /* eslint-disable no-unused-expressions */
 
 before(async () => {
+  await import('../core/code/map.js');
   await import('../core/code/map_cache.js');
 });
 

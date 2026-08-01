@@ -9,6 +9,7 @@ before(async () => {
   globalThis.window.layerChooser = { addOverlay() {} };
   globalThis.IITC.statusbar = { map: { update() {} } };
 
+  await import('../core/code/map.js');
   await import('../core/code/map_cache.js');
   await import('../core/code/map_renderer.js');
   await import('../core/code/map_debug.js');
@@ -19,8 +20,9 @@ describe('IITC.map.Request', () => {
   it('wires up cache, renderer and debug tiles on construction', () => {
     const req = new IITC.map.Request();
     expect(req.cache).to.be.instanceOf(IITC.map.Cache);
-    expect(req.render).to.be.instanceOf(IITC.map.Renderer);
+    expect(req.renderer).to.be.instanceOf(IITC.map.Renderer);
     expect(req.debugTiles).to.be.instanceOf(IITC.map.DebugTiles);
+    expect(req.render).to.equal(req.renderer);
   });
 
   it('sets an initial startup status', () => {

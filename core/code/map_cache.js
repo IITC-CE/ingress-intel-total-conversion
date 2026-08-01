@@ -1,12 +1,13 @@
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 /**
- * DataCache constructor.
  * Manages a cache for map data tiles. The cache has a maximum age and size limit,
  * and these limits can vary for mobile and desktop environments.
- * @class DataCache
+ *
+ * @memberof IITC.map
+ * @class Cache
  */
-window.DataCache = function () {
+IITC.map.Cache = function () {
   this.REQUEST_CACHE_FRESH_AGE = 3 * 60; // if younger than this, use data in the cache rather than fetching from the server
 
   this.REQUEST_CACHE_MAX_AGE = 5 * 60; // maximum cache age. entries are deleted from the cache after this time
@@ -34,11 +35,11 @@ window.DataCache = function () {
  * The data is stored along with its timestamp and expiration time.
  *
  * @function
- * @memberof DataCache
+ * @memberof IITC.map.Cache
  * @param {string} qk - The key under which to store the data.
  * @param {object} data - The data to be stored in the cache.
  */
-window.DataCache.prototype.store = function (qk, data) {
+IITC.map.Cache.prototype.store = function (qk, data) {
   this.remove(qk);
 
   var time = new Date().getTime();
@@ -54,10 +55,10 @@ window.DataCache.prototype.store = function (qk, data) {
  * Removes a specific entry from the cache based on its key.
  *
  * @function
- * @memberof DataCache
+ * @memberof IITC.map.Cache
  * @param {string} qk - The key of the data to remove from the cache.
  */
-window.DataCache.prototype.remove = function (qk) {
+IITC.map.Cache.prototype.remove = function (qk) {
   if (qk in this._cache) {
     this._cacheCharSize -= this._cache[qk].dataStr.length;
     delete this._cache[qk];
@@ -68,11 +69,11 @@ window.DataCache.prototype.remove = function (qk) {
  * Retrieves the data for a given key from the cache.
  *
  * @function
- * @memberof DataCache
+ * @memberof IITC.map.Cache
  * @param {string} qk - The key of the data to retrieve.
  * @returns {object|undefined} The cached data if it exists, otherwise undefined.
  */
-window.DataCache.prototype.get = function (qk) {
+IITC.map.Cache.prototype.get = function (qk) {
   if (qk in this._cache) return JSON.parse(this._cache[qk].dataStr);
   else return undefined;
 };
@@ -81,11 +82,11 @@ window.DataCache.prototype.get = function (qk) {
  * Retrieves the timestamp for the given key from the cache.
  *
  * @function
- * @memberof DataCache
+ * @memberof IITC.map.Cache
  * @param {string} qk - The key of the data to check.
  * @returns {number} The timestamp of the data if it exists, otherwise 0.
  */
-window.DataCache.prototype.getTime = function (qk) {
+IITC.map.Cache.prototype.getTime = function (qk) {
   if (qk in this._cache) return this._cache[qk].time;
   else return 0;
 };
@@ -94,11 +95,11 @@ window.DataCache.prototype.getTime = function (qk) {
  * Checks if the data for the given key is fresh.
  *
  * @function
- * @memberof DataCache
+ * @memberof IITC.map.Cache
  * @param {string} qk - The key of the data to check.
  * @returns {boolean|undefined} True if the data is fresh, false if it's stale, undefined if data doesn't exist.
  */
-window.DataCache.prototype.isFresh = function (qk) {
+IITC.map.Cache.prototype.isFresh = function (qk) {
   if (qk in this._cache) {
     var d = new Date();
     var t = d.getTime();
@@ -113,10 +114,10 @@ window.DataCache.prototype.isFresh = function (qk) {
  * Starts the interval to periodically run the cache expiration.
  *
  * @function
- * @memberof DataCache
+ * @memberof IITC.map.Cache
  * @param {number} period - The period in seconds between each expiration run.
  */
-window.DataCache.prototype.startExpireInterval = function (period) {
+IITC.map.Cache.prototype.startExpireInterval = function (period) {
   if (this._interval === undefined) {
     var savedContext = this;
     this._interval = setInterval(function () {
@@ -131,9 +132,9 @@ window.DataCache.prototype.startExpireInterval = function (period) {
  * effectively stopping automatic cache cleanup.
  *
  * @function
- * @memberof DataCache.prototype
+ * @memberof IITC.map.Cache
  */
-window.DataCache.prototype.stopExpireInterval = function () {
+IITC.map.Cache.prototype.stopExpireInterval = function () {
   if (this._interval !== undefined) {
     clearInterval(this._interval);
     this._interval = undefined;
@@ -146,9 +147,9 @@ window.DataCache.prototype.stopExpireInterval = function () {
  * and character size limits.
  *
  * @function
- * @memberof DataCache.prototype
+ * @memberof IITC.map.Cache
  */
-window.DataCache.prototype.runExpire = function () {
+IITC.map.Cache.prototype.runExpire = function () {
   var d = new Date();
   var t = d.getTime() - this.REQUEST_CACHE_MAX_AGE * 1000;
 
@@ -162,3 +163,7 @@ window.DataCache.prototype.runExpire = function () {
     }
   }
 };
+
+IITC.registerLegacyAliases(IITC.map, {
+  DataCache: 'Cache',
+});

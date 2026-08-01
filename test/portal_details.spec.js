@@ -1,4 +1,4 @@
-import { describe, it, before } from 'mocha';
+import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -33,20 +33,28 @@ class MockDataCache {
   }
 }
 
+// window.DataCache is a live alias of IITC.map.Cache, so scope the mock to these suites and restore it afterwards
+let originalDataCache;
+function setupWithMockCache() {
+  originalDataCache = window.DataCache;
+  window.DataCache = MockDataCache;
+  IITC.portal.details.setup();
+}
+function restoreDataCache() {
+  window.DataCache = originalDataCache;
+}
+
 before(async () => {
   // IITC.portal must exist for the module to attach .details and register aliases
   await import('../core/code/portal.js');
 
   Object.assign(globalThis.window, {
-    DataCache: MockDataCache,
     decodeArray: { portal: () => ({ mods: [1] }) },
     mapDataRequest: { render: { createPortalEntity: () => ({ options: { data: { guid: 'OK', image: null } } }) } },
   });
   globalThis.Image = class {};
 
   await import('../core/code/portal_details.js');
-
-  IITC.portal.details.setup();
 });
 
 describe('IITC.portal.details namespace', () => {
@@ -57,6 +65,9 @@ describe('IITC.portal.details namespace', () => {
 });
 
 describe('IITC.portal.details cache', () => {
+  beforeEach(setupWithMockCache);
+  afterEach(restoreDataCache);
+
   it('setup initializes an expiring cache', () => {
     IITC.portal.details.setup();
     expect(lastCache).to.be.instanceOf(MockDataCache);
@@ -77,6 +88,9 @@ describe('IITC.portal.details cache', () => {
 });
 
 describe('IITC.portal.details.request', () => {
+  beforeEach(setupWithMockCache);
+  afterEach(restoreDataCache);
+
   it('de-duplicates concurrent requests for the same portal', () => {
     window.postAjax = sinon.stub(); // never invokes callbacks -> request stays pending
 
