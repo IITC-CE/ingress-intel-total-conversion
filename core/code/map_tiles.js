@@ -24,11 +24,11 @@ IITC.map.tiles.params = {};
  */
 IITC.map.tiles.setupParams = function () {
   // default values - used to fall back to if we can't detect those used in stock intel
-  var DEFAULT_ZOOM_TO_TILES_PER_EDGE = [1, 1, 1, 40, 40, 80, 80, 320, 1000, 2000, 2000, 4000, 8000, 16000, 16000, 32000];
-  var DEFAULT_ZOOM_TO_LEVEL = [8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 4, 4, 3, 2, 2, 1, 1];
+  const DEFAULT_ZOOM_TO_TILES_PER_EDGE = [1, 1, 1, 40, 40, 80, 80, 320, 1000, 2000, 2000, 4000, 8000, 16000, 16000, 32000];
+  const DEFAULT_ZOOM_TO_LEVEL = [8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 4, 4, 3, 2, 2, 1, 1];
 
   // stock intel doesn't have this array (they use a switch statement instead), but this is far neater
-  var DEFAULT_ZOOM_TO_LINK_LENGTH = [200000, 200000, 200000, 200000, 200000, 60000, 60000, 10000, 5000, 2500, 2500, 800, 300, 0, 0];
+  const DEFAULT_ZOOM_TO_LINK_LENGTH = [200000, 200000, 200000, 200000, 200000, 60000, 60000, 10000, 5000, 2500, 2500, 800, 300, 0, 0];
 
   IITC.map.tiles.params = {};
 
@@ -74,7 +74,7 @@ IITC.map.tiles.setupParams = function () {
  * @returns {Object} An object containing tile parameters for the given zoom level.
  */
 IITC.map.tiles.getMapZoomParameters = function (zoom) {
-  var maxTilesPerEdge = IITC.map.tiles.params.TILES_PER_EDGE[IITC.map.tiles.params.TILES_PER_EDGE.length - 1];
+  const maxTilesPerEdge = IITC.map.tiles.params.TILES_PER_EDGE[IITC.map.tiles.params.TILES_PER_EDGE.length - 1];
 
   return {
     level: IITC.map.tiles.params.ZOOM_TO_LEVEL[zoom] || 0, // deprecated
@@ -87,7 +87,7 @@ IITC.map.tiles.getMapZoomParameters = function (zoom) {
 
 IITC.map.tiles.getDataZoomParameters = function (zoom) {
   zoom = arguments.length ? zoom : window.map.getZoom();
-  var dataZoom = IITC.map.tiles.getDataZoomForMapZoom(zoom);
+  const dataZoom = IITC.map.tiles.getDataZoomForMapZoom(zoom);
   return IITC.map.tiles.getMapZoomParameters(dataZoom);
 };
 
@@ -114,10 +114,10 @@ IITC.map.tiles.getDataZoomForMapZoom = function (zoom) {
   // to avoid impacting server load, we keep ourselves restricted to a zoom level with the sane number
   // of tilesPerEdge and portal levels visible
 
-  var origTileParams = IITC.map.tiles.getMapZoomParameters(zoom);
+  const origTileParams = IITC.map.tiles.getMapZoomParameters(zoom);
 
   while (zoom > window.MIN_ZOOM) {
-    var newTileParams = IITC.map.tiles.getMapZoomParameters(zoom - 1);
+    const newTileParams = IITC.map.tiles.getMapZoomParameters(zoom - 1);
 
     if (
       newTileParams.tilesPerEdge !== origTileParams.tilesPerEdge ||
@@ -149,7 +149,7 @@ IITC.map.tiles.tileToLng = function (x, params) {
 };
 
 IITC.map.tiles.tileToLat = function (y, params) {
-  var n = Math.PI - (2 * Math.PI * y) / params.tilesPerEdge;
+  const n = Math.PI - (2 * Math.PI * y) / params.tilesPerEdge;
   return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
 };
 

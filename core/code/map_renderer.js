@@ -26,7 +26,7 @@ IITC.map.Renderer.prototype.startRenderPass = function (bounds) {
 
   // we pad the bounds used for clearing a litle bit, as entities are sometimes returned outside of their specified tile boundaries
   // this will just avoid a few entity removals at start of render when they'll just be added again
-  var paddedBounds = bounds.pad(0.1);
+  const paddedBounds = bounds.pad(0.1);
 
   this.clearPortalsOutsideBounds(paddedBounds);
 
@@ -44,8 +44,8 @@ IITC.map.Renderer.prototype.startRenderPass = function (bounds) {
  * @param {L.LatLngBounds} bounds - The bounds to check against.
  */
 IITC.map.Renderer.prototype.clearPortalsOutsideBounds = function (bounds) {
-  for (var guid in window.portals) {
-    var p = window.portals[guid];
+  for (const guid in window.portals) {
+    const p = window.portals[guid];
     // clear portals outside visible bounds - unless it's the selected portal, or it's relevant to artifacts
     if (!bounds.contains(p.getLatLng()) && guid !== window.selectedPortal && !window.artifact.isInterestingPortal(guid)) {
       // remove the marker as a layer first
@@ -63,13 +63,13 @@ IITC.map.Renderer.prototype.clearPortalsOutsideBounds = function (bounds) {
  * @param {L.LatLngBounds} bounds - The bounds to check against for link removal.
  */
 IITC.map.Renderer.prototype.clearLinksOutsideBounds = function (bounds) {
-  for (var guid in window.links) {
-    var l = window.links[guid];
+  for (const guid in window.links) {
+    const l = window.links[guid];
 
     // NOTE: our geodesic lines can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on start+end point will be good enough for this check
-    var lls = l.getLatLngs();
-    var linkBounds = new L.LatLngBounds(lls);
+    const lls = l.getLatLngs();
+    const linkBounds = new L.LatLngBounds(lls);
 
     if (!bounds.intersects(linkBounds)) {
       this.deleteLinkEntity(guid);
@@ -85,13 +85,13 @@ IITC.map.Renderer.prototype.clearLinksOutsideBounds = function (bounds) {
  * @param {L.LatLngBounds} bounds - The bounds to check against for field removal.
  */
 IITC.map.Renderer.prototype.clearFieldsOutsideBounds = function (bounds) {
-  for (var guid in window.fields) {
-    var f = window.fields[guid];
+  for (const guid in window.fields) {
+    const f = window.fields[guid];
 
     // NOTE: our geodesic polys can have lots of intermediate points. the bounds calculation hasn't been optimised for this
     // so can be particularly slow. a simple bounds check based on corner points will be good enough for this check
-    var lls = f.getLatLngs();
-    var fieldBounds = new L.LatLngBounds([lls[0], lls[1]]).extend(lls[2]);
+    const lls = f.getLatLngs();
+    const fieldBounds = new L.LatLngBounds([lls[0], lls[1]]).extend(lls[2]);
 
     if (!bounds.intersects(fieldBounds)) {
       this.deleteFieldEntity(guid);
@@ -174,7 +174,7 @@ IITC.map.Renderer.prototype.processGameEntities = function (entities, details) {
  * @memberof IITC.map.Renderer
  */
 IITC.map.Renderer.prototype.endRenderPass = function () {
-  var countp = 0,
+  let countp = 0,
     countl = 0,
     countf = 0;
 
@@ -213,7 +213,7 @@ IITC.map.Renderer.prototype.endRenderPass = function () {
  * @memberof IITC.map.Renderer
  */
 IITC.map.Renderer.prototype.bringPortalsToFront = function () {
-  for (var guid in window.portals) {
+  for (const guid in window.portals) {
     window.portals[guid].bringToFront();
   }
 
@@ -247,7 +247,7 @@ IITC.map.Renderer.prototype.deleteEntity = function (guid) {
  */
 IITC.map.Renderer.prototype.deletePortalEntity = function (guid) {
   if (guid in window.portals) {
-    var p = window.portals[guid];
+    const p = window.portals[guid];
     window.ornaments.removePortal(p);
     this.removePortalFromMapLayer(p);
     delete window.portals[guid];
@@ -264,7 +264,7 @@ IITC.map.Renderer.prototype.deletePortalEntity = function (guid) {
  */
 IITC.map.Renderer.prototype.deleteLinkEntity = function (guid) {
   if (guid in window.links) {
-    var l = window.links[guid];
+    const l = window.links[guid];
     l.remove();
     delete window.links[guid];
     window.runHooks('linkRemoved', { link: l, data: l.options.data });
@@ -280,7 +280,7 @@ IITC.map.Renderer.prototype.deleteLinkEntity = function (guid) {
  */
 IITC.map.Renderer.prototype.deleteFieldEntity = function (guid) {
   if (guid in window.fields) {
-    var f = window.fields[guid];
+    const f = window.fields[guid];
     f.remove();
     delete window.fields[guid];
     window.runHooks('fieldRemoved', { field: f, data: f.options.data });
@@ -310,7 +310,7 @@ IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE
   // zero will mean any other source of portal data will have a higher timestamp
   timestamp = timestamp || 0;
 
-  var ent = [
+  const ent = [
     guid, // ent[0] = guid
     timestamp, // ent[1] = timestamp
     // ent[2] = an array with the entity data
@@ -337,10 +337,10 @@ IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE
 IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
   this.seenPortalsGuid[ent[0]] = true; // flag we've seen it
 
-  var previousData = undefined;
+  let previousData = undefined;
 
-  var data = window.decodeArray.portal(ent[2], details);
-  var guid = ent[0];
+  const data = window.decodeArray.portal(ent[2], details);
+  const guid = ent[0];
 
   // add missing fields
   data.guid = guid;
@@ -356,7 +356,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
 
   if (oldPortal) {
     // yes. now check to see if the entity data we have is newer than that in place
-    var p = window.portals[guid];
+    const p = window.portals[guid];
 
     if (!p.willUpdate(data)) {
       // this data doesn't bring new detail - abort processing
@@ -373,7 +373,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
     previousData = structuredClone(p.getDetails());
   }
 
-  var latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
+  const latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
   let marker = undefined;
   if (oldPortal) {
@@ -382,7 +382,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
     marker.updateDetails(data);
 
     if (IITC.portal.details.isFresh(guid)) {
-      var oldDetails = IITC.portal.details.get(guid);
+      const oldDetails = IITC.portal.details.get(guid);
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
         IITC.portal.details.remove(guid);
@@ -395,8 +395,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
 
     // in case of incomplete data while having fresh details in cache, update the portal with those details
     if (IITC.portal.details.isFresh(guid)) {
-      // eslint-disable-next-line no-redeclare
-      var oldDetails = IITC.portal.details.get(guid);
+      const oldDetails = IITC.portal.details.get(guid);
       if (data.timestamp > oldDetails.timestamp) {
         // data is more recent than the cached details so we remove them from the cache
         IITC.portal.details.remove(guid);
@@ -428,7 +427,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
 IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
   this.seenFieldsGuid[ent[0]] = true; // flag we've seen it
 
-  var data = {
+  const data = {
     // type: ent[2][0],
     timestamp: ent[1],
     team: ent[2][1],
@@ -438,8 +437,8 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
   };
 
   // create placeholder portals for field corners. we already do links, but there are the odd case where this is useful
-  for (var i = 0; i < 3; i++) {
-    var p = data.points[i];
+  for (let i = 0; i < 3; i++) {
+    const p = data.points[i];
     this.createPlaceholderPortalEntity(p.guid, p.latE6, p.lngE6, data.team, 0);
   }
 
@@ -447,7 +446,7 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
   if (ent[0] in window.fields) {
     // yes. in theory, we should never get updated data for an existing field. they're created, and they're destroyed - never changed
     // but theory and practice may not be the same thing...
-    var f = window.fields[ent[0]];
+    const f = window.fields[ent[0]];
 
     if (f.options.timestamp >= ent[1]) return; // this data is identical (or order) than that rendered - abort processing
 
@@ -457,14 +456,14 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
     this.deleteFieldEntity(ent[0]); // option 2, for now
   }
 
-  var team = window.teamStringToId(ent[2][1]);
-  var latlngs = [
+  const team = window.teamStringToId(ent[2][1]);
+  const latlngs = [
     new L.LatLng(data.points[0].latE6 / 1e6, data.points[0].lngE6 / 1e6),
     new L.LatLng(data.points[1].latE6 / 1e6, data.points[1].lngE6 / 1e6),
     new L.LatLng(data.points[2].latE6 / 1e6, data.points[2].lngE6 / 1e6),
   ];
 
-  var poly = L.geodesicPolygon(latlngs, {
+  const poly = L.geodesicPolygon(latlngs, {
     fillColor: window.COLORS[team],
     fillOpacity: 0.25,
     stroke: false,
@@ -496,12 +495,12 @@ IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
   // Niantic have been faking link entities, based on data from fields
   // these faked links are sent along with the real portal links, causing duplicates
   // the faked ones all have longer GUIDs, based on the field GUID (with _ab, _ac, _bc appended)
-  var fakedLink = new RegExp('^[0-9a-f]{32}.b_[ab][bc]$'); // field GUIDs always end with ".b" - faked links append the edge identifier
+  const fakedLink = new RegExp('^[0-9a-f]{32}.b_[ab][bc]$'); // field GUIDs always end with ".b" - faked links append the edge identifier
   if (fakedLink.test(ent[0])) return;
 
   this.seenLinksGuid[ent[0]] = true; // flag we've seen it
 
-  var data = {
+  const data = {
     // TODO add other properties and check correction direction
     //    type:   ent[2][0],
     timestamp: ent[1],
@@ -520,7 +519,7 @@ IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
 
   // check if entity already exists
   if (ent[0] in window.links) {
-    var l = window.links[ent[0]];
+    const l = window.links[ent[0]];
     if (l.options.timestamp >= ent[1]) return; // this data is older or identical to the rendered data - abort processing
 
     // the data is newer/better - two options
@@ -529,9 +528,9 @@ IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
     this.deleteLinkEntity(ent[0]); // option 2 - for now
   }
 
-  var team = window.teamStringToId(ent[2][1]);
-  var latlngs = [new L.LatLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), new L.LatLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
-  var poly = L.geodesicPolyline(latlngs, {
+  const team = window.teamStringToId(ent[2][1]);
+  const latlngs = [new L.LatLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), new L.LatLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
+  const poly = L.geodesicPolyline(latlngs, {
     color: window.COLORS[team],
     opacity: 1,
     weight: 2,

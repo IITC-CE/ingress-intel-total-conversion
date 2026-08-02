@@ -11,7 +11,7 @@ IITC.map = {};
 function setupCRS() {
   // use the earth radius value from s2 geometry library
   // https://github.com/google/s2-geometry-library-java/blob/c28f287b996c0cedc5516a0426fbd49f6c9611ec/src/com/google/common/geometry/S2LatLng.java#L31
-  var EARTH_RADIUS_METERS = 6367000.0;
+  const EARTH_RADIUS_METERS = 6367000.0;
   // distance calculations with that constant are a little closer to values observable in Ingress client.
   // difference is:
   // - ~0.06% when using LatLng.distanceTo() (R is 6371 vs 6367)
@@ -22,11 +22,11 @@ function setupCRS() {
   L.CRS.Earth.R = EARTH_RADIUS_METERS;
 
   // this affects Map.distance(), which is known to be used in draw-tools
-  var SphericalMercator = L.Projection.SphericalMercator;
+  const SphericalMercator = L.Projection.SphericalMercator;
   SphericalMercator.S2 = L.extend({}, SphericalMercator, {
     R: EARTH_RADIUS_METERS,
     bounds: (function () {
-      var d = EARTH_RADIUS_METERS * Math.PI;
+      const d = EARTH_RADIUS_METERS * Math.PI;
       return L.bounds([-d, -d], [d, d]);
     })(),
   });
@@ -35,7 +35,7 @@ function setupCRS() {
     code: 'Ingress',
     projection: SphericalMercator.S2,
     transformation: (function () {
-      var scale = 0.5 / (Math.PI * SphericalMercator.S2.R);
+      const scale = 0.5 / (Math.PI * SphericalMercator.S2.R);
       return L.transformation(scale, 0.5, -scale, 0.5);
     })(),
   });
@@ -66,25 +66,25 @@ function normLL(lat, lng, zoom) {
  * @returns {Object} An object containing the map's position and zoom level, or undefined if not found.
  */
 function getPosition() {
-  var url = window.getURLParam;
+  const url = window.getURLParam;
 
-  var zoom = url('z');
-  var latE6 = url('latE6');
-  var lngE6 = url('lngE6');
+  const zoom = url('z');
+  const latE6 = url('latE6');
+  const lngE6 = url('lngE6');
   if (latE6 && lngE6) {
     log.log('mappos: reading email URL params');
     return normLL(parseInt(latE6) / 1e6, parseInt(lngE6) / 1e6, zoom);
   }
 
-  var ll = url('ll') || url('pll');
+  let ll = url('ll') || url('pll');
   if (ll) {
     log.log('mappos: reading stock Intel URL params');
     ll = ll.split(',');
     return normLL(ll[0], ll[1], zoom);
   }
 
-  var lat = window.readCookie('ingress.intelmap.lat');
-  var lng = window.readCookie('ingress.intelmap.lng');
+  const lat = window.readCookie('ingress.intelmap.lat');
+  const lng = window.readCookie('ingress.intelmap.lng');
   if (lat && lng) {
     log.log('mappos: reading cookies');
     return normLL(lat, lng, window.readCookie('ingress.intelmap.zoom'));
@@ -100,7 +100,7 @@ function getPosition() {
  *                   object is a named map layer, with its value being the corresponding Leaflet tile layer object.
  */
 function createDefaultBaseMapLayers() {
-  var baseLayers = {};
+  const baseLayers = {};
 
   /*
   // OpenStreetMap attribution - required by several of the layers
@@ -116,9 +116,9 @@ function createDefaultBaseMapLayers() {
 
   // cartodb has some nice tiles too - both dark and light subtle maps - http://cartodb.com/basemaps/
   // (not available over https though - not on the right domain name anyway)
-  var cartoAttr =
+  const cartoAttr =
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
-  var cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png';
+  const cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png';
   baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all', isDark: true });
   baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all', isDark: false });
 
@@ -136,10 +136,10 @@ function createDefaultBaseMapLayers() {
     ],
   });
   baseLayers['Google Roads'] = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
-  var trafficMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
+  const trafficMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
   trafficMutant.addGoogleLayer('TrafficLayer');
   baseLayers['Google Roads + Traffic'] = trafficMutant;
-  var transitMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
+  const transitMutant = new L.GridLayer.GoogleMutant({ type: 'roadmap', isDark: false });
   transitMutant.addGoogleLayer('TransitLayer');
   baseLayers['Google Roads + Transit'] = transitMutant;
   baseLayers['Google Satellite'] = new L.GridLayer.GoogleMutant({ type: 'satellite', isDark: true });
@@ -157,9 +157,9 @@ function createDefaultBaseMapLayers() {
  * @returns {Object.<String, L.LayerGroup>} An object containing overlay layers for portals, links, fields, and factions
  */
 function createDefaultOverlays() {
-  var addLayers = {};
+  const addLayers = {};
 
-  var l0Layer = new IITC.filters.FilterLayer({
+  const l0Layer = new IITC.filters.FilterLayer({
     name: 'Unclaimed/Placeholder Portals',
     filter: [
       { portal: true, data: { team: 'N' } },
@@ -167,9 +167,9 @@ function createDefaultOverlays() {
     ],
   });
   addLayers[l0Layer.options.name] = l0Layer;
-  for (var i = 1; i <= 8; i++) {
-    var t = `Level ${i} Portals`;
-    var portalsLayer = new IITC.filters.FilterLayer({
+  for (let i = 1; i <= 8; i++) {
+    const t = `Level ${i} Portals`;
+    const portalsLayer = new IITC.filters.FilterLayer({
       name: t,
       filter: [
         { portal: true, data: { level: i, team: 'R' } },
@@ -180,28 +180,28 @@ function createDefaultOverlays() {
     addLayers[t] = portalsLayer;
   }
 
-  var fieldsLayer = new IITC.filters.FilterLayer({
+  const fieldsLayer = new IITC.filters.FilterLayer({
     name: 'Fields',
     filter: { field: true },
   });
   addLayers[fieldsLayer.options.name] = fieldsLayer;
 
-  var linksLayer = new IITC.filters.FilterLayer({
+  const linksLayer = new IITC.filters.FilterLayer({
     name: 'Links',
     filter: { link: true },
   });
   addLayers[linksLayer.options.name] = linksLayer;
 
   // faction-specific layers
-  var resistanceLayer = new IITC.filters.FilterLayer({
+  const resistanceLayer = new IITC.filters.FilterLayer({
     name: window.TEAM_NAME_RES,
     filter: { portal: true, link: true, field: true, data: { team: 'R' } },
   });
-  var enlightenedLayer = new IITC.filters.FilterLayer({
+  const enlightenedLayer = new IITC.filters.FilterLayer({
     name: window.TEAM_NAME_ENL,
     filter: { portal: true, link: true, field: true, data: { team: 'E' } },
   });
-  var machinaLayer = new IITC.filters.FilterLayer({
+  const machinaLayer = new IITC.filters.FilterLayer({
     name: window.TEAM_NAME_MAC,
     filter: { portal: true, link: true, field: true, data: { team: 'M' } },
   });
@@ -219,7 +219,6 @@ function createDefaultOverlays() {
   addLayers[window.TEAM_NAME_MAC] = machinaLayer;
 
   return addLayers;
-  /* eslint-enable dot-notation  */
 }
 
 // to be extended in app.js (or by plugins: `setup.priority = 'boot';`)
@@ -248,7 +247,7 @@ IITC.map.setup = function () {
 
   document.getElementById('map').textContent = ''; // clear 'Loading, please wait'
 
-  var map = L.map(
+  const map = L.map(
     'map',
     L.extend(
       {
@@ -266,7 +265,7 @@ IITC.map.setup = function () {
       IITC.map.options
     )
   );
-  var max_lat = map.options.crs.projection.MAX_LATITUDE;
+  const max_lat = map.options.crs.projection.MAX_LATITUDE;
   map.setMaxBounds([
     [max_lat, 360],
     [-max_lat, -360],
@@ -288,10 +287,10 @@ IITC.map.setup = function () {
     chatControlArea.style.margin = '0';
     map._controlCorners.bottomleft.appendChild(chatControlArea);
   }
-  var baseLayers = createDefaultBaseMapLayers();
-  var overlays = createDefaultOverlays();
+  const baseLayers = createDefaultBaseMapLayers();
+  const overlays = createDefaultOverlays();
 
-  var layerChooser = (window.layerChooser = new window.LayerChooser(baseLayers, overlays, { map: map }).addTo(map));
+  const layerChooser = (window.layerChooser = new window.LayerChooser(baseLayers, overlays, { map: map }).addTo(map));
 
   // as users often become confused if they accidentally switch a standard layer off, display a warning in this case
   const someStandardLayerOff = Object.values(overlays).some((layer) => !map.hasLayer(layer));
@@ -343,7 +342,7 @@ IITC.map.setup = function () {
   window.map = map;
 
   map.on('moveend', function () {
-    var center = this.getCenter().wrap();
+    const center = this.getCenter().wrap();
     window.writeCookie('ingress.intelmap.lat', center.lat);
     window.writeCookie('ingress.intelmap.lng', center.lng);
     window.writeCookie('ingress.intelmap.zoom', this.getZoom());
@@ -378,11 +377,11 @@ IITC.map.setup = function () {
   // adds a base layer to the map. done separately from the above,
   // so that plugins that add base layers can be the default
   window.addHook('iitcLoaded', function () {
-    var stored = layerChooser.getLayer(layerChooser.lastBaseLayerName);
+    const stored = layerChooser.getLayer(layerChooser.lastBaseLayerName);
     map.addLayer(stored || baseLayers['CartoDB Dark Matter']);
 
     // (setting an initial position, before a base layer is added, causes issues with leaflet) // todo check
-    var pos = getPosition();
+    let pos = getPosition();
     if (!pos) {
       pos = { center: [0, 0], zoom: 1 };
       map.locate({ setView: true });
@@ -409,7 +408,7 @@ IITC.map.setup = function () {
 const parseURLParameters = () => {
   // read here ONCE, so the URL is only evaluated one time after the
   // necessary data has been loaded.
-  var pll = window.getURLParam('pll');
+  let pll = window.getURLParam('pll');
   if (pll) {
     pll = pll.split(',');
     const center = normLL(pll[0], pll[1]).center;

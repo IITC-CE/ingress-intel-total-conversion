@@ -42,10 +42,10 @@ IITC.map.Cache = function () {
 IITC.map.Cache.prototype.store = function (qk, data) {
   this.remove(qk);
 
-  var time = Date.now();
-  var expire = time + this.REQUEST_CACHE_FRESH_AGE * 1000;
+  const time = Date.now();
+  const expire = time + this.REQUEST_CACHE_FRESH_AGE * 1000;
 
-  var dataStr = JSON.stringify(data);
+  const dataStr = JSON.stringify(data);
 
   this._cacheCharSize += dataStr.length;
   this._cache[qk] = { time: time, expire: expire, dataStr: dataStr };
@@ -101,7 +101,7 @@ IITC.map.Cache.prototype.getTime = function (qk) {
  */
 IITC.map.Cache.prototype.isFresh = function (qk) {
   if (qk in this._cache) {
-    var t = Date.now();
+    const t = Date.now();
     if (this._cache[qk].expire >= t) return true;
     else return false;
   }
@@ -148,11 +148,11 @@ IITC.map.Cache.prototype.stopExpireInterval = function () {
  * @memberof IITC.map.Cache
  */
 IITC.map.Cache.prototype.runExpire = function () {
-  var t = Date.now() - this.REQUEST_CACHE_MAX_AGE * 1000;
+  const t = Date.now() - this.REQUEST_CACHE_MAX_AGE * 1000;
 
-  var cacheSize = Object.keys(this._cache).length;
+  let cacheSize = Object.keys(this._cache).length;
 
-  for (var qk in this._cache) {
+  for (const qk in this._cache) {
     if (cacheSize > this.REQUEST_CACHE_MAX_ITEMS || this._cacheCharSize > this.REQUEST_CACHE_MAX_CHARS || this._cache[qk].time < t) {
       this._cacheCharSize -= this._cache[qk].dataStr.length;
       delete this._cache[qk];

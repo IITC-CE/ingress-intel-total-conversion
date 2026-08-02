@@ -38,12 +38,12 @@ IITC.map.DebugTiles.prototype.reset = function () {
  * @param {L.LatLngBounds} bounds - The geographical bounds of the tile.
  */
 IITC.map.DebugTiles.prototype.create = function (id, bounds) {
-  var s = { color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false };
+  const s = { color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false };
 
   bounds = new L.LatLngBounds(bounds);
   bounds = bounds.pad(-0.02);
 
-  var l = new L.Rectangle(bounds, s);
+  const l = new L.Rectangle(bounds, s);
   this.debugTileToRectangle[id] = l;
   this.debugTileLayer.addLayer(l);
   if (window.map.hasLayer(this.debugTileLayer)) {
@@ -62,9 +62,9 @@ IITC.map.DebugTiles.prototype.create = function (id, bounds) {
  * @param {string} fillcol - The color for the fill.
  */
 IITC.map.DebugTiles.prototype.setColour = function (id, bordercol, fillcol) {
-  var l = this.debugTileToRectangle[id];
+  const l = this.debugTileToRectangle[id];
   if (l) {
-    var s = { color: bordercol, fillColor: fillcol };
+    const s = { color: bordercol, fillColor: fillcol };
     l.setStyle(s);
   }
 };
@@ -78,9 +78,9 @@ IITC.map.DebugTiles.prototype.setColour = function (id, bordercol, fillcol) {
  * @param {string} state - The state of the tile (e.g., 'ok', 'error', 'requested').
  */
 IITC.map.DebugTiles.prototype.setState = function (id, state) {
-  var col = '#f0f';
-  var fill = '#f0f';
-  var clearDelay = -1;
+  let col = '#f0f';
+  let fill = '#f0f';
+  let clearDelay = -1;
   switch (state) {
     case 'ok':
       col = '#0f0';
@@ -129,7 +129,7 @@ IITC.map.DebugTiles.prototype.setState = function (id, state) {
   }
   this.setColour(id, col, fill);
   if (clearDelay >= 0) {
-    var clearAt = Date.now() + clearDelay * 1000;
+    const clearAt = Date.now() + clearDelay * 1000;
     this.debugTileClearTimes[id] = clearAt;
 
     if (!this.timer) {
@@ -165,15 +165,15 @@ IITC.map.DebugTiles.prototype.startTimer = function (waitTime) {
  * @memberof IITC.map.DebugTiles
  */
 IITC.map.DebugTiles.prototype.runClearPass = function () {
-  var now = Date.now();
-  for (var id in this.debugTileClearTimes) {
-    var diff = now - this.debugTileClearTimes[id];
+  const now = Date.now();
+  for (const id in this.debugTileClearTimes) {
+    const diff = now - this.debugTileClearTimes[id];
     if (diff > 0) {
       if (diff > this.FADE_TIME * 1000) {
         this.debugTileLayer.removeLayer(this.debugTileToRectangle[id]);
         delete this.debugTileClearTimes[id];
       } else {
-        var fade = 1.0 - diff / (this.FADE_TIME * 1000);
+        const fade = 1.0 - diff / (this.FADE_TIME * 1000);
 
         this.debugTileToRectangle[id].setStyle({ opacity: 0.4 * fade, fillOpacity: 0.1 * fade });
       }
