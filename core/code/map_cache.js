@@ -42,7 +42,7 @@ IITC.map.Cache = function () {
 IITC.map.Cache.prototype.store = function (qk, data) {
   this.remove(qk);
 
-  var time = new Date().getTime();
+  var time = Date.now();
   var expire = time + this.REQUEST_CACHE_FRESH_AGE * 1000;
 
   var dataStr = JSON.stringify(data);
@@ -101,8 +101,7 @@ IITC.map.Cache.prototype.getTime = function (qk) {
  */
 IITC.map.Cache.prototype.isFresh = function (qk) {
   if (qk in this._cache) {
-    var d = new Date();
-    var t = d.getTime();
+    var t = Date.now();
     if (this._cache[qk].expire >= t) return true;
     else return false;
   }
@@ -119,9 +118,8 @@ IITC.map.Cache.prototype.isFresh = function (qk) {
  */
 IITC.map.Cache.prototype.startExpireInterval = function (period) {
   if (this._interval === undefined) {
-    var savedContext = this;
-    this._interval = setInterval(function () {
-      savedContext.runExpire();
+    this._interval = setInterval(() => {
+      this.runExpire();
     }, period * 1000);
   }
 };
@@ -150,8 +148,7 @@ IITC.map.Cache.prototype.stopExpireInterval = function () {
  * @memberof IITC.map.Cache
  */
 IITC.map.Cache.prototype.runExpire = function () {
-  var d = new Date();
-  var t = d.getTime() - this.REQUEST_CACHE_MAX_AGE * 1000;
+  var t = Date.now() - this.REQUEST_CACHE_MAX_AGE * 1000;
 
   var cacheSize = Object.keys(this._cache).length;
 

@@ -146,13 +146,12 @@ IITC.map.DebugTiles.prototype.setState = function (id, state) {
  * @param {number} waitTime - The wait time in milliseconds before running the clear pass.
  */
 IITC.map.DebugTiles.prototype.startTimer = function (waitTime) {
-  var _this = this;
-  if (!_this.timer) {
+  if (!this.timer) {
     // a timeout of 0 firing the actual timeout - helps things run smoother
-    _this.timer = setTimeout(function () {
-      _this.timer = setTimeout(function () {
-        _this.timer = undefined;
-        _this.runClearPass();
+    this.timer = setTimeout(() => {
+      this.timer = setTimeout(() => {
+        this.timer = undefined;
+        this.runClearPass();
       }, waitTime);
     }, 0);
   }

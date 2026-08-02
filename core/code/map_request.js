@@ -87,11 +87,9 @@ Object.defineProperty(IITC.map.Request.prototype, 'render', {
  * @memberof IITC.map.Request
  */
 IITC.map.Request.prototype.start = function () {
-  var savedContext = this;
-
   // setup idle resume function
-  window.addResumeFunction(function () {
-    savedContext.idleResume();
+  window.addResumeFunction(() => {
+    this.idleResume();
   });
 
   // and map move start/end callbacks
@@ -134,7 +132,7 @@ IITC.map.Request.prototype.mapMoveEnd = function () {
       // ... and the zoom level is the same and the current bounds is inside the fetched bounds
       // so, no need to fetch data. if there's time left, restore the original timeout
 
-      var remainingTime = (this.timerExpectedTimeoutTime - new Date().getTime()) / 1000;
+      var remainingTime = (this.timerExpectedTimeoutTime - Date.now()) / 1000;
 
       if (remainingTime > this.MOVE_REFRESH) {
         this.setStatus('done', 'Map moved, but no data updates needed');
@@ -190,18 +188,16 @@ IITC.map.Request.prototype.clearTimeout = function () {
 IITC.map.Request.prototype.refreshOnTimeout = function (seconds) {
   this.clearTimeout();
 
-  log.log('starting map refresh in ' + seconds + ' seconds');
+  log.log(`starting map refresh in ${seconds} seconds`);
 
-  // 'this' won't be right inside the callback, so save it
-  // also, double setTimeout used to ensure the delay occurs after any browser-related rendering/updating/etc
-  var _this = this;
-  this.timer = setTimeout(function () {
-    _this.timer = setTimeout(function () {
-      _this.timer = undefined;
-      _this.refresh();
+  // double setTimeout used to ensure the delay occurs after any browser-related rendering/updating/etc
+  this.timer = setTimeout(() => {
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      this.refresh();
     }, seconds * 1000);
   }, 0);
-  this.timerExpectedTimeoutTime = new Date().getTime() + seconds * 1000;
+  this.timerExpectedTimeoutTime = Date.now() + seconds * 1000;
 };
 
 /**
@@ -246,7 +242,7 @@ IITC.map.Request.prototype.refresh = function () {
   }
 
   // time the refresh cycle
-  this.refreshStartTime = new Date().getTime();
+  this.refreshStartTime = Date.now();
 
   this.debugTiles.reset();
   this.resetRenderQueue();
@@ -295,11 +291,9 @@ IITC.map.Request.prototype.refresh = function () {
 
   window.runHooks('mapDataEntityInject', { callback: this.renderer.processGameEntities.bind(this.renderer) });
 
-  var logMessage = 'requesting data tiles at zoom ' + dataZoom;
-  logMessage += ' (L' + tileParams.level + '+ portals';
-  logMessage += ', ' + tileParams.tilesPerEdge + ' tiles per global edge), map zoom is ' + mapZoom;
-
-  log.log(logMessage);
+  log.log(
+    `requesting data tiles at zoom ${dataZoom} (L${tileParams.level}+ portals, ${tileParams.tilesPerEdge} tiles per global edge), map zoom is ${mapZoom}`
+  );
 
   this.cachedTileCount = 0;
   this.requestedTileCount = 0;
@@ -357,9 +351,7 @@ IITC.map.Request.prototype.refresh = function () {
     return tilesToFetchDistance[a] - tilesToFetchDistance[b];
   });
 
-  for (var i in tilesToFetch) {
-    var qk = tilesToFetch[i];
-
+  for (const qk of tilesToFetch) {
     this.queuedTiles[qk] = qk;
   }
 
@@ -389,11 +381,10 @@ IITC.map.Request.prototype.refresh = function () {
  */
 IITC.map.Request.prototype.delayProcessRequestQueue = function (seconds) {
   if (this.timer === undefined) {
-    var _this = this;
-    this.timer = setTimeout(function () {
-      _this.timer = setTimeout(function () {
-        _this.timer = undefined;
-        _this.processRequestQueue();
+    this.timer = setTimeout(() => {
+      this.timer = setTimeout(() => {
+        this.timer = undefined;
+        this.processRequestQueue();
       }, seconds * 1000);
     }, 0);
   }
@@ -478,9 +469,7 @@ IITC.map.Request.prototype.processRequestQueue = function () {
 IITC.map.Request.prototype.sendTileRequest = function (tiles) {
   var tilesList = [];
 
-  for (var i in tiles) {
-    var id = tiles[i];
-
+  for (const id of tiles) {
     this.debugTiles.setState(id, 'requested');
 
     this.requestedTiles[id] = true;
@@ -488,7 +477,7 @@ IITC.map.Request.prototype.sendTileRequest = function (tiles) {
     if (id in this.queuedTiles) {
       tilesList.push(id);
     } else {
-      log.warn('no queue entry for tile id ' + id);
+      log.warn(`no queue entry for tile id ${id}`);
     }
   }
 
@@ -496,17 +485,15 @@ IITC.map.Request.prototype.sendTileRequest = function (tiles) {
 
   this.activeRequestCount += 1;
 
-  var savedThis = this;
-
   // NOTE: don't add the request with window.request.add, as we don't want the abort handling to apply to map data any more
   window.postAjax(
     'getEntities',
     data,
-    function (data) {
-      savedThis.handleResponse(data, tiles, true);
+    (data) => {
+      this.handleResponse(data, tiles, true);
     }, // request successful callback
-    function () {
-      savedThis.handleResponse(undefined, tiles, false);
+    () => {
+      this.handleResponse(undefined, tiles, false);
     } // request failed callback
   );
 };
@@ -588,16 +575,14 @@ IITC.map.Request.prototype.handleResponse = function (data, tiles, success) {
     if (data && data.error && data.error === 'RETRY') {
       // the server can sometimes ask us to retry a request. this is botguard related, I believe
 
-      for (const i in tiles) {
-        const id = tiles[i];
+      for (const id of tiles) {
         retryTiles.push(id);
         this.debugTiles.setState(id, 'retrying');
       }
 
       window.runHooks('requestFinished', { success: false });
     } else {
-      for (const i in tiles) {
-        const id = tiles[i];
+      for (const id of tiles) {
         errorTiles.push(id);
         this.debugTiles.setState(id, 'request-fail');
       }
@@ -620,7 +605,7 @@ IITC.map.Request.prototype.handleResponse = function (data, tiles, success) {
           // TIMEOUT errors for individual tiles are quite common. used to be unlimited retries, but not any more
           timeoutTiles.push(id);
         } else {
-          log.warn('map data tile ' + id + ' failed: error==' + val.error);
+          log.warn(`map data tile ${id} failed: error==${val.error}`);
           errorTiles.push(id);
           this.debugTiles.setState(id, 'tile-fail');
         }
@@ -668,8 +653,7 @@ IITC.map.Request.prototype.handleResponse = function (data, tiles, success) {
 
   // requeue any 'timeout' tiles immediately
   if (timeoutTiles.length > 0) {
-    for (const i in timeoutTiles) {
-      const id = timeoutTiles[i];
+    for (const id of timeoutTiles) {
       delete this.requestedTiles[id];
 
       this.requeueTile(id, true);
@@ -677,8 +661,7 @@ IITC.map.Request.prototype.handleResponse = function (data, tiles, success) {
   }
 
   if (retryTiles.length > 0) {
-    for (const i in retryTiles) {
-      const id = retryTiles[i];
+    for (const id of retryTiles) {
       delete this.requestedTiles[id];
 
       this.requeueTile(id, false); // tiles from a error==RETRY request are requeued without counting it as an error
@@ -686,23 +669,20 @@ IITC.map.Request.prototype.handleResponse = function (data, tiles, success) {
   }
 
   if (errorTiles.length > 0) {
-    for (const i in errorTiles) {
-      const id = errorTiles[i];
+    for (const id of errorTiles) {
       delete this.requestedTiles[id];
       this.requeueTile(id, true);
     }
   }
 
   if (unaccountedTiles.length > 0) {
-    for (const i in unaccountedTiles) {
-      const id = unaccountedTiles[i];
+    for (const id of unaccountedTiles) {
       delete this.requestedTiles[id];
       this.requeueTile(id, true);
     }
   }
 
-  for (const i in successTiles) {
-    const id = successTiles[i];
+  for (const id of successTiles) {
     delete this.requestedTiles[id];
   }
 
@@ -758,12 +738,11 @@ IITC.map.Request.prototype.pushRenderQueue = function (id, data, status) {
  */
 IITC.map.Request.prototype.startQueueTimer = function (delay) {
   if (this.renderQueueTimer === undefined) {
-    var _this = this;
-    this.renderQueueTimer = setTimeout(function () {
-      _this.renderQueueTimer = setTimeout(
-        function () {
-          _this.renderQueueTimer = undefined;
-          _this.processRenderQueue();
+    this.renderQueueTimer = setTimeout(() => {
+      this.renderQueueTimer = setTimeout(
+        () => {
+          this.renderQueueTimer = undefined;
+          this.processRenderQueue();
         },
         (delay || 0) * 1000
       );
@@ -831,10 +810,10 @@ IITC.map.Request.prototype.processRenderQueue = function () {
   } else if (Object.keys(this.queuedTiles).length === 0) {
     this.renderer.endRenderPass();
 
-    var endTime = new Date().getTime();
+    var endTime = Date.now();
     var duration = (endTime - this.refreshStartTime) / 1000;
 
-    log.log('finished requesting data! (took ' + duration + ' seconds to complete)');
+    log.log(`finished requesting data! (took ${duration} seconds to complete)`);
 
     window.runHooks('mapDataRefreshEnd', {});
 

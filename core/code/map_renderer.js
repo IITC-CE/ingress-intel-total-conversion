@@ -119,9 +119,7 @@ IITC.map.Renderer.prototype.processTileData = function (tiledata) {
  * @param {Array} deleted - Array of deleted game entity GUIDs.
  */
 IITC.map.Renderer.prototype.processDeletedGameEntityGuids = function (deleted) {
-  for (var i in deleted) {
-    var guid = deleted[i];
-
+  for (const guid of deleted) {
     if (!(guid in this.deletedGuid)) {
       this.deletedGuid[guid] = true; // flag this guid as having being processed
 
@@ -149,24 +147,19 @@ IITC.map.Renderer.prototype.processGameEntities = function (entities, details) {
   // we loop through the entities three times - for fields, links and portals separately
   // this is a reasonably efficient work-around for leafletjs limitations on svg render order
 
-  for (const i in entities) {
-    const ent = entities[i];
+  for (const ent of entities) {
     if (ent[2][0] === 'r' && !(ent[0] in this.deletedGuid)) {
       this.createFieldEntity(ent);
     }
   }
 
-  for (const i in entities) {
-    const ent = entities[i];
-
+  for (const ent of entities) {
     if (ent[2][0] === 'e' && !(ent[0] in this.deletedGuid)) {
       this.createLinkEntity(ent);
     }
   }
 
-  for (const i in entities) {
-    const ent = entities[i];
-
+  for (const ent of entities) {
     if (ent[2][0] === 'p' && !(ent[0] in this.deletedGuid)) {
       this.createPortalEntity(ent, details);
     }
@@ -207,7 +200,7 @@ IITC.map.Renderer.prototype.endRenderPass = function () {
     }
   }
 
-  log.log('Render: end cleanup: removed ' + countp + ' portals, ' + countl + ' links, ' + countf + ' fields');
+  log.log(`Render: end cleanup: removed ${countp} portals, ${countl} links, ${countf} fields`);
 
   // reorder portals to be after links/fields
   this.bringPortalsToFront();
@@ -225,7 +218,7 @@ IITC.map.Renderer.prototype.bringPortalsToFront = function () {
   }
 
   // artifact portals are always brought to the front, above all others
-  $.each(window.artifact.getInterestingPortals(), function (i, guid) {
+  window.artifact.getInterestingPortals().forEach(function (guid) {
     if (window.portals[guid] && window.portals[guid]._map) {
       window.portals[guid].bringToFront();
     }
@@ -377,7 +370,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
     // (e.g. level changed, so size is different, or stats changed so highlighter is different)
 
     // remember the old details, for the callback
-    previousData = $.extend(true, {}, p.getDetails());
+    previousData = structuredClone(p.getDetails());
   }
 
   var latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
@@ -568,7 +561,7 @@ IITC.map.Renderer.prototype.rescalePortalMarkers = function () {
   if (this.portalMarkerScale === undefined || this.portalMarkerScale !== IITC.portal.marker.scale()) {
     this.portalMarkerScale = IITC.portal.marker.scale();
 
-    log.log('Render: map zoom ' + window.map.getZoom() + ' changes portal scale to ' + IITC.portal.marker.scale() + ' - redrawing all portals');
+    log.log(`Render: map zoom ${window.map.getZoom()} changes portal scale to ${IITC.portal.marker.scale()} - redrawing all portals`);
 
     // NOTE: we're not calling this because it resets highlights - we're calling it as it
     // resets the style (inc size) of all portal markers, applying the new scale

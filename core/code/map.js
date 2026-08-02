@@ -168,7 +168,7 @@ function createDefaultOverlays() {
   });
   addLayers[l0Layer.options.name] = l0Layer;
   for (var i = 1; i <= 8; i++) {
-    var t = 'Level ' + i + ' Portals';
+    var t = `Level ${i} Portals`;
     var portalsLayer = new IITC.filters.FilterLayer({
       name: t,
       filter: [
@@ -246,7 +246,7 @@ IITC.map.options = {
 IITC.map.setup = function () {
   setupCRS();
 
-  $('#map').text(''); // clear 'Loading, please wait'
+  document.getElementById('map').textContent = ''; // clear 'Loading, please wait'
 
   var map = L.map(
     'map',
@@ -280,43 +280,37 @@ IITC.map.setup = function () {
   // TODO? move the actual IITC DOM into the leaflet control areas, so dummy <div>s aren't needed
   if (!window.isSmartphone()) {
     // chat window area
-    $('<div>')
-      .addClass('leaflet-control')
-      .width(708)
-      .height(108)
-      .css({
-        'pointer-events': 'none',
-        margin: '0',
-      })
-      .appendTo(map._controlCorners.bottomleft);
+    const chatControlArea = document.createElement('div');
+    chatControlArea.className = 'leaflet-control';
+    chatControlArea.style.width = '708px';
+    chatControlArea.style.height = '108px';
+    chatControlArea.style.pointerEvents = 'none';
+    chatControlArea.style.margin = '0';
+    map._controlCorners.bottomleft.appendChild(chatControlArea);
   }
   var baseLayers = createDefaultBaseMapLayers();
   var overlays = createDefaultOverlays();
 
   var layerChooser = (window.layerChooser = new window.LayerChooser(baseLayers, overlays, { map: map }).addTo(map));
 
-  $.each(overlays, function (_, layer) {
-    if (map.hasLayer(layer)) {
-      return true;
-    } // continue
-
-    // as users often become confused if they accidentally switch a standard layer off, display a warning in this case
-    $('#portaldetails').html(
+  // as users often become confused if they accidentally switch a standard layer off, display a warning in this case
+  const someStandardLayerOff = Object.values(overlays).some((layer) => !map.hasLayer(layer));
+  if (someStandardLayerOff) {
+    const portalDetails = document.getElementById('portaldetails');
+    portalDetails.innerHTML =
       '<div class="layer_off_warning">' +
-        '<p><b>Warning</b>: some of the standard layers are turned off. Some portals/links/fields will not be visible.</p>' +
-        '<a id="enable_standard_layers">Enable standard layers</a>' +
-        '</div>'
-    );
-    $('#enable_standard_layers').on('click', function () {
-      $.each(overlays, function (ind, overlay) {
+      '<p><b>Warning</b>: some of the standard layers are turned off. Some portals/links/fields will not be visible.</p>' +
+      '<a id="enable_standard_layers">Enable standard layers</a>' +
+      '</div>';
+    document.getElementById('enable_standard_layers').addEventListener('click', function () {
+      Object.values(overlays).forEach((overlay) => {
         if (!map.hasLayer(overlay)) {
           map.addLayer(overlay);
         }
       });
-      $('#portaldetails').html('');
+      portalDetails.innerHTML = '';
     });
-    return false; // break
-  });
+  }
 
   map.attributionControl.setPrefix('');
 
