@@ -16,7 +16,7 @@ const requestQueue = {};
  * @memberof IITC.portal.details
  */
 const setup = function () {
-  cache = new window.DataCache();
+  cache = new IITC.map.Cache();
 
   cache.startExpireInterval(20);
 };
@@ -71,7 +71,7 @@ const handleResponseSuccess = function (deferred, guid, data, prefetch) {
 
   // entity format, as used in map data
   const ent = [guid, data.result[13], data.result];
-  const portal = window.mapDataRequest.render.createPortalEntity(ent, 'detailed');
+  const portal = IITC.map.request.renderer.createPortalEntity(ent, 'detailed');
 
   deferred.resolve(portal.options.data);
   window.runHooks('portalDetailLoaded', { guid: guid, success: true, details: portal.options.data, ent: ent, portal: portal });

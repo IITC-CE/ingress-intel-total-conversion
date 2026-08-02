@@ -617,13 +617,13 @@ window.plugin.drawTools.optReset = function () {
 };
 
 window.plugin.drawTools.snapToPortals = function () {
-  if (!window.getDataZoomTileParameters().hasPortals) {
+  if (!IITC.map.tiles.getDataZoomParameters().hasPortals) {
     if (!confirm('Not all portals are visible on the map. Snap to portals may move valid points to the wrong place. Continue?')) {
       return;
     }
   }
 
-  if (window.mapDataRequest.status.short !== 'done') {
+  if (IITC.map.request.status.short !== 'done') {
     if (!confirm('Map data has not completely loaded, so some portals may be missing. Do you want to continue?')) {
       return;
     }

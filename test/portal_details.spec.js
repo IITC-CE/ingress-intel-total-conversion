@@ -33,25 +33,26 @@ class MockDataCache {
   }
 }
 
-// window.DataCache is a live alias of IITC.map.Cache, so scope the mock to these suites and restore it afterwards
-let originalDataCache;
+// portal_details builds its cache from IITC.map.Cache, so scope the mock to these suites and restore it afterwards
+let originalCache;
 function setupWithMockCache() {
-  originalDataCache = window.DataCache;
-  window.DataCache = MockDataCache;
+  originalCache = IITC.map.Cache;
+  IITC.map.Cache = MockDataCache;
   IITC.portal.details.setup();
 }
-function restoreDataCache() {
-  window.DataCache = originalDataCache;
+function restoreCache() {
+  IITC.map.Cache = originalCache;
 }
 
 before(async () => {
   // IITC.portal must exist for the module to attach .details and register aliases
   await import('../core/code/portal.js');
+  // map.js declares IITC.map; map_cache.js provides the real IITC.map.Cache the mock stands in for
+  await import('../core/code/map.js');
+  await import('../core/code/map_cache.js');
 
-  Object.assign(globalThis.window, {
-    decodeArray: { portal: () => ({ mods: [1] }) },
-    mapDataRequest: { render: { createPortalEntity: () => ({ options: { data: { guid: 'OK', image: null } } }) } },
-  });
+  globalThis.window.decodeArray = { portal: () => ({ mods: [1] }) };
+  IITC.map.request = { renderer: { createPortalEntity: () => ({ options: { data: { guid: 'OK', image: null } } }) } };
   globalThis.Image = class {};
 
   await import('../core/code/portal_details.js');
@@ -66,7 +67,7 @@ describe('IITC.portal.details namespace', () => {
 
 describe('IITC.portal.details cache', () => {
   beforeEach(setupWithMockCache);
-  afterEach(restoreDataCache);
+  afterEach(restoreCache);
 
   it('setup initializes an expiring cache', () => {
     IITC.portal.details.setup();
@@ -89,7 +90,7 @@ describe('IITC.portal.details cache', () => {
 
 describe('IITC.portal.details.request', () => {
   beforeEach(setupWithMockCache);
-  afterEach(restoreDataCache);
+  afterEach(restoreCache);
 
   it('de-duplicates concurrent requests for the same portal', () => {
     window.postAjax = sinon.stub(); // never invokes callbacks -> request stays pending

@@ -385,7 +385,7 @@ machinaTools.onPortalDetailsUpdated = function (data) {
  * does not factor in other tools that adjust display capabilities.
  */
 machinaTools.zoomLevelHasPortals = function () {
-  return window.getDataZoomTileParameters().hasPortals;
+  return IITC.map.tiles.getDataZoomParameters().hasPortals;
 };
 
 machinaTools.updateConflictArea = function () {
