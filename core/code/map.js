@@ -8,6 +8,25 @@
  */
 IITC.map = {};
 
+/**
+ * Warning shown in the portal details panel when some standard layers are turned off
+ * @type {String}
+ * @memberof IITC.map
+ */
+IITC.map.layerOffWarningTemplate =
+  '<div class="layer_off_warning">' +
+  '<p><b>Warning</b>: some of the standard layers are turned off. Some portals/links/fields will not be visible.</p>' +
+  '<a id="enable_standard_layers">Enable standard layers</a>' +
+  '</div>';
+
+/**
+ * Attribution string for the OpenStreetMap/CartoDB base layers
+ * @type {String}
+ * @memberof IITC.map
+ */
+IITC.map.osmAttributionTemplate =
+  '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
+
 function setupCRS() {
   // use the earth radius value from s2 geometry library
   // https://github.com/google/s2-geometry-library-java/blob/c28f287b996c0cedc5516a0426fbd49f6c9611ec/src/com/google/common/geometry/S2LatLng.java#L31
@@ -116,8 +135,7 @@ function createDefaultBaseMapLayers() {
 
   // cartodb has some nice tiles too - both dark and light subtle maps - http://cartodb.com/basemaps/
   // (not available over https though - not on the right domain name anyway)
-  const cartoAttr =
-    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
+  const cartoAttr = IITC.map.osmAttributionTemplate;
   const cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png';
   baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all', isDark: true });
   baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all', isDark: false });
@@ -296,11 +314,7 @@ IITC.map.setup = function () {
   const someStandardLayerOff = Object.values(overlays).some((layer) => !map.hasLayer(layer));
   if (someStandardLayerOff) {
     const portalDetails = document.getElementById('portaldetails');
-    portalDetails.innerHTML =
-      '<div class="layer_off_warning">' +
-      '<p><b>Warning</b>: some of the standard layers are turned off. Some portals/links/fields will not be visible.</p>' +
-      '<a id="enable_standard_layers">Enable standard layers</a>' +
-      '</div>';
+    portalDetails.innerHTML = IITC.map.layerOffWarningTemplate;
     document.getElementById('enable_standard_layers').addEventListener('click', function () {
       Object.values(overlays).forEach((overlay) => {
         if (!map.hasLayer(overlay)) {

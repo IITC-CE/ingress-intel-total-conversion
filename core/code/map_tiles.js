@@ -16,6 +16,25 @@ IITC.map.tiles = {};
 
 IITC.map.tiles.params = {};
 
+// default values - used to fall back to if we can't detect those used in stock intel
+const DEFAULT_ZOOM_TO_TILES_PER_EDGE = [1, 1, 1, 40, 40, 80, 80, 320, 1000, 2000, 2000, 4000, 8000, 16000, 16000, 32000];
+const DEFAULT_ZOOM_TO_LEVEL = [8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 4, 4, 3, 2, 2, 1, 1];
+// stock intel doesn't have this array (they use a switch statement instead), but this is far neater
+const DEFAULT_ZOOM_TO_LINK_LENGTH = [200000, 200000, 200000, 200000, 200000, 60000, 60000, 10000, 5000, 2500, 2500, 800, 300, 0, 0];
+
+// stock site max data zoom; IITC map zoom can exceed it depending on the base layer, so requests are capped here
+const MAX_DATA_ZOOM = 21;
+
+/**
+ * Warning dialog shown when the stock tile parameters cannot be detected
+ * @type {String}
+ * @memberof IITC.map.tiles
+ */
+IITC.map.tiles.tileParamsWarningTemplate =
+  '<p>IITC failed to detect the ZOOM_TO_LEVEL and/or TILES_PER_EDGE settings from the stock intel site.</p>' +
+  "<p>IITC is now using fallback default values. However, if detection has failed it's likely the values have changed." +
+  ' IITC may not load the map if these default values are wrong.</p>';
+
 /**
  * Sets up the data tile parameters used for map data requests. This function initializes the params
  * object with default values or values detected from the stock Intel map.
@@ -23,13 +42,6 @@ IITC.map.tiles.params = {};
  * @memberof IITC.map.tiles
  */
 IITC.map.tiles.setupParams = function () {
-  // default values - used to fall back to if we can't detect those used in stock intel
-  const DEFAULT_ZOOM_TO_TILES_PER_EDGE = [1, 1, 1, 40, 40, 80, 80, 320, 1000, 2000, 2000, 4000, 8000, 16000, 16000, 32000];
-  const DEFAULT_ZOOM_TO_LEVEL = [8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 4, 4, 3, 2, 2, 1, 1];
-
-  // stock intel doesn't have this array (they use a switch statement instead), but this is far neater
-  const DEFAULT_ZOOM_TO_LINK_LENGTH = [200000, 200000, 200000, 200000, 200000, 60000, 60000, 10000, 5000, 2500, 2500, 800, 300, 0, 0];
-
   IITC.map.tiles.params = {};
 
   // not in stock to detect - we'll have to assume the above values...
@@ -49,10 +61,7 @@ IITC.map.tiles.setupParams = function () {
   } else {
     window.dialog({
       title: 'IITC Warning',
-      html:
-        '<p>IITC failed to detect the ZOOM_TO_LEVEL and/or TILES_PER_EDGE settings from the stock intel site.</p>' +
-        "<p>IITC is now using fallback default values. However, if detection has failed it's likely the values have changed." +
-        ' IITC may not load the map if these default values are wrong.</p>',
+      html: IITC.map.tiles.tileParamsWarningTemplate,
     });
 
     IITC.map.tiles.params.ZOOM_TO_LEVEL = DEFAULT_ZOOM_TO_LEVEL;
@@ -106,8 +115,8 @@ IITC.map.tiles.getDataZoomForMapZoom = function (zoom) {
 
   // firstly, some of IITCs zoom levels, depending on base map layer, can be higher than stock. limit zoom level
   // (stock site max zoom may vary depending on google maps detail in the area - 20 or 21 max is common)
-  if (zoom > 21) {
-    zoom = 21;
+  if (zoom > MAX_DATA_ZOOM) {
+    zoom = MAX_DATA_ZOOM;
   }
 
   // to improve the cacheing performance, we try and limit the number of zoom levels we retrieve data for

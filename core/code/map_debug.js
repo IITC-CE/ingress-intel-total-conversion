@@ -7,9 +7,6 @@
  * @class DebugTiles
  */
 IITC.map.DebugTiles = function () {
-  this.CLEAR_CHECK_TIME = 0.1;
-  this.FADE_TIME = 1.0;
-
   this.debugTileLayer = new L.LayerGroup();
   window.layerChooser.addOverlay(this.debugTileLayer, 'DEBUG Data Tiles', { default: false });
 
@@ -17,6 +14,30 @@ IITC.map.DebugTiles = function () {
   this.debugTileClearTimes = {};
   this.timer = undefined;
 };
+
+// timings for the debug-tile fade/clear cycle (seconds)
+const CLEAR_CHECK_TIME = 0.1;
+const FADE_TIME = 1.0;
+
+// base rectangle style for a debug tile; state changes only tweak the stroke/fill colour
+const TILE_BASE_STYLE = { color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false };
+
+// per-state colours and auto-clear delay (seconds); clearDelay < 0 means the tile stays until replaced
+const STATE_STYLES = {
+  ok: { color: '#0f0', fill: '#0f0', clearDelay: 2 },
+  error: { color: '#f00', fill: '#f00', clearDelay: 30 },
+  'cache-fresh': { color: '#0f0', fill: '#ff0', clearDelay: 2 },
+  'cache-stale': { color: '#f00', fill: '#ff0', clearDelay: 10 },
+  requested: { color: '#66f', fill: '#66f', clearDelay: -1 },
+  retrying: { color: '#666', fill: '#666', clearDelay: -1 },
+  'request-fail': { color: '#a00', fill: '#666', clearDelay: -1 },
+  'tile-fail': { color: '#f00', fill: '#666', clearDelay: -1 },
+  'tile-timeout': { color: '#ff0', fill: '#666', clearDelay: -1 },
+  'render-queue': { color: '#f0f', fill: '#f0f', clearDelay: -1 },
+};
+
+// fallback style for an unknown state
+const DEFAULT_STATE_STYLE = { color: '#f0f', fill: '#f0f', clearDelay: -1 };
 
 /**
  * Resets the debug tiles by clearing all layers, rectangles and clear times.
@@ -38,12 +59,10 @@ IITC.map.DebugTiles.prototype.reset = function () {
  * @param {L.LatLngBounds} bounds - The geographical bounds of the tile.
  */
 IITC.map.DebugTiles.prototype.create = function (id, bounds) {
-  const s = { color: '#666', weight: 1, opacity: 0.4, fillColor: '#666', fillOpacity: 0.1, interactive: false };
-
   bounds = new L.LatLngBounds(bounds);
   bounds = bounds.pad(-0.02);
 
-  const l = new L.Rectangle(bounds, s);
+  const l = new L.Rectangle(bounds, TILE_BASE_STYLE);
   this.debugTileToRectangle[id] = l;
   this.debugTileLayer.addLayer(l);
   if (window.map.hasLayer(this.debugTileLayer)) {
@@ -78,62 +97,15 @@ IITC.map.DebugTiles.prototype.setColour = function (id, bordercol, fillcol) {
  * @param {string} state - The state of the tile (e.g., 'ok', 'error', 'requested').
  */
 IITC.map.DebugTiles.prototype.setState = function (id, state) {
-  let col = '#f0f';
-  let fill = '#f0f';
-  let clearDelay = -1;
-  switch (state) {
-    case 'ok':
-      col = '#0f0';
-      fill = '#0f0';
-      clearDelay = 2;
-      break;
-    case 'error':
-      col = '#f00';
-      fill = '#f00';
-      clearDelay = 30;
-      break;
-    case 'cache-fresh':
-      col = '#0f0';
-      fill = '#ff0';
-      clearDelay = 2;
-      break;
-    case 'cache-stale':
-      col = '#f00';
-      fill = '#ff0';
-      clearDelay = 10;
-      break;
-    case 'requested':
-      col = '#66f';
-      fill = '#66f';
-      break;
-    case 'retrying':
-      col = '#666';
-      fill = '#666';
-      break;
-    case 'request-fail':
-      col = '#a00';
-      fill = '#666';
-      break;
-    case 'tile-fail':
-      col = '#f00';
-      fill = '#666';
-      break;
-    case 'tile-timeout':
-      col = '#ff0';
-      fill = '#666';
-      break;
-    case 'render-queue':
-      col = '#f0f';
-      fill = '#f0f';
-      break;
-  }
-  this.setColour(id, col, fill);
-  if (clearDelay >= 0) {
-    const clearAt = Date.now() + clearDelay * 1000;
+  const style = STATE_STYLES[state] || DEFAULT_STATE_STYLE;
+
+  this.setColour(id, style.color, style.fill);
+  if (style.clearDelay >= 0) {
+    const clearAt = Date.now() + style.clearDelay * 1000;
     this.debugTileClearTimes[id] = clearAt;
 
     if (!this.timer) {
-      this.startTimer(clearDelay * 1000);
+      this.startTimer(style.clearDelay * 1000);
     }
   }
 };
@@ -169,19 +141,19 @@ IITC.map.DebugTiles.prototype.runClearPass = function () {
   for (const id in this.debugTileClearTimes) {
     const diff = now - this.debugTileClearTimes[id];
     if (diff > 0) {
-      if (diff > this.FADE_TIME * 1000) {
+      if (diff > FADE_TIME * 1000) {
         this.debugTileLayer.removeLayer(this.debugTileToRectangle[id]);
         delete this.debugTileClearTimes[id];
       } else {
-        const fade = 1.0 - diff / (this.FADE_TIME * 1000);
+        const fade = 1.0 - diff / (FADE_TIME * 1000);
 
-        this.debugTileToRectangle[id].setStyle({ opacity: 0.4 * fade, fillOpacity: 0.1 * fade });
+        this.debugTileToRectangle[id].setStyle({ opacity: TILE_BASE_STYLE.opacity * fade, fillOpacity: TILE_BASE_STYLE.fillOpacity * fade });
       }
     }
   }
 
   if (Object.keys(this.debugTileClearTimes).length > 0) {
-    this.startTimer(this.CLEAR_CHECK_TIME * 1000);
+    this.startTimer(CLEAR_CHECK_TIME * 1000);
   }
 };
 

@@ -11,6 +11,25 @@ IITC.map.Renderer = function () {
 };
 
 /**
+ * Default style for link polylines
+ *
+ * @type {Object}
+ * @memberof IITC.map.Renderer
+ */
+IITC.map.Renderer.LINK_STYLE = { opacity: 1, weight: 2 };
+
+/**
+ * Default style for field polygons
+ *
+ * @type {Object}
+ * @memberof IITC.map.Renderer
+ */
+IITC.map.Renderer.FIELD_STYLE = { fillOpacity: 0.25 };
+
+// Niantic fake link entities from field data; their GUIDs are the field GUID (ending ".b") with an edge suffix appended
+const FAKED_LINK_GUID_REGEX = /^[0-9a-f]{32}.b_[ab][bc]$/;
+
+/**
  * Initiates a render pass. It's called at the start of making a batch of data requests to the servers.
  *
  * @function
@@ -465,7 +484,7 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
 
   const poly = L.geodesicPolygon(latlngs, {
     fillColor: window.COLORS[team],
-    fillOpacity: 0.25,
+    ...IITC.map.Renderer.FIELD_STYLE,
     stroke: false,
     interactive: false,
 
@@ -495,8 +514,7 @@ IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
   // Niantic have been faking link entities, based on data from fields
   // these faked links are sent along with the real portal links, causing duplicates
   // the faked ones all have longer GUIDs, based on the field GUID (with _ab, _ac, _bc appended)
-  const fakedLink = new RegExp('^[0-9a-f]{32}.b_[ab][bc]$'); // field GUIDs always end with ".b" - faked links append the edge identifier
-  if (fakedLink.test(ent[0])) return;
+  if (FAKED_LINK_GUID_REGEX.test(ent[0])) return;
 
   this.seenLinksGuid[ent[0]] = true; // flag we've seen it
 
@@ -532,8 +550,7 @@ IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
   const latlngs = [new L.LatLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), new L.LatLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
   const poly = L.geodesicPolyline(latlngs, {
     color: window.COLORS[team],
-    opacity: 1,
-    weight: 2,
+    ...IITC.map.Renderer.LINK_STYLE,
     interactive: false,
 
     team: team,
