@@ -97,7 +97,7 @@ window.runOnAppBeforeBoot = function () {
   }
 
   if (window.app.showZoom) {
-    window.mapOptions.zoomControl = window.app.showZoom();
+    IITC.map.options.zoomControl = window.app.showZoom();
   }
 
   extendLayerChooser();

@@ -227,8 +227,8 @@ IITC.statusbar.map = {
    *   - requests: Active and failed request counts
    */
   getData() {
-    const tileParams = window.getDataZoomTileParameters();
-    const mapStatus = window.mapDataRequest ? window.mapDataRequest.getStatus() : null;
+    const tileParams = IITC.map.tiles.getDataZoomParameters();
+    const mapStatus = IITC.map.request ? IITC.map.request.getStatus() : null;
     const minLinkLength = tileParams.minLinkLength;
 
     // Build comprehensive status data object

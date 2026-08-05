@@ -3,6 +3,7 @@ import { JSDOM } from 'jsdom';
 import { jQueryFactory } from 'jquery/factory';
 
 class Map {
+  options = {};
   addTo() {}
   addLayer() {}
   removeLayer() {}
@@ -51,6 +52,7 @@ globalThis.window = {
   runHooks: () => {},
   dialog: () => {},
   isSmartphone: () => false,
+  isApp: false,
   isIdle: () => false,
   postAjax: () => {},
   startRefreshTimeout: () => {},

@@ -4,6 +4,7 @@
 // @version        0.4.6
 // @description    Displays the per-team AP gains available in the current view.
 
+/* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
@@ -65,7 +66,7 @@ window.plugin.compAPStats.updateNoPortals = function () {
 };
 
 window.plugin.compAPStats.update = function (hasFinished) {
-  if (!window.getDataZoomTileParameters().hasPortals) {
+  if (!IITC.map.tiles.getDataZoomParameters().hasPortals) {
     window.plugin.compAPStats.updateNoPortals(hasFinished);
     return;
   }

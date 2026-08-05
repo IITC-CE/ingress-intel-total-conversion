@@ -2,12 +2,14 @@
 
 /**
  * Class for managing map data requests from the Ingress servers, caching the data, and passing it to the renderer.
- * @class MapDataRequest
+ *
+ * @memberof IITC.map
+ * @class Request
  */
-window.MapDataRequest = function () {
-  this.cache = new window.DataCache();
-  this.render = new window.Render();
-  this.debugTiles = new window.RenderDebugTiles();
+IITC.map.Request = function () {
+  this.cache = new IITC.map.Cache();
+  this.renderer = new IITC.map.Renderer();
+  this.debugTiles = new IITC.map.DebugTiles();
 
   this.activeRequestCount = 0;
   this.requestedTiles = {};
@@ -67,18 +69,27 @@ window.MapDataRequest = function () {
   this.setStatus('startup', undefined, -1);
 };
 
+// backward-compatible alias for the renderer, historically exposed as `.render`
+Object.defineProperty(IITC.map.Request.prototype, 'render', {
+  get() {
+    return this.renderer;
+  },
+  set(value) {
+    this.renderer = value;
+  },
+  configurable: true,
+});
+
 /**
  * Starts the data request process, setting up hooks and callbacks.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.start = function () {
-  var savedContext = this;
-
+IITC.map.Request.prototype.start = function () {
   // setup idle resume function
-  window.addResumeFunction(function () {
-    savedContext.idleResume();
+  window.addResumeFunction(() => {
+    this.idleResume();
   });
 
   // and map move start/end callbacks
@@ -96,9 +107,9 @@ window.MapDataRequest.prototype.start = function () {
  * Callback for map movement start. Pauses the rendering and data requests.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.mapMoveStart = function () {
+IITC.map.Request.prototype.mapMoveStart = function () {
   log.log('refresh map movestart');
 
   this.setStatus('paused');
@@ -110,10 +121,10 @@ window.MapDataRequest.prototype.mapMoveStart = function () {
  * Handles map movement end. Determines whether new data needs to be fetched based on map bounds and zoom level.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.mapMoveEnd = function () {
-  var bounds = window.clampLatLngBounds(window.map.getBounds());
+IITC.map.Request.prototype.mapMoveEnd = function () {
+  const bounds = window.clampLatLngBounds(window.map.getBounds());
 
   if (this.fetchedDataParams) {
     // we have fetched (or are fetching) data...
@@ -121,7 +132,7 @@ window.MapDataRequest.prototype.mapMoveEnd = function () {
       // ... and the zoom level is the same and the current bounds is inside the fetched bounds
       // so, no need to fetch data. if there's time left, restore the original timeout
 
-      var remainingTime = (this.timerExpectedTimeoutTime - new Date().getTime()) / 1000;
+      const remainingTime = (this.timerExpectedTimeoutTime - Date.now()) / 1000;
 
       if (remainingTime > this.MOVE_REFRESH) {
         this.setStatus('done', 'Map moved, but no data updates needed');
@@ -140,9 +151,9 @@ window.MapDataRequest.prototype.mapMoveEnd = function () {
  * Resumes data fetching and rendering after being idle.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.idleResume = function () {
+IITC.map.Request.prototype.idleResume = function () {
   // if we have no timer set and there are no active requests, refresh has gone idle and the timer needs restarting
 
   if (this.idle) {
@@ -157,9 +168,9 @@ window.MapDataRequest.prototype.idleResume = function () {
  * Clears the current data refresh timeout.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.clearTimeout = function () {
+IITC.map.Request.prototype.clearTimeout = function () {
   if (this.timer) {
     log.log('cancelling existing map refresh timer');
     clearTimeout(this.timer);
@@ -171,36 +182,34 @@ window.MapDataRequest.prototype.clearTimeout = function () {
  * Sets a timeout to refresh the map data.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {number} seconds - Time in seconds to wait before refreshing the map data.
  */
-window.MapDataRequest.prototype.refreshOnTimeout = function (seconds) {
+IITC.map.Request.prototype.refreshOnTimeout = function (seconds) {
   this.clearTimeout();
 
-  log.log('starting map refresh in ' + seconds + ' seconds');
+  log.log(`starting map refresh in ${seconds} seconds`);
 
-  // 'this' won't be right inside the callback, so save it
-  // also, double setTimeout used to ensure the delay occurs after any browser-related rendering/updating/etc
-  var _this = this;
-  this.timer = setTimeout(function () {
-    _this.timer = setTimeout(function () {
-      _this.timer = undefined;
-      _this.refresh();
+  // double setTimeout used to ensure the delay occurs after any browser-related rendering/updating/etc
+  this.timer = setTimeout(() => {
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      this.refresh();
     }, seconds * 1000);
   }, 0);
-  this.timerExpectedTimeoutTime = new Date().getTime() + seconds * 1000;
+  this.timerExpectedTimeoutTime = Date.now() + seconds * 1000;
 };
 
 /**
  * Sets the current status of the map data request, including a short description, long description, and progress.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {string} short - Short description of the current status.
  * @param {string} [long] - Long description of the current status.
  * @param {number} [progress] - Progress indicator, typically represented as a percentage.
  */
-window.MapDataRequest.prototype.setStatus = function (short, long, progress) {
+IITC.map.Request.prototype.setStatus = function (short, long, progress) {
   this.status = { short: short, long: long, progress: progress };
   IITC.statusbar.map.update();
 };
@@ -209,10 +218,10 @@ window.MapDataRequest.prototype.setStatus = function (short, long, progress) {
  * Gets the current status of the map data request, including short description, long description, and progress.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @returns {Object} An object containing the current status of the map data request.
  */
-window.MapDataRequest.prototype.getStatus = function () {
+IITC.map.Request.prototype.getStatus = function () {
   return this.status;
 };
 
@@ -221,9 +230,9 @@ window.MapDataRequest.prototype.getStatus = function () {
  * preparing requests for map data, and handling cached data.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.refresh = function () {
+IITC.map.Request.prototype.refresh = function () {
   // if we're idle, don't refresh
   if (window.isIdle()) {
     log.log('suspending map refresh - is idle');
@@ -233,7 +242,7 @@ window.MapDataRequest.prototype.refresh = function () {
   }
 
   // time the refresh cycle
-  this.refreshStartTime = new Date().getTime();
+  this.refreshStartTime = Date.now();
 
   this.debugTiles.reset();
   this.resetRenderQueue();
@@ -247,12 +256,12 @@ window.MapDataRequest.prototype.refresh = function () {
   // then fetch order isn't optimal, but it won't break things.
   this.queuedTiles = {};
 
-  var bounds = window.clampLatLngBounds(window.map.getBounds());
-  var mapZoom = window.map.getZoom();
+  const bounds = window.clampLatLngBounds(window.map.getBounds());
+  const mapZoom = window.map.getZoom();
 
-  var dataZoom = window.getDataZoomForMapZoom(mapZoom);
+  const dataZoom = IITC.map.tiles.getDataZoomForMapZoom(mapZoom);
 
-  var tileParams = window.getMapZoomTileParameters(dataZoom);
+  const tileParams = IITC.map.tiles.getMapZoomParameters(dataZoom);
 
   // DEBUG: resize the bounds so we only retrieve some data
   // bounds = bounds.pad(-0.4);
@@ -260,15 +269,15 @@ window.MapDataRequest.prototype.refresh = function () {
   // var debugrect = new L.Rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
   // setTimeout (function(){ map.removeLayer(debugrect); }, 10*1000);
 
-  var x1 = window.lngToTile(bounds.getWest(), tileParams);
-  var x2 = window.lngToTile(bounds.getEast(), tileParams);
-  var y1 = window.latToTile(bounds.getNorth(), tileParams);
-  var y2 = window.latToTile(bounds.getSouth(), tileParams);
+  const x1 = IITC.map.tiles.lngToTile(bounds.getWest(), tileParams);
+  const x2 = IITC.map.tiles.lngToTile(bounds.getEast(), tileParams);
+  const y1 = IITC.map.tiles.latToTile(bounds.getNorth(), tileParams);
+  const y2 = IITC.map.tiles.latToTile(bounds.getSouth(), tileParams);
 
   // calculate the full bounds for the data - including the part of the tiles off the screen edge
-  var dataBounds = new L.LatLngBounds([
-    [window.tileToLat(y2 + 1, tileParams), window.tileToLng(x1, tileParams)],
-    [window.tileToLat(y1, tileParams), window.tileToLng(x2 + 1, tileParams)],
+  const dataBounds = new L.LatLngBounds([
+    [IITC.map.tiles.tileToLat(y2 + 1, tileParams), IITC.map.tiles.tileToLng(x1, tileParams)],
+    [IITC.map.tiles.tileToLat(y1, tileParams), IITC.map.tiles.tileToLng(x2 + 1, tileParams)],
   ]);
   // var debugrect2 = new L.Rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
   // setTimeout (function(){ map.removeLayer(debugrect2); }, 10*1000);
@@ -278,15 +287,13 @@ window.MapDataRequest.prototype.refresh = function () {
 
   window.runHooks('mapDataRefreshStart', { bounds: bounds, mapZoom: mapZoom, dataZoom: dataZoom, minPortalLevel: tileParams.level, tileBounds: dataBounds });
 
-  this.render.startRenderPass(dataBounds);
+  this.renderer.startRenderPass(dataBounds);
 
-  window.runHooks('mapDataEntityInject', { callback: this.render.processGameEntities.bind(this.render) });
+  window.runHooks('mapDataEntityInject', { callback: this.renderer.processGameEntities.bind(this.renderer) });
 
-  var logMessage = 'requesting data tiles at zoom ' + dataZoom;
-  logMessage += ' (L' + tileParams.level + '+ portals';
-  logMessage += ', ' + tileParams.tilesPerEdge + ' tiles per global edge), map zoom is ' + mapZoom;
-
-  log.log(logMessage);
+  log.log(
+    `requesting data tiles at zoom ${dataZoom} (L${tileParams.level}+ portals, ${tileParams.tilesPerEdge} tiles per global edge), map zoom is ${mapZoom}`
+  );
 
   this.cachedTileCount = 0;
   this.requestedTileCount = 0;
@@ -294,20 +301,20 @@ window.MapDataRequest.prototype.refresh = function () {
   this.failedTileCount = 0;
   this.staleTileCount = 0;
 
-  var tilesToFetchDistance = {};
+  const tilesToFetchDistance = {};
 
   // map center point - for fetching center tiles first
-  var mapCenterPoint = window.map.project(window.map.getCenter(), mapZoom);
+  const mapCenterPoint = window.map.project(window.map.getCenter(), mapZoom);
 
   // y goes from left to right
-  for (var y = y1; y <= y2; y++) {
+  for (let y = y1; y <= y2; y++) {
     // x goes from bottom to top(?)
-    for (var x = x1; x <= x2; x++) {
-      var tile_id = window.pointToTileId(tileParams, x, y);
-      var latNorth = window.tileToLat(y, tileParams);
-      var latSouth = window.tileToLat(y + 1, tileParams);
-      var lngWest = window.tileToLng(x, tileParams);
-      var lngEast = window.tileToLng(x + 1, tileParams);
+    for (let x = x1; x <= x2; x++) {
+      const tile_id = IITC.map.tiles.pointToTileId(tileParams, x, y);
+      const latNorth = IITC.map.tiles.tileToLat(y, tileParams);
+      const latSouth = IITC.map.tiles.tileToLat(y + 1, tileParams);
+      const lngWest = IITC.map.tiles.tileToLng(x, tileParams);
+      const lngEast = IITC.map.tiles.tileToLng(x + 1, tileParams);
 
       this.debugTiles.create(tile_id, [
         [latSouth, lngWest],
@@ -323,14 +330,14 @@ window.MapDataRequest.prototype.refresh = function () {
 
         // tile needed. calculate the distance from the centre of the screen, to optimise the load order
 
-        var latCenter = (latNorth + latSouth) / 2;
-        var lngCenter = (lngEast + lngWest) / 2;
-        var tileLatLng = new L.LatLng(latCenter, lngCenter);
+        const latCenter = (latNorth + latSouth) / 2;
+        const lngCenter = (lngEast + lngWest) / 2;
+        const tileLatLng = new L.LatLng(latCenter, lngCenter);
 
-        var tilePoint = window.map.project(tileLatLng, mapZoom);
+        const tilePoint = window.map.project(tileLatLng, mapZoom);
 
-        var delta = mapCenterPoint.subtract(tilePoint);
-        var distanceSquared = delta.x * delta.x + delta.y * delta.y;
+        const delta = mapCenterPoint.subtract(tilePoint);
+        const distanceSquared = delta.x * delta.x + delta.y * delta.y;
 
         tilesToFetchDistance[tile_id] = distanceSquared;
         this.requestedTileCount += 1;
@@ -339,14 +346,12 @@ window.MapDataRequest.prototype.refresh = function () {
   }
 
   // re-order the tile list by distance from the centre of the screen. this should load more relevant data first
-  var tilesToFetch = Object.keys(tilesToFetchDistance);
+  const tilesToFetch = Object.keys(tilesToFetchDistance);
   tilesToFetch.sort(function (a, b) {
     return tilesToFetchDistance[a] - tilesToFetchDistance[b];
   });
 
-  for (var i in tilesToFetch) {
-    var qk = tilesToFetch[i];
-
+  for (const qk of tilesToFetch) {
     this.queuedTiles[qk] = qk;
   }
 
@@ -371,16 +376,15 @@ window.MapDataRequest.prototype.refresh = function () {
  * Delays the processing of the request queue for fetching map data tiles. The delay is specified in seconds.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {number} seconds - The delay in seconds before starting to process the request queue.
  */
-window.MapDataRequest.prototype.delayProcessRequestQueue = function (seconds) {
+IITC.map.Request.prototype.delayProcessRequestQueue = function (seconds) {
   if (this.timer === undefined) {
-    var _this = this;
-    this.timer = setTimeout(function () {
-      _this.timer = setTimeout(function () {
-        _this.timer = undefined;
-        _this.processRequestQueue();
+    this.timer = setTimeout(() => {
+      this.timer = setTimeout(() => {
+        this.timer = undefined;
+        this.processRequestQueue();
       }, seconds * 1000);
     }, 0);
   }
@@ -391,9 +395,9 @@ window.MapDataRequest.prototype.delayProcessRequestQueue = function (seconds) {
  * tile error handling, and updates the request status.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.processRequestQueue = function () {
+IITC.map.Request.prototype.processRequestQueue = function () {
   // if nothing left in the queue, finish
   if (Object.keys(this.queuedTiles).length === 0) {
     // we leave the renderQueue code to handle ending the render pass now
@@ -406,7 +410,7 @@ window.MapDataRequest.prototype.processRequestQueue = function () {
   }
 
   // create a list of tiles that aren't requested over the network
-  var pendingTiles = [];
+  const pendingTiles = [];
   for (const id in this.queuedTiles) {
     if (!(id in this.requestedTiles)) {
       pendingTiles.push(id);
@@ -415,17 +419,17 @@ window.MapDataRequest.prototype.processRequestQueue = function () {
 
   // log.log('- request state: '+Object.keys(this.requestedTiles).length+' tiles in '+this.activeRequestCount+' active requests, '+pendingTiles.length+' tiles queued');
 
-  var requestBuckets = this.MAX_REQUESTS - this.activeRequestCount;
+  const requestBuckets = this.MAX_REQUESTS - this.activeRequestCount;
   if (pendingTiles.length > 0 && requestBuckets > 0) {
-    var requestBucketSize = Math.min(this.NUM_TILES_PER_REQUEST, Math.max(5, Math.ceil(pendingTiles.length / requestBuckets)));
-    for (var bucket = 0; bucket < requestBuckets; bucket++) {
+    const requestBucketSize = Math.min(this.NUM_TILES_PER_REQUEST, Math.max(5, Math.ceil(pendingTiles.length / requestBuckets)));
+    for (let bucket = 0; bucket < requestBuckets; bucket++) {
       // if the tiles for this request have had several retries, use smaller requests
       // maybe some of the tiles caused all the others to error? no harm anyway, and it may help...
-      var numTilesThisRequest = Math.min(requestBucketSize, pendingTiles.length);
+      let numTilesThisRequest = Math.min(requestBucketSize, pendingTiles.length);
 
       let id = pendingTiles[0];
-      var retryTotal = this.tileErrorCount[id] || 0;
-      for (var i = 1; i < numTilesThisRequest; i++) {
+      let retryTotal = this.tileErrorCount[id] || 0;
+      for (let i = 1; i < numTilesThisRequest; i++) {
         id = pendingTiles[i];
         retryTotal += this.tileErrorCount[id] || 0;
         if (retryTotal > this.MAX_TILE_RETRIES) {
@@ -434,7 +438,7 @@ window.MapDataRequest.prototype.processRequestQueue = function () {
         }
       }
 
-      var tiles = pendingTiles.splice(0, numTilesThisRequest);
+      const tiles = pendingTiles.splice(0, numTilesThisRequest);
       if (tiles.length > 0) {
         this.sendTileRequest(tiles);
       }
@@ -442,8 +446,8 @@ window.MapDataRequest.prototype.processRequestQueue = function () {
   }
 
   // update status
-  var pendingTileCount = this.requestedTileCount - (this.successTileCount + this.failedTileCount + this.staleTileCount);
-  var longText =
+  const pendingTileCount = this.requestedTileCount - (this.successTileCount + this.failedTileCount + this.staleTileCount);
+  const longText =
     `Tiles: ${this.cachedTileCount} cached, ` +
     `${this.successTileCount} loaded, ` +
     (this.staleTileCount ? this.staleTileCount + ' stale, ' : '') +
@@ -459,15 +463,13 @@ window.MapDataRequest.prototype.processRequestQueue = function () {
  * Updates the debugTiles state and manages the count of active requests.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {Array} tiles - An array of tile identifiers to request.
  */
-window.MapDataRequest.prototype.sendTileRequest = function (tiles) {
-  var tilesList = [];
+IITC.map.Request.prototype.sendTileRequest = function (tiles) {
+  const tilesList = [];
 
-  for (var i in tiles) {
-    var id = tiles[i];
-
+  for (const id of tiles) {
     this.debugTiles.setState(id, 'requested');
 
     this.requestedTiles[id] = true;
@@ -475,25 +477,23 @@ window.MapDataRequest.prototype.sendTileRequest = function (tiles) {
     if (id in this.queuedTiles) {
       tilesList.push(id);
     } else {
-      log.warn('no queue entry for tile id ' + id);
+      log.warn(`no queue entry for tile id ${id}`);
     }
   }
 
-  var data = { tileKeys: tilesList };
+  const data = { tileKeys: tilesList };
 
   this.activeRequestCount += 1;
-
-  var savedThis = this;
 
   // NOTE: don't add the request with window.request.add, as we don't want the abort handling to apply to map data any more
   window.postAjax(
     'getEntities',
     data,
-    function (data) {
-      savedThis.handleResponse(data, tiles, true);
+    (data) => {
+      this.handleResponse(data, tiles, true);
     }, // request successful callback
-    function () {
-      savedThis.handleResponse(undefined, tiles, false);
+    () => {
+      this.handleResponse(undefined, tiles, false);
     } // request failed callback
   );
 };
@@ -503,11 +503,11 @@ window.MapDataRequest.prototype.sendTileRequest = function (tiles) {
  * Handles retry limits and uses stale data if available.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {string} id - The tile identifier.
  * @param {boolean} error - Flag indicating whether the tile fetch encountered an error.
  */
-window.MapDataRequest.prototype.requeueTile = function (id, error) {
+IITC.map.Request.prototype.requeueTile = function (id, error) {
   if (id in this.queuedTiles) {
     // tile is currently wanted...
 
@@ -522,7 +522,7 @@ window.MapDataRequest.prototype.requeueTile = function (id, error) {
 
     if (error) {
       // if error is still true, retry limit hit. use stale data from cache if available
-      var data = this.cache ? this.cache.get(id) : undefined;
+      const data = this.cache ? this.cache.get(id) : undefined;
       if (data) {
         // we have cached data - use it, even though it's stale
         this.pushRenderQueue(id, data, 'cache-stale');
@@ -553,19 +553,19 @@ window.MapDataRequest.prototype.requeueTile = function (id, error) {
  * Processes success and error cases, manages retries for failed tiles, and updates the render queue with new data.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {Object} data - The response data from the server.
  * @param {Array} tiles - The array of requested tile identifiers.
  * @param {boolean} success - Flag indicating if the request was successful.
  */
-window.MapDataRequest.prototype.handleResponse = function (data, tiles, success) {
+IITC.map.Request.prototype.handleResponse = function (data, tiles, success) {
   this.activeRequestCount -= 1;
 
-  var successTiles = [];
-  var errorTiles = [];
-  var retryTiles = [];
-  var timeoutTiles = [];
-  var unaccountedTiles = tiles.slice(0); // Clone
+  const successTiles = [];
+  const errorTiles = [];
+  const retryTiles = [];
+  const timeoutTiles = [];
+  let unaccountedTiles = tiles.slice(0); // Clone
 
   if (!success || !data || !data.result) {
     log.warn('Request.handleResponse: request failed - requeuing...' + (data && data.error ? ' error: ' + data.error : ''));
@@ -575,16 +575,14 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
     if (data && data.error && data.error === 'RETRY') {
       // the server can sometimes ask us to retry a request. this is botguard related, I believe
 
-      for (const i in tiles) {
-        const id = tiles[i];
+      for (const id of tiles) {
         retryTiles.push(id);
         this.debugTiles.setState(id, 'retrying');
       }
 
       window.runHooks('requestFinished', { success: false });
     } else {
-      for (const i in tiles) {
-        const id = tiles[i];
+      for (const id of tiles) {
         errorTiles.push(id);
         this.debugTiles.setState(id, 'request-fail');
       }
@@ -595,10 +593,10 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   } else {
     // TODO: use result.minLevelOfDetail ??? stock site doesn't use it yet...
 
-    var m = data.result.map;
+    const m = data.result.map;
 
-    for (var id in m) {
-      var val = m[id];
+    for (const id in m) {
+      const val = m[id];
       unaccountedTiles.splice(unaccountedTiles.indexOf(id), 1);
       if ('error' in val) {
         // server returned an error for this individual data tile
@@ -607,7 +605,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
           // TIMEOUT errors for individual tiles are quite common. used to be unlimited retries, but not any more
           timeoutTiles.push(id);
         } else {
-          log.warn('map data tile ' + id + ' failed: error==' + val.error);
+          log.warn(`map data tile ${id} failed: error==${val.error}`);
           errorTiles.push(id);
           this.debugTiles.setState(id, 'tile-fail');
         }
@@ -644,7 +642,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   } else {
     nextQueueDelay = this.RUN_QUEUE_DELAY;
   }
-  var statusMsg = 'getEntities status: ' + tiles.length + ' tiles: ';
+  let statusMsg = 'getEntities status: ' + tiles.length + ' tiles: ';
   statusMsg += successTiles.length + ' successful';
   if (retryTiles.length) statusMsg += ', ' + retryTiles.length + ' retried';
   if (timeoutTiles.length) statusMsg += ', ' + timeoutTiles.length + ' timed out';
@@ -655,8 +653,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
 
   // requeue any 'timeout' tiles immediately
   if (timeoutTiles.length > 0) {
-    for (const i in timeoutTiles) {
-      const id = timeoutTiles[i];
+    for (const id of timeoutTiles) {
       delete this.requestedTiles[id];
 
       this.requeueTile(id, true);
@@ -664,8 +661,7 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   }
 
   if (retryTiles.length > 0) {
-    for (const i in retryTiles) {
-      const id = retryTiles[i];
+    for (const id of retryTiles) {
       delete this.requestedTiles[id];
 
       this.requeueTile(id, false); // tiles from a error==RETRY request are requeued without counting it as an error
@@ -673,23 +669,20 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
   }
 
   if (errorTiles.length > 0) {
-    for (const i in errorTiles) {
-      const id = errorTiles[i];
+    for (const id of errorTiles) {
       delete this.requestedTiles[id];
       this.requeueTile(id, true);
     }
   }
 
   if (unaccountedTiles.length > 0) {
-    for (const i in unaccountedTiles) {
-      const id = unaccountedTiles[i];
+    for (const id of unaccountedTiles) {
       delete this.requestedTiles[id];
       this.requeueTile(id, true);
     }
   }
 
-  for (const i in successTiles) {
-    const id = successTiles[i];
+  for (const id of successTiles) {
     delete this.requestedTiles[id];
   }
 
@@ -700,9 +693,9 @@ window.MapDataRequest.prototype.handleResponse = function (data, tiles, success)
  * Resets the render queue, clearing existing queued render tasks and stopping any active timer.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.resetRenderQueue = function () {
+IITC.map.Request.prototype.resetRenderQueue = function () {
   this.renderQueue = [];
 
   if (this.renderQueueTimer) {
@@ -716,12 +709,12 @@ window.MapDataRequest.prototype.resetRenderQueue = function () {
  * Pushes a tile to the render queue for processing. The queue is processed to render entities on the map.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {string} id - The identifier of the tile.
  * @param {Object} data - Data associated with the tile, including game entity GUIDs and entities.
  * @param {string} status - The status of the tile, such as 'render-queue'.
  */
-window.MapDataRequest.prototype.pushRenderQueue = function (id, data, status) {
+IITC.map.Request.prototype.pushRenderQueue = function (id, data, status) {
   this.debugTiles.setState(id, 'render-queue');
   this.renderQueue.push({
     id: id,
@@ -740,17 +733,16 @@ window.MapDataRequest.prototype.pushRenderQueue = function (id, data, status) {
  * Starts a timer to process the render queue after a specified delay.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {number} delay - The delay in seconds before processing the render queue.
  */
-window.MapDataRequest.prototype.startQueueTimer = function (delay) {
+IITC.map.Request.prototype.startQueueTimer = function (delay) {
   if (this.renderQueueTimer === undefined) {
-    var _this = this;
-    this.renderQueueTimer = setTimeout(function () {
-      _this.renderQueueTimer = setTimeout(
-        function () {
-          _this.renderQueueTimer = undefined;
-          _this.processRenderQueue();
+    this.renderQueueTimer = setTimeout(() => {
+      this.renderQueueTimer = setTimeout(
+        () => {
+          this.renderQueueTimer = undefined;
+          this.processRenderQueue();
         },
         (delay || 0) * 1000
       );
@@ -762,10 +754,10 @@ window.MapDataRequest.prototype.startQueueTimer = function (delay) {
  * Pauses or resumes the render queue processing. When paused, the queue timer is cleared.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  * @param {boolean} pause - Flag indicating whether to pause (true) or resume (false) the render queue processing.
  */
-window.MapDataRequest.prototype.pauseRenderQueue = function (pause) {
+IITC.map.Request.prototype.pauseRenderQueue = function (pause) {
   this.renderQueuePaused = pause;
   if (pause) {
     if (this.renderQueueTimer) {
@@ -785,26 +777,26 @@ window.MapDataRequest.prototype.pauseRenderQueue = function (pause) {
  * It ensures that the quantity of entities processed per cycle does not exceed a set limit.
  *
  * @function
- * @memberof MapDataRequest
+ * @memberof IITC.map.Request
  */
-window.MapDataRequest.prototype.processRenderQueue = function () {
-  var drawEntityLimit = this.RENDER_BATCH_SIZE;
+IITC.map.Request.prototype.processRenderQueue = function () {
+  let drawEntityLimit = this.RENDER_BATCH_SIZE;
 
   // TODO: we don't take account of how many of the entities are actually new/removed - they
   //  could already be drawn and not changed. will see how it works like this...
   while (drawEntityLimit > 0 && this.renderQueue.length > 0) {
-    var current = this.renderQueue[0];
+    const current = this.renderQueue[0];
 
     if (current.deleted.length > 0) {
-      var deleteThisPass = current.deleted.splice(0, drawEntityLimit);
+      const deleteThisPass = current.deleted.splice(0, drawEntityLimit);
       drawEntityLimit -= deleteThisPass.length;
-      this.render.processDeletedGameEntityGuids(deleteThisPass);
+      this.renderer.processDeletedGameEntityGuids(deleteThisPass);
     }
 
     if (drawEntityLimit > 0 && current.entities.length > 0) {
-      var drawThisPass = current.entities.splice(0, drawEntityLimit);
+      const drawThisPass = current.entities.splice(0, drawEntityLimit);
       drawEntityLimit -= drawThisPass.length;
-      this.render.processGameEntities(drawThisPass, 'extended');
+      this.renderer.processGameEntities(drawThisPass, 'extended');
     }
 
     if (current.deleted.length === 0 && current.entities.length === 0) {
@@ -816,16 +808,16 @@ window.MapDataRequest.prototype.processRenderQueue = function () {
   if (this.renderQueue.length > 0) {
     this.startQueueTimer(this.RENDER_PAUSE);
   } else if (Object.keys(this.queuedTiles).length === 0) {
-    this.render.endRenderPass();
+    this.renderer.endRenderPass();
 
-    var endTime = new Date().getTime();
-    var duration = (endTime - this.refreshStartTime) / 1000;
+    const endTime = Date.now();
+    const duration = (endTime - this.refreshStartTime) / 1000;
 
-    log.log('finished requesting data! (took ' + duration + ' seconds to complete)');
+    log.log(`finished requesting data! (took ${duration} seconds to complete)`);
 
     window.runHooks('mapDataRefreshEnd', {});
 
-    var longStatus =
+    const longStatus =
       `Tiles: ${this.cachedTileCount} cached, ` +
       `${this.successTileCount} loaded, ` +
       (this.staleTileCount ? this.staleTileCount + ' stale, ' : '') +
@@ -833,9 +825,13 @@ window.MapDataRequest.prototype.processRenderQueue = function () {
       `in ${duration} seconds`;
 
     // refresh timer based on time to run this pass, with a minimum of REFRESH seconds
-    var minRefresh = window.map.getZoom() > 12 ? this.REFRESH_CLOSE : this.REFRESH_FAR;
-    var refreshTimer = Math.max(minRefresh, duration * this.FETCH_TO_REFRESH_FACTOR);
+    const minRefresh = window.map.getZoom() > 12 ? this.REFRESH_CLOSE : this.REFRESH_FAR;
+    const refreshTimer = Math.max(minRefresh, duration * this.FETCH_TO_REFRESH_FACTOR);
     this.refreshOnTimeout(refreshTimer);
     this.setStatus(this.failedTileCount ? 'errors' : this.staleTileCount ? 'out of date' : 'done', longStatus);
   }
 };
+
+IITC.registerLegacyAliases(IITC.map, {
+  MapDataRequest: 'Request',
+});

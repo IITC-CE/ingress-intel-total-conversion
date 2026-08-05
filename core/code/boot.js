@@ -292,8 +292,8 @@ function boot() {
   setupIngressMarkers();
   window.extractFromStock();
   window.setupIdle();
-  window.setupDataTileParams();
-  window.setupMap();
+  IITC.map.tiles.setupParams();
+  IITC.map.setup();
   window.setupOMS();
   window.ornaments.setup();
   window.layerChooser._lastPriority = 1000; // plugins overlays have priority >1000
