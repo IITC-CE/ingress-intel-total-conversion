@@ -19,14 +19,6 @@ function buildDom() {
   document.body.classList.remove('show-controls');
 }
 
-// portal_display owns moving the image into the sidebar, so just put the result in place
-function renderPortalDetails() {
-  document.getElementById('portaldetails').innerHTML = '<div class="imgpreview"><span id="level"></span></div>';
-  const fullImage = document.createElement('img');
-  fullImage.className = 'fullimg';
-  document.getElementById('sidebar').append(fullImage);
-}
-
 describe('smartphone boot hooks', () => {
   before(() => {
     IITC.statusbar = IITC.statusbar || {};
@@ -129,34 +121,11 @@ describe('smartphone boot hooks', () => {
     });
   });
 
-  describe('runOnSmartphonesAfterBoot', () => {
-    it('opens the map pane', () => {
-      const show = sinon.stub(window, 'show');
+  it('opens the map pane after boot', () => {
+    const show = sinon.stub(window, 'show');
 
-      window.runOnSmartphonesAfterBoot();
+    window.runOnSmartphonesAfterBoot();
 
-      expect(show.calledWith('map')).to.be.true;
-    });
-
-    it('scrolls the sidebar to the full image when the preview is clicked', () => {
-      window.runOnSmartphonesAfterBoot();
-      renderPortalDetails();
-
-      const animate = sinon.spy($.fn, 'animate');
-      $('.imgpreview').trigger('click');
-
-      expect(animate.calledOnce).to.be.true;
-      expect(animate.firstCall.args[0]).to.have.property('scrollTop');
-    });
-
-    it('ignores clicks that land on a child of the preview, such as the level marker', () => {
-      window.runOnSmartphonesAfterBoot();
-      renderPortalDetails();
-
-      const animate = sinon.spy($.fn, 'animate');
-      $('#level').trigger('click');
-
-      expect(animate.called).to.be.false;
-    });
+    expect(show.calledWith('map')).to.be.true;
   });
 });

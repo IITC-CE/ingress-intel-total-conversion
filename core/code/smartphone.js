@@ -22,7 +22,7 @@ window.smartphone = function () {};
  */
 window.runOnSmartphonesBeforeBoot = function () {
   if (!window.isSmartphone()) return;
-  log.warn('running smartphone pre boot stuff');
+  log.debug('running smartphone pre boot stuff');
 
   // add smartphone stylesheet
   var style = document.createElement('style');
@@ -55,26 +55,13 @@ window.runOnSmartphonesBeforeBoot = function () {
 
 /**
  * Performs setup tasks for IITC on smartphones after the IITC boot process.
- * This includes initializing mobile info display, adjusting UI elements for mobile compatibility,
- * and setting event handlers for mobile-specific interactions.
+ * Opens the map pane, which is the view the mobile layout starts on.
  *
  * @function runOnSmartphonesAfterBoot
  */
 window.runOnSmartphonesAfterBoot = function () {
   if (!window.isSmartphone()) return;
-  log.warn('running smartphone post boot stuff');
+  log.debug('running smartphone post boot stuff');
 
   window.show('map');
-
-  // replace img full view handler
-  $('#portaldetails')
-    .off('click', '.imgpreview')
-    .on('click', '.imgpreview', function (e) {
-      if (e.currentTarget === e.target) {
-        // do not fire on #level
-        $('.ui-tooltip').remove();
-        var newTop = $('.fullimg').position().top + $('#sidebar').scrollTop();
-        $('#sidebar').animate({ scrollTop: newTop }, 200);
-      }
-    });
 };
