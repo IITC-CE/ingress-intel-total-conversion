@@ -6,9 +6,6 @@ import { expect } from 'chai';
 
 import('../core/code/utils.js');
 
-await import('../core/code/smartphone.js');
-await import('../core/code/player_names.js');
-
 describe('IITC.utils.getURLParam', () => {
   beforeEach(() => {
     // Reset the window.location.search to a known state
@@ -829,7 +826,7 @@ const UA = {
   desktop: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
 };
 
-describe('window.isSmartphone', () => {
+describe('IITC.utils.isSmartphone', () => {
   beforeEach(() => {
     window.location.search = '';
     setUserAgent(UA.desktop);
@@ -841,64 +838,82 @@ describe('window.isSmartphone', () => {
 
   it('honours the vp parameter over the user agent', () => {
     window.location.search = '?vp=m';
-    expect(window.isSmartphone()).to.be.true;
+    expect(IITC.utils.isSmartphone()).to.be.true;
 
     window.location.search = '?vp=f';
     setUserAgent(UA.androidPhone);
-    expect(window.isSmartphone()).to.be.false;
+    expect(IITC.utils.isSmartphone()).to.be.false;
   });
 
   it('falls back to the user agent when vp is absent or unrecognised', () => {
     setUserAgent(UA.androidPhone);
 
     window.location.search = '?foo=bar';
-    expect(window.isSmartphone()).to.be.true;
+    expect(IITC.utils.isSmartphone()).to.be.true;
 
     window.location.search = '?vp=x';
-    expect(window.isSmartphone()).to.be.true;
+    expect(IITC.utils.isSmartphone()).to.be.true;
   });
 
   it('detects Android phones and iOS devices', () => {
     [UA.androidPhone, UA.iphone, UA.ipadMobileMode, UA.ipod].forEach((ua) => {
       setUserAgent(ua);
-      expect(window.isSmartphone(), ua).to.be.true;
+      expect(IITC.utils.isSmartphone(), ua).to.be.true;
     });
   });
 
   it('ignores Android tablets, iPads and desktop browsers', () => {
     [UA.androidTablet, UA.ipad, UA.desktop].forEach((ua) => {
       setUserAgent(ua);
-      expect(window.isSmartphone(), ua).to.be.false;
+      expect(IITC.utils.isSmartphone(), ua).to.be.false;
     });
   });
 
   it('matches Android case-sensitively and iOS case-insensitively', () => {
     setUserAgent('mozilla/5.0 (linux; android 14; pixel 8) chrome/120.0.0.0 mobile safari/537.36');
-    expect(window.isSmartphone()).to.be.false;
+    expect(IITC.utils.isSmartphone()).to.be.false;
 
     setUserAgent('mozilla/5.0 (iphone; cpu iphone os 17_0 like mac os x) applewebkit/605.1.15');
-    expect(window.isSmartphone()).to.be.true;
+    expect(IITC.utils.isSmartphone()).to.be.true;
   });
 
   it('returns a boolean rather than a regex match result', () => {
     setUserAgent(UA.androidPhone);
-    expect(window.isSmartphone()).to.be.a('boolean');
+    expect(IITC.utils.isSmartphone()).to.be.a('boolean');
 
     setUserAgent(UA.desktop);
-    expect(window.isSmartphone()).to.be.a('boolean');
+    expect(IITC.utils.isSmartphone()).to.be.a('boolean');
   });
 });
 
-describe('window.isSystemPlayer', () => {
+describe('IITC.utils.isSystemPlayer', () => {
   it('recognises the system accounts', () => {
-    expect(window.isSystemPlayer('__ADA__')).to.be.true;
-    expect(window.isSystemPlayer('__JARVIS__')).to.be.true;
-    expect(window.isSystemPlayer('__MACHINA__')).to.be.true;
+    expect(IITC.utils.isSystemPlayer('__ADA__')).to.be.true;
+    expect(IITC.utils.isSystemPlayer('__JARVIS__')).to.be.true;
+    expect(IITC.utils.isSystemPlayer('__MACHINA__')).to.be.true;
   });
 
   it('rejects regular names, near matches and missing input', () => {
     ['someplayer', 'ADA', '__ada__', '__Jarvis__', '__ADA', 'ADA__', '___ADA___', 'x__ADA__', '__NIANTIC__', '', null, undefined].forEach((name) => {
-      expect(window.isSystemPlayer(name), String(name)).to.be.false;
+      expect(IITC.utils.isSystemPlayer(name), String(name)).to.be.false;
     });
+  });
+});
+
+describe('legacy aliases for the moved environment and player helpers', () => {
+  it('keeps the legacy globals pointing at their IITC.utils counterparts', () => {
+    expect(window.isSmartphone).to.equal(IITC.utils.isSmartphone);
+    expect(window.isSystemPlayer).to.equal(IITC.utils.isSystemPlayer);
+  });
+
+  it('syncs an assignment to the legacy global back into the namespace', () => {
+    const original = IITC.utils.isSmartphone;
+    const replacement = () => true;
+
+    window.isSmartphone = replacement;
+    expect(IITC.utils.isSmartphone).to.equal(replacement);
+
+    IITC.utils.isSmartphone = original;
+    expect(window.isSmartphone).to.equal(original);
   });
 });

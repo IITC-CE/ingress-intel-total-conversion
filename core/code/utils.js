@@ -271,6 +271,26 @@ const formatAgo = (time, now, options = { showSeconds: false }) => {
 const isTouchDevice = () => L.Browser.touch;
 
 /**
+ * Determines if the user's device is a smartphone.
+ * Note it should not detect tablets because their display is large enough to use the desktop version.
+ * The stock intel site allows forcing mobile/full sites with a vp=m or vp=f parameter. This function supports the same.
+ *
+ * @memberof IITC.utils
+ * @returns {boolean} True if the user's device is a smartphone, false otherwise.
+ */
+const isSmartphone = () => {
+  // stock only allows this for some browsers - e.g. android phone/tablet.
+  // let's allow it for all, but no promises it'll work right
+  const viewParam = IITC.utils.getURLParam('vp');
+  if (viewParam === 'm') return true;
+  if (viewParam === 'f') return false;
+
+  // the two patterns differ in case sensitivity, so they must not be merged into a single regex
+  const userAgent = navigator.userAgent;
+  return /Android.*Mobile/.test(userAgent) || /iPhone|iPad|iPod/i.test(userAgent);
+};
+
+/**
  * Calculates the number of pixels left to scroll down before reaching the bottom of an element.
  *
  * @memberof IITC.utils
@@ -515,6 +535,18 @@ const getTeamId = (input) => {
   return window.TEAM_NONE;
 };
 
+const SYSTEM_PLAYERS = ['__ADA__', '__JARVIS__', '__MACHINA__'];
+
+/**
+ * Checks if a player name is a special system account (e.g., `__JARVIS__`, `__ADA__`)
+ * that shouldn't be listed as a regular player.
+ *
+ * @memberof IITC.utils
+ * @param {string} name - The player name to check.
+ * @returns {boolean} Returns `true` if the player name is a system account, otherwise `false`.
+ */
+const isSystemPlayer = (name) => SYSTEM_PLAYERS.includes(name);
+
 /**
  * Checks whether a DOM element is currently visible, matching jQuery's ':visible' semantics
  * (the element occupies space in the layout). Uses an offset-based test rather than inspecting
@@ -544,6 +576,7 @@ IITC.utils = {
   formatDistance,
   formatAgo,
   isTouchDevice,
+  isSmartphone,
   scrollBottom,
   escapeJS,
   escapeHtml,
@@ -556,6 +589,7 @@ IITC.utils = {
   clampLatLngBounds,
   isPointInPolygon,
   getTeamId,
+  isSystemPlayer,
   _isVisible,
 };
 
@@ -573,6 +607,7 @@ const legacyFunctionMappings = {
   formatInterval: 'formatInterval',
   formatDistance: 'formatDistance',
   isTouchDevice: 'isTouchDevice',
+  isSmartphone: 'isSmartphone',
   scrollBottom: 'scrollBottom',
   escapeJavascriptString: 'escapeJS',
   escapeHtmlSpecialChars: 'escapeHtml',
@@ -585,6 +620,7 @@ const legacyFunctionMappings = {
   clampLatLngBounds: 'clampLatLngBounds',
   pnpoly: 'isPointInPolygon',
   teamStringToId: 'getTeamId',
+  isSystemPlayer: 'isSystemPlayer',
 };
 
 IITC.registerLegacyAliases(window.IITC.utils, legacyFunctionMappings);
