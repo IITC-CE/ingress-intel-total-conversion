@@ -8,14 +8,6 @@ import sinon from 'sinon';
 await import('../core/code/utils.js');
 await import('../core/code/smartphone.js');
 
-// the boot hook registers its work through addHook, so keep the callbacks to fire them by hand
-const hooks = {};
-const originalAddHook = window.addHook;
-
-function fireHook(name) {
-  (hooks[name] || []).forEach((callback) => callback());
-}
-
 function buildDom() {
   document.body.innerHTML = [
     '<div id="chatcontrols"></div>',
@@ -27,8 +19,12 @@ function buildDom() {
   document.body.classList.remove('show-controls');
 }
 
-function renderPortalImage(src) {
-  document.getElementById('portaldetails').innerHTML = `<div class="imgpreview"><span id="level"></span><img class="hide" src="${src}"></div>`;
+// portal_display owns moving the image into the sidebar, so just put the result in place
+function renderPortalDetails() {
+  document.getElementById('portaldetails').innerHTML = '<div class="imgpreview"><span id="level"></span></div>';
+  const fullImage = document.createElement('img');
+  fullImage.className = 'fullimg';
+  document.getElementById('sidebar').append(fullImage);
 }
 
 describe('smartphone boot hooks', () => {
@@ -41,11 +37,6 @@ describe('smartphone boot hooks', () => {
   });
 
   beforeEach(() => {
-    Object.keys(hooks).forEach((name) => delete hooks[name]);
-    window.addHook = (name, callback) => {
-      hooks[name] = hooks[name] || [];
-      hooks[name].push(callback);
-    };
     buildDom();
     sinon.stub(IITC.utils, 'isSmartphone').returns(true);
   });
@@ -54,7 +45,6 @@ describe('smartphone boot hooks', () => {
     sinon.restore();
     document.body.innerHTML = '';
     document.body.classList.remove('show-controls');
-    window.addHook = originalAddHook;
   });
 
   it('leaves everything alone on a desktop browser', () => {
@@ -66,7 +56,6 @@ describe('smartphone boot hooks', () => {
 
     expect(document.querySelectorAll('#chatcontrols a')).to.have.length(0);
     expect(document.body.classList.contains('show-controls')).to.be.false;
-    expect(hooks.portalDetailsUpdated).to.be.undefined;
     expect(show.called).to.be.false;
   });
 
@@ -140,43 +129,6 @@ describe('smartphone boot hooks', () => {
     });
   });
 
-  describe('full portal image', () => {
-    it('moves the portal image into the sidebar and unhides it', () => {
-      window.runOnSmartphonesBeforeBoot();
-      renderPortalImage('portal.png');
-
-      fireHook('portalDetailsUpdated');
-
-      const full = document.querySelector('#sidebar img.fullimg');
-      expect(full).to.be.ok;
-      expect(full.classList.contains('hide')).to.be.false;
-    });
-
-    it('replaces the previous image rather than stacking a second one', () => {
-      window.runOnSmartphonesBeforeBoot();
-
-      renderPortalImage('first.png');
-      fireHook('portalDetailsUpdated');
-      renderPortalImage('second.png');
-      fireHook('portalDetailsUpdated');
-
-      const full = document.querySelectorAll('#sidebar img.fullimg');
-      expect(full).to.have.length(1);
-      expect(full[0].getAttribute('src')).to.equal('second.png');
-    });
-
-    it('drops the image when the details carry no preview', () => {
-      window.runOnSmartphonesBeforeBoot();
-      renderPortalImage('portal.png');
-      fireHook('portalDetailsUpdated');
-
-      document.getElementById('portaldetails').innerHTML = '';
-      fireHook('portalDetailsUpdated');
-
-      expect(document.querySelectorAll('.fullimg')).to.have.length(0);
-    });
-  });
-
   describe('runOnSmartphonesAfterBoot', () => {
     it('opens the map pane', () => {
       const show = sinon.stub(window, 'show');
@@ -187,10 +139,8 @@ describe('smartphone boot hooks', () => {
     });
 
     it('scrolls the sidebar to the full image when the preview is clicked', () => {
-      window.runOnSmartphonesBeforeBoot();
       window.runOnSmartphonesAfterBoot();
-      renderPortalImage('portal.png');
-      fireHook('portalDetailsUpdated');
+      renderPortalDetails();
 
       const animate = sinon.spy($.fn, 'animate');
       $('.imgpreview').trigger('click');
@@ -200,10 +150,8 @@ describe('smartphone boot hooks', () => {
     });
 
     it('ignores clicks that land on a child of the preview, such as the level marker', () => {
-      window.runOnSmartphonesBeforeBoot();
       window.runOnSmartphonesAfterBoot();
-      renderPortalImage('portal.png');
-      fireHook('portalDetailsUpdated');
+      renderPortalDetails();
 
       const animate = sinon.spy($.fn, 'animate');
       $('#level').trigger('click');

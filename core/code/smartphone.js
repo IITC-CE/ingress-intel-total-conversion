@@ -51,21 +51,6 @@ window.runOnSmartphonesBeforeBoot = function () {
   if (!window.useAppPanes()) {
     document.body.classList.add('show-controls');
   }
-
-  window.addHook('portalDetailsUpdated', function () {
-    var x = $('.imgpreview img').removeClass('hide');
-
-    if (!x.length) {
-      $('.fullimg').remove();
-      return;
-    }
-
-    if ($('.fullimg').length) {
-      $('.fullimg').replaceWith(x.addClass('fullimg'));
-    } else {
-      x.addClass('fullimg').appendTo('#sidebar');
-    }
-  });
 };
 
 /**
