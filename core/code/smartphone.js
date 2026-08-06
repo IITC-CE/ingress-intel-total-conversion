@@ -30,19 +30,6 @@ window.runOnSmartphonesBeforeBoot = function () {
   style.appendChild(document.createTextNode('@include_string:smartphone.css@'));
   document.head.appendChild(style);
 
-  // don’t need many of those
-  window.setupStyles = function () {
-    $('head').append(
-      '<style>' +
-        [
-          '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
-          '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
-          '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
-        ].join('\n') +
-        '</style>'
-    );
-  };
-
   window.smartphone.mapButton = $('<a>map</a>').click(function () {
     window.show('map');
     $('#map').css({ visibility: 'visible', opacity: '1' });

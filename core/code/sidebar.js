@@ -24,24 +24,6 @@ window.setupSidebar = function () {
 };
 
 /**
- * Function to append IITC's custom CSS styles to the `<head>` element.
- * Overwritten in smartphone.js.
- *
- * @function setupStyles
- */
-window.setupStyles = function () {
-  $('head').append(
-    '<style>' +
-      [
-        '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
-        '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
-        '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
-      ].join('\n') +
-      '</style>'
-  );
-};
-
-/**
  * Sets up custom icons by appending SVG definitions to the DOM.
  *
  * @function setupIcons
