@@ -1,10 +1,13 @@
-import { describe, it, before, beforeEach } from 'mocha';
+import { describe, it, before, after, beforeEach } from 'mocha';
 import { expect } from 'chai';
 
 /* global IITC */
 /* eslint-disable no-unused-expressions */
 
 import('../core/code/utils.js');
+
+await import('../core/code/smartphone.js');
+await import('../core/code/player_names.js');
 
 describe('IITC.utils.getURLParam', () => {
   beforeEach(() => {
@@ -806,5 +809,96 @@ describe('IITC.utils._isVisible', () => {
     const el = document.createElement('div');
     el.getClientRects = () => [{ width: 10, height: 10 }];
     expect(IITC.utils._isVisible(el)).to.be.true;
+  });
+});
+
+// navigator is a getter-only own property of globalThis in Node, so swap the whole object
+const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+
+function setUserAgent(userAgent) {
+  Object.defineProperty(globalThis, 'navigator', { value: { userAgent }, configurable: true });
+}
+
+const UA = {
+  androidPhone: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+  androidTablet: 'Mozilla/5.0 (Linux; Android 14; SM-X710) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+  ipadMobileMode: 'Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1',
+  ipad: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Safari/605.1.15',
+  ipod: 'Mozilla/5.0 (iPod touch; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)',
+  desktop: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+};
+
+describe('window.isSmartphone', () => {
+  beforeEach(() => {
+    window.location.search = '';
+    setUserAgent(UA.desktop);
+  });
+
+  after(() => {
+    if (originalNavigator) Object.defineProperty(globalThis, 'navigator', originalNavigator);
+  });
+
+  it('honours the vp parameter over the user agent', () => {
+    window.location.search = '?vp=m';
+    expect(window.isSmartphone()).to.be.true;
+
+    window.location.search = '?vp=f';
+    setUserAgent(UA.androidPhone);
+    expect(window.isSmartphone()).to.be.false;
+  });
+
+  it('falls back to the user agent when vp is absent or unrecognised', () => {
+    setUserAgent(UA.androidPhone);
+
+    window.location.search = '?foo=bar';
+    expect(window.isSmartphone()).to.be.true;
+
+    window.location.search = '?vp=x';
+    expect(window.isSmartphone()).to.be.true;
+  });
+
+  it('detects Android phones and iOS devices', () => {
+    [UA.androidPhone, UA.iphone, UA.ipadMobileMode, UA.ipod].forEach((ua) => {
+      setUserAgent(ua);
+      expect(window.isSmartphone(), ua).to.be.true;
+    });
+  });
+
+  it('ignores Android tablets, iPads and desktop browsers', () => {
+    [UA.androidTablet, UA.ipad, UA.desktop].forEach((ua) => {
+      setUserAgent(ua);
+      expect(window.isSmartphone(), ua).to.be.false;
+    });
+  });
+
+  it('matches Android case-sensitively and iOS case-insensitively', () => {
+    setUserAgent('mozilla/5.0 (linux; android 14; pixel 8) chrome/120.0.0.0 mobile safari/537.36');
+    expect(window.isSmartphone()).to.be.false;
+
+    setUserAgent('mozilla/5.0 (iphone; cpu iphone os 17_0 like mac os x) applewebkit/605.1.15');
+    expect(window.isSmartphone()).to.be.true;
+  });
+
+  it('returns a boolean rather than a regex match result', () => {
+    setUserAgent(UA.androidPhone);
+    expect(window.isSmartphone()).to.be.a('boolean');
+
+    setUserAgent(UA.desktop);
+    expect(window.isSmartphone()).to.be.a('boolean');
+  });
+});
+
+describe('window.isSystemPlayer', () => {
+  it('recognises the system accounts', () => {
+    expect(window.isSystemPlayer('__ADA__')).to.be.true;
+    expect(window.isSystemPlayer('__JARVIS__')).to.be.true;
+    expect(window.isSystemPlayer('__MACHINA__')).to.be.true;
+  });
+
+  it('rejects regular names, near matches and missing input', () => {
+    ['someplayer', 'ADA', '__ada__', '__Jarvis__', '__ADA', 'ADA__', '___ADA___', 'x__ADA__', '__NIANTIC__', '', null, undefined].forEach((name) => {
+      expect(window.isSystemPlayer(name), String(name)).to.be.false;
+    });
   });
 });
