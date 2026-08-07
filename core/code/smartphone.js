@@ -1,4 +1,4 @@
-/* global IITC, log -- eslint */
+/* global log -- eslint */
 
 /**
  * @file This file provides functions and utilities specifically for the smartphone layout of IITC.
@@ -14,20 +14,8 @@
 window.smartphone = function () {};
 
 /**
- * Marks a pane button as the active tab in the chat controls, the way IITC.chat marks its channels.
- *
- * @function setActivePaneTab
- * @param {HTMLElement} tab - The pane button to mark.
- */
-function setActivePaneTab(tab) {
-  document.querySelector('#chatcontrols .active')?.classList.remove('active');
-  tab.classList.add('active');
-}
-
-/**
  * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
- * This includes adding smartphone-specific stylesheets
- * and modifying some of the setup functions for mobile compatibility.
+ * Adds the smartphone stylesheet and the map/info pane buttons the mobile layout switches between.
  *
  * @function runOnSmartphonesBeforeBoot
  */
@@ -43,16 +31,10 @@ window.runOnSmartphonesBeforeBoot = function () {
 
   window.smartphone.mapButton = $('<a data-channel="map">map</a>').click(function () {
     window.show('map');
-    $('#map').css({ visibility: 'visible', opacity: '1' });
-    IITC.statusbar.show();
-    setActivePaneTab(this);
   });
 
   window.smartphone.sideButton = $('<a data-channel="info">info</a>').click(function () {
     window.show('info');
-    $('#scrollwrapper').show();
-    IITC.portal.display.resetScroll();
-    setActivePaneTab(this);
   });
 
   $('#chatcontrols').append(window.smartphone.mapButton).append(window.smartphone.sideButton);
