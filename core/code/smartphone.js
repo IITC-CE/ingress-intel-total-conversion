@@ -1,43 +1,62 @@
-/* global log -- eslint */
+/* global IITC, log -- eslint */
 
 /**
- * @file This file provides functions and utilities specifically for the smartphone layout of IITC.
- * @module smartphone
+ * Namespace for the smartphone layout of IITC.
+ *
+ * It holds no public API: the boot hooks below are internal, and are only reachable across modules
+ * because the bundle wraps every file in its own scope.
+ *
+ * @memberof IITC
+ * @namespace smartphone
  */
 
 /**
- * Placeholder for smartphone specific manipulations.
- * This function does not implement any logic by itself.
+ * Legacy namespace of the smartphone layout. IITC itself no longer reads it, it survives as the
+ * home of `mapButton` and `sideButton` for plugins that click them to switch panes.
  *
- * @function smartphone
+ * @deprecated call `window.show('map')` or `window.show('info')` to switch panes, and take the
+ * button itself from `document.querySelector('#chatcontrols a[data-channel="map"]')` if needed.
  */
 window.smartphone = function () {};
+
+/**
+ * Creates one of the pane buttons shown in the chat controls.
+ *
+ * Bound through jQuery, not addEventListener: plugins switch panes by calling `.click()` on the
+ * jQuery object `window.smartphone` publishes, and that runs jQuery-registered handlers only.
+ *
+ * @function createPaneButton
+ * @param {string} pane - The pane it opens, used as both label and channel id.
+ * @returns {jQuery} The button.
+ */
+function createPaneButton(pane) {
+  return $('<a>')
+    .attr('data-channel', pane)
+    .text(pane)
+    .on('click', () => window.show(pane));
+}
 
 /**
  * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
  * Adds the smartphone stylesheet and the map/info pane buttons the mobile layout switches between.
  *
- * @function runOnSmartphonesBeforeBoot
+ * Called once from `boot`.
+ *
+ * @memberof IITC.smartphone
+ * @private
  */
-window.runOnSmartphonesBeforeBoot = function () {
-  if (!window.isSmartphone()) return;
+const _runBeforeBoot = function () {
+  if (!IITC.utils.isSmartphone()) return;
   log.debug('running smartphone pre boot stuff');
 
   // add smartphone stylesheet
-  var style = document.createElement('style');
-  style.type = 'text/css';
-  style.appendChild(document.createTextNode('@include_string:smartphone.css@'));
-  document.head.appendChild(style);
+  const style = document.createElement('style');
+  style.textContent = '@include_string:smartphone.css@';
+  document.head.append(style);
 
-  window.smartphone.mapButton = $('<a data-channel="map">map</a>').click(function () {
-    window.show('map');
-  });
-
-  window.smartphone.sideButton = $('<a data-channel="info">info</a>').click(function () {
-    window.show('info');
-  });
-
-  $('#chatcontrols').append(window.smartphone.mapButton).append(window.smartphone.sideButton);
+  window.smartphone.mapButton = createPaneButton('map');
+  window.smartphone.sideButton = createPaneButton('info');
+  $('#chatcontrols').append(window.smartphone.mapButton, window.smartphone.sideButton);
 
   if (!window.useAppPanes()) {
     document.body.classList.add('show-controls');
@@ -48,11 +67,19 @@ window.runOnSmartphonesBeforeBoot = function () {
  * Performs setup tasks for IITC on smartphones after the IITC boot process.
  * Opens the map pane, which is the view the mobile layout starts on.
  *
- * @function runOnSmartphonesAfterBoot
+ * Called once from `boot`.
+ *
+ * @memberof IITC.smartphone
+ * @private
  */
-window.runOnSmartphonesAfterBoot = function () {
-  if (!window.isSmartphone()) return;
+const _runAfterBoot = function () {
+  if (!IITC.utils.isSmartphone()) return;
   log.debug('running smartphone post boot stuff');
 
   window.show('map');
+};
+
+IITC.smartphone = {
+  _runBeforeBoot,
+  _runAfterBoot,
 };
