@@ -1381,7 +1381,7 @@ window.plugin.bookmarks.initMPE = function () {
 /** ************************************************************************************************************************************************************/
 
 var setup = function () {
-  window.plugin.bookmarks.isSmart = window.isSmartphone();
+  window.plugin.bookmarks.isSmart = IITC.utils.isSmartphone();
 
   // HOOKS:
   // - pluginBkmrksEdit:    fired when a bookmarks/folder is removed, added or sorted,

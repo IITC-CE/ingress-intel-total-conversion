@@ -230,7 +230,7 @@ const renderToSidebar = function (portal) {
   header.innerHTML = IITC.portal.display.moveToPortalIconTemplate;
   header.firstElementChild.addEventListener('click', function () {
     IITC.portal.zoomToAndShow(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
-    if (window.isSmartphone()) {
+    if (IITC.utils.isSmartphone()) {
       window.show('map');
     }
   });
@@ -467,7 +467,7 @@ const select = function (guid, event) {
  */
 const rangeLinkClick = function () {
   if (window.portalRangeIndicator) window.map.fitBounds(window.portalRangeIndicator.getBounds());
-  if (window.isSmartphone()) window.show('map');
+  if (IITC.utils.isSmartphone()) window.show('map');
 };
 
 /**

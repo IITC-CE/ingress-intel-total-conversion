@@ -22,7 +22,7 @@ window.isApp = isApp;
  */
 window.useAppPanes = function () {
   // isSmartphone is important to disable panes in desktop mode
-  return isApp && window.app.addPane && window.isSmartphone();
+  return isApp && window.app.addPane && IITC.utils.isSmartphone();
 };
 window.useAndroidPanes = window.useAppPanes; // compatibility
 

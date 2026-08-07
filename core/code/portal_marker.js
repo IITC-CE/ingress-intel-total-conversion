@@ -24,7 +24,7 @@ function handler_portal_dblclick(e) {
 function handler_portal_contextmenu(e) {
   IITC.portal.display.select(e.target.options.guid, e.type);
   IITC.portal.display.renderDetails(e.target.options.guid);
-  if (window.isSmartphone()) {
+  if (IITC.utils.isSmartphone()) {
     window.show('info');
   } else {
     const scrollwrapper = document.getElementById('scrollwrapper');

@@ -170,7 +170,7 @@ IITC.statusbar.init = function () {
   const useMapApi = window.isApp && window.app.setMapStatus;
 
   // Set display flags based on API availability
-  this.showHtmlPortalInfo = window.isSmartphone() && !usePortalApi;
+  this.showHtmlPortalInfo = IITC.utils.isSmartphone() && !usePortalApi;
   this.showHtmlMapInfo = !useMapApi;
 
   // Create HTML elements only if needed
@@ -273,7 +273,7 @@ IITC.statusbar.map = {
       portalLevelsContent = 'portals';
     } else {
       // Space is valuable on mobile
-      let prefix = !window.isSmartphone() ? templates.linksPrefix : '';
+      let prefix = !IITC.utils.isSmartphone() ? templates.linksPrefix : '';
 
       let content = 'all links';
       if (data.portalLevels.minLinkLength > 0) {

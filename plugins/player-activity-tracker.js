@@ -473,7 +473,7 @@ window.plugin.playerTracker.centerMapOnUser = function (nick) {
   var last = data.events[data.events.length - 1];
   var position = window.plugin.playerTracker.getLatLngFromEvent(last);
 
-  if (window.isSmartphone()) window.show('map');
+  if (IITC.utils.isSmartphone()) window.show('map');
   window.map.setView(position, window.map.getZoom());
 
   if (data.marker) {
@@ -492,7 +492,7 @@ window.plugin.playerTracker.onNicknameClicked = function (info) {
 window.plugin.playerTracker.onSearchResultSelected = function (result, event) {
   event.stopPropagation(); // prevent chat from handling the click
 
-  if (window.isSmartphone()) window.show('map');
+  if (IITC.utils.isSmartphone()) window.show('map');
 
   // if the user moved since the search was started, check if we have a new set of data
   if (false === window.plugin.playerTracker.centerMapOnUser(result.nickname)) window.map.setView(result.position);

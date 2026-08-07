@@ -5,7 +5,7 @@
 // @description    Show scale bar on the map.
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   {
@@ -38,7 +38,7 @@ function setup() {
   var options = L.extend(
     {},
     {
-      maxWidth: window.isSmartphone() ? 100 : 200,
+      maxWidth: IITC.utils.isSmartphone() ? 100 : 200,
     },
     scaleBar.options
   );

@@ -5,7 +5,7 @@
 // @description    Show a mini map on the corner of the map.
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   { version: '0.4.5', changes: ['Refactoring: update Leaflet API usage'] },
@@ -132,7 +132,7 @@ function setup() {
 
   // mobile mode  - bottom-right (default)
   // desktop mode - bottom-left, so it doesn't clash with the sidebar
-  if (!window.isSmartphone()) {
+  if (!IITC.utils.isSmartphone()) {
     miniMap.options.position = miniMap.options.position || 'bottomleft';
   }
 

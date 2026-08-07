@@ -295,7 +295,7 @@ IITC.map.setup = function () {
 
   // add empty div to leaflet control areas - to force other leaflet controls to move around IITC UI elements
   // TODO? move the actual IITC DOM into the leaflet control areas, so dummy <div>s aren't needed
-  if (!window.isSmartphone()) {
+  if (!IITC.utils.isSmartphone()) {
     // chat window area
     const chatControlArea = document.createElement('div');
     chatControlArea.className = 'leaflet-control';
