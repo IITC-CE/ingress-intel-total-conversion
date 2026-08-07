@@ -14,6 +14,17 @@
 window.smartphone = function () {};
 
 /**
+ * Marks a pane button as the active tab in the chat controls, the way IITC.chat marks its channels.
+ *
+ * @function setActivePaneTab
+ * @param {HTMLElement} tab - The pane button to mark.
+ */
+function setActivePaneTab(tab) {
+  document.querySelector('#chatcontrols .active')?.classList.remove('active');
+  tab.classList.add('active');
+}
+
+/**
  * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
  * This includes adding smartphone-specific stylesheets
  * and modifying some of the setup functions for mobile compatibility.
@@ -30,20 +41,18 @@ window.runOnSmartphonesBeforeBoot = function () {
   style.appendChild(document.createTextNode('@include_string:smartphone.css@'));
   document.head.appendChild(style);
 
-  window.smartphone.mapButton = $('<a>map</a>').click(function () {
+  window.smartphone.mapButton = $('<a data-channel="map">map</a>').click(function () {
     window.show('map');
     $('#map').css({ visibility: 'visible', opacity: '1' });
     IITC.statusbar.show();
-    $('#chatcontrols a.active').removeClass('active');
-    $("#chatcontrols a:contains('map')").addClass('active');
+    setActivePaneTab(this);
   });
 
-  window.smartphone.sideButton = $('<a>info</a>').click(function () {
+  window.smartphone.sideButton = $('<a data-channel="info">info</a>').click(function () {
     window.show('info');
     $('#scrollwrapper').show();
     IITC.portal.display.resetScroll();
-    $('#chatcontrols a.active').removeClass('active');
-    $("#chatcontrols a:contains('info')").addClass('active');
+    setActivePaneTab(this);
   });
 
   $('#chatcontrols').append(window.smartphone.mapButton).append(window.smartphone.sideButton);
