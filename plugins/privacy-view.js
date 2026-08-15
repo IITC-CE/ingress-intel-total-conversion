@@ -39,7 +39,7 @@ privacyView.text = {
 privacyView.toggle = () => {
   privacyView.is_active = !privacyView.is_active;
   document.body.classList.toggle('privacy_active', privacyView.is_active);
-  if (window.isSmartphone()) {
+  if (IITC.utils.isSmartphone()) {
     IITC.toolbox.updateButton('privacytoggle', { label: privacyView.text[privacyView.is_active] });
   } else {
     $('#privacytoggle').text(privacyView.is_active ? 'Privacy active' : 'Privacy inactive');
@@ -62,7 +62,7 @@ function setup() {
     )
     .appendTo('head');
 
-  if (window.isSmartphone()) {
+  if (IITC.utils.isSmartphone()) {
     IITC.toolbox.addButton({
       id: 'privacytoggle',
       label: 'Permalink',

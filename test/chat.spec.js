@@ -289,7 +289,7 @@ describe('chat.chooser', () => {
 
   it('shows the app pane on a smartphone without app panes', () => {
     document.body.innerHTML = '<a id="tab" data-channel="faction"></a>';
-    sinon.stub(window, 'isSmartphone').returns(true);
+    sinon.stub(IITC.utils, 'isSmartphone').returns(true);
     sinon.stub(window, 'useAppPanes').returns(false);
     const show = sinon.stub(window, 'show');
 

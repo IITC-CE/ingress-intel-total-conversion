@@ -233,7 +233,7 @@ window.plugin.missions = {
       tabs.tabs('refresh');
       tabs.find('.ui-tabs-nav').sortable('refresh');
       tabs.tabs('option', 'active', -1);
-      if (window.isSmartphone()) {
+      if (IITC.utils.isSmartphone()) {
         window.show('plugin-missions');
       }
     } else {
@@ -722,7 +722,7 @@ window.plugin.missions = {
       title.addEventListener(
         'click',
         function (ev) {
-          if (window.isSmartphone()) {
+          if (IITC.utils.isSmartphone()) {
             window.show('map');
           }
           IITC.portal.selectByLatLng(lat, lng);
@@ -734,7 +734,7 @@ window.plugin.missions = {
       title.addEventListener(
         'dblclick',
         function (ev) {
-          if (window.isSmartphone()) {
+          if (IITC.utils.isSmartphone()) {
             window.show('map');
           }
           IITC.portal.zoomToAndShow(waypoint.portal.guid, [lat, lng]);

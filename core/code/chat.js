@@ -326,7 +326,7 @@ chat.toggle = () => {
  * @param {string} name - The name of the chat tab to show and activate.
  */
 chat.show = (name) => {
-  if (window.isSmartphone()) {
+  if (IITC.utils.isSmartphone()) {
     IITC.statusbar.hide();
   } else {
     IITC.statusbar.show();
@@ -348,7 +348,7 @@ chat.show = (name) => {
 chat.chooser = (event) => {
   const tab = event.target.dataset.channel;
 
-  if (window.isSmartphone() && !window.useAppPanes()) {
+  if (IITC.utils.isSmartphone() && !window.useAppPanes()) {
     window.show(tab);
   } else {
     chat.chooseTab(tab);
@@ -672,7 +672,7 @@ chat.postMsg = () => {
  * @memberof IITC.chat
  */
 chat.setupPosting = () => {
-  if (!window.isSmartphone()) {
+  if (!IITC.utils.isSmartphone()) {
     document.querySelector('#chatinput input').addEventListener('keydown', (event) => {
       try {
         const kc = event.keyCode ? event.keyCode : event.which;

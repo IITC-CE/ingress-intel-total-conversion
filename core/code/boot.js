@@ -281,7 +281,7 @@ function boot() {
   if (window.deviceID) {
     log.log('Your device ID: ' + window.deviceID);
   }
-  window.runOnSmartphonesBeforeBoot();
+  IITC.smartphone._runBeforeBoot();
   window.runOnAppBeforeBoot();
 
   var loadPlugins = prepPluginsToLoad();
@@ -308,7 +308,7 @@ function boot() {
 
   loadPlugins();
 
-  window.runOnSmartphonesAfterBoot();
+  IITC.smartphone._runAfterBoot();
   window.runOnAppAfterBoot();
 
   // workaround for #129. Not sure why this is required.

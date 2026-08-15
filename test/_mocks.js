@@ -32,6 +32,7 @@ class Map {
 // the url backs document.location / baseURI used when building permalinks
 const { window: domWindow } = new JSDOM('<!DOCTYPE html><html><body></body></html>', { url: 'https://intel.ingress.com/intel' });
 globalThis.document = domWindow.document;
+globalThis.Image = domWindow.Image;
 globalThis.$ = jQueryFactory(domWindow);
 globalThis.jQuery = globalThis.$;
 

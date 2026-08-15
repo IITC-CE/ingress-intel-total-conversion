@@ -315,7 +315,7 @@ var setup = function () {
   window.plugin.farmFind.minLevel = 7;
   window.plugin.farmFind.minNearby = 5;
   window.plugin.farmFind.setupCSS();
-  if (window.isSmartphone()) {
+  if (IITC.utils.isSmartphone()) {
     window.plugin.farmFind.setupSmartCSS();
   }
   window.plugin.farmFind.Radius = 500;

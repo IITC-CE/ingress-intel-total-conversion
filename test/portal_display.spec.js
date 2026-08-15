@@ -239,6 +239,48 @@ describe('IITC.portal.display.resetScroll', () => {
   });
 });
 
+describe('IITC.portal.display._renderMobileFullImage', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="sidebar"><div id="portaldetails"></div><div id="toolbox"></div></div>';
+    sinon.stub(IITC.utils, 'isSmartphone').returns(true);
+  });
+
+  it('appends the image at the end of the sidebar, below the toolbox', () => {
+    IITC.portal.display._renderMobileFullImage('portal.png');
+
+    const sidebar = document.getElementById('sidebar');
+    const full = sidebar.querySelector('img.fullimg');
+    expect(full).to.be.ok;
+    expect(full.getAttribute('src')).to.equal('portal.png');
+    expect(sidebar.lastElementChild).to.equal(full);
+  });
+
+  it('replaces the previous image rather than stacking a second one', () => {
+    IITC.portal.display._renderMobileFullImage('first.png');
+    IITC.portal.display._renderMobileFullImage('second.png');
+
+    const full = document.querySelectorAll('img.fullimg');
+    expect(full).to.have.length(1);
+    expect(full[0].getAttribute('src')).to.equal('second.png');
+  });
+
+  it('drops the image when called without a url, which is the deselected-portal case', () => {
+    IITC.portal.display._renderMobileFullImage('portal.png');
+    IITC.portal.display._renderMobileFullImage();
+
+    expect(document.querySelectorAll('.fullimg')).to.have.length(0);
+  });
+
+  it('renders nothing on a desktop browser but still clears a leftover', () => {
+    IITC.portal.display._renderMobileFullImage('portal.png');
+    IITC.utils.isSmartphone.returns(false);
+
+    IITC.portal.display._renderMobileFullImage('portal.png');
+
+    expect(document.querySelectorAll('.fullimg')).to.have.length(0);
+  });
+});
+
 describe('IITC.portal.display.renderUrl', () => {
   it('renders permalink, scanner and map-links entries into .linkdetails', () => {
     document.body.innerHTML = '<div class="linkdetails"></div>';
@@ -350,6 +392,30 @@ describe('IITC.portal.display.renderToSidebar', () => {
     expect(IITC.portal.display.renderUrl.calledOnceWithExactly(1, 2, 'My Portal', 'g')).to.be.true;
     expect(window.runHooks.calledWith('portalDetailsUpdated')).to.be.true;
     expect(IITC.portal.display.setIndicators.calledOnce).to.be.true;
+  });
+
+  it('on a smartphone renders the image in the sidebar instead of hiding one inside the details', () => {
+    document.body.innerHTML = '<div id="sidebar"><div id="portaldetails"></div><div id="toolbox"></div></div>';
+    sinon.stub(IITC.utils, 'isSmartphone').returns(true);
+
+    IITC.portal.display.renderToSidebar(makePortal());
+
+    expect(document.querySelectorAll('.imgpreview img')).to.have.length(0);
+    expect(document.querySelector('#sidebar > .fullimg').getAttribute('src')).to.equal('img.png');
+  });
+
+  it('leaves the sidebar image alone while the details are still loading', () => {
+    document.body.innerHTML = '<div id="sidebar"><div id="portaldetails"></div><img class="fullimg" src="previous.png"></div>';
+    sinon.stub(IITC.utils, 'isSmartphone').returns(true);
+    const portal = makePortal({
+      hasFullDetails: () => false,
+      getDetails: () => ({ title: 'P', team: 'NEUTRAL', image: '', latE6: 0, lngE6: 0 }),
+    });
+    portal.options.level = 0;
+
+    IITC.portal.display.renderToSidebar(portal);
+
+    expect(document.querySelector('.fullimg').getAttribute('src')).to.equal('previous.png');
   });
 
   it('shows a loading placeholder and skips the hook when details are incomplete', () => {

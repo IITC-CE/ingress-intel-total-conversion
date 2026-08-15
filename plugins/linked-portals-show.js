@@ -196,7 +196,7 @@ showLinkedPortal.requestPortalData = function () {
 
 showLinkedPortal.showLinkOnMap = function () {
   // close portal info in order to preview link on map
-  if (window.isSmartphone()) {
+  if (IITC.utils.isSmartphone()) {
     window.show('map');
   }
   if (!showLinkedPortal.preview) {

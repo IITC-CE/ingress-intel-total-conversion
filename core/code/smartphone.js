@@ -1,132 +1,85 @@
 /* global IITC, log -- eslint */
 
 /**
- * @file This file provides functions and utilities specifically for the smartphone layout of IITC.
- * @module smartphone
+ * Namespace for the smartphone layout of IITC.
+ *
+ * It holds no public API: the boot hooks below are internal, and are only reachable across modules
+ * because the bundle wraps every file in its own scope.
+ *
+ * @memberof IITC
+ * @namespace smartphone
  */
 
 /**
- * Determines if the user's device is a smartphone.
- * Note it should not detect tablets because their display is large enough to use the desktop version.
- * The stock intel site allows forcing mobile/full sites with a vp=m or vp=f parameter. This function supports the same.
+ * Legacy namespace of the smartphone layout. IITC itself no longer reads it, it survives as the
+ * home of `mapButton` and `sideButton` for plugins that click them to switch panes.
  *
- * @function isSmartphone
- * @returns {boolean} True if the user's device is a smartphone, false otherwise.
- */
-window.isSmartphone = function () {
-  // this check is also used in main.js. Note it should not detect
-  // tablets because their display is large enough to use the desktop
-  // version.
-
-  // The stock intel site allows forcing mobile/full sites with a vp=m or vp=f
-  // parameter - let's support the same. (stock only allows this for some
-  // browsers - e.g. android phone/tablet. let's allow it for all, but
-  // no promises it'll work right)
-  var viewParam = window.getURLParam('vp');
-  if (viewParam === 'm') return true;
-  if (viewParam === 'f') return false;
-
-  return !!(navigator.userAgent.match(/Android.*Mobile/) || navigator.userAgent.match(/iPhone|iPad|iPod/i));
-};
-
-/**
- * Placeholder for smartphone specific manipulations.
- * This function does not implement any logic by itself.
- *
- * @function smartphone
+ * @deprecated call `window.show('map')` or `window.show('info')` to switch panes, and take the
+ * button itself from `document.querySelector('#chatcontrols a[data-channel="map"]')` if needed.
  */
 window.smartphone = function () {};
 
 /**
- * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
- * This includes adding smartphone-specific stylesheets
- * and modifying some of the setup functions for mobile compatibility.
+ * Creates one of the pane buttons shown in the chat controls.
  *
- * @function runOnSmartphonesBeforeBoot
+ * Bound through jQuery, not addEventListener: plugins switch panes by calling `.click()` on the
+ * jQuery object `window.smartphone` publishes, and that runs jQuery-registered handlers only.
+ *
+ * @function createPaneButton
+ * @param {string} pane - The pane it opens, used as both label and channel id.
+ * @returns {jQuery} The button.
  */
-window.runOnSmartphonesBeforeBoot = function () {
-  if (!window.isSmartphone()) return;
-  log.warn('running smartphone pre boot stuff');
+function createPaneButton(pane) {
+  return $('<a>')
+    .attr('data-channel', pane)
+    .text(pane)
+    .on('click', () => window.show(pane));
+}
+
+/**
+ * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
+ * Adds the smartphone stylesheet and the map/info pane buttons the mobile layout switches between.
+ *
+ * Called once from `boot`.
+ *
+ * @memberof IITC.smartphone
+ * @private
+ */
+const _runBeforeBoot = function () {
+  if (!IITC.utils.isSmartphone()) return;
+  log.debug('running smartphone pre boot stuff');
 
   // add smartphone stylesheet
-  var style = document.createElement('style');
-  style.type = 'text/css';
-  style.appendChild(document.createTextNode('@include_string:smartphone.css@'));
-  document.head.appendChild(style);
+  const style = document.createElement('style');
+  style.textContent = '@include_string:smartphone.css@';
+  document.head.append(style);
 
-  // don’t need many of those
-  window.setupStyles = function () {
-    $('head').append(
-      '<style>' +
-        [
-          '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
-          '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
-          '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
-        ].join('\n') +
-        '</style>'
-    );
-  };
-
-  window.smartphone.mapButton = $('<a>map</a>').click(function () {
-    window.show('map');
-    $('#map').css({ visibility: 'visible', opacity: '1' });
-    IITC.statusbar.show();
-    $('#chatcontrols a.active').removeClass('active');
-    $("#chatcontrols a:contains('map')").addClass('active');
-  });
-
-  window.smartphone.sideButton = $('<a>info</a>').click(function () {
-    window.show('info');
-    $('#scrollwrapper').show();
-    IITC.portal.display.resetScroll();
-    $('#chatcontrols a.active').removeClass('active');
-    $("#chatcontrols a:contains('info')").addClass('active');
-  });
-
-  $('#chatcontrols').append(window.smartphone.mapButton).append(window.smartphone.sideButton);
+  window.smartphone.mapButton = createPaneButton('map');
+  window.smartphone.sideButton = createPaneButton('info');
+  $('#chatcontrols').append(window.smartphone.mapButton, window.smartphone.sideButton);
 
   if (!window.useAppPanes()) {
     document.body.classList.add('show-controls');
   }
-
-  window.addHook('portalDetailsUpdated', function () {
-    var x = $('.imgpreview img').removeClass('hide');
-
-    if (!x.length) {
-      $('.fullimg').remove();
-      return;
-    }
-
-    if ($('.fullimg').length) {
-      $('.fullimg').replaceWith(x.addClass('fullimg'));
-    } else {
-      x.addClass('fullimg').appendTo('#sidebar');
-    }
-  });
 };
 
 /**
  * Performs setup tasks for IITC on smartphones after the IITC boot process.
- * This includes initializing mobile info display, adjusting UI elements for mobile compatibility,
- * and setting event handlers for mobile-specific interactions.
+ * Opens the map pane, which is the view the mobile layout starts on.
  *
- * @function runOnSmartphonesAfterBoot
+ * Called once from `boot`.
+ *
+ * @memberof IITC.smartphone
+ * @private
  */
-window.runOnSmartphonesAfterBoot = function () {
-  if (!window.isSmartphone()) return;
-  log.warn('running smartphone post boot stuff');
+const _runAfterBoot = function () {
+  if (!IITC.utils.isSmartphone()) return;
+  log.debug('running smartphone post boot stuff');
 
   window.show('map');
+};
 
-  // replace img full view handler
-  $('#portaldetails')
-    .off('click', '.imgpreview')
-    .on('click', '.imgpreview', function (e) {
-      if (e.currentTarget === e.target) {
-        // do not fire on #level
-        $('.ui-tooltip').remove();
-        var newTop = $('.fullimg').position().top + $('#sidebar').scrollTop();
-        $('#sidebar').animate({ scrollTop: newTop }, 200);
-      }
-    });
+IITC.smartphone = {
+  _runBeforeBoot,
+  _runAfterBoot,
 };

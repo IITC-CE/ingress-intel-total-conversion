@@ -77,6 +77,27 @@ const resetScroll = function () {
 };
 
 /**
+ * Renders the smartphone-only copy of the portal image, shown full width below the toolbox
+ * in addition to the preview inside the details.
+ *
+ * It sits at the end of `#sidebar` rather than inside `#portaldetails`, so re-rendering the details
+ * does not clear it and every render has to replace it explicitly.
+ *
+ * @memberof IITC.portal.display
+ * @private
+ * @param {string} [url] - The portal image URL.
+ */
+const _renderMobileFullImage = function (url) {
+  document.querySelector('#sidebar > .fullimg')?.remove();
+  if (!url || !IITC.utils.isSmartphone()) return;
+
+  const fullImage = document.createElement('img');
+  fullImage.setAttribute('class', 'fullimg');
+  fullImage.setAttribute('src', url);
+  document.getElementById('sidebar')?.append(fullImage);
+};
+
+/**
  * Generates and displays URLs related to the portal.
  * This includes a permalink for the portal, a link for Ingress Prime, and links to alternative maps.
  * Function is overwritten in `app.js`
@@ -149,9 +170,7 @@ const renderDetails = function (guid, forceSelect) {
     const portalDetails = document.getElementById('portaldetails');
     if (portalDetails) portalDetails.innerHTML = '';
     IITC.statusbar.portal.update();
-    if (window.isSmartphone()) {
-      document.querySelectorAll('.fullimg').forEach((el) => el.remove());
-    }
+    _renderMobileFullImage();
     return;
   }
 
@@ -211,7 +230,7 @@ const renderToSidebar = function (portal) {
   header.innerHTML = IITC.portal.display.moveToPortalIconTemplate;
   header.firstElementChild.addEventListener('click', function () {
     IITC.portal.zoomToAndShow(guid, [details.latE6 / 1e6, details.lngE6 / 1e6]);
-    if (window.isSmartphone()) {
+    if (IITC.utils.isSmartphone()) {
       window.show('map');
     }
   });
@@ -242,11 +261,17 @@ const renderToSidebar = function (portal) {
   levelSpan.setAttribute('title', levelDetails);
   levelSpan.textContent = levelInt;
 
-  const fullImg = document.createElement('img');
-  fullImg.setAttribute('class', 'hide');
-  fullImg.setAttribute('src', img);
+  imgPreview.append(levelSpan);
+  if (!IITC.utils.isSmartphone()) {
+    // never rendered - the preview itself is a CSS background. This preloads the image so the
+    // desktop click handler can read naturalWidth synchronously when sizing its dialog
+    const fullImg = document.createElement('img');
+    fullImg.setAttribute('class', 'hide');
+    fullImg.setAttribute('src', img);
+    imgPreview.append(fullImg);
+  }
 
-  imgPreview.append(levelSpan, fullImg);
+  if (hasFullDetails) _renderMobileFullImage(img);
 
   portalDetails.append(header, imgPreview);
   portalDetails.insertAdjacentHTML(
@@ -442,7 +467,7 @@ const select = function (guid, event) {
  */
 const rangeLinkClick = function () {
   if (window.portalRangeIndicator) window.map.fitBounds(window.portalRangeIndicator.getBounds());
-  if (window.isSmartphone()) window.show('map');
+  if (IITC.utils.isSmartphone()) window.show('map');
 };
 
 /**
@@ -518,6 +543,7 @@ const makePermalink = function (latlng, options) {
 
 IITC.portal.display = {
   resetScroll,
+  _renderMobileFullImage,
   renderUrl,
   renderDetails,
   renderToSidebar,
