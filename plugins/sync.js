@@ -568,9 +568,9 @@ window.plugin.sync.Authorizer = function (options) {
   this.authorize = this.authorize.bind(this);
 };
 
-window.plugin.sync.Authorizer.prototype.API_KEY = 'AIzaSyBeVNFEHh35baf5y9miCjaw43L61BTeyhg';
+window.plugin.sync.Authorizer.prototype.API_KEY = '';
 window.plugin.sync.Authorizer.prototype.DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
-window.plugin.sync.Authorizer.prototype.CLIENT_ID = '1099227387115-osrmhfh1i6dto7v7npk4dcpog1cnljtb.apps.googleusercontent.com';
+window.plugin.sync.Authorizer.prototype.CLIENT_ID = '';
 window.plugin.sync.Authorizer.prototype.SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 window.plugin.sync.Authorizer.prototype.isAuthed = function () {
