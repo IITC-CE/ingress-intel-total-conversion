@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Class: FileReader | IITC-CE</title>
+    <title>Namespace: smartphone | IITC-CE</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -48,8 +48,8 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="L.html">L</a>.</span>FileReader<span class="signature">()</span><span class="type-signature"></span></h2>
+        <h2>
+            <span class="ancestors"><a href="IITC.html">IITC</a>.</span>smartphone</h2>
         
     
 </header>
@@ -59,55 +59,12 @@
         <div class="container-overview">
         
             
-
-<dt>
-    
-        <h4 class="name" id="FileReader">
+                <div class="description"><p>Namespace for the smartphone layout of IITC.</p>
+<p>It holds no public API: the boot hooks below are internal, and are only reachable across modules
+because the bundle wraps every file in its own scope.</p></div>
             
-                new <span class="type-signature"></span>FileReader<span class="signature">()</span><span class="type-signature"></span>
-                
+
             
-            <div class="container-source members">
-                <code><a href="code_utils_file.js.html">code/utils_file.js</a></code>,
-                <code><a href="code_utils_file.js.html#line50">line 50</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Leaflet wrapper over <a href="https://w3c.github.io/FileAPI/#APIASynch">FileReader</a> Web API,
-making it compatible with the Leaflet event system.
-This class extends <code>L.Evented</code>.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
 
 <dl class="details">
@@ -144,24 +101,10 @@ This class extends <code>L.Evented</code>.</p>
 </dl>
 
 
-    
-
-</dd>
-
+            
         
         </div>
     
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li>L.Evented</li>
-    </ul>
-
 
     
 
@@ -185,14 +128,14 @@ This class extends <code>L.Evented</code>.</p>
 
 <dt>
     
-        <h4 class="name" id=".loadFile">
+        <h4 class="name" id="._runAfterBoot">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>loadFile<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="L.FileReader.html">L.FileReader</a>}</span>
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_runAfterBoot<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_utils_file.js.html">code/utils_file.js</a></code>,
-                <code><a href="code_utils_file.js.html#line205">line 205</a></code>
+                <code><a href="code_smartphone.js.html">code/smartphone.js</a></code>,
+                <code><a href="code_smartphone.js.html#line75">line 75</a></code>
             </div>
             
         </h4>
@@ -204,79 +147,9 @@ This class extends <code>L.Evented</code>.</p>
 
     
     <div class="description">
-        <p>Instantiates a <code>L.FileReader</code> object and initiates a file chooser dialog.
-This function simulates a click on a hidden file input element created with the given options.
-The <code>read</code> method is called with the file chosen by the user.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Options for the file input element.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
+        <p>Performs setup tasks for IITC on smartphones after the IITC boot process.
+Opens the map pane, which is the view the mobile layout starts on.</p>
+<p>Called once from <code>boot</code>.</p>
     </div>
     
 
@@ -291,26 +164,13 @@ The <code>read</code> method is called with the file chosen by the user.</p>
     
 
     
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
 
+    
 
+    
 
-<span class="param-type"><a href="L.FileReader.html">L.FileReader</a></span>
+    
 
-
-
-
-
-- <p>A new instance of <code>L.FileReader</code> with the file to be read.</p>
-
-
-
-
-            
-    </div>
     
 
     
@@ -359,14 +219,14 @@ The <code>read</code> method is called with the file chosen by the user.</p>
 
 <dt>
     
-        <h4 class="name" id=".read">
+        <h4 class="name" id="._runBeforeBoot">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>read<span class="signature">(file<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="L.FileReader.html">L.FileReader</a>}</span>
+                <span class="type-signature"><span class="icon green">private</span>, <span class="icon green">static</span> </span>_runBeforeBoot<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="code_utils_file.js.html">code/utils_file.js</a></code>,
-                <code><a href="code_utils_file.js.html#line113">line 113</a></code>
+                <code><a href="code_smartphone.js.html">code/smartphone.js</a></code>,
+                <code><a href="code_smartphone.js.html#line48">line 48</a></code>
             </div>
             
         </h4>
@@ -378,115 +238,9 @@ The <code>read</code> method is called with the file chosen by the user.</p>
 
     
     <div class="description">
-        <p>Starts reading the contents of the specified file
-using <a href="https://w3c.github.io/FileAPI/#reading-a-file">reader method</a> specified in <code>options</code>.
-Note: all 'init*' event handlers expected to be already attached <strong>before</strong> this method call.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>file</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Blob</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>The file or blob to be read. Optional if already set.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Options for file reading. Same as in constructor.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
+        <p>Performs initial setup tasks for IITC on smartphones before the IITC boot process.
+Adds the smartphone stylesheet and the map/info pane buttons the mobile layout switches between.</p>
+<p>Called once from <code>boot</code>.</p>
     </div>
     
 
@@ -501,26 +255,13 @@ Note: all 'init*' event handlers expected to be already attached <strong>before<
     
 
     
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
 
+    
 
+    
 
-<span class="param-type"><a href="L.FileReader.html">L.FileReader</a></span>
+    
 
-
-
-
-
-- <p>Returns the <code>L.FileReader</code> instance for chaining.</p>
-
-
-
-
-            
-    </div>
     
 
     
@@ -589,7 +330,7 @@ Note: all 'init*' event handlers expected to be already attached <strong>before<
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'L.FileReader_sub'.replace(/"/g, '_');
+        var id = 'IITC.smartphone_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
