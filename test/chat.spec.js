@@ -63,6 +63,37 @@ describe('chat.addChannel / getChannelDesc', () => {
     expect(chat.addChannel({ id: 'dup', name: 'Two' })).to.be.false;
     expect(chat.channels).to.have.length(1);
   });
+
+  it('creates the message container before the tabs are set up', () => {
+    document.body.innerHTML = '<div id="chatcontrols"><a></a></div><div id="chat"></div>';
+
+    chat.addChannel({ id: 'debug', name: 'Debug' });
+
+    // debug-console writes into its channel from a boot plugin, before chat.setup() runs
+    expect(document.getElementById('chatdebug')).to.exist;
+    expect(document.querySelector('#chatdebug table')).to.exist;
+    // the tab itself is deferred, so that comm channels keep the first slots
+    expect(document.querySelector('#chatcontrols a[data-channel="debug"]')).to.not.exist;
+  });
+
+  it('does not mistake an unrelated element for the container', () => {
+    document.body.innerHTML = '<div id="chatcontrols"><a></a></div><div id="chat"></div><form id="chatinput"></form>';
+
+    // 'chat' + id collides with the static markup for these two
+    chat.addChannel({ id: 'controls', name: 'Controls' });
+    chat.addChannel({ id: 'input', name: 'Input' });
+
+    expect(document.querySelector('#chat > [id="chatcontrols"]')).to.exist;
+    expect(document.querySelector('#chat > [id="chatinput"]')).to.exist;
+  });
+
+  it('tolerates a missing chat panel', () => {
+    document.body.innerHTML = '';
+
+    // only reachable while the tabs are not set up, hence ahead of the setupTabs specs
+    expect(() => chat.addChannel({ id: 'early', name: 'Early' })).to.not.throw();
+    expect(chat.getChannelDesc('early')).to.exist;
+  });
 });
 
 describe('chat.backgroundChannelData', () => {
@@ -142,6 +173,7 @@ describe('chat.setupTabs / chooseTab', () => {
   before(() => {
     document.body.innerHTML = '<div id="chatcontrols"></div><div id="chat"></div><div id="chatinput"><mark></mark></div>';
     chat.channels.length = 0;
+    chat.addChannel({ id: 'debug', name: 'Debug' });
     chat.setupTabs();
   });
 
@@ -154,6 +186,11 @@ describe('chat.setupTabs / chooseTab', () => {
     expect(chat.getChannelDesc('all')).to.be.ok;
     expect(chat.getChannelDesc('faction')).to.be.ok;
     expect(chat.getChannelDesc('alerts')).to.be.ok;
+  });
+
+  it('reuses the container a plugin channel created before the tabs existed', () => {
+    expect(document.querySelectorAll('#chatdebug')).to.have.length(1);
+    expect(document.querySelector('#chatcontrols a[data-channel="debug"]')).to.exist;
   });
 
   it('wires the legacy per-channel data references', () => {
