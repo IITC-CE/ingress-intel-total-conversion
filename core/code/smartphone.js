@@ -22,7 +22,7 @@ window.smartphone = function () {};
 /**
  * Creates one of the pane buttons shown in the chat controls.
  *
- * Bound through jQuery, not addEventListener: plugins switch panes by calling `.click()` on the
+ * Bound through jQuery, not addEventListener: plugins switch panes by trigger `click` on the
  * jQuery object `window.smartphone` publishes, and that runs jQuery-registered handlers only.
  *
  * @function createPaneButton

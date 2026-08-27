@@ -165,7 +165,7 @@ window.runOnAppBeforeBoot = function () {
 
       var shareLink = $('<a>')
         .text('Share portal')
-        .click(function () {
+        .on('click', function () {
           window.app.intentPosLink(lat, lng, window.map.getZoom(), title, true, guid);
         });
       $('.linkdetails').append($('<aside>').append(shareLink));
@@ -179,7 +179,7 @@ window.runOnAppAfterBoot = function () {
   }
 
   if (window.app.intentPosLink) {
-    $('#permalink').click(function (e) {
+    $('#permalink').on('click', function (e) {
       e.preventDefault();
       var center = window.map.getCenter();
       window.app.intentPosLink(center.lat, center.lng, window.map.getZoom(), 'Selected map view', false);
