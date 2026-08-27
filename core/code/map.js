@@ -115,7 +115,8 @@ function createDefaultBaseMapLayers() {
   // (not available over https though - not on the right domain name anyway)
   var cartoAttr =
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
-  var cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png';
+  var cartoAPIKey = 'cb1_2d98_1_8c4c1ddaeb0a769373718043';
+  var cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png?key=' + cartoAPIKey;
   baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all' });
   baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all' });
 
