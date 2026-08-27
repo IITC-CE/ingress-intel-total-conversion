@@ -1,13 +1,17 @@
 // @author         jaiperdu
 // @name           Debug console tab
 // @category       Debug
-// @version        0.2.0
+// @version        0.2.1
 // @description    Add a debug console tab
 
 /* exported setup, changelog --eslint */
 /* global IITC, L */
 
 var changelog = [
+  {
+    version: '0.2.1',
+    changes: ['Fix auto-scroll to the bottom', 'Do not let a failed log line break the code that logged it'],
+  },
   {
     version: '0.2.0',
     changes: [
@@ -105,19 +109,17 @@ debugTab.renderLine = function (errorType, args) {
   var pre = document.createElement('pre');
   pre.textContent = text;
 
-  // Check if the last message is visible (scroll position)
   var debugContainer = document.getElementById('chatdebug');
-  var isAtBottom = debugContainer.scrollTop >= debugContainer.scrollTopMax;
+  var scrollBefore = IITC.utils.scrollBottom(debugContainer);
 
   // Insert a new row in the debug table
-  var table = document.querySelector('#chatdebug table');
+  var table = debugContainer.querySelector('table');
   var row = table.insertRow();
   row.insertCell().append(time);
   row.insertCell().append(type);
   row.insertCell().append(pre);
 
-  // Auto-scroll to the bottom if the user was at the bottom
-  if (isAtBottom) debugContainer.scrollTo(0, debugContainer.scrollTopMax);
+  IITC.chat.keepScrollPosition(debugContainer, scrollBefore, false);
 };
 
 debugTab.console = {};
@@ -150,7 +152,11 @@ function overwriteNative() {
       if (nativeConsole) {
         nativeConsole[which].apply(nativeConsole, arguments);
       }
-      debugTab.console[which].apply(debugTab.console, arguments);
+      try {
+        debugTab.console[which].apply(debugTab.console, arguments);
+      } catch {
+        // never break the caller: console.* is called from arbitrary code
+      }
     };
   }
 
