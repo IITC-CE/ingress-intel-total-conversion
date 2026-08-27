@@ -567,13 +567,14 @@ chat.setupTabs = () => {
 chat.setup = () => {
   chat.setupTabs();
 
-  if (localStorage['iitc-chat-tab']) {
-    chat.chooseTab(localStorage['iitc-chat-tab']);
-  }
-
+  // show the panel first: chooseTab() cannot apply the deferred needsScrollTop while hidden
   ['chatcontrols', 'chat', 'chatinput'].forEach((id) => {
     document.getElementById(id).style.display = '';
   });
+
+  if (localStorage['iitc-chat-tab']) {
+    chat.chooseTab(localStorage['iitc-chat-tab']);
+  }
 
   document.querySelector('#chatcontrols a').addEventListener('click', chat.toggle);
 
