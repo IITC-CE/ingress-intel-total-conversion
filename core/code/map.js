@@ -136,7 +136,8 @@ function createDefaultBaseMapLayers() {
   // cartodb has some nice tiles too - both dark and light subtle maps - http://cartodb.com/basemaps/
   // (not available over https though - not on the right domain name anyway)
   const cartoAttr = IITC.map.osmAttributionTemplate;
-  const cartoUrl = 'https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png';
+  const cartoAPIKey = 'cb1_2d98_1_8c4c1ddaeb0a769373718043';
+  const cartoUrl = `https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png?key=${cartoAPIKey}`;
   baseLayers['CartoDB Dark Matter'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all', isDark: true });
   baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all', isDark: false });
 
