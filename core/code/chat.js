@@ -380,24 +380,28 @@ chat.keepScrollPosition = (box, scrollBefore, isOldMsgs) => {
     return;
   }
 
-  if (scrollBefore === 0 || isOldMsgs) {
+  // within a pixel counts as at the bottom: a fresh container reports 1 (the table is kept
+  // taller than the panel) and a fractional devicePixelRatio makes scrollBottom subpixel
+  if (scrollBefore <= 1 || isOldMsgs) {
     state.ignoreNextScroll = true;
     elm.scrollTop = elm.scrollTop + (window.scrollBottom(elm) - scrollBefore);
   }
 };
 
 /**
- * Create and insert into the DOM/Mobile app the channel tab
+ * Create and insert into the DOM the channel message container
+ *
+ * Called both from addChannel(), so a channel provider can render into `#chat<id>` right
+ * away, and from createChannelTab() for the comm channels, so it stays idempotent and
+ * silently does nothing while the chat panel itself is missing from the DOM
  *
  * @param {ChannelDescription} channelDesc - channel description
- * @static
+ * @private
  */
-function createChannelTab(channelDesc) {
-  const chatControls = document.getElementById('chatcontrols');
+function createChannelContainer(channelDesc) {
   const chatDiv = document.getElementById('chat');
-  const accessLink = L.Util.template(chat.channelTabTemplate, channelDesc);
-  chatControls.insertAdjacentHTML('beforeend', accessLink);
-  chatControls.lastElementChild.addEventListener('click', chat.chooser);
+  // looked up inside the panel: document-wide, 'chat' + id would also hit #chatcontrols and friends
+  if (!chatDiv || chatDiv.querySelector(`[id="chat${channelDesc.id}"]`)) return;
 
   const channelDiv = L.Util.template(chat.channelContainerTemplate, channelDesc);
   chatDiv.insertAdjacentHTML('beforeend', channelDiv);
@@ -413,6 +417,21 @@ function createChannelTab(channelDesc) {
       if (window.scrollBottom(elm) === 0) channelDesc.request(channelDesc.id, false);
     });
   }
+}
+
+/**
+ * Create and insert into the DOM/Mobile app the channel tab
+ *
+ * @param {ChannelDescription} channelDesc - channel description
+ * @private
+ */
+function createChannelTab(channelDesc) {
+  const chatControls = document.getElementById('chatcontrols');
+  const accessLink = L.Util.template(chat.channelTabTemplate, channelDesc);
+  chatControls.insertAdjacentHTML('beforeend', accessLink);
+  chatControls.lastElementChild.addEventListener('click', chat.chooser);
+
+  createChannelContainer(channelDesc);
 
   // pane
   if (window.useAndroidPanes()) {
@@ -427,7 +446,8 @@ let isTabsSetup = false;
 /**
  * Add to the channel list a new channel description
  *
- * If tabs are already created, a tab is created for this channel as well
+ * The message container is created right away, so `#chat<id>` is usable as soon as this
+ * returns; the tab waits for chat.setupTabs(), which decides the final order and indices
  *
  * @memberof IITC.chat
  * @param {ChannelDescription} channelDesc - channel description
@@ -447,6 +467,7 @@ chat.addChannel = (channelDesc) => {
   channelDesc.index = chat.channels.length;
 
   if (isTabsSetup) createChannelTab(channelDesc);
+  else createChannelContainer(channelDesc);
 
   return true;
 };
@@ -548,13 +569,14 @@ chat.setupTabs = () => {
 chat.setup = () => {
   chat.setupTabs();
 
-  if (localStorage['iitc-chat-tab']) {
-    chat.chooseTab(localStorage['iitc-chat-tab']);
-  }
-
+  // show the panel first: chooseTab() cannot apply the deferred needsScrollTop while hidden
   ['chatcontrols', 'chat', 'chatinput'].forEach((id) => {
     document.getElementById(id).style.display = '';
   });
+
+  if (localStorage['iitc-chat-tab']) {
+    chat.chooseTab(localStorage['iitc-chat-tab']);
+  }
 
   document.querySelector('#chatcontrols a').addEventListener('click', chat.toggle);
 
