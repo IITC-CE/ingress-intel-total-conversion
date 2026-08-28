@@ -380,7 +380,9 @@ chat.keepScrollPosition = (box, scrollBefore, isOldMsgs) => {
     return;
   }
 
-  if (scrollBefore === 0 || isOldMsgs) {
+  // within a pixel counts as at the bottom: a fresh container reports 1 (the table is kept
+  // taller than the panel) and a fractional devicePixelRatio makes scrollBottom subpixel
+  if (scrollBefore <= 1 || isOldMsgs) {
     state.ignoreNextScroll = true;
     elm.scrollTop = elm.scrollTop + (window.scrollBottom(elm) - scrollBefore);
   }

@@ -482,6 +482,28 @@ describe('chat.keepScrollPosition', () => {
     expect(chat.channelState(el).ignoreNextScroll).to.be.true;
   });
 
+  it('treats a subpixel scrollBottom as being at the bottom', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(true);
+    const el = document.getElementById('chatall');
+
+    // a fractional devicePixelRatio leaves scrollTop subpixel, so scrollBottom misses
+    // an exact 0 even at the very end
+    chat.keepScrollPosition(el, -0.2, false);
+
+    expect(chat.channelState(el).ignoreNextScroll).to.be.true;
+  });
+
+  it('does not scroll when the user is genuinely scrolled up', () => {
+    document.body.innerHTML = '<div id="chatall"></div>';
+    sinon.stub(IITC.utils, '_isVisible').returns(true);
+    const el = document.getElementById('chatall');
+
+    chat.keepScrollPosition(el, 40, false);
+
+    expect(chat.channelState(el).ignoreNextScroll).to.be.undefined;
+  });
+
   it('accepts a jQuery object as the box for legacy callers', () => {
     document.body.innerHTML = '<div id="chatall"></div>';
     sinon.stub(IITC.utils, '_isVisible').returns(true);
