@@ -144,15 +144,15 @@ var LayerChooser = L.Control.Layers.extend({
         localStorage['iitc-base-map'] = data.name;
       };
       layer.on('add', data.statusTracking, this);
-      // --- Early restore of saved basemap (handles late-loading providers) ---
+      // Early restore of saved basemap (handles late-loading providers)
       try {
         var saved = this.lastBaseLayerName || localStorage['iitc-base-map'];
-        if (!this._earlyRestoreDone && map && saved && name === saved) {
+        if (!this._earlyRestoreDone && this._map && saved && name === saved) {
           this._earlyRestoreDone = true;
           this.showLayer(layer, true);
         }
       } catch (e) {
-        if (window.debug) log.warn('LayerChooser early-restore failed:', e);
+        log.warn('LayerChooser early-restore failed:', e);
       }
     }
   },
