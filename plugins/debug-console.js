@@ -10,7 +10,11 @@
 var changelog = [
   {
     version: '0.2.1',
-    changes: ['Fix auto-scroll to the bottom', 'Do not let a failed log line break the code that logged it'],
+    changes: [
+      'Fix auto-scroll to the bottom',
+      'Do not let a failed log line break the code that logged it',
+      'Show the message and stack of logged errors instead of {}',
+    ],
   },
   {
     version: '0.2.0',
@@ -60,10 +64,22 @@ debugTab.renderLine = function (errorType, args) {
   args = Array.prototype.slice.call(args);
   var text = [];
 
+  // JSON.stringify renders an Error as {}: name/message/stack are non-enumerable
+  function errorToText(e) {
+    var head = String(e);
+    var stack = e.stack ? String(e.stack) : '';
+    if (!stack) return head;
+    // Chrome heads the stack with "Name: message"; Firefox and Safari list frames only
+    return stack.indexOf(head) === 0 ? stack : head + '\n' + stack;
+  }
+
   // Function to safely stringify objects with depth limitation
   function safeStringify(obj, depth = 5) {
     let cache = [];
     return JSON.stringify(obj, function (key, value) {
+      if (value instanceof Error) {
+        return errorToText(value);
+      }
       if (typeof value === 'object' && value !== null) {
         // Detect circular references or if the depth exceeds the limit
         if (cache.indexOf(value) !== -1 || cache.length > depth) {
@@ -77,8 +93,10 @@ debugTab.renderLine = function (errorType, args) {
   }
 
   args.forEach(function (v) {
-    // If v is not a string or number, attempt to stringify
-    if (typeof v !== 'string' && typeof v !== 'number') {
+    if (v instanceof Error) {
+      v = errorToText(v);
+    } else if (typeof v !== 'string' && typeof v !== 'number') {
+      // If v is not a string or number, attempt to stringify
       try {
         v = safeStringify(v);
       } catch {
