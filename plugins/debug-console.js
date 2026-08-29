@@ -14,6 +14,7 @@ var changelog = [
       'Fix auto-scroll to the bottom',
       'Do not let a failed log line break the code that logged it',
       'Show the message and stack of logged errors instead of {}',
+      'Show log messages coming from IITC core, not just from plugins',
     ],
   },
   {
@@ -183,6 +184,13 @@ function overwriteNative() {
   overwrite('error');
   overwrite('debug');
   overwrite('info');
+
+  // ulog bound the console its loggers saw at creation; re-assigning the level rebinds them all
+  // to the console installed above, so core output reaches this tab too
+  if (window.log) {
+    var level = window.log.level;
+    window.log.level = level;
+  }
 }
 
 // Old API utils
