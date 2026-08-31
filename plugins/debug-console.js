@@ -1,7 +1,7 @@
 // @author         jaiperdu
 // @name           Debug console tab
 // @category       Debug
-// @version        0.2.1
+// @version        0.3.0
 // @description    Add a debug console tab
 
 /* exported setup, changelog --eslint */
@@ -9,12 +9,13 @@
 
 var changelog = [
   {
-    version: '0.2.1',
+    version: '0.3.0',
     changes: [
       'Fix auto-scroll to the bottom',
       'Do not let a failed log line break the code that logged it',
       'Show the message and stack of logged errors instead of {}',
-      'Show log messages coming from IITC core, not just from plugins',
+      'Capture messages logged through ulog, not just console.* calls',
+      'Add per-level filter buttons, with debug hidden by default; hidden levels are kept and can be shown again',
     ],
   },
   {
@@ -33,6 +34,24 @@ var changelog = [
 ];
 
 var debugTab = {};
+
+// ulog level numbers, compared against the browser console threshold
+var LEVELS = { error: 1, warn: 2, info: 3, log: 4, debug: 5, trace: 6 };
+var ROW_TYPES = { error: 'error', warn: 'warning', info: 'info', log: 'log', debug: 'debug', trace: 'debug' };
+// row type with the button label
+var FILTERS = [
+  { type: 'error', label: 'errors' },
+  { type: 'warning', label: 'warnings' },
+  { type: 'info', label: 'info' },
+  { type: 'log', label: 'logs' },
+  { type: 'debug', label: 'debug' },
+];
+var FILTER_KEY = 'plugin-debug-console-hidden';
+var MAX_ROWS = 2000;
+
+var nativeConsole;
+// core logs its internal diagnostics at debug level, so start with that noise folded away
+var hidden = { debug: true };
 
 // DEBUGGING TOOLS ///////////////////////////////////////////////////
 // meant to be used from browser debugger tools and the like.
@@ -59,6 +78,64 @@ debugTab.create = function () {
     },
   });
 };
+
+function saveFilters() {
+  try {
+    localStorage[FILTER_KEY] = JSON.stringify(
+      FILTERS.filter(function (filter) {
+        return hidden[filter.type];
+      }).map(function (filter) {
+        return filter.type;
+      })
+    );
+  } catch {
+    // the filter still applies, it just will not be remembered
+  }
+}
+
+function loadFilters() {
+  try {
+    var stored = localStorage[FILTER_KEY];
+    if (!stored) return;
+    hidden = {};
+    JSON.parse(stored).forEach(function (type) {
+      hidden[type] = true;
+    });
+  } catch {
+    // malformed state, keep the defaults
+  }
+}
+
+function applyFilters(container) {
+  FILTERS.forEach(function (filter) {
+    container.classList.toggle('hide-' + filter.type, !!hidden[filter.type]);
+  });
+}
+
+function buildFilterBar(container) {
+  var bar = document.createElement('div');
+  bar.className = 'debug-filters';
+  if (IITC.utils.isSmartphone()) bar.classList.add('mobile');
+
+  FILTERS.forEach(function (filter) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = filter.type;
+    button.textContent = filter.label;
+    button.title = 'Toggle ' + filter.label;
+    button.classList.toggle('off', !!hidden[filter.type]);
+    button.addEventListener('click', function () {
+      hidden[filter.type] = !hidden[filter.type];
+      button.classList.toggle('off', !!hidden[filter.type]);
+      applyFilters(container);
+      saveFilters();
+    });
+    bar.append(button);
+  });
+
+  container.insertBefore(bar, container.firstChild);
+  applyFilters(container);
+}
 
 debugTab.renderLine = function (errorType, args) {
   // Convert arguments to an array
@@ -116,7 +193,7 @@ debugTab.renderLine = function (errorType, args) {
   var time = document.createElement('time');
   var d = new Date();
   time.textContent = d.toLocaleTimeString();
-  time.title = d.toLocaleString();
+  time.title = IITC.utils.unixTimeToDateTimeString(d.getTime(), true);
   time.dataset.timestamp = d.getTime();
 
   // Type element creation (for log type)
@@ -129,21 +206,27 @@ debugTab.renderLine = function (errorType, args) {
   pre.textContent = text;
 
   var debugContainer = document.getElementById('chatdebug');
+  if (!debugContainer.querySelector('.debug-filters')) buildFilterBar(debugContainer);
   var scrollBefore = IITC.utils.scrollBottom(debugContainer);
 
   // Insert a new row in the debug table
   var table = debugContainer.querySelector('table');
   var row = table.insertRow();
+  row.className = errorType;
   row.insertCell().append(time);
   row.insertCell().append(type);
   row.insertCell().append(pre);
+
+  while (table.rows.length > MAX_ROWS) {
+    table.deleteRow(0);
+  }
 
   IITC.chat.keepScrollPosition(debugContainer, scrollBefore, false);
 };
 
 debugTab.console = {};
 debugTab.console.log = function () {
-  debugTab.renderLine('notice', arguments);
+  debugTab.renderLine('log', arguments);
 };
 
 debugTab.console.warn = function () {
@@ -163,7 +246,7 @@ debugTab.console.info = function () {
 };
 
 function overwriteNative() {
-  var nativeConsole = window.console;
+  nativeConsole = window.console;
   window.console = L.extend({}, window.console);
 
   function overwrite(which) {
@@ -184,13 +267,37 @@ function overwriteNative() {
   overwrite('error');
   overwrite('debug');
   overwrite('info');
+}
 
-  // ulog bound the console its loggers saw at creation; re-assigning the level rebinds them all
-  // to the console installed above, so core output reaches this tab too
-  if (window.log) {
-    var level = window.log.level;
-    window.log.level = level;
+// ulog binds whatever con() returns at logger creation, so a private sink gives this tab every
+// level while the console keeps its threshold; assigning the level rebinds the existing loggers
+function installLogSink() {
+  if (!window.log) return;
+
+  var consoleLevel = window.log.level;
+  // ?debug=<module> raises the level for a single module, which a flat threshold cannot express
+  if (consoleLevel < LEVELS.debug && (/[?&]debug=/.test(location.search) || localStorage.debug)) {
+    consoleLevel = LEVELS.debug;
   }
+
+  var sink = {};
+  Object.keys(LEVELS).forEach(function (method) {
+    sink[method] = function () {
+      try {
+        debugTab.renderLine(ROW_TYPES[method], arguments);
+      } catch {
+        // never break the caller: log.* is called from arbitrary code
+      }
+      if (nativeConsole && LEVELS[method] <= consoleLevel) {
+        (nativeConsole[method] || nativeConsole.log).apply(nativeConsole, arguments);
+      }
+    };
+  });
+
+  window.log.con = function () {
+    return sink;
+  };
+  window.log.level = 'trace';
 }
 
 // Old API utils
@@ -212,8 +319,10 @@ debugTab.show = function () {
 
 function setup() {
   window.plugin.debug = debugTab;
+  loadFilters();
   debugTab.create();
   overwriteNative();
+  installLogSink();
 
   $('<style>').prop('type', 'text/css').text('@include_string:debug-console.css@').appendTo('head');
 
