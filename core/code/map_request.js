@@ -110,7 +110,7 @@ IITC.map.Request.prototype.start = function () {
  * @memberof IITC.map.Request
  */
 IITC.map.Request.prototype.mapMoveStart = function () {
-  log.log('refresh map movestart');
+  log.debug('refresh map movestart');
 
   this.setStatus('paused');
   this.clearTimeout();
@@ -157,7 +157,7 @@ IITC.map.Request.prototype.idleResume = function () {
   // if we have no timer set and there are no active requests, refresh has gone idle and the timer needs restarting
 
   if (this.idle) {
-    log.log('refresh map idle resume');
+    log.debug('refresh map idle resume');
     this.idle = false;
     this.setStatus('idle restart', undefined, -1);
     this.refreshOnTimeout(this.IDLE_RESUME_REFRESH);
@@ -172,7 +172,7 @@ IITC.map.Request.prototype.idleResume = function () {
  */
 IITC.map.Request.prototype.clearTimeout = function () {
   if (this.timer) {
-    log.log('cancelling existing map refresh timer');
+    log.debug('cancelling existing map refresh timer');
     clearTimeout(this.timer);
     this.timer = undefined;
   }
@@ -188,7 +188,7 @@ IITC.map.Request.prototype.clearTimeout = function () {
 IITC.map.Request.prototype.refreshOnTimeout = function (seconds) {
   this.clearTimeout();
 
-  log.log(`starting map refresh in ${seconds} seconds`);
+  log.debug(`starting map refresh in ${seconds} seconds`);
 
   // double setTimeout used to ensure the delay occurs after any browser-related rendering/updating/etc
   this.timer = setTimeout(() => {
@@ -235,7 +235,7 @@ IITC.map.Request.prototype.getStatus = function () {
 IITC.map.Request.prototype.refresh = function () {
   // if we're idle, don't refresh
   if (window.isIdle()) {
-    log.log('suspending map refresh - is idle');
+    log.debug('suspending map refresh - is idle');
     this.setStatus('idle');
     this.idle = true;
     return;
@@ -291,7 +291,7 @@ IITC.map.Request.prototype.refresh = function () {
 
   window.runHooks('mapDataEntityInject', { callback: this.renderer.processGameEntities.bind(this.renderer) });
 
-  log.log(
+  log.debug(
     `requesting data tiles at zoom ${dataZoom} (L${tileParams.level}+ portals, ${tileParams.tilesPerEdge} tiles per global edge), map zoom is ${mapZoom}`
   );
 
@@ -361,7 +361,7 @@ IITC.map.Request.prototype.refresh = function () {
   // so as far as plugins are concerned, it should be treated as a finished request
   window.runHooks('requestFinished', { success: true });
 
-  log.log('done request preparation (cleared out-of-bounds and invalid for zoom, and rendered cached data)');
+  log.debug('done request preparation (cleared out-of-bounds and invalid for zoom, and rendered cached data)');
 
   if (Object.keys(this.queuedTiles).length > 0) {
     // queued requests - don't start processing the download queue immediately - start it after a short delay
@@ -649,7 +649,7 @@ IITC.map.Request.prototype.handleResponse = function (data, tiles, success) {
   if (errorTiles.length) statusMsg += ', ' + errorTiles.length + ' failed';
   if (unaccountedTiles.length) statusMsg += ', ' + unaccountedTiles.length + ' unaccounted';
   statusMsg += '. delay ' + nextQueueDelay + ' seconds';
-  log.log(statusMsg);
+  log.debug(statusMsg);
 
   // requeue any 'timeout' tiles immediately
   if (timeoutTiles.length > 0) {
@@ -813,7 +813,7 @@ IITC.map.Request.prototype.processRenderQueue = function () {
     const endTime = Date.now();
     const duration = (endTime - this.refreshStartTime) / 1000;
 
-    log.log(`finished requesting data! (took ${duration} seconds to complete)`);
+    log.debug(`finished requesting data! (took ${duration} seconds to complete)`);
 
     window.runHooks('mapDataRefreshEnd', {});
 

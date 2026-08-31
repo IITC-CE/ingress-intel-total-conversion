@@ -25,7 +25,7 @@ var idlePoll = function () {
     window._idleTimeLimit = window.REFRESH; // set a small time limit before entering idle mode
   }
   if (!wasIdle && window.isIdle()) {
-    log.log('idlePoll: entering idle mode');
+    log.debug('idlePoll: entering idle mode');
   }
 };
 
@@ -39,7 +39,7 @@ setInterval(idlePoll, IDLE_POLL_TIME * 1000);
 window.idleReset = function () {
   // update immediately when the user comes back
   if (window.isIdle()) {
-    log.log('idleReset: leaving idle mode');
+    log.debug('idleReset: leaving idle mode');
     window.idleTime = 0;
     $.each(window._onResumeFunctions, function (ind, f) {
       f();
@@ -60,7 +60,7 @@ window.idleSet = function () {
   window._idleTimeLimit = 0; // a zero time here will cause idle to start immediately
 
   if (!wasIdle && window.isIdle()) {
-    log.log('idleSet: entering idle mode');
+    log.debug('idleSet: entering idle mode');
   }
 };
 
