@@ -61,7 +61,7 @@
 
         <activity
             android:name="org.exarhteam.iitc_mobile.IITC_Mobile"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|uiMode"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask">
