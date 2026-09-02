@@ -78,7 +78,7 @@ android {
         }
     }
 
-    lintOptions {
+    lint {
         abortOnError false
     }
     compileOptions {
