@@ -141,13 +141,13 @@ function getPosition() {
   const latE6 = url('latE6');
   const lngE6 = url('lngE6');
   if (latE6 &amp;&amp; lngE6) {
-    log.log('mappos: reading email URL params');
+    log.debug('mappos: reading email URL params');
     return normLL(parseInt(latE6) / 1e6, parseInt(lngE6) / 1e6, zoom);
   }
 
   let ll = url('ll') || url('pll');
   if (ll) {
-    log.log('mappos: reading stock Intel URL params');
+    log.debug('mappos: reading stock Intel URL params');
     ll = ll.split(',');
     return normLL(ll[0], ll[1], zoom);
   }
@@ -155,7 +155,7 @@ function getPosition() {
   const lat = window.readCookie('ingress.intelmap.lat');
   const lng = window.readCookie('ingress.intelmap.lng');
   if (lat &amp;&amp; lng) {
-    log.log('mappos: reading cookies');
+    log.debug('mappos: reading cookies');
     return normLL(lat, lng, window.readCookie('ingress.intelmap.zoom'));
   }
 }

@@ -233,7 +233,7 @@ window.dialog = function (options) {
           window.DIALOGS[$(this).data('id')] = this;
           window.DIALOG_COUNT++;
 
-          log.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') opened. ' + window.DIALOG_COUNT + ' remain.');
+          log.debug('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') opened. ' + window.DIALOG_COUNT + ' remain.');
         },
         close: function () {
           // Run the close callback if we have one
@@ -250,7 +250,7 @@ window.dialog = function (options) {
           delete window.DIALOGS[$(this).data('id')];
 
           window.DIALOG_COUNT--;
-          log.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') closed. ' + window.DIALOG_COUNT + ' remain.');
+          log.debug('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') closed. ' + window.DIALOG_COUNT + ' remain.');
 
           // remove from DOM and destroy
           $(this).dialog('destroy').remove();

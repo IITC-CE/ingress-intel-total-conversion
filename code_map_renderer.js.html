@@ -269,7 +269,7 @@ IITC.map.Renderer.prototype.endRenderPass = function () {
     }
   }
 
-  log.log(`Render: end cleanup: removed ${countp} portals, ${countl} links, ${countf} fields`);
+  log.debug(`Render: end cleanup: removed ${countp} portals, ${countl} links, ${countf} fields`);
 
   // reorder portals to be after links/fields
   this.bringPortalsToFront();
@@ -627,7 +627,7 @@ IITC.map.Renderer.prototype.rescalePortalMarkers = function () {
   if (this.portalMarkerScale === undefined || this.portalMarkerScale !== IITC.portal.marker.scale()) {
     this.portalMarkerScale = IITC.portal.marker.scale();
 
-    log.log(`Render: map zoom ${window.map.getZoom()} changes portal scale to ${IITC.portal.marker.scale()} - redrawing all portals`);
+    log.debug(`Render: map zoom ${window.map.getZoom()} changes portal scale to ${IITC.portal.marker.scale()} - redrawing all portals`);
 
     // NOTE: we're not calling this because it resets highlights - we're calling it as it
     // resets the style (inc size) of all portal markers, applying the new scale
