@@ -770,13 +770,14 @@ window.fields = {};
 // overwrite data
 if (typeof window.plugin !== 'function') window.plugin = function () {};
 
-// eslint-disable-next-line no-unused-vars
 const ulog = (function (module) {
   '@include_raw:external/ulog.min.js@';
   return module;
 })({}).exports;
 
+// Root logger. Core modules get a `log` local at build time; this keeps the name resolvable when
+// a plugin monkey-patches a core function through toString() + eval, and exposes `log.level`
+window.log = ulog;
+
 // eslint-disable-next-line
 '@bundle_code@';
-
-/* exported ulog -- eslint */

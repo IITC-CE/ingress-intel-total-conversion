@@ -324,7 +324,7 @@ function _genPostData(channel, getOlderMsgs, ...args) {
   const CHAT_BOUNDINGBOX_SAME_FACTOR = 0.1;
   // if the old and new box contain each other, after expanding by the factor, don't reset comm
   if (!(b.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(_oldBBox) && _oldBBox.pad(CHAT_BOUNDINGBOX_SAME_FACTOR).contains(b))) {
-    log.log(`Bounding Box changed, comm will be cleared (old: ${_oldBBox.toBBoxString()}; new: ${b.toBBoxString()})`);
+    log.debug(`Bounding Box changed, comm will be cleared (old: ${_oldBBox.toBBoxString()}; new: ${b.toBBoxString()})`);
 
     // need to reset these flags now because clearing will only occur
     // after the request is finished – i.e. there would be one almost

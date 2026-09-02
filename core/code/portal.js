@@ -589,7 +589,7 @@ const selectWhenLoadedByLatLng = (latLng) => {
 
 const testPortalLatLng = (data) => {
   if (data.portal.getLatLng().equals(urlPortalLL)) {
-    log.log(`urlPortalLL ${urlPortalLL.toString()} matches portal GUID ${data.portal.options.guid}`);
+    log.debug(`urlPortalLL ${urlPortalLL.toString()} matches portal GUID ${data.portal.options.guid}`);
     window.selectedPortal = data.portal.options.guid;
     IITC.portal.display.renderDetails(window.selectedPortal, true);
     urlPortalLL = undefined;
@@ -616,7 +616,7 @@ const selectWhenLoadedByGuid = (guid) => {
 
 const testPortalGuid = (data) => {
   if (data.portal.options.guid === urlPortal) {
-    log.log(`urlPortal GUID ${window.urlPortal} found - selecting...`);
+    log.debug(`urlPortal GUID ${window.urlPortal} found - selecting...`);
     window.selectedPortal = urlPortal;
     IITC.portal.display.renderDetails(window.selectedPortal, true);
     urlPortal = undefined;
