@@ -22,12 +22,12 @@ def metaFDroid(File apkDir, variant) {
 }
 
 android {
-    compileSdkVersion 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "org.exarhteam.iitc_mobile"
-        minSdkVersion 21
-        targetSdkVersion 35
+        minSdk 21
+        targetSdk 36
         versionCode = getVersionCodeTimeStamps()
         versionName "0.42.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -78,7 +78,7 @@ android {
         }
     }
 
-    lintOptions {
+    lint {
         abortOnError false
     }
     compileOptions {

@@ -61,7 +61,7 @@
 
         <activity
             android:name="org.exarhteam.iitc_mobile.IITC_Mobile"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|uiMode"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask">
@@ -136,6 +136,7 @@
             android:theme="@style/AppPrefTheme"
             android:exported="false"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+            android:enableOnBackInvokedCallback="false"
             android:label="@string/activity_settings"/>
 
         <activity
@@ -143,6 +144,7 @@
             android:exported="true"
             android:theme="@style/AppPrefTheme"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+            android:enableOnBackInvokedCallback="false"
             android:label="@string/activity_plugins">
             <!-- Handles external user plugins -->
             <intent-filter>

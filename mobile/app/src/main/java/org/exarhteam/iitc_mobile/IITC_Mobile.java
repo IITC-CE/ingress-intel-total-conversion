@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Build;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -128,6 +129,7 @@ public class IITC_Mobile extends AppCompatActivity
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
     private Pane mCurrentPane = Pane.MAP;
     private boolean mBackButtonPressed = false;
+    private OnBackPressedCallback mBackPressedCallback;
 
     // Setup receiver to detect if Samsung DeX mode has been changed
 	private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
@@ -205,6 +207,14 @@ public class IITC_Mobile extends AppCompatActivity
 
         // Setup window insets for edge-to-edge display
         WindowInsetsHelper.setupMainActivityInsets(this);
+
+        mBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                handleBackPressed();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, mBackPressedCallback);
 
         debugScrollButton = findViewById(R.id.debugScrollButton);
 
@@ -720,8 +730,7 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     // we want a self defined behavior for the back button
-    @Override
-    public void onBackPressed() {
+    private void handleBackPressed() {
         // exit fullscreen mode if it is enabled and action bar is disabled or the back stack is empty
         if (mIitcWebView.isInFullscreen() && mBackStack.isEmpty()) {
             mIitcWebView.toggleFullscreen();
@@ -752,7 +761,11 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         if (mBackButtonPressed || !mSharedPrefs.getBoolean("pref_press_twice_to_exit", false)) {
-            super.onBackPressed();
+            // let the system handle this press, then take the events over again:
+            // back on the task root sends the app to the background without destroying it
+            mBackPressedCallback.setEnabled(false);
+            getOnBackPressedDispatcher().onBackPressed();
+            mBackPressedCallback.setEnabled(true);
         } else {
             mBackButtonPressed = true;
             Toast.makeText(this, getString(R.string.toast_press_twice_to_exit), Toast.LENGTH_SHORT).show();
