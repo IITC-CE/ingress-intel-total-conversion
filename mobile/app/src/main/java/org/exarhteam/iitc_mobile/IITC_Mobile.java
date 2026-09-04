@@ -642,13 +642,6 @@ public class IITC_Mobile extends AppCompatActivity
         if (mReloadNeeded) {
             Log.d("preference had changed...reload needed");
             reloadIITC();
-        } else {
-            // iitc is not fully booted...timer will be reset by the script itself
-            if (findViewById(R.id.imageLoading).getVisibility() == View.GONE) {
-                // enough idle...let's do some work
-                Log.d("resuming...reset idleTimer");
-                mIitcWebView.loadJS("(function(){if(window.idleReset) window.idleReset();})();");
-            }
         }
 
         mUserLocation.onStart();
