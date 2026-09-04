@@ -88,6 +88,11 @@ var idleMouseMove = function (e) {
 window.setupIdle = function () {
   $('body').keypress(window.idleReset);
   $('body').mousemove(idleMouseMove);
+
+  // a hidden page goes idle within REFRESH seconds, so resume as soon as it is visible again
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) window.idleReset();
+  });
 };
 
 /**

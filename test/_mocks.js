@@ -64,6 +64,8 @@ globalThis.window = {
   requests: { addRefreshFunction: () => {} },
   CHAT_REQUEST_SCROLL_TOP: 200,
   failedRequestCount: 0,
+  REFRESH: 30,
+  MAX_IDLE_TIME: 15 * 60,
 
   // game constants, mirrored from core/total-conversion-build.js (all indexed by numeric team id where relevant)
   TEAM_NONE: 0,
