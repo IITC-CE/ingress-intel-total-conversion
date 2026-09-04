@@ -255,7 +255,8 @@ describe('IITC.portal navigation', () => {
     window.DEFAULT_ZOOM = 17;
     window.portals = {};
     window.selectedPortal = undefined;
-    window.renderPortalDetails = sinon.spy();
+    // window.renderPortalDetails aliases this property, and sinon.restore() only undoes stubs
+    sinon.stub(IITC.portal.display, 'renderDetails');
     sinon.stub(window.map, 'setView');
   });
 

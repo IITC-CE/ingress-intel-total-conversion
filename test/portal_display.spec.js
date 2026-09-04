@@ -10,17 +10,12 @@ function resonators(levels, owner = 'me') {
   return levels.map((level) => (level === null ? null : { level, energy: window.RESO_NRG[level], owner }));
 }
 
-// captured before other specs overwrite the renderPortalDetails alias with a bare spy
-let realRenderDetails;
-
 before(async () => {
   await import('../core/code/utils.js');
   await import('../core/code/portal.js');
   await import('../core/code/portal_details.js');
   await import('../core/code/portal_display.js');
   await import('../core/code/portal_display_tools.js');
-
-  realRenderDetails = IITC.portal.display.renderDetails;
 });
 
 afterEach(() => sinon.restore());
@@ -301,7 +296,6 @@ describe('IITC.portal.display.renderUrl', () => {
 
 describe('IITC.portal.display.renderDetails', () => {
   beforeEach(() => {
-    IITC.portal.display.renderDetails = realRenderDetails; // undo the alias overwrite from other specs
     window.portals = {};
     window.selectedPortal = undefined;
     IITC.statusbar = { portal: { update: sinon.spy() } };
