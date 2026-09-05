@@ -163,12 +163,12 @@ machinaTracker.createPortalLink = function (portal) {
       title: portal.name,
       href: IITC.portal.display.makePermalink(portal.latLng),
     })
-    .click((event) => {
+    .on('click', (event) => {
       IITC.portal.selectByLatLng(portal.latLng);
       event.preventDefault();
       return false;
     })
-    .dblclick((event) => {
+    .on('dblclick', (event) => {
       window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
       IITC.portal.selectByLatLng(portal.latLng);
       event.preventDefault();

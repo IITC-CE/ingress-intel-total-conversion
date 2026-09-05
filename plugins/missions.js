@@ -145,9 +145,7 @@ window.plugin.missions = {
     if (!data.portalDetails.mission && !data.portalDetails.mission50plus) {
       return;
     }
-    var missionHtml = $('<a>')
-      .click(this.openPortalMissions.bind(this))
-      .text('Missions');
+    var missionHtml = $('<a>').on('click', this.openPortalMissions.bind(this)).text('Missions');
     $('.linkdetails').append($('<aside>').append(missionHtml));
   },
 
@@ -275,7 +273,7 @@ window.plugin.missions = {
         let dia = $(openDialog).closest('.ui-dialog');
         let button = dia.find('.ui-dialog-titlebar-button-collapse');
         if (button) {
-          $(button).click();
+          $(button).trigger('click');
         }
       }
     } else {

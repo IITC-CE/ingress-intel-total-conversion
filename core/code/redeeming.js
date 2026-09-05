@@ -201,8 +201,8 @@ window.formatPasscodeShort = function (data) {
  * @function setupRedeem
  */
 window.setupRedeem = function () {
-  $('#redeem').keypress(function (e) {
-    if ((e.keyCode ? e.keyCode : e.which) !== 13) return;
+  $('#redeem').on('keypress', function (e) {
+    if (e.which !== 13) return;
 
     var passcode = $(this).val();
     passcode = passcode.replace(/[^\x20-\x7E]+/g, ''); // removes non-printable characters

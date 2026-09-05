@@ -72,7 +72,7 @@ function setup() {
     });
   } else {
     $('<a id="privacytoggle" accesskey="9">')
-      .click(function () {
+      .on('click', function () {
         window.plugin.privacyView.toggle();
       })
       .attr('title', '[9]')

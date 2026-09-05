@@ -232,7 +232,7 @@ window.plugin.portalcounts.getPortals = function () {
   if (window.plugin.portalcounts.nozeroes) {
     $('#portalcounts').addClass('nozeroes');
   }
-  $('#portalcounts svg').click(function () {
+  $('#portalcounts svg').on('click', function () {
     $('#portalcounts').toggleClass('nozeroes');
   });
 };

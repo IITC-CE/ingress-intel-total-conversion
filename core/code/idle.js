@@ -86,8 +86,8 @@ var idleMouseMove = function (e) {
  * @function setupIdle
  */
 window.setupIdle = function () {
-  $('body').keypress(window.idleReset);
-  $('body').mousemove(idleMouseMove);
+  $('body').on('keypress', window.idleReset);
+  $('body').on('mousemove', idleMouseMove);
 };
 
 /**
