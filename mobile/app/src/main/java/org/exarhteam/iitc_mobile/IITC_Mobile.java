@@ -184,7 +184,7 @@ public class IITC_Mobile extends AppCompatActivity
             version = version.substring(0, dashIndex);
         }
         final String iitcMobileUA = "IITC-Mobile/" + version + " (https://github.com/IITC-CE/ingress-intel-total-conversion)";
-        
+
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
         mAllowedHostnames.put("google.com", googleUA);
         mAllowedHostnames.put("youtube.com", googleUA);
@@ -400,11 +400,11 @@ public class IITC_Mobile extends AppCompatActivity
             final int mode = Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0"));
             if (mUserLocation.setLocationMode(mode))
                 mReloadNeeded = true;
-            
+
             // Sync plugin checkbox state with location mode preference
             boolean shouldBeEnabled = mode != 0;
             boolean isCurrentlyEnabled = mSharedPrefs.getBoolean("user-location.user.js", false);
-            
+
             if (shouldBeEnabled != isCurrentlyEnabled) {
                 SharedPreferences.Editor editor = mSharedPrefs.edit();
                 editor.putBoolean("user-location.user.js", shouldBeEnabled);
@@ -415,7 +415,7 @@ public class IITC_Mobile extends AppCompatActivity
             // Sync location mode preference when user-location plugin checkbox changes
             boolean pluginEnabled = sharedPreferences.getBoolean(key, false);
             String currentMode = mSharedPrefs.getString("pref_user_location_mode", "0");
-            
+
             if (pluginEnabled && "0".equals(currentMode)) {
                 // Enable location mode when plugin is enabled (default to show position)
                 SharedPreferences.Editor editor = mSharedPrefs.edit();
@@ -500,8 +500,10 @@ public class IITC_Mobile extends AppCompatActivity
     // handles ingress intel url intents, search intents, geo intents and javascript file intents
     private void handleIntent(final Intent intent, final boolean onCreate) {
         final String action = intent.getAction();
-        if (Intent.ACTION_VIEW.equals(action)) {
-            final Uri uri = intent.getData();
+        final Uri uri = intent.getData();
+        final boolean hasViewUri = Intent.ACTION_VIEW.equals(action) && uri != null && uri.getScheme() != null;
+
+        if (hasViewUri) {
             Log.d("intent received url: " + uri.toString());
 
             if (uri.getScheme().equals("http") || uri.getScheme().equals("https")) {
@@ -512,7 +514,7 @@ public class IITC_Mobile extends AppCompatActivity
                     return;
                 }
             }
-            
+
             if (uri.getScheme().equals("iitc")) {
                 // Convert iitc:// scheme to https://intel.ingress.com/ URL
                 String convertedUrl = mIntelUrl + uri.getSchemeSpecificPart();
@@ -1124,7 +1126,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     private void updateViews() {
         boolean wasDebugging = mViewDebug.getVisibility() == View.VISIBLE;
-        
+
         if (!mDebugging) {
             mViewDebug.setVisibility(View.GONE);
             mLayoutDebug.setVisibility(View.GONE);
@@ -1158,7 +1160,7 @@ public class IITC_Mobile extends AppCompatActivity
                 mLayoutDebug.setVisibility(View.VISIBLE);
             }
         }
-        
+
         // Update safe area insets when debug mode changes
         if (wasDebugging != mDebugging) {
             mIitcWebView.applySafeAreaInsets();
