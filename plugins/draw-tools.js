@@ -13,6 +13,7 @@ var changelog = [
     changes: [
       'Sync drawn items across devices via the Sync plugin (Multi-Projects-Extension aware)',
       'Register with the Sync plugin regardless of plugin load order',
+      'Fix drawn area used by Tidy Links and Fly Links being misplaced after zooming',
     ],
   },
   { version: '0.12.1', changes: ['Refactoring: update Leaflet API usage'] },
@@ -999,11 +1000,8 @@ window.plugin.drawTools.initMPE = function () {
   });
 };
 
-var cachedFilters;
+// one filter per drawn polygon; each compares layer points, so it is valid only for the view it was built in
 window.plugin.drawTools.getLocationFilters = function () {
-  if (cachedFilters) {
-    return cachedFilters;
-  }
   var filters;
   if (!window.map.hasLayer(window.plugin.drawTools.drawnItems)) {
     return [];
@@ -1052,7 +1050,6 @@ window.plugin.drawTools.getLocationFilters = function () {
       return window.pnpoly(poly, point);
     };
   });
-  cachedFilters = filters;
   return filters;
 };
 
@@ -1208,9 +1205,6 @@ function setup() {
   var filterEvents = new L.Evented();
   window.map.on('draw:created draw:edited draw:deleted', function (e) {
     filterEvents.fire('changed', { originalEvent: e });
-  });
-  filterEvents.on('changed', function () {
-    cachedFilters = null;
   });
   window.plugin.drawTools.filterEvents = filterEvents;
 }
