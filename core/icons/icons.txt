@@ -1,0 +1,115 @@
+# Material Symbols icons bundled with IITC
+#
+# One icon name per line, exactly as published at https://fonts.google.com/icons
+# Blank lines and everything after "#" are ignored.
+#
+# Names are used verbatim in markup, as ligatures:
+#
+#     <i class="icon">close</i>
+#
+# To add an icon: append its name here, run ./icons_gen.py
+# and commit the regenerated core/icons/icons.woff2.
+# Avoid removing names: plugins outside this repository may already use them.
+
+# --- controls ---
+close
+search
+my_location
+location_on
+menu
+more_vert
+chevron_left
+chevron_right
+expand_less
+expand_more
+arrow_back
+arrow_forward
+arrow_upward
+arrow_downward
+
+# --- status ---
+check
+notifications
+check_circle
+cancel
+error
+warning
+info
+help
+
+# --- toggles ---
+check_box
+check_box_outline_blank
+indeterminate_check_box
+radio_button_checked
+radio_button_unchecked
+visibility
+visibility_off
+lock
+
+# --- editing ---
+add
+add_box
+add_circle
+remove
+edit
+delete
+undo
+redo
+content_copy
+content_paste
+save
+download
+upload
+
+# --- map and data ---
+layers
+map
+public
+place
+navigation
+near_me
+straighten
+timeline
+filter_alt
+filter_alt_off
+sort
+sort_by_alpha
+list
+view_list
+bar_chart
+leaderboard
+scoreboard
+data_usage
+route
+history
+schedule
+label
+flag
+shield
+
+# --- panes and plugins ---
+bookmark
+star
+chat
+campaign
+mail
+event
+extension
+group
+person
+description
+folder
+folder_copy
+link
+open_in_new
+share
+refresh
+sync
+settings
+fullscreen
+fullscreen_exit
+login
+logout
+home
+bug_report
