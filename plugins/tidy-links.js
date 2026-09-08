@@ -29,9 +29,6 @@ window.plugin.tidyLinks = tidyLinks;
 
 tidyLinks.MAX_PORTALS_TO_LINK = 200; // N.B.: this limit is not about performance
 
-// zoom level used for projecting points between latLng and pixel coordinates. may affect precision of triangulation
-tidyLinks.PROJECT_ZOOM = 16;
-
 // https://leafletjs.com/reference-1.4.0.html#polyline-stroke
 tidyLinks.STROKE_STYLE = {
   color: 'red',
