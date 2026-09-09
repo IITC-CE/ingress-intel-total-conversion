@@ -16,7 +16,7 @@
  * @property {string|null} [title] - Optional. The title (tooltip) for the button.
  * @property {string|null} [accessKey] - Optional. The access key for the button.
  * @property {Function|null} [mouseover] - Optional. The mouseover event for the button.
- * @property {string|null} [icon] - Optional. Icon name from FontAwesome for the button.
+ * @property {string|null} [icon] - Optional. Material Symbols ligature name for the button, or a Font Awesome class such as "fa-book".
  */
 
 IITC.toolbox = {
@@ -131,7 +131,7 @@ IITC.toolbox = {
     if (typeof buttonData.mouseover === 'function') buttonElement.onmouseover = buttonData.mouseover;
 
     if (typeof buttonData.icon === 'string') {
-      const iconHTML = `<i class="fa ${buttonData.icon}"></i>`;
+      const iconHTML = buttonData.icon.startsWith('fa-') ? `<i class="fa ${buttonData.icon}"></i>` : `<i class="icon">${buttonData.icon}</i>`;
       buttonElement.innerHTML = iconHTML + buttonElement.innerHTML;
     }
 
