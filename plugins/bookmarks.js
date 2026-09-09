@@ -1344,6 +1344,7 @@ window.plugin.bookmarks.initMPE = function () {
   window.plugin.mpe.setMultiProjects({
     namespace: 'bookmarks',
     title: 'Bookmarks for Maps and Portals',
+    icon: 'bookmark',
     fa: 'fa-bookmark',
     defaultKey: 'plugin-bookmarks',
     func_setKey: function (newKey) {
