@@ -271,7 +271,7 @@ window.plugin.mpe.ui.addControl = function () {
     label: 'MultiProjects',
     action: window.plugin.mpe.dialog.openMain,
     class: 'list-group-item',
-    icon: 'fa-files-o',
+    icon: 'folder_copy',
   });
 };
 window.plugin.mpe.ui.appendContainerInSidebar = function () {
