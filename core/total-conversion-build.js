@@ -248,15 +248,9 @@ document.body.innerHTML =
   '    <div id="gamestat">&nbsp;loading global control stats</div>' +
   '    <div id="searchwrapper">' +
   '      <div id="searchbox">' +
-  '        <div id="searchicon"><img src="' +
-  '@include_img:images/icon-search.svg@' +
-  '" alt="Search"/></div>' +
-  '        <div id="searchcancel"><img src="' +
-  '@include_img:images/icon-close-small.svg@' +
-  '" alt="Cancel search"/></div>' +
-  '        <button title="Current location" id="buttongeolocation"><img src="' +
-  '@include_img:images/icon-my-location.svg@' +
-  '" alt="Current location"/></button>' +
+  '        <div id="searchicon"><iitc-icon fallback="🔍">search</iitc-icon></div>' +
+  '        <div id="searchcancel"><iitc-icon filled label="Cancel search" fallback="✕">cancel</iitc-icon></div>' +
+  '        <button title="Current location" id="buttongeolocation"><iitc-icon fallback="⌖">my_location</iitc-icon></button>' +
   '        <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>' +
   '      </div>' +
   '    </div>' +

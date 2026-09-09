@@ -46,3 +46,8 @@ body.icons-unavailable iitc-icon::before {
   font: inherit;
   font-size: 1rem;
 }
+
+/* An icon that replaced a character carries it here, to be drawn in its place */
+body.icons-unavailable iitc-icon[fallback]::before {
+  content: attr(fallback);
+}
