@@ -12,7 +12,8 @@
  * @type {String}
  * @memberof IITC.portal.display
  */
-let moveToPortalIconTemplate = '<svg class="material-icons icon-button"><use xlink:href="#ic_place_24px"></use><title>Click to move to portal</title></svg>';
+let moveToPortalIconTemplate =
+  '<i class="icon filled icon-button" title="Click to move to portal" aria-label="Move to portal" data-fallback="📍">location_on</i>';
 
 /**
  * Template wrapping the #randdetails table (owner, range, links, fields, shielding, energy, AP, hacks)
@@ -240,11 +241,13 @@ const renderToSidebar = function (portal) {
   titleValue.textContent = title;
   header.append(titleValue);
 
-  const closeButton = document.createElement('span');
-  closeButton.setAttribute('class', 'close');
+  const closeButton = document.createElement('i');
+  closeButton.setAttribute('class', 'close icon');
   closeButton.setAttribute('title', 'Close [w]');
   closeButton.setAttribute('accesskey', 'w');
-  closeButton.textContent = 'X';
+  closeButton.setAttribute('aria-label', 'Close');
+  closeButton.setAttribute('data-fallback', 'X');
+  closeButton.textContent = 'close';
   closeButton.addEventListener('click', function () {
     IITC.portal.display.renderDetails(null);
   });

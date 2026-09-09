@@ -371,9 +371,8 @@ describe('IITC.portal.display.renderToSidebar', () => {
     IITC.portal.display.renderToSidebar(makePortal());
 
     expect(document.getElementById('portaldetails').innerHTML).to.equal(
-      '<h3 id="portaltitle" class="title"><svg class="material-icons icon-button">' +
-        '<use xlink:href="#ic_place_24px"></use><title>Click to move to portal</title></svg>' +
-        '<span class="value">My Portal</span><span class="close" title="Close [w]" accesskey="w">X</span></h3>' +
+      '<h3 id="portaltitle" class="title"><i class="icon filled icon-button" title="Click to move to portal" aria-label="Move to portal" data-fallback="📍">location_on</i>' +
+        '<span class="value">My Portal</span><i class="close icon" title="Close [w]" accesskey="w" aria-label="Close" data-fallback="X">close</i></h3>' +
         '<div class="imgpreview" title="My Portal\n\nClick to show full image." style="background-image: url(&quot;img.png&quot;)">' +
         '<span id="level" title="Level 8\nfully upgraded">8</span><img class="hide" src="img.png"></div>' +
         '<div class="mods">MODS</div>' +
@@ -422,9 +421,8 @@ describe('IITC.portal.display.renderToSidebar', () => {
     IITC.portal.display.renderToSidebar(portal);
 
     expect(document.getElementById('portaldetails').innerHTML).to.equal(
-      '<h3 id="portaltitle" class="title"><svg class="material-icons icon-button">' +
-        '<use xlink:href="#ic_place_24px"></use><title>Click to move to portal</title></svg>' +
-        '<span class="value">P</span><span class="close" title="Close [w]" accesskey="w">X</span></h3>' +
+      '<h3 id="portaltitle" class="title"><i class="icon filled icon-button" title="Click to move to portal" aria-label="Move to portal" data-fallback="📍">location_on</i>' +
+        '<span class="value">P</span><i class="close icon" title="Close [w]" accesskey="w" aria-label="Close" data-fallback="X">close</i></h3>' +
         '<div class="imgpreview" title="P\n\nClick to show full image." style="background-image: url(&quot;default.png&quot;)">' +
         '<span id="level" title="Level 0">0</span><img class="hide" src="default.png"></div>' +
         '<div id="portalStatus">Loading details...</div>' +
