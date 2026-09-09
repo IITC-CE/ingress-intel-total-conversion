@@ -1,14 +1,11 @@
 #keys-content-outer {
-  display: table;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   width: 100%;
   height: 26px;
-  text-align: center;
-}
-
-#keys-content-outer > div{
-  display: inline-block;
-  vertical-align: middle;
-  margin: 6px 3px 1px 3px;
+  margin-top: 3px;
 }
 
 #keys-label {
@@ -16,52 +13,31 @@
   cursor: help;
 }
 
-#keys-add {
-}
-
 #keys-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 26px;
   height: 18px !important;
   border: 1px solid;
-  text-align: center;
   cursor: help;
 }
 
-#keys-subtract {
-}
-
 .keys-button {
-  position:relative;
-  width: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 16px !important;
 }
 
-.keys-button > div {
-  background-color: rgb(32, 168, 177);
-  position: absolute;
-}
-
-.keys-button-minus {
-  width: 100%;
-  height: 4px;
-  top: 6px;
-}
-
-.keys-button-plus-h {
-  width: 100%;
-  height: 4px;
-  top: 6px;
-}
-
-.keys-button-plus-v {
-  width: 4px;
-  height: 100%;
-  left: 6px;
+.keys-button .icon {
+  color: rgb(32, 168, 177);
+  font-size: 16px;
+  cursor: pointer;
 }
 
 #keys-help {
-  font-weight: 900;
-  margin: 6px 3px 1px 20px !important;
+  margin-left: 14px;
   cursor: help;
 }
 
@@ -83,4 +59,3 @@
   margin-left: 0.3em;
   margin-right: -1px;
 }
-
