@@ -170,6 +170,13 @@ IITC.map.tiles.pointToTileId = function (params, x, y) {
   return `${params.zoom}_${x}_${y}_${params.level}_8_100`;
 };
 
+IITC.map.tiles.tileIdToPoint = function (params, tileID) {
+  const parts = tileID.split('_');
+  if (parts.length !== 6) throw new Error('Invalid tileID: ' + tileID);
+
+  return { x: parseInt(parts[1]), y: parseInt(parts[2]) };
+};
+
 IITC.registerLegacyAliases(IITC.map.tiles, {
   setupDataTileParams: 'setupParams',
   TILE_PARAMS: 'params',
