@@ -36,7 +36,7 @@ describe('IITC.map.tiles coordinate conversions', () => {
   });
 
   it('pointToTileId builds the zoom_x_y_level tile id', () => {
-    expect(IITC.map.tiles.pointToTileId({ zoom: 5, level: 3 }, 10, 20)).to.equal('5_10_20_3_8_100');
+    expect(IITC.map.tiles.pointToTileId({ tilesPerEdge: 1e6, zoom: 5, level: 3 }, 10, 20)).to.equal('5_10_20_3_8_100');
   });
 });
 

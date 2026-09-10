@@ -26,6 +26,7 @@ class Map {
       toBBoxString: () => '0,0,1,1',
     };
   }
+  on() {}
 }
 
 // real jsdom DOM bound to the same window as jQuery, so specs build/inspect it natively;

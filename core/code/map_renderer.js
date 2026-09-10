@@ -8,6 +8,15 @@
  */
 IITC.map.Renderer = function () {
   this.portalMarkerScale = undefined;
+
+  // watch for antimeridian switch
+  this.lastMapCenterLng = window.map.getCenter().lng;
+  window.map.on('move', () => {
+    const centerLng = window.map.getCenter().lng;
+    const delta = Math.round((centerLng - this.lastMapCenterLng) / 360) * 360;
+    this.lastMapCenterLng = centerLng;
+    if (delta !== 0) this.onAntiMeridianCrossed(delta);
+  });
 };
 
 /**
@@ -609,6 +618,44 @@ IITC.map.Renderer.prototype.addPortalToMapLayer = function (portal) {
 IITC.map.Renderer.prototype.removePortalFromMapLayer = function (portal) {
   // remove it from the portalsLevels layer
   portal.remove();
+};
+
+/**
+ * Removes a portal from the visible map layer.
+ *
+ * @function
+ * @memberof IITC.map.Renderer
+ * @param {Object} portal - The portal object to remove from the map layer.
+ */
+IITC.map.Renderer.prototype.onAntiMeridianCrossed = function (offset) {
+  const offsetE6 = offset * 1e6;
+
+  console.log(`Render: antimeridian crossed, offsetting all entities by ${offset} degrees`);
+
+  for (const guid in window.portals) {
+    const portal = window.portals[guid];
+    const latlng = portal.getLatLng();
+    latlng.lng += offset;
+    portal.setLatLng(latlng);
+    portal.options.data.lngE6 += offsetE6;
+  }
+
+  for (const guid in window.links) {
+    const link = window.links[guid];
+    const latlngs = link.getLatLngs();
+    latlngs.forEach((pos) => (pos.lng += offset));
+    link.setLatLngs(latlngs);
+    link.options.data.oLngE6 += offsetE6;
+    link.options.data.dLngE6 += offsetE6;
+  }
+
+  for (const guid in window.fields) {
+    const field = window.fields[guid];
+    const latlngs = field.getLatLngs();
+    latlngs.forEach((pos) => (pos.lng += offset));
+    field.setLatLngs(latlngs);
+    field.options.data.points.forEach((point) => (point.lngE6 += offsetE6));
+  }
 };
 
 IITC.registerLegacyAliases(IITC.map, {
