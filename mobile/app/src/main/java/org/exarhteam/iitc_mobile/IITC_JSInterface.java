@@ -143,7 +143,7 @@ public class IITC_JSInterface {
     // some plugins may have no specific icons...add a default icon
     @JavascriptInterface
     public void addPane(final String name, final String label) {
-        mIitc.runOnUiThread(() -> mIitc.getNavigationHelper().addPane(name, label, "ic_action_new_event"));
+        mIitc.runOnUiThread(() -> mIitc.getNavigationHelper().addPane(name, label, IITC_IconDrawable.DEFAULT_LIGATURE));
     }
 
     @JavascriptInterface

@@ -1,7 +1,6 @@
 package org.exarhteam.iitc_mobile;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,6 +20,9 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnItemClickListener {
 
@@ -164,18 +166,45 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
         }
     }
 
+    /**
+     * Drawable names that plugins outside this repository still pass to addPane, each mapped to the
+     * icon that stands in for it.
+     */
+    private static final Map<String, String> LEGACY_ICONS = new HashMap<String, String>() {{
+        put("ic_action_about", "info");
+        put("ic_action_add_to_queue", "add_circle");
+        put("ic_action_cc_bcc", "mail");
+        put("ic_action_copy", "content_copy");
+        put("ic_action_data_usage", "bar_chart");
+        put("ic_action_error", "warning");
+        put("ic_action_error_red", "error");
+        put("ic_action_full_screen", "fullscreen");
+        put("ic_action_group", "group");
+        put("ic_action_location_follow", "my_location");
+        put("ic_action_location_found", "location_on");
+        put("ic_action_new", "add");
+        put("ic_action_new_event", "event");
+        put("ic_action_paste", "content_paste");
+        put("ic_action_place", "place");
+        put("ic_action_refresh", "sync");
+        put("ic_action_return_from_full_screen", "fullscreen_exit");
+        put("ic_action_save", "save");
+        put("ic_action_search", "search");
+        put("ic_action_share", "share");
+        put("ic_action_star", "star");
+        put("ic_action_view_as_list", "list");
+        put("ic_action_view_as_list_compact", "view_list");
+        put("ic_action_warning", "warning");
+        put("ic_action_warning_yellow", "warning");
+        put("ic_action_web_site", "public");
+        put("ic_drawer", "menu");
+        put("ic_iitcm", "map");
+        put("ic_missions", "flag");
+    }};
+
     public void addPane(final String name, final String label, final String icon) {
-        final Resources res = mIitc.getResources();
-        final String packageName = res.getResourcePackageName(R.string.app_name);
-        /*
-         * since the package name is overridden in test builds
-         * we can't use context.getPackageName() to get the package name
-         * because the resources were processed before the package name was finally updated.
-         * so we have to retrieve the package name of another resource with Resources.getResourcePackageName()
-         * see http://www.piwai.info/renaming-android-manifest-package/
-         */
-        final int resId = mIitc.getResources().getIdentifier(icon, "drawable", packageName);
-        mNavigationAdapter.add(new Pane(name, label, resId));
+        final String ligature = LEGACY_ICONS.containsKey(icon) ? LEGACY_ICONS.get(icon) : icon;
+        mNavigationAdapter.add(Pane.withFontIcon(name, label, ligature));
     }
 
     public void closeDrawers() {
@@ -339,9 +368,8 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
 
             view.setText(item.label);
 
-            if (item.icon != 0) {
-                view.setCompoundDrawablesWithIntrinsicBounds(item.icon, 0, 0, 0);
-            }
+            final Drawable icon = new IITC_IconDrawable(mIitc, item.iconLigature, view.getCurrentTextColor());
+            view.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
 
             return view;
         }
@@ -357,27 +385,30 @@ public class IITC_NavigationHelper extends ActionBarDrawerToggle implements OnIt
     }
 
     public static class Pane {
-        public static final Pane ALL = new Pane("all", R.string.pane_all, R.drawable.ic_action_view_as_list);
-        public static final Pane FACTION = new Pane("faction", R.string.pane_faction, R.drawable.ic_action_cc_bcc);
-        public static final Pane ALERTS = new Pane("alerts", R.string.pane_alerts, R.drawable.ic_action_warning);
-        public static final Pane INFO = new Pane("info", R.string.pane_info, R.drawable.ic_action_about);
-        public static final Pane MAP = new Pane("map", R.string.pane_map, R.drawable.ic_map_white);
+        public static final Pane ALL = Pane.withFontIcon("all", R.string.pane_all, "campaign");
+        public static final Pane FACTION = Pane.withFontIcon("faction", R.string.pane_faction, "group");
+        public static final Pane ALERTS = Pane.withFontIcon("alerts", R.string.pane_alerts, "notifications");
+        public static final Pane INFO = Pane.withFontIcon("info", R.string.pane_info, "info");
+        public static final Pane MAP = Pane.withFontIcon("map", R.string.pane_map, "map");
 
-        private final int icon;
+        private final String iconLigature;
         public String label;
         public int label_resource;
         public String name;
 
-        public Pane(final String name, final int label_resource, final int icon) {
-            this.name = name;
-            this.label_resource = label_resource;
-            this.icon = icon;
-        }
-
-        public Pane(final String name, final String label, final int icon) {
+        private Pane(final String name, final String label, final int label_resource, final String iconLigature) {
             this.name = name;
             this.label = label;
-            this.icon = icon;
+            this.label_resource = label_resource;
+            this.iconLigature = iconLigature;
+        }
+
+        public static Pane withFontIcon(final String name, final String label, final String ligature) {
+            return new Pane(name, label, 0, ligature);
+        }
+
+        public static Pane withFontIcon(final String name, final int label_resource, final String ligature) {
+            return new Pane(name, null, label_resource, ligature);
         }
 
         @Override
