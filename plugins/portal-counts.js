@@ -374,7 +374,7 @@ window.plugin.portalcounts.onPaneChanged = function (pane) {
 
 var setup = function () {
   if (window.useAppPanes()) {
-    window.app.addPane('plugin-portalcounts', 'Portal counts', 'ic_action_data_usage');
+    window.app.addPane('plugin-portalcounts', 'Portal counts', 'data_usage');
     window.addHook('paneChanged', window.plugin.portalcounts.onPaneChanged);
   } else {
     IITC.toolbox.addButton({

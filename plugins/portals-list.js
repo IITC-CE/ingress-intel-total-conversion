@@ -495,7 +495,7 @@ var setup = function () {
   window.plugin.portalslist.filter = 0;
 
   if (window.useAppPanes()) {
-    window.app.addPane('plugin-portalslist', 'Portals list', 'ic_action_paste');
+    window.app.addPane('plugin-portalslist', 'Portals list', 'list');
     window.addHook('paneChanged', window.plugin.portalslist.onPaneChanged);
   } else {
     IITC.toolbox.addButton({

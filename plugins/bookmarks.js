@@ -1416,7 +1416,7 @@ var setup = function () {
     $('body').append(window.plugin.bookmarks.htmlBkmrksBox);
     $('#bookmarksBox').css('display', 'none').addClass('mobile');
 
-    if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'ic_action_star');
+    if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'star');
     window.addHook('paneChanged', window.plugin.bookmarks.onPaneChanged);
   }
   IITC.toolbox.addButton({
