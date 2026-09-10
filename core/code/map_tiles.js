@@ -163,9 +163,10 @@ IITC.map.tiles.tileToLat = function (y, params) {
 };
 
 IITC.map.tiles.pointToTileId = function (params, x, y) {
-  // change to quadkey construction
-  // as of 2014-05-06: zoom_x_y_minlvl_maxlvl_maxhealth
+  // wrap x around the world
+  x = (x + params.tilesPerEdge) % params.tilesPerEdge;
 
+  // as of 2014-05-06: zoom_x_y_minlvl_maxlvl_maxhealth
   return `${params.zoom}_${x}_${y}_${params.level}_8_100`;
 };
 

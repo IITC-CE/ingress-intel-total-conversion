@@ -256,18 +256,12 @@ IITC.map.Request.prototype.refresh = function () {
   // then fetch order isn't optimal, but it won't break things.
   this.queuedTiles = {};
 
-  const bounds = window.clampLatLngBounds(window.map.getBounds());
+  const bounds = window.map.getBounds();
   const mapZoom = window.map.getZoom();
 
   const dataZoom = IITC.map.tiles.getDataZoomForMapZoom(mapZoom);
 
   const tileParams = IITC.map.tiles.getMapZoomParameters(dataZoom);
-
-  // DEBUG: resize the bounds so we only retrieve some data
-  // bounds = bounds.pad(-0.4);
-
-  // var debugrect = new L.Rectangle(bounds,{color: 'red', fill: false, weight: 4, opacity: 0.8}).addTo(map);
-  // setTimeout (function(){ map.removeLayer(debugrect); }, 10*1000);
 
   const x1 = IITC.map.tiles.lngToTile(bounds.getWest(), tileParams);
   const x2 = IITC.map.tiles.lngToTile(bounds.getEast(), tileParams);
@@ -279,8 +273,6 @@ IITC.map.Request.prototype.refresh = function () {
     [IITC.map.tiles.tileToLat(y2 + 1, tileParams), IITC.map.tiles.tileToLng(x1, tileParams)],
     [IITC.map.tiles.tileToLat(y1, tileParams), IITC.map.tiles.tileToLng(x2 + 1, tileParams)],
   ]);
-  // var debugrect2 = new L.Rectangle(dataBounds,{color: 'magenta', fill: false, weight: 4, opacity: 0.8}).addTo(map);
-  // setTimeout (function(){ map.removeLayer(debugrect2); }, 10*1000);
 
   // store the parameters used for fetching the data. used to prevent unneeded refreshes after move/zoom
   this.fetchedDataParams = { bounds: dataBounds, mapZoom: mapZoom, dataZoom: dataZoom };
