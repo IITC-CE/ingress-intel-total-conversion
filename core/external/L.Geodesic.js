@@ -64,6 +64,16 @@
       return [];
     }
 
+
+    // workaround: warpping lngitudes can cause issues with geodesic calculations.
+    // so if the first and last points are on opposite sides of the anti-meridian, 
+    // reverse the array so that the first point is always to the west of the last point
+    const last = latlngs.length-1;
+    if (latlngs[0].lng - latlngs[last].lng> 180) {
+      latlngs.reverse();
+    }
+
+
     // geodesic calculations have issues when crossing the anti-meridian. so offset the points
     // so this isn't an issue, then add back the offset afterwards
     // a center longitude would be ideal - but the start point longitude will be 'good enough'
