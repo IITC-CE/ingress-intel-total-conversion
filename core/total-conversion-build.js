@@ -222,6 +222,9 @@ document.head.innerHTML =
   '<style>' +
   '@include_string:style.css@' +
   '</style>' +
+  '<style>' +
+  '@include_css:icons/icons.css@' +
+  '</style>' +
   // note: smartphone.css injection moved into code/smartphone.js
   '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic-ext,greek-ext,greek,vietnamese,latin-ext,cyrillic"/>';
 
@@ -245,15 +248,9 @@ document.body.innerHTML =
   '    <div id="gamestat">&nbsp;loading global control stats</div>' +
   '    <div id="searchwrapper">' +
   '      <div id="searchbox">' +
-  '        <div id="searchicon"><img src="' +
-  '@include_img:images/icon-search.svg@' +
-  '" alt="Search"/></div>' +
-  '        <div id="searchcancel"><img src="' +
-  '@include_img:images/icon-close-small.svg@' +
-  '" alt="Cancel search"/></div>' +
-  '        <button title="Current location" id="buttongeolocation"><img src="' +
-  '@include_img:images/icon-my-location.svg@' +
-  '" alt="Current location"/></button>' +
+  '        <div id="searchicon"><i class="icon" aria-label="Search" data-fallback="🔍">search</i></div>' +
+  '        <div id="searchcancel"><i class="icon filled" aria-label="Cancel search" data-fallback="✕">cancel</i></div>' +
+  '        <button title="Current location" id="buttongeolocation"><i class="icon" aria-label="Current location" data-fallback="⌖">my_location</i></button>' +
   '        <input id="search" placeholder="Search location…" type="search" accesskey="f" title="Search for a place [f]"/>' +
   '      </div>' +
   '    </div>' +

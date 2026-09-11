@@ -245,7 +245,7 @@ window.plugin.bookmarks.loadList = function (typeList) {
 
     // Create a label and a anchor for the sortable
     var folderDelete =
-      '<span class="folderLabel"><a class="bookmarksRemoveFrom" onclick="window.plugin.bookmarks.removeElement(this, \'folder\');return false;" title="Remove this folder">X</a>';
+      '<span class="folderLabel"><a class="bookmarksRemoveFrom" onclick="window.plugin.bookmarks.removeElement(this, \'folder\');return false;" title="Remove this folder"><i class="icon" aria-label="Remove" data-fallback="X">close</i></a>';
     var folderName =
       '<a class="bookmarksAnchor" onclick="window.plugin.bookmarks.openFolder(this);return false"><span></span>' + folders['label'] + '</a></span>'; // <span><span></span></span>';
     var folderLabel = folderDelete + folderName;
@@ -264,7 +264,7 @@ window.plugin.bookmarks.loadList = function (typeList) {
     var fold = folders['bkmrk'];
     for (var idBkmrk in fold) {
       var btn_link;
-      var btn_remove = `<a class="bookmarksRemoveFrom" onclick="window.plugin.bookmarks.removeElement(this, '${typeList}');return false;" title="Remove from bookmarks">X</a>`;
+      var btn_remove = `<a class="bookmarksRemoveFrom" onclick="window.plugin.bookmarks.removeElement(this, '${typeList}');return false;" title="Remove from bookmarks"><i class="icon" aria-label="Remove" data-fallback="X">close</i></a>`;
 
       var btn_move = '';
       if (window.plugin.bookmarks.isSmart) {
@@ -1267,7 +1267,7 @@ window.plugin.bookmarks.setupPortalsList = function () {
       $(cell).addClass('portal-list-bookmark').attr('data-list-bookmark', guid);
 
       // for some reason, jQuery removes event listeners when the list is sorted. Therefore we use DOM's addEventListener
-      $('<span>')
+      $('<i class="icon">star</i>')
         .appendTo(cell)[0]
         .addEventListener(
           'click',
@@ -1319,7 +1319,7 @@ window.plugin.bookmarks.setupContent = function () {
 
   window.plugin.bookmarks.htmlDisabledMessage = '<div title="Your browser do not support localStorage">Plugin Bookmarks disabled*.</div>';
   window.plugin.bookmarks.htmlStar =
-    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><span></span></a>';
+    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><i class="icon">star</i></a>';
   window.plugin.bookmarks.htmlMoveBtn =
     '<a id="bookmarksMove" class="btn" onclick="window.plugin.bookmarks.moveMode();return false;">Show/Hide "Move" button</a>';
 
@@ -1344,6 +1344,7 @@ window.plugin.bookmarks.initMPE = function () {
   window.plugin.mpe.setMultiProjects({
     namespace: 'bookmarks',
     title: 'Bookmarks for Maps and Portals',
+    icon: 'bookmark',
     fa: 'fa-bookmark',
     defaultKey: 'plugin-bookmarks',
     func_setKey: function (newKey) {
@@ -1415,7 +1416,7 @@ var setup = function () {
     $('body').append(window.plugin.bookmarks.htmlBkmrksBox);
     $('#bookmarksBox').css('display', 'none').addClass('mobile');
 
-    if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'ic_action_star');
+    if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'star');
     window.addHook('paneChanged', window.plugin.bookmarks.onPaneChanged);
   }
   IITC.toolbox.addButton({

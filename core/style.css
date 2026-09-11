@@ -51,14 +51,36 @@ body {
   margin: 0;
 }
 
-/* Material Icons */
-.material-icons {
-  width: 24px;
-  height: 24px;
-}
-
 .icon-button {
   cursor: pointer;
+}
+
+/* Icons drawn as generated content have no accessible label, so each falls back
+   to the character it replaced; the layers control instead uncovers the
+   background image of external/leaflet.css */
+body.icons-unavailable #searchwrapper h3::before,
+body.icons-unavailable #chatcontrols .toggle::before {
+  content: "▲";
+}
+
+body.icons-unavailable #chatcontrols.expand .toggle::before {
+  content: "▼";
+}
+
+body.icons-unavailable .ui-tabs-nav .ui-icon-close::before {
+  content: "×";
+}
+
+body.icons-unavailable #sidebartoggle .open::before {
+  content: "◀";
+}
+
+body.icons-unavailable #sidebartoggle .close::before {
+  content: "▶";
+}
+
+body.icons-unavailable .leaflet-control-layers-toggle::before {
+  content: "";
 }
 
 i.tiny { font-size: 1rem; }
@@ -94,8 +116,9 @@ i.large { font-size: 6rem; }
 
 #sidebartoggle {
   display: block;
-  padding: 20px 5px;
+  padding: 20px 0;
   margin-top: -31px; /* -(toggle height / 2) */
+  width: 20px;
   line-height: 10px;
   position: absolute;
   top: calc(var(--safe-area-inset-top) + 108px);
@@ -233,8 +256,8 @@ body.sidebar-open .leaflet-right {
 
 .toggle {
   display: block;
-  height: 0;
-  width: 0;
+  font-family: 'IITC Material Symbols';
+  line-height: 1;
 }
 
 /* field mu count */
@@ -295,15 +318,16 @@ body.sidebar-open .leaflet-right {
 
 
 #chatcontrols .toggle {
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: 10px solid #FFCE00;
-  margin: 6px auto auto;
+  font-size: 20px;
+  line-height: 24px;
 }
 
-#chatcontrols.expand .toggle {
-  border-top: 10px solid #FFCE00;
-  border-bottom: none;
+#chatcontrols .toggle::before {
+  content: "expand_less";
+}
+
+#chatcontrols.expand .toggle::before {
+  content: "expand_more";
 }
 
 #chatcontrols .loading {
@@ -515,16 +539,15 @@ mark {
 
 
 #sidebartoggle .toggle {
-  border-bottom: 10px solid transparent;
-  border-top: 10px solid transparent;
+  font-size: 20px;
 }
 
-#sidebartoggle .open {
-  border-right: 10px solid #FFCE00;
+#sidebartoggle .open::before {
+  content: "chevron_left";
 }
 
-#sidebartoggle .close {
-  border-left: 10px solid #FFCE00;
+#sidebartoggle .close::before {
+  content: "chevron_right";
 }
 
 /* player stats */
@@ -634,6 +657,7 @@ input[type="search"], input[type="url"] {
 }
 #searchicon, #searchcancel, #buttongeolocation {
   display: flex;
+  color: #BBBBBB;
   align-items: center;
   position: absolute;
   margin: 0;
@@ -642,8 +666,11 @@ input[type="search"], input[type="url"] {
   height: 24px;
   background-color: transparent;
 }
-#searchicon img, #searchcancel img, #buttongeolocation img {
-  height: 20px;
+#searchicon .icon, #buttongeolocation .icon {
+  font-size: 20px;
+}
+#searchcancel .icon {
+  font-size: 18px;
 }
 #searchicon {
   left: 0;
@@ -671,7 +698,7 @@ input[type="search"], input[type="url"] {
   overflow-y: auto;
 }
 #searchwrapper h3 {
-  padding: 0 0 0 25px;
+  padding: 0 0 0 23px;
   position: relative;
   font-size: 1em;
   height: auto;
@@ -679,11 +706,12 @@ input[type="search"], input[type="url"] {
 }
 #searchwrapper h3::before {
   position: absolute;
-  left: 5px;
+  left: 4px;
   font-size: 14px;
   margin-right: 2px;
   font-weight: normal;
-  content: "▲";
+  font-family: 'IITC Material Symbols';
+  content: "expand_less";
   transition: transform 0.3s ease;
 }
 #searchwrapper .searchquery.collapsed h3::before {
@@ -743,6 +771,10 @@ input[type="search"], input[type="url"] {
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
+}
+
+#portaltitle .icon {
+  font-size: 24px;
 }
 
 #portaltitle .close {
@@ -960,6 +992,12 @@ input[type="search"], input[type="url"] {
   margin-right: 5px;
   white-space: nowrap;
   display: inline-block;
+}
+
+#toolbox_component > a > .icon {
+  margin-top: -2px;
+  margin-right: 2px;
+  font-size: 1em;
 }
 
 /* a common portal display takes this much space (prevents moving
@@ -1316,6 +1354,26 @@ td + td {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M3.5 9h11' stroke='black' stroke-width='2.2' fill='none'/%3E%3C/svg%3E");
 }
 
+/* The bundled font replaces the layers.png of external/leaflet.css, which stays
+   in place for the browsers that refuse it */
+body:not(.icons-unavailable) .leaflet-control-layers-toggle,
+body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
+  background-image: none;
+}
+
+.leaflet-control-layers-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaflet-control-layers-toggle::before {
+  font-family: 'IITC Material Symbols';
+  content: "layers";
+  font-size: 28px;
+  color: #454545;
+}
+
 
 .portal_details th, .portal_details td {
   vertical-align: top;
@@ -1533,7 +1591,8 @@ g.checkpoint:hover circle {
 	width: 16px;
 }
 .ui-tabs-nav .ui-icon-close::before {
-	content: "×";
+	font-family: 'IITC Material Symbols';
+	content: "close";
 	font-size: 16px;
 	height: 16px;
 	position: absolute;
@@ -1542,10 +1601,6 @@ g.checkpoint:hover circle {
 	vertical-align: baseline;
 	width: 16px;
 	cursor: pointer;
-}
-
-svg.icon-button {
-	fill: currentColor;
 }
 
 .leaflet-marker-icon > svg {

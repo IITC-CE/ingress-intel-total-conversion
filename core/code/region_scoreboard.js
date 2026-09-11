@@ -453,7 +453,7 @@ window.RegionScoreboardSetup = (function () {
 
   return function setup() {
     if (window.useAppPanes()) {
-      window.app.addPane('regionScoreboard', 'Region scores', 'ic_action_view_as_list');
+      window.app.addPane('regionScoreboard', 'Region scores', 'leaderboard');
       window.addHook('paneChanged', function (pane) {
         if (pane === 'regionScoreboard') {
           showDialog();

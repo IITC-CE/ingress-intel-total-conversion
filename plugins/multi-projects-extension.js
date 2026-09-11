@@ -131,6 +131,9 @@ window.plugin.mpe.data.isInManager = function (PJ) {
 window.plugin.mpe.data.getFaClass = function (PJ) {
   return window.plugin.mpe.obj.projects[PJ].fa;
 };
+window.plugin.mpe.data.getIcon = function (PJ) {
+  return window.plugin.mpe.obj.projects[PJ].icon;
+};
 window.plugin.mpe.data.getTitle = function (PJ) {
   return window.plugin.mpe.obj.projects[PJ].title;
 };
@@ -194,13 +197,8 @@ window.plugin.mpe.getHTML.projectOptions = function (PJ) {
 window.plugin.mpe.getHTML.project = function (PJ) {
   var PROJ = window.plugin.mpe.obj.projects[PJ];
   var listElem = '';
-  var txtNew = '+';
-  var txtDel = 'X';
-
-  if (window.plugin.faIcon) {
-    txtNew = '<i class="fa fa-plus"></i>';
-    txtDel = '<i class="fa fa-trash"></i>';
-  }
+  var txtNew = '<i class="icon" aria-label="New" data-fallback="+">add</i>';
+  var txtDel = '<i class="icon" aria-label="Delete" data-fallback="X">delete</i>';
 
   listElem += `<div class="mpe manager ${PJ} list-group-item" data-mpe="${PJ}">`;
   listElem += `<h4>${PROJ.title}</h4>`;
@@ -273,7 +271,7 @@ window.plugin.mpe.ui.addControl = function () {
     label: 'MultiProjects',
     action: window.plugin.mpe.dialog.openMain,
     class: 'list-group-item',
-    icon: 'fa-files-o',
+    icon: 'folder_copy',
   });
 };
 window.plugin.mpe.ui.appendContainerInSidebar = function () {
@@ -378,14 +376,19 @@ window.plugin.mpe.ui.toggleSidebar = function (PJ) {
 function getProjectIcon(PJ) {
   var title = window.plugin.mpe.data.getTitle(PJ);
 
+  var icon = window.plugin.mpe.data.getIcon(PJ);
+  if (icon.length !== 0) {
+    return '<i class="left icon" title="' + title + '">' + icon + '</i>';
+  }
+
   if (window.plugin.faIcon) {
     var fa = window.plugin.mpe.data.getFaClass(PJ);
     fa = fa.length !== 0 ? fa : 'nofa';
     return '<i class="left fa ' + fa + '" title="' + title + '"></i>';
-  } else {
-    var short = title ? title.substr(0, 3) : 'n/a';
-    return '<i class="left fa" title="' + title + '">' + short + '</i>';
   }
+
+  var short = title ? title.substr(0, 3) : 'n/a';
+  return '<i class="left fa" title="' + title + '">' + short + '</i>';
 }
 
 window.plugin.mpe.ui.toggleManager = function (PJ) {
@@ -485,6 +488,9 @@ window.plugin.mpe.setMultiProjects = function (settings) {
     if (!settings.title) {
       settings.title = 'Untitled';
     }
+    if (!settings.icon) {
+      settings.icon = '';
+    }
     if (!settings.fa) {
       settings.fa = '';
     }
@@ -495,6 +501,7 @@ window.plugin.mpe.setMultiProjects = function (settings) {
     var newMPE = {
       namespace: settings.namespace,
       title: settings.title,
+      icon: settings.icon,
       fa: settings.fa,
       defaultKey: settings.defaultKey,
       currKey: settings.defaultKey,
@@ -519,7 +526,7 @@ window.plugin.mpe.setupCSS = function () {
         '.mpe .left{float:left;}' +
         '.mpe .right{float:right;}' +
         '.mpe .clear{clear:both;}' +
-        '.mpe .fa{line-height:20px;}' +
+        '.mpe .fa, .mpe .icon{line-height:19px;}' +
         '.ui-dialog .mpe{width:90%;margin:8px auto 8px;}' +
         '.mpe h4{margin:0 0 4px;font-size:15px;font-style:italic;}' +
         '.mpe select, .mpe a{border:1px solid #ffce00;padding:1px 4px 2px;background:rgba(8,48,78,.9);height:23px;color:#ffce00;}' +
@@ -532,7 +539,7 @@ window.plugin.mpe.setupCSS = function () {
         '#sidebar .mpeSidebar{}' +
         '#sidebar .mpeSidebar .mpe{width:100%;padding:3px 4px;}' +
         '#sidebar .mpeSidebar .mpe h4{display:none;}' +
-        '#sidebar .mpeSidebar .mpe > .fa{color:#ccc;width:8%;height:23px;margin-right:1%}' +
+        '#sidebar .mpeSidebar .mpe > .fa, #sidebar .mpeSidebar .mpe > .icon{color:#ccc;width:8%;height:23px;margin-right:1%;line-height: 22px;}' +
         "#sidebar .mpeSidebar .mpe > .fa.nofa:before{content:'\0';}" +
         '#sidebar .mpeSidebar .mpe a{}' +
         '#sidebar .mpeSidebar .mpe select{width:63%;}'

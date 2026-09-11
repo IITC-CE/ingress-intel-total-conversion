@@ -968,6 +968,8 @@ window.plugin.drawTools.initMPE = function () {
   window.plugin.mpe.setMultiProjects({
     namespace: 'drawTools',
     title: 'Draw Tools Layer',
+    // Material Symbols ligature name
+    icon: 'edit',
     // Font awesome css class
     fa: 'fa-pencil',
     // Function to change a localstorage key
