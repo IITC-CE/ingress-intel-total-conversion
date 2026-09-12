@@ -350,7 +350,7 @@ IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE
     ],
   ];
 
-  this.createPortalEntity(ent, 'core'); // placeholder
+  this.createPortalEntity(ent, 'core', 0); // placeholder
 };
 
 /**
@@ -362,14 +362,13 @@ IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE
  * @param {Array} ent - An array representing the game entity.
  * @param {string} details - Detail level expected in {@link window.decodeArray.portal} (e.g., 'core', 'summary').
  */
-IITC.map.Renderer.prototype.createPortalEntity = function (ent, details, lngE6_delta = 0) {
+IITC.map.Renderer.prototype.createPortalEntity = function (ent, details, lngE6_delta) {
   this.seenPortalsGuid[ent[0]] = true; // flag we've seen it
 
   let previousData = undefined;
 
   const data = window.decodeArray.portal(ent[2], details);
   const guid = ent[0];
-  data.lngE6 += lngE6_delta;
 
   // add missing fields
   data.guid = guid;
@@ -402,6 +401,12 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details, lngE6_d
     previousData = structuredClone(p.getDetails());
   }
 
+  // Wrap portal
+  if (lngE6_delta === undefined) {
+    const centerLng = window.map.getCenter().lng;
+    lngE6_delta = Math.round((centerLng * 1e6 - data.lngE6) / (360 * 1e6)) * 360 * 1e6;
+  }
+  data.lngE6 += lngE6_delta;
   const latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
   let marker = undefined;
