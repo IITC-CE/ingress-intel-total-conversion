@@ -8,6 +8,15 @@
  */
 IITC.map.Renderer = function () {
   this.portalMarkerScale = undefined;
+
+  // watch for antimeridian switch
+  this.lastMapCenterLng = window.map.getCenter().lng;
+  window.map.on('move', () => {
+    const centerLng = window.map.getCenter().lng;
+    const delta = Math.round((centerLng - this.lastMapCenterLng) / 360) * 360;
+    this.lastMapCenterLng = centerLng;
+    if (delta !== 0) this.onAntiMeridianCrossed(delta);
+  });
 };
 
 /**
@@ -160,7 +169,7 @@ IITC.map.Renderer.prototype.processDeletedGameEntityGuids = function (deleted) {
  * @param {Array} entities - Array of game entities.
  * @param {string} details - Details for the {@link window.decodeArray.portal} function.
  */
-IITC.map.Renderer.prototype.processGameEntities = function (entities, details) {
+IITC.map.Renderer.prototype.processGameEntities = function (entities, details, lngE6_delta) {
   // details expected in decodeArray.portal
 
   // we loop through the entities three times - for fields, links and portals separately
@@ -168,19 +177,19 @@ IITC.map.Renderer.prototype.processGameEntities = function (entities, details) {
 
   for (const ent of entities) {
     if (ent[2][0] === 'r' && !(ent[0] in this.deletedGuid)) {
-      this.createFieldEntity(ent);
+      this.createFieldEntity(ent, lngE6_delta);
     }
   }
 
   for (const ent of entities) {
     if (ent[2][0] === 'e' && !(ent[0] in this.deletedGuid)) {
-      this.createLinkEntity(ent);
+      this.createLinkEntity(ent, lngE6_delta);
     }
   }
 
   for (const ent of entities) {
     if (ent[2][0] === 'p' && !(ent[0] in this.deletedGuid)) {
-      this.createPortalEntity(ent, details);
+      this.createPortalEntity(ent, details, lngE6_delta);
     }
   }
 };
@@ -341,7 +350,7 @@ IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE
     ],
   ];
 
-  this.createPortalEntity(ent, 'core'); // placeholder
+  this.createPortalEntity(ent, 'core', 0); // placeholder
 };
 
 /**
@@ -353,7 +362,7 @@ IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE
  * @param {Array} ent - An array representing the game entity.
  * @param {string} details - Detail level expected in {@link window.decodeArray.portal} (e.g., 'core', 'summary').
  */
-IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
+IITC.map.Renderer.prototype.createPortalEntity = function (ent, details, lngE6_delta) {
   this.seenPortalsGuid[ent[0]] = true; // flag we've seen it
 
   let previousData = undefined;
@@ -392,6 +401,12 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
     previousData = structuredClone(p.getDetails());
   }
 
+  // Wrap portal
+  if (lngE6_delta === undefined) {
+    const centerLng = window.map.getCenter().lng;
+    lngE6_delta = Math.round((centerLng * 1e6 - data.lngE6) / (360 * 1e6)) * 360 * 1e6;
+  }
+  data.lngE6 += lngE6_delta;
   const latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
 
   let marker = undefined;
@@ -443,7 +458,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
  * @memberof IITC.map.Renderer
  * @param {Array} ent - An array representing the game entity.
  */
-IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
+IITC.map.Renderer.prototype.createFieldEntity = function (ent, lngE6_delta) {
   this.seenFieldsGuid[ent[0]] = true; // flag we've seen it
 
   const data = {
@@ -451,7 +466,7 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
     timestamp: ent[1],
     team: ent[2][1],
     points: ent[2][2].map(function (arr) {
-      return { guid: arr[0], latE6: arr[1], lngE6: arr[2] };
+      return { guid: arr[0], latE6: arr[1], lngE6: arr[2] + lngE6_delta };
     }),
   };
 
@@ -510,7 +525,7 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
  * @memberof IITC.map.Renderer
  * @param {Array} ent - An array representing the game entity.
  */
-IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
+IITC.map.Renderer.prototype.createLinkEntity = function (ent, lngE6_delta) {
   // Niantic have been faking link entities, based on data from fields
   // these faked links are sent along with the real portal links, causing duplicates
   // the faked ones all have longer GUIDs, based on the field GUID (with _ab, _ac, _bc appended)
@@ -525,10 +540,10 @@ IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
     team: ent[2][1],
     oGuid: ent[2][2],
     oLatE6: ent[2][3],
-    oLngE6: ent[2][4],
+    oLngE6: ent[2][4] + lngE6_delta,
     dGuid: ent[2][5],
     dLatE6: ent[2][6],
-    dLngE6: ent[2][7],
+    dLngE6: ent[2][7] + lngE6_delta,
   };
 
   // create placeholder entities for link start and end points (before checking if the link itself already exists
@@ -608,6 +623,44 @@ IITC.map.Renderer.prototype.addPortalToMapLayer = function (portal) {
 IITC.map.Renderer.prototype.removePortalFromMapLayer = function (portal) {
   // remove it from the portalsLevels layer
   portal.remove();
+};
+
+/**
+ * Removes a portal from the visible map layer.
+ *
+ * @function
+ * @memberof IITC.map.Renderer
+ * @param {Object} portal - The portal object to remove from the map layer.
+ */
+IITC.map.Renderer.prototype.onAntiMeridianCrossed = function (offset) {
+  const offsetE6 = offset * 1e6;
+
+  console.log(`Render: antimeridian crossed, offsetting all entities by ${offset} degrees`);
+
+  for (const guid in window.portals) {
+    const portal = window.portals[guid];
+    const latlng = portal.getLatLng();
+    latlng.lng += offset;
+    portal.setLatLng(latlng);
+    portal.options.data.lngE6 += offsetE6;
+  }
+
+  for (const guid in window.links) {
+    const link = window.links[guid];
+    const latlngs = link.getLatLngs();
+    latlngs.forEach((pos) => (pos.lng += offset));
+    link.setLatLngs(latlngs);
+    link.options.data.oLngE6 += offsetE6;
+    link.options.data.dLngE6 += offsetE6;
+  }
+
+  for (const guid in window.fields) {
+    const field = window.fields[guid];
+    const latlngs = field.getLatLngs();
+    latlngs.forEach((pos) => (pos.lng += offset));
+    field.setLatLngs(latlngs);
+    field.options.data.points.forEach((point) => (point.lngE6 += offsetE6));
+  }
 };
 
 IITC.registerLegacyAliases(IITC.map, {
