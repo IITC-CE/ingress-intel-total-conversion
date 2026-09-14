@@ -1,12 +1,13 @@
 // @author         xelio
 // @name           Keys
 // @category       Misc
-// @version        0.4.3
+// @version        0.4.4
 // @description    Allow manual entry of key counts for each portal. Use the 'keys-on-map' plugin to show the numbers on the map, and 'sync' to share between multiple browsers or desktop/mobile.
 
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  { version: '0.4.4', changes: ['Register with the Sync plugin regardless of plugin load order'] },
   {
     version: '0.4.3',
     changes: ['Refactoring: fix eslint'],
@@ -101,9 +102,12 @@ window.plugin.keys.syncNow = function () {
   window.plugin.sync.updateMap('keys', 'keys', Object.keys(window.plugin.keys.updatingQueue));
 };
 
-// Call after IITC and all plugin loaded
-window.plugin.keys.registerFieldForSyncing = function () {
-  if (!window.plugin.sync) return;
+window.plugin.keys.registerFieldForSyncing = () => {
+  // sync may not be loaded yet, and fires this hook once it is
+  if (!window.plugin.sync) {
+    window.addHook('pluginSyncReady', window.plugin.keys.registerFieldForSyncing);
+    return;
+  }
   window.plugin.sync.registerMapForSync('keys', 'keys', window.plugin.keys.syncCallback, window.plugin.keys.syncInitialed);
 };
 

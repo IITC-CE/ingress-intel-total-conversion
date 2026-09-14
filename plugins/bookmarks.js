@@ -1,13 +1,14 @@
 // @author         ZasoGD
 // @name           Bookmarks for maps and portals
 // @category       Controls
-// @version        0.4.7
+// @version        0.4.8
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync. Supports Multi-Project-Extension
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.4.8', changes: ['Register with the Sync plugin regardless of plugin load order'] },
   { version: '0.4.7', changes: ['Fix data reset issue'] },
   {
     version: '0.4.6',
@@ -1064,9 +1065,12 @@ window.plugin.bookmarks.syncNow = function () {
   window.plugin.sync.updateMap('bookmarks', window.plugin.bookmarks.KEY.field, Object.keys(window.plugin.bookmarks.updatingQueue));
 };
 
-// Call after IITC and all plugin loaded
-window.plugin.bookmarks.registerFieldForSyncing = function () {
-  if (!window.plugin.sync) return;
+window.plugin.bookmarks.registerFieldForSyncing = () => {
+  // sync may not be loaded yet, and fires this hook once it is
+  if (!window.plugin.sync) {
+    window.addHook('pluginSyncReady', window.plugin.bookmarks.registerFieldForSyncing);
+    return;
+  }
   window.plugin.sync.registerMapForSync(
     'bookmarks',
     window.plugin.bookmarks.KEY.field,
@@ -1381,7 +1385,7 @@ window.plugin.bookmarks.initMPE = function () {
 /** ************************************************************************************************************************************************************/
 
 var setup = function () {
-  window.plugin.bookmarks.isSmart = window.isSmartphone();
+  window.plugin.bookmarks.isSmart = IITC.utils.isSmartphone();
 
   // HOOKS:
   // - pluginBkmrksEdit:    fired when a bookmarks/folder is removed, added or sorted,

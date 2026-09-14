@@ -281,7 +281,7 @@ function boot() {
   if (window.deviceID) {
     log.log('Your device ID: ' + window.deviceID);
   }
-  window.runOnSmartphonesBeforeBoot();
+  IITC.smartphone._runBeforeBoot();
   window.runOnAppBeforeBoot();
 
   var loadPlugins = prepPluginsToLoad();
@@ -292,13 +292,13 @@ function boot() {
   setupIngressMarkers();
   window.extractFromStock();
   window.setupIdle();
-  window.setupDataTileParams();
-  window.setupMap();
+  IITC.map.tiles.setupParams();
+  IITC.map.setup();
   window.setupOMS();
   window.ornaments.setup();
   window.layerChooser._lastPriority = 1000; // plugins overlays have priority >1000
   window.setupTooltips();
-  window.chat.setup();
+  IITC.chat.setup();
   window.updateGameScore();
   window.search.setup();
   IITC.portal.details.setup();
@@ -308,7 +308,7 @@ function boot() {
 
   loadPlugins();
 
-  window.runOnSmartphonesAfterBoot();
+  IITC.smartphone._runAfterBoot();
   window.runOnAppAfterBoot();
 
   // workaround for #129. Not sure why this is required.
@@ -341,6 +341,8 @@ try {
 
   // eslint-disable-next-line
   '@include_raw:external/jquery-4.0.0.min.js@';
+  // eslint-disable-next-line
+  '@include_raw:external/jquery-migrate-4.0.2.js@';
   // eslint-disable-next-line
   '@include_raw:external/jquery-ui-1.14.2.min.js@';
   // eslint-disable-next-line

@@ -208,7 +208,7 @@ window.plugin.portalcounts.getPortals = function () {
     counts += '<p>No Portals in range!</p>';
   }
 
-  if (!window.getDataZoomTileParameters().hasPortals) {
+  if (!IITC.map.tiles.getDataZoomParameters().hasPortals) {
     counts += '<p class="help"><b>Warning</b>: Portal counts is inaccurate when zoomed to link-level</p>';
   }
 
@@ -232,7 +232,7 @@ window.plugin.portalcounts.getPortals = function () {
   if (window.plugin.portalcounts.nozeroes) {
     $('#portalcounts').addClass('nozeroes');
   }
-  $('#portalcounts svg').click(function () {
+  $('#portalcounts svg').on('click', function () {
     $('#portalcounts').toggleClass('nozeroes');
   });
 };

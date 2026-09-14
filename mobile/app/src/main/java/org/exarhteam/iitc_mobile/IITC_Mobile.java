@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Build;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -128,6 +129,7 @@ public class IITC_Mobile extends AppCompatActivity
     private final Stack<Pane> mBackStack = new Stack<IITC_NavigationHelper.Pane>();
     private Pane mCurrentPane = Pane.MAP;
     private boolean mBackButtonPressed = false;
+    private OnBackPressedCallback mBackPressedCallback;
 
     // Setup receiver to detect if Samsung DeX mode has been changed
 	private final BroadcastReceiver mDesktopModeReceiver = new BroadcastReceiver() {
@@ -182,7 +184,7 @@ public class IITC_Mobile extends AppCompatActivity
             version = version.substring(0, dashIndex);
         }
         final String iitcMobileUA = "IITC-Mobile/" + version + " (https://github.com/IITC-CE/ingress-intel-total-conversion)";
-        
+
         mAllowedHostnames.put("intel.ingress.com", mIITCDefaultUA);
         mAllowedHostnames.put("google.com", googleUA);
         mAllowedHostnames.put("youtube.com", googleUA);
@@ -205,6 +207,14 @@ public class IITC_Mobile extends AppCompatActivity
 
         // Setup window insets for edge-to-edge display
         WindowInsetsHelper.setupMainActivityInsets(this);
+
+        mBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                handleBackPressed();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, mBackPressedCallback);
 
         debugScrollButton = findViewById(R.id.debugScrollButton);
 
@@ -390,11 +400,11 @@ public class IITC_Mobile extends AppCompatActivity
             final int mode = Integer.parseInt(mSharedPrefs.getString("pref_user_location_mode", "0"));
             if (mUserLocation.setLocationMode(mode))
                 mReloadNeeded = true;
-            
+
             // Sync plugin checkbox state with location mode preference
             boolean shouldBeEnabled = mode != 0;
             boolean isCurrentlyEnabled = mSharedPrefs.getBoolean("user-location.user.js", false);
-            
+
             if (shouldBeEnabled != isCurrentlyEnabled) {
                 SharedPreferences.Editor editor = mSharedPrefs.edit();
                 editor.putBoolean("user-location.user.js", shouldBeEnabled);
@@ -405,7 +415,7 @@ public class IITC_Mobile extends AppCompatActivity
             // Sync location mode preference when user-location plugin checkbox changes
             boolean pluginEnabled = sharedPreferences.getBoolean(key, false);
             String currentMode = mSharedPrefs.getString("pref_user_location_mode", "0");
-            
+
             if (pluginEnabled && "0".equals(currentMode)) {
                 // Enable location mode when plugin is enabled (default to show position)
                 SharedPreferences.Editor editor = mSharedPrefs.edit();
@@ -490,8 +500,10 @@ public class IITC_Mobile extends AppCompatActivity
     // handles ingress intel url intents, search intents, geo intents and javascript file intents
     private void handleIntent(final Intent intent, final boolean onCreate) {
         final String action = intent.getAction();
-        if (Intent.ACTION_VIEW.equals(action)) {
-            final Uri uri = intent.getData();
+        final Uri uri = intent.getData();
+        final boolean hasViewUri = Intent.ACTION_VIEW.equals(action) && uri != null && uri.getScheme() != null;
+
+        if (hasViewUri) {
             Log.d("intent received url: " + uri.toString());
 
             if (uri.getScheme().equals("http") || uri.getScheme().equals("https")) {
@@ -502,7 +514,7 @@ public class IITC_Mobile extends AppCompatActivity
                     return;
                 }
             }
-            
+
             if (uri.getScheme().equals("iitc")) {
                 // Convert iitc:// scheme to https://intel.ingress.com/ URL
                 String convertedUrl = mIntelUrl + uri.getSchemeSpecificPart();
@@ -632,13 +644,6 @@ public class IITC_Mobile extends AppCompatActivity
         if (mReloadNeeded) {
             Log.d("preference had changed...reload needed");
             reloadIITC();
-        } else {
-            // iitc is not fully booted...timer will be reset by the script itself
-            if (findViewById(R.id.imageLoading).getVisibility() == View.GONE) {
-                // enough idle...let's do some work
-                Log.d("resuming...reset idleTimer");
-                mIitcWebView.loadJS("(function(){if(window.idleReset) window.idleReset();})();");
-            }
         }
 
         mUserLocation.onStart();
@@ -720,8 +725,7 @@ public class IITC_Mobile extends AppCompatActivity
     }
 
     // we want a self defined behavior for the back button
-    @Override
-    public void onBackPressed() {
+    private void handleBackPressed() {
         // exit fullscreen mode if it is enabled and action bar is disabled or the back stack is empty
         if (mIitcWebView.isInFullscreen() && mBackStack.isEmpty()) {
             mIitcWebView.toggleFullscreen();
@@ -752,7 +756,11 @@ public class IITC_Mobile extends AppCompatActivity
         }
 
         if (mBackButtonPressed || !mSharedPrefs.getBoolean("pref_press_twice_to_exit", false)) {
-            super.onBackPressed();
+            // let the system handle this press, then take the events over again:
+            // back on the task root sends the app to the background without destroying it
+            mBackPressedCallback.setEnabled(false);
+            getOnBackPressedDispatcher().onBackPressed();
+            mBackPressedCallback.setEnabled(true);
         } else {
             mBackButtonPressed = true;
             Toast.makeText(this, getString(R.string.toast_press_twice_to_exit), Toast.LENGTH_SHORT).show();
@@ -1118,7 +1126,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     private void updateViews() {
         boolean wasDebugging = mViewDebug.getVisibility() == View.VISIBLE;
-        
+
         if (!mDebugging) {
             mViewDebug.setVisibility(View.GONE);
             mLayoutDebug.setVisibility(View.GONE);
@@ -1152,7 +1160,7 @@ public class IITC_Mobile extends AppCompatActivity
                 mLayoutDebug.setVisibility(View.VISIBLE);
             }
         }
-        
+
         // Update safe area insets when debug mode changes
         if (wasDebugging != mDebugging) {
             mIitcWebView.applySafeAreaInsets();

@@ -385,7 +385,7 @@ machinaTools.onPortalDetailsUpdated = function (data) {
  * does not factor in other tools that adjust display capabilities.
  */
 machinaTools.zoomLevelHasPortals = function () {
-  return window.getDataZoomTileParameters().hasPortals;
+  return IITC.map.tiles.getDataZoomParameters().hasPortals;
 };
 
 machinaTools.updateConflictArea = function () {
@@ -745,7 +745,7 @@ machinaTools.refreshLinkLengths = function () {
       $('<div>', { class: 'warning', title: 'Data incomplete - some origin portals not loaded' }).text('🔴').appendTo(html);
     }
 
-    if (window.isSmartphone()) {
+    if (IITC.utils.isSmartphone()) {
       html.addClass('mobile');
       var LinksView = L.Control.extend({
         options: { position: 'topright' },

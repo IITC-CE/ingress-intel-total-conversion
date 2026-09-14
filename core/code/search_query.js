@@ -252,7 +252,7 @@ class Query {
     result.layer = this.resultLayer(result);
 
     if (result.layer) window.map.addLayer(result.layer);
-    if (window.isSmartphone()) window.show('map');
+    if (IITC.utils.isSmartphone()) window.show('map');
   }
 
   /**

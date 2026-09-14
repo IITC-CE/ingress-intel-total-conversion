@@ -1,4 +1,4 @@
-import { describe, it, before, beforeEach } from 'mocha';
+import { describe, it, before, after, beforeEach } from 'mocha';
 import { expect } from 'chai';
 
 /* global IITC */
@@ -568,14 +568,7 @@ describe('IITC.utils.genFourColumnTable', () => {
   it('should generate a single row with two data cells for one block', () => {
     const blocks = [['Header1', 'Data1', 'Tooltip1']];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
-      `<tr>` +
-      `<td title="Tooltip1">Data1</td>` +
-      `<th title="Tooltip1">Header1</th>` +
-      `<td></td>` +
-      `<td></td>` +
-      `</tr>`;
+    const check = `<tr><td title="Tooltip1">Data1</td><th title="Tooltip1">Header1</th><td></td><td></td></tr>`;
     expect(result).to.equal(check);
   });
 
@@ -585,8 +578,8 @@ describe('IITC.utils.genFourColumnTable', () => {
       ['Header2', 'Data2', 'Tooltip2'],
     ];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
+    const check =
+      `` +
       `<tr>` +
       `<td title="Tooltip1">Data1</td>` +
       `<th title="Tooltip1">Header1</th>` +
@@ -603,8 +596,8 @@ describe('IITC.utils.genFourColumnTable', () => {
       ['Header3', 'Data3', 'Tooltip3'],
     ];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
+    const check =
+      `` +
       `<tr>` +
       `<td title="Tooltip1">Data1</td>` +
       `<th title="Tooltip1">Header1</th>` +
@@ -626,14 +619,7 @@ describe('IITC.utils.genFourColumnTable', () => {
       ['Header2', 'Data2'],
     ];
     const result = IITC.utils.genFourColumnTable(blocks);
-    /* eslint-disable-next-line */
-    const check = `` +
-      `<tr>` +
-      `<td>Data1</td>` +
-      `<th>Header1</th>` +
-      `<th>Header2</th>` +
-      `<td>Data2</td>` +
-      `</tr>`;
+    const check = `<tr><td>Data1</td><th>Header1</th><th>Header2</th><td>Data2</td></tr>`;
     expect(result).to.equal(check);
   });
 });
@@ -648,15 +634,14 @@ describe('IITC.utils.textToTable', () => {
   it('should create a table with one row and two columns for a single tab-separated line', () => {
     const text = 'Cell1\tCell2';
     const result = IITC.utils.textToTable(text);
-    const check = `<table>` + `<tr><td>Cell1</td><td>Cell2</td></tr>` + `</table>`;
+    const check = `<table><tr><td>Cell1</td><td>Cell2</td></tr></table>`;
     expect(result).to.equal(check);
   });
 
   it('should create a table with multiple rows and columns for text with multiple lines and tabs', () => {
     const text = 'R1C1\tR1C2\nR2C1\tR2C2\nR3C1\tR3C2';
     const result = IITC.utils.textToTable(text);
-    const check =
-      `<table>` + `<tr><td>R1C1</td><td>R1C2</td></tr>` + `<tr><td>R2C1</td><td>R2C2</td></tr>` + `<tr><td>R3C1</td><td>R3C2</td></tr>` + `</table>`;
+    const check = `<table><tr><td>R1C1</td><td>R1C2</td></tr><tr><td>R2C1</td><td>R2C2</td></tr><tr><td>R3C1</td><td>R3C2</td></tr></table>`;
     expect(result).to.equal(check);
   });
 
@@ -681,7 +666,7 @@ describe('IITC.utils.textToTable', () => {
   it('should escape HTML special characters within cells', () => {
     const text = 'Cell1\tCell<2>\nCell&3\tCell"4"';
     const result = IITC.utils.textToTable(text);
-    const check = `<table>` + `<tr><td>Cell1</td><td>Cell&lt;2&gt;</td></tr>` + `<tr><td>Cell&amp;3</td><td>Cell&quot;4&quot;</td></tr>` + `</table>`;
+    const check = `<table><tr><td>Cell1</td><td>Cell&lt;2&gt;</td></tr><tr><td>Cell&amp;3</td><td>Cell&quot;4&quot;</td></tr></table>`;
     expect(result).to.equal(check);
   });
 });
@@ -791,5 +776,144 @@ describe('IITC.utils.getTeamId', () => {
       expect(IITC.utils.getTeamId(true)).to.equal(window.TEAM_NONE);
       expect(IITC.utils.getTeamId([])).to.equal(window.TEAM_NONE);
     });
+  });
+});
+
+describe('IITC.utils._isVisible', () => {
+  it('returns false for a null or missing element', () => {
+    expect(IITC.utils._isVisible(null)).to.be.false;
+    expect(IITC.utils._isVisible(undefined)).to.be.false;
+  });
+
+  it('returns false for an element that occupies no layout space', () => {
+    const el = document.createElement('div');
+    expect(IITC.utils._isVisible(el)).to.be.false;
+  });
+
+  it('returns true when the element has a non-zero offset width', () => {
+    const el = document.createElement('div');
+    Object.defineProperty(el, 'offsetWidth', { value: 100, configurable: true });
+    expect(IITC.utils._isVisible(el)).to.be.true;
+  });
+
+  it('returns true when the element has a non-zero offset height', () => {
+    const el = document.createElement('div');
+    Object.defineProperty(el, 'offsetHeight', { value: 20, configurable: true });
+    expect(IITC.utils._isVisible(el)).to.be.true;
+  });
+
+  it('returns true when the element reports client rects', () => {
+    const el = document.createElement('div');
+    el.getClientRects = () => [{ width: 10, height: 10 }];
+    expect(IITC.utils._isVisible(el)).to.be.true;
+  });
+});
+
+// navigator is a getter-only own property of globalThis in Node, so swap the whole object
+const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+
+function setUserAgent(userAgent) {
+  Object.defineProperty(globalThis, 'navigator', { value: { userAgent }, configurable: true });
+}
+
+const UA = {
+  androidPhone: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+  androidTablet: 'Mozilla/5.0 (Linux; Android 14; SM-X710) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+  ipadMobileMode: 'Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1',
+  ipad: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Safari/605.1.15',
+  ipod: 'Mozilla/5.0 (iPod touch; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)',
+  desktop: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+};
+
+describe('IITC.utils.isSmartphone', () => {
+  beforeEach(() => {
+    window.location.search = '';
+    setUserAgent(UA.desktop);
+  });
+
+  after(() => {
+    if (originalNavigator) Object.defineProperty(globalThis, 'navigator', originalNavigator);
+  });
+
+  it('honours the vp parameter over the user agent', () => {
+    window.location.search = '?vp=m';
+    expect(IITC.utils.isSmartphone()).to.be.true;
+
+    window.location.search = '?vp=f';
+    setUserAgent(UA.androidPhone);
+    expect(IITC.utils.isSmartphone()).to.be.false;
+  });
+
+  it('falls back to the user agent when vp is absent or unrecognised', () => {
+    setUserAgent(UA.androidPhone);
+
+    window.location.search = '?foo=bar';
+    expect(IITC.utils.isSmartphone()).to.be.true;
+
+    window.location.search = '?vp=x';
+    expect(IITC.utils.isSmartphone()).to.be.true;
+  });
+
+  it('detects Android phones and iOS devices', () => {
+    [UA.androidPhone, UA.iphone, UA.ipadMobileMode, UA.ipod].forEach((ua) => {
+      setUserAgent(ua);
+      expect(IITC.utils.isSmartphone(), ua).to.be.true;
+    });
+  });
+
+  it('ignores Android tablets, iPads and desktop browsers', () => {
+    [UA.androidTablet, UA.ipad, UA.desktop].forEach((ua) => {
+      setUserAgent(ua);
+      expect(IITC.utils.isSmartphone(), ua).to.be.false;
+    });
+  });
+
+  it('matches Android case-sensitively and iOS case-insensitively', () => {
+    setUserAgent('mozilla/5.0 (linux; android 14; pixel 8) chrome/120.0.0.0 mobile safari/537.36');
+    expect(IITC.utils.isSmartphone()).to.be.false;
+
+    setUserAgent('mozilla/5.0 (iphone; cpu iphone os 17_0 like mac os x) applewebkit/605.1.15');
+    expect(IITC.utils.isSmartphone()).to.be.true;
+  });
+
+  it('returns a boolean rather than a regex match result', () => {
+    setUserAgent(UA.androidPhone);
+    expect(IITC.utils.isSmartphone()).to.be.a('boolean');
+
+    setUserAgent(UA.desktop);
+    expect(IITC.utils.isSmartphone()).to.be.a('boolean');
+  });
+});
+
+describe('IITC.utils.isSystemPlayer', () => {
+  it('recognises the system accounts', () => {
+    expect(IITC.utils.isSystemPlayer('__ADA__')).to.be.true;
+    expect(IITC.utils.isSystemPlayer('__JARVIS__')).to.be.true;
+    expect(IITC.utils.isSystemPlayer('__MACHINA__')).to.be.true;
+  });
+
+  it('rejects regular names, near matches and missing input', () => {
+    ['someplayer', 'ADA', '__ada__', '__Jarvis__', '__ADA', 'ADA__', '___ADA___', 'x__ADA__', '__NIANTIC__', '', null, undefined].forEach((name) => {
+      expect(IITC.utils.isSystemPlayer(name), String(name)).to.be.false;
+    });
+  });
+});
+
+describe('legacy aliases for the moved environment and player helpers', () => {
+  it('keeps the legacy globals pointing at their IITC.utils counterparts', () => {
+    expect(window.isSmartphone).to.equal(IITC.utils.isSmartphone);
+    expect(window.isSystemPlayer).to.equal(IITC.utils.isSystemPlayer);
+  });
+
+  it('syncs an assignment to the legacy global back into the namespace', () => {
+    const original = IITC.utils.isSmartphone;
+    const replacement = () => true;
+
+    window.isSmartphone = replacement;
+    expect(IITC.utils.isSmartphone).to.equal(replacement);
+
+    IITC.utils.isSmartphone = original;
+    expect(window.isSmartphone).to.equal(original);
   });
 });

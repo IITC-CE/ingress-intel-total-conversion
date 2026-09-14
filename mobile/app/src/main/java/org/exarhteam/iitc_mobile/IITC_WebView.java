@@ -1,7 +1,6 @@
 package org.exarhteam.iitc_mobile;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -9,12 +8,14 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
+
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import org.exarhteam.iitc_mobile.async.CheckHttpResponse;
 
@@ -39,7 +40,7 @@ public class IITC_WebView extends WebView {
     private IITC_Mobile mIitc;
     private SharedPreferences mSharedPrefs;
     private int mFullscreenStatus = 0;
-    private Runnable mNavHider;
+    private WindowInsetsControllerCompat mInsetsController;
     private boolean mDisableJs = false;
     private int defaultZoom;
     private int mSafeAreaTopPx = 0;
@@ -80,22 +81,6 @@ public class IITC_WebView extends WebView {
         mJsInterface = new IITC_JSInterface(mIitc);
 
         addJavascriptInterface(mJsInterface, "app");
-
-        mNavHider = new Runnable() {
-            @Override
-            public void run() {
-                if (isInFullscreen() && (getFullscreenStatus() & (FS_NAVBAR)) != 0) {
-                    int systemUiVisibility = SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-                    // in immersive mode the user can interact with the app while the navbar is hidden
-                    // you can leave this mode by swiping down from the top of the screen. this does only work
-                    // when the app is in total-fullscreen mode
-                    if ((mFullscreenStatus & FS_SYSBAR) != 0) {
-                        systemUiVisibility |= SYSTEM_UI_FLAG_IMMERSIVE;
-                    }
-                    setSystemUiVisibility(systemUiVisibility);
-                }
-            }
-        };
 
         mIitcWebChromeClient = new IITC_WebChromeClient(mIitc);
         setWebChromeClient(mIitcWebChromeClient);
@@ -155,38 +140,47 @@ public class IITC_WebView extends WebView {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(final MotionEvent event) {
-        getHandler().removeCallbacks(mNavHider);
-        getHandler().postDelayed(mNavHider, 3000);
-        return super.onTouchEvent(event);
-    }
-
-    @Override
-    public void setSystemUiVisibility(final int visibility) {
-        if ((visibility & SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
-            getHandler().postDelayed(mNavHider, 3000);
-        }
-        super.setSystemUiVisibility(visibility);
-    }
-
     @Override
     public void onWindowFocusChanged(final boolean hasWindowFocus) {
         if (hasWindowFocus) {
-            getHandler().postDelayed(mNavHider, 3000);
             // if the webView has focus, JS should always be enabled
             mDisableJs = false;
-        } else {
-            getHandler().removeCallbacks(mNavHider);
+            // the system brings the bars back while the window is out of focus,
+            // for example when the notification shade is pulled down
+            if (isInFullscreen()) {
+                hideSystemBars();
+            }
         }
         super.onWindowFocusChanged(hasWindowFocus);
+    }
+
+    private WindowInsetsControllerCompat getInsetsController() {
+        if (mInsetsController == null) {
+            mInsetsController = WindowCompat.getInsetsController(
+                    mIitc.getWindow(), mIitc.getWindow().getDecorView());
+        }
+        return mInsetsController;
+    }
+
+    // hide the bars selected in the fullscreen preference
+    private void hideSystemBars() {
+        final WindowInsetsControllerCompat controller = getInsetsController();
+        // the user can interact with the app while the bars are hidden and brings them
+        // back temporarily by swiping from the edge of the screen
+        controller.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+
+        if ((mFullscreenStatus & FS_SYSBAR) != 0) {
+            controller.hide(WindowInsetsCompat.Type.statusBars());
+        }
+        if ((mFullscreenStatus & FS_NAVBAR) != 0) {
+            controller.hide(WindowInsetsCompat.Type.navigationBars());
+        }
     }
 
     public void toggleFullscreen() {
         mFullscreenStatus ^= FS_ENABLED;
 
-        final WindowManager.LayoutParams attrs = mIitc.getWindow().getAttributes();
         // toggle notification bar
         if (isInFullscreen()) {
             // show a toast with instructions to exit the fullscreen mode again
@@ -194,23 +188,15 @@ public class IITC_WebView extends WebView {
             if ((mFullscreenStatus & FS_ACTIONBAR) != 0) {
                 mIitc.getNavigationHelper().hideActionBar();
             }
-            if ((mFullscreenStatus & FS_SYSBAR) != 0) {
-                attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            }
-            if ((mFullscreenStatus & FS_NAVBAR) != 0) {
-                getHandler().post(mNavHider);
-            }
+            hideSystemBars();
             if ((mFullscreenStatus & FS_STATUSBAR) != 0) {
                 loadUrl("javascript: $('#updatestatus').hide();");
             }
         } else {
-            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            getInsetsController().show(WindowInsetsCompat.Type.systemBars());
             mIitc.getNavigationHelper().showActionBar();
             loadUrl("javascript: $('#updatestatus').show();");
-            getHandler().removeCallbacks(mNavHider);
-            super.setSystemUiVisibility(SYSTEM_UI_FLAG_VISIBLE);
         }
-        mIitc.getWindow().setAttributes(attrs);
         mIitc.invalidateOptionsMenu();
 
         // Update safe area insets when fullscreen mode changes
@@ -226,10 +212,6 @@ public class IITC_WebView extends WebView {
         for (final String entry : entries) {
             mFullscreenStatus += Integer.parseInt(entry);
         }
-    }
-
-    int getFullscreenStatus() {
-        return mFullscreenStatus;
     }
 
     public boolean isInFullscreen() {

@@ -347,7 +347,7 @@ window.plugin.portalslist.portalTable = function (sortBy, sortOrder, filter, rev
     cell.className = 'name ' + filterName;
     cell.textContent = label + ':';
     cell.title = `Show only ${label} portals`;
-    $(cell).click(function () {
+    $(cell).on('click', function () {
       if (this.classList.contains('active')) {
         $('#portalslist')
           .empty()
@@ -370,7 +370,7 @@ window.plugin.portalslist.portalTable = function (sortBy, sortOrder, filter, rev
       cell.textContent = length;
     } else {
       cell.title = `Hide ${label} portals `;
-      $(cell).click(function () {
+      $(cell).on('click', function () {
         if (this.classList.contains('active')) {
           $('#portalslist')
             .empty()
@@ -415,7 +415,7 @@ window.plugin.portalslist.portalTable = function (sortBy, sortOrder, filter, rev
         cell.classList.add('sorted');
       }
 
-      $(cell).click(function () {
+      $(cell).on('click', function () {
         var order;
         if (i === sortBy) {
           order = -sortOrder;

@@ -434,7 +434,7 @@ window.plugin.guessPlayerLevels.guess = function () {
       $.each(r, function (ind, reso) {
         if (!reso) return true;
         var nick = reso.owner;
-        if (window.isSystemPlayer(nick)) return true;
+        if (IITC.utils.isSystemPlayer(nick)) return true;
 
         var lvl = window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer(nick).min;
         if (!lvl) return true;
@@ -445,7 +445,7 @@ window.plugin.guessPlayerLevels.guess = function () {
 
       if (details.captured) {
         var nick = details.owner;
-        if (window.isSystemPlayer(nick)) return true;
+        if (IITC.utils.isSystemPlayer(nick)) return true;
         var lvl = window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer(nick).min;
         if (!lvl) return true;
 

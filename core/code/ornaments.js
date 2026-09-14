@@ -143,7 +143,7 @@ window.ornaments = {
         if (ornament in this.icon) {
           if (this.icon[ornament].layer) {
             if (this.layers[this.icon[ornament].layer] === undefined) {
-              log.log('Add missing layer: ', this.icon[ornament].layer);
+              log.debug('Add missing layer: ', this.icon[ornament].layer);
               window.ornaments.createLayer(window.ornaments.icon[ornament].layer);
             }
             layer = this.layers[window.ornaments.icon[ornament].layer];

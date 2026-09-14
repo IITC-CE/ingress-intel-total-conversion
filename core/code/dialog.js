@@ -121,7 +121,7 @@ window.dialog = function (options) {
           // then dialog's bottom may go beyond screen (e.g. 'Auto draw' with a bunch of bookmarks in folder).
           // So this is just a nasty workaround for such issue.
           // todo: watch height changes and adapt automatically
-          titlebar.dblclick(sizeFix);
+          titlebar.on('dblclick', sizeFix);
 
           if (!$(this).dialog('option', 'modal')) {
             // Start out with a cloned version of the close button
@@ -129,8 +129,9 @@ window.dialog = function (options) {
 
             // Change it into a collapse button and set the click handler
             collapse.addClass('ui-dialog-titlebar-button-collapse ui-dialog-titlebar-button-collapse-expanded');
-            collapse.click(
-              $.proxy(function () {
+            collapse.on(
+              'click',
+              function () {
                 var collapsed = $(this).data('collapsed') === true;
 
                 // Toggle collapsed state
@@ -138,12 +139,12 @@ window.dialog = function (options) {
 
                 // Run callbacks if we have them
                 if ($(this).data('collapseExpandCallback')) {
-                  $.proxy($(this).data('collapseExpandCallback'), this)(!collapsed);
+                  $(this).data('collapseExpandCallback').bind(this)(!collapsed);
                 } else {
                   if (!collapsed && $(this).data('collapseCallback')) {
-                    $.proxy($(this).data('collapseCallback'), this)();
+                    $(this).data('collapseCallback').bind(this)();
                   } else if (collapsed && $(this).data('expandCallback')) {
-                    $.proxy($(this).data('expandCallback'), this)();
+                    $(this).data('expandCallback').bind(this)();
                   }
                 }
 
@@ -172,7 +173,7 @@ window.dialog = function (options) {
                   $(button).removeClass('ui-dialog-titlebar-button-collapse-expanded');
                   $(button).addClass('ui-dialog-titlebar-button-collapse-collapsed');
                 }
-              }, this)
+              }.bind(this)
             );
 
             // Put it into the titlebar
@@ -183,12 +184,12 @@ window.dialog = function (options) {
           window.DIALOGS[$(this).data('id')] = this;
           window.DIALOG_COUNT++;
 
-          log.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') opened. ' + window.DIALOG_COUNT + ' remain.');
+          log.debug('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') opened. ' + window.DIALOG_COUNT + ' remain.');
         },
         close: function () {
           // Run the close callback if we have one
           if ($(this).data('closeCallback')) {
-            $.proxy($(this).data('closeCallback'), this)();
+            $(this).data('closeCallback').bind(this)();
           }
 
           // Make sure that we don't keep a dead dialog in focus
@@ -200,25 +201,25 @@ window.dialog = function (options) {
           delete window.DIALOGS[$(this).data('id')];
 
           window.DIALOG_COUNT--;
-          log.log('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') closed. ' + window.DIALOG_COUNT + ' remain.');
+          log.debug('window.dialog: ' + $(this).data('id') + ' (' + $(this).dialog('option', 'title') + ') closed. ' + window.DIALOG_COUNT + ' remain.');
 
           // remove from DOM and destroy
           $(this).dialog('destroy').remove();
         },
         focus: function () {
           if ($(this).data('focusCallback')) {
-            $.proxy($(this).data('focusCallback'), this)();
+            $(this).data('focusCallback').bind(this)();
           }
 
           // Blur the window currently in focus unless we're gaining focus
           if (window.DIALOG_FOCUS && $(window.DIALOG_FOCUS).data('id') !== $(this).data('id')) {
-            $.proxy(function () {
+            (function () {
               if ($(this).data('blurCallback')) {
-                $.proxy($(this).data('blurCallback'), this)();
+                $(this).data('blurCallback').bind(this)();
               }
 
               $(this).closest('.ui-dialog').find('.ui-dialog-title').removeClass('ui-dialog-title-active').addClass('ui-dialog-title-inactive');
-            }, window.DIALOG_FOCUS)();
+            }).bind(window.DIALOG_FOCUS)();
           }
 
           // This dialog is now in focus

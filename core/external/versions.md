@@ -1,8 +1,12 @@
 ### jQuery-related components:
 
 * https://jquery.com/
-  3.6.0
-  https://code.jquery.com/jquery-3.6.0.min.js
+  4.0.0
+  https://code.jquery.com/jquery-4.0.0.min.js
+
+* https://github.com/jquery/jquery-migrate
+  4.0.2
+  https://code.jquery.com/jquery-migrate-4.0.2.js
 
 * https://jqueryui.com/
   1.12.1

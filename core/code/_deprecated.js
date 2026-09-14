@@ -288,3 +288,21 @@ window.urlPortalLL = null;
  * @deprecated GUIDs are no longer cached.
  */
 window.pushPortalGuidPositionCache = function () {};
+
+/**
+ * Appends IITC's custom CSS styles to the `<head>` element.
+ * Still called from `setupSidebar`, but it has no styles of its own left:
+ * the layout it once computed in JS became CSS custom properties, and the last rules
+ * styled `#largepreview`, an element gone since the portal image moved into a dialog.
+ *
+ * The empty array and its `join` are load-bearing: plugins inject rules by rewriting this
+ * function around the array literal.
+ *
+ * @deprecated inject a `<style>` element directly instead of patching this function.
+ */
+window.setupStyles = function () {
+  const styles = [].join('\n');
+  if (!styles) return;
+
+  $('head').append('<style>' + styles + '</style>');
+};

@@ -1,13 +1,21 @@
 // @author         breunigs
 // @name           Draw tools
 // @category       Draw
-// @version        0.12.1
+// @version        0.13.0
 // @description    Allow drawing things onto the current map so you may plan your next move. Supports Multi-Project-Extension.
 
 /* global IITC, L -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.13.0',
+    changes: [
+      'Sync drawn items across devices via the Sync plugin (Multi-Projects-Extension aware)',
+      'Register with the Sync plugin regardless of plugin load order',
+      'Fix drawn area used by Tidy Links and Fly Links being misplaced after zooming',
+    ],
+  },
   { version: '0.12.1', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.11.0',
@@ -41,7 +49,17 @@ var changelog = [
 // use own namespace for plugin
 window.plugin.drawTools = function () {};
 
-window.plugin.drawTools.KEY_STORAGE = 'plugin-draw-tools-layer';
+window.plugin.drawTools.DEFAULT_KEY_STORAGE = 'plugin-draw-tools-layer';
+// MPE points this at the active project's key, while DEFAULT_KEY_STORAGE keeps naming the default one
+window.plugin.drawTools.KEY_STORAGE = window.plugin.drawTools.DEFAULT_KEY_STORAGE;
+
+// Field synced by plugins/sync.js, keyed by "<projectStorageKey>::<uuid>" so that one
+// registered field covers every MPE project
+window.plugin.drawTools.itemMap = {};
+window.plugin.drawTools.updateQueue = {};
+window.plugin.drawTools.enableSync = false;
+window.plugin.drawTools.SYNC_DELAY = 5000;
+window.plugin.drawTools.KEY_DELIMITER = '::';
 
 window.plugin.drawTools.merge = {};
 window.plugin.drawTools.merge.status = true;
@@ -214,36 +232,93 @@ window.plugin.drawTools.getSnapLatLng = function (unsnappedLatLng) {
   return new L.LatLng(candidates[0][1].lat, candidates[0][1].lng); // return a clone of the portal location
 };
 
-window.plugin.drawTools.save = function () {
-  var data = [];
+window.plugin.drawTools.generateId = () => {
+  if (window.plugin.sync?.generateUUID) return window.plugin.sync.generateUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+};
 
-  window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
-    var item = {};
-    if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
-      item.type = 'circle';
-      item.latLng = layer.getLatLng();
-      item.radius = layer.getRadius();
-      item.color = layer.options.color;
-    } else if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
-      item.type = 'polygon';
-      item.latLngs = layer.getLatLngs();
-      item.color = layer.options.color;
-    } else if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
-      item.type = 'polyline';
-      item.latLngs = layer.getLatLngs();
-      item.color = layer.options.color;
-    } else if (layer instanceof L.Marker) {
-      item.type = 'marker';
-      item.latLng = layer.getLatLng();
-      item.color = layer.options.icon.options.color;
-    } else {
+window.plugin.drawTools.makeKey = (prefix, id) => prefix + window.plugin.drawTools.KEY_DELIMITER + id;
+
+window.plugin.drawTools.parseKey = (composite) => {
+  // ids are UUIDs, so splitting from the right holds without relying on MPE to keep delimiters out of project keys
+  const idx = composite.lastIndexOf(window.plugin.drawTools.KEY_DELIMITER);
+  if (idx === -1) return null;
+  return { prefix: composite.slice(0, idx), id: composite.slice(idx + window.plugin.drawTools.KEY_DELIMITER.length) };
+};
+
+// null for a layer type draw-tools does not persist
+window.plugin.drawTools.serializeLayer = function (layer) {
+  const item = {};
+  if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
+    item.type = 'circle';
+    item.latLng = layer.getLatLng();
+    item.radius = layer.getRadius();
+    item.color = layer.options.color;
+  } else if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
+    item.type = 'polygon';
+    item.latLngs = layer.getLatLngs();
+    item.color = layer.options.color;
+  } else if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
+    item.type = 'polyline';
+    item.latLngs = layer.getLatLngs();
+    item.color = layer.options.color;
+  } else if (layer instanceof L.Marker) {
+    item.type = 'marker';
+    item.latLng = layer.getLatLng();
+    item.color = layer.options.icon.options.color;
+  } else {
+    return null;
+  }
+  return item;
+};
+
+window.plugin.drawTools.save = function () {
+  const data = [];
+  const currentItems = {};
+  const prefix = window.plugin.drawTools.KEY_STORAGE;
+  const itemMap = window.plugin.drawTools.itemMap;
+
+  window.plugin.drawTools.drawnItems.eachLayer((layer) => {
+    const item = window.plugin.drawTools.serializeLayer(layer);
+    if (!item) {
       console.warn('Unknown layer type when saving draw tools layer');
       return; // .eachLayer 'continue'
     }
-
+    // a merge import can bring in ids already in use, and the duplicate would overwrite its twin in currentItems
+    if (!layer._drawToolsId || currentItems[layer._drawToolsId]) {
+      layer._drawToolsId = window.plugin.drawTools.generateId();
+    }
+    item.id = layer._drawToolsId;
+    currentItems[item.id] = item;
     data.push(item);
   });
-  localStorage[window.plugin.drawTools.KEY_STORAGE] = JSON.stringify(data);
+  localStorage[prefix] = JSON.stringify(data);
+
+  const changed = [];
+  Object.keys(itemMap).forEach((compKey) => {
+    const parsed = window.plugin.drawTools.parseKey(compKey);
+    if (!parsed || parsed.prefix !== prefix || currentItems[parsed.id]) return;
+    delete itemMap[compKey];
+    changed.push(compKey);
+  });
+  Object.entries(currentItems).forEach(([id, item]) => {
+    const compKey = window.plugin.drawTools.makeKey(prefix, id);
+    const newStr = JSON.stringify(item);
+    if (itemMap[compKey] && JSON.stringify(itemMap[compKey]) === newStr) return;
+    // serializeLayer hands back Leaflet's own latLng arrays and a vertex edit mutates them in place, so a stored reference compares equal to itself
+    itemMap[compKey] = JSON.parse(newStr);
+    changed.push(compKey);
+  });
+
+  if (changed.length > 0) {
+    changed.forEach((k) => {
+      window.plugin.drawTools.updateQueue[k] = true;
+    });
+    window.plugin.drawTools.delaySync();
+  }
 
   console.log('draw-tools: saved to localStorage');
 };
@@ -287,6 +362,7 @@ window.plugin.drawTools.import = function (data) {
         break;
     }
     if (layer) {
+      layer._drawToolsId = item.id || window.plugin.drawTools.generateId();
       window.plugin.drawTools.drawnItems.addLayer(layer);
     }
   });
@@ -610,6 +686,7 @@ window.plugin.drawTools.optReset = function () {
     localStorage[window.plugin.drawTools.KEY_STORAGE] = '[]';
     window.plugin.drawTools.drawnItems.clearLayers();
     window.plugin.drawTools.load();
+    window.plugin.drawTools.save(); // reconcile itemMap and push deletions through sync
     console.log('DRAWTOOLS: reset all drawn items');
     window.plugin.drawTools.optAlert('Reset Successful. ');
     window.runHooks('pluginDrawTools', { event: 'clear' });
@@ -617,13 +694,13 @@ window.plugin.drawTools.optReset = function () {
 };
 
 window.plugin.drawTools.snapToPortals = function () {
-  if (!window.getDataZoomTileParameters().hasPortals) {
+  if (!IITC.map.tiles.getDataZoomParameters().hasPortals) {
     if (!confirm('Not all portals are visible on the map. Snap to portals may move valid points to the wrong place. Continue?')) {
       return;
     }
   }
 
-  if (window.mapDataRequest.status.short !== 'done') {
+  if (IITC.map.request.status.short !== 'done') {
     if (!confirm('Map data has not completely loaded, so some portals may be missing. Do you want to continue?')) {
       return;
     }
@@ -898,7 +975,7 @@ window.plugin.drawTools.initMPE = function () {
       window.plugin.drawTools.KEY_STORAGE = newKey;
     },
     // Native value of localstorage key
-    defaultKey: 'plugin-draw-tools-layer',
+    defaultKey: window.plugin.drawTools.DEFAULT_KEY_STORAGE,
     // This function is run before the localstorage key change
     func_pre: function () {},
     // This function is run after the localstorage key change
@@ -923,11 +1000,8 @@ window.plugin.drawTools.initMPE = function () {
   });
 };
 
-var cachedFilters;
+// one filter per drawn polygon; each compares layer points, so it is valid only for the view it was built in
 window.plugin.drawTools.getLocationFilters = function () {
-  if (cachedFilters) {
-    return cachedFilters;
-  }
   var filters;
   if (!window.map.hasLayer(window.plugin.drawTools.drawnItems)) {
     return [];
@@ -976,8 +1050,149 @@ window.plugin.drawTools.getLocationFilters = function () {
       return window.pnpoly(poly, point);
     };
   });
-  cachedFilters = filters;
   return filters;
+};
+
+// ---------------------------------------------------------------------------------
+// SYNC (via plugins/sync.js)
+// ---------------------------------------------------------------------------------
+
+// localStorage keys holding draw-tools data: the default project plus any MPE projects
+window.plugin.drawTools.getAllProjectKeys = () => {
+  const keys = [window.plugin.drawTools.DEFAULT_KEY_STORAGE];
+  // MPE prefixes every project key with 'MPE_', so none of them can collide with the default one
+  keys.push(...(window.plugin.mpe?.obj?.projects?.drawTools?.pj ?? []));
+  return keys;
+};
+
+// Mints ids for legacy id-less drawings in every project and populates itemMap
+// Returns true when the active project was rewritten, leaving its layers out of step with storage
+window.plugin.drawTools.seedItemMap = () => {
+  const itemMap = {};
+  const activePrefix = window.plugin.drawTools.KEY_STORAGE;
+  let activeMutated = false;
+
+  window.plugin.drawTools.getAllProjectKeys().forEach((prefix) => {
+    const raw = localStorage[prefix];
+    if (!raw) return;
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      console.warn(`draw-tools: failed to parse localStorage[${prefix}] during sync seed`);
+      return;
+    }
+    if (!Array.isArray(data)) return;
+
+    let mutated = false;
+    data.forEach((item) => {
+      if (!item?.type) return;
+      if (!item.id) {
+        item.id = window.plugin.drawTools.generateId();
+        mutated = true;
+      }
+      itemMap[window.plugin.drawTools.makeKey(prefix, item.id)] = item;
+    });
+    if (!mutated) return;
+    localStorage[prefix] = JSON.stringify(data);
+    if (prefix === activePrefix) activeMutated = true;
+  });
+
+  window.plugin.drawTools.itemMap = itemMap;
+  return activeMutated;
+};
+
+window.plugin.drawTools.delaySync = () => {
+  if (!window.plugin.drawTools.enableSync) return;
+  clearTimeout(window.plugin.drawTools.delaySync.timer);
+  window.plugin.drawTools.delaySync.timer = setTimeout(() => {
+    window.plugin.drawTools.delaySync.timer = null;
+    window.plugin.drawTools.syncNow();
+  }, window.plugin.drawTools.SYNC_DELAY);
+};
+
+window.plugin.drawTools.syncNow = () => {
+  if (!window.plugin.drawTools.enableSync) return;
+  const keys = Object.keys(window.plugin.drawTools.updateQueue);
+  if (keys.length === 0) return;
+  window.plugin.drawTools.updateQueue = {};
+  window.plugin.sync.updateMap('drawTools', 'itemMap', keys);
+};
+
+// fullUpdated is set whenever the file was last written by another client, meaning sync has
+// just replaced itemMap wholesale, so every project's localStorage is rebuilt from it
+window.plugin.drawTools.remoteCallback = (pluginName, fieldName, e, fullUpdated) => {
+  if (!fullUpdated || fieldName !== 'itemMap') return;
+
+  const byPrefix = {};
+  Object.entries(window.plugin.drawTools.itemMap).forEach(([compKey, item]) => {
+    const parsed = window.plugin.drawTools.parseKey(compKey);
+    if (!parsed || !item) return;
+    (byPrefix[parsed.prefix] ??= []).push(item);
+  });
+
+  // a project the remote no longer lists has to be emptied here, not left as it was
+  window.plugin.drawTools.getAllProjectKeys().forEach((prefix) => {
+    byPrefix[prefix] ??= [];
+  });
+  Object.entries(byPrefix).forEach(([prefix, items]) => {
+    localStorage[prefix] = JSON.stringify(items);
+  });
+
+  // so MPE learns about projects that arrived only from the remote
+  window.plugin.mpe?.data?.scanStorageForOne?.('drawTools');
+
+  window.plugin.drawTools.drawnItems.clearLayers();
+  window.plugin.drawTools.load();
+
+  // sync already replaced itemMap, so anything still queued refers to values that are gone
+  const discarded = Object.keys(window.plugin.drawTools.updateQueue).length;
+  window.plugin.drawTools.updateQueue = {};
+
+  console.log('draw-tools: rebuilt from remote sync');
+  if (discarded > 0) console.warn(`draw-tools: ${discarded} local change(s) were overwritten before they reached sync`);
+};
+
+window.plugin.drawTools.syncInitialized = (pluginName, fieldName) => {
+  if (fieldName !== 'itemMap') return;
+  window.plugin.drawTools.enableSync = true;
+  if (Object.keys(window.plugin.drawTools.updateQueue).length > 0) {
+    window.plugin.drawTools.delaySync();
+  }
+};
+
+// MPE has no delete event: a deletion surfaces as the implicit switch back to the default
+// project, so entries left pointing at a vanished prefix are what tells us it is gone
+window.plugin.drawTools.reconcileAfterMpeChange = (data) => {
+  if (data?.data?.namespace !== 'drawTools') return;
+
+  const validPrefixes = new Set(window.plugin.drawTools.getAllProjectKeys());
+  const dropped = Object.keys(window.plugin.drawTools.itemMap).filter((compKey) => {
+    const parsed = window.plugin.drawTools.parseKey(compKey);
+    return parsed && !validPrefixes.has(parsed.prefix);
+  });
+  if (dropped.length === 0) return;
+
+  dropped.forEach((compKey) => {
+    delete window.plugin.drawTools.itemMap[compKey];
+    window.plugin.drawTools.updateQueue[compKey] = true;
+  });
+  window.plugin.drawTools.delaySync();
+};
+
+window.plugin.drawTools.registerFieldForSyncing = () => {
+  // sync may not be loaded yet, and fires this hook once it is
+  if (!window.plugin.sync) {
+    window.addHook('pluginSyncReady', window.plugin.drawTools.registerFieldForSyncing);
+    return;
+  }
+  // seeding rewrote storage, so the layers already on the map still carry no ids
+  if (window.plugin.drawTools.seedItemMap()) {
+    window.plugin.drawTools.drawnItems.clearLayers();
+    window.plugin.drawTools.load();
+  }
+  window.addHook('mpe', window.plugin.drawTools.reconcileAfterMpeChange);
+  window.plugin.sync.registerMapForSync('drawTools', 'itemMap', window.plugin.drawTools.remoteCallback, window.plugin.drawTools.syncInitialized);
 };
 
 function setup() {
@@ -985,13 +1200,11 @@ function setup() {
   window.plugin.drawTools.boot(); // initialize drawtools
   window.plugin.drawTools.initMPE(); // register to MPE if available
   window.plugin.drawTools.initEDF(); // initialize empty drawn fields
+  window.plugin.drawTools.registerFieldForSyncing(); // register with sync.js if available
 
   var filterEvents = new L.Evented();
   window.map.on('draw:created draw:edited draw:deleted', function (e) {
     filterEvents.fire('changed', { originalEvent: e });
-  });
-  filterEvents.on('changed', function () {
-    cachedFilters = null;
   });
   window.plugin.drawTools.filterEvents = filterEvents;
 }

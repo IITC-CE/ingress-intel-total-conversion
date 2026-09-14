@@ -208,6 +208,12 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
         (out_dir / (plugin_name + '.meta.js')).write_text(meta, encoding='utf8')
 
 
+def plugin_build(source, out_dir, deps_list=None):
+    """Build single plugin, with timestamps generated for this build."""
+    settings.generate_timestamps()
+    process_file(source, out_dir, deps_list=deps_list)
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
@@ -242,10 +248,10 @@ if __name__ == '__main__':
         print('Plugin build: {.build_name} (watch mode)\n'
               ' source: {.source}\n'
               ' target: {}'.format(settings, args, target))
-        watch(process_file, args.source, args.out_dir, interval=settings.watch_interval)
+        watch(plugin_build, args.source, args.out_dir, interval=settings.watch_interval)
     else:
         try:
-            process_file(args.source, args.out_dir)
+            plugin_build(args.source, args.out_dir)
         except UserWarning as err:
             parser.error(err)
         print(target)

@@ -77,11 +77,11 @@ machinaTracker.zoomListener = function () {
     machinaTracker.drawnTraces.clearLayers();
     ctrl.addClass('disabled').attr('title', 'Zoom in to show those.');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
-    window.chat.backgroundChannelData('plugin.machinaTracker', 'all', false); // disable this plugin's interest in 'all' COMM
+    IITC.chat.backgroundChannelData('plugin.machinaTracker', 'all', false); // disable this plugin's interest in 'all' COMM
   } else {
     ctrl.removeClass('disabled').attr('title', '');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
-    window.chat.backgroundChannelData('plugin.machinaTracker', 'all', true); // enable this plugin's interest in 'all' COMM
+    IITC.chat.backgroundChannelData('plugin.machinaTracker', 'all', true); // enable this plugin's interest in 'all' COMM
   }
 };
 
@@ -163,12 +163,12 @@ machinaTracker.createPortalLink = function (portal) {
       title: portal.name,
       href: IITC.portal.display.makePermalink(portal.latLng),
     })
-    .click((event) => {
+    .on('click', (event) => {
       IITC.portal.selectByLatLng(portal.latLng);
       event.preventDefault();
       return false;
     })
-    .dblclick((event) => {
+    .on('dblclick', (event) => {
       window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
       IITC.portal.selectByLatLng(portal.latLng);
       event.preventDefault();

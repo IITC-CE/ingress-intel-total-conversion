@@ -129,11 +129,11 @@ window.plugin.playerTracker.zoomListener = function () {
     window.plugin.playerTracker.drawnTracesRes.clearLayers();
     ctrl.addClass('disabled').attr('title', 'Zoom in to show those.');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
-    window.chat.backgroundChannelData('plugin.playerTracker', 'all', false); // disable this plugin's interest in 'all' COMM
+    IITC.chat.backgroundChannelData('plugin.playerTracker', 'all', false); // disable this plugin's interest in 'all' COMM
   } else {
     ctrl.removeClass('disabled').attr('title', '');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
-    window.chat.backgroundChannelData('plugin.playerTracker', 'all', true); // enable this plugin's interest in 'all' COMM
+    IITC.chat.backgroundChannelData('plugin.playerTracker', 'all', true); // enable this plugin's interest in 'all' COMM
   }
 };
 
@@ -424,17 +424,17 @@ window.plugin.playerTracker.getPortalLink = function (data) {
   return $('<a>')
     .addClass('text-overflow-ellipsis')
     .css('max-width', '15em')
-    .text(window.chat.getChatPortalName(data))
+    .text(IITC.comm.getChatPortalName(data))
     .prop({
-      title: window.chat.getChatPortalName(data),
+      title: IITC.comm.getChatPortalName(data),
       href: IITC.portal.display.makePermalink(position),
     })
-    .click(function (event) {
+    .on('click', function (event) {
       IITC.portal.selectByLatLng(position);
       event.preventDefault();
       return false;
     })
-    .dblclick(function (event) {
+    .on('dblclick', function (event) {
       window.map.setView(position, window.DEFAULT_ZOOM);
       IITC.portal.selectByLatLng(position);
       event.preventDefault();
@@ -473,7 +473,7 @@ window.plugin.playerTracker.centerMapOnUser = function (nick) {
   var last = data.events[data.events.length - 1];
   var position = window.plugin.playerTracker.getLatLngFromEvent(last);
 
-  if (window.isSmartphone()) window.show('map');
+  if (IITC.utils.isSmartphone()) window.show('map');
   window.map.setView(position, window.map.getZoom());
 
   if (data.marker) {
@@ -492,7 +492,7 @@ window.plugin.playerTracker.onNicknameClicked = function (info) {
 window.plugin.playerTracker.onSearchResultSelected = function (result, event) {
   event.stopPropagation(); // prevent chat from handling the click
 
-  if (window.isSmartphone()) window.show('map');
+  if (IITC.utils.isSmartphone()) window.show('map');
 
   // if the user moved since the search was started, check if we have a new set of data
   if (false === window.plugin.playerTracker.centerMapOnUser(result.nickname)) window.map.setView(result.position);

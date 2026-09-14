@@ -1,13 +1,14 @@
 // @author         3ch01c
 // @name           Uniques
 // @category       Misc
-// @version        0.2.7
+// @version        0.2.8
 // @description    Allow manual entry of portals visited/captured. Use the 'highlighter-uniques' plugin to show the uniques on the map, and 'sync' to share between multiple browsers or desktop/mobile. It will try and guess which portals you have captured from COMM/portal details, but this will not catch every case.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  { version: '0.2.8', changes: ['Register with the Sync plugin regardless of plugin load order'] },
   {
     version: '0.2.7',
     changes: ['Refactoring: fix eslint'],
@@ -320,9 +321,12 @@ window.plugin.uniques.syncQueue = function () {
   }, window.plugin.uniques.SYNC_DELAY);
 };
 
-// Call after IITC and all plugin loaded
-window.plugin.uniques.registerFieldForSyncing = function () {
-  if (!window.plugin.sync) return;
+window.plugin.uniques.registerFieldForSyncing = () => {
+  // sync may not be loaded yet, and fires this hook once it is
+  if (!window.plugin.sync) {
+    window.addHook('pluginSyncReady', window.plugin.uniques.registerFieldForSyncing);
+    return;
+  }
   window.plugin.sync.registerMapForSync('uniques', 'uniques', window.plugin.uniques.syncCallback, window.plugin.uniques.syncInitialed);
 };
 

@@ -22,7 +22,7 @@ window.isApp = isApp;
  */
 window.useAppPanes = function () {
   // isSmartphone is important to disable panes in desktop mode
-  return isApp && window.app.addPane && window.isSmartphone();
+  return isApp && window.app.addPane && IITC.utils.isSmartphone();
 };
 window.useAndroidPanes = window.useAppPanes; // compatibility
 
@@ -97,7 +97,7 @@ window.runOnAppBeforeBoot = function () {
   }
 
   if (window.app.showZoom) {
-    window.mapOptions.zoomControl = window.app.showZoom();
+    IITC.map.options.zoomControl = window.app.showZoom();
   }
 
   extendLayerChooser();
@@ -165,7 +165,7 @@ window.runOnAppBeforeBoot = function () {
 
       var shareLink = $('<a>')
         .text('Share portal')
-        .click(function () {
+        .on('click', function () {
           window.app.intentPosLink(lat, lng, window.map.getZoom(), title, true, guid);
         });
       $('.linkdetails').append($('<aside>').append(shareLink));
@@ -179,7 +179,7 @@ window.runOnAppAfterBoot = function () {
   }
 
   if (window.app.intentPosLink) {
-    $('#permalink').click(function (e) {
+    $('#permalink').on('click', function (e) {
       e.preventDefault();
       var center = window.map.getCenter();
       window.app.intentPosLink(center.lat, center.lng, window.map.getZoom(), 'Selected map view', false);

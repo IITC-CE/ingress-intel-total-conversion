@@ -10,12 +10,33 @@
     color: #eee
 }
 
-#chatdebug td mark.error {
-    color: #FF424D
+/* the level colour marks the label and the message, the timestamp stays neutral */
+#chatdebug tr.error td mark,
+#chatdebug tr.error td pre {
+    color: #FF424D;
 }
 
-#chatdebug td mark.warning {
-    color: #FFDE42
+#chatdebug tr.warning td mark,
+#chatdebug tr.warning td pre {
+    color: #FFDE42;
+}
+
+#chatdebug tr.info td mark,
+#chatdebug tr.info td pre {
+    color: #6ECBFF;
+}
+
+#chatdebug tr.debug td mark,
+#chatdebug tr.debug td pre {
+    color: #9E9E9E;
+}
+
+/* core/style.css styles .warning for page-level notices, which also matches these rows */
+#chatdebug tr.warning,
+#chatdebug tr.warning td mark {
+    font-weight: normal;
+    text-shadow: none;
+    text-align: left;
 }
 
 #chatdebug td pre {
@@ -26,4 +47,76 @@
 
 #chatinput.debug mark {
     color: #bbb;
+}
+
+.debug-filters {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 3px;
+}
+
+.debug-filters button {
+    padding: 0 5px;
+    border: 1px solid #20A8B1;
+    border-radius: 2px;
+    background: rgb(8, 48, 78);
+    color: #eee;
+    font-size: 11px;
+    line-height: 16px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+}
+
+.debug-filters:hover button {
+    opacity: 1;
+}
+
+.debug-filters button.error {
+    color: #FF424D
+}
+
+/* the global .warning class reaches this button too */
+.debug-filters button.warning {
+    color: #FFDE42;
+    font-weight: normal;
+    text-shadow: none;
+}
+
+.debug-filters button.info {
+    color: #6ECBFF
+}
+
+.debug-filters button.debug {
+    color: #9E9E9E
+}
+
+.debug-filters button.off {
+    border-color: #444;
+    color: #666;
+}
+
+/* touch targets take the full width, and there is no pointer to reveal them on hover */
+.debug-filters.mobile button {
+    flex: 1;
+    opacity: 1;
+    padding: 4px 0;
+    font-size: 13px;
+    line-height: 24px;
+}
+
+/* the filter can hide the last row, which is what core/style.css uses to absorb surplus height */
+#chatdebug table {
+    min-height: 0;
+}
+
+#chatdebug.hide-error tr.error,
+#chatdebug.hide-warning tr.warning,
+#chatdebug.hide-log tr.log,
+#chatdebug.hide-info tr.info,
+#chatdebug.hide-debug tr.debug {
+    display: none;
 }

@@ -24,24 +24,6 @@ window.setupSidebar = function () {
 };
 
 /**
- * Function to append IITC's custom CSS styles to the `<head>` element.
- * Overwritten in smartphone.js.
- *
- * @function setupStyles
- */
-window.setupStyles = function () {
-  $('head').append(
-    '<style>' +
-      [
-        '#largepreview.enl img { border:2px solid ' + window.COLORS[window.TEAM_ENL] + '; } ',
-        '#largepreview.res img { border:2px solid ' + window.COLORS[window.TEAM_RES] + '; } ',
-        '#largepreview.none img { border:2px solid ' + window.COLORS[window.TEAM_NONE] + '; } ',
-      ].join('\n') +
-      '</style>'
-  );
-};
-
-/**
  * Sets up custom icons by appending SVG definitions to the DOM.
  *
  * @function setupIcons
@@ -138,14 +120,27 @@ function setupSidebarToggle() {
 }
 
 /**
- * Sets up event listeners for the large portal image view. This dialog is displayed
- * when a user clicks on the portal photo in the sidebar. It creates a new image
- * preview inside a dialog box.
+ * Sets up event listeners for the large portal image view.
+ * On the desktop the photo opens in a dialog;
+ * on a smartphone the full size image is already rendered at the end of the sidebar,
+ * so the click scrolls down to it instead.
  *
  * @function setupLargeImagePreview
  */
 function setupLargeImagePreview() {
-  $('#portaldetails').on('click', '.imgpreview', function () {
+  $('#portaldetails').on('click', '.imgpreview', function (event) {
+    if (IITC.utils.isSmartphone()) {
+      if (event.currentTarget !== event.target) return; // do not fire on #level
+
+      document.querySelectorAll('.ui-tooltip').forEach((tooltip) => tooltip.remove());
+
+      const fullImage = document.querySelector('#sidebar > .fullimg');
+      if (!fullImage) return;
+
+      fullImage.parentElement.scrollTo({ top: fullImage.offsetTop, behavior: 'smooth' });
+      return;
+    }
+
     var img = this.querySelector('img');
     // dialogs have 12px padding around the content
     var dlgWidth = Math.max(img.naturalWidth + 24, 500);

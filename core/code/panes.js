@@ -13,32 +13,61 @@
 window.currentPane = '';
 
 /**
+ * Marks a pane or chat channel as the active tab in the chat controls.
+ *
+ * @function _setActiveTab
+ * @param {string} id - The ID of the pane.
+ */
+window._setActiveTab = function (id) {
+  document.querySelector('#chatcontrols .active')?.classList.remove('active');
+  document.querySelector(`#chatcontrols a[data-channel='${id}']`)?.classList.add('active');
+};
+
+/**
+ * Shows the elements a pane consists of and marks its tab in the chat controls.
+ * A comm channel is handed over to IITC.chat, which renders and marks it itself.
+ *
+ * @function _applyPane
+ * @param {string} id - The ID of the pane to apply.
+ */
+window._applyPane = function (id) {
+  if (IITC.chat.getChannelDesc(id)) {
+    IITC.chat.show(id);
+    return;
+  }
+
+  switch (id) {
+    case 'map':
+      $('#map').css({ visibility: 'visible', opacity: '1' });
+      IITC.statusbar.show();
+      $('#portal_highlight_select').show();
+      $('#farm_level_select').show();
+      window._setActiveTab(id);
+      break;
+    case 'info':
+      $('#scrollwrapper').show();
+      IITC.portal.display.resetScroll();
+      window._setActiveTab(id);
+      break;
+  }
+};
+
+/**
  * Shows a specified pane and hides others.
  *
  * @function show
  * @param {string} id - The ID of the pane to show.
  */
 window.show = function (id) {
-  if (window.currentPane === id) return;
+  const changed = window.currentPane !== id;
   window.currentPane = id;
-  window.hideall();
 
-  window.runHooks('paneChanged', id);
-
-  // look for comm tab first
-  if (window.chat.getChannelDesc(id)) window.chat.show(id);
-  else {
-    switch (id) {
-      case 'map':
-        window.smartphone.mapButton.click();
-        $('#portal_highlight_select').show();
-        $('#farm_level_select').show();
-        break;
-      case 'info':
-        window.smartphone.sideButton.click();
-        break;
-    }
+  if (changed) {
+    window.hideall();
+    window.runHooks('paneChanged', id);
   }
+
+  window._applyPane(id);
 };
 
 /**

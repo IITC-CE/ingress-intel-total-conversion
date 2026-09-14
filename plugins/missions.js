@@ -1,13 +1,14 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.3.6
+// @version        0.3.7
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  { version: '0.3.7', changes: ['Register with the Sync plugin regardless of plugin load order'] },
   { version: '0.3.6', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.5',
@@ -145,9 +146,7 @@ window.plugin.missions = {
     if (!data.portalDetails.mission && !data.portalDetails.mission50plus) {
       return;
     }
-    var missionHtml = $('<a>')
-      .click(this.openPortalMissions.bind(this))
-      .text('Missions');
+    var missionHtml = $('<a>').on('click', this.openPortalMissions.bind(this)).text('Missions');
     $('.linkdetails').append($('<aside>').append(missionHtml));
   },
 
@@ -233,7 +232,7 @@ window.plugin.missions = {
       tabs.tabs('refresh');
       tabs.find('.ui-tabs-nav').sortable('refresh');
       tabs.tabs('option', 'active', -1);
-      if (window.isSmartphone()) {
+      if (IITC.utils.isSmartphone()) {
         window.show('plugin-missions');
       }
     } else {
@@ -275,7 +274,7 @@ window.plugin.missions = {
         let dia = $(openDialog).closest('.ui-dialog');
         let button = dia.find('.ui-dialog-titlebar-button-collapse');
         if (button) {
-          $(button).click();
+          $(button).trigger('click');
         }
       }
     } else {
@@ -722,7 +721,7 @@ window.plugin.missions = {
       title.addEventListener(
         'click',
         function (ev) {
-          if (window.isSmartphone()) {
+          if (IITC.utils.isSmartphone()) {
             window.show('map');
           }
           IITC.portal.selectByLatLng(lat, lng);
@@ -734,7 +733,7 @@ window.plugin.missions = {
       title.addEventListener(
         'dblclick',
         function (ev) {
-          if (window.isSmartphone()) {
+          if (IITC.utils.isSmartphone()) {
             window.show('map');
           }
           IITC.portal.zoomToAndShow(waypoint.portal.guid, [lat, lng]);
@@ -1323,10 +1322,16 @@ window.plugin.missions = {
     window.addHook('plugin-missions-waypoint-changed', this.onWaypointChanged.bind(this));
     window.addHook('plugin-missions-waypoints-refreshed', this.onWaypointsRefreshed.bind(this));
 
-    if (window.plugin.sync) {
+    const registerFieldsForSyncing = () => {
+      // sync may not be loaded yet, and fires this hook once it is
+      if (!window.plugin.sync) {
+        window.addHook('pluginSyncReady', registerFieldsForSyncing);
+        return;
+      }
       window.plugin.sync.registerMapForSync('missions', 'checkedMissions', this.syncCallback.bind(this), this.syncInitialed.bind(this));
       window.plugin.sync.registerMapForSync('missions', 'checkedWaypoints', this.syncCallback.bind(this), this.syncInitialed.bind(this));
-    }
+    };
+    registerFieldsForSyncing();
 
     setTimeout(this.onIITCLoaded.bind(this));
   },
