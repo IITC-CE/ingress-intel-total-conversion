@@ -328,33 +328,7 @@ body.sidebar-open .leaflet-right {
 
 #chatcontrols .loading {
   background-color: rgba(255, 0, 0, 0.3);
-  -webkit-animation: chatloading 1.2s infinite linear;
-  -moz-animation: chatloading 1.2s infinite linear;
   animation: chatloading 1.2s infinite linear;
-}
-
-@-webkit-keyframes chatloading {
-  0% {
-    background-color: rgba(255, 0, 0, 0.4);
-  }
-  50% {
-    background-color: rgba(255, 0, 0, 0.1);
-  }
-  100% {
-    background-color: rgba(255, 0, 0, 0.4);
-  }
-}
-
-@-moz-keyframes chatloading {
-  0% {
-    background-color: rgba(255, 0, 0, 0.4);
-  }
-  50% {
-    background-color: rgba(255, 0, 0, 0.1);
-  }
-  100% {
-    background-color: rgba(255, 0, 0, 0.4);
-  }
 }
 
 @keyframes chatloading {
@@ -400,8 +374,6 @@ em {
   overflow-x: hidden;
   overflow-y: scroll;
   height: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 2px;
   position: relative;
@@ -543,8 +515,6 @@ mark {
 
 #sidebar > * {
   border-bottom: 1px solid #20a8b1;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: calc(var(--sidebar-width) + 1px);
 }
@@ -573,8 +543,6 @@ h2 {
   padding: 0 4px;
   margin: 0;
   cursor: help;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
 }
@@ -654,8 +622,6 @@ input[type='url'] {
   font-size: 12px;
   border: 0;
   font-family: inherit;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -869,12 +835,10 @@ input[type='url'] {
 #randdetails,
 #resodetails {
   width: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 0 4px;
   table-layout: fixed;
-  border-spacing: 0m;
+  border-spacing: 0;
   border-collapse: collapse;
 }
 
@@ -947,8 +911,6 @@ input[type='url'] {
   height: 18px;
   padding: 1px;
   width: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
   left: 0;
@@ -1201,11 +1163,9 @@ input[type='url'] {
 }
 .ui-dialog-titlebar-button-close::after {
   transform: translateY(3.5px) rotate(45deg);
-  -webkit-transform: translateY(3.5px) rotate(45deg);
 }
 .ui-dialog-titlebar-button-close::before {
   transform: translateY(3.5px) rotate(-45deg);
-  -webkit-transform: translateY(3.5px) rotate(-45deg);
 }
 .ui-dialog-titlebar-button.ui-state-active::after,
 .ui-dialog-titlebar-button.ui-state-active::before,
@@ -1443,10 +1403,6 @@ table.artifact .portal {
   height: 20px;
   padding: 0;
   margin: 0 0 0 20px;
-  -webkit-transform: none;
-  -moz-transform: none;
-  -ms-transform: none;
-  -o-transform: none;
   transform: none;
 }
 
