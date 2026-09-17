@@ -17,6 +17,7 @@
     "jsdoc": "^4.0.4",
     "jsdom": "^29.1.1",
     "mocha": "^11.7.6",
+    "lightningcss-cli": "^1.33.0",
     "prettier": "^3.3.3",
     "sinon": "^21.0.0",
     "taffydb": "^2.7.3",
@@ -29,5 +30,8 @@
     "fileserver": "./web_server_local.py local",
     "docs": "jsdoc -c jsdoc-conf.json -R README.md -d ./docs",
     "test": "mocha -r test/_mocks.js --exit"
+  },
+  "allowScripts": {
+    "lightningcss-cli@1.33.0": true
   }
 }

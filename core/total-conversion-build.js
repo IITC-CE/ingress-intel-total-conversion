@@ -220,7 +220,7 @@ document.head.innerHTML =
   '@include_css:external/leaflet.css@' +
   '</style>' +
   '<style>' +
-  '@include_string:style.css@' +
+  '@include_css:style.css@' +
   '</style>' +
   '<style>' +
   '@include_css:icons/icons.css@' +

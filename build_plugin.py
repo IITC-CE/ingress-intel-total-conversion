@@ -4,13 +4,20 @@
 
 import base64
 import re
+import subprocess
 import sys
+import tempfile
 from functools import partial
 from importlib import import_module
 from mimetypes import guess_type
 from pathlib import Path
+from typing import Iterable
 
 import settings
+
+
+_css_tempdir = None
+_processed_css = {}
 
 
 def get_module(name):
@@ -134,8 +141,87 @@ def bundle_code(_, path=None):
 
 
 def imgrepl(match, path=None):
-    fullname = path / match.group('filename')
+    filename = match.group('filename')
+    # skip absolut path files
+    if re.match(r'^(?:[a-z][a-z0-9+.-]*:|//|/)', filename, re.IGNORECASE):
+        return match.group(0)
+
+    fullname = path / filename
+    if not fullname.is_file():
+        return match.group(0)
     return load_image(fullname)
+
+
+def prepare_css(sources: Iterable[Path], deps_list=None):
+    global _css_tempdir, _processed_css
+
+    finish_css()
+    source_root = settings.build_source_dir
+    css_files = {}
+    include_pattern = re.compile(r'@include_css:([\w./-]+)@')
+    for source in sources:
+        include_root = source.parent.parent if source.parent.name == 'code' else source.parent
+        for include in include_pattern.findall(source.read_text(encoding='utf-8-sig')):
+            filename = (include_root / include).resolve()
+            if not filename.is_file():
+                raise UserWarning(f'CSS file not found: {filename}')
+            css_files[filename] = None
+
+    if not css_files:
+        return
+
+    cli = source_root / 'node_modules' / '.bin' / 'lightningcss'
+    if not cli.is_file():
+        raise UserWarning('Lightning CSS CLI requires npm dependencies; run npm install')
+
+    basenames = [filename.name for filename in css_files]
+    if len(basenames) != len(set(basenames)):
+        raise UserWarning('Lightning CSS CLI output filenames must be unique')
+
+    _css_tempdir = tempfile.TemporaryDirectory(prefix='iitc-lightningcss-')
+    output_dir = Path(_css_tempdir.name)
+    result = subprocess.run(
+        [
+            str(cli),
+            '--bundle',
+            '--minify',
+            '--browserslist',
+            '--output-dir',
+            str(output_dir),
+            *(str(filename) for filename in css_files),
+        ],
+        cwd=source_root,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode:
+        finish_css()
+        raise UserWarning(f'Lightning CSS processing failed:\n{result.stderr.decode()}')
+
+    _processed_css = {filename: output_dir / filename.name for filename in css_files}
+    for filename in css_files:
+        if deps_list is not None:
+            deps_list.append(filename)
+    if deps_list is not None:
+        deps_list.append(source_root / 'package.json')
+
+
+def finish_css():
+    global _css_tempdir, _processed_css
+
+    if _css_tempdir is not None:
+        _css_tempdir.cleanup()
+    _css_tempdir = None
+    _processed_css = {}
+
+
+def process_css(filename):
+    log_dependency(filename)
+    try:
+        processed = _processed_css[filename.resolve()]
+    except KeyError:
+        raise UserWarning(f'CSS was not prepared for build: {filename}') from None
+    return processed.read_text(encoding='utf-8')
 
 
 def expand_template(match, path=None):
@@ -159,7 +245,7 @@ def expand_template(match, path=None):
         return quote % load_image(fullname)
     elif kw == 'include_css':
         pattern = r'(?<=url\()["\']?(?P<filename>[^)#]+?)["\']?(?=\))'
-        css = re.sub(pattern, partial(imgrepl, path=fullname.parent), readtext(fullname))
+        css = re.sub(pattern, partial(imgrepl, path=fullname.parent), process_css(fullname))
         return quote % multi_line(css)
 
 
@@ -211,7 +297,12 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
 def plugin_build(source, out_dir, deps_list=None):
     """Build single plugin, with timestamps generated for this build."""
     settings.generate_timestamps()
-    process_file(source, out_dir, deps_list=deps_list)
+    source_files = [source, *sorted((source.parent / 'code').glob('*.js'))]
+    prepare_css(source_files, deps_list=deps_list)
+    try:
+        process_file(source, out_dir, deps_list=deps_list)
+    finally:
+        finish_css()
 
 
 if __name__ == '__main__':
