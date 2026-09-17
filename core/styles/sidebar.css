@@ -41,6 +41,19 @@
   border-radius: 5px 0 0 5px;
   text-decoration: none;
   right: var(--safe-area-inset-right);
+
+  .toggle {
+    border-bottom: 10px solid transparent;
+    border-top: 10px solid transparent;
+  }
+
+  .open {
+    border-right: 10px solid #ffce00;
+  }
+
+  .close {
+    border-left: 10px solid #ffce00;
+  }
 }
 
 body.sidebar-open .leaflet-right {
@@ -57,24 +70,12 @@ body.sidebar-open #sidebartoggle {
   width: calc(var(--sidebar-width) + 1px);
 }
 
-#sidebartoggle .toggle {
-  border-bottom: 10px solid transparent;
-  border-top: 10px solid transparent;
-}
-
-#sidebartoggle .open {
-  border-right: 10px solid #ffce00;
-}
-
-#sidebartoggle .close {
-  border-left: 10px solid #ffce00;
-}
-
 /* player stats */
 #playerstat {
   height: 30px;
 }
 
+/* Agent stats row */
 h2 {
   color: #ffce00;
   font-size: 21px;
@@ -83,26 +84,43 @@ h2 {
   cursor: help;
   box-sizing: border-box;
   width: 100%;
-}
 
-h2 #name {
-  font-weight: 300;
-  display: inline;
-  vertical-align: top;
-  white-space: nowrap;
-}
+  #name {
+    font-weight: 300;
+    display: inline;
+    vertical-align: top;
+    white-space: nowrap;
 
-h2 #name .playername {
-  max-width: 70%;
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    .playername {
+      max-width: 70%;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-h2 #stats {
-  float: right;
-  height: 100%;
-  overflow: hidden;
+    /* show sign out*/
+    &:hover {
+      .playername {
+        max-width: 50%;
+      }
+      #signout {
+        display: inline-block;
+      }
+    }
+  }
+
+  #stats {
+    float: right;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  sup,
+  sub {
+    display: block;
+    font-size: 11px;
+    margin-bottom: -2px;
+  }
 }
 
 #signout {
@@ -113,19 +131,6 @@ h2 #stats {
   display: none; /* starts hidden */
   vertical-align: text-top;
 }
-#name:hover .playername {
-  max-width: 50%;
-}
-#name:hover #signout {
-  display: inline-block;
-}
-
-h2 sup,
-h2 sub {
-  display: block;
-  font-size: 11px;
-  margin-bottom: -2px;
-}
 
 /* gamestats */
 #gamestat span {
@@ -134,14 +139,13 @@ h2 sub {
   cursor: help;
   padding: 0 3px;
   box-sizing: border-box;
-}
 
-#gamestat .res {
-  background: #005684;
-}
-
-#gamestat .enl {
-  background: #017f01;
+  &.res {
+    background: #005684;
+  }
+  &.enl {
+    background: #017f01;
+  }
 }
 
 /* search input, and others */

@@ -1,7 +1,8 @@
-.ui-dialog-aboutIITC .plugin-is-standard {
-  color: darkgray;
-}
-
-.ui-dialog-aboutIITC .plugin-error {
-  text-decoration: line-through;
+.ui-dialog-aboutIITC {
+  .plugin-is-standard {
+    color: darkgray;
+  }
+  .plugin-error {
+    text-decoration: line-through;
+  }
 }

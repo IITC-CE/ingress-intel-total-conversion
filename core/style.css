@@ -266,3 +266,15 @@ svg.icon-button {
 .ui-dialog-non-standard-intel .ui-dialog-buttonset button:nth-child(2) {
   float: left;
 }
+
+::-webkit-input-placeholder {
+  font-style: italic;
+}
+
+:-moz-placeholder {
+  font-style: italic;
+}
+
+::-moz-placeholder {
+  font-style: italic;
+}

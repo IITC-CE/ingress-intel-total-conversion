@@ -13,10 +13,10 @@
   right: var(--safe-area-inset-right);
   z-index: 3002;
   box-sizing: border-box;
-}
 
-#updatestatus .map {
-  margin-left: 8px;
+  .map {
+    margin-left: 8px;
+  }
 }
 
 #loadlevel {
