@@ -4,9 +4,6 @@
 @import 'styles/sidebar.css';
 @import 'styles/map_status.css';
 @import 'styles/dialogs.css';
-@import 'styles/dialog_redeem.css';
-@import 'styles/dialog_artifact.css';
-@import 'styles/dialog_cellscore.css';
 
 /* general rules ******************************************************/
 
@@ -260,14 +257,6 @@ svg.icon-button {
     1px 1px black,
     -1px -1px black;
   text-align: center;
-}
-
-.ui-dialog-aboutIITC .plugin-is-standard {
-  color: darkgray;
-}
-
-.ui-dialog-aboutIITC .plugin-error {
-  text-decoration: line-through;
 }
 
 .ui-dialog-non-standard-intel .ui-dialog-buttonset button:first-child {
