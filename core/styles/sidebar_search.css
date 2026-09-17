@@ -1,14 +1,17 @@
 #searchwrapper {
   position: relative;
 }
+
 #search {
   width: 100%;
   padding-left: 24px;
   padding-right: 36px;
+
+  &::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
 }
-#search::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-}
+
 #searchicon,
 #searchcancel,
 #buttongeolocation {
@@ -21,52 +24,62 @@
   height: 24px;
   background-color: transparent;
 }
+
 #searchicon img,
 #searchcancel img,
 #buttongeolocation img {
   height: 20px;
 }
+
 #searchicon {
   left: 0;
 }
+
 #searchcancel {
   right: 24px;
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
-#searchcancel.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
+
 #buttongeolocation {
   right: 0;
   cursor: pointer;
 }
+
 #buttongeolocation:focus {
   outline: 1px dotted #ffce00;
 }
+
 .searchquery {
   max-height: 25em;
   overflow-y: auto;
 }
+
 #searchwrapper h3 {
   padding: 0 0 0 25px;
   position: relative;
   font-size: 1em;
   height: auto;
   cursor: pointer;
+
+  &::before {
+    position: absolute;
+    left: 5px;
+    font-size: 14px;
+    margin-right: 2px;
+    font-weight: normal;
+    content: '▲';
+    transition: transform 0.3s ease;
+  }
 }
-#searchwrapper h3::before {
-  position: absolute;
-  left: 5px;
-  font-size: 14px;
-  margin-right: 2px;
-  font-weight: normal;
-  content: '▲';
-  transition: transform 0.3s ease;
-}
+
 #searchwrapper .searchquery.collapsed h3::before {
   transform: rotate(180deg);
 }
@@ -95,16 +108,4 @@
 #searchwrapper li em {
   color: #ccc;
   font-size: 0.9em;
-}
-
-::-webkit-input-placeholder {
-  font-style: italic;
-}
-
-:-moz-placeholder {
-  font-style: italic;
-}
-
-::-moz-placeholder {
-  font-style: italic;
 }
