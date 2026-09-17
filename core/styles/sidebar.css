@@ -1,3 +1,5 @@
+@import './sidebar_search.css';
+
 #scrollwrapper {
   overflow-x: hidden;
   overflow-y: auto;
@@ -159,117 +161,6 @@ input[type='url'] {
   border: 0;
   font-family: inherit;
   box-sizing: border-box;
-}
-
-#searchwrapper {
-  position: relative;
-}
-#search {
-  width: 100%;
-  padding-left: 24px;
-  padding-right: 36px;
-}
-#search::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-}
-#searchicon,
-#searchcancel,
-#buttongeolocation {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  margin: 0;
-  border: 0 none transparent;
-  padding: 0 2px;
-  height: 24px;
-  background-color: transparent;
-}
-#searchicon img,
-#searchcancel img,
-#buttongeolocation img {
-  height: 20px;
-}
-#searchicon {
-  left: 0;
-}
-#searchcancel {
-  right: 24px;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-#searchcancel.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-#buttongeolocation {
-  right: 0;
-  cursor: pointer;
-}
-#buttongeolocation:focus {
-  outline: 1px dotted #ffce00;
-}
-.searchquery {
-  max-height: 25em;
-  overflow-y: auto;
-}
-#searchwrapper h3 {
-  padding: 0 0 0 25px;
-  position: relative;
-  font-size: 1em;
-  height: auto;
-  cursor: pointer;
-}
-#searchwrapper h3::before {
-  position: absolute;
-  left: 5px;
-  font-size: 14px;
-  margin-right: 2px;
-  font-weight: normal;
-  content: '▲';
-  transition: transform 0.3s ease;
-}
-#searchwrapper .searchquery.collapsed h3::before {
-  transform: rotate(180deg);
-}
-#searchwrapper ul {
-  max-height: 100%;
-  padding-left: 16px;
-  overflow: hidden;
-}
-#searchwrapper li {
-  cursor: pointer;
-}
-#searchwrapper .searchquery.collapsed ul {
-  max-height: 0;
-}
-#searchwrapper li a {
-  margin-left: -14px;
-  padding-left: 14px;
-  background-position: 1px center;
-  background-repeat: no-repeat;
-  background-size: 12px 12px;
-}
-#searchwrapper li:focus a,
-#searchwrapper li:hover a {
-  text-decoration: underline;
-}
-#searchwrapper li em {
-  color: #ccc;
-  font-size: 0.9em;
-}
-
-::-webkit-input-placeholder {
-  font-style: italic;
-}
-
-:-moz-placeholder {
-  font-style: italic;
-}
-
-::-moz-placeholder {
-  font-style: italic;
 }
 
 .leaflet-control-layers input {
