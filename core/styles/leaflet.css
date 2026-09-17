@@ -116,13 +116,13 @@
 
 #map .leaflet-popup-content-wrapper {
   border-radius: 0;
-  border: 1px solid #20a8b1;
+  border: 1px solid var(--color-bg-border);
   background: #0e3d4e;
   pointer-events: auto;
 }
 
 #map .leaflet-popup-content {
-  color: #ffce00;
+  color: var(--color-primary);
   margin: 5px 8px;
 }
 
@@ -137,7 +137,7 @@
 
 #map .leaflet-popup-tip {
   /* change the tip from an arrow to a simple line */
-  background: #20a8b1;
+  background: var(--color-bg-border);
   width: 1px;
   height: 20px;
   padding: 0;

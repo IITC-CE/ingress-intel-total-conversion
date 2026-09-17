@@ -4,13 +4,13 @@
   /* tweak accordion control*/
   .ui-accordion-header,
   .ui-accordion-content {
-    border: 1px solid #20a8b1;
+    border: 1px solid var(--color-bg-border);
     margin-top: -1px;
     display: block;
   }
 
   .ui-accordion-header {
-    color: #ffce00;
+    color: var(--color-primary);
     outline: none;
     &:before {
       font-size: 18px;

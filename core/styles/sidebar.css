@@ -13,8 +13,8 @@
 }
 
 #sidebar {
-  background-color: rgba(8, 48, 78, 0.9);
-  border-left: 1px solid #20a8b1;
+  background-color: var(--color-bg-trans);
+  border-left: 1px solid var(--color-bg-border);
   color: #888;
   position: relative;
   left: 0;
@@ -34,9 +34,9 @@
   position: absolute;
   top: calc(var(--safe-area-inset-top) + 108px);
   z-index: 3002;
-  background-color: rgba(8, 48, 78, 0.9);
-  color: #ffce00;
-  border: 1px solid #20a8b1;
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+  border: 1px solid var(--color-bg-border);
   border-right: none;
   border-radius: 5px 0 0 5px;
   text-decoration: none;
@@ -48,11 +48,11 @@
   }
 
   .open {
-    border-right: 10px solid #ffce00;
+    border-right: 10px solid var(--color-primary);
   }
 
   .close {
-    border-left: 10px solid #ffce00;
+    border-left: 10px solid var(--color-primary);
   }
 }
 
@@ -77,7 +77,7 @@ body.sidebar-open #sidebartoggle {
 
 /* Agent stats row */
 h2 {
-  color: #ffce00;
+  color: var(--color-primary);
   font-size: 21px;
   padding: 0 4px;
   margin: 0;
@@ -127,7 +127,7 @@ h2 {
   font-size: 12px;
   font-weight: normal;
   padding: 0 4px;
-  background-color: rgba(8, 48, 78, 0.5);
+  background-color: rgb(from var(--color-bg) r g b / 0.5);
   display: none; /* starts hidden */
   vertical-align: text-top;
 }
@@ -158,7 +158,7 @@ input[type='email'],
 input[type='search'],
 input[type='url'] {
   background-color: rgba(0, 0, 0, 0.3);
-  color: #ffce00;
+  color: var(--color-primary);
   height: 24px;
   padding: 0px 4px 0px 4px;
   font-size: 12px;
@@ -188,7 +188,7 @@ input[type='url'] {
 #portaltitle .close {
   margin-right: 2px;
   cursor: pointer;
-  color: #ffce00;
+  color: var(--color-primary);
   font-weight: normal;
 }
 
@@ -421,7 +421,7 @@ input[type='url'] {
 /* history details */
 #historydetails {
   text-align: center;
-  color: #ffce00;
+  color: var(--color-primary);
 }
 
 #historydetails .missing {

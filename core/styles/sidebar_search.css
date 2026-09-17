@@ -54,7 +54,7 @@
 }
 
 #buttongeolocation:focus {
-  outline: 1px dotted #ffce00;
+  outline: 1px dotted var(--color-primary);
 }
 
 .searchquery {
