@@ -3,8 +3,10 @@
 """Utility to build iitc plugin for given source file name."""
 
 import base64
+import hashlib
 import os
 import re
+import shutil
 import subprocess
 import sys
 from functools import partial
@@ -13,6 +15,16 @@ from mimetypes import guess_type
 from pathlib import Path
 
 import settings
+
+
+_postcss_cache_dir = None
+_postcss_cache_ready = False
+
+
+def reset_postcss_cache():
+    global _postcss_cache_dir, _postcss_cache_ready
+    _postcss_cache_dir = None
+    _postcss_cache_ready = False
 
 
 def get_module(name):
@@ -148,12 +160,24 @@ def imgrepl(match, path=None):
 
 
 def process_css(filename):
+    global _postcss_cache_dir, _postcss_cache_ready
+
     log_dependency(filename)
     postcss = settings.build_source_dir / 'node_modules' / '.bin' / 'postcss'
     if os.name == 'nt':
         postcss = postcss.with_suffix('.cmd')
     if not postcss.is_file():
         raise UserWarning('PostCSS build requires npm dependencies; run npm install')
+
+    # cache postcss result (to speed up incremental builds)
+    source_root = settings.build_source_dir
+    cache_dir = source_root / '.postcss-cache'
+    check_postcss_cache(source_root, cache_dir)
+
+    cache_name = hashlib.sha256(str(filename.relative_to(source_root)).encode()).hexdigest()
+    cache_file = _postcss_cache_dir / f'{cache_name}.css'
+    if cache_file.is_file():
+        return cache_file.read_text(encoding='utf-8')
 
     result = subprocess.run(
         [str(postcss), str(filename), '--no-map'],
@@ -163,7 +187,35 @@ def process_css(filename):
     )
     if result.returncode:
         raise UserWarning(f'PostCSS processing failed: {filename}\n{result.stderr}')
+    cache_dir.mkdir(exist_ok=True)
+    cache_file.write_text(result.stdout, encoding='utf-8')
     return result.stdout
+
+
+def check_postcss_cache(source_root, cache_dir):
+    global _postcss_cache_dir, _postcss_cache_ready
+
+    if not _postcss_cache_ready:
+        # check for fle changes
+        cache_key = hashlib.sha256()
+        css_files = sorted(path for path in source_root.rglob('*.css') if cache_dir not in path.parents)
+        for dependency in [*css_files, source_root / 'postcss.config.js', source_root / 'package.json']:
+            if not dependency.is_file():
+                continue
+            log_dependency(dependency)
+            cache_key.update(str(dependency.relative_to(source_root)).encode())
+            cache_key.update(dependency.read_bytes())
+
+        manifest = cache_dir / 'manifest'
+        fingerprint = cache_key.hexdigest()
+        cache_outdated = not cache_dir.exists() or not manifest.is_file() or manifest.read_text(encoding='ascii') != fingerprint
+        if cache_outdated:
+            if cache_dir.exists():
+                shutil.rmtree(cache_dir)
+            cache_dir.mkdir()
+            manifest.write_text(fingerprint, encoding='ascii')
+        _postcss_cache_dir = cache_dir
+        _postcss_cache_ready = True
 
 
 def expand_template(match, path=None):
@@ -239,6 +291,7 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
 def plugin_build(source, out_dir, deps_list=None):
     """Build single plugin, with timestamps generated for this build."""
     settings.generate_timestamps()
+    reset_postcss_cache()
     process_file(source, out_dir, deps_list=deps_list)
 
 

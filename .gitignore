@@ -10,6 +10,7 @@ local*.py
 package-lock.json
 
 node_modules/
+.postcss-cache/
 docs/
 
 ### JetBrains IDE Ignores ###

@@ -49,6 +49,7 @@ def run_cmds(cmds, source, target):
 
 def iitc_build(source, outdir, deps_list=None):
     settings.generate_timestamps()
+    build_plugin.reset_postcss_cache()
     run_cmds(settings.pre_build, source, outdir)
 
     iitc_script = 'core/total-conversion-build.js'
