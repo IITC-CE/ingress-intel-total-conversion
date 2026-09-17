@@ -1,3 +1,8 @@
+@import './dialog_redeem.css';
+@import './dialog_artifact.css';
+@import './dialog_cellscore.css';
+@import './dialog_about.css';
+
 .ui-tooltip,
 .ui-dialog {
   position: absolute;
