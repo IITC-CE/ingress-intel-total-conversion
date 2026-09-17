@@ -777,4 +777,4 @@ const ulog = (function (module) {
 window.log = ulog;
 
 // eslint-disable-next-line
-'@bundle_code@';
+('@bundle_code@');

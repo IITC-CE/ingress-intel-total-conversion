@@ -185,7 +185,7 @@ def process_file(source, out_dir, dist_path=None, deps_list=None):
     settings.plugin_id = plugin_name
 
     path = source.parent  # used as root for all (relative) paths
-    script = re.sub(r"'@bundle_code@';", partial(bundle_code, path=path), script)
+    script = re.sub(r"\(?'@bundle_code@'\)?;", partial(bundle_code, path=path), script)
     try:
         script_before_wrapper, script = script.split('\n/*wrapped-from-here*/\n', 1)
     except ValueError:
