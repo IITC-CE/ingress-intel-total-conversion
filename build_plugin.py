@@ -4,6 +4,7 @@
 
 import base64
 import re
+import subprocess
 import sys
 from functools import partial
 from importlib import import_module
@@ -134,8 +135,32 @@ def bundle_code(_, path=None):
 
 
 def imgrepl(match, path=None):
-    fullname = path / match.group('filename')
+    filename = match.group('filename')
+    # skip absolut path files
+    if re.match(r'^(?:[a-z][a-z0-9+.-]*:|//|/)', filename, re.IGNORECASE):
+        return match.group(0)
+
+    fullname = path / filename
+    if not fullname.is_file():
+        return match.group(0)
     return load_image(fullname)
+
+
+def process_css(filename):
+    log_dependency(filename)
+    postcss = settings.build_source_dir / 'node_modules' / '.bin' / 'postcss'
+    if not postcss.is_file():
+        raise UserWarning('PostCSS build requires npm dependencies; run npm install')
+
+    result = subprocess.run(
+        [str(postcss), str(filename), '--no-map'],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode:
+        raise UserWarning(f'PostCSS processing failed: {filename}\n{result.stderr}')
+    return result.stdout
 
 
 def expand_template(match, path=None):
@@ -159,7 +184,7 @@ def expand_template(match, path=None):
         return quote % load_image(fullname)
     elif kw == 'include_css':
         pattern = r'(?<=url\()["\']?(?P<filename>[^)#]+?)["\']?(?=\))'
-        css = re.sub(pattern, partial(imgrepl, path=fullname.parent), readtext(fullname))
+        css = re.sub(pattern, partial(imgrepl, path=fullname.parent), process_css(fullname))
         return quote % multi_line(css)
 
 
