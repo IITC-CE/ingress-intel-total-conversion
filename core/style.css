@@ -4,11 +4,24 @@
  * NOTE: @media needs to be first?
  */
 @media print {
-  .leaflet-control-container { display: none !important; }
-  #chatcontrols, #chat, #chatinput { display: none !important; }
-  #sidebartoggle, #sidebar { display: none !important; }
-  #updatestatus { display: none !important; }
-  #portal_highlight_select { display: none !important; }
+  .leaflet-control-container {
+    display: none !important;
+  }
+  #chatcontrols,
+  #chat,
+  #chatinput {
+    display: none !important;
+  }
+  #sidebartoggle,
+  #sidebar {
+    display: none !important;
+  }
+  #updatestatus {
+    display: none !important;
+  }
+  #portal_highlight_select {
+    display: none !important;
+  }
 }
 
 :root {
@@ -19,7 +32,6 @@
   --sidebar-width: 300px; /* How wide should the sidebar be, in pixels */
   --hidden-scrollbar-width: 20px; /* How much space to leave for scrollbars, in pixels */
   --chat-shrinked: 60px; /* Height of chat when chat is collapsed, in pixels */
-  --icon-target-size: 24px; /* Smallest tap target an icon may occupy, in pixels */
 }
 
 .text-overflow-ellipsis {
@@ -31,8 +43,8 @@
   width: 100%;
 }
 
-
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow: hidden; /* workaround for #373 */
@@ -45,55 +57,34 @@ html, body {
   width: 100%;
 }
 
-
 body {
   font-size: 14px;
-  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif;
+  font-family: Roboto, 'Helvetica Neue', Helvetica, sans-serif;
   margin: 0;
 }
 
-/* the text size scales the glyph but not the box, so a floor in pixels keeps the target hittable */
+/* Material Icons */
+.material-icons {
+  width: 24px;
+  height: 24px;
+}
+
 .icon-button {
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--icon-target-size);
-  min-height: var(--icon-target-size);
 }
 
-/* Icons drawn as generated content have no accessible label, so each falls back
-   to the character it replaced; the layers control instead uncovers the
-   background image of external/leaflet.css */
-body.icons-unavailable #searchwrapper h3::before,
-body.icons-unavailable #chatcontrols .toggle::before {
-  content: "▲";
+i.tiny {
+  font-size: 1rem;
 }
-
-body.icons-unavailable #chatcontrols.expand .toggle::before {
-  content: "▼";
+i.small {
+  font-size: 2rem;
 }
-
-body.icons-unavailable .ui-tabs-nav .ui-icon-close::before {
-  content: "×";
+i.medium {
+  font-size: 4rem;
 }
-
-body.icons-unavailable #sidebartoggle .open::before {
-  content: "◀";
+i.large {
+  font-size: 6rem;
 }
-
-body.icons-unavailable #sidebartoggle .close::before {
-  content: "▶";
-}
-
-body.icons-unavailable .leaflet-control-layers-toggle::before {
-  content: "";
-}
-
-i.tiny { font-size: 1rem; }
-i.small { font-size: 2rem; }
-i.medium { font-size: 4rem; }
-i.large { font-size: 6rem; }
 
 #scrollwrapper {
   overflow-x: hidden;
@@ -109,30 +100,29 @@ i.large { font-size: 6rem; }
 
 #sidebar {
   background-color: rgba(8, 48, 78, 0.9);
-  border-left: 1px solid #20A8B1;
+  border-left: 1px solid #20a8b1;
   color: #888;
   position: relative;
   left: 0;
   top: 0;
   width: calc(var(--sidebar-width) + var(--hidden-scrollbar-width) + 1px);
   max-height: 100%;
-  overflow-y:scroll;
-  overflow-x:hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
   pointer-events: auto;
 }
 
 #sidebartoggle {
   display: block;
-  padding: 20px 0;
+  padding: 20px 5px;
   margin-top: -31px; /* -(toggle height / 2) */
-  width: 20px;
   line-height: 10px;
   position: absolute;
   top: calc(var(--safe-area-inset-top) + 108px);
   z-index: 3002;
   background-color: rgba(8, 48, 78, 0.9);
-  color: #FFCE00;
-  border: 1px solid #20A8B1;
+  color: #ffce00;
+  border: 1px solid #20a8b1;
   border-right: none;
   border-radius: 5px 0 0 5px;
   text-decoration: none;
@@ -177,7 +167,7 @@ a:hover {
 }
 
 .leaflet-control-container .leaflet-top.leaflet-left {
-  width: 700px;  /* chat default width */
+  width: 700px; /* chat default width */
   height: calc(100% - 126px); /* chat default start */
   max-height: 90%;
   display: flex;
@@ -186,7 +176,6 @@ a:hover {
   align-content: flex-start;
   align-items: flex-start;
 }
-
 
 .leaflet-control-layers-overlays label.disabled {
   text-decoration: line-through;
@@ -204,7 +193,7 @@ a:hover {
 .leaflet-control-layers-overlays {
   float: left;
   margin-left: 8px;
-  border-left: 1px solid #DDDDDD;
+  border-left: 1px solid #dddddd;
   padding-left: 8px;
   overflow-y: auto;
   max-height: 600px;
@@ -215,14 +204,14 @@ a:hover {
   display: none;
 }
 
-
 /* shift controls when chat is expanded */
 .leaflet-left .leaflet-control.chat-expand {
   margin-left: 720px;
 }
 
 /* leaflet controls */
-.leaflet-left, .leaflet-right {
+.leaflet-left,
+.leaflet-right {
   display: grid;
   grid-gap: 10px;
   justify-items: baseline;
@@ -263,32 +252,34 @@ body.sidebar-open .leaflet-right {
 
 .toggle {
   display: block;
-  font-family: 'IITC Material Symbols';
-  line-height: 1;
+  height: 0;
+  width: 0;
 }
 
 /* field mu count */
 .fieldmu {
-  color: #FFCE00;
+  color: #ffce00;
   font-size: 13px;
-  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; /*override leaflet-container */
+  font-family: Roboto, 'Helvetica Neue', Helvetica, sans-serif; /*override leaflet-container */
   text-align: center;
-  text-shadow: 0 0 0.2em black, 0 0 0.2em black, 0 0 0.2em black;
+  text-shadow:
+    0 0 0.2em black,
+    0 0 0.2em black,
+    0 0 0.2em black;
   pointer-events: none;
 }
-
 
 /* chat ***************************************************************/
 
 #chatcontrols {
-  color: #FFCE00;
+  color: #ffce00;
   background: rgba(8, 48, 78, 0.9);
   position: absolute;
   bottom: calc(var(--chat-shrinked) + var(--safe-area-inset-bottom) + 22px);
   left: var(--safe-area-inset-left);
   z-index: 3000;
   height: 26px;
-  padding-left:1px;
+  padding-left: 1px;
 }
 
 #chatcontrols.expand {
@@ -303,66 +294,80 @@ body.sidebar-open .leaflet-right {
   text-align: center;
   height: 24px;
   line-height: 24px;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   vertical-align: top;
 }
 
 #chatcontrols a:first-child {
-  letter-spacing:-1px;
+  letter-spacing: -1px;
   text-decoration: none;
 }
 
 #chatcontrols a.active {
-  border-color: #FFCE00;
-  border-bottom-width:0px;
-  font-weight:bold;
+  border-color: #ffce00;
+  border-bottom-width: 0px;
+  font-weight: bold;
   background: rgb(8, 48, 78);
 }
 
 #chatcontrols a.active + a {
-  border-left-color: #FFCE00
+  border-left-color: #ffce00;
 }
-
 
 #chatcontrols .toggle {
-  font-size: 20px;
-  line-height: 24px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #ffce00;
+  margin: 6px auto auto;
 }
 
-#chatcontrols .toggle::before {
-  content: "expand_less";
-}
-
-#chatcontrols.expand .toggle::before {
-  content: "expand_more";
+#chatcontrols.expand .toggle {
+  border-top: 10px solid #ffce00;
+  border-bottom: none;
 }
 
 #chatcontrols .loading {
-  background-color: rgba(255,0,0,0.3);
+  background-color: rgba(255, 0, 0, 0.3);
   -webkit-animation: chatloading 1.2s infinite linear;
   -moz-animation: chatloading 1.2s infinite linear;
   animation: chatloading 1.2s infinite linear;
 }
 
 @-webkit-keyframes chatloading {
-    0% { background-color: rgba(255,0,0,0.4) }
-   50% { background-color: rgba(255,0,0,0.1) }
-  100% { background-color: rgba(255,0,0,0.4) }
+  0% {
+    background-color: rgba(255, 0, 0, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+  100% {
+    background-color: rgba(255, 0, 0, 0.4);
+  }
 }
 
 @-moz-keyframes chatloading {
-    0% { background-color: rgba(255,0,0,0.4) }
-   50% { background-color: rgba(255,0,0,0.1) }
-  100% { background-color: rgba(255,0,0,0.4) }
+  0% {
+    background-color: rgba(255, 0, 0, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+  100% {
+    background-color: rgba(255, 0, 0, 0.4);
+  }
 }
 
 @keyframes chatloading {
-    0% { background-color: rgba(255,0,0,0.4) }
-   50% { background-color: rgba(255,0,0,0.1) }
-  100% { background-color: rgba(255,0,0,0.4) }
+  0% {
+    background-color: rgba(255, 0, 0, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+  100% {
+    background-color: rgba(255, 0, 0, 0.4);
+  }
 }
-
-
 
 #chat {
   position: absolute;
@@ -376,7 +381,7 @@ body.sidebar-open .leaflet-right {
   background: rgba(8, 48, 78, 0.9);
   line-height: 15px;
   color: #eee;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   border-bottom: 0;
   box-sizing: border-box;
 }
@@ -387,23 +392,23 @@ em {
 }
 
 #chat.expand {
-  height:auto;
+  height: auto;
   top: calc(var(--safe-area-inset-top) + 25px);
 }
 
-
 #chat > div {
-  overflow-x:hidden;
-  overflow-y:scroll;
+  overflow-x: hidden;
+  overflow-y: scroll;
   height: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 2px;
-  position:relative;
+  position: relative;
 }
 
-#chat table, #chatinput table {
+#chat table,
+#chatinput table {
   width: 100%;
   table-layout: fixed;
   border-spacing: 0;
@@ -415,7 +420,7 @@ em {
 
 /* expand last row if needed */
 #chat table tr:last-child {
-    height: 100%;
+  height: 100%;
 }
 
 #chatinput table {
@@ -431,7 +436,8 @@ em {
   color: #bbb;
 }
 
-#chat td, #chatinput td {
+#chat td,
+#chatinput td {
   font-size: 13px;
   vertical-align: top;
   padding-bottom: 3px;
@@ -446,7 +452,8 @@ em {
 }
 
 /* time */
-#chat td:first-child, #chatinput td:first-child {
+#chat td:first-child,
+#chatinput td:first-child {
   width: 44px;
   overflow: hidden;
   padding-left: 2px;
@@ -459,7 +466,8 @@ em {
 }
 
 /* nick */
-#chat td:nth-child(2), #chatinput td:nth-child(2) {
+#chat td:nth-child(2),
+#chatinput td:nth-child(2) {
   width: 91px;
   overflow: hidden;
   padding-left: 2px;
@@ -475,7 +483,7 @@ em {
   content: '[faction]';
   color: #f88;
   background-color: #500;
-  margin-right: .2rem;
+  margin-right: 0.2rem;
 }
 
 #chatall tr.public td:nth-child(3):before,
@@ -483,7 +491,7 @@ em {
   content: '[public]';
   color: #ff6;
   background-color: #550;
-  margin-right: .2rem;
+  margin-right: 0.2rem;
 }
 
 mark {
@@ -494,7 +502,7 @@ mark {
   display: inline-block;
   width: 1px;
   height: 1px;
-  overflow:hidden;
+  overflow: hidden;
   color: transparent;
 }
 
@@ -507,7 +515,7 @@ mark {
   width: 708px;
   max-width: 100vw;
   height: calc(var(--safe-area-inset-bottom) + 23px);
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   z-index: 3001;
   box-sizing: border-box;
   padding-bottom: var(--safe-area-inset-bottom);
@@ -519,42 +527,39 @@ mark {
   vertical-align: middle;
 }
 
-
 #chatinput input {
   background: transparent;
-  color: #EEEEEE;
+  color: #eeeeee;
   width: 100%;
   height: 100%;
-  padding:3px 4px 1px 4px;
+  padding: 3px 4px 1px 4px;
 }
 
 .bidi-isolate {
-    unicode-bidi: isolate;
+  unicode-bidi: isolate;
 }
-
 
 /* sidebar ************************************************************/
 
 #sidebar > * {
-  border-bottom: 1px solid #20A8B1;
+  border-bottom: 1px solid #20a8b1;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: calc(var(--sidebar-width) + 1px);
 }
 
-
-
 #sidebartoggle .toggle {
-  font-size: 20px;
+  border-bottom: 10px solid transparent;
+  border-top: 10px solid transparent;
 }
 
-#sidebartoggle .open::before {
-  content: "chevron_left";
+#sidebartoggle .open {
+  border-right: 10px solid #ffce00;
 }
 
-#sidebartoggle .close::before {
-  content: "chevron_right";
+#sidebartoggle .close {
+  border-left: 10px solid #ffce00;
 }
 
 /* player stats */
@@ -567,7 +572,7 @@ h2 {
   font-size: 21px;
   padding: 0 4px;
   margin: 0;
-  cursor:help;
+  cursor: help;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -609,18 +614,18 @@ h2 #stats {
   display: inline-block;
 }
 
-h2 sup, h2 sub {
+h2 sup,
+h2 sub {
   display: block;
   font-size: 11px;
   margin-bottom: -2px;
 }
 
-
 /* gamestats */
 #gamestat span {
   display: inline-block;
   font-weight: bold;
-  cursor:help;
+  cursor: help;
   padding: 0 3px;
   box-sizing: border-box;
 }
@@ -633,19 +638,22 @@ h2 sup, h2 sub {
   background: #017f01;
 }
 
-
 /* search input, and others */
-input:not([type]), .input,
-input[type="text"], input[type="password"],
-input[type="number"], input[type="email"],
-input[type="search"], input[type="url"] {
+input:not([type]),
+.input,
+input[type='text'],
+input[type='password'],
+input[type='number'],
+input[type='email'],
+input[type='search'],
+input[type='url'] {
   background-color: rgba(0, 0, 0, 0.3);
   color: #ffce00;
   height: 24px;
-  padding:0px 4px 0px 4px;
+  padding: 0px 4px 0px 4px;
   font-size: 12px;
-  border:0;
-  font-family:inherit;
+  border: 0;
+  font-family: inherit;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -654,46 +662,36 @@ input[type="search"], input[type="url"] {
 #searchwrapper {
   position: relative;
 }
-#searchbox {
-  position: relative;
-}
 #search {
   width: 100%;
-  height: 2em;
-  min-height: var(--icon-target-size);
-  padding-left: max(2em, var(--icon-target-size));
-  padding-right: max(4em, calc(2 * var(--icon-target-size)));
+  padding-left: 24px;
+  padding-right: 36px;
 }
 #search::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
-#searchicon, #searchcancel, #buttongeolocation {
+#searchicon,
+#searchcancel,
+#buttongeolocation {
   display: flex;
-  color: #BBBBBB;
   align-items: center;
-  justify-content: center;
   position: absolute;
-  top: 0;
-  bottom: 0;
-  margin: auto 0; /* centres the icon over a field shorter than the target */
+  margin: 0;
   border: 0 none transparent;
-  padding: 0 0.1em;
-  font-size: 20px;
-  min-width: var(--icon-target-size);
-  min-height: var(--icon-target-size);
+  padding: 0 2px;
+  height: 24px;
   background-color: transparent;
 }
-#searchicon iitc-icon, #buttongeolocation iitc-icon {
-  font-size: 1em;
-}
-#searchcancel iitc-icon {
-  font-size: 0.9em;
+#searchicon img,
+#searchcancel img,
+#buttongeolocation img {
+  height: 20px;
 }
 #searchicon {
   left: 0;
 }
 #searchcancel {
-  right: max(1.2em, var(--icon-target-size));
+  right: 24px;
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
@@ -715,7 +713,7 @@ input[type="search"], input[type="url"] {
   overflow-y: auto;
 }
 #searchwrapper h3 {
-  padding: 0 0 0 23px;
+  padding: 0 0 0 25px;
   position: relative;
   font-size: 1em;
   height: auto;
@@ -723,12 +721,11 @@ input[type="search"], input[type="url"] {
 }
 #searchwrapper h3::before {
   position: absolute;
-  left: 4px;
+  left: 5px;
   font-size: 14px;
   margin-right: 2px;
   font-weight: normal;
-  font-family: 'IITC Material Symbols';
-  content: "expand_less";
+  content: '▲';
   transition: transform 0.3s ease;
 }
 #searchwrapper .searchquery.collapsed h3::before {
@@ -752,7 +749,8 @@ input[type="search"], input[type="url"] {
   background-repeat: no-repeat;
   background-size: 12px 12px;
 }
-#searchwrapper li:focus a, #searchwrapper li:hover a {
+#searchwrapper li:focus a,
+#searchwrapper li:hover a {
   text-decoration: underline;
 }
 #searchwrapper li em {
@@ -779,8 +777,8 @@ input[type="search"], input[type="url"] {
 
 #portaltitle {
   display: flex;
-  align-items: center;
   margin: 2px 0;
+  line-height: 24px;
   white-space: nowrap;
 }
 
@@ -790,14 +788,10 @@ input[type="search"], input[type="url"] {
   flex: 1;
 }
 
-#portaltitle iitc-icon {
-  font-size: 24px;
-}
-
 #portaltitle .close {
   margin-right: 2px;
   cursor: pointer;
-  color: #FFCE00;
+  color: #ffce00;
   font-weight: normal;
 }
 
@@ -821,10 +815,15 @@ input[type="search"], input[type="url"] {
 
 #level {
   font-size: 40px;
-  text-shadow: -1px -1px #000, 1px -1px #000, -1px 1px #000, 1px 1px #000, 0 0 5px #fff;
+  text-shadow:
+    -1px -1px #000,
+    1px -1px #000,
+    -1px 1px #000,
+    1px 1px #000,
+    0 0 5px #fff;
   display: block;
   margin-right: 15px;
-  text-align:right;
+  text-align: right;
   float: right;
 }
 
@@ -842,14 +841,14 @@ input[type="search"], input[type="url"] {
    * introduces additional margins in random cases. No clear necessary,
    * as that’s solved by setting height on .mods. */
   display: block;
-  float:left;
+  float: left;
   height: 63px;
   margin: 0 2px;
   overflow: hidden;
   padding: 2px;
   text-align: center;
   width: 63px;
-  cursor:help;
+  cursor: help;
   border: 1px solid #666;
 }
 
@@ -857,15 +856,18 @@ input[type="search"], input[type="url"] {
   cursor: auto;
 }
 
-.res .mods span, .res .meter {
+.res .mods span,
+.res .meter {
   border: 1px solid #0076b6;
 }
-.enl .mods span, .enl .meter {
+.enl .mods span,
+.enl .meter {
   border: 1px solid #017f01;
 }
 
 /* random details, resonator details */
-#randdetails, #resodetails {
+#randdetails,
+#resodetails {
   width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -876,7 +878,8 @@ input[type="search"], input[type="url"] {
   border-collapse: collapse;
 }
 
-#randdetails td, #resodetails td {
+#randdetails td,
+#resodetails td {
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: top;
@@ -884,51 +887,53 @@ input[type="search"], input[type="url"] {
   width: 50%;
 }
 
-#randdetails th, #resodetails th {
+#randdetails th,
+#resodetails th {
   font-weight: normal;
   text-align: right;
   width: 62px;
-  padding:0px;
-  padding-right:4px;
-  padding-left:4px;
+  padding: 0px;
+  padding-right: 4px;
+  padding-left: 4px;
 }
 
-#randdetails th + th, #resodetails th + th {
+#randdetails th + th,
+#resodetails th + th {
   text-align: left;
   padding-right: 4px;
   padding-left: 4px;
 }
 
-#randdetails td:first-child, #resodetails td:first-child {
+#randdetails td:first-child,
+#resodetails td:first-child {
   text-align: right;
   padding-left: 2px;
 }
 
-#randdetails td:last-child, #resodetails td:last-child {
+#randdetails td:last-child,
+#resodetails td:last-child {
   text-align: left;
   padding-right: 2px;
 }
-
 
 #randdetails {
   margin-top: 4px;
   margin-bottom: 5px;
 }
 
-
 #randdetails tt {
   font-family: inherit;
   cursor: help;
 }
 
-#artifact_target, #artifact_fragments {
+#artifact_target,
+#artifact_fragments {
   margin-top: 4px;
   margin-bottom: 4px;
 
   margin-left: 8px;
   margin-right: 8px;
 }
-
 
 /* resonators */
 #resodetails {
@@ -954,7 +959,7 @@ input[type="search"], input[type="url"] {
   overflow: hidden;
 }
 .meter.north:before {
-  content: "";
+  content: '';
   background-color: red;
   border: 1px solid #000000;
   border-radius: 100%;
@@ -977,7 +982,7 @@ input[type="search"], input[type="url"] {
   left: 0;
   right: 0;
   top: -2px;
-  text-shadow: 0.0em 0.0em 0.3em #808080;
+  text-shadow: 0em 0em 0.3em #808080;
   text-align: center;
   word-spacing: 4px; /* to leave some space for the north indicator */
 }
@@ -1000,21 +1005,17 @@ input[type="search"], input[type="url"] {
   display: none !important;
 }
 
-#toolbox, #toolbox_component {
-  text-align: left;    /* centre didn't look as nice here as it did above in .linkdetails */
+#toolbox,
+#toolbox_component {
+  text-align: left; /* centre didn't look as nice here as it did above in .linkdetails */
 }
 
-#toolbox > a, #toolbox_component > a {
+#toolbox > a,
+#toolbox_component > a {
   margin-left: 5px;
   margin-right: 5px;
   white-space: nowrap;
   display: inline-block;
-}
-
-#toolbox_component > a > iitc-icon {
-  margin-top: -2px;
-  margin-right: 2px;
-  font-size: 1em;
 }
 
 /* a common portal display takes this much space (prevents moving
@@ -1046,11 +1047,11 @@ input[type="search"], input[type="url"] {
   width: var(--sidebar-width);
   background-color: rgba(8, 48, 78, 0.9);
   border-bottom: 0;
-  border-top: 1px solid #20A8B1;
-  border-left: 1px solid #20A8B1;
+  border-top: 1px solid #20a8b1;
+  border-left: 1px solid #20a8b1;
   bottom: 0;
   color: #ffce00;
-  font-size:13px;
+  font-size: 13px;
   padding: 4px;
   padding-bottom: var(--safe-area-inset-bottom);
   position: fixed;
@@ -1064,11 +1065,11 @@ input[type="search"], input[type="url"] {
 }
 
 #loadlevel {
-  background: #FFF;
+  background: #fff;
   color: #000000;
   display: inline-block;
   min-width: 1.8em;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   border-width: 0 1px;
   margin: -4px 0;
   padding: 4px 0.2em;
@@ -1080,11 +1081,12 @@ input[type="search"], input[type="url"] {
 
 /* Dialogs
  */
-.ui-tooltip, .ui-dialog {
+.ui-tooltip,
+.ui-dialog {
   position: absolute;
   z-index: 9500;
   background-color: rgba(8, 48, 78, 0.9);
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   color: #eee;
   font-size: 13px;
   line-height: 15px;
@@ -1102,7 +1104,7 @@ input[type="search"], input[type="url"] {
   top: 0;
   width: 100%;
   z-index: 10000;
-  background:  #444;
+  background: #444;
   opacity: 0.6;
 }
 
@@ -1114,8 +1116,9 @@ input[type="search"], input[type="url"] {
   z-index: 10002 !important;
 }
 
-.ui-tooltip, .ui-dialog a {
-  color: #FFCE00;
+.ui-tooltip,
+.ui-dialog a {
+  color: #ffce00;
 }
 
 .ui-dialog {
@@ -1187,7 +1190,7 @@ input[type="search"], input[type="url"] {
 .ui-dialog-titlebar-button-collapse::after,
 .ui-dialog-titlebar-button-close::after,
 .ui-dialog-titlebar-button-close::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 3px;
   left: 50%;
@@ -1235,7 +1238,7 @@ input[type="search"], input[type="url"] {
 
 .ui-dialog-buttonpane {
   padding: 6px;
-  border-top: 1px solid #20A8B1;
+  border-top: 1px solid #20a8b1;
 }
 
 .ui-dialog-buttonset {
@@ -1246,8 +1249,8 @@ input[type="search"], input[type="url"] {
 .ui-dialog-content button {
   padding: 2px;
   min-width: 40px;
-  color: #FFCE00;
-  border: 1px solid #FFCE00;
+  color: #ffce00;
+  border: 1px solid #ffce00;
   background-color: rgba(8, 48, 78, 0.9);
 }
 
@@ -1270,7 +1273,7 @@ td + td {
 
 /* redeem results *****************************************************/
 .redeemReward {
-  font-family: Inconsolata, Consolas, Menlo, "Courier New", monospace;
+  font-family: Inconsolata, Consolas, Menlo, 'Courier New', monospace;
   list-style-type: none;
   padding: 0;
   font-size: 14px;
@@ -1297,12 +1300,12 @@ td + td {
 
 .pl_nudge_date:after {
   background: no-repeat url(//commondatastorage.googleapis.com/ingress.com/img/nudge_pointy.png);
-  position:absolute;
-  content:"";
-  height:20px;
+  position: absolute;
+  content: '';
+  height: 20px;
   width: 5px;
-  right:-5px;
-  top:-1px
+  right: -5px;
+  top: -1px;
 }
 
 .pl_nudge_date {
@@ -1312,7 +1315,7 @@ td + td {
   border-top: 1px solid #ffd652;
   color: #ffd652;
   display: block;
-  position:relative;
+  position: relative;
   height: 18px;
   width: 36px;
   padding-left: 2px;
@@ -1331,18 +1334,19 @@ td + td {
   color: #00c2ff;
 }
 
-.ALIENS, .ENLIGHTENED {
+.ALIENS,
+.ENLIGHTENED {
   color: #28f428;
 }
 
 #portal_highlight_select {
   position: absolute;
-  top:5px;
-  left:10px;
+  top: 5px;
+  left: 10px;
   z-index: 2500;
-  font-size:11px;
-  background-color:#0E3C46;
-  color:#ffce00;
+  font-size: 11px;
+  background-color: #0e3c46;
+  color: #ffce00;
 }
 
 .leaflet-control-scale {
@@ -1358,7 +1362,8 @@ td + td {
   text-decoration: none;
 }
 
-.leaflet-control-zoom-in, .leaflet-control-zoom-out {
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
   background-size: 18px;
   font-size: 0 !important;
 }
@@ -1371,28 +1376,8 @@ td + td {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M3.5 9h11' stroke='black' stroke-width='2.2' fill='none'/%3E%3C/svg%3E");
 }
 
-/* The bundled font replaces the layers.png of external/leaflet.css, which stays
-   in place for the browsers that refuse it */
-body:not(.icons-unavailable) .leaflet-control-layers-toggle,
-body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
-  background-image: none;
-}
-
-.leaflet-control-layers-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.leaflet-control-layers-toggle::before {
-  font-family: 'IITC Material Symbols';
-  content: "layers";
-  font-size: 28px;
-  color: #454545;
-}
-
-
-.portal_details th, .portal_details td {
+.portal_details th,
+.portal_details td {
   vertical-align: top;
   text-align: left;
 }
@@ -1402,14 +1387,14 @@ body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
   padding-right: 1em;
 }
 
-.portal_details tr.padding-top th, .portal_details tr.padding-top td {
+.portal_details tr.padding-top th,
+.portal_details tr.padding-top td {
   padding-top: 0.7em;
 }
 
 #play_button {
   display: none;
 }
-
 
 /** artifact dialog *****************/
 table.artifact tr > * {
@@ -1424,7 +1409,6 @@ table.artifact .portal {
   min-width: 200px; /* min-width for portal names, to ensure really long lists of artifacts don't crowd names out */
 }
 
-
 /* leaflet popups - restyle to match the theme of IITC */
 #map .leaflet-popup {
   pointer-events: none;
@@ -1433,7 +1417,7 @@ table.artifact .portal {
 #map .leaflet-popup-content-wrapper {
   border-radius: 0px;
   -webkit-border-radius: 0px;
-  border: 1px solid #20A8B1;
+  border: 1px solid #20a8b1;
   background: #0e3d4e;
   pointer-events: auto;
 }
@@ -1452,10 +1436,9 @@ table.artifact .portal {
   pointer-events: auto;
 }
 
-
 #map .leaflet-popup-tip {
   /* change the tip from an arrow to a simple line */
-  background: #20A8B1;
+  background: #20a8b1;
   width: 1px;
   height: 20px;
   padding: 0;
@@ -1467,10 +1450,9 @@ table.artifact .portal {
   transform: none;
 }
 
-
 /* misc */
 .layer_off_warning {
-  color: #FFCE00;
+  color: #ffce00;
   margin: 8px;
   text-align: center;
 }
@@ -1480,26 +1462,27 @@ table.artifact .portal {
 }
 
 /* region scores */
-.cellscore .ui-accordion-header, .cellscore .ui-accordion-content {
-	border: 1px solid #20a8b1;
-	margin-top: -1px;
-	display: block;
+.cellscore .ui-accordion-header,
+.cellscore .ui-accordion-content {
+  border: 1px solid #20a8b1;
+  margin-top: -1px;
+  display: block;
 }
 .cellscore .ui-accordion-header {
-	color: #ffce00;
-	outline: none
+  color: #ffce00;
+  outline: none;
 }
 .cellscore .ui-accordion-header:before {
-	font-size: 18px;
-	margin-right: 2px;
-	content: "⊞";
+  font-size: 18px;
+  margin-right: 2px;
+  content: '⊞';
 }
 .cellscore .ui-accordion-header-active:before {
-	content: "⊟";
+  content: '⊟';
 }
 .cellscore table {
-	width: 90%;
-	max-width: 360px; /* prevent width change on scrollbar appearance (after animation) */
+  width: 90%;
+  max-width: 360px; /* prevent width change on scrollbar appearance (after animation) */
 }
 
 /* prevent nonfunctional horizontal scrollbar in Chrome (perhaps jQuery issue) */
@@ -1513,7 +1496,7 @@ table.artifact .portal {
 }
 
 @-moz-document url-prefix() {
- .cellscore .logscale {
+  .cellscore .logscale {
     transform: scale(0.8);
   }
 
@@ -1528,15 +1511,17 @@ g.checkpoint:hover circle {
   stroke-width: 2px;
 }
 
-.cellscore th, .cellscore td {
-	text-align: left;
-	padding-left: 5px;
+.cellscore th,
+.cellscore td {
+  text-align: left;
+  padding-left: 5px;
 }
 .checkpoint_table {
-	border-collapse: collapse;
+  border-collapse: collapse;
 }
-.checkpoint_table th, .checkpoint_table td {
-	text-align: right;
+.checkpoint_table th,
+.checkpoint_table td {
+  text-align: right;
 }
 
 .cellscore #overview {
@@ -1567,69 +1552,74 @@ g.checkpoint:hover circle {
 
 /* tabs */
 .ui-tabs-nav {
-	display: block;
-	border-bottom: 1px solid #20a8b1;
-	border-top: 1px solid transparent;
-	margin: 3px 0 0;
-	padding: 0;
+  display: block;
+  border-bottom: 1px solid #20a8b1;
+  border-top: 1px solid transparent;
+  margin: 3px 0 0;
+  padding: 0;
 }
 .ui-tabs-nav::after {
-	content: '';
-	clear: left;
-	display: block;
-	height: 0;
-	width: 0;
+  content: '';
+  clear: left;
+  display: block;
+  height: 0;
+  width: 0;
 }
 .ui-tabs-nav li {
-	list-style: none;
-	display: block;
-	float:left;
-	margin: 0 0 -1px;
-	border: 1px solid #20a8b1;
+  list-style: none;
+  display: block;
+  float: left;
+  margin: 0 0 -1px;
+  border: 1px solid #20a8b1;
 }
 .ui-tabs-nav li.ui-tabs-active {
-	border-bottom-color: #0F2C3F;
-	background: #0F2C3F;
-	border-width: 2px 2px 1px;
-	font-weight: bold;
-	margin: -1px 1px;
+  border-bottom-color: #0f2c3f;
+  background: #0f2c3f;
+  border-width: 2px 2px 1px;
+  font-weight: bold;
+  margin: -1px 1px;
 }
 .ui-tabs-nav a {
-	display: inline-block;
-	padding: 0.2em 0.7em;
+  display: inline-block;
+  padding: 0.2em 0.7em;
 }
 .ui-tabs-nav .ui-icon {
-	display: inline-block;
-	font-size: 0;
-	height: 22px;
-	overflow: hidden;
-	position: relative;
-	vertical-align: top;
-	width: 16px;
+  display: inline-block;
+  font-size: 0;
+  height: 22px;
+  overflow: hidden;
+  position: relative;
+  vertical-align: top;
+  width: 16px;
 }
 .ui-tabs-nav .ui-icon-close::before {
-	font-family: 'IITC Material Symbols';
-	content: "close";
-	font-size: 16px;
-	height: 16px;
-	position: absolute;
-	text-align: center;
-	top: 2px;
-	vertical-align: baseline;
-	width: 16px;
-	cursor: pointer;
+  content: '×';
+  font-size: 16px;
+  height: 16px;
+  position: absolute;
+  text-align: center;
+  top: 2px;
+  vertical-align: baseline;
+  width: 16px;
+  cursor: pointer;
+}
+
+svg.icon-button {
+  fill: currentColor;
 }
 
 .leaflet-marker-icon > svg {
-	height: inherit;
-	width: inherit;
+  height: inherit;
+  width: inherit;
 }
 
 /* Warning text */
 .warning {
   color: #f77;
   font-weight: bold;
-  text-shadow: 1px 1px black, -1px -1px black;
+  text-shadow:
+    1px 1px black,
+    -1px -1px black;
   text-align: center;
 }
 
