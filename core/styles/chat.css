@@ -1,6 +1,6 @@
 #chatcontrols {
-  color: #ffce00;
-  background: rgba(8, 48, 78, 0.9);
+  color: var(--color-primary);
+  background: var(--color-bg-trans);
   position: absolute;
   bottom: calc(var(--chat-shrinked) + var(--safe-area-inset-bottom) + 22px);
   left: var(--safe-area-inset-left);
@@ -11,7 +11,7 @@
   .toggle {
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 10px solid #ffce00;
+    border-bottom: 10px solid var(--color-primary);
     margin: 6px auto auto;
   }
 
@@ -20,7 +20,7 @@
     bottom: auto;
 
     .toggle {
-      border-top: 10px solid #ffce00;
+      border-top: 10px solid var(--color-primary);
       border-bottom: none;
     }
   }
@@ -32,7 +32,7 @@
     text-align: center;
     height: 24px;
     line-height: 24px;
-    border: 1px solid #20a8b1;
+    border: 1px solid var(--color-bg-border);
     vertical-align: top;
 
     &:first-child {
@@ -41,10 +41,10 @@
     }
 
     &.active {
-      border-color: #ffce00;
+      border-color: var(--color-primary);
       border-bottom-width: 0px;
       font-weight: bold;
-      background: rgb(8, 48, 78);
+      background: var(--color-bg);
     }
   }
   .loading {
@@ -54,7 +54,7 @@
 }
 
 #chatcontrols a.active + a {
-  border-left-color: #ffce00;
+  border-left-color: var(--color-primary);
 }
 
 @keyframes chatloading {
@@ -78,10 +78,10 @@
   padding-left: var(--safe-area-inset-left);
   left: 0;
   z-index: 3000;
-  background: rgba(8, 48, 78, 0.9);
+  background: var(--color-bg-trans);
   line-height: 15px;
-  color: #eee;
-  border: 1px solid #20a8b1;
+  color: var(--color-secondary);
+  border: 1px solid var(--color-bg-border);
   border-bottom: 0;
   box-sizing: border-box;
 
@@ -209,11 +209,11 @@ mark {
   bottom: 0;
   left: 0;
   padding: 0 2px;
-  background: rgba(8, 48, 78, 0.9);
+  background: var(--color-bg-trans);
   width: 708px;
   max-width: 100vw;
   height: calc(var(--safe-area-inset-bottom) + 23px);
-  border: 1px solid #20a8b1;
+  border: 1px solid var(--color-bg-border);
   z-index: 3001;
   box-sizing: border-box;
   padding-bottom: var(--safe-area-inset-bottom);
@@ -227,7 +227,7 @@ mark {
 
 #chatinput input {
   background: transparent;
-  color: #eeeeee;
+  color: var(--color-secondary);
   width: 100%;
   height: 100%;
   padding: 3px 4px 1px 4px;

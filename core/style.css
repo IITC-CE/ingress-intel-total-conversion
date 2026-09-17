@@ -15,6 +15,18 @@
   --sidebar-width: 300px; /* How wide should the sidebar be, in pixels */
   --hidden-scrollbar-width: 20px; /* How much space to leave for scrollbars, in pixels */
   --chat-shrinked: 60px; /* Height of chat when chat is collapsed, in pixels */
+
+  /* colors */
+  --color-enl: #03fe03; /* rgb(3 254 3) */
+  --color-res: #00c5ff; /* rgb(0 197 255) */
+  --color-mac: #ff2020; /* rgb(255 32 32) */
+  --color-none: #fff;
+
+  --color-primary: #ffce00; /* rgb(255 206 0) */
+  --color-secondary: #eee; /* rgb(238 238 238) */
+  --color-bg: rgb(8 48 78);
+  --color-bg-trans: rgb(from var(--color-bg) r g b / 0.9);
+  --color-bg-border: #20a8b1; /* rgb(32 168 177) */
 }
 
 .text-overflow-ellipsis {
@@ -70,19 +82,19 @@ i.large {
 }
 
 .enl {
-  color: #03fe03;
+  color: var(--color-enl);
 }
 
 .res {
-  color: #00c5ff;
+  color: var(--color-res);
 }
 
 .mac {
-  color: #ff2020;
+  color: var(--color-mac);
 }
 
 .none {
-  color: #fff;
+  color: var(--color-none);
 }
 
 .nickname {
@@ -90,7 +102,7 @@ i.large {
 }
 
 a {
-  color: #ffce00;
+  color: var(--color-primary);
   cursor: pointer;
   text-decoration: none;
 }
@@ -138,7 +150,7 @@ td + td {
   z-index: 2500;
   font-size: 11px;
   background-color: #0e3c46;
-  color: #ffce00;
+  color: var(--color-primary);
 }
 
 .portal_details th,
@@ -164,7 +176,7 @@ td + td {
 
 /* misc */
 .layer_off_warning {
-  color: #ffce00;
+  color: var(--color-primary);
   margin: 8px;
   text-align: center;
 }
@@ -238,7 +250,7 @@ svg.icon-button {
 
 /* Warning text */
 .warning {
-  color: #f77;
+  color: #f77; /* rgb(255 119 119) */
   font-weight: bold;
   text-shadow:
     1px 1px black,

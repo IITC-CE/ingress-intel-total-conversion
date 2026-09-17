@@ -1,6 +1,6 @@
 table.artifact {
   tr > * {
-    background: rgba(8, 48, 78, 0.9);
+    background: var(--color-bg-trans);
   }
 
   td.info {

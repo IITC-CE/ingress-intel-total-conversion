@@ -7,9 +7,9 @@
 .ui-dialog {
   position: absolute;
   z-index: 9500;
-  background-color: rgba(8, 48, 78, 0.9);
-  border: 1px solid #20a8b1;
-  color: #eee;
+  background-color: var(--color-bg-trans);
+  border: 1px solid var(--color-bg-border);
+  color: var(--color-secondary);
   font-size: 13px;
   line-height: 15px;
   padding: 2px 4px;
@@ -40,7 +40,7 @@
 
 .ui-tooltip,
 .ui-dialog a {
-  color: #ffce00;
+  color: var(--color-primary);
 }
 
 .ui-dialog {
@@ -69,7 +69,7 @@
 }
 
 .ui-dialog-title-active {
-  color: #ffce00;
+  color: var(--color-primary);
 }
 
 .ui-dialog-title-inactive {
@@ -85,7 +85,7 @@
   height: 17px;
   top: 3px;
   cursor: pointer;
-  border: 1px solid rgb(32, 168, 177);
+  border: 1px solid var(--color-bg-border);
   background-color: rgba(0, 0, 0, 0);
   padding: 0;
 
@@ -103,7 +103,7 @@
 }
 
 .ui-dialog-titlebar-button-collapse-collapsed {
-  background-color: rgb(32, 168, 177);
+  background-color: var(--color-bg-border);
 }
 
 .ui-dialog-titlebar-button-collapse::after,
@@ -116,7 +116,7 @@
   width: 11px;
   margin-left: -6px;
   height: 0;
-  border-top: 2px solid rgb(32, 168, 177);
+  border-top: 2px solid var(--color-bg-border);
 }
 .ui-dialog-titlebar-button-close::after {
   transform: translateY(3.5px) rotate(45deg);
@@ -162,9 +162,9 @@
 .ui-dialog-content button {
   padding: 2px;
   min-width: 40px;
-  color: #ffce00;
-  border: 1px solid #ffce00;
-  background-color: rgba(8, 48, 78, 0.9);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-bg-trans);
 }
 
 .ui-dialog-buttonset button:hover {
