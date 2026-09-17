@@ -1,0 +1,146 @@
+.leaflet-control {
+  user-select: none;
+}
+
+.leaflet-control-container .leaflet-top.leaflet-left {
+  width: 700px; /* chat default width */
+  height: calc(100% - 126px); /* chat default start */
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+
+.leaflet-control-layers-overlays label.disabled {
+  text-decoration: line-through;
+  cursor: help;
+}
+
+/* base layer selection - first column */
+.leaflet-control-layers-base {
+  float: left;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+/* overlays layer selection - 2nd column */
+.leaflet-control-layers-overlays {
+  float: left;
+  margin-left: 8px;
+  border-left: 1px solid #dddddd;
+  padding-left: 8px;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+/* hide the usual separator */
+.leaflet-control-layers-separator {
+  display: none;
+}
+
+/* shift controls when chat is expanded */
+.leaflet-left .leaflet-control.chat-expand {
+  margin-left: 720px;
+}
+
+/* leaflet controls */
+.leaflet-left,
+.leaflet-right {
+  display: grid;
+  grid-gap: 10px;
+  justify-items: baseline;
+}
+
+.leaflet-right {
+  justify-items: end;
+}
+
+.leaflet-left .leaflet-control,
+.leaflet-right .leaflet-control {
+  margin: 0;
+}
+
+.leaflet-top {
+  top: 10px;
+  margin-top: var(--safe-area-inset-top);
+}
+
+.leaflet-right {
+  right: 10px;
+  margin-right: var(--safe-area-inset-right);
+}
+
+.leaflet-bottom {
+  bottom: 10px;
+  margin-bottom: calc(22px + var(--safe-area-inset-bottom));
+}
+
+.leaflet-left {
+  left: 10px;
+  margin-left: var(--safe-area-inset-left);
+}
+
+.leaflet-control-scale {
+  order: -90;
+}
+
+.leaflet-bar {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+}
+
+.leaflet-bar a {
+  text-decoration: none;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-size: 18px;
+  font-size: 0 !important;
+}
+
+.leaflet-control-zoom-in {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M9 3v12M3 9h12' stroke='black' stroke-width='2.2' fill='none'/%3E%3C/svg%3E");
+}
+
+.leaflet-control-zoom-out {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M3.5 9h11' stroke='black' stroke-width='2.2' fill='none'/%3E%3C/svg%3E");
+}
+
+/* leaflet popups - restyle to match the theme of IITC */
+#map .leaflet-popup {
+  pointer-events: none;
+}
+
+#map .leaflet-popup-content-wrapper {
+  border-radius: 0;
+  border: 1px solid #20a8b1;
+  background: #0e3d4e;
+  pointer-events: auto;
+}
+
+#map .leaflet-popup-content {
+  color: #ffce00;
+  margin: 5px 8px;
+}
+
+#map .leaflet-popup-close-button {
+  padding: 2px 1px 0 0;
+  font-size: 12px;
+  line-height: 8px;
+  width: 10px;
+  height: 10px;
+  pointer-events: auto;
+}
+
+#map .leaflet-popup-tip {
+  /* change the tip from an arrow to a simple line */
+  background: #20a8b1;
+  width: 1px;
+  height: 20px;
+  padding: 0;
+  margin: 0 0 0 20px;
+  transform: none;
+}
