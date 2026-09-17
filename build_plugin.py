@@ -3,6 +3,7 @@
 """Utility to build iitc plugin for given source file name."""
 
 import base64
+import os
 import re
 import subprocess
 import sys
@@ -149,6 +150,8 @@ def imgrepl(match, path=None):
 def process_css(filename):
     log_dependency(filename)
     postcss = settings.build_source_dir / 'node_modules' / '.bin' / 'postcss'
+    if os.name == 'nt':
+        postcss = postcss.with_suffix('.cmd')
     if not postcss.is_file():
         raise UserWarning('PostCSS build requires npm dependencies; run npm install')
 
