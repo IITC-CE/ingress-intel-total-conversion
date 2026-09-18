@@ -48,7 +48,7 @@
     }
   }
   .loading {
-    background-color: rgba(255, 0, 0, 0.3);
+    background-color: color-mix(RED 33%, transparent);
     animation: chatloading 1.2s infinite linear;
   }
 }
@@ -59,13 +59,13 @@
 
 @keyframes chatloading {
   0% {
-    background-color: rgba(255, 0, 0, 0.4);
+    background-color: color-mix(RED 40%, transparent);
   }
   50% {
-    background-color: rgba(255, 0, 0, 0.1);
+    background-color: color-mix(RED 10%, transparent);
   }
   100% {
-    background-color: rgba(255, 0, 0, 0.4);
+    background-color: color-mix(RED 40%, transparent);
   }
 }
 

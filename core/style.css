@@ -25,7 +25,8 @@
   --color-primary: #ffce00; /* rgb(255 206 0) */
   --color-secondary: #eee; /* rgb(238 238 238) */
   --color-bg: rgb(8 48 78);
-  --color-bg-trans: rgb(from var(--color-bg) r g b / 0.9);
+  --color-bg-trans: color-mix(var(--color-bg) 90%, transparent);
+  --color-bg-trans-50: color-mix(var(--color-bg) 50%, transparent);
   --color-bg-border: #20a8b1; /* rgb(32 168 177) */
 }
 
