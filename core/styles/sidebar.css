@@ -141,10 +141,10 @@ h2 {
   box-sizing: border-box;
 
   &.res {
-    background: #005684;
+    background: color-mix(var(--color-res) 60%, black);
   }
   &.enl {
-    background: #017f01;
+    background: color-mix(var(--color-enl) 60%, black);
   }
 }
 
