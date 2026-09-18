@@ -127,7 +127,7 @@ h2 {
   font-size: 12px;
   font-weight: normal;
   padding: 0 4px;
-  background-color: rgb(from var(--color-bg) r g b / 0.5);
+  background-color: var(--color-bg-trans-50);
   display: none; /* starts hidden */
   vertical-align: text-top;
 }
