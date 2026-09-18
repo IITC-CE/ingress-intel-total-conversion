@@ -123,15 +123,15 @@ body {
 }
 
 #mobileinfo .enl .filllevel {
-  background-color: #03fe03 !important;
+  background-color: var(--color_enl) !important;
 }
 
 #mobileinfo .res .filllevel {
-  background-color: #00c5ff !important;
+  background-color: var(--color-res) !important;
 }
 
 #mobileinfo .mac .filllevel {
-  background-color: #ff0028 !important;
+  background-color: var(--color-mac) !important;
 }
 
 #playerstat {
@@ -222,13 +222,13 @@ body {
 }
 
 #chatcontrols a.active {
-  border-color: #ffce00;
+  border-color: var(--color-primary);
   border-bottom-width: 0px;
   font-weight: bold;
 }
 
 #chatcontrols a.active + a {
-  border-left-color: #ffce00;
+  border-left-color: var(--color-primary);
 }
 
 #sidebartoggle {
@@ -275,7 +275,7 @@ body {
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
-  border: 2px outset #20a8b1;
+  border: 2px outset var(--color-bg-border);
 }
 
 #toolbox > a,
@@ -283,11 +283,11 @@ body {
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
-  border: 2px outset #20a8b1;
+  border: 2px outset var(--color-bg-border);
 }
 
 #portaldetails .close {
-  border: 1px outset #20a8b1;
+  border: 1px outset var(--color-bg-border);
   font-size: 22px;
 }
 
