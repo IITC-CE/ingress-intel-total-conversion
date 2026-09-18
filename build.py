@@ -4,6 +4,7 @@
 
 import os
 import shutil
+import time
 from pathlib import Path
 from runpy import run_path
 
@@ -80,6 +81,7 @@ def backup(directory):
 
 
 def backup_and_run(deps_list=None):
+    start_time = time.perf_counter()
     source = Path(settings.build_source_dir)
     target = Path(settings.build_target_dir)
     workdir = target.with_name('~')
@@ -90,6 +92,7 @@ def backup_and_run(deps_list=None):
 
     backup(target)
     workdir.replace(target)
+    print(f'Build finished in {time.perf_counter() - start_time:.2f}s')
 
 
 def on_event(cmd):
