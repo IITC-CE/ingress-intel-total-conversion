@@ -32,9 +32,9 @@
   margin-top: -31px; /* -(toggle height / 2) */
   line-height: 10px;
   position: absolute;
-  top: calc(var(--safe-area-inset-top) + 108px);
+  top: calc(var(--safe-area-inset-top) + 103px);
   z-index: 3002;
-  background-color: var(--color-bg);
+  background-color: var(--color-bg-trans);
   color: var(--color-primary);
   border: 1px solid var(--color-bg-border);
   border-right: none;
