@@ -33,7 +33,7 @@ body {
 #loadlevel {
   border-width: 0;
   background: transparent;
-  color: #FFF;
+  color: #fff;
 }
 
 #mobileinfo {
@@ -42,7 +42,7 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  position:relative;
+  position: relative;
   padding: 4px 0;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -56,7 +56,7 @@ body {
 
 #mobileinfo .portallevel {
   padding: 0 0.25em;
-  color: #FFF;
+  color: #fff;
 }
 
 #mobileinfo .resonators-container {
@@ -72,14 +72,30 @@ body {
 }
 
 /* Position resonators based on their data-slot value */
-#mobileinfo .resonator[data-slot="0"] { left: 0%; }
-#mobileinfo .resonator[data-slot="1"] { left: 12.5%; }
-#mobileinfo .resonator[data-slot="2"] { left: 25%; }
-#mobileinfo .resonator[data-slot="3"] { left: 37.5%; }
-#mobileinfo .resonator[data-slot="4"] { left: 50%; }
-#mobileinfo .resonator[data-slot="5"] { left: 62.5%; }
-#mobileinfo .resonator[data-slot="6"] { left: 75%; }
-#mobileinfo .resonator[data-slot="7"] { left: 87.5%; }
+#mobileinfo .resonator[data-slot='0'] {
+  left: 0%;
+}
+#mobileinfo .resonator[data-slot='1'] {
+  left: 12.5%;
+}
+#mobileinfo .resonator[data-slot='2'] {
+  left: 25%;
+}
+#mobileinfo .resonator[data-slot='3'] {
+  left: 37.5%;
+}
+#mobileinfo .resonator[data-slot='4'] {
+  left: 50%;
+}
+#mobileinfo .resonator[data-slot='5'] {
+  left: 62.5%;
+}
+#mobileinfo .resonator[data-slot='6'] {
+  left: 75%;
+}
+#mobileinfo .resonator[data-slot='7'] {
+  left: 87.5%;
+}
 
 #mobileinfo .resonator.empty {
   border-top-color: transparent;
@@ -87,7 +103,7 @@ body {
 
 /* Keep the north indicator (the dot above north resonators) */
 #mobileinfo .resonator.north:before {
-  content: "";
+  content: '';
   background-color: var(--resonator-color, red);
   border-radius: 100%;
   display: block;
@@ -135,7 +151,7 @@ body {
 }
 
 #playerstat h2 #name .playername,
-#playerstat h2 #name:hover .playername{
+#playerstat h2 #name:hover .playername {
   max-width: 60vw;
 }
 
@@ -144,7 +160,8 @@ body {
   overflow: initial;
 }
 
-#name #signout { /* no hover, always show signout button */
+#name #signout {
+  /* no hover, always show signout button */
   display: inline-block;
   position: initial;
   margin-left: 4px;
@@ -171,7 +188,7 @@ body {
 
 #chatcontrols a {
   width: 50px;
-  height:36px;
+  height: 36px;
   overflow: hidden;
   vertical-align: middle;
   line-height: 36px;
@@ -199,18 +216,19 @@ body {
   padding-right: var(--safe-area-inset-right);
 }
 
-#chat td:nth-child(2), #chatinput td:nth-child(2) {
+#chat td:nth-child(2),
+#chatinput td:nth-child(2) {
   width: 77px;
 }
 
 #chatcontrols a.active {
-  border-color: #FFCE00;
-  border-bottom-width:0px;
-  font-weight:bold
+  border-color: #ffce00;
+  border-bottom-width: 0px;
+  font-weight: bold;
 }
 
 #chatcontrols a.active + a {
-  border-left-color: #FFCE00
+  border-left-color: #ffce00;
 }
 
 #sidebartoggle {
@@ -229,7 +247,7 @@ body {
 #sidebar {
   width: 100% !important;
   min-height: 100%;
-  border:0;
+  border: 0;
 }
 
 #sidebar > * {
@@ -248,28 +266,28 @@ body {
  * for some reason leaflet popups on mobile are colored white on white
  * so force the popup msg color to black
  */
-.leaflet-popup-content{
-    color:black;
+.leaflet-popup-content {
+  color: black;
 }
-
 
 /* add extra padding, and a button effect, to sidebar link areas */
-.linkdetails aside  {
+.linkdetails aside {
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
-  border: 2px outset #20A8B1;
+  border: 2px outset #20a8b1;
 }
 
-#toolbox > a, #toolbox_component > a {
+#toolbox > a,
+#toolbox_component > a {
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
-  border: 2px outset #20A8B1;
+  border: 2px outset #20a8b1;
 }
 
 #portaldetails .close {
-  border: 1px outset #20A8B1;
+  border: 1px outset #20a8b1;
   font-size: 22px;
 }
 
@@ -331,7 +349,7 @@ body.show-controls #map {
 }
 
 body.show-controls #scrollwrapper {
-  margin-top: var(--top-controls-height)
+  margin-top: var(--top-controls-height);
 }
 
 body.show-controls #chat {
