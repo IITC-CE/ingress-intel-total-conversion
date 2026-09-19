@@ -49,6 +49,42 @@ window.setupTooltips = function (element) {
 };
 
 /**
+ * Marks the body on browsers that refuse the bundled icon font, so its stylesheet can fall back to the accessible labels
+ *
+ * @function setupIconFont
+ */
+function setupIconFont() {
+  if (!document.fonts) return;
+
+  var markUnavailable = function () {
+    document.body.classList.add('icons-unavailable');
+  };
+
+  // A browser told to ignore page fonts still reports the face as loaded, so
+  // the font is measured rather than asked about: its ligature collapses the
+  // five characters of an icon name into a single glyph, which no fallback does
+  var isDrawn = function () {
+    var width = function (family) {
+      var probe = document.createElement('span');
+      probe.textContent = 'close';
+      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-size:100px;font-family:' + family;
+      document.body.appendChild(probe);
+      var measured = probe.offsetWidth;
+      probe.remove();
+      return measured;
+    };
+    return width('"IITC Material Symbols",monospace') !== width('monospace');
+  };
+
+  document.fonts
+    .load('1em "IITC Material Symbols"', 'close')
+    .then(function () {
+      if (!isDrawn()) markUnavailable();
+    })
+    .catch(markUnavailable);
+}
+
+/**
  * Initializes Ingress markers with custom icons.
  * @function setupIngressMarkers
  */
@@ -281,6 +317,7 @@ function boot() {
   if (window.deviceID) {
     log.log('Your device ID: ' + window.deviceID);
   }
+  setupIconFont();
   IITC.smartphone._runBeforeBoot();
   window.runOnAppBeforeBoot();
 

@@ -1284,7 +1284,7 @@ window.plugin.missions = {
           },
         });
 
-      window.app.addPane('plugin-missions', 'Missions', 'ic_missions');
+      window.app.addPane('plugin-missions', 'Missions', 'route');
       window.addHook('paneChanged', this.onPaneChanged.bind(this));
     }
 

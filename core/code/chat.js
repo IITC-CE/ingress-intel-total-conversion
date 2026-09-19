@@ -437,7 +437,7 @@ function createChannelTab(channelDesc) {
   if (window.useAndroidPanes()) {
     // exlude hard coded panes
     if (channelDesc.id !== 'all' && channelDesc.id !== 'faction' && channelDesc.id !== 'alerts') {
-      app.addPane(channelDesc.id, channelDesc.name, 'ic_action_view_as_list');
+      app.addPane(channelDesc.id, channelDesc.name, 'chat');
     }
   }
 }

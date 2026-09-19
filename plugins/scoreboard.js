@@ -170,7 +170,7 @@ function displayScoreboard() {
 
 function setup() {
   if (window.useAppPanes()) {
-    window.app.addPane('plugin-Scoreboard', 'Scoreboard', 'ic_action_view_as_list_compact');
+    window.app.addPane('plugin-Scoreboard', 'Scoreboard', 'scoreboard');
     window.addHook('paneChanged', function (pane) {
       if (pane === 'plugin-Scoreboard') {
         displayScoreboard();

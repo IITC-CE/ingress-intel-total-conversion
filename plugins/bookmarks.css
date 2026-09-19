@@ -270,32 +270,31 @@
 #bkmrksTrigger:hover{
 	margin-top:0;
 }
-.portal-list-bookmark span {
-	display:inline-block;
+.portal-list-bookmark iitc-icon {
 	margin: -3px;
-	width:16px;
-	height:15px;
-	overflow:hidden;
-	background-repeat:no-repeat;
 	cursor:pointer;
 }
-#bkmrksTrigger, .bkmrksStar span, .portal-list-bookmark span {
+#bkmrksTrigger {
 	background-image:url(images/bookmarks-img.png);
 }
-.bkmrksStar span{
-	display:inline-block;
+.bkmrksStar iitc-icon {
 	float:left;
-	margin:3px 1px 0 4px;
-	width:16px;
-	height:15px;
-	overflow:hidden;
-	background-repeat:no-repeat;
+	margin: 0 0 0 2px;
 }
-.bkmrksStar span, .bkmrksStar.favorite:focus span{
-	background-position:left top;
+.bkmrksStar iitc-icon, .portal-list-bookmark iitc-icon {
+	font-size:16px;
 }
-.bkmrksStar:focus span, .bkmrksStar.favorite span, .portal-list-bookmark.favorite span{
-	background-position:right top;
+.bkmrksStar iitc-icon, .bkmrksStar.favorite:focus iitc-icon {
+	font-variation-settings:'FILL' 0;
+}
+.bkmrksStar:focus iitc-icon, .bkmrksStar.favorite iitc-icon, .portal-list-bookmark.favorite iitc-icon {
+	font-variation-settings:'FILL' 1;
+}
+body.icons-unavailable .bkmrksStar iitc-icon::before, body.icons-unavailable .portal-list-bookmark iitc-icon::before{
+	content:"\2606";
+}
+body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavailable .portal-list-bookmark.favorite iitc-icon::before{
+	content:"\2605";
 }
 #bookmarksBox .bookmarkList .bookmarkFolder{
 	overflow:hidden;
