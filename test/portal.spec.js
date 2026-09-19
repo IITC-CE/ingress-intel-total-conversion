@@ -283,6 +283,13 @@ describe('IITC.portal navigation', () => {
     expect(window.map.setView.called).to.be.false;
   });
 
+  it('selectByLatLng matches a portal drawn on another world copy', () => {
+    window.portals = { g: { options: { data: { latE6: 1e6, lngE6: 179.9e6 } } } };
+    IITC.portal.selectByLatLng(1, -180.1);
+    expect(window.renderPortalDetails.calledOnceWithExactly('g')).to.be.true;
+    expect(window.map.setView.called).to.be.false;
+  });
+
   it('selectByLatLng unpacks an array and defers when the portal is off-screen', () => {
     const defer = sinon.stub(IITC.portal, 'selectWhenLoadedByLatLng');
     IITC.portal.selectByLatLng([3, 4]);
@@ -323,6 +330,17 @@ describe('IITC.portal navigation', () => {
     expect(window.renderPortalDetails.called).to.be.false;
 
     hooks.portalAdded[0]({ portal: { options: { guid: 'hit', data: { latE6: 1e6, lngE6: 2e6 } } } });
+    expect(window.selectedPortal).to.equal('hit');
+    expect(window.renderPortalDetails.calledOnceWithExactly('hit', true)).to.be.true;
+  });
+
+  it('selectWhenLoadedByLatLng matches a portal drawn on another world copy', () => {
+    const hooks = {};
+    window.addHook = (name, cb) => (hooks[name] = hooks[name] || []).push(cb);
+    window.removeHook = (name, cb) => (hooks[name] = hooks[name].filter((h) => h !== cb));
+
+    IITC.portal.selectWhenLoadedByLatLng(new L.LatLng(1, 180.1));
+    hooks.portalAdded[0]({ portal: { options: { guid: 'hit', data: { latE6: 1e6, lngE6: -179.9e6 } } } });
     expect(window.selectedPortal).to.equal('hit');
     expect(window.renderPortalDetails.calledOnceWithExactly('hit', true)).to.be.true;
   });
