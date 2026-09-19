@@ -125,7 +125,19 @@ globalThis.localStorage = {};
 
 // leaflet
 globalThis.L = {
-  LatLng: class {},
+  LatLng: class {
+    constructor(lat, lng) {
+      this.lat = lat;
+      this.lng = lng;
+    }
+    equals(other, margin) {
+      const max = Math.max(Math.abs(this.lat - other.lat), Math.abs(this.lng - other.lng));
+      return max <= (margin === undefined ? 1e-9 : margin);
+    }
+    wrap() {
+      return new L.LatLng(this.lat, ((((this.lng + 180) % 360) + 360) % 360) - 180);
+    }
+  },
   latLng: (lat, lng) => new L.LatLng(lat, lng),
   LayerGroup: class {
     addTo() {}

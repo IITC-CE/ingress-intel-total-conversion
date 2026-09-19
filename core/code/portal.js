@@ -96,6 +96,18 @@ const findGuidByPositionE6 = function (latE6, lngE6) {
 };
 
 /**
+ * Returns the portal location as it comes from the intel data, with the longitude inside [-180, 180].
+ * The marker itself is drawn on the world copy nearest the map view, so its own position may be outside that range
+ *
+ * @memberof IITC.portal
+ * @param {L.PortalMarker} portal - The portal marker.
+ * @returns {L.LatLng} The portal location.
+ */
+const getLatLng = function (portal) {
+  return new L.LatLng(portal.options.data.latE6 / 1e6, portal.options.data.lngE6 / 1e6);
+};
+
+/**
  * Calculates the resonator-based level of a portal.
  * This includes a decimal part and is not clamped to the minimum level of 1
  *
@@ -558,16 +570,15 @@ const selectByLatLng = function (lat, lng) {
     lng = lat.lng;
     lat = lat.lat;
   }
+  const ll = new L.LatLng(lat, lng).wrap();
   for (const guid in window.portals) {
-    const latlng = window.portals[guid].getLatLng();
-    if (latlng.lat === lat && latlng.lng === lng) {
+    if (IITC.portal.getLatLng(window.portals[guid]).equals(ll)) {
       IITC.portal.display.renderDetails(guid);
       return;
     }
   }
 
   // not currently visible
-  const ll = new L.LatLng(lat, lng);
   IITC.portal.selectWhenLoadedByLatLng(ll);
   window.map.setView(ll, window.DEFAULT_ZOOM);
 };
@@ -588,7 +599,7 @@ const selectWhenLoadedByLatLng = (latLng) => {
 };
 
 const testPortalLatLng = (data) => {
-  if (data.portal.getLatLng().equals(urlPortalLL)) {
+  if (IITC.portal.getLatLng(data.portal).equals(urlPortalLL.wrap())) {
     log.debug(`urlPortalLL ${urlPortalLL.toString()} matches portal GUID ${data.portal.options.guid}`);
     window.selectedPortal = data.portal.options.guid;
     IITC.portal.display.renderDetails(window.selectedPortal, true);
@@ -633,6 +644,7 @@ IITC.portal = {
   getFields,
   getFieldsCount,
   findGuidByPositionE6,
+  getLatLng,
   // Detail computations
   getLevel,
   getTotalEnergy,

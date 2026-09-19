@@ -522,16 +522,23 @@ const makePermalink = function (latlng, options) {
   // ensures that lat,lng are with same precision as in stock intel permalinks
   const round = (l) => Math.floor(l * 1e6) / 1e6;
 
+  // the map center and portal markers may sit on a world copy past 180 degrees, a permalink always carries the wrapped longitude
+  // whole worlds are shifted on the E6 grid the intel data uses, so the result lands back on it exactly
+  const wrapLng = (lng) => {
+    const lngE6 = Math.round(lng * 1e6);
+    return (lngE6 - Math.round(lngE6 / 360e6) * 360e6) / 1e6;
+  };
+
   const args = [];
   if (!latlng || options.includeMapView) {
     const c = window.map.getCenter();
-    args.push('ll=' + [round(c.lat), round(c.lng)].join(','), 'z=' + window.map.getZoom());
+    args.push('ll=' + [round(c.lat), wrapLng(round(c.lng))].join(','), 'z=' + window.map.getZoom());
   }
   if (latlng) {
     if ('lat' in latlng) {
       latlng = [latlng.lat, latlng.lng];
     }
-    args.push('pll=' + latlng.join(','));
+    args.push('pll=' + [latlng[0], wrapLng(latlng[1])].join(','));
   }
   let url = '';
   if (options.fullURL) {
