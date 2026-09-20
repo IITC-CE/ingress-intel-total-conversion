@@ -114,6 +114,20 @@ window.plugin.mpe.data.getProjects = function (PJ) {
   return window.plugin.mpe.obj.projects[PJ].pj;
 };
 
+// the default project is the absence of an entry, so old storages need no migration
+window.plugin.mpe.data.getSavedKeyPj = (PJ) => window.plugin.mpe.obj.opt.settings.current?.[PJ];
+window.plugin.mpe.data.saveKeyPj = (PJ, storageKey) => {
+  const { settings } = window.plugin.mpe.obj.opt;
+  settings.current ??= {};
+
+  if (storageKey === window.plugin.mpe.data.getPreKeyPj(PJ)) {
+    delete settings.current[PJ];
+  } else {
+    settings.current[PJ] = storageKey;
+  }
+  window.plugin.mpe.storage.saveStorage();
+};
+
 window.plugin.mpe.data.isInSidebar = function (PJ) {
   var arrSidebar = window.plugin.mpe.obj.opt['settings']['sidebar'];
   var index = arrSidebar.indexOf(PJ);
@@ -414,6 +428,7 @@ window.plugin.mpe.action.switchProject = function (PJ, storageKey) {
 
   // change in obj
   window.plugin.mpe.data.setKey(PJ, storageKey);
+  window.plugin.mpe.data.saveKeyPj(PJ, storageKey);
 
   pj.func_pre();
 
@@ -504,7 +519,7 @@ window.plugin.mpe.setMultiProjects = function (settings) {
       settings.fa = '';
     }
     if (!settings.func_pre) {
-      settings.func_pre = '';
+      settings.func_pre = () => {};
     }
 
     var newMPE = {
@@ -523,7 +538,28 @@ window.plugin.mpe.setMultiProjects = function (settings) {
     window.plugin.mpe.obj.projects[settings.namespace] = newMPE;
     window.plugin.mpe.data.scanStorageForOne(settings.namespace);
     window.plugin.mpe.ui.toggleSidebar(settings.namespace);
+    window.plugin.mpe.action.restoreProject(settings.namespace);
   }
+};
+
+// plugins always register on their default key, so an earlier choice is re-applied here
+window.plugin.mpe.action.restoreProject = (PJ) => {
+  // the switch runs plugin code that expects every plugin to be set up
+  if (!window.iitcLoaded) {
+    window.addHook('iitcLoaded', () => window.plugin.mpe.action.restoreProject(PJ));
+    return;
+  }
+
+  const storageKey = window.plugin.mpe.data.getSavedKeyPj(PJ);
+  if (storageKey === undefined || storageKey === window.plugin.mpe.data.getCurrKeyPj(PJ)) return;
+
+  // the project may have been deleted in another tab
+  if (!window.plugin.mpe.data.getProjects(PJ).includes(storageKey)) {
+    window.plugin.mpe.data.saveKeyPj(PJ, window.plugin.mpe.data.getPreKeyPj(PJ));
+    return;
+  }
+
+  window.plugin.mpe.action.switchProject(PJ, storageKey);
 };
 
 window.plugin.mpe.setupCSS = function () {
