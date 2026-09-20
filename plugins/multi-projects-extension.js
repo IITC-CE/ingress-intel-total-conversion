@@ -45,6 +45,9 @@ window.plugin.mpe.action = {};
 window.plugin.mpe.obj.projects = {};
 window.plugin.mpe.obj.opt = { settings: { manager: [], sidebar: [] } };
 
+const pendingProjects = [];
+window.plugin.mpe.isReady = false;
+
 // ------------------------------------------------------
 // STORAGE
 // ------------------------------------------------------
@@ -481,6 +484,12 @@ window.plugin.mpe.action.deleteProject = function (PJ, storage) {
 // ------------------------------------------------------
 
 window.plugin.mpe.setMultiProjects = function (settings) {
+  // setup may not have run yet: it replays whatever registered before it
+  if (!window.plugin.mpe.isReady) {
+    pendingProjects.push(settings);
+    return;
+  }
+
   window.plugin.mpe.storage.loadStorage();
   window.plugin.mpe.ui.appendContainerInSidebar();
 
@@ -552,6 +561,12 @@ var setup = function () {
   window.plugin.mpe.setupCSS();
   window.plugin.mpe.ui.addControl();
   window.plugin.mpe.ui.appendContainerInSidebar();
+
+  window.plugin.mpe.isReady = true;
+  pendingProjects.splice(0).forEach((settings) => window.plugin.mpe.setMultiProjects(settings));
+
+  // lets plugins that ran before MPE register their projects
+  window.runHooks('pluginMpeReady');
 };
 
-setup.priority = 'high';
+setup.priority = 'highest';

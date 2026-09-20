@@ -959,8 +959,9 @@ window.plugin.drawTools.edfStatusToggle = function () {
 // MPE - MULTI PROJECTS EXTENSION
 // ---------------------------------------------------------------------------------
 window.plugin.drawTools.initMPE = function () {
-  // Not launch the code if the MPE plugin there isn't.
+  // MPE may not be loaded yet, and fires this hook once it is
   if (!window.plugin.mpe) {
+    window.addHook('pluginMpeReady', window.plugin.drawTools.initMPE);
     return;
   }
 

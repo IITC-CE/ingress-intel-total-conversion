@@ -1341,6 +1341,12 @@ window.plugin.bookmarks.setupContent = function () {
 
 /** ************************************************************************************************************************************************************/
 window.plugin.bookmarks.initMPE = function () {
+  // MPE may not be loaded yet, and fires this hook once it is
+  if (!window.plugin.mpe) {
+    window.addHook('pluginMpeReady', window.plugin.bookmarks.initMPE);
+    return;
+  }
+
   window.plugin.mpe.setMultiProjects({
     namespace: 'bookmarks',
     title: 'Bookmarks for Maps and Portals',
@@ -1469,10 +1475,7 @@ var setup = function () {
   if (window.plugin.portalslist) {
     window.plugin.bookmarks.setupPortalsList();
   }
-  // Initilaize MPE-Support only if MPE-Module is available
-  if (window.plugin.mpe !== undefined) {
-    window.plugin.bookmarks.initMPE();
-  }
+  window.plugin.bookmarks.initMPE();
 };
 // moved setupCSS to the end to improve readability of built script
 window.plugin.bookmarks.setupCSS = function () {
