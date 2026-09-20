@@ -179,6 +179,10 @@ window.plugin.mpe.data.scanStorageForAll = function () {
 };
 window.plugin.mpe.data.scanStorageForOne = function (name) {
   var PROJ = window.plugin.mpe.obj.projects[name];
+  // not registered yet: setMultiProjects scans as soon as it is
+  if (!PROJ) {
+    return;
+  }
   PROJ.pj = [];
 
   //        if(window.localStorage[PROJ.defaultKey] !== undefined){
