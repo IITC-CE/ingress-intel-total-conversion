@@ -56,6 +56,10 @@ window.plugin.bookmarks.currentProject = {};
 // every project's bookmarks, the map handed to sync: the name is also the Drive file name
 window.plugin.bookmarks.SYNC_FIELD = 'bkmrksObj';
 window.plugin.bookmarks.SYNC_KEY_DELIMITER = '|';
+// deletion leaves this mark, so a device that still has the project drops it instead of pushing it back
+window.plugin.bookmarks.DELETED_MARK = 'deleted';
+// how long a mark is kept: long enough for every device to have synced at least once
+window.plugin.bookmarks.DELETED_MARK_TTL = 30 * 24 * 60 * 60 * 1000;
 window.plugin.bookmarks.bkmrksObj = {};
 window.plugin.bookmarks.LIST_TYPES = ['portals', 'maps'];
 window.plugin.bookmarks.emptyList = () => ({ [window.plugin.bookmarks.KEY_OTHER_BKMRK]: { label: 'Others', state: 1, bkmrk: {} } });
@@ -1121,10 +1125,22 @@ window.plugin.bookmarks.reconcileAfterMpeChange = (data) => {
   if (data?.data?.namespace !== 'bookmarks') return;
 
   const valid = new Set(window.plugin.bookmarks.getAllProjectKeys());
-  const dropped = Object.keys(window.plugin.bookmarks.bkmrksObj).filter((syncKey) => !valid.has(window.plugin.bookmarks.parseSyncKey(syncKey).storageKey));
+  const gone = new Set();
+  const dropped = Object.keys(window.plugin.bookmarks.bkmrksObj).filter((syncKey) => {
+    const { storageKey, list } = window.plugin.bookmarks.parseSyncKey(syncKey);
+    // a mark outlives the project it belongs to
+    if (list === window.plugin.bookmarks.DELETED_MARK || valid.has(storageKey)) return false;
+    gone.add(storageKey);
+    return true;
+  });
   dropped.forEach((syncKey) => {
     delete window.plugin.bookmarks.bkmrksObj[syncKey];
     window.plugin.bookmarks.updateQueue[syncKey] = true;
+  });
+  gone.forEach((deletedKey) => {
+    const mark = window.plugin.bookmarks.makeSyncKey(deletedKey, window.plugin.bookmarks.DELETED_MARK);
+    window.plugin.bookmarks.bkmrksObj[mark] = Date.now();
+    window.plugin.bookmarks.updateQueue[mark] = true;
   });
 
   // a project created a moment ago has no entry yet
@@ -1133,6 +1149,10 @@ window.plugin.bookmarks.reconcileAfterMpeChange = (data) => {
   if (isNew) {
     window.plugin.bookmarks.seedProject(storageKey);
     window.plugin.bookmarks.queueProject(storageKey);
+    // the project is back, so its mark goes
+    const mark = window.plugin.bookmarks.makeSyncKey(storageKey, window.plugin.bookmarks.DELETED_MARK);
+    delete window.plugin.bookmarks.bkmrksObj[mark];
+    window.plugin.bookmarks.updateQueue[mark] = true;
   }
 
   if (dropped.length === 0 && !isNew) return;
@@ -1164,8 +1184,13 @@ window.plugin.bookmarks.syncCallback = (pluginName, fieldName, e, fullUpdated) =
   if (fieldName !== window.plugin.bookmarks.SYNC_FIELD || !fullUpdated) return;
 
   const byProject = {};
+  const marked = new Map();
   Object.entries(window.plugin.bookmarks.bkmrksObj).forEach(([syncKey, folders]) => {
     const { storageKey, list } = window.plugin.bookmarks.parseSyncKey(syncKey);
+    if (list === window.plugin.bookmarks.DELETED_MARK) {
+      marked.set(storageKey, folders);
+      return;
+    }
     // a key some other client keeps in the same file
     if (!window.plugin.bookmarks.LIST_TYPES.includes(list)) return;
     (byProject[storageKey] ??= {})[list] = folders;
@@ -1174,6 +1199,29 @@ window.plugin.bookmarks.syncCallback = (pluginName, fieldName, e, fullUpdated) =
     window.plugin.bookmarks.LIST_TYPES.forEach((list) => (data[list] ??= window.plugin.bookmarks.emptyList()));
     localStorage[storageKey] = JSON.stringify(data);
   });
+
+  let dropMark = false;
+  marked.forEach((markedAt, storageKey) => {
+    // the default project is never deleted, whatever the file says
+    if (storageKey === window.plugin.bookmarks.DEFAULT_KEY_STORAGE) return;
+
+    const recreated = storageKey in byProject;
+    if (!recreated) delete localStorage[storageKey];
+
+    // a mark is dropped once the project is back, or once it has outlived its purpose
+    const age = Date.now() - (Number.isFinite(markedAt) ? markedAt : Date.now());
+    if (recreated || age > window.plugin.bookmarks.DELETED_MARK_TTL) {
+      const mark = window.plugin.bookmarks.makeSyncKey(storageKey, window.plugin.bookmarks.DELETED_MARK);
+      delete window.plugin.bookmarks.bkmrksObj[mark];
+      window.plugin.bookmarks.updateQueue[mark] = true;
+      dropMark = true;
+    }
+  });
+
+  // the project open right now may be one of those just deleted
+  if (marked.has(window.plugin.bookmarks.KEY_STORAGE) && !(window.plugin.bookmarks.KEY_STORAGE in byProject)) {
+    window.plugin.mpe?.action?.switchProject?.('bookmarks', window.plugin.bookmarks.DEFAULT_KEY_STORAGE);
+  }
 
   // so MPE learns about projects that arrived or went away on another device
   window.plugin.mpe?.data?.scanStorageForOne?.('bookmarks');
@@ -1184,7 +1232,7 @@ window.plugin.bookmarks.syncCallback = (pluginName, fieldName, e, fullUpdated) =
     window.plugin.bookmarks.seedProject(storageKey);
     window.plugin.bookmarks.queueProject(storageKey);
   });
-  if (missing.length > 0) {
+  if (missing.length > 0 || dropMark) {
     window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
     window.plugin.bookmarks.delaySync();
   }
