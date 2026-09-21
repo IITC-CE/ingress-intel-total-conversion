@@ -48,14 +48,14 @@ window.plugin.bookmarks.KEY_STORAGE = 'plugin-bookmarks';
 window.plugin.bookmarks.DEFAULT_KEY_STORAGE = 'plugin-bookmarks';
 window.plugin.bookmarks.KEY_STATUS_BOX = 'plugin-bookmarks-box';
 
-window.plugin.bookmarks.IsDefaultStorageKey = true; // as default on startup
 window.plugin.bookmarks.UPDATE_QUEUE = { key: 'plugin-bookmarks-queue', field: 'updateQueue' };
 window.plugin.bookmarks.UPDATING_QUEUE = { key: 'plugin-bookmarks-updating-queue', field: 'updatingQueue' };
 
 // bookmarks of the selected project, what the rest of the plugin reads
 window.plugin.bookmarks.currentProject = {};
-// the synced copy of the default project: the name is also the Drive file name
+// every project's bookmarks, the map handed to sync: the name is also the Drive file name
 window.plugin.bookmarks.SYNC_FIELD = 'bkmrksObj';
+window.plugin.bookmarks.SYNC_KEY_DELIMITER = '|';
 window.plugin.bookmarks.bkmrksObj = {};
 window.plugin.bookmarks.LIST_TYPES = ['portals', 'maps'];
 window.plugin.bookmarks.emptyList = () => ({ [window.plugin.bookmarks.KEY_OTHER_BKMRK]: { label: 'Others', state: 1, bkmrk: {} } });
@@ -1053,7 +1053,7 @@ window.plugin.bookmarks.dialogLoadList = function () {
 /** ************************************************************************************************************************************************************/
 // Delay the syncing to group a few updates in a single request
 window.plugin.bookmarks.delaySync = function () {
-  if (!window.plugin.bookmarks.enableSync || !window.plugin.bookmarks.IsDefaultStorageKey) return;
+  if (!window.plugin.bookmarks.enableSync) return;
   clearTimeout(window.plugin.bookmarks.delaySync.timer);
   window.plugin.bookmarks.delaySync.timer = setTimeout(function () {
     window.plugin.bookmarks.delaySync.timer = null;
@@ -1063,7 +1063,7 @@ window.plugin.bookmarks.delaySync = function () {
 
 // Store the updateQueue in updatingQueue and upload
 window.plugin.bookmarks.syncNow = function () {
-  if (!window.plugin.bookmarks.enableSync || !window.plugin.bookmarks.IsDefaultStorageKey) return;
+  if (!window.plugin.bookmarks.enableSync) return;
   $.extend(window.plugin.bookmarks.updatingQueue, window.plugin.bookmarks.updateQueue);
   window.plugin.bookmarks.updateQueue = {};
   window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATING_QUEUE);
@@ -1072,21 +1072,72 @@ window.plugin.bookmarks.syncNow = function () {
   window.plugin.sync.updateMap('bookmarks', window.plugin.bookmarks.SYNC_FIELD, Object.keys(window.plugin.bookmarks.updatingQueue));
 };
 
-window.plugin.bookmarks.seedSyncMap = () => {
+// localStorage keys holding bookmarks: the default project plus any MPE projects
+window.plugin.bookmarks.getAllProjectKeys = () => {
+  const keys = [window.plugin.bookmarks.DEFAULT_KEY_STORAGE];
+  keys.push(...(window.plugin.mpe?.obj?.projects?.bookmarks?.pj ?? []));
+  return keys;
+};
+
+// the default project keeps the plain 'portals' and 'maps' keys, the only ones an older client reads
+window.plugin.bookmarks.makeSyncKey = (storageKey, list) =>
+  storageKey === window.plugin.bookmarks.DEFAULT_KEY_STORAGE ? list : storageKey + window.plugin.bookmarks.SYNC_KEY_DELIMITER + list;
+
+window.plugin.bookmarks.parseSyncKey = (syncKey) => {
+  const idx = syncKey.lastIndexOf(window.plugin.bookmarks.SYNC_KEY_DELIMITER);
+  if (idx === -1) return { storageKey: window.plugin.bookmarks.DEFAULT_KEY_STORAGE, list: syncKey };
+  return { storageKey: syncKey.slice(0, idx), list: syncKey.slice(idx + window.plugin.bookmarks.SYNC_KEY_DELIMITER.length) };
+};
+
+window.plugin.bookmarks.seedProject = (storageKey) => {
   let data = {};
-  const raw = localStorage[window.plugin.bookmarks.DEFAULT_KEY_STORAGE];
+  const raw = localStorage[storageKey];
   if (raw) {
     try {
       data = JSON.parse(raw);
     } catch {
-      console.warn('bookmarks: failed to parse the default project while seeding sync');
+      console.warn(`bookmarks: failed to parse localStorage[${storageKey}] while seeding sync`);
     }
   }
 
-  window.plugin.bookmarks.bkmrksObj = {};
   window.plugin.bookmarks.LIST_TYPES.forEach((list) => {
-    window.plugin.bookmarks.bkmrksObj[list] = data[list] ?? window.plugin.bookmarks.emptyList();
+    window.plugin.bookmarks.bkmrksObj[window.plugin.bookmarks.makeSyncKey(storageKey, list)] = data[list] ?? window.plugin.bookmarks.emptyList();
   });
+};
+
+window.plugin.bookmarks.seedSyncMap = () => {
+  window.plugin.bookmarks.bkmrksObj = {};
+  window.plugin.bookmarks.getAllProjectKeys().forEach(window.plugin.bookmarks.seedProject);
+};
+
+// a queued key with nothing behind it tells sync to drop it
+window.plugin.bookmarks.queueProject = (storageKey) => {
+  window.plugin.bookmarks.LIST_TYPES.forEach((list) => {
+    window.plugin.bookmarks.updateQueue[window.plugin.bookmarks.makeSyncKey(storageKey, list)] = true;
+  });
+};
+
+window.plugin.bookmarks.reconcileAfterMpeChange = (data) => {
+  if (data?.data?.namespace !== 'bookmarks') return;
+
+  const valid = new Set(window.plugin.bookmarks.getAllProjectKeys());
+  const dropped = Object.keys(window.plugin.bookmarks.bkmrksObj).filter((syncKey) => !valid.has(window.plugin.bookmarks.parseSyncKey(syncKey).storageKey));
+  dropped.forEach((syncKey) => {
+    delete window.plugin.bookmarks.bkmrksObj[syncKey];
+    window.plugin.bookmarks.updateQueue[syncKey] = true;
+  });
+
+  // a project created a moment ago has no entry yet
+  const storageKey = window.plugin.bookmarks.KEY_STORAGE;
+  const isNew = !(window.plugin.bookmarks.makeSyncKey(storageKey, 'portals') in window.plugin.bookmarks.bkmrksObj);
+  if (isNew) {
+    window.plugin.bookmarks.seedProject(storageKey);
+    window.plugin.bookmarks.queueProject(storageKey);
+  }
+
+  if (dropped.length === 0 && !isNew) return;
+  window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
+  window.plugin.bookmarks.delaySync();
 };
 
 window.plugin.bookmarks.registerFieldForSyncing = () => {
@@ -1096,6 +1147,9 @@ window.plugin.bookmarks.registerFieldForSyncing = () => {
     return;
   }
   window.plugin.bookmarks.seedSyncMap();
+  window.addHook('mpe', window.plugin.bookmarks.reconcileAfterMpeChange);
+  // MPE can register its projects after the seeding above, leaving them out of the map
+  window.addHook('pluginMpeReady', window.plugin.bookmarks.seedSyncMap);
   window.plugin.sync.registerMapForSync(
     'bookmarks',
     window.plugin.bookmarks.SYNC_FIELD,
@@ -1105,11 +1159,36 @@ window.plugin.bookmarks.registerFieldForSyncing = () => {
 };
 
 // fullUpdated is set whenever the file was last written by another client, meaning sync has
-// just replaced the map wholesale
+// just replaced the map wholesale, so every project's localStorage is rebuilt from it
 window.plugin.bookmarks.syncCallback = (pluginName, fieldName, e, fullUpdated) => {
   if (fieldName !== window.plugin.bookmarks.SYNC_FIELD || !fullUpdated) return;
 
-  localStorage[window.plugin.bookmarks.DEFAULT_KEY_STORAGE] = JSON.stringify(window.plugin.bookmarks.bkmrksObj);
+  const byProject = {};
+  Object.entries(window.plugin.bookmarks.bkmrksObj).forEach(([syncKey, folders]) => {
+    const { storageKey, list } = window.plugin.bookmarks.parseSyncKey(syncKey);
+    // a key some other client keeps in the same file
+    if (!window.plugin.bookmarks.LIST_TYPES.includes(list)) return;
+    (byProject[storageKey] ??= {})[list] = folders;
+  });
+  Object.entries(byProject).forEach(([storageKey, data]) => {
+    window.plugin.bookmarks.LIST_TYPES.forEach((list) => (data[list] ??= window.plugin.bookmarks.emptyList()));
+    localStorage[storageKey] = JSON.stringify(data);
+  });
+
+  // so MPE learns about projects that arrived or went away on another device
+  window.plugin.mpe?.data?.scanStorageForOne?.('bookmarks');
+
+  // an older client writes the file without these keys, so the local copy is kept and pushed back
+  const missing = window.plugin.bookmarks.getAllProjectKeys().filter((storageKey) => !(storageKey in byProject));
+  missing.forEach((storageKey) => {
+    window.plugin.bookmarks.seedProject(storageKey);
+    window.plugin.bookmarks.queueProject(storageKey);
+  });
+  if (missing.length > 0) {
+    window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
+    window.plugin.bookmarks.delaySync();
+  }
+
   window.plugin.bookmarks.refreshBkmrks();
   window.plugin.bookmarks.resetAllStars();
   window.runHooks('pluginBkmrksSyncEnd', { target: 'all', action: 'sync' });
@@ -1134,8 +1213,9 @@ window.plugin.bookmarks.storeLocal = function (mapping) {
 };
 
 window.plugin.bookmarks.syncBkmrks = function () {
-  window.plugin.bookmarks.seedSyncMap();
-  window.plugin.bookmarks.LIST_TYPES.forEach((list) => (window.plugin.bookmarks.updateQueue[list] = true));
+  const storageKey = window.plugin.bookmarks.KEY_STORAGE;
+  window.plugin.bookmarks.seedProject(storageKey);
+  window.plugin.bookmarks.queueProject(storageKey);
   window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
   window.plugin.bookmarks.delaySync();
 };
@@ -1349,13 +1429,9 @@ window.plugin.bookmarks.initMPE = function () {
     title: 'Bookmarks for Maps and Portals',
     icon: 'bookmark',
     fa: 'fa-bookmark',
-    defaultKey: 'plugin-bookmarks',
+    defaultKey: window.plugin.bookmarks.DEFAULT_KEY_STORAGE,
     func_setKey: function (newKey) {
       window.plugin.bookmarks.KEY_STORAGE = newKey;
-    },
-    func_pre: function () {
-      // disable sync
-      window.plugin.bookmarks.IsDefaultStorageKey = false;
     },
     func_post: function () {
       // Delete all Markers (stared portals)
@@ -1378,9 +1454,6 @@ window.plugin.bookmarks.initMPE = function () {
 
       // Refresh Highlighter
       window.plugin.bookmarks.highlightRefresh({ target: 'all', action: 'MPEswitch' });
-
-      // enable sync if default storage
-      window.plugin.bookmarks.IsDefaultStorageKey = this.defaultKey === this.currKey;
     },
   });
 };
@@ -1452,6 +1525,9 @@ var setup = function () {
   window.addHook('portalDetailsUpdated', window.plugin.bookmarks.onPortalSelected);
   window.addHook('search', window.plugin.bookmarks.onSearch);
 
+  // MPE has to know the projects before syncing seeds them
+  window.plugin.bookmarks.initMPE();
+
   // Sync
   window.addHook('pluginBkmrksEdit', window.plugin.bookmarks.syncBkmrks);
   window.plugin.bookmarks.registerFieldForSyncing();
@@ -1471,7 +1547,6 @@ var setup = function () {
   if (window.plugin.portalslist) {
     window.plugin.bookmarks.setupPortalsList();
   }
-  window.plugin.bookmarks.initMPE();
 };
 // moved setupCSS to the end to improve readability of built script
 window.plugin.bookmarks.setupCSS = function () {
