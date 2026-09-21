@@ -44,14 +44,21 @@ window.plugin.bookmarks.SYNC_DELAY = 5000;
 
 window.plugin.bookmarks.KEY_OTHER_BKMRK = 'idOthers';
 window.plugin.bookmarks.KEY_STORAGE = 'plugin-bookmarks';
+// MPE points KEY_STORAGE at the selected project, so the default one is kept separately
+window.plugin.bookmarks.DEFAULT_KEY_STORAGE = 'plugin-bookmarks';
 window.plugin.bookmarks.KEY_STATUS_BOX = 'plugin-bookmarks-box';
 
-window.plugin.bookmarks.KEY = { key: window.plugin.bookmarks.KEY_STORAGE, field: 'bkmrksObj' };
 window.plugin.bookmarks.IsDefaultStorageKey = true; // as default on startup
 window.plugin.bookmarks.UPDATE_QUEUE = { key: 'plugin-bookmarks-queue', field: 'updateQueue' };
 window.plugin.bookmarks.UPDATING_QUEUE = { key: 'plugin-bookmarks-updating-queue', field: 'updatingQueue' };
 
+// bookmarks of the selected project, what the rest of the plugin reads
+window.plugin.bookmarks.currentProject = {};
+// the synced copy of the default project: the name is also the Drive file name
+window.plugin.bookmarks.SYNC_FIELD = 'bkmrksObj';
 window.plugin.bookmarks.bkmrksObj = {};
+window.plugin.bookmarks.LIST_TYPES = ['portals', 'maps'];
+window.plugin.bookmarks.emptyList = () => ({ [window.plugin.bookmarks.KEY_OTHER_BKMRK]: { label: 'Others', state: 1, bkmrk: {} } });
 window.plugin.bookmarks.statusBox = {};
 window.plugin.bookmarks.updateQueue = {};
 window.plugin.bookmarks.updatingQueue = {};
@@ -102,12 +109,12 @@ window.plugin.bookmarks.escapeUnicode = function (str) {
 
 // Update the localStorage
 window.plugin.bookmarks.saveStorage = function () {
-  localStorage[window.plugin.bookmarks.KEY_STORAGE] = JSON.stringify(window.plugin.bookmarks.bkmrksObj);
+  localStorage[window.plugin.bookmarks.KEY_STORAGE] = JSON.stringify(window.plugin.bookmarks.currentProject);
 };
 
 // Load the localStorage
 window.plugin.bookmarks.loadStorage = function () {
-  window.plugin.bookmarks.bkmrksObj = JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]);
+  window.plugin.bookmarks.currentProject = JSON.parse(localStorage[window.plugin.bookmarks.KEY_STORAGE]);
 };
 
 window.plugin.bookmarks.saveStorageBox = function () {
@@ -123,9 +130,9 @@ window.plugin.bookmarks.upgradeToNewStorage = function () {
     var oldStor_1 = JSON.parse(localStorage['plugin-bookmarks-maps-data']);
     var oldStor_2 = JSON.parse(localStorage['plugin-bookmarks-portals-data']);
 
-    window.plugin.bookmarks.bkmrksObj = {};
-    window.plugin.bookmarks.bkmrksObj.maps = oldStor_1.bkmrk_maps;
-    window.plugin.bookmarks.bkmrksObj.portals = oldStor_2.bkmrk_portals;
+    window.plugin.bookmarks.currentProject = {};
+    window.plugin.bookmarks.currentProject.maps = oldStor_1.bkmrk_maps;
+    window.plugin.bookmarks.currentProject.portals = oldStor_2.bkmrk_portals;
     window.plugin.bookmarks.saveStorage();
 
     localStorage.removeItem('plugin-bookmarks-maps-data');
@@ -136,9 +143,9 @@ window.plugin.bookmarks.upgradeToNewStorage = function () {
 
 window.plugin.bookmarks.createStorage = function () {
   if (!localStorage[window.plugin.bookmarks.KEY_STORAGE]) {
-    window.plugin.bookmarks.bkmrksObj = {};
-    window.plugin.bookmarks.bkmrksObj.maps = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
-    window.plugin.bookmarks.bkmrksObj.portals = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
+    window.plugin.bookmarks.currentProject = {};
+    window.plugin.bookmarks.currentProject.maps = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
+    window.plugin.bookmarks.currentProject.portals = { idOthers: { label: 'Others', state: 1, bkmrk: {} } };
     window.plugin.bookmarks.saveStorage();
   }
   if (!localStorage[window.plugin.bookmarks.KEY_STATUS_BOX]) {
@@ -213,14 +220,14 @@ window.plugin.bookmarks.openFolder = function (elem) {
   var ID = $(elem).parent().parent('li').attr('id');
 
   var newFlag;
-  var flag = window.plugin.bookmarks.bkmrksObj[typeList][ID]['state'];
+  var flag = window.plugin.bookmarks.currentProject[typeList][ID]['state'];
   if (flag) {
     newFlag = 0;
   } else if (!flag) {
     newFlag = 1;
   }
 
-  window.plugin.bookmarks.bkmrksObj[typeList][ID]['state'] = newFlag;
+  window.plugin.bookmarks.currentProject[typeList][ID]['state'] = newFlag;
   window.plugin.bookmarks.saveStorage();
   window.runHooks('pluginBkmrksEdit', { target: 'folder', action: newFlag ? 'open' : 'close', id: ID });
 };
@@ -237,7 +244,7 @@ window.plugin.bookmarks.loadList = function (typeList) {
   }
 
   // For each folder
-  var list = window.plugin.bookmarks.bkmrksObj[typeList];
+  var list = window.plugin.bookmarks.currentProject[typeList];
 
   for (var idFolders in list) {
     var folders = list[idFolders];
@@ -310,7 +317,7 @@ window.plugin.bookmarks.loadList = function (typeList) {
 /** *************************************************************************************************************************************************************/
 
 window.plugin.bookmarks.findByGuid = function (guid) {
-  var list = window.plugin.bookmarks.bkmrksObj['portals'];
+  var list = window.plugin.bookmarks.currentProject['portals'];
 
   for (var idFolders in list) {
     for (var idBkmrk in list[idFolders]['bkmrk']) {
@@ -378,7 +385,7 @@ window.plugin.bookmarks.switchStarPortal = function (guid) {
   // If portal is saved in bookmarks: Remove this bookmark
   var bkmrkData = window.plugin.bookmarks.findByGuid(guid);
   if (bkmrkData) {
-    var list = window.plugin.bookmarks.bkmrksObj['portals'];
+    var list = window.plugin.bookmarks.currentProject['portals'];
     delete list[bkmrkData['id_folder']]['bkmrk'][bkmrkData['id_bookmark']];
     $('.bkmrk#' + bkmrkData['id_bookmark'] + '').remove();
 
@@ -411,7 +418,7 @@ window.plugin.bookmarks.addPortalBookmarkByMarker = function (marker, doPostProc
   const latlng = `${ll.lat},${ll.lng}`;
   const ID = window.plugin.bookmarks.generateID();
 
-  window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {
+  window.plugin.bookmarks.currentProject['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = {
     guid: guid,
     latlng: latlng,
     label: label,
@@ -466,7 +473,7 @@ window.plugin.bookmarks.addPortalBookmark = function (guid, latlng, label) {
   var ID = window.plugin.bookmarks.generateID();
 
   // Add bookmark in the localStorage
-  window.plugin.bookmarks.bkmrksObj['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = { guid: guid, latlng: latlng, label: label };
+  window.plugin.bookmarks.currentProject['portals'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = { guid: guid, latlng: latlng, label: label };
 
   window.plugin.bookmarks.saveStorage();
   window.plugin.bookmarks.refreshBkmrks();
@@ -494,14 +501,14 @@ window.plugin.bookmarks.addElement = function (elem, type) {
     var latlng = lat + ',' + lng;
     var zoom = parseInt(window.map.getZoom());
     // Add bookmark in the localStorage
-    window.plugin.bookmarks.bkmrksObj['maps'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = { label: label, latlng: latlng, z: zoom };
+    window.plugin.bookmarks.currentProject['maps'][window.plugin.bookmarks.KEY_OTHER_BKMRK]['bkmrk'][ID] = { label: label, latlng: latlng, z: zoom };
   } else {
     if (label === '') {
       label = 'Folder';
     }
     var short_type = typeList.replace('bkmrk_', '');
     // Add new folder in the localStorage
-    window.plugin.bookmarks.bkmrksObj[short_type][ID] = { label: label, state: 1, bkmrk: {} };
+    window.plugin.bookmarks.currentProject[short_type][ID] = { label: label, state: 1, bkmrk: {} };
   }
   window.plugin.bookmarks.saveStorage();
   window.plugin.bookmarks.refreshBkmrks();
@@ -515,9 +522,9 @@ window.plugin.bookmarks.removeElement = function (elem, type) {
     const typeList = $(elem).parent().parent().parent().parent().parent('div').attr('id');
     const ID = $(elem).parent('li').attr('id');
     var IDfold = $(elem).parent().parent().parent('li').attr('id');
-    var guid = window.plugin.bookmarks.bkmrksObj[typeList.replace('bkmrk_', '')][IDfold]['bkmrk'][ID].guid;
+    var guid = window.plugin.bookmarks.currentProject[typeList.replace('bkmrk_', '')][IDfold]['bkmrk'][ID].guid;
 
-    delete window.plugin.bookmarks.bkmrksObj[typeList.replace('bkmrk_', '')][IDfold]['bkmrk'][ID];
+    delete window.plugin.bookmarks.currentProject[typeList.replace('bkmrk_', '')][IDfold]['bkmrk'][ID];
     $(elem).parent('li').remove();
 
     if (type === 'portals') {
@@ -535,7 +542,7 @@ window.plugin.bookmarks.removeElement = function (elem, type) {
     const typeList = $(elem).parent().parent().parent().parent('div').attr('id');
     const ID = $(elem).parent().parent('li').attr('id');
 
-    delete window.plugin.bookmarks.bkmrksObj[typeList.replace('bkmrk_', '')][ID];
+    delete window.plugin.bookmarks.currentProject[typeList.replace('bkmrk_', '')][ID];
     $(elem).parent().parent('li').remove();
     window.plugin.bookmarks.saveStorage();
     window.plugin.bookmarks.updateStarPortal();
@@ -578,11 +585,11 @@ window.plugin.bookmarks.mobileSort = function (elem) {
   var newFold = $(elem).data('id');
   var oldFold = window.plugin.bookmarks.mobileSortIDf;
 
-  var Bkmrk = window.plugin.bookmarks.bkmrksObj[type][oldFold].bkmrk[idBkmrk];
+  var Bkmrk = window.plugin.bookmarks.currentProject[type][oldFold].bkmrk[idBkmrk];
 
-  delete window.plugin.bookmarks.bkmrksObj[type][oldFold].bkmrk[idBkmrk];
+  delete window.plugin.bookmarks.currentProject[type][oldFold].bkmrk[idBkmrk];
 
-  window.plugin.bookmarks.bkmrksObj[type][newFold].bkmrk[idBkmrk] = Bkmrk;
+  window.plugin.bookmarks.currentProject[type][newFold].bkmrk[idBkmrk] = Bkmrk;
 
   window.plugin.bookmarks.saveStorage();
   window.plugin.bookmarks.refreshBkmrks();
@@ -594,7 +601,7 @@ window.plugin.bookmarks.mobileSort = function (elem) {
 window.plugin.bookmarks.onSearch = function (query) {
   var term = query.term.toLowerCase();
 
-  $.each(window.plugin.bookmarks.bkmrksObj.maps, function (id, folder) {
+  $.each(window.plugin.bookmarks.currentProject.maps, function (id, folder) {
     $.each(folder.bkmrk, function (id, bookmark) {
       if (bookmark.label.toLowerCase().indexOf(term) === -1) return;
 
@@ -609,7 +616,7 @@ window.plugin.bookmarks.onSearch = function (query) {
     });
   });
 
-  $.each(window.plugin.bookmarks.bkmrksObj.portals, function (id, folder) {
+  $.each(window.plugin.bookmarks.currentProject.portals, function (id, folder) {
     $.each(folder.bkmrk, function (id, bookmark) {
       if (bookmark.label.toLowerCase().indexOf(term) === -1) return;
 
@@ -648,9 +655,9 @@ window.plugin.bookmarks.sortFolder = function (typeList) {
   var newArr = {};
   $(`#${typeList} li.bookmarkFolder`).each(function () {
     var idFold = $(this).attr('id');
-    newArr[idFold] = window.plugin.bookmarks.bkmrksObj[keyType][idFold];
+    newArr[idFold] = window.plugin.bookmarks.currentProject[keyType][idFold];
   });
-  window.plugin.bookmarks.bkmrksObj[keyType] = newArr;
+  window.plugin.bookmarks.currentProject[keyType] = newArr;
   window.plugin.bookmarks.saveStorage();
 
   window.runHooks('pluginBkmrksEdit', { target: 'folder', action: 'sort' });
@@ -664,7 +671,7 @@ window.plugin.bookmarks.sortBookmark = function (typeList) {
 
   $(`#${typeList} li.bookmarkFolder`).each(function () {
     var idFold = $(this).attr('id');
-    newArr[idFold] = window.plugin.bookmarks.bkmrksObj[keyType][idFold];
+    newArr[idFold] = window.plugin.bookmarks.currentProject[keyType][idFold];
     newArr[idFold].bkmrk = {};
   });
 
@@ -674,16 +681,16 @@ window.plugin.bookmarks.sortBookmark = function (typeList) {
     var idFold = $(this).parent().parent('li').attr('id');
     var id = $(this).attr('id');
 
-    var list = window.plugin.bookmarks.bkmrksObj[keyType];
+    var list = window.plugin.bookmarks.currentProject[keyType];
     for (var idFoldersOrigin in list) {
       for (var idBkmrk in list[idFoldersOrigin]['bkmrk']) {
         if (idBkmrk === id) {
-          newArr[idFold].bkmrk[id] = window.plugin.bookmarks.bkmrksObj[keyType][idFoldersOrigin].bkmrk[id];
+          newArr[idFold].bkmrk[id] = window.plugin.bookmarks.currentProject[keyType][idFoldersOrigin].bkmrk[id];
         }
       }
     }
   });
-  window.plugin.bookmarks.bkmrksObj[keyType] = newArr;
+  window.plugin.bookmarks.currentProject[keyType] = newArr;
   window.plugin.bookmarks.saveStorage();
   window.runHooks('pluginBkmrksEdit', { target: 'bookmarks', action: 'sort' });
   console.log('BOOKMARKS: sorted bookmark (portal/map)');
@@ -867,7 +874,7 @@ window.plugin.bookmarks.renameFolder = function (elem) {
     try {
       var newName = window.plugin.bookmarks.escapeHtml(promptAction);
 
-      window.plugin.bookmarks.bkmrksObj[type][idFold].label = newName;
+      window.plugin.bookmarks.currentProject[type][idFold].label = newName;
       $('#bookmarksDialogRenameF #' + idFold).text(newName);
       window.plugin.bookmarks.saveStorage();
       window.plugin.bookmarks.refreshBkmrks();
@@ -1062,7 +1069,24 @@ window.plugin.bookmarks.syncNow = function () {
   window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATING_QUEUE);
   window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
 
-  window.plugin.sync.updateMap('bookmarks', window.plugin.bookmarks.KEY.field, Object.keys(window.plugin.bookmarks.updatingQueue));
+  window.plugin.sync.updateMap('bookmarks', window.plugin.bookmarks.SYNC_FIELD, Object.keys(window.plugin.bookmarks.updatingQueue));
+};
+
+window.plugin.bookmarks.seedSyncMap = () => {
+  let data = {};
+  const raw = localStorage[window.plugin.bookmarks.DEFAULT_KEY_STORAGE];
+  if (raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      console.warn('bookmarks: failed to parse the default project while seeding sync');
+    }
+  }
+
+  window.plugin.bookmarks.bkmrksObj = {};
+  window.plugin.bookmarks.LIST_TYPES.forEach((list) => {
+    window.plugin.bookmarks.bkmrksObj[list] = data[list] ?? window.plugin.bookmarks.emptyList();
+  });
 };
 
 window.plugin.bookmarks.registerFieldForSyncing = () => {
@@ -1071,51 +1095,33 @@ window.plugin.bookmarks.registerFieldForSyncing = () => {
     window.addHook('pluginSyncReady', window.plugin.bookmarks.registerFieldForSyncing);
     return;
   }
+  window.plugin.bookmarks.seedSyncMap();
   window.plugin.sync.registerMapForSync(
     'bookmarks',
-    window.plugin.bookmarks.KEY.field,
+    window.plugin.bookmarks.SYNC_FIELD,
     window.plugin.bookmarks.syncCallback,
     window.plugin.bookmarks.syncInitialized
   );
 };
 
-// Call after local or remote change uploaded
-window.plugin.bookmarks.syncCallback = function (pluginName, fieldName, e, fullUpdated) {
-  if (fieldName === window.plugin.bookmarks.KEY.field) {
-    window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.KEY);
-    // All data is replaced if other client update the data during this client offline,
-    if (fullUpdated) {
-      window.plugin.bookmarks.refreshBkmrks();
-      window.plugin.bookmarks.resetAllStars();
-      window.runHooks('pluginBkmrksSyncEnd', { target: 'all', action: 'sync' });
-      console.log('BOOKMARKS: synchronized all from drive after offline');
-      return;
-    }
+// fullUpdated is set whenever the file was last written by another client, meaning sync has
+// just replaced the map wholesale
+window.plugin.bookmarks.syncCallback = (pluginName, fieldName, e, fullUpdated) => {
+  if (fieldName !== window.plugin.bookmarks.SYNC_FIELD || !fullUpdated) return;
 
-    if (!e) return;
-    if (e.isLocal) {
-      // Update pushed successfully, remove it from updatingQueue
-      delete window.plugin.bookmarks.updatingQueue[e.property];
-      console.log('BOOKMARKS: synchronized to drive');
-    } else {
-      // Remote update
-      delete window.plugin.bookmarks.updateQueue[e.property];
-      window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
-      window.plugin.bookmarks.refreshBkmrks();
-      window.plugin.bookmarks.resetAllStars();
-      window.runHooks('pluginBkmrksSyncEnd', { target: 'all', action: 'sync' });
-      console.log('BOOKMARKS: synchronized all from remote');
-    }
-  }
+  localStorage[window.plugin.bookmarks.DEFAULT_KEY_STORAGE] = JSON.stringify(window.plugin.bookmarks.bkmrksObj);
+  window.plugin.bookmarks.refreshBkmrks();
+  window.plugin.bookmarks.resetAllStars();
+  window.runHooks('pluginBkmrksSyncEnd', { target: 'all', action: 'sync' });
+  console.log('BOOKMARKS: rebuilt from remote sync');
 };
 
 // syncing of the field is initialized, upload all queued update
-window.plugin.bookmarks.syncInitialized = function (pluginName, fieldName) {
-  if (fieldName === window.plugin.bookmarks.KEY.field) {
-    window.plugin.bookmarks.enableSync = true;
-    if (Object.keys(window.plugin.bookmarks.updateQueue).length > 0) {
-      window.plugin.bookmarks.delaySync();
-    }
+window.plugin.bookmarks.syncInitialized = (pluginName, fieldName) => {
+  if (fieldName !== window.plugin.bookmarks.SYNC_FIELD) return;
+  window.plugin.bookmarks.enableSync = true;
+  if (Object.keys(window.plugin.bookmarks.updateQueue).length > 0) {
+    window.plugin.bookmarks.delaySync();
   }
 };
 
@@ -1127,20 +1133,11 @@ window.plugin.bookmarks.storeLocal = function (mapping) {
   }
 };
 
-window.plugin.bookmarks.loadLocal = function (mapping) {
-  var objectJSON = localStorage[mapping.key];
-  if (!objectJSON) return;
-  window.plugin.bookmarks[mapping.field] = mapping.convertFunc ? mapping.convertFunc(JSON.parse(objectJSON)) : JSON.parse(objectJSON);
-};
-
 window.plugin.bookmarks.syncBkmrks = function () {
-  window.plugin.bookmarks.loadLocal(window.plugin.bookmarks.KEY);
-
-  window.plugin.bookmarks.updateQueue = window.plugin.bookmarks.bkmrksObj;
+  window.plugin.bookmarks.seedSyncMap();
+  window.plugin.bookmarks.LIST_TYPES.forEach((list) => (window.plugin.bookmarks.updateQueue[list] = true));
   window.plugin.bookmarks.storeLocal(window.plugin.bookmarks.UPDATE_QUEUE);
-
   window.plugin.bookmarks.delaySync();
-  window.plugin.bookmarks.loadLocal(window.plugin.bookmarks.KEY); // switch back to active storage related to KEY
 };
 
 /** ************************************************************************************************************************************************************/
@@ -1172,7 +1169,7 @@ window.plugin.bookmarks.highlightRefresh = function (data) {
 /** BOOKMARKED PORTALS LAYER ***********************************************************************************************************************************/
 /** ************************************************************************************************************************************************************/
 window.plugin.bookmarks.addAllStars = function () {
-  var list = window.plugin.bookmarks.bkmrksObj.portals;
+  var list = window.plugin.bookmarks.currentProject.portals;
 
   for (var idFolders in list) {
     for (var idBkmrks in list[idFolders]['bkmrk']) {
@@ -1355,7 +1352,6 @@ window.plugin.bookmarks.initMPE = function () {
     defaultKey: 'plugin-bookmarks',
     func_setKey: function (newKey) {
       window.plugin.bookmarks.KEY_STORAGE = newKey;
-      window.plugin.bookmarks.KEY.key = newKey;
     },
     func_pre: function () {
       // disable sync
