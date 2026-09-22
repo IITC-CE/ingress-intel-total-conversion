@@ -269,9 +269,8 @@ body {
 }
 
 #portaldetails .close {
-  padding: 4px;
   border: 1px outset #20A8B1;
-  margin-top: 2px;
+  font-size: 22px;
 }
 
 /* Position fix for edge-to-edge screens */

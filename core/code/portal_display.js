@@ -242,7 +242,7 @@ const renderToSidebar = function (portal) {
   header.append(titleValue);
 
   const closeButton = document.createElement('iitc-icon');
-  closeButton.setAttribute('class', 'close');
+  closeButton.setAttribute('class', 'close icon-button');
   closeButton.setAttribute('title', 'Close [w]');
   closeButton.setAttribute('accesskey', 'w');
   closeButton.setAttribute('label', 'Close');
