@@ -372,7 +372,7 @@ describe('IITC.portal.display.renderToSidebar', () => {
 
     expect(document.getElementById('portaldetails').innerHTML).to.equal(
       '<h3 id="portaltitle" class="title"><iitc-icon filled="" class="icon-button" title="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>' +
-        '<span class="value">My Portal</span><iitc-icon class="close" title="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
+        '<span class="value">My Portal</span><iitc-icon class="close icon-button" title="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
         '<div class="imgpreview" title="My Portal\n\nClick to show full image." style="background-image: url(&quot;img.png&quot;)">' +
         '<span id="level" title="Level 8\nfully upgraded">8</span><img class="hide" src="img.png"></div>' +
         '<div class="mods">MODS</div>' +
@@ -422,7 +422,7 @@ describe('IITC.portal.display.renderToSidebar', () => {
 
     expect(document.getElementById('portaldetails').innerHTML).to.equal(
       '<h3 id="portaltitle" class="title"><iitc-icon filled="" class="icon-button" title="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>' +
-        '<span class="value">P</span><iitc-icon class="close" title="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
+        '<span class="value">P</span><iitc-icon class="close icon-button" title="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
         '<div class="imgpreview" title="P\n\nClick to show full image." style="background-image: url(&quot;default.png&quot;)">' +
         '<span id="level" title="Level 0">0</span><img class="hide" src="default.png"></div>' +
         '<div id="portalStatus">Loading details...</div>' +

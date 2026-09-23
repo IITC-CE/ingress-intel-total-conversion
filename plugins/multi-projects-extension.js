@@ -526,12 +526,12 @@ window.plugin.mpe.setupCSS = function () {
         '.mpe .left{float:left;}' +
         '.mpe .right{float:right;}' +
         '.mpe .clear{clear:both;}' +
-        '.mpe .fa, .mpe iitc-icon{line-height:19px;}' +
+        '.mpe .fa, .mpe iitc-icon{line-height:1;}' +
         '.ui-dialog .mpe{width:90%;margin:8px auto 8px;}' +
         '.mpe h4{margin:0 0 4px;font-size:15px;font-style:italic;}' +
-        '.mpe select, .mpe a{border:1px solid #ffce00;padding:1px 4px 2px;background:rgba(8,48,78,.9);height:23px;color:#ffce00;}' +
+        '.mpe select, .mpe a{border:1px solid #ffce00;padding:1px 4px 2px;background:rgba(8,48,78,.9);min-height:23px;color:#ffce00;}' +
         '.mpe select{width:72%;margin: 0 3%;}' +
-        '.mpe a{width:11%;}' +
+        '.mpe a{width:11%;display:flex;align-items:center;justify-content:center;}' +
         '.ui-dialog-mpe button{margin-left:6px;padding:4px 8px 2px;}' +
         '.mpe.settings > div{border:1px solid #ffce00;padding:1px 5px 3px;background:rgba(8,48,78,.9);display:inline-block;}' +
         '.mpe.settings label{cursor:pointer;color:#ffce00;margin:0 2px 0px;}' +
@@ -539,7 +539,7 @@ window.plugin.mpe.setupCSS = function () {
         '#sidebar .mpeSidebar{}' +
         '#sidebar .mpeSidebar .mpe{width:100%;padding:3px 4px;}' +
         '#sidebar .mpeSidebar .mpe h4{display:none;}' +
-        '#sidebar .mpeSidebar .mpe > .fa, #sidebar .mpeSidebar .mpe > iitc-icon{color:#ccc;width:8%;height:23px;margin-right:1%;line-height: 22px;}' +
+        '#sidebar .mpeSidebar .mpe > .fa, #sidebar .mpeSidebar .mpe > iitc-icon{color:#ccc;width:8%;min-height:23px;margin-right:1%;display:flex;align-items:center;justify-content:center;}' +
         "#sidebar .mpeSidebar .mpe > .fa.nofa:before{content:'\0';}" +
         '#sidebar .mpeSidebar .mpe a{}' +
         '#sidebar .mpeSidebar .mpe select{width:63%;}'
