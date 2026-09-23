@@ -277,8 +277,15 @@ describe('IITC.portal navigation', () => {
   });
 
   it('selectByLatLng renders a portal that is currently visible', () => {
-    window.portals = { g: { getLatLng: () => ({ lat: 1, lng: 2 }) } };
+    window.portals = { g: { options: { data: { latE6: 1e6, lngE6: 2e6 } } } };
     IITC.portal.selectByLatLng(1, 2);
+    expect(window.renderPortalDetails.calledOnceWithExactly('g')).to.be.true;
+    expect(window.map.setView.called).to.be.false;
+  });
+
+  it('selectByLatLng matches a portal drawn on another world copy', () => {
+    window.portals = { g: { options: { data: { latE6: 1e6, lngE6: 179.9e6 } } } };
+    IITC.portal.selectByLatLng(1, -180.1);
     expect(window.renderPortalDetails.calledOnceWithExactly('g')).to.be.true;
     expect(window.map.setView.called).to.be.false;
   });
@@ -315,14 +322,25 @@ describe('IITC.portal navigation', () => {
     window.addHook = (name, cb) => (hooks[name] = hooks[name] || []).push(cb);
     window.removeHook = (name, cb) => (hooks[name] = hooks[name].filter((h) => h !== cb));
 
-    const target = {};
+    const target = new L.LatLng(1, 2);
     IITC.portal.selectWhenLoadedByLatLng(target);
     expect(window.urlPortalLL).to.equal(target);
 
-    hooks.portalAdded[0]({ portal: { getLatLng: () => ({ equals: () => false }), options: { guid: 'x' } } });
+    hooks.portalAdded[0]({ portal: { options: { guid: 'x', data: { latE6: 3e6, lngE6: 4e6 } } } });
     expect(window.renderPortalDetails.called).to.be.false;
 
-    hooks.portalAdded[0]({ portal: { getLatLng: () => ({ equals: (o) => o === target }), options: { guid: 'hit' } } });
+    hooks.portalAdded[0]({ portal: { options: { guid: 'hit', data: { latE6: 1e6, lngE6: 2e6 } } } });
+    expect(window.selectedPortal).to.equal('hit');
+    expect(window.renderPortalDetails.calledOnceWithExactly('hit', true)).to.be.true;
+  });
+
+  it('selectWhenLoadedByLatLng matches a portal drawn on another world copy', () => {
+    const hooks = {};
+    window.addHook = (name, cb) => (hooks[name] = hooks[name] || []).push(cb);
+    window.removeHook = (name, cb) => (hooks[name] = hooks[name].filter((h) => h !== cb));
+
+    IITC.portal.selectWhenLoadedByLatLng(new L.LatLng(1, 180.1));
+    hooks.portalAdded[0]({ portal: { options: { guid: 'hit', data: { latE6: 1e6, lngE6: -179.9e6 } } } });
     expect(window.selectedPortal).to.equal('hit');
     expect(window.renderPortalDetails.calledOnceWithExactly('hit', true)).to.be.true;
   });

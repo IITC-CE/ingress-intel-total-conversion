@@ -8,7 +8,28 @@
  */
 IITC.map.Renderer = function () {
   this.portalMarkerScale = undefined;
+
+  // longitude every entity is drawn around: each one goes to its world copy nearest this anchor
+  this.worldAnchorLng = window.map.getCenter().lng;
+  window.map.on('move', () => {
+    const centerLng = window.map.getCenter().lng;
+    // a drag wrapped by worldCopyJump, setView, flyTo or a long pan can take the view away from the anchor;
+    // the margin keeps small moves cheap and stops entities near the antipode from flipping between copies
+    if (Math.abs(centerLng - this.worldAnchorLng) <= IITC.map.Renderer.WORLD_ANCHOR_MARGIN) return;
+
+    this.worldAnchorLng = centerLng;
+    this.placeOnWorldCopy();
+  });
 };
+
+/**
+ * How far in degrees the map center may move away from the world anchor before every entity is placed again.
+ * Entities stay on the copy shown while the view is narrower than 270 degrees minus the longitude span of a shape
+ *
+ * @type {number}
+ * @memberof IITC.map.Renderer
+ */
+IITC.map.Renderer.WORLD_ANCHOR_MARGIN = 45;
 
 /**
  * Default style for link polylines
@@ -314,10 +335,9 @@ IITC.map.Renderer.prototype.deleteFieldEntity = function (guid) {
  * @memberof IITC.map.Renderer
  * @param {string} guid - The globally unique identifier of the portal.
  * @param {number} latE6 - The latitude of the portal in E6 format.
- * @param {number} lngE6 - The longitude of the portal in E6 format.
+ * @param {number} lngE6 - The true (unshifted) longitude of the portal in E6 format.
  * @param {string} team - The team faction of the portal.
  * @param {number} [timestamp=0] - Timestamp of the portal data. Defaults to 0 to allow newer data sources to override
- * @param {number} [timestamp] - The timestamp of the portal data.
  */
 IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE6, lngE6, team, timestamp) {
   // intel no longer returns portals at anything but the closest zoom
@@ -344,9 +364,43 @@ IITC.map.Renderer.prototype.createPlaceholderPortalEntity = function (guid, latE
   this.createPortalEntity(ent, 'core'); // placeholder
 };
 
+// pull a longitude to the world copy nearest the anchor, so an entity crossing the antimeridian
+// spans the short way round instead of ~360 degrees
+const nearestWorldCopy = (lngE6, anchorE6) => lngE6 - Math.round((lngE6 - anchorE6) / (360 * 1e6)) * 360 * 1e6;
+
+// lay out a link or field on a single world copy: the points stay continuous across the antimeridian
+// and the whole shape goes to the copy nearest the anchor, independent of the tile that delivered it
+const worldCopyLatLngs = (points, anchorE6) => {
+  const lngsE6 = points.map((point) => nearestWorldCopy(point.lngE6, points[0].lngE6));
+  const midE6 = (Math.min(...lngsE6) + Math.max(...lngsE6)) / 2;
+  const offsetE6 = nearestWorldCopy(midE6, anchorE6) - midE6;
+  return points.map((point, i) => new L.LatLng(point.latE6 / 1e6, (lngsE6[i] + offsetE6) / 1e6));
+};
+
+const linkEnds = (data) => [
+  { latE6: data.oLatE6, lngE6: data.oLngE6 },
+  { latE6: data.dLatE6, lngE6: data.dLngE6 },
+];
+
+// move a drawn link or field to the given world copy
+const moveShapeToWorldCopy = (shape, latlngs) => {
+  if (shape.getLatLngs()[0].lng !== latlngs[0].lng) shape.setLatLngs(latlngs);
+};
+
+// move a portal marker to the given world copy - its data keeps the true longitude
+// the stored point is mutated in place, so layers sharing it (labels, ornaments) follow the marker
+const moveToWorldCopy = (portal, lng) => {
+  const pos = portal.getLatLng();
+  if (pos.lng === lng) return;
+  pos.lng = lng;
+  portal.setLatLng(pos);
+};
+
 /**
  * Creates a portal entity from the provided game entity data.
  * If the portal already exists and the new data is more recent, it replaces the existing data.
+ *
+ * The entity data keeps the true longitude, the marker is drawn on the world copy nearest the world anchor
  *
  * @function
  * @memberof IITC.map.Renderer
@@ -392,7 +446,7 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
     previousData = structuredClone(p.getDetails());
   }
 
-  const latlng = new L.LatLng(data.latE6 / 1e6, data.lngE6 / 1e6);
+  const latlng = new L.LatLng(data.latE6 / 1e6, nearestWorldCopy(data.lngE6, this.worldAnchorLng * 1e6) / 1e6);
 
   let marker = undefined;
   if (oldPortal) {
@@ -428,6 +482,9 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
     window.portals[data.guid] = marker;
   }
 
+  // updateDetails places the marker on the true longitude, so the world copy is applied afterwards
+  moveToWorldCopy(marker, latlng.lng);
+
   window.ornaments.addPortal(marker);
 
   // TODO? postpone adding to the map layer
@@ -438,6 +495,8 @@ IITC.map.Renderer.prototype.createPortalEntity = function (ent, details) {
 
 /**
  * Creates a field entity from the provided game entity data.
+ *
+ * The entity data keeps the true longitudes of the corners, the polygon is drawn on the world copy nearest the world anchor
  *
  * @function
  * @memberof IITC.map.Renderer
@@ -476,11 +535,7 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
   }
 
   const team = window.teamStringToId(ent[2][1]);
-  const latlngs = [
-    new L.LatLng(data.points[0].latE6 / 1e6, data.points[0].lngE6 / 1e6),
-    new L.LatLng(data.points[1].latE6 / 1e6, data.points[1].lngE6 / 1e6),
-    new L.LatLng(data.points[2].latE6 / 1e6, data.points[2].lngE6 / 1e6),
-  ];
+  const latlngs = worldCopyLatLngs(data.points, this.worldAnchorLng * 1e6);
 
   const poly = L.geodesicPolygon(latlngs, {
     fillColor: window.COLORS[team],
@@ -505,6 +560,8 @@ IITC.map.Renderer.prototype.createFieldEntity = function (ent) {
 
 /**
  * Creates a link entity from the provided game entity data.
+ *
+ * The entity data keeps the true longitudes of both ends, the line is drawn on the world copy nearest the world anchor
  *
  * @function
  * @memberof IITC.map.Renderer
@@ -547,7 +604,7 @@ IITC.map.Renderer.prototype.createLinkEntity = function (ent) {
   }
 
   const team = window.teamStringToId(ent[2][1]);
-  const latlngs = [new L.LatLng(data.oLatE6 / 1e6, data.oLngE6 / 1e6), new L.LatLng(data.dLatE6 / 1e6, data.dLngE6 / 1e6)];
+  const latlngs = worldCopyLatLngs(linkEnds(data), this.worldAnchorLng * 1e6);
   const poly = L.geodesicPolyline(latlngs, {
     color: window.COLORS[team],
     ...IITC.map.Renderer.LINK_STYLE,
@@ -608,6 +665,31 @@ IITC.map.Renderer.prototype.addPortalToMapLayer = function (portal) {
 IITC.map.Renderer.prototype.removePortalFromMapLayer = function (portal) {
   // remove it from the portalsLevels layer
   portal.remove();
+};
+
+/**
+ * Moves every rendered entity to its world copy nearest the world anchor.
+ * The copy is derived from the true longitudes kept in the entity data, so it doesn't depend on earlier placement
+ *
+ * @memberof IITC.map.Renderer
+ */
+IITC.map.Renderer.prototype.placeOnWorldCopy = function () {
+  const anchorE6 = this.worldAnchorLng * 1e6;
+
+  for (const guid in window.portals) {
+    const portal = window.portals[guid];
+    moveToWorldCopy(portal, nearestWorldCopy(portal.options.data.lngE6, anchorE6) / 1e6);
+  }
+
+  for (const guid in window.links) {
+    const link = window.links[guid];
+    moveShapeToWorldCopy(link, worldCopyLatLngs(linkEnds(link.options.data), anchorE6));
+  }
+
+  for (const guid in window.fields) {
+    const field = window.fields[guid];
+    moveShapeToWorldCopy(field, worldCopyLatLngs(field.options.data.points, anchorE6));
+  }
 };
 
 IITC.registerLegacyAliases(IITC.map, {

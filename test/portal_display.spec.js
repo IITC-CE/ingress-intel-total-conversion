@@ -63,6 +63,18 @@ describe('IITC.portal.display.makePermalink', () => {
   it('accepts an L.LatLng-like object', () => {
     expect(IITC.portal.display.makePermalink({ lat: 3, lng: 4 })).to.equal('/intel?pll=3,4');
   });
+
+  it('wraps a longitude taken from a world copy past 180 degrees', () => {
+    expect(IITC.portal.display.makePermalink({ lat: 3, lng: 180.1 })).to.equal('/intel?pll=3,-179.9');
+    expect(IITC.portal.display.makePermalink({ lat: 3, lng: -180.1 })).to.equal('/intel?pll=3,179.9');
+  });
+
+  it('wraps the map view longitude', () => {
+    const center = globalThis.window.map.getCenter;
+    globalThis.window.map.getCenter = () => ({ lat: 10, lng: 180.5 });
+    expect(IITC.portal.display.makePermalink()).to.equal('/intel?ll=10,-179.5&z=15');
+    globalThis.window.map.getCenter = center;
+  });
 });
 
 describe('IITC.portal.display.makePrimeLink', () => {

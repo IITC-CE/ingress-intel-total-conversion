@@ -62,7 +62,7 @@ window.addHook('search', (query) => {
       position: new L.LatLng(lat, lng),
       onSelected: (result) => {
         for (const [guid, portal] of Object.entries(window.portals)) {
-          const { lat: pLat, lng: pLng } = portal.getLatLng();
+          const { lat: pLat, lng: pLng } = IITC.portal.getLatLng(portal);
           if (`${pLat.toFixed(6)},${pLng.toFixed(6)}` === latLngString) {
             IITC.portal.display.renderDetails(guid);
             return;
