@@ -16,6 +16,7 @@
   --sidebar-width: 300px; /* How wide should the sidebar be, in pixels */
   --hidden-scrollbar-width: 20px; /* How much space to leave for scrollbars, in pixels */
   --chat-shrinked: 60px; /* Height of chat when chat is collapsed, in pixels */
+  --icon-target-size: 24px; /* Smallest tap target an icon may occupy, in pixels */
 
   /* colors */
   --color-enl: #03fe03; /* rgb(3 254 3) */
@@ -60,8 +61,14 @@ body {
   margin: 0;
 }
 
+/* the text size scales the glyph but not the box, so a floor in pixels keeps the target hittable */
 .icon-button {
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--icon-target-size);
+  min-height: var(--icon-target-size);
 }
 
 i.tiny {
