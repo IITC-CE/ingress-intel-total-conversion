@@ -959,8 +959,9 @@ window.plugin.drawTools.edfStatusToggle = function () {
 // MPE - MULTI PROJECTS EXTENSION
 // ---------------------------------------------------------------------------------
 window.plugin.drawTools.initMPE = function () {
-  // Not launch the code if the MPE plugin there isn't.
+  // MPE may not be loaded yet, and fires this hook once it is
   if (!window.plugin.mpe) {
+    window.addHook('pluginMpeReady', window.plugin.drawTools.initMPE);
     return;
   }
 
@@ -1182,6 +1183,14 @@ window.plugin.drawTools.reconcileAfterMpeChange = (data) => {
   window.plugin.drawTools.delaySync();
 };
 
+// MPE can register its projects after the seeding below, leaving them out of itemMap
+window.plugin.drawTools.reseedAfterMpeReady = () => {
+  if (window.plugin.drawTools.seedItemMap()) {
+    window.plugin.drawTools.drawnItems.clearLayers();
+    window.plugin.drawTools.load();
+  }
+};
+
 window.plugin.drawTools.registerFieldForSyncing = () => {
   // sync may not be loaded yet, and fires this hook once it is
   if (!window.plugin.sync) {
@@ -1194,6 +1203,7 @@ window.plugin.drawTools.registerFieldForSyncing = () => {
     window.plugin.drawTools.load();
   }
   window.addHook('mpe', window.plugin.drawTools.reconcileAfterMpeChange);
+  window.addHook('pluginMpeReady', window.plugin.drawTools.reseedAfterMpeReady);
   window.plugin.sync.registerMapForSync('drawTools', 'itemMap', window.plugin.drawTools.remoteCallback, window.plugin.drawTools.syncInitialized);
 };
 
