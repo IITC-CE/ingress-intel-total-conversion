@@ -1,0 +1,35 @@
+#updatestatus {
+  width: var(--sidebar-width);
+  background-color: var(--color-bg-trans);
+  border-bottom: 0;
+  border-top: 1px solid var(--color-bg-border);
+  border-left: 1px solid var(--color-bg-border);
+  bottom: 0;
+  color: var(--color-primary);
+  font-size: 13px;
+  padding: 4px;
+  padding-bottom: var(--safe-area-inset-bottom);
+  position: fixed;
+  right: var(--safe-area-inset-right);
+  z-index: 3002;
+  box-sizing: border-box;
+
+  .map {
+    margin-left: 8px;
+  }
+}
+
+#loadlevel {
+  background: #fff;
+  color: #000000;
+  display: inline-block;
+  min-width: 1.8em;
+  border: 1px solid #20a8b1;
+  border-width: 0 1px;
+  margin: -4px 0;
+  padding: 4px 0.2em;
+}
+
+#innerstatus .failed-request {
+  color: #f66;
+}

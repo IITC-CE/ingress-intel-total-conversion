@@ -4,6 +4,7 @@
 
 import os
 import shutil
+import time
 from pathlib import Path
 from runpy import run_path
 
@@ -49,6 +50,7 @@ def run_cmds(cmds, source, target):
 
 def iitc_build(source, outdir, deps_list=None):
     settings.generate_timestamps()
+    build_plugin.reset_postcss_cache()
     run_cmds(settings.pre_build, source, outdir)
 
     iitc_script = 'core/total-conversion-build.js'
@@ -79,6 +81,7 @@ def backup(directory):
 
 
 def backup_and_run(deps_list=None):
+    start_time = time.perf_counter()
     source = Path(settings.build_source_dir)
     target = Path(settings.build_target_dir)
     workdir = target.with_name('~')
@@ -89,6 +92,7 @@ def backup_and_run(deps_list=None):
 
     backup(target)
     workdir.replace(target)
+    print(f'Build finished in {time.perf_counter() - start_time:.2f}s')
 
 
 def on_event(cmd):

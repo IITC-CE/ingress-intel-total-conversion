@@ -1,0 +1,126 @@
+#searchwrapper {
+  position: relative;
+}
+
+#searchbox {
+  position: relative;
+}
+
+#search {
+  width: 100%;
+  height: 2em;
+  min-height: var(--icon-target-size);
+  padding-left: max(2em, var(--icon-target-size));
+  padding-right: max(4em, calc(2 * var(--icon-target-size)));
+
+  &::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+}
+
+#searchicon,
+#searchcancel,
+#buttongeolocation {
+  display: flex;
+  color: #bbbbbb;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0; /* centres the icon over a field shorter than the target */
+  border: 0 none transparent;
+  padding: 0 0.1em;
+  font-size: 20px;
+  min-width: var(--icon-target-size);
+  min-height: var(--icon-target-size);
+  background-color: transparent;
+}
+
+#searchicon iitc-icon,
+#buttongeolocation iitc-icon {
+  font-size: 1em;
+}
+
+#searchcancel iitc-icon {
+  font-size: 0.9em;
+}
+#searchicon {
+  left: 0;
+}
+
+#searchcancel {
+  right: 24px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+#buttongeolocation {
+  right: 0;
+  cursor: pointer;
+}
+
+#buttongeolocation:focus {
+  outline: 1px dotted var(--color-primary);
+}
+
+.searchquery {
+  max-height: 25em;
+  overflow-y: auto;
+}
+
+#searchwrapper h3 {
+  padding: 0 0 0 23px;
+  position: relative;
+  font-size: 1em;
+  height: auto;
+  cursor: pointer;
+
+  &::before {
+    position: absolute;
+    left: 4px;
+    font-size: 14px;
+    margin-right: 2px;
+    font-weight: normal;
+    font-family: 'IITC Material Symbols';
+    content: 'expand_less';
+    transition: transform 0.3s ease;
+  }
+}
+
+#searchwrapper .searchquery.collapsed h3::before {
+  transform: rotate(180deg);
+}
+#searchwrapper ul {
+  max-height: 100%;
+  padding-left: 16px;
+  overflow: hidden;
+}
+#searchwrapper li {
+  cursor: pointer;
+}
+#searchwrapper .searchquery.collapsed ul {
+  max-height: 0;
+}
+#searchwrapper li a {
+  margin-left: -14px;
+  padding-left: 14px;
+  background-position: 1px center;
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+}
+#searchwrapper li:focus a,
+#searchwrapper li:hover a {
+  text-decoration: underline;
+}
+#searchwrapper li em {
+  color: #ccc;
+  font-size: 0.9em;
+}
