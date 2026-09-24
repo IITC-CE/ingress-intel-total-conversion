@@ -9,19 +9,20 @@
   padding-left: 1px;
 
   .toggle {
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid var(--color-primary);
-    margin: 6px auto auto;
+    font-size: 20px;
+    line-height: 24px;
+
+    &::before {
+      content: 'expand_less';
+    }
   }
 
   &.expand {
     top: var(--safe-area-inset-top);
     bottom: auto;
 
-    .toggle {
-      border-top: 10px solid var(--color-primary);
-      border-bottom: none;
+    .toggle::before {
+      content: 'expand_more';
     }
   }
 

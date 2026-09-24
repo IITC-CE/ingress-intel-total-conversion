@@ -144,3 +144,23 @@
   margin: 0 0 0 20px;
   transform: none;
 }
+
+/* The bundled font replaces the layers.png of external/leaflet.css, which stays
+   in place for the browsers that refuse it */
+body:not(.icons-unavailable) .leaflet-control-layers-toggle,
+body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
+  background-image: none;
+}
+
+.leaflet-control-layers-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaflet-control-layers-toggle::before {
+  font-family: 'IITC Material Symbols';
+  content: 'layers';
+  font-size: 28px;
+  color: #454545;
+}

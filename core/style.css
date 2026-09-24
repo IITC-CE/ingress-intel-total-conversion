@@ -4,6 +4,7 @@
 @import 'styles/sidebar.css';
 @import 'styles/map_status.css';
 @import 'styles/dialogs.css';
+@import 'styles/no_icons.css';
 
 /* general rules ******************************************************/
 
@@ -59,12 +60,6 @@ body {
   margin: 0;
 }
 
-/* Material Icons */
-.material-icons {
-  width: 24px;
-  height: 24px;
-}
-
 .icon-button {
   cursor: pointer;
 }
@@ -118,8 +113,8 @@ a:hover {
 
 .toggle {
   display: block;
-  height: 0;
-  width: 0;
+  font-family: 'IITC Material Symbols';
+  line-height: 1;
 }
 
 td {
@@ -229,7 +224,8 @@ td + td {
   width: 16px;
 }
 .ui-tabs-nav .ui-icon-close::before {
-  content: '×';
+  font-family: 'IITC Material Symbols';
+  content: 'close';
   font-size: 16px;
   height: 16px;
   position: absolute;
@@ -238,10 +234,6 @@ td + td {
   vertical-align: baseline;
   width: 16px;
   cursor: pointer;
-}
-
-svg.icon-button {
-  fill: currentColor;
 }
 
 .leaflet-marker-icon > svg {
