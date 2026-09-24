@@ -28,8 +28,9 @@
 
 #sidebartoggle {
   display: block;
-  padding: 20px 5px;
+  padding: 20px 0px;
   margin-top: -31px; /* -(toggle height / 2) */
+  width: 20px;
   line-height: 10px;
   position: absolute;
   top: calc(var(--safe-area-inset-top) + 103px);
@@ -43,16 +44,15 @@
   right: var(--safe-area-inset-right);
 
   .toggle {
-    border-bottom: 10px solid transparent;
-    border-top: 10px solid transparent;
+    font-size: 20px;
   }
 
-  .open {
-    border-right: 10px solid var(--color-primary);
+  .open::before {
+    content: 'chevron_left';
   }
 
-  .close {
-    border-left: 10px solid var(--color-primary);
+  .close::before {
+    content: 'chevron_right';
   }
 }
 
@@ -183,6 +183,10 @@ input[type='url'] {
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
+}
+
+#portaltitle iitc-icon {
+  font-size: 24px;
 }
 
 #portaltitle .close {

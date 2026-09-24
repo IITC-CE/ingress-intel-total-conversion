@@ -16,6 +16,7 @@
 #searchcancel,
 #buttongeolocation {
   display: flex;
+  color: #bbbbbb;
   align-items: center;
   position: absolute;
   margin: 0;
@@ -25,12 +26,14 @@
   background-color: transparent;
 }
 
-#searchicon img,
-#searchcancel img,
-#buttongeolocation img {
-  height: 20px;
+#searchicon iitc-icon,
+#buttongeolocation iitc-icon {
+  font-size: 20px;
 }
 
+#searchcancel iitc-icon {
+  font-size: 18px;
+}
 #searchicon {
   left: 0;
 }
@@ -63,7 +66,7 @@
 }
 
 #searchwrapper h3 {
-  padding: 0 0 0 25px;
+  padding: 0 0 0 23px;
   position: relative;
   font-size: 1em;
   height: auto;
@@ -71,11 +74,12 @@
 
   &::before {
     position: absolute;
-    left: 5px;
+    left: 4px;
     font-size: 14px;
     margin-right: 2px;
     font-weight: normal;
-    content: '▲';
+    font-family: 'IITC Material Symbols';
+    content: 'expand_less';
     transition: transform 0.3s ease;
   }
 }
