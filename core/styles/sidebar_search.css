@@ -2,10 +2,16 @@
   position: relative;
 }
 
+#searchbox {
+  position: relative;
+}
+
 #search {
   width: 100%;
-  padding-left: 24px;
-  padding-right: 36px;
+  height: 2em;
+  min-height: var(--icon-target-size);
+  padding-left: max(2em, var(--icon-target-size));
+  padding-right: max(4em, calc(2 * var(--icon-target-size)));
 
   &::-webkit-search-cancel-button {
     -webkit-appearance: none;
@@ -18,21 +24,26 @@
   display: flex;
   color: #bbbbbb;
   align-items: center;
+  justify-content: center;
   position: absolute;
-  margin: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto 0; /* centres the icon over a field shorter than the target */
   border: 0 none transparent;
-  padding: 0 2px;
-  height: 24px;
+  padding: 0 0.1em;
+  font-size: 20px;
+  min-width: var(--icon-target-size);
+  min-height: var(--icon-target-size);
   background-color: transparent;
 }
 
 #searchicon iitc-icon,
 #buttongeolocation iitc-icon {
-  font-size: 20px;
+  font-size: 1em;
 }
 
 #searchcancel iitc-icon {
-  font-size: 18px;
+  font-size: 0.9em;
 }
 #searchicon {
   left: 0;
