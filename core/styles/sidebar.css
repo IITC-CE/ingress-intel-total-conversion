@@ -415,6 +415,12 @@ input[type='url'] {
   display: inline-block;
 }
 
+#toolbox_component > a > iitc-icon {
+  margin-top: -2px;
+  margin-right: 2px;
+  font-size: 1em;
+}
+
 /* a common portal display takes this much space (prevents moving
  * content when first selecting a portal) */
 
