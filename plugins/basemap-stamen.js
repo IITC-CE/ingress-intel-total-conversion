@@ -1,13 +1,23 @@
 // @author         jonatkins
 // @name           Stamen.com map layers
 // @category       Map Tiles
-// @version        0.2.5
-// @description    Add the 'Toner' and 'Watercolor' map layers from maps.stamen.com.
+// @version        0.3.0
+// @description    Add the Stamen map layers, hosted by Stadia Maps.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
-var changelog = [
+const changelog = [
+  {
+    version: '0.3.0',
+    changes: [
+      'Fix the layers failing to load after Stamen shut down its tile servers',
+      'Tiles now come from Stadia Maps',
+      'Add the Terrain and Toner Dark layers',
+      'Request high density tiles on retina displays',
+      'Fix the Watercolor zoom limit',
+    ],
+  },
   {
     version: '0.2.5',
     changes: ['Refactoring: fix eslint'],
@@ -23,66 +33,63 @@ var changelog = [
 ];
 
 // use own namespace for plugin
-var mapStamen = {};
+const mapStamen = {};
 
-// see API here http://maps.stamen.com/
-// https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js (overcomplicated)
+// Stadia Maps hosts the Stamen styles and serves them to registered accounts only
+// https://docs.stadiamaps.com/authentication
+mapStamen.apiKey = '51a526b0-a035-4b6b-9c35-778bdff3095d';
 
-mapStamen.setup = function () {
-  var baseUrl = 'https://stamen-tiles-{s}.a.ssl.fastly.net/{layer}/{z}/{x}/{y}.{type}';
-  var L_StamenTileLayer = L.TileLayer.extend({
-    options: {
-      subdomains: 'abcd',
-      type: 'png',
-      minZoom: 0,
-      maxZoom: 21,
-      attribution: [
-        'Map tiles by <a href="http://stamen.com/">Stamen Design</a>, ',
-        'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
-        'Data by <a href="http://openstreetmap.org/">OpenStreetMap</a>, ',
-        'under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
-      ].join(''),
-    },
-    initialize: function (name, options) {
-      options.layer = name.replace(' ', '-').toLowerCase();
-      L.TileLayer.prototype.initialize.call(this, baseUrl, options);
-    },
-  });
+// `{r}` is filled with `@2x` on retina displays, where Stadia renders the tile at double resolution
+mapStamen.tileServer = 'https://tiles.stadiamaps.com/tiles/{layer}/{z}/{x}/{y}{r}.{type}';
 
-  function addLayer(name, options, isDark) {
-    window.layerChooser.addBaseLayer(new L_StamenTileLayer(name, options), 'Stamen ' + name, { isDark: isDark });
-  }
+mapStamen.attribution = [
+  '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> ',
+  '&copy; <a href="https://stamen.com/">Stamen Design</a> ',
+  '&copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> ',
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+].join('');
 
-  var options = { minZoom: 0, maxNativeZoom: 20 };
-  addLayer('Toner', options, false);
-  addLayer('Toner Background', options, false);
-  addLayer('Toner Lite', options, false);
+// watercolor is painted straight from OpenStreetMap, without the OpenMapTiles schema the other styles use
+mapStamen.watercolorAttribution = [
+  '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> ',
+  '&copy; <a href="https://stamen.com/">Stamen Design</a> ',
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+].join('');
+
+mapStamen.options = {
+  minZoom: 0,
+  maxZoom: 21,
+  // Stadia renders one level past this, but each level costs four times the tiles, so the last one is upscaled
+  maxNativeZoom: 20,
+  type: 'png',
+  attribution: mapStamen.attribution,
+};
+
+mapStamen.sets = {
+  Toner: { isDark: false },
+  'Toner Background': { isDark: false },
+  'Toner Lite': { isDark: false },
+  'Toner Dark': { isDark: true },
+  Terrain: { isDark: true },
   // transparent layers. could be useful over satellite imagery or similar
-  // addLayer('Toner Hybrid',options);
-  // addLayer('Toner Labels',options);
-  // addLayer('Toner Lines',options);
-
-  options = { minZoom: 1, maxNativeZoom: 13 }; // Should support up to 18, but too many 404 on zoom > 13
-  // addLayer('Terrain',options);
-  // addLayer('Terrain Labels',options);
-  // addLayer('Terrain Lines',options);
-  // addLayer('Terrain Background',options);
-
-  options = {
-    minZoom: 1,
-    maxZoom: 21,
-    maxNativeZoom: 18,
+  // 'Toner Lines': { isDark: false },
+  // 'Toner Labels': { isDark: false },
+  // 'Terrain Lines': { isDark: false },
+  // 'Terrain Labels': { isDark: false },
+  Watercolor: {
     type: 'jpg',
-    attribution: [
-      'Map tiles by <a href="http://stamen.com/">Stamen Design</a>, ',
-      'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ',
-      'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, ',
-      'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-    ].join(''),
-  };
-  addLayer('Watercolor', options, false);
+    maxNativeZoom: 16,
+    attribution: mapStamen.watercolorAttribution,
+    isDark: true,
+  },
 };
 
 function setup() {
-  mapStamen.setup();
+  const url = mapStamen.apiKey ? `${mapStamen.tileServer}?api_key=${mapStamen.apiKey}` : mapStamen.tileServer;
+
+  for (const [name, set] of Object.entries(mapStamen.sets)) {
+    const layer = `stamen_${name.replace(/ /g, '_').toLowerCase()}`;
+    const options = { ...mapStamen.options, ...set, layer };
+    window.layerChooser.addBaseLayer(L.tileLayer(url, options), `Stamen ${name}`, { isDark: options.isDark });
+  }
 }
