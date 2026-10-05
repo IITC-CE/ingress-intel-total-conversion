@@ -15,6 +15,7 @@ window.RegionScoreboardSetup = (function () {
   var mainDialog;
   var regionScore;
   var timer;
+  var requestedRegion;
 
   /**
    * Constructs a RegionScore object from server results. Contains methods to process and retrieve score data.
@@ -177,20 +178,25 @@ window.RegionScoreboardSetup = (function () {
     */
 
   function showRegion(latE6, lngE6) {
-    var text = 'Loading regional scores...';
-    if (window.useAppPanes()) {
-      var style = 'position: absolute; top: 0; width: 100%; max-width: 412px';
-      mainDialog = $('<div>', { class: 'safe-area-insets', style: style }).html(text).appendTo(document.body);
-    } else {
-      mainDialog = window.dialog({
-        title: 'Region scores',
-        html: text,
-        width: 450,
-        height: 340,
-        closeCallback: onDialogClose,
-      });
+    requestedRegion = { latE6: latE6, lngE6: lngE6 };
+
+    if (!mainDialog) {
+      if (window.useAppPanes()) {
+        var style = 'position: absolute; top: 0; width: 100%; max-width: 412px';
+        mainDialog = $('<div>', { class: 'safe-area-insets', style: style }).appendTo(document.body);
+      } else {
+        mainDialog = window.dialog({
+          title: 'Region scores',
+          html: '',
+          width: 520,
+          height: 600,
+          closeCallback: onDialogClose,
+        });
+      }
     }
 
+    stopTimer();
+    mainDialog.html('Loading regional scores...');
     window.postAjax('getRegionScoreDetails', { latE6: latE6, lngE6: lngE6 }, onRequestSuccess, onRequestFailure);
   }
 
@@ -211,10 +217,29 @@ window.RegionScoreboardSetup = (function () {
   function updateDialog(logscale) {
     mainDialog.html(
       `<div class="cellscore">` +
-        `<b>Region scores for ${regionScore.regionName}</b>` +
+        `<section class="scoreboard-section region-selection">` +
+        `<h2>Region scores</h2>` +
+        `<form class="region-select-form">` +
+        `<label>Latitude<input name="latitude" type="number" min="-90" max="90" step="any" required value="${requestedRegion.latE6 / 1e6}"></label>` +
+        `<label>Longitude<input name="longitude" type="number" min="-180" max="180" step="any" required value="${requestedRegion.lngE6 / 1e6}"></label>` +
+        `<button type="submit">Show region</button>` +
+        `<button class="map-center" type="button">Use map center</button>` +
+        `</form>` +
+        `<p class="region-name">${regionScore.regionName}</p>` +
+        `<p class="region-error" role="alert" aria-live="polite"></p>` +
+        `</section>` +
+        `<section class="scoreboard-section">` +
+        `<h2>Current scores</h2>` +
         `<div class="historychart">${createResults()}${HistoryChart(regionScore, logscale)}</div>` +
-        `<b>Checkpoint overview</b><div>${createHistoryTable()}</div>` +
-        `<b>Top agents</b><div>${createAgentTable()}</div>` +
+        `</section>` +
+        `<section class="scoreboard-section checkpoint-section">` +
+        `<h2>Checkpoint history</h2>` +
+        `<label class="checkpoint-month-label">Month <select class="checkpoint-month">${createMonthOptions()}</select></label>` +
+        `<div class="checkpoint-history">${createHistoryTable()}</div>` +
+        `</section>` +
+        `<section class="scoreboard-section">` +
+        `<h2>Top agents</h2><div>${createAgentTable()}</div>` +
+        `</section>` +
         `</div>` +
         createTimers()
     );
@@ -226,9 +251,24 @@ window.RegionScoreboardSetup = (function () {
       content: window.convertTextToTableMagic(tooltip),
     });
 
-    $('.cellscore', mainDialog).accordion({
-      header: 'b',
-      heightStyle: 'fill',
+    $('.region-select-form', mainDialog).on('submit', function (event) {
+      event.preventDefault();
+      var latitude = parseFloat($('input[name="latitude"]', this).val());
+      var longitude = parseFloat($('input[name="longitude"]', this).val());
+      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+        $('.region-error', mainDialog).text('Enter a valid latitude and longitude.');
+        return;
+      }
+      showRegion(Math.round(latitude * 1e6), Math.round(longitude * 1e6));
+    });
+
+    $('.map-center', mainDialog).on('click', function () {
+      var center = window.map.getCenter();
+      showRegion(Math.round(center.lat * 1e6), Math.round(center.lng * 1e6));
+    });
+
+    $('.checkpoint-month', mainDialog).on('change', function () {
+      $('.checkpoint-history', mainDialog).html(createHistoryTable($(this).val()));
     });
 
     $('input.logscale', mainDialog).change(function () {
@@ -275,9 +315,29 @@ window.RegionScoreboardSetup = (function () {
 
   function onDialogClose() {
     stopTimer();
+    mainDialog = undefined;
   }
 
-  function createHistoryTable() {
+  function getCheckpointMonths() {
+    var months = [];
+    for (var cp = 1; cp <= regionScore.CP_COUNT; cp++) {
+      var date = regionScore.getCheckpointEnd(cp);
+      var month = date.getFullYear() + '-' + pad(date.getMonth() + 1);
+      if (months.indexOf(month) < 0) months.push(month);
+    }
+    return months;
+  }
+
+  function createMonthOptions() {
+    var options = '<option value="all">All months</option>';
+    getCheckpointMonths().forEach(function (month) {
+      var date = new Date(parseInt(month.slice(0, 4)), parseInt(month.slice(5, 7)) - 1, 1);
+      options += `<option value="${month}">${date.toLocaleString(undefined, { month: 'long', year: 'numeric' })}</option>`;
+    });
+    return options;
+  }
+
+  function createHistoryTable(selectedMonth) {
     var _invert = window.PLAYER.team === 'RESISTANCE';
     function order(_1, _2) {
       return (_invert ? [_2, _1] : [_1, _2]).join('');
@@ -287,22 +347,35 @@ window.RegionScoreboardSetup = (function () {
 
     var table = `<table class="checkpoint_table"><thead><tr><th>CP</th><th>Time</th>${order('<th>' + enl.name + '</th>', '<th>' + res.name + '</th>')}</tr>`;
 
-    var total = regionScore.getCPSum();
+    var total = [0, 0];
+    for (var totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
+      var totalDate = regionScore.getCheckpointEnd(totalCp);
+      var totalMonth = totalDate.getFullYear() + '-' + pad(totalDate.getMonth() + 1);
+      var checkpointScore = regionScore.getCPScore(totalCp);
+      if ((!selectedMonth || selectedMonth === 'all' || selectedMonth === totalMonth) && checkpointScore) {
+        total[0] += checkpointScore[0];
+        total[1] += checkpointScore[1];
+      }
+    }
     table +=
       '<tr class="cp_total"><th></th><th></th>' +
       order('<th class="' + enl.class + '">' + window.digits(total[0]) + '</th>', '<th class="' + res.class + '">' + window.digits(total[1]) + '</th>') +
       '</tr></thead>';
 
-    for (var cp = regionScore.getLastCP(); cp > 0; cp--) {
+    for (var cp = regionScore.CP_COUNT; cp > 0; cp--) {
+      var checkpointDate = regionScore.getCheckpointEnd(cp);
+      var month = checkpointDate.getFullYear() + '-' + pad(checkpointDate.getMonth() + 1);
+      if (selectedMonth && selectedMonth !== 'all' && selectedMonth !== month) continue;
+
       var score = regionScore.getCPScore(cp);
-      var class_e = score[0] > score[1] ? ' class="' + enl.class + '"' : '';
-      var class_r = score[1] > score[0] ? ' class="' + res.class + '"' : '';
+      var class_e = score && score[0] > score[1] ? ' class="' + enl.class + '"' : '';
+      var class_r = score && score[1] > score[0] ? ' class="' + res.class + '"' : '';
 
       table +=
         `<tr>` +
         `<td>${cp}</td>` +
-        `<td>${formatDayHours(regionScore.getCheckpointEnd(cp))}</td>` +
-        order(`<td${class_e}>${window.digits(score[0])}</td>`, `<td${class_r}>${window.digits(score[1])}</td>`) +
+        `<td>${formatDayHours(checkpointDate)}</td>` +
+        order(`<td${class_e}>${score ? window.digits(score[0]) : '–'}</td>`, `<td${class_r}>${score ? window.digits(score[1]) : '–'}</td>`) +
         `</tr>`;
     }
 
@@ -425,6 +498,7 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function onTimer() {
+    if (!regionScore || !mainDialog) return;
     var d = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1) - new Date();
     $('#cycletimer', mainDialog).html(formatMinutes(Math.max(0, Math.floor(d / 1000))));
   }
@@ -459,6 +533,8 @@ window.RegionScoreboardSetup = (function () {
           showDialog();
         } else if (mainDialog) {
           mainDialog.remove();
+          mainDialog = undefined;
+          stopTimer();
         }
       });
     } else {
