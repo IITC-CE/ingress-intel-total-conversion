@@ -182,8 +182,8 @@ window.RegionScoreboardSetup = (function () {
 
     if (!mainDialog) {
       if (window.useAppPanes()) {
-        var style = 'position: absolute; top: 0; width: 100%; max-width: 412px';
-        mainDialog = $('<div>', { class: 'safe-area-insets', style: style }).appendTo(document.body);
+        var style = 'position: absolute; top: 0; bottom: 0; width: 100%; max-width: 412px';
+        mainDialog = $('<div>', { class: 'safe-area-insets region-scoreboard-dialog', style: style }).appendTo(document.body);
       } else {
         mainDialog = window.dialog({
           title: 'Region scores',
@@ -192,6 +192,7 @@ window.RegionScoreboardSetup = (function () {
           height: 600,
           closeCallback: onDialogClose,
         });
+        mainDialog.addClass('region-scoreboard-dialog');
       }
     }
 
@@ -217,29 +218,27 @@ window.RegionScoreboardSetup = (function () {
   function updateDialog(logscale) {
     mainDialog.html(
       `<div class="cellscore">` +
-        `<section class="scoreboard-section region-selection">` +
-        `<h2>Region scores</h2>` +
+        `<details class="scoreboard-section region-selection">` +
+        `<summary><span>Region selection</span><span class="region-summary-name">${regionScore.regionName}</span></summary>` +
         `<form class="region-select-form">` +
-        `<label>Latitude<input name="latitude" type="number" min="-90" max="90" step="any" required value="${requestedRegion.latE6 / 1e6}"></label>` +
-        `<label>Longitude<input name="longitude" type="number" min="-180" max="180" step="any" required value="${requestedRegion.lngE6 / 1e6}"></label>` +
+        `<label>Region ID<input name="region" type="text" required placeholder="NR02-GOLF-12" value="${getRegionName(requestedRegion)}"></label>` +
         `<button type="submit">Show region</button>` +
         `<button class="map-center" type="button">Use map center</button>` +
         `</form>` +
-        `<p class="region-name">${regionScore.regionName}</p>` +
         `<p class="region-error" role="alert" aria-live="polite"></p>` +
-        `</section>` +
-        `<section class="scoreboard-section">` +
-        `<h2>Current scores</h2>` +
+        `</details>` +
+        `<details class="scoreboard-section" open>` +
+        `<summary>Current scores</summary>` +
         `<div class="historychart">${createResults()}${HistoryChart(regionScore, logscale)}</div>` +
-        `</section>` +
-        `<section class="scoreboard-section checkpoint-section">` +
-        `<h2>Checkpoint history</h2>` +
+        `</details>` +
+        `<details class="scoreboard-section checkpoint-section" open>` +
+        `<summary>Checkpoint history</summary>` +
         `<label class="checkpoint-month-label">Month <select class="checkpoint-month">${createMonthOptions()}</select></label>` +
         `<div class="checkpoint-history">${createHistoryTable()}</div>` +
-        `</section>` +
-        `<section class="scoreboard-section">` +
-        `<h2>Top agents</h2><div>${createAgentTable()}</div>` +
-        `</section>` +
+        `</details>` +
+        `<details class="scoreboard-section" open>` +
+        `<summary>Top agents</summary><div>${createAgentTable()}</div>` +
+        `</details>` +
         `</div>` +
         createTimers()
     );
@@ -253,18 +252,31 @@ window.RegionScoreboardSetup = (function () {
 
     $('.region-select-form', mainDialog).on('submit', function (event) {
       event.preventDefault();
-      var latitude = parseFloat($('input[name="latitude"]', this).val());
-      var longitude = parseFloat($('input[name="longitude"]', this).val());
-      if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-        $('.region-error', mainDialog).text('Enter a valid latitude and longitude.');
+      var regionName = $('input[name="region"]', this).val();
+      if (!window.plugin || !window.plugin.regions || !window.plugin.regions.getCellFromName) {
+        $('.region-error', mainDialog).text('Enable the Ingress scoring regions plugin to select a region ID.');
         return;
       }
-      showRegion(Math.round(latitude * 1e6), Math.round(longitude * 1e6));
+
+      var cell = window.plugin.regions.getCellFromName(regionName);
+      if (!cell) {
+        $('.region-error', mainDialog).text('Enter a valid region ID, for example NR02-GOLF-12.');
+        return;
+      }
+
+      var center = cell.getLatLng();
+      showRegion(Math.round(center.lat * 1e6), Math.round(center.lng * 1e6));
     });
 
     $('.map-center', mainDialog).on('click', function () {
       var center = window.map.getCenter();
-      showRegion(Math.round(center.lat * 1e6), Math.round(center.lng * 1e6));
+      if (!window.plugin || !window.plugin.regions || !window.plugin.regions.getNameFromLatLng) {
+        $('.region-error', mainDialog).text('Enable the Ingress scoring regions plugin to select a region ID.');
+        return;
+      }
+      $('input[name="region"]', mainDialog).val(window.plugin.regions.getNameFromLatLng(center));
+      $('.region-error', mainDialog).empty();
+      $('.region-select-form', mainDialog).trigger('submit');
     });
 
     $('.checkpoint-month', mainDialog).on('change', function () {
@@ -273,7 +285,15 @@ window.RegionScoreboardSetup = (function () {
 
     $('input.logscale', mainDialog).change(function () {
       var input = $(this);
+      var openSections = $('details.scoreboard-section', mainDialog)
+        .map(function () {
+          return this.open;
+        })
+        .get();
       updateDialog(input.prop('checked'));
+      $('details.scoreboard-section', mainDialog).each(function (index) {
+        this.open = openSections[index];
+      });
     });
   }
 
@@ -335,6 +355,11 @@ window.RegionScoreboardSetup = (function () {
       options += `<option value="${month}">${date.toLocaleString(undefined, { month: 'long', year: 'numeric' })}</option>`;
     });
     return options;
+  }
+
+  function getRegionName(region) {
+    if (!window.plugin || !window.plugin.regions || !window.plugin.regions.getNameFromLatLng) return '';
+    return window.plugin.regions.getNameFromLatLng({ lat: region.latE6 / 1e6, lng: region.lngE6 / 1e6 });
   }
 
   function createHistoryTable(selectedMonth) {
@@ -476,10 +501,10 @@ window.RegionScoreboardSetup = (function () {
     var endcp = regionScore.getCycleEnd();
 
     return (
-      `<div class="checkpoint_timers"><table><tr>` +
-      `<td>Next CP at: ${formatHours(nextcp)} (in <span id="cycletimer"></span>)</td>` +
-      `<td>Cycle ends: ${formatDayHours(endcp)}</td>` +
-      `</tr></table></div>`
+      `<div class="checkpoint_timers"><div class="checkpoint-timer-row">` +
+      `<span>Next CP at: ${formatHours(nextcp)} (in <span id="cycletimer"></span>)</span>` +
+      `<span>Cycle ends: ${formatDayHours(endcp)}</span>` +
+      `</div></div>`
     );
   }
 

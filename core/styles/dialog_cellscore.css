@@ -1,28 +1,57 @@
 /* region scores */
 
+.ui-dialog-content.region-scoreboard-dialog,
+.region-scoreboard-dialog.safe-area-insets {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.region-scoreboard-dialog.safe-area-insets {
+  box-sizing: border-box;
+}
+
 .cellscore {
   display: flex;
   flex-direction: column;
   gap: 10px;
   box-sizing: border-box;
-  max-height: min(70vh, 560px);
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   padding: 8px;
 
-  .scoreboard-section {
+  details.scoreboard-section {
     border: 1px solid var(--color-bg-border);
     padding: 8px;
+  }
+
+  .scoreboard-section > summary {
+    color: var(--color-primary);
+    cursor: pointer;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .region-selection > summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+
+  .region-summary-name {
+    margin-left: auto;
+  }
+
+  .scoreboard-section[open] > summary {
+    margin-bottom: 8px;
   }
 
   h2 {
     color: var(--color-primary);
     font-size: 1.1em;
     margin: 0 0 8px;
-  }
-
-  .region-name {
-    font-weight: bold;
-    margin: 8px 0 0;
   }
 
   table {
@@ -126,23 +155,29 @@ g.checkpoint:hover circle {
   min-width: 180px;
 }
 
-.checkpoint_timers table {
-  padding-top: 4px;
-  width: 100%;
+.checkpoint_timers {
+  flex: 0 0 auto;
+  padding: 4px 8px 8px;
 }
 
-.checkpoint_timers td {
-  display: block;
+.checkpoint-timer-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 @media (max-width: 600px) {
   .cellscore {
-    max-height: calc(100vh - 105px);
     padding: 6px;
-
     .region-select-form {
       flex-direction: column;
       align-items: stretch;
     }
+  }
+
+  .checkpoint-timer-row {
+    font-size: 0.75em;
+    gap: 4px;
   }
 }
