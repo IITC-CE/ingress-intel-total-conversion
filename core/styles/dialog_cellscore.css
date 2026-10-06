@@ -60,7 +60,15 @@
   }
 
   .historychart > div {
-    overflow-x: auto;
+    width: 100%;
+  }
+
+  .history-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
   }
 
   .logscale {
