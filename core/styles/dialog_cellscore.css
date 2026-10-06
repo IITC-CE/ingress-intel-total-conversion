@@ -133,11 +133,6 @@
   }
 }
 
-@-moz-document url-prefix() {
-  .cellscore .logscale {
-    transform: scale(0.8);
-  }
-}
 
 g.checkpoint:hover circle {
   fill-opacity: 1;
@@ -166,6 +161,9 @@ g.checkpoint:hover circle {
 .checkpoint_timers {
   flex: 0 0 auto;
   padding: 4px 8px 8px;
+  margin-top: 4px;
+  border: 1px solid var(--color-bg-border);
+  background: hsl(from var(--color-bg) h s 20%);
 }
 
 .checkpoint-timer-row {
