@@ -14,6 +14,7 @@
 window.RegionScoreboardSetup = (function () {
   var mainDialog;
   var regionScore;
+  var historyChart;
   var timer;
   var requestedRegion;
 
@@ -233,7 +234,11 @@ window.RegionScoreboardSetup = (function () {
         `</details>` +
         `<details class="scoreboard-section" open>` +
         `<summary>Current scores</summary>` +
-        `<div class="historychart">${createResults()}${HistoryChart(regionScore, logscale)}</div>` +
+        `<div class="historychart">${createResults()}` +
+        `<div class="history-chart-container">` +
+        `<svg class="history-chart" width="400" height="133" viewBox="0 0 400 133"></svg>` +
+        `<label><input type="checkbox" class="logscale"${logscale ? ' checked' : ''}> log</label>` +
+        `</div></div>` +
         `</details>` +
         `<details class="scoreboard-section checkpoint-section" open>` +
         `<summary>Checkpoint history</summary>` +
@@ -247,6 +252,8 @@ window.RegionScoreboardSetup = (function () {
         createTimers()
     );
 
+    historyChart = new HistoryChart($('svg.history-chart', mainDialog)[0]);
+    historyChart.update(regionScore, logscale);
     setupToolTips();
 
     var tooltip = createResultTooltip();
@@ -288,16 +295,8 @@ window.RegionScoreboardSetup = (function () {
     });
 
     $('input.logscale', mainDialog).change(function () {
-      var input = $(this);
-      var openSections = $('details.scoreboard-section', mainDialog)
-        .map(function () {
-          return this.open;
-        })
-        .get();
-      updateDialog(input.prop('checked'));
-      $('details.scoreboard-section', mainDialog).each(function (index) {
-        this.open = openSections[index];
-      });
+      historyChart.update(regionScore, $(this).prop('checked'));
+      setupToolTips();
     });
   }
 
@@ -578,59 +577,47 @@ window.RegionScoreboardSetup = (function () {
 })();
 
 /**
- * Creates an SVG-based history chart for regional scores.
- *
- * @function HistoryChart
- * @param {RegionScore} _regionScore - The RegionScore object containing score data.
- * @param {boolean} logscale - Whether to use logarithmic scale for the chart.
- * @returns {string} An SVG string representing the history chart.
+ * Updates an SVG history chart for regional scores.
  */
-var HistoryChart = (function () {
-  var regionScore;
-  var scaleFct;
-  var logscale;
-  var svgTickText;
-
-  function create(_regionScore, logscale) {
-    regionScore = _regionScore;
-
-    var max = regionScore.getScoreMax(10); // NOTE: ensure a min of 10 for the graph
-    max *= 1.09; // scale up maximum a little, so graph isn't squashed right against upper edge
-    setScaleType(max, logscale);
-
-    svgTickText = [];
-
-    // svg area 400x130. graph area 350x100, offset to 40,10
-    var svg =
-      '<div><svg width="400" height="133" style="margin-left: 10px;">' +
-      svgBackground() +
-      svgAxis(max) +
-      svgAveragePath() +
-      svgFactionPath() +
-      svgCheckPointMarkers() +
-      svgTickText.join('') +
-      '<foreignObject height="18" width="60" y="113" x="0" class="node"><label title="Logarithmic scale">' +
-      '<input type="checkbox" class="logscale"' +
-      (logscale ? ' checked' : '') +
-      '/>' +
-      'log</label></foreignObject>' +
-      '</svg></div>';
-
-    return svg;
+class HistoryChart {
+  /**
+   * @param {SVGElement} svg - The SVG element used to render the chart.
+   */
+  constructor(svg) {
+    this.svg = svg;
   }
 
-  function svgFactionPath() {
+  /**
+   * Replace the chart content for the supplied score data and scale.
+   *
+   * @param {RegionScore} regionScore - The RegionScore object containing score data.
+   * @param {boolean} logscale - Whether to use logarithmic scale for the chart.
+   */
+  update(regionScore, logscale) {
+    this.regionScore = regionScore;
+    this.logscale = logscale;
+    this.svgTickText = [];
+
+    var max = this.regionScore.getScoreMax(10); // NOTE: ensure a min of 10 for the graph
+    max *= 1.09; // scale up maximum a little, so graph isn't squashed right against upper edge
+    this.setScaleType(max);
+
+    this.svg.innerHTML =
+      this.svgBackground() + this.svgAxis(max) + this.svgAveragePath() + this.svgFactionPath() + this.svgCheckPointMarkers() + this.svgTickText.join('');
+  }
+
+  svgFactionPath() {
     var svgPath = '';
 
     for (var t = 0; t < 2; t++) {
-      var col = getFactionColor(t);
+      var col = this.getFactionColor(t);
       var teamPaths = [];
 
-      for (var cp = 1; cp <= regionScore.getLastCP(); cp++) {
-        var score = regionScore.getCPScore(cp);
+      for (var cp = 1; cp <= this.regionScore.getLastCP(); cp++) {
+        var score = this.regionScore.getCPScore(cp);
         if (score !== undefined) {
           var x = cp * 10 + 40;
-          teamPaths.push(x + ',' + scaleFct(score[t]));
+          teamPaths.push(x + ',' + this.scaleFct(score[t]));
         }
       }
 
@@ -642,22 +629,22 @@ var HistoryChart = (function () {
     return svgPath;
   }
 
-  function svgCheckPointMarkers() {
+  svgCheckPointMarkers() {
     var markers = '';
 
-    var col1 = getFactionColor(0);
-    var col2 = getFactionColor(1);
+    var col1 = this.getFactionColor(0);
+    var col2 = this.getFactionColor(1);
 
-    for (var cp = 1; cp <= regionScore.CP_COUNT; cp++) {
-      var scores = regionScore.getCPScore(cp);
+    for (var cp = 1; cp <= this.regionScore.CP_COUNT; cp++) {
+      var scores = this.regionScore.getCPScore(cp);
 
       markers +=
         `<g title="dummy" class="checkpoint" data-cp="${cp}">` + `<rect x="${cp * 10 + 35}" y="10" width="10" height="100" fill="black" fill-opacity="0" />`;
 
       if (scores) {
         markers +=
-          `<circle cx="${cp * 10 + 40}" cy="${scaleFct(scores[0])}" r="3" stroke-width="1" stroke="${col1}" fill="${col1}" fill-opacity="0.5" />` +
-          `<circle cx="${cp * 10 + 40}" cy="${scaleFct(scores[1])}" r="3" stroke-width="1" stroke="${col2}" fill="${col2}" fill-opacity="0.5" />`;
+          `<circle cx="${cp * 10 + 40}" cy="${this.scaleFct(scores[0])}" r="3" stroke-width="1" stroke="${col1}" fill="${col1}" fill-opacity="0.5" />` +
+          `<circle cx="${cp * 10 + 40}" cy="${this.scaleFct(scores[1])}" r="3" stroke-width="1" stroke="${col2}" fill="${col2}" fill-opacity="0.5" />`;
       }
 
       markers += '</g>';
@@ -666,32 +653,36 @@ var HistoryChart = (function () {
     return markers;
   }
 
-  function svgBackground() {
+  svgBackground() {
     return '<rect x="0" y="1" width="400" height="132" stroke="#FFCE00" fill="#08304E" />';
   }
 
-  function svgAxis(max) {
-    return '<path d="M40,110 L40,10 M40,110 L390,110" stroke="#fff" />' + createTicks(max);
+  svgAxis(max) {
+    return '<path d="M40,110 L40,10 M40,110 L390,110" stroke="#fff" />' + this.createTicks(max);
   }
 
-  function createTicks(max) {
-    var ticks = createTicksHorz();
+  createTicks(max) {
+    var ticks = this.createTicksHorz();
 
     function addVTick(i) {
-      var y = scaleFct(i);
+      var y = this.scaleFct(i);
 
       ticks.push('M40,' + y + ' L390,' + y);
-      svgTickText.push(
-        '<text x="35" y="' + y + '" font-size="12" font-family="Roboto, Helvetica, sans-serif" text-anchor="end" fill="#fff">' + formatNumber(i) + '</text>'
+      this.svgTickText.push(
+        '<text x="35" y="' +
+          y +
+          '" font-size="12" font-family="Roboto, Helvetica, sans-serif" text-anchor="end" fill="#fff">' +
+          this.formatNumber(i) +
+          '</text>'
       );
     }
 
     // vertical
     // first we calculate the power of 10 that is smaller than the max limit
     var vtickStep = Math.pow(10, Math.floor(Math.log10(max)));
-    if (logscale) {
+    if (this.logscale) {
       for (var i = 0; i < 4; i++) {
-        addVTick(vtickStep);
+        addVTick.call(this, vtickStep);
         vtickStep /= 10;
       }
     } else {
@@ -703,19 +694,19 @@ var HistoryChart = (function () {
       }
 
       for (var ti = vtickStep; ti <= max; ti += vtickStep) {
-        addVTick(ti);
+        addVTick.call(this, ti);
       }
     }
 
     return '<path d="' + ticks.join(' ') + '" stroke="#fff" opacity="0.3" />';
   }
 
-  function createTicksHorz() {
+  createTicksHorz() {
     var ticks = [];
     for (var i = 5; i <= 35; i += 5) {
       var x = i * 10 + 40;
       ticks.push('M' + x + ',10 L' + x + ',110');
-      svgTickText.push(
+      this.svgTickText.push(
         '<text x="' + x + '" y="125" font-size="12" font-family="Roboto, Helvetica, sans-serif" text-anchor="middle" fill="#fff">' + i + '</text>'
       );
     }
@@ -723,17 +714,17 @@ var HistoryChart = (function () {
     return ticks;
   }
 
-  function svgAveragePath() {
+  svgAveragePath() {
     var path = '';
     for (var faction = 1; faction < 3; faction++) {
       var col = window.COLORS[faction];
 
       var points = [];
-      for (var cp = 1; cp <= regionScore.CP_COUNT; cp++) {
-        var score = regionScore.getAvgScoreAtCP(faction, cp);
+      for (var cp = 1; cp <= this.regionScore.CP_COUNT; cp++) {
+        var score = this.regionScore.getAvgScoreAtCP(faction, cp);
 
         var x = cp * 10 + 40;
-        var y = scaleFct(score);
+        var y = this.scaleFct(score);
         points.push(x + ',' + y);
       }
 
@@ -743,30 +734,29 @@ var HistoryChart = (function () {
     return path;
   }
 
-  function setScaleType(max, useLogScale) {
-    logscale = useLogScale;
-    if (useLogScale) {
+  setScaleType(max) {
+    if (this.logscale) {
       if (!Math.log10)
         Math.log10 = function (x) {
           return Math.log(x) / Math.LN10;
         };
 
       // 0 cannot be displayed on a log scale, so we set the minimum to 0.001 and divide by lg(0.001)=-3
-      scaleFct = function (y) {
+      this.scaleFct = function (y) {
         return Math.round(10 - (Math.log10(Math.max(0.001, y / max)) / 3) * 100);
       };
     } else {
-      scaleFct = function (y) {
+      this.scaleFct = function (y) {
         return Math.round(110 - (y / max) * 100);
       };
     }
   }
 
-  function getFactionColor(t) {
+  getFactionColor(t) {
     return t === 0 ? window.COLORS[window.TEAM_ENL] : window.COLORS[window.TEAM_RES];
   }
 
-  function formatNumber(num) {
+  formatNumber(num) {
     if (num >= 1_000_000_000) {
       return num / 1_000_000_000 + 'B';
     } else if (num >= 1_000_000) {
@@ -777,6 +767,4 @@ var HistoryChart = (function () {
       return num.toString();
     }
   }
-
-  return create;
-})();
+}
