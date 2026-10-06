@@ -39,7 +39,7 @@ window.RegionScoreboardSetup = (function () {
       this.CP_COUNT = 35;
       this.CP_DURATION = 5 * 60 * 60 * 1000;
       this.CYCLE_DURATION = this.CP_DURATION * this.CP_COUNT;
-
+      this.MAC_INTERVAL = 13; // Cycles
       this.checkpoints = [];
 
       for (var i = 0; i < serverResult.scoreHistory.length; i++) {
@@ -156,6 +156,15 @@ window.RegionScoreboardSetup = (function () {
       return this.checkpoints.length - 1;
     }
 
+    getCycleStart(cycle) {
+      if (cycle === undefined) return this.cycleStartTime;
+      return new Date(cycle * this.CYCLE_DURATION);
+    }
+
+    getCurrentCycle() {
+      return Math.floor(Date.now() / this.CYCLE_DURATION);
+    }
+
     getCycleEnd() {
       return this.getCheckpointTime(this.CP_COUNT);
     }
@@ -243,14 +252,14 @@ window.RegionScoreboardSetup = (function () {
         `</div></div>` +
         `</details>` +
         `<details class="scoreboard-section checkpoint-section" open>` +
-        `<summary>Checkpoint history</summary>` +
+        `<summary>Checkpoints</summary>` +
         `<div class="checkpoint-cycle-controls">` +
         `<button type="button" class="checkpoint-cycle-previous" aria-label="Previous checkpoint cycle">‹</button>` +
-        `<label>Jump to date <input type="date" class="checkpoint-date" value="${formatCycleDateInput(checkpointCycleStart)}"></label>` +
+        `<input type="date" class="checkpoint-date" value="${formatCycleDateInput(checkpointCycleStart)}">` +
         `<button type="button" class="checkpoint-cycle-next" aria-label="Next checkpoint cycle">›</button>` +
         `<button type="button" class="checkpoint-cycle-current">Current cycle</button>` +
         `</div>` +
-        `<div class="checkpoint-history">${createHistoryTable(checkpointCycleStart)}</div>` +
+        `<div class="checkpoint-history">${createCheckpointTable(checkpointCycleStart)}</div>` +
         `</details>` +
         `<details class="scoreboard-section" open>` +
         `<summary>Top agents</summary><div>${createAgentTable()}</div>` +
@@ -340,7 +349,7 @@ window.RegionScoreboardSetup = (function () {
         swipeStart = undefined;
       });
 
-    $('input.logscale', mainDialog).change(function () {
+    $('input.logscale', mainDialog).on('change', function () {
       historyChart.update(regionScore, $(this).prop('checked'));
       setupToolTips();
     });
@@ -401,7 +410,7 @@ window.RegionScoreboardSetup = (function () {
 
   function updateCheckpointHistory() {
     $('.checkpoint-date', mainDialog).val(formatCycleDateInput(checkpointCycleStart));
-    $('.checkpoint-history', mainDialog).html(createHistoryTable(checkpointCycleStart));
+    $('.checkpoint-history', mainDialog).html(createCheckpointTable(checkpointCycleStart));
   }
 
   function getRegionName(region) {
@@ -409,24 +418,27 @@ window.RegionScoreboardSetup = (function () {
     return window.plugin.regions.getNameFromLatLng({ lat: region.latE6 / 1e6, lng: region.lngE6 / 1e6 });
   }
 
-  function createHistoryTable(cycleStart) {
-    var showScores = cycleStart.getTime() === regionScore.cycleStartTime.getTime();
-    var _invert = window.PLAYER.team === 'RESISTANCE';
+  function createCheckpointTable(cycleStart) {
+    const showScores = cycleStart.getTime() === regionScore.cycleStartTime.getTime();
+    const isMacPause = Math.floor(cycleStart.getTime() / regionScore.CYCLE_DURATION + 1) % regionScore.MAC_INTERVAL === 0;
+    const _invert = window.PLAYER.team === 'RESISTANCE';
     function order(_1, _2) {
       return (_invert ? [_2, _1] : [_1, _2]).join('');
     }
-    var enl = { class: window.TEAM_TO_CSS[window.TEAM_ENL], name: window.TEAM_NAMES[window.TEAM_ENL] };
-    var res = { class: window.TEAM_TO_CSS[window.TEAM_RES], name: window.TEAM_NAMES[window.TEAM_RES] };
+    const enl = { class: window.TEAM_TO_CSS[window.TEAM_ENL], name: window.TEAM_NAMES[window.TEAM_ENL] };
+    const res = { class: window.TEAM_TO_CSS[window.TEAM_RES], name: window.TEAM_NAMES[window.TEAM_RES] };
 
-    var table =
+    let table = isMacPause ? "<div class='mac_pause'>MAC paused</div>" : '';
+
+    table +=
       `<table class="checkpoint_table"><thead><tr><th>CP</th><th>Time</th>` +
       (showScores ? order('<th>' + enl.name + '</th>', '<th>' + res.name + '</th>') : '') +
       `</tr>`;
 
     if (showScores) {
-      var total = [0, 0];
-      for (var totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
-        var checkpointScore = regionScore.getCPScore(totalCp);
+      const total = [0, 0];
+      for (let totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
+        const checkpointScore = regionScore.getCPScore(totalCp);
         if (checkpointScore) {
           total[0] += checkpointScore[0];
           total[1] += checkpointScore[1];
@@ -441,15 +453,19 @@ window.RegionScoreboardSetup = (function () {
     table += '</thead>';
 
     for (var cp = regionScore.CP_COUNT; cp > 0; cp--) {
-      var checkpointDate = new Date(cycleStart.getTime() + regionScore.CP_DURATION * cp);
-      var score = showScores ? regionScore.getCPScore(cp) : undefined;
-      var class_e = score && score[0] > score[1] ? ' class="' + enl.class + '"' : '';
-      var class_r = score && score[1] > score[0] ? ' class="' + res.class + '"' : '';
+      const checkpointDate = new Date(cycleStart.getTime() + regionScore.CP_DURATION * cp);
+      const score = showScores ? regionScore.getCPScore(cp) : undefined;
+      const class_e = score && score[0] > score[1] ? ' class="' + enl.class + '"' : '';
+      const class_r = score && score[1] > score[0] ? ' class="' + res.class + '"' : '';
+
+      const lastcheckpointDate = new Date(cycleStart.getTime() + regionScore.CP_DURATION * (cp - 1)).getDate();
+      const dayChange = checkpointDate.getDate() !== lastcheckpointDate;
+      const showDay = cp === 1 || cp === regionScore.CP_COUNT || dayChange;
 
       table +=
-        `<tr>` +
+        `<tr ${dayChange ? "class='daychange'" : ''}>` +
         `<td>${cp}</td>` +
-        `<td>${formatDayHours(checkpointDate)}</td>` +
+        `<td>${showDay ? formatDayHours(checkpointDate) : formatHours(checkpointDate)}</td>` +
         (showScores
           ? order(`<td${class_e}>${score ? window.digits(score[0]) : '–'}</td>`, `<td${class_r}>${score ? window.digits(score[1]) : '–'}</td>`)
           : '') +
@@ -549,8 +565,8 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function createTimers() {
-    var nextcp = regionScore.getCheckpointTime(regionScore.getLastCP() + 1);
-    var endcp = regionScore.getCycleEnd();
+    const nextcp = regionScore.getCheckpointTime(regionScore.getLastCP() + 1);
+    const endcp = regionScore.getCycleEnd();
 
     return (
       `<div class="checkpoint_timers"><div class="checkpoint-timer-row">` +

@@ -117,9 +117,9 @@
 
   .checkpoint-cycle-controls {
     display: flex;
-    align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 1em;
     margin-bottom: 8px;
 
     label {
@@ -136,6 +136,17 @@
   .checkpoint-history {
     overflow-x: auto;
     touch-action: pan-y;
+  }
+
+  .mac_pause {
+    font-size: larger;
+    text-align: center;
+    border: 1px solid var(--color-bg-border);
+    border-radius: 5px;
+  }
+
+  .daychange {
+    border-bottom: 1px dashed var(--color-bg-border);
   }
 
   .region-error {
@@ -173,6 +184,7 @@ g.checkpoint:hover circle {
   padding: 4px 8px 8px;
   margin-top: 4px;
   border: 1px solid var(--color-bg-border);
+  border-radius: 2px;
   background: hsl(from var(--color-bg) h s 20%);
 }
 
