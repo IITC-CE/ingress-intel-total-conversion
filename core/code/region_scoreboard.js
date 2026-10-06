@@ -18,51 +18,62 @@ window.RegionScoreboardSetup = (function () {
   var requestedRegion;
 
   /**
-   * Constructs a RegionScore object from server results. Contains methods to process and retrieve score data.
+   * Interface to manage RegionScore data from server results.
    *
    * @class
    * @name RegionScore
-   * @param {Object} serverResult - The data returned from the server for regional scores.
    */
-  function RegionScore(serverResult) {
-    this.ori_data = serverResult;
-    this.topAgents = serverResult.topAgents;
-    this.regionName = serverResult.regionName;
-    this.gameScore = serverResult.gameScore;
+  class RegionScore {
+    /**
+     * @param {Object} serverResult - The data returned from the server for regional scores.
+     */
+    constructor(serverResult) {
+      this.ori_data = serverResult;
+      this.topAgents = serverResult.topAgents;
+      this.regionName = serverResult.regionName;
+      this.gameScore = serverResult.gameScore;
 
-    this.median = [-1, -1, -1];
-    this.CP_COUNT = 35;
-    this.CP_DURATION = 5 * 60 * 60 * 1000;
-    this.CYCLE_DURATION = this.CP_DURATION * this.CP_COUNT;
+      this.median = [-1, -1, -1];
+      this.CP_COUNT = 35;
+      this.CP_DURATION = 5 * 60 * 60 * 1000;
+      this.CYCLE_DURATION = this.CP_DURATION * this.CP_COUNT;
 
-    this.checkpoints = [];
+      this.checkpoints = [];
 
-    this.hasNoTopAgents = function () {
+      for (var i = 0; i < serverResult.scoreHistory.length; i++) {
+        var h = serverResult.scoreHistory[i];
+        this.checkpoints[parseInt(h[0])] = [parseInt(h[1]), parseInt(h[2])];
+      }
+
+      this.cycleStartTime = new Date(Math.floor(Date.now() / this.CYCLE_DURATION) * this.CYCLE_DURATION);
+    }
+
+    hasNoTopAgents() {
       return this.topAgents.length === 0;
-    };
+    }
 
-    this.getAvgScore = function (faction) {
+    getAvgScore(faction) {
       return parseInt(this.gameScore[faction === window.TEAM_ENL ? 0 : 1]);
-    };
+    }
 
-    this.getAvgScoreMax = function () {
+    getAvgScoreMax() {
       return Math.max(this.getAvgScore(window.TEAM_ENL), this.getAvgScore(window.TEAM_RES), 1);
-    };
+    }
 
-    this.getCPScore = function (cp) {
+    getCPScore(cp) {
       return this.checkpoints[cp];
-    };
+    }
 
-    this.getScoreMax = function (min_value) {
+    getScoreMax(min_value) {
       var max = min_value || 0;
       for (var i = 1; i < this.checkpoints.length; i++) {
         var cp = this.checkpoints[i];
         max = Math.max(max, cp[0], cp[1]);
       }
       return max;
-    };
+    }
 
-    this.getCPSum = function () {
+    getCPSum() {
       var sums = [0, 0];
       for (var i = 1; i < this.checkpoints.length; i++) {
         sums[0] += this.checkpoints[i][0];
@@ -70,9 +81,9 @@ window.RegionScoreboardSetup = (function () {
       }
 
       return sums;
-    };
+    }
 
-    this.getAvgScoreAtCP = function (faction, cp_idx) {
+    getAvgScoreAtCP(faction, cp_idx) {
       var idx = faction === window.TEAM_RES ? 1 : 0;
 
       var score = 0;
@@ -91,9 +102,9 @@ window.RegionScoreboardSetup = (function () {
       }
 
       return Math.floor(score / cp_idx);
-    };
+    }
 
-    this.getScoreMedian = function (faction) {
+    getScoreMedian(faction) {
       if (this.median[faction] < 0) {
         var idx = faction === window.TEAM_RES ? 1 : 0;
         var values = this.checkpoints.map(function (val) {
@@ -106,9 +117,9 @@ window.RegionScoreboardSetup = (function () {
       }
 
       return this.median[faction];
-    };
+    }
 
-    this.findMedian = function (values) {
+    findMedian(values) {
       var len = values.length;
       var rank = Math.floor((len - 1) / 2);
 
@@ -136,27 +147,20 @@ window.RegionScoreboardSetup = (function () {
         if (rank < i) m = j;
       }
       return values[rank];
-    };
-
-    this.getLastCP = function () {
-      if (this.checkpoints.length === 0) return 0;
-      return this.checkpoints.length - 1;
-    };
-
-    this.getCycleEnd = function () {
-      return this.getCheckpointEnd(this.CP_COUNT);
-    };
-
-    this.getCheckpointEnd = function (cp) {
-      return new Date(this.cycleStartTime.getTime() + this.CP_DURATION * cp);
-    };
-
-    for (var i = 0; i < serverResult.scoreHistory.length; i++) {
-      var h = serverResult.scoreHistory[i];
-      this.checkpoints[parseInt(h[0])] = [parseInt(h[1]), parseInt(h[2])];
     }
 
-    this.cycleStartTime = new Date(Math.floor(Date.now() / this.CYCLE_DURATION) * this.CYCLE_DURATION);
+    getLastCP() {
+      if (this.checkpoints.length === 0) return 0;
+      return this.checkpoints.length - 1;
+    }
+
+    getCycleEnd() {
+      return this.getCheckpointTime(this.CP_COUNT);
+    }
+
+    getCheckpointTime(cp) {
+      return new Date(this.cycleStartTime.getTime() + this.CP_DURATION * cp);
+    }
   }
 
   function showDialog() {
@@ -321,7 +325,7 @@ window.RegionScoreboardSetup = (function () {
         var enl_str = score_now ? '\nEnl:\t' + formatScore(0, score_now, score_last) : '';
         var res_str = score_now ? '\nRes:\t' + formatScore(1, score_now, score_last) : '';
 
-        tooltip = 'CP:\t' + cp + '\t-\t' + formatDayHours(regionScore.getCheckpointEnd(cp)) + '\n<hr>' + enl_str + res_str;
+        tooltip = 'CP:\t' + cp + '\t-\t' + formatDayHours(regionScore.getCheckpointTime(cp)) + '\n<hr>' + enl_str + res_str;
       }
 
       elem.tooltip({
@@ -341,7 +345,7 @@ window.RegionScoreboardSetup = (function () {
   function getCheckpointMonths() {
     var months = [];
     for (var cp = 1; cp <= regionScore.CP_COUNT; cp++) {
-      var date = regionScore.getCheckpointEnd(cp);
+      var date = regionScore.getCheckpointTime(cp);
       var month = date.getFullYear() + '-' + pad(date.getMonth() + 1);
       if (months.indexOf(month) < 0) months.push(month);
     }
@@ -374,7 +378,7 @@ window.RegionScoreboardSetup = (function () {
 
     var total = [0, 0];
     for (var totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
-      var totalDate = regionScore.getCheckpointEnd(totalCp);
+      var totalDate = regionScore.getCheckpointTime(totalCp);
       var totalMonth = totalDate.getFullYear() + '-' + pad(totalDate.getMonth() + 1);
       var checkpointScore = regionScore.getCPScore(totalCp);
       if ((!selectedMonth || selectedMonth === 'all' || selectedMonth === totalMonth) && checkpointScore) {
@@ -388,7 +392,7 @@ window.RegionScoreboardSetup = (function () {
       '</tr></thead>';
 
     for (var cp = regionScore.CP_COUNT; cp > 0; cp--) {
-      var checkpointDate = regionScore.getCheckpointEnd(cp);
+      var checkpointDate = regionScore.getCheckpointTime(cp);
       var month = checkpointDate.getFullYear() + '-' + pad(checkpointDate.getMonth() + 1);
       if (selectedMonth && selectedMonth !== 'all' && selectedMonth !== month) continue;
 
@@ -497,7 +501,7 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function createTimers() {
-    var nextcp = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1);
+    var nextcp = regionScore.getCheckpointTime(regionScore.getLastCP() + 1);
     var endcp = regionScore.getCycleEnd();
 
     return (
@@ -524,7 +528,7 @@ window.RegionScoreboardSetup = (function () {
 
   function onTimer() {
     if (!regionScore || !mainDialog) return;
-    var d = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1) - new Date();
+    var d = regionScore.getCheckpointTime(regionScore.getLastCP() + 1) - new Date();
     $('#cycletimer', mainDialog).html(formatMinutes(Math.max(0, Math.floor(d / 1000))));
   }
 
