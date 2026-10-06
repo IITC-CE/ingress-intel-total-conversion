@@ -24,6 +24,7 @@
 
   details.scoreboard-section {
     border: 1px solid var(--color-bg-border);
+    border-radius: 2px;
     padding: 8px;
   }
 
@@ -55,8 +56,11 @@
   }
 
   table {
-    width: 100%;
+    width: 80%;
     max-width: 100%;
+    white-space: nowrap;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .historychart > div {
@@ -111,20 +115,27 @@
     }
   }
 
-  .checkpoint-month-label {
-    display: inline-flex;
+  .checkpoint-cycle-controls {
+    display: flex;
     align-items: center;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-bottom: 8px;
+
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .checkpoint-date {
+      min-width: 0;
+    }
   }
 
   .checkpoint-history {
     overflow-x: auto;
-  }
-
-  .checkpoint_table {
-    width: auto;
-    white-space: nowrap;
+    touch-action: pan-y;
   }
 
   .region-error {
@@ -132,7 +143,6 @@
     margin: 6px 0 0;
   }
 }
-
 
 g.checkpoint:hover circle {
   fill-opacity: 1;

@@ -15,6 +15,7 @@ window.RegionScoreboardSetup = (function () {
   var mainDialog;
   var regionScore;
   var historyChart;
+  var checkpointCycleStart;
   var timer;
   var requestedRegion;
 
@@ -221,6 +222,7 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function updateDialog(logscale) {
+    checkpointCycleStart = regionScore.cycleStartTime;
     mainDialog.html(
       `<div class="cellscore">` +
         `<details class="scoreboard-section region-selection">` +
@@ -242,8 +244,13 @@ window.RegionScoreboardSetup = (function () {
         `</details>` +
         `<details class="scoreboard-section checkpoint-section" open>` +
         `<summary>Checkpoint history</summary>` +
-        `<label class="checkpoint-month-label">Month <select class="checkpoint-month">${createMonthOptions()}</select></label>` +
-        `<div class="checkpoint-history">${createHistoryTable()}</div>` +
+        `<div class="checkpoint-cycle-controls">` +
+        `<button type="button" class="checkpoint-cycle-previous" aria-label="Previous checkpoint cycle">‹</button>` +
+        `<label>Jump to date <input type="date" class="checkpoint-date" value="${formatCycleDateInput(checkpointCycleStart)}"></label>` +
+        `<button type="button" class="checkpoint-cycle-next" aria-label="Next checkpoint cycle">›</button>` +
+        `<button type="button" class="checkpoint-cycle-current">Current cycle</button>` +
+        `</div>` +
+        `<div class="checkpoint-history">${createHistoryTable(checkpointCycleStart)}</div>` +
         `</details>` +
         `<details class="scoreboard-section" open>` +
         `<summary>Top agents</summary><div>${createAgentTable()}</div>` +
@@ -290,9 +297,48 @@ window.RegionScoreboardSetup = (function () {
       $('.region-select-form', mainDialog).trigger('submit');
     });
 
-    $('.checkpoint-month', mainDialog).on('change', function () {
-      $('.checkpoint-history', mainDialog).html(createHistoryTable($(this).val()));
+    $('.checkpoint-cycle-previous', mainDialog).on('click', function () {
+      checkpointCycleStart = new Date(checkpointCycleStart.getTime() - regionScore.CYCLE_DURATION);
+      updateCheckpointHistory();
     });
+
+    $('.checkpoint-cycle-next', mainDialog).on('click', function () {
+      checkpointCycleStart = new Date(checkpointCycleStart.getTime() + regionScore.CYCLE_DURATION);
+      updateCheckpointHistory();
+    });
+
+    $('.checkpoint-date', mainDialog).on('change', function () {
+      if (this.value) {
+        checkpointCycleStart = getCycleStartForDate(this.value);
+        updateCheckpointHistory();
+      }
+    });
+
+    $('.checkpoint-cycle-current', mainDialog).on('click', function () {
+      checkpointCycleStart = regionScore.cycleStartTime;
+      updateCheckpointHistory();
+    });
+
+    var swipeStart;
+    $('.checkpoint-history', mainDialog)
+      .on('touchstart', function (event) {
+        var touch = event.originalEvent.touches[0];
+        swipeStart = { x: touch.clientX, y: touch.clientY };
+      })
+      .on('touchend', function (event) {
+        if (!swipeStart) return;
+        var touch = event.originalEvent.changedTouches[0];
+        var deltaX = touch.clientX - swipeStart.x;
+        var deltaY = touch.clientY - swipeStart.y;
+        swipeStart = undefined;
+
+        if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+        checkpointCycleStart = new Date(checkpointCycleStart.getTime() + (deltaX < 0 ? 1 : -1) * regionScore.CYCLE_DURATION);
+        updateCheckpointHistory();
+      })
+      .on('touchcancel', function () {
+        swipeStart = undefined;
+      });
 
     $('input.logscale', mainDialog).change(function () {
       historyChart.update(regionScore, $(this).prop('checked'));
@@ -341,23 +387,21 @@ window.RegionScoreboardSetup = (function () {
     mainDialog = undefined;
   }
 
-  function getCheckpointMonths() {
-    var months = [];
-    for (var cp = 1; cp <= regionScore.CP_COUNT; cp++) {
-      var date = regionScore.getCheckpointTime(cp);
-      var month = date.getFullYear() + '-' + pad(date.getMonth() + 1);
-      if (months.indexOf(month) < 0) months.push(month);
-    }
-    return months;
+  function getCycleStartForDate(dateValue) {
+    var dateParts = dateValue.split('-').map(Number);
+    var date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 12);
+    var cycleDuration = regionScore.CYCLE_DURATION;
+    return new Date(Math.floor(date.getTime() / cycleDuration) * cycleDuration);
   }
 
-  function createMonthOptions() {
-    var options = '<option value="all">All months</option>';
-    getCheckpointMonths().forEach(function (month) {
-      var date = new Date(parseInt(month.slice(0, 4)), parseInt(month.slice(5, 7)) - 1, 1);
-      options += `<option value="${month}">${date.toLocaleString(undefined, { month: 'long', year: 'numeric' })}</option>`;
-    });
-    return options;
+  function formatCycleDateInput(cycleStart) {
+    var date = new Date(cycleStart.getTime() + regionScore.CYCLE_DURATION / 2);
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+  }
+
+  function updateCheckpointHistory() {
+    $('.checkpoint-date', mainDialog).val(formatCycleDateInput(checkpointCycleStart));
+    $('.checkpoint-history', mainDialog).html(createHistoryTable(checkpointCycleStart));
   }
 
   function getRegionName(region) {
@@ -365,7 +409,8 @@ window.RegionScoreboardSetup = (function () {
     return window.plugin.regions.getNameFromLatLng({ lat: region.latE6 / 1e6, lng: region.lngE6 / 1e6 });
   }
 
-  function createHistoryTable(selectedMonth) {
+  function createHistoryTable(cycleStart) {
+    var showScores = cycleStart.getTime() === regionScore.cycleStartTime.getTime();
     var _invert = window.PLAYER.team === 'RESISTANCE';
     function order(_1, _2) {
       return (_invert ? [_2, _1] : [_1, _2]).join('');
@@ -373,29 +418,31 @@ window.RegionScoreboardSetup = (function () {
     var enl = { class: window.TEAM_TO_CSS[window.TEAM_ENL], name: window.TEAM_NAMES[window.TEAM_ENL] };
     var res = { class: window.TEAM_TO_CSS[window.TEAM_RES], name: window.TEAM_NAMES[window.TEAM_RES] };
 
-    var table = `<table class="checkpoint_table"><thead><tr><th>CP</th><th>Time</th>${order('<th>' + enl.name + '</th>', '<th>' + res.name + '</th>')}</tr>`;
+    var table =
+      `<table class="checkpoint_table"><thead><tr><th>CP</th><th>Time</th>` +
+      (showScores ? order('<th>' + enl.name + '</th>', '<th>' + res.name + '</th>') : '') +
+      `</tr>`;
 
-    var total = [0, 0];
-    for (var totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
-      var totalDate = regionScore.getCheckpointTime(totalCp);
-      var totalMonth = totalDate.getFullYear() + '-' + pad(totalDate.getMonth() + 1);
-      var checkpointScore = regionScore.getCPScore(totalCp);
-      if ((!selectedMonth || selectedMonth === 'all' || selectedMonth === totalMonth) && checkpointScore) {
-        total[0] += checkpointScore[0];
-        total[1] += checkpointScore[1];
+    if (showScores) {
+      var total = [0, 0];
+      for (var totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
+        var checkpointScore = regionScore.getCPScore(totalCp);
+        if (checkpointScore) {
+          total[0] += checkpointScore[0];
+          total[1] += checkpointScore[1];
+        }
       }
+
+      table +=
+        '<tr class="cp_total"><th></th><th></th>' +
+        order('<th class="' + enl.class + '">' + window.digits(total[0]) + '</th>', '<th class="' + res.class + '">' + window.digits(total[1]) + '</th>') +
+        '</tr>';
     }
-    table +=
-      '<tr class="cp_total"><th></th><th></th>' +
-      order('<th class="' + enl.class + '">' + window.digits(total[0]) + '</th>', '<th class="' + res.class + '">' + window.digits(total[1]) + '</th>') +
-      '</tr></thead>';
+    table += '</thead>';
 
     for (var cp = regionScore.CP_COUNT; cp > 0; cp--) {
-      var checkpointDate = regionScore.getCheckpointTime(cp);
-      var month = checkpointDate.getFullYear() + '-' + pad(checkpointDate.getMonth() + 1);
-      if (selectedMonth && selectedMonth !== 'all' && selectedMonth !== month) continue;
-
-      var score = regionScore.getCPScore(cp);
+      var checkpointDate = new Date(cycleStart.getTime() + regionScore.CP_DURATION * cp);
+      var score = showScores ? regionScore.getCPScore(cp) : undefined;
       var class_e = score && score[0] > score[1] ? ' class="' + enl.class + '"' : '';
       var class_r = score && score[1] > score[0] ? ' class="' + res.class + '"' : '';
 
@@ -403,7 +450,9 @@ window.RegionScoreboardSetup = (function () {
         `<tr>` +
         `<td>${cp}</td>` +
         `<td>${formatDayHours(checkpointDate)}</td>` +
-        order(`<td${class_e}>${score ? window.digits(score[0]) : '–'}</td>`, `<td${class_r}>${score ? window.digits(score[1]) : '–'}</td>`) +
+        (showScores
+          ? order(`<td${class_e}>${score ? window.digits(score[0]) : '–'}</td>`, `<td${class_r}>${score ? window.digits(score[1]) : '–'}</td>`)
+          : '') +
         `</tr>`;
     }
 
