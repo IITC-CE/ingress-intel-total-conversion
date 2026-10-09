@@ -3,6 +3,8 @@
 """Utility to build iitc plugin for given source file name."""
 
 import base64
+import json
+import os
 import re
 import subprocess
 import sys
@@ -180,19 +182,26 @@ def prepare_css(sources: Iterable[Path], deps_list=None):
     if len(basenames) != len(set(basenames)):
         raise UserWarning('Lightning CSS CLI output filenames must be unique')
 
+    env = None
+    if settings.css_sourcemap:
+        # parallel bundling misnumbers map sources, see parcel-bundler/lightningcss#1167
+        env = {**os.environ, 'RAYON_NUM_THREADS': '1'}
+
     _css_tempdir = tempfile.TemporaryDirectory(prefix='iitc-lightningcss-')
     output_dir = Path(_css_tempdir.name)
     result = subprocess.run(
         [
             str(cli),
             '--bundle',
-            '--minify',
+            # url() inlining would shift columns of single-line minified CSS
+            '--sourcemap' if settings.css_sourcemap else '--minify',
             '--browserslist',
             '--output-dir',
             str(output_dir),
             *(str(filename) for filename in css_files),
         ],
         cwd=source_root,
+        env=env,
         capture_output=True,
         check=False,
     )
@@ -232,7 +241,20 @@ def process_css(filename):
         processed = _processed_css[filename.resolve()]
     except KeyError:
         raise UserWarning(f'CSS was not prepared for build: {filename}') from None
-    return processed.read_text(encoding='utf-8')
+    css = processed.read_text(encoding='utf-8')
+    sourcemap = processed.with_name(processed.name + '.map')
+    if sourcemap.is_file():
+        css = inline_sourcemap(css, sourcemap)
+    return css
+
+
+def inline_sourcemap(css, sourcemap):
+    """Embed source map into CSS, with sources under iitc:///."""
+    data = json.loads(sourcemap.read_text(encoding='utf-8'))
+    data['sources'] = [f'iitc:///{Path(source).as_posix()}' for source in data['sources']]
+    encoded = base64.b64encode(json.dumps(data, separators=(',', ':')).encode()).decode()
+    css = re.sub(r'\s*/\*# sourceMappingURL=[^*]*\*/\s*$', '', css)
+    return f'{css}\n/*# sourceMappingURL=data:application/json;base64,{encoded} */\n'
 
 
 def expand_template(match, path=None):
