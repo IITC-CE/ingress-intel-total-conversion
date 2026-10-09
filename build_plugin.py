@@ -202,8 +202,17 @@ def prepare_css(sources: Iterable[Path], deps_list=None):
     for filename in css_files:
         if deps_list is not None:
             deps_list.append(filename)
+            deps_list.extend(css_imports(filename))
     if deps_list is not None:
         deps_list.append(source_root / 'package.json')
+
+
+def css_imports(filename):
+    """Yield files bundled into given CSS file via @import (recursively)."""
+    for imported in re.findall(r'@import\s+[\'"](.+?)[\'"]', filename.read_text(encoding='utf-8-sig')):
+        imported = filename.parent / imported
+        yield imported
+        yield from css_imports(imported)
 
 
 def finish_css():
