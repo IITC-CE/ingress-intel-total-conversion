@@ -1,0 +1,446 @@
+@import './sidebar_search.css';
+
+#scrollwrapper {
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+  right: calc(-2 * var(--hidden-scrollbar-width) + 2px + var(--safe-area-inset-right));
+  top: var(--safe-area-inset-top);
+  width: calc(var(--sidebar-width) + 2 * var(--hidden-scrollbar-width));
+  bottom: calc(var(--safe-area-inset-bottom) + 45px);
+  z-index: 3001;
+  pointer-events: none;
+}
+
+#sidebar {
+  background-color: var(--color-bg-trans);
+  border-left: 1px solid var(--color-bg-border);
+  color: #888;
+  position: relative;
+  left: 0;
+  top: 0;
+  width: calc(var(--sidebar-width) + var(--hidden-scrollbar-width) + 1px);
+  max-height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  pointer-events: auto;
+}
+
+#sidebartoggle {
+  display: block;
+  padding: 20px 0px;
+  margin-top: -31px; /* -(toggle height / 2) */
+  width: 20px;
+  line-height: 10px;
+  position: absolute;
+  top: calc(var(--safe-area-inset-top) + 103px);
+  z-index: 3002;
+  background-color: var(--color-bg-trans);
+  color: var(--color-primary);
+  border: 1px solid var(--color-bg-border);
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+  text-decoration: none;
+  right: var(--safe-area-inset-right);
+
+  .toggle {
+    font-size: 20px;
+  }
+
+  .open::before {
+    content: 'chevron_left';
+  }
+
+  .close::before {
+    content: 'chevron_right';
+  }
+}
+
+body.sidebar-open .leaflet-right {
+  margin-right: calc(var(--sidebar-width) + 1px + var(--safe-area-inset-right));
+}
+
+body.sidebar-open #sidebartoggle {
+  right: calc(var(--sidebar-width) + 1px + var(--safe-area-inset-right));
+}
+
+#sidebar > * {
+  border-bottom: 1px solid #20a8b1;
+  box-sizing: border-box;
+  width: calc(var(--sidebar-width) + 1px);
+}
+
+/* player stats */
+#playerstat {
+  height: 30px;
+}
+
+/* Agent stats row */
+h2 {
+  color: var(--color-primary);
+  font-size: 21px;
+  padding: 0 4px;
+  margin: 0;
+  cursor: help;
+  box-sizing: border-box;
+  width: 100%;
+
+  #name {
+    font-weight: 300;
+    display: inline;
+    vertical-align: top;
+    white-space: nowrap;
+
+    .playername {
+      max-width: 70%;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* show sign out*/
+    &:hover {
+      .playername {
+        max-width: 50%;
+      }
+      #signout {
+        display: inline-block;
+      }
+    }
+  }
+
+  #stats {
+    float: right;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  sup,
+  sub {
+    display: block;
+    font-size: 11px;
+    margin-bottom: -2px;
+  }
+}
+
+#signout {
+  font-size: 12px;
+  font-weight: normal;
+  padding: 0 4px;
+  background-color: var(--color-bg-trans-50);
+  display: none; /* starts hidden */
+  vertical-align: text-top;
+}
+
+/* gamestats */
+#gamestat span {
+  display: inline-block;
+  font-weight: bold;
+  cursor: help;
+  padding: 0 3px;
+  box-sizing: border-box;
+
+  &.res {
+    background: color-mix(var(--color-res) 60%, black);
+  }
+  &.enl {
+    background: color-mix(var(--color-enl) 60%, black);
+  }
+}
+
+/* search input, and others */
+input:not([type]),
+.input,
+input[type='text'],
+input[type='password'],
+input[type='number'],
+input[type='email'],
+input[type='search'],
+input[type='url'] {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: var(--color-primary);
+  height: 24px;
+  padding: 0px 4px 0px 4px;
+  font-size: 12px;
+  border: 0;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.leaflet-control-layers input {
+  height: auto;
+  padding: 0;
+}
+
+#portaltitle {
+  display: flex;
+  margin: 2px 0;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+#portaltitle .value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+#portaltitle iitc-icon {
+  font-size: 24px;
+}
+
+#portaltitle .close {
+  margin-right: 2px;
+  cursor: pointer;
+  color: var(--color-primary);
+  font-weight: normal;
+}
+
+/* portal image */
+.imgpreview {
+  height: 190px;
+  background: no-repeat center center;
+  background-size: contain;
+  cursor: help;
+  overflow: hidden;
+  position: relative;
+}
+
+.imgpreview img.hide {
+  display: none;
+}
+
+.imgpreview .portalDetails {
+  display: none;
+}
+
+#level {
+  font-size: 40px;
+  text-shadow:
+    -1px -1px #000,
+    1px -1px #000,
+    -1px 1px #000,
+    1px 1px #000,
+    0 0 5px #fff;
+  display: block;
+  margin-right: 15px;
+  text-align: right;
+  float: right;
+}
+
+/* portal mods */
+.mods {
+  margin: 3px auto 1px auto;
+  width: 296px;
+  height: 67px;
+  text-align: center;
+}
+
+.mods span {
+  background-color: rgba(0, 0, 0, 0.3);
+  /* can’t use inline-block because Webkit's implementation is buggy and
+   * introduces additional margins in random cases. No clear necessary,
+   * as that’s solved by setting height on .mods. */
+  display: block;
+  float: left;
+  height: 63px;
+  margin: 0 2px;
+  overflow: hidden;
+  padding: 2px;
+  text-align: center;
+  width: 63px;
+  cursor: help;
+  border: 1px solid #666;
+}
+
+.mods span:not([title]) {
+  cursor: auto;
+}
+
+.res .mods span,
+.res .meter {
+  border: 1px solid #0076b6;
+}
+.enl .mods span,
+.enl .meter {
+  border: 1px solid #017f01;
+}
+
+/* random details, resonator details */
+#randdetails,
+#resodetails {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 4px;
+  table-layout: fixed;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+#randdetails td,
+#resodetails td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+  width: 50%;
+}
+
+#randdetails th,
+#resodetails th {
+  font-weight: normal;
+  text-align: right;
+  width: 62px;
+  padding: 0px;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+#randdetails th + th,
+#resodetails th + th {
+  text-align: left;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+#randdetails td:first-child,
+#resodetails td:first-child {
+  text-align: right;
+  padding-left: 2px;
+}
+
+#randdetails td:last-child,
+#resodetails td:last-child {
+  text-align: left;
+  padding-right: 2px;
+}
+
+#randdetails {
+  margin-top: 4px;
+  margin-bottom: 5px;
+}
+
+#randdetails tt {
+  font-family: inherit;
+  cursor: help;
+}
+
+#artifact_target,
+#artifact_fragments {
+  margin-top: 4px;
+  margin-bottom: 4px;
+
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* resonators */
+#resodetails {
+  margin-bottom: 0px;
+}
+
+.meter {
+  background: #000;
+  cursor: help;
+  display: inline-block;
+  height: 18px;
+  padding: 1px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+.meter.north {
+  overflow: hidden;
+}
+.meter.north:before {
+  content: '';
+  background-color: red;
+  border: 1px solid #000000;
+  border-radius: 100%;
+  display: block;
+  height: 6px;
+  width: 6px;
+  left: 50%;
+  top: -3px;
+  margin-left: -4px;
+  position: absolute;
+}
+
+.meter span {
+  display: block;
+  height: 14px;
+}
+
+.meter-level {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  text-shadow: 0em 0em 0.3em #808080;
+  text-align: center;
+  word-spacing: 4px; /* to leave some space for the north indicator */
+}
+
+/* links below resos */
+
+.linkdetails {
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.linkdetails aside {
+  display: inline-block;
+  white-space: nowrap;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#toolbox {
+  display: none !important;
+}
+
+#toolbox,
+#toolbox_component {
+  text-align: left; /* centre didn't look as nice here as it did above in .linkdetails */
+}
+
+#toolbox > a,
+#toolbox_component > a {
+  margin-left: 5px;
+  margin-right: 5px;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+#toolbox_component > a > iitc-icon {
+  margin-top: -2px;
+  margin-right: 2px;
+  font-size: 1em;
+}
+
+/* a common portal display takes this much space (prevents moving
+ * content when first selecting a portal) */
+
+#portaldetails {
+  min-height: 63px;
+}
+
+/* history details */
+#historydetails {
+  text-align: center;
+  color: var(--color-primary);
+}
+
+#historydetails .missing {
+}
+
+#historydetails span {
+  color: #ff4a4a;
+}
+
+#historydetails span.completed {
+  color: #03fe03;
+}

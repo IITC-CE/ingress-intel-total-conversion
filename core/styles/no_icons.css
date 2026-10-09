@@ -1,0 +1,29 @@
+/* Icons drawn as generated content have no accessible label, so each falls back
+   to the character it replaced; the layers control instead uncovers the
+   background image of external/leaflet.css */
+body.icons-unavailable {
+  #searchwrapper h3::before,
+  #chatcontrols .toggle::before {
+    content: '▲';
+  }
+
+  #chatcontrols.expand .toggle::before {
+    content: '▼';
+  }
+
+  .ui-tabs-nav .ui-icon-close::before {
+    content: '×';
+  }
+
+  #sidebartoggle .open::before {
+    content: '◀';
+  }
+
+  #sidebartoggle .close::before {
+    content: '▶';
+  }
+
+  .leaflet-control-layers-toggle::before {
+    content: '';
+  }
+}

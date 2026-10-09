@@ -220,7 +220,7 @@ document.head.innerHTML =
   '@include_css:external/leaflet.css@' +
   '</style>' +
   '<style>' +
-  '@include_string:style.css@' +
+  '@include_css:style.css@' +
   '</style>' +
   '<style>' +
   '@include_css:icons/icons.css@' +
@@ -777,4 +777,4 @@ const ulog = (function (module) {
 window.log = ulog;
 
 // eslint-disable-next-line
-'@bundle_code@';
+('@bundle_code@');

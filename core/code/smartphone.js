@@ -51,7 +51,7 @@ const _runBeforeBoot = function () {
 
   // add smartphone stylesheet
   const style = document.createElement('style');
-  style.textContent = '@include_string:smartphone.css@';
+  style.textContent = '@include_css:smartphone.css@';
   document.head.append(style);
 
   window.smartphone.mapButton = createPaneButton('map');

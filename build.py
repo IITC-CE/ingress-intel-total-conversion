@@ -4,6 +4,7 @@
 
 import os
 import shutil
+import time
 from pathlib import Path
 from runpy import run_path
 
@@ -52,16 +53,22 @@ def iitc_build(source, outdir, deps_list=None):
     run_cmds(settings.pre_build, source, outdir)
 
     iitc_script = 'core/total-conversion-build.js'
-    build_plugin.process_file(source / iitc_script, outdir, deps_list=deps_list)
+    plugin_files = sorted(source.joinpath('plugins').glob('*.js'))
+    css_sources = [source / iitc_script, *sorted((source / 'core' / 'code').glob('*.js')), *plugin_files]
+    build_plugin.prepare_css(css_sources, deps_list=deps_list)
+    try:
+        build_plugin.process_file(source / iitc_script, outdir, deps_list=deps_list)
 
-    outdir.joinpath('plugins').mkdir(parents=True, exist_ok=True)
-    for filename in source.joinpath('plugins').glob('*.js'):
-        build_plugin.process_file(
-            filename,
-            outdir / 'plugins',
-            dist_path='plugins',
-            deps_list=deps_list
-        )
+        outdir.joinpath('plugins').mkdir(parents=True, exist_ok=True)
+        for filename in plugin_files:
+            build_plugin.process_file(
+                filename,
+                outdir / 'plugins',
+                dist_path='plugins',
+                deps_list=deps_list
+            )
+    finally:
+        build_plugin.finish_css()
 
     run_cmds(settings.post_build, source, outdir)
 
@@ -79,6 +86,7 @@ def backup(directory):
 
 
 def backup_and_run(deps_list=None):
+    start_time = time.perf_counter()
     source = Path(settings.build_source_dir)
     target = Path(settings.build_target_dir)
     workdir = target.with_name('~')
@@ -89,6 +97,7 @@ def backup_and_run(deps_list=None):
 
     backup(target)
     workdir.replace(target)
+    print(f'Build finished in {time.perf_counter() - start_time:.2f}s')
 
 
 def on_event(cmd):

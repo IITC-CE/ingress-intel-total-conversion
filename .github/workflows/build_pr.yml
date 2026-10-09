@@ -21,9 +21,16 @@ jobs:
         with:
           python-version: '3.9'
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+
+      - name: Install dependencies
+        run: npm install
+
       - name: Set env BUILD_TYPE
         run: |
-            echo "BUILD_TYPE=test" >> "$GITHUB_ENV"
+          echo "BUILD_TYPE=test" >> "$GITHUB_ENV"
 
       - name: Download localbuildsettings.py
         run: wget https://iitc.app/deploy/localbuildsettings.py
