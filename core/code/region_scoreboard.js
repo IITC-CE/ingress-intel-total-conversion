@@ -14,54 +14,68 @@
 window.RegionScoreboardSetup = (function () {
   var mainDialog;
   var regionScore;
+  var historyChart;
+  var checkpointCycleStart;
   var timer;
+  var requestedRegion;
 
   /**
-   * Constructs a RegionScore object from server results. Contains methods to process and retrieve score data.
+   * Interface to manage RegionScore data from server results.
    *
    * @class
    * @name RegionScore
-   * @param {Object} serverResult - The data returned from the server for regional scores.
    */
-  function RegionScore(serverResult) {
-    this.ori_data = serverResult;
-    this.topAgents = serverResult.topAgents;
-    this.regionName = serverResult.regionName;
-    this.gameScore = serverResult.gameScore;
+  class RegionScore {
+    /**
+     * @param {Object} serverResult - The data returned from the server for regional scores.
+     */
+    constructor(serverResult) {
+      this.ori_data = serverResult;
+      this.topAgents = serverResult.topAgents;
+      this.regionName = serverResult.regionName;
+      this.gameScore = serverResult.gameScore;
 
-    this.median = [-1, -1, -1];
-    this.CP_COUNT = 35;
-    this.CP_DURATION = 5 * 60 * 60 * 1000;
-    this.CYCLE_DURATION = this.CP_DURATION * this.CP_COUNT;
+      this.median = [-1, -1, -1];
+      this.CP_COUNT = 35;
+      this.CP_DURATION = 5 * 60 * 60 * 1000;
+      this.CYCLE_DURATION = this.CP_DURATION * this.CP_COUNT;
+      this.MAC_INTERVAL = 13; // Cycles
+      this.checkpoints = [];
 
-    this.checkpoints = [];
+      for (var i = 0; i < serverResult.scoreHistory.length; i++) {
+        var h = serverResult.scoreHistory[i];
+        this.checkpoints[parseInt(h[0])] = [parseInt(h[1]), parseInt(h[2])];
+      }
 
-    this.hasNoTopAgents = function () {
+      this.cycleStartTime = new Date(Math.floor(Date.now() / this.CYCLE_DURATION) * this.CYCLE_DURATION);
+    }
+
+    hasNoTopAgents() {
       return this.topAgents.length === 0;
-    };
+    }
 
-    this.getAvgScore = function (faction) {
+    getAvgScore(faction) {
       return parseInt(this.gameScore[faction === window.TEAM_ENL ? 0 : 1]);
-    };
+    }
 
-    this.getAvgScoreMax = function () {
+    getAvgScoreMax() {
       return Math.max(this.getAvgScore(window.TEAM_ENL), this.getAvgScore(window.TEAM_RES), 1);
-    };
+    }
 
-    this.getCPScore = function (cp) {
+    getCPScore(cp) {
       return this.checkpoints[cp];
-    };
+    }
 
-    this.getScoreMax = function (min_value) {
+    getScoreMax(min_value) {
       var max = min_value || 0;
       for (var i = 1; i < this.checkpoints.length; i++) {
         var cp = this.checkpoints[i];
         max = Math.max(max, cp[0], cp[1]);
       }
       return max;
-    };
+    }
 
-    this.getCPSum = function () {
+    getCPSum() {
       var sums = [0, 0];
       for (var i = 1; i < this.checkpoints.length; i++) {
         sums[0] += this.checkpoints[i][0];
@@ -69,9 +83,9 @@ window.RegionScoreboardSetup = (function () {
       }
 
       return sums;
-    };
+    }
 
-    this.getAvgScoreAtCP = function (faction, cp_idx) {
+    getAvgScoreAtCP(faction, cp_idx) {
       var idx = faction === window.TEAM_RES ? 1 : 0;
 
       var score = 0;
@@ -90,9 +104,9 @@ window.RegionScoreboardSetup = (function () {
       }
 
       return Math.floor(score / cp_idx);
-    };
+    }
 
-    this.getScoreMedian = function (faction) {
+    getScoreMedian(faction) {
       if (this.median[faction] < 0) {
         var idx = faction === window.TEAM_RES ? 1 : 0;
         var values = this.checkpoints.map(function (val) {
@@ -105,9 +119,9 @@ window.RegionScoreboardSetup = (function () {
       }
 
       return this.median[faction];
-    };
+    }
 
-    this.findMedian = function (values) {
+    findMedian(values) {
       var len = values.length;
       var rank = Math.floor((len - 1) / 2);
 
@@ -135,27 +149,29 @@ window.RegionScoreboardSetup = (function () {
         if (rank < i) m = j;
       }
       return values[rank];
-    };
-
-    this.getLastCP = function () {
-      if (this.checkpoints.length === 0) return 0;
-      return this.checkpoints.length - 1;
-    };
-
-    this.getCycleEnd = function () {
-      return this.getCheckpointEnd(this.CP_COUNT);
-    };
-
-    this.getCheckpointEnd = function (cp) {
-      return new Date(this.cycleStartTime.getTime() + this.CP_DURATION * cp);
-    };
-
-    for (var i = 0; i < serverResult.scoreHistory.length; i++) {
-      var h = serverResult.scoreHistory[i];
-      this.checkpoints[parseInt(h[0])] = [parseInt(h[1]), parseInt(h[2])];
     }
 
-    this.cycleStartTime = new Date(Math.floor(Date.now() / this.CYCLE_DURATION) * this.CYCLE_DURATION);
+    getLastCP() {
+      if (this.checkpoints.length === 0) return 0;
+      return this.checkpoints.length - 1;
+    }
+
+    getCycleStart(cycle) {
+      if (cycle === undefined) return this.cycleStartTime;
+      return new Date(cycle * this.CYCLE_DURATION);
+    }
+
+    getCurrentCycle() {
+      return Math.floor(Date.now() / this.CYCLE_DURATION);
+    }
+
+    getCycleEnd() {
+      return this.getCheckpointTime(this.CP_COUNT);
+    }
+
+    getCheckpointTime(cp) {
+      return new Date(this.cycleStartTime.getTime() + this.CP_DURATION * cp);
+    }
   }
 
   function showDialog() {
@@ -177,20 +193,26 @@ window.RegionScoreboardSetup = (function () {
     */
 
   function showRegion(latE6, lngE6) {
-    var text = 'Loading regional scores...';
-    if (window.useAppPanes()) {
-      var style = 'position: absolute; top: 0; width: 100%; max-width: 412px';
-      mainDialog = $('<div>', { class: 'safe-area-insets', style: style }).html(text).appendTo(document.body);
-    } else {
-      mainDialog = window.dialog({
-        title: 'Region scores',
-        html: text,
-        width: 450,
-        height: 340,
-        closeCallback: onDialogClose,
-      });
+    requestedRegion = { latE6: latE6, lngE6: lngE6 };
+
+    if (!mainDialog) {
+      if (window.useAppPanes()) {
+        var style = 'position: absolute; top: 0; bottom: 0; width: 100%; max-width: 412px';
+        mainDialog = $('<div>', { class: 'safe-area-insets region-scoreboard-dialog', style: style }).appendTo(document.body);
+      } else {
+        mainDialog = window.dialog({
+          title: 'Region scores',
+          html: '',
+          width: 520,
+          height: 600,
+          closeCallback: onDialogClose,
+        });
+        mainDialog.addClass('region-scoreboard-dialog');
+      }
     }
 
+    stopTimer();
+    mainDialog.html('Loading regional scores...');
     window.postAjax('getRegionScoreDetails', { latE6: latE6, lngE6: lngE6 }, onRequestSuccess, onRequestFailure);
   }
 
@@ -209,16 +231,45 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function updateDialog(logscale) {
+    checkpointCycleStart = regionScore.cycleStartTime;
     mainDialog.html(
       `<div class="cellscore">` +
-        `<b>Region scores for ${regionScore.regionName}</b>` +
-        `<div class="historychart">${createResults()}${HistoryChart(regionScore, logscale)}</div>` +
-        `<b>Checkpoint overview</b><div>${createHistoryTable()}</div>` +
-        `<b>Top agents</b><div>${createAgentTable()}</div>` +
+        `<details class="scoreboard-section region-selection">` +
+        `<summary><span>Region selection</span><span class="region-summary-name">${regionScore.regionName}</span></summary>` +
+        `<form class="region-select-form">` +
+        `<label>Region ID<input name="region" type="text" required placeholder="NR02-GOLF-12" value="${getRegionName(requestedRegion)}"></label>` +
+        `<button type="submit">Show region</button>` +
+        `<button class="map-center" type="button">Use map center</button>` +
+        `</form>` +
+        `<p class="region-error" role="alert" aria-live="polite"></p>` +
+        `</details>` +
+        `<details class="scoreboard-section" open>` +
+        `<summary>Current scores</summary>` +
+        `<div class="historychart">${createResults()}` +
+        `<div class="history-chart-container">` +
+        `<svg class="history-chart" width="400" height="133" viewBox="0 0 400 133"></svg>` +
+        `<label><input type="checkbox" class="logscale"${logscale ? ' checked' : ''}> log</label>` +
+        `</div></div>` +
+        `</details>` +
+        `<details class="scoreboard-section checkpoint-section" open>` +
+        `<summary>Checkpoints</summary>` +
+        `<div class="checkpoint-cycle-controls">` +
+        `<button type="button" class="checkpoint-cycle-previous" aria-label="Previous checkpoint cycle">‹</button>` +
+        `<input type="date" class="checkpoint-date" value="${formatCycleDateInput(checkpointCycleStart)}">` +
+        `<button type="button" class="checkpoint-cycle-next" aria-label="Next checkpoint cycle">›</button>` +
+        `<button type="button" class="checkpoint-cycle-current">Current cycle</button>` +
+        `</div>` +
+        `<div class="checkpoint-history">${createCheckpointTable(checkpointCycleStart)}</div>` +
+        `</details>` +
+        `<details class="scoreboard-section" open>` +
+        `<summary>Top agents</summary><div>${createAgentTable()}</div>` +
+        `</details>` +
         `</div>` +
         createTimers()
     );
 
+    historyChart = new HistoryChart($('svg.history-chart', mainDialog)[0]);
+    historyChart.update(regionScore, logscale);
     setupToolTips();
 
     var tooltip = createResultTooltip();
@@ -226,14 +277,81 @@ window.RegionScoreboardSetup = (function () {
       content: window.convertTextToTableMagic(tooltip),
     });
 
-    $('.cellscore', mainDialog).accordion({
-      header: 'b',
-      heightStyle: 'fill',
+    $('.region-select-form', mainDialog).on('submit', function (event) {
+      event.preventDefault();
+      var regionName = $('input[name="region"]', this).val();
+      if (!window.plugin || !window.plugin.regions || !window.plugin.regions.getCellFromName) {
+        $('.region-error', mainDialog).text('Enable the Ingress scoring regions plugin to select a region ID.');
+        return;
+      }
+
+      var cell = window.plugin.regions.getCellFromName(regionName);
+      if (!cell) {
+        $('.region-error', mainDialog).text('Enter a valid region ID, for example NR02-GOLF-12.');
+        return;
+      }
+
+      var center = cell.getLatLng();
+      showRegion(Math.round(center.lat * 1e6), Math.round(center.lng * 1e6));
     });
 
-    $('input.logscale', mainDialog).change(function () {
-      var input = $(this);
-      updateDialog(input.prop('checked'));
+    $('.map-center', mainDialog).on('click', function () {
+      var center = window.map.getCenter();
+      if (!window.plugin || !window.plugin.regions || !window.plugin.regions.getNameFromLatLng) {
+        $('.region-error', mainDialog).text('Enable the Ingress scoring regions plugin to select a region ID.');
+        return;
+      }
+      $('input[name="region"]', mainDialog).val(window.plugin.regions.getNameFromLatLng(center));
+      $('.region-error', mainDialog).empty();
+      $('.region-select-form', mainDialog).trigger('submit');
+    });
+
+    $('.checkpoint-cycle-previous', mainDialog).on('click', function () {
+      checkpointCycleStart = new Date(checkpointCycleStart.getTime() - regionScore.CYCLE_DURATION);
+      updateCheckpointHistory();
+    });
+
+    $('.checkpoint-cycle-next', mainDialog).on('click', function () {
+      checkpointCycleStart = new Date(checkpointCycleStart.getTime() + regionScore.CYCLE_DURATION);
+      updateCheckpointHistory();
+    });
+
+    $('.checkpoint-date', mainDialog).on('change', function () {
+      if (this.value) {
+        checkpointCycleStart = getCycleStartForDate(this.value);
+        updateCheckpointHistory();
+      }
+    });
+
+    $('.checkpoint-cycle-current', mainDialog).on('click', function () {
+      checkpointCycleStart = regionScore.cycleStartTime;
+      updateCheckpointHistory();
+    });
+
+    var swipeStart;
+    $('.checkpoint-history', mainDialog)
+      .on('touchstart', function (event) {
+        var touch = event.originalEvent.touches[0];
+        swipeStart = { x: touch.clientX, y: touch.clientY };
+      })
+      .on('touchend', function (event) {
+        if (!swipeStart) return;
+        var touch = event.originalEvent.changedTouches[0];
+        var deltaX = touch.clientX - swipeStart.x;
+        var deltaY = touch.clientY - swipeStart.y;
+        swipeStart = undefined;
+
+        if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+        checkpointCycleStart = new Date(checkpointCycleStart.getTime() + (deltaX < 0 ? 1 : -1) * regionScore.CYCLE_DURATION);
+        updateCheckpointHistory();
+      })
+      .on('touchcancel', function () {
+        swipeStart = undefined;
+      });
+
+    $('input.logscale', mainDialog).on('change', function () {
+      historyChart.update(regionScore, $(this).prop('checked'));
+      setupToolTips();
     });
   }
 
@@ -261,7 +379,7 @@ window.RegionScoreboardSetup = (function () {
         var enl_str = score_now ? '\nEnl:\t' + formatScore(0, score_now, score_last) : '';
         var res_str = score_now ? '\nRes:\t' + formatScore(1, score_now, score_last) : '';
 
-        tooltip = 'CP:\t' + cp + '\t-\t' + formatDayHours(regionScore.getCheckpointEnd(cp)) + '\n<hr>' + enl_str + res_str;
+        tooltip = 'CP:\t' + cp + '\t-\t' + formatDayHours(regionScore.getCheckpointTime(cp)) + '\n<hr>' + enl_str + res_str;
       }
 
       elem.tooltip({
@@ -275,34 +393,82 @@ window.RegionScoreboardSetup = (function () {
 
   function onDialogClose() {
     stopTimer();
+    mainDialog = undefined;
   }
 
-  function createHistoryTable() {
-    var _invert = window.PLAYER.team === 'RESISTANCE';
+  function getCycleStartForDate(dateValue) {
+    var dateParts = dateValue.split('-').map(Number);
+    var date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 12);
+    var cycleDuration = regionScore.CYCLE_DURATION;
+    return new Date(Math.floor(date.getTime() / cycleDuration) * cycleDuration);
+  }
+
+  function formatCycleDateInput(cycleStart) {
+    var date = new Date(cycleStart.getTime() + regionScore.CYCLE_DURATION / 2);
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+  }
+
+  function updateCheckpointHistory() {
+    $('.checkpoint-date', mainDialog).val(formatCycleDateInput(checkpointCycleStart));
+    $('.checkpoint-history', mainDialog).html(createCheckpointTable(checkpointCycleStart));
+  }
+
+  function getRegionName(region) {
+    if (!window.plugin || !window.plugin.regions || !window.plugin.regions.getNameFromLatLng) return '';
+    return window.plugin.regions.getNameFromLatLng({ lat: region.latE6 / 1e6, lng: region.lngE6 / 1e6 });
+  }
+
+  function createCheckpointTable(cycleStart) {
+    const showScores = cycleStart.getTime() === regionScore.cycleStartTime.getTime();
+    const isMacPause = Math.floor(cycleStart.getTime() / regionScore.CYCLE_DURATION + 1) % regionScore.MAC_INTERVAL === 0;
+    const _invert = window.PLAYER.team === 'RESISTANCE';
     function order(_1, _2) {
       return (_invert ? [_2, _1] : [_1, _2]).join('');
     }
-    var enl = { class: window.TEAM_TO_CSS[window.TEAM_ENL], name: window.TEAM_NAMES[window.TEAM_ENL] };
-    var res = { class: window.TEAM_TO_CSS[window.TEAM_RES], name: window.TEAM_NAMES[window.TEAM_RES] };
+    const enl = { class: window.TEAM_TO_CSS[window.TEAM_ENL], name: window.TEAM_NAMES[window.TEAM_ENL] };
+    const res = { class: window.TEAM_TO_CSS[window.TEAM_RES], name: window.TEAM_NAMES[window.TEAM_RES] };
 
-    var table = `<table class="checkpoint_table"><thead><tr><th>CP</th><th>Time</th>${order('<th>' + enl.name + '</th>', '<th>' + res.name + '</th>')}</tr>`;
+    let table = isMacPause ? "<div class='mac_pause'>MAC paused</div>" : '';
 
-    var total = regionScore.getCPSum();
     table +=
-      '<tr class="cp_total"><th></th><th></th>' +
-      order('<th class="' + enl.class + '">' + window.digits(total[0]) + '</th>', '<th class="' + res.class + '">' + window.digits(total[1]) + '</th>') +
-      '</tr></thead>';
+      `<table class="checkpoint_table"><thead><tr><th>CP</th><th>Time</th>` +
+      (showScores ? order('<th>' + enl.name + '</th>', '<th>' + res.name + '</th>') : '') +
+      `</tr>`;
 
-    for (var cp = regionScore.getLastCP(); cp > 0; cp--) {
-      var score = regionScore.getCPScore(cp);
-      var class_e = score[0] > score[1] ? ' class="' + enl.class + '"' : '';
-      var class_r = score[1] > score[0] ? ' class="' + res.class + '"' : '';
+    if (showScores) {
+      const total = [0, 0];
+      for (let totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
+        const checkpointScore = regionScore.getCPScore(totalCp);
+        if (checkpointScore) {
+          total[0] += checkpointScore[0];
+          total[1] += checkpointScore[1];
+        }
+      }
 
       table +=
-        `<tr>` +
+        '<tr class="cp_total"><th></th><th></th>' +
+        order('<th class="' + enl.class + '">' + window.digits(total[0]) + '</th>', '<th class="' + res.class + '">' + window.digits(total[1]) + '</th>') +
+        '</tr>';
+    }
+    table += '</thead>';
+
+    for (var cp = regionScore.CP_COUNT; cp > 0; cp--) {
+      const checkpointDate = new Date(cycleStart.getTime() + regionScore.CP_DURATION * cp);
+      const score = showScores ? regionScore.getCPScore(cp) : undefined;
+      const class_e = score && score[0] > score[1] ? ' class="' + enl.class + '"' : '';
+      const class_r = score && score[1] > score[0] ? ' class="' + res.class + '"' : '';
+
+      const lastcheckpointDate = new Date(cycleStart.getTime() + regionScore.CP_DURATION * (cp - 1)).getDate();
+      const dayChange = checkpointDate.getDate() !== lastcheckpointDate;
+      const showDay = cp === 1 || cp === regionScore.CP_COUNT || dayChange;
+
+      table +=
+        `<tr ${dayChange ? "class='daychange'" : ''}>` +
         `<td>${cp}</td>` +
-        `<td>${formatDayHours(regionScore.getCheckpointEnd(cp))}</td>` +
-        order(`<td${class_e}>${window.digits(score[0])}</td>`, `<td${class_r}>${window.digits(score[1])}</td>`) +
+        `<td>${showDay ? formatDayHours(checkpointDate) : formatHours(checkpointDate)}</td>` +
+        (showScores
+          ? order(`<td${class_e}>${score ? window.digits(score[0]) : '–'}</td>`, `<td${class_r}>${score ? window.digits(score[1]) : '–'}</td>`)
+          : '') +
         `</tr>`;
     }
 
@@ -399,14 +565,14 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function createTimers() {
-    var nextcp = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1);
-    var endcp = regionScore.getCycleEnd();
+    const nextcp = regionScore.getCheckpointTime(regionScore.getLastCP() + 1);
+    const endcp = regionScore.getCycleEnd();
 
     return (
-      `<div class="checkpoint_timers"><table><tr>` +
-      `<td>Next CP at: ${formatHours(nextcp)} (in <span id="cycletimer"></span>)</td>` +
-      `<td>Cycle ends: ${formatDayHours(endcp)}</td>` +
-      `</tr></table></div>`
+      `<div class="checkpoint_timers"><div class="checkpoint-timer-row">` +
+      `<span>Next CP at: ${formatHours(nextcp)} (in <span id="cycletimer"></span>)</span>` +
+      `<span>Cycle ends: ${formatDayHours(endcp)}</span>` +
+      `</div></div>`
     );
   }
 
@@ -425,7 +591,8 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function onTimer() {
-    var d = regionScore.getCheckpointEnd(regionScore.getLastCP() + 1) - new Date();
+    if (!regionScore || !mainDialog) return;
+    var d = regionScore.getCheckpointTime(regionScore.getLastCP() + 1) - new Date();
     $('#cycletimer', mainDialog).html(formatMinutes(Math.max(0, Math.floor(d / 1000))));
   }
 
@@ -459,6 +626,8 @@ window.RegionScoreboardSetup = (function () {
           showDialog();
         } else if (mainDialog) {
           mainDialog.remove();
+          mainDialog = undefined;
+          stopTimer();
         }
       });
     } else {
@@ -473,59 +642,47 @@ window.RegionScoreboardSetup = (function () {
 })();
 
 /**
- * Creates an SVG-based history chart for regional scores.
- *
- * @function HistoryChart
- * @param {RegionScore} _regionScore - The RegionScore object containing score data.
- * @param {boolean} logscale - Whether to use logarithmic scale for the chart.
- * @returns {string} An SVG string representing the history chart.
+ * Updates an SVG history chart for regional scores.
  */
-var HistoryChart = (function () {
-  var regionScore;
-  var scaleFct;
-  var logscale;
-  var svgTickText;
-
-  function create(_regionScore, logscale) {
-    regionScore = _regionScore;
-
-    var max = regionScore.getScoreMax(10); // NOTE: ensure a min of 10 for the graph
-    max *= 1.09; // scale up maximum a little, so graph isn't squashed right against upper edge
-    setScaleType(max, logscale);
-
-    svgTickText = [];
-
-    // svg area 400x130. graph area 350x100, offset to 40,10
-    var svg =
-      '<div><svg width="400" height="133" style="margin-left: 10px;">' +
-      svgBackground() +
-      svgAxis(max) +
-      svgAveragePath() +
-      svgFactionPath() +
-      svgCheckPointMarkers() +
-      svgTickText.join('') +
-      '<foreignObject height="18" width="60" y="113" x="0" class="node"><label title="Logarithmic scale">' +
-      '<input type="checkbox" class="logscale"' +
-      (logscale ? ' checked' : '') +
-      '/>' +
-      'log</label></foreignObject>' +
-      '</svg></div>';
-
-    return svg;
+class HistoryChart {
+  /**
+   * @param {SVGElement} svg - The SVG element used to render the chart.
+   */
+  constructor(svg) {
+    this.svg = svg;
   }
 
-  function svgFactionPath() {
+  /**
+   * Replace the chart content for the supplied score data and scale.
+   *
+   * @param {RegionScore} regionScore - The RegionScore object containing score data.
+   * @param {boolean} logscale - Whether to use logarithmic scale for the chart.
+   */
+  update(regionScore, logscale) {
+    this.regionScore = regionScore;
+    this.logscale = logscale;
+    this.svgTickText = [];
+
+    var max = this.regionScore.getScoreMax(10); // NOTE: ensure a min of 10 for the graph
+    max *= 1.09; // scale up maximum a little, so graph isn't squashed right against upper edge
+    this.setScaleType(max);
+
+    this.svg.innerHTML =
+      this.svgBackground() + this.svgAxis(max) + this.svgAveragePath() + this.svgFactionPath() + this.svgCheckPointMarkers() + this.svgTickText.join('');
+  }
+
+  svgFactionPath() {
     var svgPath = '';
 
     for (var t = 0; t < 2; t++) {
-      var col = getFactionColor(t);
+      var col = this.getFactionColor(t);
       var teamPaths = [];
 
-      for (var cp = 1; cp <= regionScore.getLastCP(); cp++) {
-        var score = regionScore.getCPScore(cp);
+      for (var cp = 1; cp <= this.regionScore.getLastCP(); cp++) {
+        var score = this.regionScore.getCPScore(cp);
         if (score !== undefined) {
           var x = cp * 10 + 40;
-          teamPaths.push(x + ',' + scaleFct(score[t]));
+          teamPaths.push(x + ',' + this.scaleFct(score[t]));
         }
       }
 
@@ -537,22 +694,22 @@ var HistoryChart = (function () {
     return svgPath;
   }
 
-  function svgCheckPointMarkers() {
+  svgCheckPointMarkers() {
     var markers = '';
 
-    var col1 = getFactionColor(0);
-    var col2 = getFactionColor(1);
+    var col1 = this.getFactionColor(0);
+    var col2 = this.getFactionColor(1);
 
-    for (var cp = 1; cp <= regionScore.CP_COUNT; cp++) {
-      var scores = regionScore.getCPScore(cp);
+    for (var cp = 1; cp <= this.regionScore.CP_COUNT; cp++) {
+      var scores = this.regionScore.getCPScore(cp);
 
       markers +=
         `<g title="dummy" class="checkpoint" data-cp="${cp}">` + `<rect x="${cp * 10 + 35}" y="10" width="10" height="100" fill="black" fill-opacity="0" />`;
 
       if (scores) {
         markers +=
-          `<circle cx="${cp * 10 + 40}" cy="${scaleFct(scores[0])}" r="3" stroke-width="1" stroke="${col1}" fill="${col1}" fill-opacity="0.5" />` +
-          `<circle cx="${cp * 10 + 40}" cy="${scaleFct(scores[1])}" r="3" stroke-width="1" stroke="${col2}" fill="${col2}" fill-opacity="0.5" />`;
+          `<circle cx="${cp * 10 + 40}" cy="${this.scaleFct(scores[0])}" r="3" stroke-width="1" stroke="${col1}" fill="${col1}" fill-opacity="0.5" />` +
+          `<circle cx="${cp * 10 + 40}" cy="${this.scaleFct(scores[1])}" r="3" stroke-width="1" stroke="${col2}" fill="${col2}" fill-opacity="0.5" />`;
       }
 
       markers += '</g>';
@@ -561,32 +718,36 @@ var HistoryChart = (function () {
     return markers;
   }
 
-  function svgBackground() {
+  svgBackground() {
     return '<rect x="0" y="1" width="400" height="132" stroke="#FFCE00" fill="#08304E" />';
   }
 
-  function svgAxis(max) {
-    return '<path d="M40,110 L40,10 M40,110 L390,110" stroke="#fff" />' + createTicks(max);
+  svgAxis(max) {
+    return '<path d="M40,110 L40,10 M40,110 L390,110" stroke="#fff" />' + this.createTicks(max);
   }
 
-  function createTicks(max) {
-    var ticks = createTicksHorz();
+  createTicks(max) {
+    var ticks = this.createTicksHorz();
 
     function addVTick(i) {
-      var y = scaleFct(i);
+      var y = this.scaleFct(i);
 
       ticks.push('M40,' + y + ' L390,' + y);
-      svgTickText.push(
-        '<text x="35" y="' + y + '" font-size="12" font-family="Roboto, Helvetica, sans-serif" text-anchor="end" fill="#fff">' + formatNumber(i) + '</text>'
+      this.svgTickText.push(
+        '<text x="35" y="' +
+          y +
+          '" font-size="12" font-family="Roboto, Helvetica, sans-serif" text-anchor="end" fill="#fff">' +
+          this.formatNumber(i) +
+          '</text>'
       );
     }
 
     // vertical
     // first we calculate the power of 10 that is smaller than the max limit
     var vtickStep = Math.pow(10, Math.floor(Math.log10(max)));
-    if (logscale) {
+    if (this.logscale) {
       for (var i = 0; i < 4; i++) {
-        addVTick(vtickStep);
+        addVTick.call(this, vtickStep);
         vtickStep /= 10;
       }
     } else {
@@ -598,19 +759,19 @@ var HistoryChart = (function () {
       }
 
       for (var ti = vtickStep; ti <= max; ti += vtickStep) {
-        addVTick(ti);
+        addVTick.call(this, ti);
       }
     }
 
     return '<path d="' + ticks.join(' ') + '" stroke="#fff" opacity="0.3" />';
   }
 
-  function createTicksHorz() {
+  createTicksHorz() {
     var ticks = [];
     for (var i = 5; i <= 35; i += 5) {
       var x = i * 10 + 40;
       ticks.push('M' + x + ',10 L' + x + ',110');
-      svgTickText.push(
+      this.svgTickText.push(
         '<text x="' + x + '" y="125" font-size="12" font-family="Roboto, Helvetica, sans-serif" text-anchor="middle" fill="#fff">' + i + '</text>'
       );
     }
@@ -618,17 +779,17 @@ var HistoryChart = (function () {
     return ticks;
   }
 
-  function svgAveragePath() {
+  svgAveragePath() {
     var path = '';
     for (var faction = 1; faction < 3; faction++) {
       var col = window.COLORS[faction];
 
       var points = [];
-      for (var cp = 1; cp <= regionScore.CP_COUNT; cp++) {
-        var score = regionScore.getAvgScoreAtCP(faction, cp);
+      for (var cp = 1; cp <= this.regionScore.CP_COUNT; cp++) {
+        var score = this.regionScore.getAvgScoreAtCP(faction, cp);
 
         var x = cp * 10 + 40;
-        var y = scaleFct(score);
+        var y = this.scaleFct(score);
         points.push(x + ',' + y);
       }
 
@@ -638,30 +799,29 @@ var HistoryChart = (function () {
     return path;
   }
 
-  function setScaleType(max, useLogScale) {
-    logscale = useLogScale;
-    if (useLogScale) {
+  setScaleType(max) {
+    if (this.logscale) {
       if (!Math.log10)
         Math.log10 = function (x) {
           return Math.log(x) / Math.LN10;
         };
 
       // 0 cannot be displayed on a log scale, so we set the minimum to 0.001 and divide by lg(0.001)=-3
-      scaleFct = function (y) {
+      this.scaleFct = function (y) {
         return Math.round(10 - (Math.log10(Math.max(0.001, y / max)) / 3) * 100);
       };
     } else {
-      scaleFct = function (y) {
+      this.scaleFct = function (y) {
         return Math.round(110 - (y / max) * 100);
       };
     }
   }
 
-  function getFactionColor(t) {
+  getFactionColor(t) {
     return t === 0 ? window.COLORS[window.TEAM_ENL] : window.COLORS[window.TEAM_RES];
   }
 
-  function formatNumber(num) {
+  formatNumber(num) {
     if (num >= 1_000_000_000) {
       return num / 1_000_000_000 + 'B';
     } else if (num >= 1_000_000) {
@@ -672,6 +832,4 @@ var HistoryChart = (function () {
       return num.toString();
     }
   }
-
-  return create;
-})();
+}
