@@ -53,6 +53,9 @@
  * - `nicknameClicked`: Event triggered when a player's nickname is clicked.
  * - `geoSearch`: Event triggered during a geographic search.
  * - `search`: Event triggered during a search operation.
+ * - `optionChanged`: Called after the value of an option has changed (see `IITC.options`), for declared
+ *                     options and for plugin state stored or removed through `IITC.options` alike;
+ *                     provides `{ key, value, oldValue }`
  *
  * @module hooks
  */
