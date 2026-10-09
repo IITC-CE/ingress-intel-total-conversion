@@ -120,8 +120,9 @@ globalThis.app = { addPane: () => {} };
 // ulog stub (each bundled core module receives a `log` instance)
 globalThis.log = { log() {}, debug() {}, info() {}, warn() {}, error() {} };
 
-// browser storage stub
-globalThis.localStorage = {};
+// browser storage: jsdom's real Storage, so the getItem/setItem API behaves as in the browser
+globalThis.localStorage = domWindow.localStorage;
+globalThis.window.localStorage = domWindow.localStorage;
 
 // leaflet
 globalThis.L = {
