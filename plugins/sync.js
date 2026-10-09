@@ -840,7 +840,7 @@ window.plugin.sync.toggleDialogLink = function () {
 };
 
 window.plugin.sync.showDialog = function () {
-  window.dialog({ html: window.plugin.sync.dialogHTML, title: 'Sync', modal: true, id: 'sync-setting' });
+  window.dialog({ html: window.plugin.sync.dialogHTML, title: 'Sync', modal: true, id: 'sync-option' });
   window.plugin.sync.toggleAuthButton();
   window.plugin.sync.toggleDialogLink();
   window.plugin.sync.updateAccountInfo();
