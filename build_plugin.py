@@ -171,6 +171,8 @@ def prepare_css(sources: Iterable[Path], deps_list=None):
         return
 
     cli = source_root / 'node_modules' / '.bin' / 'lightningcss'
+    if sys.platform == 'win32':
+        cli = source_root / 'node_modules' / 'lightningcss-cli' / 'lightningcss.exe'
     if not cli.is_file():
         raise UserWarning('Lightning CSS CLI requires npm dependencies; run npm install')
 
