@@ -15,6 +15,8 @@ defaults = {  # common for all build targets
 
     'version_timestamp': False,        # add extra component to version field (to force update)
 
+    'css_sourcemap': False,            # embed CSS source maps (disables CSS minification)
+
     # these settings should be modified when developing own fork of this project
     'namespace': 'https://github.com/IITC-CE/ingress-intel-total-conversion',
     'url_homepage': 'https://iitc.app/',
@@ -57,6 +59,7 @@ builds = {  # every build entry extends common defaults
         'url_dist_base': 'http://localhost:8000',
         'update_file': '.user.js',
         'version_timestamp': True,
+        'css_sourcemap': True,
     },
 
     # use no-inject wrapper for easy breakpoints (Tampermonkey only!)
@@ -65,6 +68,7 @@ builds = {  # every build entry extends common defaults
         'update_file': '.user.js',
         'version_timestamp': True,
         'plugin_wrapper': 'pluginwrapper_noinject',
+        'css_sourcemap': True,
     },
 
     # default entry that also builds the mobile .apk
