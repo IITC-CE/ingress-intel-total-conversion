@@ -63,10 +63,57 @@ window.plugin.drawTools.KEY_DELIMITER = '::';
 
 window.plugin.drawTools.merge = {};
 window.plugin.drawTools.merge.status = true;
-window.plugin.drawTools.merge.toggle = function () {
-  var status = window.plugin.drawTools.merge.status;
-  status = Boolean(!status);
-  window.plugin.drawTools.merge.status = status;
+// reset: the new value of the setting; without it the setting flips (merge.status is its opposite)
+window.plugin.drawTools.merge.toggle = (reset = window.plugin.drawTools.merge.status) => {
+  IITC.settings.set('draw-tools.resetBeforeImport', reset);
+};
+
+// set between Leaflet.draw's edit or delete start and stop
+window.plugin.drawTools.editing = false;
+// a redraw was needed while editing (fill changed or a layer was added); done when editing stops
+window.plugin.drawTools.fillPending = false;
+
+// the color, the fill and the reset before paste or import; onChange applies a change from the dialog or from sync
+window.plugin.drawTools.registerSettings = () => {
+  IITC.settings.register('draw-tools', {
+    title: 'Draw Tools',
+    blocks: [
+      {
+        type: 'color',
+        key: 'color',
+        title: 'Color',
+        default: '#a24ac3',
+        onChange: (color) => {
+          window.plugin.drawTools.currentColor = color;
+          window.plugin.drawTools.setDrawColor(color);
+        },
+      },
+      {
+        type: 'boolean',
+        key: 'resetBeforeImport',
+        title: 'Reset draws before paste or import',
+        onChange: (reset) => {
+          window.plugin.drawTools.merge.status = !reset;
+        },
+      },
+      {
+        type: 'boolean',
+        key: 'fill',
+        title: 'Fill the polygon(s)',
+        default: true,
+        onChange: (fill) => {
+          // reloading the shapes would drop the layers an edit or delete is working on
+          if (window.plugin.drawTools.editing) {
+            window.plugin.drawTools.fillPending = true;
+            return;
+          }
+          window.plugin.drawTools.EDFstatus = !fill;
+          window.plugin.drawTools.toggleOpacityOpt();
+          window.plugin.drawTools.clearAndDraw();
+        },
+      },
+    ],
+  });
 };
 
 window.plugin.drawTools.getMarkerIcon = function (color) {
@@ -374,15 +421,8 @@ window.plugin.drawTools.import = function (data) {
 
 // Manual import, export and reset data
 window.plugin.drawTools.manualOpt = function () {
-  var mergeStatusCheck = '';
-  if (!window.plugin.drawTools.merge.status) {
-    mergeStatusCheck = 'checked';
-  }
-
-  var edfStatusCheck = '';
-  if (!window.plugin.drawTools.EDFstatus) {
-    edfStatusCheck = 'checked';
-  }
+  const mergeStatusCheck = IITC.settings.get('draw-tools.resetBeforeImport') ? 'checked' : '';
+  const edfStatusCheck = IITC.settings.get('draw-tools.fill') ? 'checked' : '';
 
   var html =
     '<div class="drawtoolsStyles">' +
@@ -397,9 +437,9 @@ window.plugin.drawTools.manualOpt = function () {
     '<a onclick="window.plugin.drawTools.optReset();return false;" tabindex="0">Reset Drawn Items</a>' +
     '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>' +
     `<center><label id="MergeToggle"><input type="checkbox" ${mergeStatusCheck} name="merge" ` +
-    'onchange="window.plugin.drawTools.merge.toggle();return false;" />Reset draws before paste or import</label></center>' +
+    'onchange="window.plugin.drawTools.merge.toggle(this.checked);return false;" />Reset draws before paste or import</label></center>' +
     `<center><label id="edfToggle"><input type="checkbox" ${edfStatusCheck} name="edf" ` +
-    'onchange="window.plugin.drawTools.edfStatusToggle();return false;" />Fill the polygon(s)</label></center>' +
+    'onchange="window.plugin.drawTools.edfStatusToggle(this.checked);return false;" />Fill the polygon(s)</label></center>' +
     '</div>';
 
   window.dialog({
@@ -423,7 +463,7 @@ window.plugin.drawTools.manualOpt = function () {
       ['#000000', '#666666', '#bbbbbb', '#ffffff'],
     ],
     change: function (color) {
-      window.plugin.drawTools.setDrawColor(color.toHexString());
+      IITC.settings.set('draw-tools.color', color.toHexString());
     },
     // move: function(color) { window.plugin.drawTools.setDrawColor(color.toHexString()); },
     color: window.plugin.drawTools.currentColor,
@@ -790,9 +830,15 @@ window.plugin.drawTools.snapToPortals = function () {
 };
 
 window.plugin.drawTools.boot = function () {
+  window.plugin.drawTools.registerSettings();
+  window.plugin.drawTools.currentColor = IITC.settings.get('draw-tools.color');
+  window.plugin.drawTools.merge.status = !IITC.settings.get('draw-tools.resetBeforeImport');
+  window.plugin.drawTools.EDFstatus = !IITC.settings.get('draw-tools.fill');
+
   window.plugin.drawTools.currentMarker = window.plugin.drawTools.getMarkerIcon(window.plugin.drawTools.currentColor);
 
   window.plugin.drawTools.setOptions();
+  window.plugin.drawTools.toggleOpacityOpt();
 
   // create a leaflet FeatureGroup to hold drawn items
   window.plugin.drawTools.drawnItems = new L.FeatureGroup();
@@ -834,26 +880,18 @@ window.plugin.drawTools.boot = function () {
 
     if (window.plugin.drawTools.EDFstatus) {
       //    window.plugin.drawTools.toggleOpacityOpt(); // disabled by Zaso
-      window.plugin.drawTools.clearAndDraw();
+      // reloading would drop the layers an edit or delete is working on; redraw when it stops
+      if (window.plugin.drawTools.editing) window.plugin.drawTools.fillPending = true;
+      else window.plugin.drawTools.clearAndDraw();
     }
 
     window.runHooks('pluginDrawTools', { event: 'layerCreated', layer: layer });
   });
 
-  window.plugin.drawTools.oldEDFstatus = false;
-  window.map.on('draw:deletestart', function () {
-    console.log('draw:deletestart');
-    window.plugin.drawTools.oldEDFstatus = window.plugin.drawTools.EDFstatus;
-    window.plugin.drawTools.EDFstatus = false;
-    window.plugin.drawTools.toggleOpacityOpt();
-    window.plugin.drawTools.clearAndDraw();
-  });
-  window.map.on('draw:deletestop', function () {
-    console.log('draw:deletestop');
-    window.plugin.drawTools.EDFstatus = window.plugin.drawTools.oldEDFstatus;
-    window.plugin.drawTools.toggleOpacityOpt();
-    window.plugin.drawTools.clearAndDraw();
-  });
+  window.map.on('draw:editstart', window.plugin.drawTools.onEditStart);
+  window.map.on('draw:editstop', window.plugin.drawTools.onEditStop);
+  window.map.on('draw:deletestart', window.plugin.drawTools.onDeleteStart);
+  window.map.on('draw:deletestop', window.plugin.drawTools.onDeleteStop);
 
   window.map.on('draw:deleted', function () {
     window.plugin.drawTools.save();
@@ -917,20 +955,38 @@ window.plugin.drawTools.getDrawAsLines = function () {
 // ---------------------------------------------------------------------------------
 window.plugin.drawTools.EDFstatus = false;
 
-window.plugin.drawTools.initEDF = function () {
-  // window.addHook('pluginDrawTools', window.plugin.drawTools.edf.hookManagement);
-  window.addHook('iitcLoaded', function () {
-    if (window.plugin.drawTools.EDFstatus) {
-      window.plugin.drawTools.toggleOpacityOpt();
-      window.plugin.drawTools.clearAndDraw();
-    }
-  });
+window.plugin.drawTools.onEditStart = () => {
+  window.plugin.drawTools.editing = true;
 };
 
-window.plugin.drawTools.toggleEDF = function () {
-  var status = window.plugin.drawTools.EDFstatus;
-  status = Boolean(!status);
-  window.plugin.drawTools.EDFstatus = status;
+window.plugin.drawTools.onEditStop = () => {
+  window.plugin.drawTools.editing = false;
+  if (!window.plugin.drawTools.fillPending) return;
+  window.plugin.drawTools.fillPending = false;
+  window.plugin.drawTools.EDFstatus = !IITC.settings.get('draw-tools.fill');
+  window.plugin.drawTools.toggleOpacityOpt();
+  window.plugin.drawTools.clearAndDraw();
+};
+
+// polygons stay filled and clickable while deleting, so that they can be picked
+window.plugin.drawTools.onDeleteStart = () => {
+  window.plugin.drawTools.editing = true;
+  window.plugin.drawTools.EDFstatus = false;
+  window.plugin.drawTools.toggleOpacityOpt();
+  window.plugin.drawTools.clearAndDraw();
+};
+
+window.plugin.drawTools.onDeleteStop = () => {
+  window.plugin.drawTools.editing = false;
+  window.plugin.drawTools.fillPending = false;
+  window.plugin.drawTools.EDFstatus = !IITC.settings.get('draw-tools.fill');
+  window.plugin.drawTools.toggleOpacityOpt();
+  window.plugin.drawTools.clearAndDraw();
+};
+
+// fill: the new value of the setting; without it the setting flips. onChange redraws the polygons
+window.plugin.drawTools.toggleEDF = (fill = !IITC.settings.get('draw-tools.fill')) => {
+  IITC.settings.set('draw-tools.fill', fill);
 };
 
 window.plugin.drawTools.toggleOpacityOpt = function () {
@@ -949,10 +1005,8 @@ window.plugin.drawTools.clearAndDraw = function () {
   console.log('DRAWTOOLS: reset all drawn items');
 };
 
-window.plugin.drawTools.edfStatusToggle = function () {
-  window.plugin.drawTools.toggleEDF();
-  window.plugin.drawTools.toggleOpacityOpt();
-  window.plugin.drawTools.clearAndDraw();
+window.plugin.drawTools.edfStatusToggle = (fill) => {
+  window.plugin.drawTools.toggleEDF(fill);
 };
 
 // ---------------------------------------------------------------------------------
@@ -1211,7 +1265,6 @@ function setup() {
   loadExternals(); // initialize leaflet
   window.plugin.drawTools.boot(); // initialize drawtools
   window.plugin.drawTools.initMPE(); // register to MPE if available
-  window.plugin.drawTools.initEDF(); // initialize empty drawn fields
   window.plugin.drawTools.registerFieldForSyncing(); // register with sync.js if available
 
   var filterEvents = new L.Evented();
