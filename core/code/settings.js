@@ -353,11 +353,60 @@ const reset = (key) => {
   if (!sameValue(value, oldValue)) notifyChange(key, value, oldValue);
 };
 
+/**
+ * Collects the stored values of declared settings; defaults are left out, so an import on another
+ * device keeps that device's defaults. Values are not validated here: options may still be loading,
+ * and `import` checks every value anyway
+ *
+ * @alias IITC.settings.export
+ * @returns {Object<string, *>} Values by setting key
+ *
+ * @example
+ * const backup = JSON.stringify(IITC.settings.export());
+ */
+const exportValues = () => {
+  const values = {};
+  for (const key of Object.keys(definitions)) {
+    const stored = readStored(key);
+    if (stored !== undefined) values[key] = stored;
+  }
+  return values;
+};
+
+/**
+ * Stores values produced by `export`. Each value goes through `set`, so it is validated
+ * and announced like any other change; keys no registered page declares are skipped
+ *
+ * @alias IITC.settings.import
+ * @param {Object<string, *>} values - Values by setting key
+ * @returns {{applied: string[], rejected: string[], skipped: string[]}} Keys stored, keys whose value
+ *          was not allowed or could not be stored, and undeclared keys
+ *
+ * @example
+ * const { rejected } = IITC.settings.import(JSON.parse(backup));
+ */
+const importValues = (values) => {
+  const result = { applied: [], rejected: [], skipped: [] };
+  if (!isPlainObject(values)) {
+    log.warn('settings: import expects an object of values by key');
+    return result;
+  }
+
+  for (const [key, value] of Object.entries(values)) {
+    if (!definitions[key]) result.skipped.push(key);
+    else if (set(key, value)) result.applied.push(key);
+    else result.rejected.push(key);
+  }
+  return result;
+};
+
 IITC.settings = {
   register,
   get,
   set,
   reset,
+  export: exportValues,
+  import: importValues,
   _pages: pages,
   _definitions: definitions,
 };
