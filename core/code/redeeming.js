@@ -1,4 +1,4 @@
-/* global log -- eslint */
+/* global IITC, log -- eslint */
 
 /**
  * @file This file contains functions related to the handling of passcode redeeming in Ingress.
@@ -72,12 +72,7 @@ window.handleRedeemResponse = function (data, textStatus, jqXHR) {
     window.setupPlayerStat();
   }
 
-  var format = 'long';
-  try {
-    format = localStorage['iitc-passcode-format'];
-  } catch {
-    /* empty */
-  }
+  let format = IITC.settings.get('iitc.passcodeFormat');
 
   var formatHandlers = {
     short: window.formatPasscodeShort,
@@ -93,7 +88,7 @@ window.handleRedeemResponse = function (data, textStatus, jqXHR) {
 
     buttons[label.toUpperCase()] = function () {
       $(this).dialog('close');
-      localStorage['iitc-passcode-format'] = label;
+      IITC.settings.set('iitc.passcodeFormat', label);
       window.handleRedeemResponse(data, textStatus, jqXHR);
     };
   });
