@@ -1392,7 +1392,7 @@ window.plugin.bookmarks.setupPortalsList = function () {
       $(cell).addClass('portal-list-bookmark').attr('data-list-bookmark', guid);
 
       // for some reason, jQuery removes event listeners when the list is sorted. Therefore we use DOM's addEventListener
-      $('<iitc-icon>star</iitc-icon>')
+      $('<iitc-icon filled>star</iitc-icon>')
         .appendTo(cell)[0]
         .addEventListener(
           'click',
@@ -1444,7 +1444,7 @@ window.plugin.bookmarks.setupContent = function () {
 
   window.plugin.bookmarks.htmlDisabledMessage = '<div title="Your browser do not support localStorage">Plugin Bookmarks disabled*.</div>';
   window.plugin.bookmarks.htmlStar =
-    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><iitc-icon>star</iitc-icon></a>';
+    '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><iitc-icon filled>star</iitc-icon></a>';
   window.plugin.bookmarks.htmlMoveBtn =
     '<a id="bookmarksMove" class="btn" onclick="window.plugin.bookmarks.moveMode();return false;">Show/Hide "Move" button</a>';
 

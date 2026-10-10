@@ -291,13 +291,13 @@
 	min-height:var(--icon-target-size, 24px);
 }
 .bkmrksStar iitc-icon, .portal-list-bookmark iitc-icon {
-	font-size:16px;
+	font-size:19px;
 }
 .bkmrksStar iitc-icon, .bkmrksStar.favorite:focus iitc-icon {
-	font-variation-settings:'FILL' 0;
+	color:var(--color-none);
 }
 .bkmrksStar:focus iitc-icon, .bkmrksStar.favorite iitc-icon, .portal-list-bookmark.favorite iitc-icon {
-	font-variation-settings:'FILL' 1;
+	color:var(--color-primary);
 }
 body.icons-unavailable .bkmrksStar iitc-icon::before, body.icons-unavailable .portal-list-bookmark iitc-icon::before{
 	content:"\2606";
