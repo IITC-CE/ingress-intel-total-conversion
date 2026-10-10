@@ -1,11 +1,9 @@
 /* global IITC -- eslint */
 
 /**
- * @file General options of IITC, declared as the `iitc` page. A module that owns a whole page
- *       declares it itself; this file declares the shared page for options of several core modules,
- *       and those modules only read and write the values. This file sorts right after options.js
- *       in the bundle, so the page exists before boot(), where core modules and plugin setups first
- *       read its values
+ * @file General options of IITC, declared as the `iitc` page for options of several core modules.
+ *       This file sorts right after options.js in the bundle, so the page exists before boot(), where
+ *       core modules and plugin setups first read its values
  * @module options_general
  */
 
