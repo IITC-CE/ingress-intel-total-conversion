@@ -28,7 +28,9 @@
  * @property {Array|Function} [options] - `select` choices: values or `{value, label}` objects
  * @property {boolean} [alpha] - Allows `color` values with an alpha channel (`#rrggbbaa`)
  * @property {Function} [validate] - Returns true, or an error message for a value that is not allowed
- * @property {Function} [onChange] - Called with `(value, oldValue)` after the value has changed
+ * @property {Function} [onChange] - Called with `(value, oldValue, source)` after the value has changed
+ * @property {boolean} [sync=true] - False keeps the setting on this device: sync neither sends nor applies it,
+ *                                   while a local backup still holds it
  * @property {Function} [over] - Items of a `repeat` block, returned as `[{id, title}]` with ids that stay the same between calls
  * @property {Array<IITC.settings.SettingBlock>} [blocks] - Blocks of a `repeat` block; their settings hold a map of item id to value
  */
@@ -143,7 +145,7 @@ const validate = (def, value) => {
 
 // parsed stored value, read anew on every call so callers may change it; undefined when missing or
 // unreadable; no defaults or validation
-const readStored = (key) => {
+const readStored = (key, quiet = false) => {
   const storageKey = STORAGE_PREFIX + key;
   const stored = localStorage.getItem(storageKey);
   if (stored === null) return undefined;
@@ -151,7 +153,7 @@ const readStored = (key) => {
   try {
     return JSON.parse(stored);
   } catch (e) {
-    log.warn(`settings: cannot read "${storageKey}": ${e}`);
+    if (!quiet) log.warn(`settings: cannot read "${storageKey}": ${e}`);
     return undefined;
   }
 };
@@ -171,12 +173,12 @@ const writeStored = (key, value) => {
 };
 
 // runs the settingChanged hook, then the block's onChange
-const notifyChange = (key, value, oldValue) => {
-  window.runHooks('settingChanged', { key, value, oldValue });
+const notifyChange = (key, value, oldValue, source) => {
+  window.runHooks('settingChanged', { key, value, oldValue, source });
   const onChange = definitions[key]?.onChange;
   if (!onChange) return;
   try {
-    onChange(value, oldValue);
+    onChange(value, oldValue, source);
   } catch (e) {
     log.error(`settings: onChange of "${key}" failed: ${e}`);
   }
@@ -245,6 +247,7 @@ const register = (pageId, page) => {
 
   const namespace = page.namespace ?? pageId;
   pages[pageId] = { ...page, namespace };
+  const keys = [];
   for (const def of collectDefinitions(namespace, page.blocks)) {
     const existing = definitions[def.fullKey];
     if (existing) {
@@ -252,7 +255,11 @@ const register = (pageId, page) => {
       continue;
     }
     definitions[def.fullKey] = { ...def, pageId };
+    keys.push(def.fullKey);
   }
+
+  // last, so settingsPageRegistered handlers (sync) see the page settled
+  window.runHooks('settingsPageRegistered', { pageId, keys });
   return true;
 };
 
@@ -296,6 +303,39 @@ const get = (key, fallback) => {
 };
 
 /**
+ * Tells whether a setting may travel to other devices: it is declared, and not with `sync: false`
+ *
+ * @private
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @returns {boolean} True for a declared setting that syncs
+ */
+const syncs = (key) => definitions[key] !== undefined && definitions[key].sync !== false;
+
+/**
+ * Tells what localStorage holds for a key, without logging: nothing, a value that reads and passes
+ * the declaration, or one that cannot be read or fails it (an old range, options not loaded yet)
+ *
+ * @private
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @returns {'missing'|'valid'|'invalid'} The state of the stored value
+ */
+const storedState = (key) => {
+  if (localStorage.getItem(STORAGE_PREFIX + key) === null) return 'missing';
+  const stored = readStored(key, true);
+  if (stored === undefined) return 'invalid';
+  const def = definitions[key];
+  return !def || validate(def, stored) === true ? 'valid' : 'invalid';
+};
+
+// values from another device apply only to declared settings that do not belong to this device
+const refusesRemote = (key, source) => {
+  if (source !== 'remote') return false;
+  if (syncs(key)) return false;
+  log.warn(`settings: "${key}" ${definitions[key] ? 'belongs to this device' : 'is not declared'} and ignores remote values`);
+  return true;
+};
+
+/**
  * Stores the value of a setting. Values of declared settings are validated first;
  * the `settingChanged` hook and the block's `onChange` run when the value actually changes
  *
@@ -305,15 +345,20 @@ const get = (key, fallback) => {
  * @memberof IITC.settings
  * @param {string} key - Setting key, `<namespace>.<key>`
  * @param {*} value - New value
- * @returns {boolean} False if the value is not allowed or could not be stored
+ * @param {Object} [options]
+ * @param {string} [options.source='local'] - Origin of the change, passed to the settingChanged hook; sync uses `remote`
+ * @returns {boolean} False if the value is not allowed or could not be stored, or if a `remote` value
+ *          targets an undeclared key or a setting declared with `sync: false`
  *
  * @example
  * IITC.settings.set('draw-tools.color', '#a24ac3');
  */
-const set = (key, value) => {
+const set = (key, value, options) => {
+  const source = options?.source ?? 'local';
+  if (refusesRemote(key, source)) return false;
   const def = definitions[key];
   if (!def && value === undefined) {
-    reset(key);
+    reset(key, { source });
     return true;
   }
 
@@ -330,7 +375,7 @@ const set = (key, value) => {
   if (stored !== undefined && sameValue(value, stored)) return true;
   if (!writeStored(key, value)) return false;
 
-  if (!sameValue(value, oldValue)) notifyChange(key, value, oldValue);
+  if (!sameValue(value, oldValue)) notifyChange(key, value, oldValue, source);
   return true;
 };
 
@@ -339,18 +384,24 @@ const set = (key, value) => {
  *
  * @memberof IITC.settings
  * @param {string} key - Setting key, `<namespace>.<key>`
+ * @param {Object} [options]
+ * @param {string} [options.source='local'] - Origin of the change, passed to the settingChanged hook; sync uses `remote`
+ * @returns {boolean} False if a `remote` reset targets an undeclared key or a setting declared with `sync: false`
  *
  * @example
  * IITC.settings.reset('draw-tools.color');
  */
-const reset = (key) => {
+const reset = (key, options) => {
+  const source = options?.source ?? 'local';
+  if (refusesRemote(key, source)) return false;
   const def = definitions[key];
   const stored = readStored(key);
   const oldValue = def ? resolve(key, stored, true) : stored;
   localStorage.removeItem(STORAGE_PREFIX + key);
 
   const value = get(key);
-  if (!sameValue(value, oldValue)) notifyChange(key, value, oldValue);
+  if (!sameValue(value, oldValue)) notifyChange(key, value, oldValue, source);
+  return true;
 };
 
 /**
@@ -359,14 +410,17 @@ const reset = (key) => {
  * and `import` checks every value anyway
  *
  * @alias IITC.settings.export
+ * @param {Object} [options]
+ * @param {boolean} [options.sync=false] - Leaves out settings declared with `sync: false`, for sending to other devices
  * @returns {Object<string, *>} Values by setting key
  *
  * @example
  * const backup = JSON.stringify(IITC.settings.export());
  */
-const exportValues = () => {
+const exportValues = (options) => {
   const values = {};
   for (const key of Object.keys(definitions)) {
+    if (options?.sync && !syncs(key)) continue;
     const stored = readStored(key);
     if (stored !== undefined) values[key] = stored;
   }
@@ -375,17 +429,20 @@ const exportValues = () => {
 
 /**
  * Stores values produced by `export`. Each value goes through `set`, so it is validated
- * and announced like any other change; keys no registered page declares are skipped
+ * and announced like any other change. Keys no registered page declares are skipped, and so are
+ * settings declared with `sync: false` when the values come from another device (source `remote`)
  *
  * @alias IITC.settings.import
  * @param {Object<string, *>} values - Values by setting key
+ * @param {Object} [options]
+ * @param {string} [options.source='local'] - Origin of the values, passed to the settingChanged hook; sync uses `remote`
  * @returns {{applied: string[], rejected: string[], skipped: string[]}} Keys stored, keys whose value
- *          was not allowed or could not be stored, and undeclared keys
+ *          was not allowed or could not be stored, and keys left alone
  *
  * @example
  * const { rejected } = IITC.settings.import(JSON.parse(backup));
  */
-const importValues = (values) => {
+const importValues = (values, options) => {
   const result = { applied: [], rejected: [], skipped: [] };
   if (!isPlainObject(values)) {
     log.warn('settings: import expects an object of values by key');
@@ -393,8 +450,9 @@ const importValues = (values) => {
   }
 
   for (const [key, value] of Object.entries(values)) {
-    if (!definitions[key]) result.skipped.push(key);
-    else if (set(key, value)) result.applied.push(key);
+    const def = definitions[key];
+    if (!def || (!syncs(key) && options?.source === 'remote')) result.skipped.push(key);
+    else if (set(key, value, options)) result.applied.push(key);
     else result.rejected.push(key);
   }
   return result;
@@ -407,6 +465,8 @@ IITC.settings = {
   reset,
   export: exportValues,
   import: importValues,
+  _syncs: syncs,
+  _storedState: storedState,
   _pages: pages,
   _definitions: definitions,
 };

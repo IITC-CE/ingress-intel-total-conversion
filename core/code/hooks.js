@@ -55,7 +55,11 @@
  * - `search`: Event triggered during a search operation.
  * - `settingChanged`: Called after the value of a setting has changed (see `IITC.settings`), for declared
  *                     settings and for plugin state stored or removed through `IITC.settings` alike;
- *                     provides `{ key, value, oldValue }`
+ *                     provides `{ key, value, oldValue, source }`. `source` is `local` unless the caller
+ *                     passes another one: sync uses `remote`, and `legacy` marks a value moved from an older build
+ * - `settingsPageRegistered`: Called after a settings page is declared, once its values can be read;
+ *                             provides `{ pageId, keys }` with the keys this declaration owns. Pages declared
+ *                             before a handler was added are not announced again
  *
  * @module hooks
  */
