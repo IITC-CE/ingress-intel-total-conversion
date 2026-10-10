@@ -55,7 +55,11 @@
  * - `search`: Event triggered during a search operation.
  * - `optionChanged`: Called after the value of an option has changed (see `IITC.options`), for declared
  *                     options and for plugin state stored or removed through `IITC.options` alike;
- *                     provides `{ key, value, oldValue }`
+ *                     provides `{ key, value, oldValue, source }`. `source` is `local` unless the caller
+ *                     passes another one: sync uses `remote`, and `legacy` marks a value moved from an older build
+ * - `optionsPageRegistered`: Called after an options page is declared, once its values can be read;
+ *                             provides `{ pageId, keys }` with the keys this declaration owns. Pages declared
+ *                             before a handler was added are not announced again
  *
  * @module hooks
  */

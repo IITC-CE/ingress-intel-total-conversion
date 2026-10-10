@@ -286,15 +286,15 @@ describe('IITC.options', () => {
   });
 
   describe('change notification', () => {
-    it('runs the optionChanged hook, then onChange, with the new and the old value', () => {
+    it('runs the optionChanged hook, then onChange, with the new value, the old value and the source', () => {
       const onChange = sinon.spy();
       const hook = onHook('optionChanged');
       const id = page([{ type: 'number', key: 'n', default: 30, onChange }]);
 
       options.set(`${id}.n`, 60);
 
-      expect(hook.calledOnceWithExactly({ key: `${id}.n`, value: 60, oldValue: 30 })).to.be.true;
-      expect(onChange.calledOnceWithExactly(60, 30)).to.be.true;
+      expect(hook.calledOnceWithExactly({ key: `${id}.n`, value: 60, oldValue: 30, source: 'local' })).to.be.true;
+      expect(onChange.calledOnceWithExactly(60, 30, 'local')).to.be.true;
       expect(hook.calledBefore(onChange)).to.be.true;
     });
 
@@ -326,6 +326,51 @@ describe('IITC.options', () => {
       expect(onChange.calledOnce).to.be.true;
     });
 
+    it('defaults the source when opts are null', () => {
+      const hook = onHook('optionChanged');
+      const id = page([{ type: 'boolean', key: 'b' }]);
+
+      options.set(`${id}.b`, true, null);
+      options.reset(`${id}.b`, null);
+
+      expect(hook.args.map(([event]) => event.source)).to.deep.equal(['local', 'local']);
+    });
+
+    it('keeps an option that belongs to this device from remote set and reset', () => {
+      const id = page([{ type: 'number', key: 'n', default: 30, sync: false }]);
+      options.set(`${id}.n`, 60);
+
+      expect(options.set(`${id}.n`, 90, { source: 'remote' })).to.be.false;
+      expect(options.reset(`${id}.n`, { source: 'remote' })).to.be.false;
+      expect(options.get(`${id}.n`)).to.equal(60);
+
+      expect(options.set(`${id}.n`, 90)).to.be.true;
+      expect(options.reset(`${id}.n`)).to.be.true;
+      expect(options.get(`${id}.n`)).to.equal(30);
+    });
+
+    it('ignores remote values for undeclared keys', () => {
+      expect(options.set('test-free.remote', 42, { source: 'remote' })).to.be.false;
+      expect(localStorage.getItem('iitc-option:test-free.remote')).to.be.null;
+
+      options.set('test-free.remote', 'local value');
+      expect(options.set('test-free.remote', undefined, { source: 'remote' })).to.be.false;
+      expect(options.get('test-free.remote')).to.equal('local value');
+    });
+
+    it('passes the source given to set and reset', () => {
+      const onChange = sinon.spy();
+      const id = page([{ type: 'number', key: 'n', default: 30, onChange }]);
+
+      options.set(`${id}.n`, 60, { source: 'remote' });
+      options.reset(`${id}.n`, { source: 'remote' });
+
+      expect(onChange.args).to.deep.equal([
+        [60, 30, 'remote'],
+        [30, 60, 'remote'],
+      ]);
+    });
+
     it('stays silent when the value does not change', () => {
       const onChange = sinon.spy();
       const hook = onHook('optionChanged');
@@ -346,7 +391,7 @@ describe('IITC.options', () => {
 
       options.reset(`${id}.n`);
 
-      expect(onChange.lastCall.args).to.deep.equal([30, 60]);
+      expect(onChange.lastCall.args).to.deep.equal([30, 60, 'local']);
     });
   });
 
@@ -374,6 +419,51 @@ describe('IITC.options', () => {
     });
   });
 
+  describe('optionsPageRegistered hook', () => {
+    it('reports the page and its keys once they can be read', () => {
+      const seen = [];
+      onHook('optionsPageRegistered', ({ pageId, keys }) => seen.push({ pageId, keys, values: keys.map((key) => options.get(key)) }));
+
+      options.register('test-registered-hook', { blocks: [{ type: 'number', key: 'n', default: 7 }, { type: 'heading' }] });
+
+      expect(seen).to.deep.equal([{ pageId: 'test-registered-hook', keys: ['test-registered-hook.n'], values: [7] }]);
+    });
+
+    it('announces no change when a new declaration of the page reads a value differently', () => {
+      const onChange = sinon.spy();
+      const hook = onHook('optionChanged');
+      const declare = (choices) => options.register('test-redeclare', { blocks: [{ type: 'select', key: 'mode', choices, default: 'a', onChange }] });
+      declare(['a', 'b']);
+      options.set('test-redeclare.mode', 'b');
+      onChange.resetHistory();
+      hook.resetHistory();
+
+      declare(['a', 'c']);
+
+      expect(options.get('test-redeclare.mode')).to.equal('a');
+      expect(onChange.called).to.be.false;
+      expect(hook.called).to.be.false;
+      expect(localStorage.getItem('iitc-option:test-redeclare.mode')).to.equal('"b"');
+    });
+
+    it('lets an optionsPageRegistered handler set values without reporting them twice', () => {
+      const hook = onHook('optionChanged');
+      let round = 0;
+      onHook('optionsPageRegistered', ({ keys }) => {
+        round++;
+        keys.forEach((key) => options.set(key, `remote ${round}`, { source: 'remote' }));
+      });
+
+      options.register('test-register-set', { blocks: [{ type: 'string', key: 's' }] });
+      options.register('test-register-set', { blocks: [{ type: 'string', key: 's' }] });
+
+      expect(hook.args.map(([event]) => [event.value, event.source])).to.deep.equal([
+        ['remote 1', 'remote'],
+        ['remote 2', 'remote'],
+      ]);
+    });
+  });
+
   describe('export', () => {
     it('collects stored values of declared options, without defaults or undeclared keys', () => {
       const id = page([
@@ -391,6 +481,44 @@ describe('IITC.options', () => {
       expect(values[`${id}.b`]).to.be.true;
       expect(values).to.not.have.property(`${id}.unset`);
       expect(values).to.not.have.property('test-free.state');
+    });
+
+    it('leaves out options that belong to this device only when exporting for sync', () => {
+      const id = page([{ type: 'boolean', key: 'local', sync: false }]);
+      options.set(`${id}.local`, true);
+
+      expect(options.exportValues()[`${id}.local`]).to.be.true;
+      expect(options.exportValues({ sync: true })).to.not.have.property(`${id}.local`);
+    });
+
+    it('keeps options without a sync flag when exporting for sync', () => {
+      const id = page([{ type: 'boolean', key: 'plain' }]);
+      options.set(`${id}.plain`, true);
+      expect(options.exportValues({ sync: true })[`${id}.plain`]).to.be.true;
+    });
+
+    it('tells whether a stored value is missing, valid or invalid, without logging', () => {
+      const id = page([{ type: 'number', key: 'n', max: 10 }]);
+      const warn = sinon.spy(globalThis.log, 'warn');
+
+      expect(options._storedState(`${id}.n`)).to.equal('missing');
+      localStorage.setItem(`iitc-option:${id}.n`, '5');
+      expect(options._storedState(`${id}.n`)).to.equal('valid');
+      localStorage.setItem(`iitc-option:${id}.n`, '500');
+      expect(options._storedState(`${id}.n`)).to.equal('invalid');
+      localStorage.setItem(`iitc-option:${id}.n`, '{broken');
+      expect(options._storedState(`${id}.n`)).to.equal('invalid');
+      expect(warn.called).to.be.false;
+    });
+
+    it('tells which keys are declared options that sync', () => {
+      const id = page([
+        { type: 'boolean', key: 'shared' },
+        { type: 'boolean', key: 'local', sync: false },
+      ]);
+      expect(options._syncs(`${id}.shared`)).to.be.true;
+      expect(options._syncs(`${id}.local`)).to.be.false;
+      expect(options._syncs('test-free.state')).to.be.false;
     });
 
     it('keeps a stored value that the current choices do not list yet', () => {
@@ -427,7 +555,7 @@ describe('IITC.options', () => {
 
       options.importValues({ [`${id}.n`]: 45 });
 
-      expect(onChange.calledOnceWithExactly(45, 30)).to.be.true;
+      expect(onChange.calledOnceWithExactly(45, 30, 'local')).to.be.true;
     });
 
     it('restores what export produced', () => {
@@ -445,6 +573,38 @@ describe('IITC.options', () => {
       const values = { constructor: 1, toString: 1, ...JSON.parse('{"__proto__": 1}') };
 
       expect(options.importValues(values)).to.deep.equal({ applied: [], rejected: [], skipped: ['constructor', 'toString', '__proto__'] });
+    });
+
+    it('restores options that belong to this device from a local backup', () => {
+      const id = page([{ type: 'boolean', key: 'local', sync: false }]);
+      options.set(`${id}.local`, true);
+      const backup = options.exportValues();
+      localStorage.clear();
+
+      expect(options.importValues(backup).applied).to.include(`${id}.local`);
+      expect(options.get(`${id}.local`)).to.be.true;
+    });
+
+    it('skips options that belong to this device when the values come from another one', () => {
+      const id = page([
+        { type: 'boolean', key: 'local', sync: false },
+        { type: 'repeat', over: () => [], blocks: [{ type: 'string', key: 'names', sync: false }] },
+      ]);
+
+      const result = options.importValues({ [`${id}.local`]: true, [`${id}.names`]: { a: 'x' } }, { source: 'remote' });
+
+      expect(result.skipped).to.deep.equal([`${id}.local`, `${id}.names`]);
+      expect(options.get(`${id}.local`)).to.be.false;
+      expect(options.get(`${id}.names`)).to.deep.equal({});
+    });
+
+    it('passes the source to the optionChanged hook', () => {
+      const hook = onHook('optionChanged');
+      const id = page([{ type: 'number', key: 'n' }]);
+
+      options.importValues({ [`${id}.n`]: 5 }, { source: 'remote' });
+
+      expect(hook.firstCall.args[0].source).to.equal('remote');
     });
 
     it('ignores input that is not an object of values', () => {
