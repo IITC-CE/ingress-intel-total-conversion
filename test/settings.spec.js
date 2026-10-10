@@ -286,15 +286,15 @@ describe('IITC.settings', () => {
   });
 
   describe('change notification', () => {
-    it('runs the settingChanged hook, then onChange, with the new and the old value', () => {
+    it('runs the settingChanged hook, then onChange, with the new value, the old value and the source', () => {
       const onChange = sinon.spy();
       const hook = onHook('settingChanged');
       const id = page([{ type: 'number', key: 'n', default: 30, onChange }]);
 
       settings.set(`${id}.n`, 60);
 
-      expect(hook.calledOnceWithExactly({ key: `${id}.n`, value: 60, oldValue: 30 })).to.be.true;
-      expect(onChange.calledOnceWithExactly(60, 30)).to.be.true;
+      expect(hook.calledOnceWithExactly({ key: `${id}.n`, value: 60, oldValue: 30, source: 'local' })).to.be.true;
+      expect(onChange.calledOnceWithExactly(60, 30, 'local')).to.be.true;
       expect(hook.calledBefore(onChange)).to.be.true;
     });
 
@@ -326,6 +326,51 @@ describe('IITC.settings', () => {
       expect(onChange.calledOnce).to.be.true;
     });
 
+    it('defaults the source when options are null', () => {
+      const hook = onHook('settingChanged');
+      const id = page([{ type: 'boolean', key: 'b' }]);
+
+      settings.set(`${id}.b`, true, null);
+      settings.reset(`${id}.b`, null);
+
+      expect(hook.args.map(([event]) => event.source)).to.deep.equal(['local', 'local']);
+    });
+
+    it('keeps a setting that belongs to this device from remote set and reset', () => {
+      const id = page([{ type: 'number', key: 'n', default: 30, sync: false }]);
+      settings.set(`${id}.n`, 60);
+
+      expect(settings.set(`${id}.n`, 90, { source: 'remote' })).to.be.false;
+      expect(settings.reset(`${id}.n`, { source: 'remote' })).to.be.false;
+      expect(settings.get(`${id}.n`)).to.equal(60);
+
+      expect(settings.set(`${id}.n`, 90)).to.be.true;
+      expect(settings.reset(`${id}.n`)).to.be.true;
+      expect(settings.get(`${id}.n`)).to.equal(30);
+    });
+
+    it('ignores remote values for undeclared keys', () => {
+      expect(settings.set('test-free.remote', 42, { source: 'remote' })).to.be.false;
+      expect(localStorage.getItem('iitc-setting:test-free.remote')).to.be.null;
+
+      settings.set('test-free.remote', 'local value');
+      expect(settings.set('test-free.remote', undefined, { source: 'remote' })).to.be.false;
+      expect(settings.get('test-free.remote')).to.equal('local value');
+    });
+
+    it('passes the source given to set and reset', () => {
+      const onChange = sinon.spy();
+      const id = page([{ type: 'number', key: 'n', default: 30, onChange }]);
+
+      settings.set(`${id}.n`, 60, { source: 'remote' });
+      settings.reset(`${id}.n`, { source: 'remote' });
+
+      expect(onChange.args).to.deep.equal([
+        [60, 30, 'remote'],
+        [30, 60, 'remote'],
+      ]);
+    });
+
     it('stays silent when the value does not change', () => {
       const onChange = sinon.spy();
       const hook = onHook('settingChanged');
@@ -346,7 +391,7 @@ describe('IITC.settings', () => {
 
       settings.reset(`${id}.n`);
 
-      expect(onChange.lastCall.args).to.deep.equal([30, 60]);
+      expect(onChange.lastCall.args).to.deep.equal([30, 60, 'local']);
     });
   });
 
@@ -374,6 +419,51 @@ describe('IITC.settings', () => {
     });
   });
 
+  describe('settingsPageRegistered hook', () => {
+    it('reports the page and its keys once they can be read', () => {
+      const seen = [];
+      onHook('settingsPageRegistered', ({ pageId, keys }) => seen.push({ pageId, keys, values: keys.map((key) => settings.get(key)) }));
+
+      settings.register('test-registered-hook', { blocks: [{ type: 'number', key: 'n', default: 7 }, { type: 'heading' }] });
+
+      expect(seen).to.deep.equal([{ pageId: 'test-registered-hook', keys: ['test-registered-hook.n'], values: [7] }]);
+    });
+
+    it('announces no change when a new declaration of the page reads a value differently', () => {
+      const onChange = sinon.spy();
+      const hook = onHook('settingChanged');
+      const declare = (options) => settings.register('test-redeclare', { blocks: [{ type: 'select', key: 'mode', options, default: 'a', onChange }] });
+      declare(['a', 'b']);
+      settings.set('test-redeclare.mode', 'b');
+      onChange.resetHistory();
+      hook.resetHistory();
+
+      declare(['a', 'c']);
+
+      expect(settings.get('test-redeclare.mode')).to.equal('a');
+      expect(onChange.called).to.be.false;
+      expect(hook.called).to.be.false;
+      expect(localStorage.getItem('iitc-setting:test-redeclare.mode')).to.equal('"b"');
+    });
+
+    it('lets a settingsPageRegistered handler set values without reporting them twice', () => {
+      const hook = onHook('settingChanged');
+      let round = 0;
+      onHook('settingsPageRegistered', ({ keys }) => {
+        round++;
+        keys.forEach((key) => settings.set(key, `remote ${round}`, { source: 'remote' }));
+      });
+
+      settings.register('test-register-set', { blocks: [{ type: 'string', key: 's' }] });
+      settings.register('test-register-set', { blocks: [{ type: 'string', key: 's' }] });
+
+      expect(hook.args.map(([event]) => [event.value, event.source])).to.deep.equal([
+        ['remote 1', 'remote'],
+        ['remote 2', 'remote'],
+      ]);
+    });
+  });
+
   describe('export', () => {
     it('collects stored values of declared settings, without defaults or undeclared keys', () => {
       const id = page([
@@ -391,6 +481,44 @@ describe('IITC.settings', () => {
       expect(values[`${id}.b`]).to.be.true;
       expect(values).to.not.have.property(`${id}.unset`);
       expect(values).to.not.have.property('test-free.state');
+    });
+
+    it('leaves out settings that belong to this device only when exporting for sync', () => {
+      const id = page([{ type: 'boolean', key: 'local', sync: false }]);
+      settings.set(`${id}.local`, true);
+
+      expect(settings.exportValues()[`${id}.local`]).to.be.true;
+      expect(settings.exportValues({ sync: true })).to.not.have.property(`${id}.local`);
+    });
+
+    it('keeps settings without a sync flag when exporting for sync', () => {
+      const id = page([{ type: 'boolean', key: 'plain' }]);
+      settings.set(`${id}.plain`, true);
+      expect(settings.exportValues({ sync: true })[`${id}.plain`]).to.be.true;
+    });
+
+    it('tells whether a stored value is missing, valid or invalid, without logging', () => {
+      const id = page([{ type: 'number', key: 'n', max: 10 }]);
+      const warn = sinon.spy(globalThis.log, 'warn');
+
+      expect(settings._storedState(`${id}.n`)).to.equal('missing');
+      localStorage.setItem(`iitc-setting:${id}.n`, '5');
+      expect(settings._storedState(`${id}.n`)).to.equal('valid');
+      localStorage.setItem(`iitc-setting:${id}.n`, '500');
+      expect(settings._storedState(`${id}.n`)).to.equal('invalid');
+      localStorage.setItem(`iitc-setting:${id}.n`, '{broken');
+      expect(settings._storedState(`${id}.n`)).to.equal('invalid');
+      expect(warn.called).to.be.false;
+    });
+
+    it('tells which keys are declared settings that sync', () => {
+      const id = page([
+        { type: 'boolean', key: 'shared' },
+        { type: 'boolean', key: 'local', sync: false },
+      ]);
+      expect(settings._syncs(`${id}.shared`)).to.be.true;
+      expect(settings._syncs(`${id}.local`)).to.be.false;
+      expect(settings._syncs('test-free.state')).to.be.false;
     });
 
     it('keeps a stored value that the current options do not list yet', () => {
@@ -427,7 +555,7 @@ describe('IITC.settings', () => {
 
       settings.importValues({ [`${id}.n`]: 45 });
 
-      expect(onChange.calledOnceWithExactly(45, 30)).to.be.true;
+      expect(onChange.calledOnceWithExactly(45, 30, 'local')).to.be.true;
     });
 
     it('restores what export produced', () => {
@@ -445,6 +573,38 @@ describe('IITC.settings', () => {
       const values = { constructor: 1, toString: 1, ...JSON.parse('{"__proto__": 1}') };
 
       expect(settings.importValues(values)).to.deep.equal({ applied: [], rejected: [], skipped: ['constructor', 'toString', '__proto__'] });
+    });
+
+    it('restores settings that belong to this device from a local backup', () => {
+      const id = page([{ type: 'boolean', key: 'local', sync: false }]);
+      settings.set(`${id}.local`, true);
+      const backup = settings.exportValues();
+      localStorage.clear();
+
+      expect(settings.importValues(backup).applied).to.include(`${id}.local`);
+      expect(settings.get(`${id}.local`)).to.be.true;
+    });
+
+    it('skips settings that belong to this device when the values come from another one', () => {
+      const id = page([
+        { type: 'boolean', key: 'local', sync: false },
+        { type: 'repeat', over: () => [], blocks: [{ type: 'string', key: 'names', sync: false }] },
+      ]);
+
+      const result = settings.importValues({ [`${id}.local`]: true, [`${id}.names`]: { a: 'x' } }, { source: 'remote' });
+
+      expect(result.skipped).to.deep.equal([`${id}.local`, `${id}.names`]);
+      expect(settings.get(`${id}.local`)).to.be.false;
+      expect(settings.get(`${id}.names`)).to.deep.equal({});
+    });
+
+    it('passes the source to the settingChanged hook', () => {
+      const hook = onHook('settingChanged');
+      const id = page([{ type: 'number', key: 'n' }]);
+
+      settings.importValues({ [`${id}.n`]: 5 }, { source: 'remote' });
+
+      expect(hook.firstCall.args[0].source).to.equal('remote');
     });
 
     it('ignores input that is not an object of values', () => {
