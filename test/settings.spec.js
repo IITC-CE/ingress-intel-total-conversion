@@ -373,4 +373,82 @@ describe('IITC.settings', () => {
       expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: true });
     });
   });
+
+  describe('export', () => {
+    it('collects stored values of declared settings, without defaults or undeclared keys', () => {
+      const id = page([
+        { type: 'number', key: 'n', default: 30 },
+        { type: 'string', key: 'unset', default: 'x' },
+        { type: 'boolean', key: 'b' },
+      ]);
+      settings.set(`${id}.n`, 60);
+      settings.set(`${id}.b`, true);
+      settings.set('test-free.state', 'saved');
+
+      const values = settings.exportValues();
+
+      expect(values[`${id}.n`]).to.equal(60);
+      expect(values[`${id}.b`]).to.be.true;
+      expect(values).to.not.have.property(`${id}.unset`);
+      expect(values).to.not.have.property('test-free.state');
+    });
+
+    it('keeps a stored value that the current options do not list yet', () => {
+      let layers = [];
+      const id = page([{ type: 'select', key: 'layer', options: () => layers }]);
+      localStorage.setItem(`iitc-setting:${id}.layer`, '"satellite"');
+
+      const backup = settings.exportValues();
+      expect(backup[`${id}.layer`]).to.equal('satellite');
+
+      localStorage.clear();
+      layers = ['roads', 'satellite'];
+      expect(settings.importValues(backup).applied).to.include(`${id}.layer`);
+    });
+  });
+
+  describe('import', () => {
+    it('stores declared values and reports the rest', () => {
+      const id = page([
+        { type: 'number', key: 'n', max: 100 },
+        { type: 'string', key: 's' },
+      ]);
+
+      const result = settings.importValues({ [`${id}.n`]: 500, [`${id}.s`]: 'text', 'test-missing-plugin.key': 1 });
+
+      expect(result).to.deep.equal({ applied: [`${id}.s`], rejected: [`${id}.n`], skipped: ['test-missing-plugin.key'] });
+      expect(settings.get(`${id}.s`)).to.equal('text');
+      expect(localStorage.getItem('iitc-setting:test-missing-plugin.key')).to.be.null;
+    });
+
+    it('announces imported values like any other change', () => {
+      const onChange = sinon.spy();
+      const id = page([{ type: 'number', key: 'n', default: 30, onChange }]);
+
+      settings.importValues({ [`${id}.n`]: 45 });
+
+      expect(onChange.calledOnceWithExactly(45, 30)).to.be.true;
+    });
+
+    it('restores what export produced', () => {
+      const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'boolean', key: 'hidden' }] }]);
+      settings.set(`${id}.hidden`, { ap1: true });
+      const backup = JSON.parse(JSON.stringify(settings.exportValues()));
+      localStorage.clear();
+
+      settings.importValues(backup);
+
+      expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: true });
+    });
+
+    it('skips keys named after Object.prototype members', () => {
+      const values = { constructor: 1, toString: 1, ...JSON.parse('{"__proto__": 1}') };
+
+      expect(settings.importValues(values)).to.deep.equal({ applied: [], rejected: [], skipped: ['constructor', 'toString', '__proto__'] });
+    });
+
+    it('ignores input that is not an object of values', () => {
+      expect(settings.importValues(['a'])).to.deep.equal({ applied: [], rejected: [], skipped: [] });
+    });
+  });
 });
