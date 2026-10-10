@@ -75,6 +75,9 @@ window.ornaments = {
    */
   knownOrnaments: {},
 
+  // set while a redraw waits in the microtask queue, so changes in one task redraw once
+  _reloadQueued: false,
+
   /**
    * Sets up the ornament layer and necessary event handlers.
    *
@@ -82,12 +85,14 @@ window.ornaments = {
    * @memberof window.ornaments
    */
   setup: function () {
+    this.registerSettings();
     this._portals = {};
     this.layerGroup = () => new L.LayerGroup();
     if (window.map.options.preferCanvas && L.Browser.canvas && !window.DISABLE_CANVASICONLAYER) {
       this.layerGroup = L.canvasIconLayer;
       L.CanvasIconLayer.mergeOptions({ padding: L.Canvas.prototype.options.padding });
     }
+    this.migrate();
     this.load();
 
     this.layers = {};
@@ -104,6 +109,112 @@ window.ornaments = {
       accesskey: 'o',
       action: window.ornaments.ornamentsOpt,
     });
+  },
+
+  /**
+   * Declares the `ornaments` settings page: `excluded` is the comma-separated list of ID prefixes to hide,
+   * and `hidden` maps each known ornament ID to whether it is hidden. A change from the dialog, a backup or (for
+   * the prefixes) sync updates `excludedOrnaments` and `knownOrnaments` and schedules a redraw
+   *
+   * @memberof window.ornaments
+   */
+  registerSettings() {
+    IITC.settings.register('ornaments', {
+      title: 'Ornaments',
+      blocks: [
+        {
+          type: 'string',
+          key: 'excluded',
+          title: 'Hide ornaments that start with',
+          onChange: (text) => {
+            const prefixes = window.ornaments.parsePrefixes(text);
+            // 'pe,' and 'pe' differ as text but hide the same ornaments
+            if (prefixes.join(',') === window.ornaments.excludedOrnaments.join(',')) return;
+            window.ornaments.excludedOrnaments = prefixes;
+            window.ornaments.scheduleReload();
+          },
+        },
+        {
+          type: 'repeat',
+          over: () =>
+            Object.keys(window.ornaments.knownOrnaments)
+              .sort()
+              .map((id) => ({ id, title: window.ornaments.icon[id]?.name ?? id })),
+          blocks: [
+            {
+              type: 'boolean',
+              key: 'hidden',
+              title: 'Hide',
+              // the map also lists the ornaments this device has seen, and a remote copy would replace it whole
+              sync: false,
+              onChange: (hidden) => {
+                // ornaments seen this session stay known, unhidden unless the new value says otherwise
+                const known = Object.keys(window.ornaments.knownOrnaments).map((id) => [id, false]);
+                window.ornaments.knownOrnaments = { ...Object.fromEntries(known), ...hidden };
+                window.ornaments.scheduleReload();
+              },
+            },
+          ],
+        },
+      ],
+    });
+  },
+
+  /**
+   * Redraws the ornaments once the current task is done, however many changes it makes
+   *
+   * @memberof window.ornaments
+   */
+  scheduleReload() {
+    if (this._reloadQueued) return;
+    this._reloadQueued = true;
+    queueMicrotask(() => {
+      this._reloadQueued = false;
+      this.reload();
+    });
+  },
+
+  /**
+   * Moves the ornament settings of older builds to the settings, once: the prefixes from `excludedOrnaments`
+   * and the known ornaments from `knownOrnaments`. The legacy keys go, values left out as unreadable with them
+   *
+   * @memberof window.ornaments
+   */
+  migrate() {
+    const legacy = (key) => {
+      try {
+        return JSON.parse(localStorage.getItem(key));
+      } catch (e) {
+        log.warn(`ornaments: cannot read the legacy "${key}": ${e}`);
+        return null;
+      }
+    };
+
+    const excluded = legacy('excludedOrnaments');
+    if (Array.isArray(excluded))
+      IITC.settings.set('ornaments.excluded', excluded.filter((prefix) => typeof prefix === 'string').join(','), { source: 'legacy' });
+    else if (excluded !== null) log.warn('ornaments: the legacy "excludedOrnaments" is not a list and is left out');
+
+    const known = legacy('knownOrnaments');
+    if (known !== null && typeof known === 'object' && !Array.isArray(known)) {
+      // any truthy entry hid the ornament in older builds
+      IITC.settings.set('ornaments.hidden', Object.fromEntries(Object.entries(known).map(([id, hidden]) => [id, Boolean(hidden)])), {
+        source: 'legacy',
+      });
+    } else if (known !== null) log.warn('ornaments: the legacy "knownOrnaments" is not a map and is left out');
+    localStorage.removeItem('excludedOrnaments');
+    localStorage.removeItem('knownOrnaments');
+  },
+
+  /**
+   * Splits a list of ornament ID prefixes separated by spaces or commas
+   *
+   * @memberof window.ornaments
+   * @param {string} text - Prefixes as typed by the user
+   * @returns {string[]} Non-empty prefixes
+   */
+  parsePrefixes(text) {
+    return text.split(/[\s,]+/).filter(Boolean);
   },
 
   /**
@@ -216,43 +327,26 @@ window.ornaments = {
   },
 
   /**
-   * Loads ornament data from localStorage.
+   * Loads the ornament settings
    *
    * @function
    * @memberof window.ornaments
    */
   load: function () {
-    var dataStr;
-    try {
-      dataStr = localStorage.getItem('excludedOrnaments');
-      if (!dataStr) {
-        return;
-      }
-      this.excludedOrnaments = JSON.parse(dataStr);
-    } catch (e) {
-      log.warn('ornaments: failed to load excludedOrnaments from localStorage: ' + e);
-    }
-    try {
-      dataStr = localStorage.getItem('knownOrnaments');
-      if (!dataStr) {
-        this.initOrnaments();
-        return;
-      }
-      this.knownOrnaments = JSON.parse(dataStr);
-    } catch (e) {
-      log.warn('ornaments: failed to load data from localStorage: ' + e);
-    }
+    this.excludedOrnaments = this.parsePrefixes(IITC.settings.get('ornaments.excluded'));
+    this.knownOrnaments = IITC.settings.get('ornaments.hidden');
   },
 
   /**
-   * Saves the current ornament configuration to localStorage.
+   * Stores the ornament settings and redraws the ornaments
    *
    * @function
    * @memberof window.ornaments
    */
   save: function () {
-    localStorage['excludedOrnaments'] = JSON.stringify(this.excludedOrnaments);
-    localStorage['knownOrnaments'] = JSON.stringify(this.knownOrnaments);
+    IITC.settings.set('ornaments.excluded', this.excludedOrnaments.join(','));
+    IITC.settings.set('ornaments.hidden', this.knownOrnaments);
+    this.scheduleReload();
   },
 
   /**
@@ -274,12 +368,7 @@ window.ornaments = {
    * @memberof window.ornaments
    */
   processInput: function () {
-    window.ornaments.excludedOrnaments = $('#ornaments_E')
-      .val()
-      .split(/[\s,]+/);
-    window.ornaments.excludedOrnaments = window.ornaments.excludedOrnaments.filter(function (ornamentCode) {
-      return ornamentCode !== '';
-    });
+    window.ornaments.excludedOrnaments = window.ornaments.parsePrefixes($('#ornaments_E').val());
     // process the input from the checkboxes
     for (var ornamentCode in window.ornaments.knownOrnaments) {
       var input = $('#chk_orn_' + ornamentCode);
@@ -306,7 +395,7 @@ window.ornaments = {
       var name = window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name + ' (' + ornamentCode + ')' : ornamentCode;
       var checked = window.ornaments.knownOrnaments[ornamentCode] || hidden ? 'checked ' : '';
       text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked;
-      text += ' onchange="window.ornaments.processInput();window.ornaments.save();window.ornaments.reload()"';
+      text += ' onchange="window.ornaments.processInput();window.ornaments.save()"';
       text += hidden ? 'disabled' : '';
       text += '>' + name + '</label><br>';
     });
@@ -333,7 +422,6 @@ window.ornaments = {
     window.ornaments.processInput();
     window.ornaments.replaceOL();
     window.ornaments.save();
-    window.ornaments.reload();
   },
 
   /**
@@ -361,14 +449,12 @@ window.ornaments = {
       buttons: {
         RESET: function () {
           window.ornaments.initOrnaments();
-          window.ornaments.reload();
           $(this).dialog('close');
         },
         OK: function () {
           // process the input from the input
           window.ornaments.processInput();
           window.ornaments.save();
-          window.ornaments.reload();
           $(this).dialog('close');
         },
       },
