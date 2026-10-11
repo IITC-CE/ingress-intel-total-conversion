@@ -317,3 +317,11 @@ window.setupStyles = function () {
  * @param {string} [dataType] - The MIME type of the file, used to filter file types in the app
  */
 window.saveFile = (data, filename, dataType) => IITC.utils.exportFile(data, filename, dataType);
+
+/**
+ * Opens the options window on the 'About IITC' page
+ *
+ * @deprecated use `IITC.options.open('about')` instead
+ * @function aboutIITC
+ */
+window.aboutIITC = () => IITC.options.open('about');
