@@ -341,6 +341,7 @@ function boot() {
   IITC.portal.details.setup();
   window.setupRedeem();
   window.setupSidebar();
+  IITC.settings._setupWindow();
   IITC.statusbar.init();
 
   loadPlugins();

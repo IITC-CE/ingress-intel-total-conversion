@@ -355,3 +355,46 @@ body.show-controls #scrollwrapper {
 body.show-controls #chat {
   top: var(--top-controls-height) !important;
 }
+
+/* settings window: buttons and page links large enough for a finger */
+.iitc-settings .iitc-settings-page button {
+  min-height: 34px;
+  padding: 5px 10px;
+}
+
+.iitc-settings .iitc-settings-buttons {
+  gap: 8px;
+}
+
+.iitc-settings .iitc-settings-page .iitc-settings-icon-button {
+  min-width: 34px;
+
+  & iitc-icon {
+    font-size: 20px;
+  }
+}
+
+/* a radio as easy to hit as a button */
+.iitc-settings input[type='radio'] {
+  width: 20px;
+  height: 20px;
+}
+
+.iitc-settings .iitc-settings-page-link {
+  padding: 8px;
+}
+
+.iitc-settings .iitc-settings-back {
+  min-width: 36px;
+  min-height: 36px;
+
+  & iitc-icon {
+    font-size: 24px;
+  }
+}
+
+/* 16px, so the browser of a phone does not zoom in on the field */
+.iitc-settings .iitc-settings-search {
+  padding: 8px 10px;
+  font-size: 16px;
+}
