@@ -158,12 +158,26 @@ const readStored = (key, quiet = false) => {
   }
 };
 
-// encodes and stores a value; false when it cannot be serialized or stored
-const writeStored = (key, value) => {
-  const storageKey = STORAGE_PREFIX + key;
+// the string a value is kept as in localStorage; throws when it cannot be serialized
+const encodeStored = (value) => {
+  const stored = JSON.stringify(value);
+  if (stored === undefined) throw new TypeError('the value cannot be serialized');
+  return stored;
+};
+
+// the default of a declared setting in its stored form, undefined when it cannot be stored (a select
+// whose options are not loaded yet)
+const storedDefault = (key) => {
   try {
-    const stored = JSON.stringify(value);
-    if (stored === undefined) throw new TypeError('the value cannot be serialized');
+    return encodeStored(defaultOf(definitions[key]));
+  } catch {
+    return undefined;
+  }
+};
+
+// stores an encoded value; false when localStorage refuses it
+const writeStored = (storageKey, stored) => {
+  try {
     localStorage.setItem(storageKey, stored);
   } catch (e) {
     log.error(`settings: cannot store "${storageKey}": ${e}`);
@@ -336,8 +350,10 @@ const refusesRemote = (key, source) => {
 };
 
 /**
- * Stores the value of a setting. Values of declared settings are validated first;
- * the `settingChanged` hook and the block's `onChange` run when the value actually changes
+ * Stores the value of a setting. Values of declared settings are validated first; a value stored in the same
+ * form as the one already there changes nothing, and a value stored in the same form as the default is
+ * removed, as `reset` does. The `settingChanged` hook and the block's `onChange` run when the value
+ * actually changes, and receive the value as `get` returns it
  *
  * Storing `undefined` under an undeclared key removes the value, as `reset` does;
  * a declared setting rejects it
@@ -370,12 +386,25 @@ const set = (key, value, options) => {
     }
   }
 
+  const storageKey = STORAGE_PREFIX + key;
+  let encoded;
+  try {
+    encoded = encodeStored(value);
+  } catch (e) {
+    log.error(`settings: cannot store "${storageKey}": ${e}`);
+    return false;
+  }
+  // a value equal to the default is not kept, as if the setting was never changed
+  if (def && encoded === storedDefault(key)) return reset(key, { source });
+  if (encoded === localStorage.getItem(storageKey)) return true;
+
   const stored = readStored(key);
   const oldValue = def ? resolve(key, stored, true) : stored;
-  if (stored !== undefined && sameValue(value, stored)) return true;
-  if (!writeStored(key, value)) return false;
+  if (!writeStored(storageKey, encoded)) return false;
 
-  if (!sameValue(value, oldValue)) notifyChange(key, value, oldValue, source);
+  const current = readStored(key);
+  const newValue = current === undefined ? value : current;
+  if (!sameValue(newValue, oldValue)) notifyChange(key, newValue, oldValue, source);
   return true;
 };
 
