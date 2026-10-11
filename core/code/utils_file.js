@@ -1,4 +1,4 @@
-/* global L, log -- eslint */
+/* global IITC, L, log -- eslint */
 
 /**
  * @file This file provides utilities for handling files in an environment-independent way, including
@@ -322,3 +322,118 @@ L.FileListLoader.loadFiles = function (options) {
   L.FileReader._chooseFiles(loader.load.bind(loader), options);
   return loader;
 };
+
+/**
+ * Hands text over to the user: to the share sheet in the app, elsewhere in a dialog with a button
+ * that copies it to the clipboard
+ *
+ * @memberof IITC.utils
+ * @param {string} text - Text to hand over
+ * @param {Object} [options]
+ * @param {string} [options.title='Export'] - Title of the dialog
+ */
+const exportText = (text, { title = 'Export' } = {}) => {
+  if (window.isApp && window.app?.shareString) {
+    window.app.shareString(text);
+    return;
+  }
+  const textarea = document.createElement('textarea');
+  textarea.className = 'iitc-export-text';
+  textarea.readOnly = true;
+  textarea.value = text;
+  textarea.addEventListener('focus', () => textarea.select());
+  window.dialog({
+    title,
+    html: textarea,
+    width: 600,
+    // a second export replaces the first
+    id: 'iitc-export-text',
+    buttons: {
+      Copy: (event) => {
+        const button = event.currentTarget;
+        // the selection lets the user copy by hand where the clipboard is not available
+        textarea.select();
+        if (!navigator.clipboard) {
+          button.textContent = 'Press Ctrl+C';
+          return;
+        }
+        navigator.clipboard.writeText(text).then(
+          () => {
+            button.textContent = 'Copied';
+          },
+          (e) => {
+            button.textContent = 'Press Ctrl+C';
+            log.warn('Could not copy to the clipboard', e);
+          }
+        );
+      },
+    },
+  });
+};
+
+/**
+ * Asks the user for text in a dialog
+ *
+ * @memberof IITC.utils
+ * @param {Object} [options]
+ * @param {string} [options.title='Import'] - Title of the dialog
+ * @param {string} [options.label] - Explanation above the text field
+ * @returns {Promise<string|undefined>} The text without surrounding white space, or undefined when
+ *                                      nothing was entered or the dialog is closed without OK
+ */
+const importText = ({ title = 'Import', label = 'Paste the text here' } = {}) =>
+  new Promise((resolve) => {
+    const content = document.createElement('div');
+    const text = document.createElement('p');
+    text.textContent = label;
+    const textarea = document.createElement('textarea');
+    textarea.className = 'iitc-import-text';
+    content.append(text, textarea);
+    window.dialog({
+      title,
+      html: content,
+      width: 600,
+      // a second import closes the first, which then resolves with undefined
+      id: 'iitc-import-text',
+      buttons: {
+        OK: function () {
+          resolve(textarea.value.trim() || undefined);
+          $(this).dialog('close');
+        },
+      },
+      closeCallback: () => resolve(undefined),
+    });
+  });
+
+/**
+ * Saves data as a file: downloads it, or in the app lets the user pick where to save it
+ *
+ * @memberof IITC.utils
+ * @param {string} data - The data to save; the app takes only strings
+ * @param {string} filename - Suggested file name
+ * @param {string} [dataType] - MIME type of the file
+ */
+const exportFile = (data, filename, dataType) => {
+  window.saveFile(data, filename, dataType);
+};
+
+/**
+ * Lets the user pick files and reads them as text
+ *
+ * @memberof IITC.utils
+ * @param {Object} [options]
+ * @param {string} [options.accept] - File types to offer, as in the `accept` attribute of a file input
+ * @param {boolean} [options.multiple=false] - Allows picking more than one file
+ * @returns {Promise<Array<{name: string, text: string}>>} The files that could be read; stays pending
+ *                                                       when the user closes the file chooser without picking
+ */
+const importFile = ({ accept, multiple = false } = {}) =>
+  new Promise((resolve) => {
+    const files = [];
+    // an accept of undefined would become the attribute value 'undefined'
+    L.FileListLoader.loadFiles(accept === undefined ? { multiple } : { accept, multiple })
+      .on('load', (e) => files.push({ name: e.file.name, text: e.reader.result }))
+      .on('loaded', () => resolve(files));
+  });
+
+Object.assign(IITC.utils, { exportText, importText, exportFile, importFile });
