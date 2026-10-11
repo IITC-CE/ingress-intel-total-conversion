@@ -21,6 +21,12 @@ const page = (blocks) => {
 // lets pending handlers and the redraw after them run
 const settle = () => new Promise((resolve) => setTimeout(resolve));
 
+// lets the files chosen be read: they are read in a task of their own after the press
+const read = async () => {
+  await settle();
+  await settle();
+};
+
 const change = (input, value) => {
   if (input.type === 'checkbox') input.checked = value;
   else input.value = value;
@@ -700,6 +706,16 @@ describe('IITC.settings._renderPage', () => {
       expect(warn.calledWithMatch('action block "Run" has no action function')).to.be.true;
     });
 
+    it('reads files with onFiles alone, without a Paste button or a warning', () => {
+      const warn = sinon.spy(globalThis.log, 'warn');
+      const id = page([{ type: 'import', title: 'Import', onFiles: () => {}, accept: '.json' }]);
+      settings._renderPage(id, container);
+
+      expect(Object.keys(buttons(container))).to.deep.equal(['Choose file']);
+      expect(buttons(container)['Choose file'].disabled).to.be.false;
+      expect(warn.called).to.be.false;
+    });
+
     it('exports text, and a file only when a file name is given', () => {
       const id = page([
         { type: 'export', title: 'Export items', data: () => '{}', filename: 'items.json', dataType: 'application/json' },
@@ -732,6 +748,17 @@ describe('IITC.settings._renderPage', () => {
       expect(container.querySelector('.iitc-settings-message .iitc-settings-message-text').textContent).to.equal('Imported');
     });
 
+    it('shows what onData reports instead of the plain message', async () => {
+      IITC.utils.importText.resolves('{}');
+      const id = page([{ type: 'import', title: 'Import', onData: () => 'Imported 2 of 3 settings.' }]);
+      settings._renderPage(id, container);
+
+      click(buttons(container).Paste);
+      await settle();
+
+      expect(container.querySelector('.iitc-settings-message .iitc-settings-message-text').textContent).to.equal('Imported 2 of 3 settings.');
+    });
+
     it('does nothing when the paste dialog is closed', async () => {
       const onData = sinon.spy();
       IITC.utils.importText.resolves(undefined);
@@ -753,11 +780,48 @@ describe('IITC.settings._renderPage', () => {
       settings._renderPage(id, container);
 
       click(buttons(container)['Choose file']);
-      await settle();
+      await read();
 
-      expect(IITC.utils.importFile.calledOnceWith({ accept: '.json' })).to.be.true;
+      expect(IITC.utils.importFile.calledOnceWith({ accept: '.json', multiple: false })).to.be.true;
       expect(onData.firstCall.args.slice(0, 2)).to.deep.equal(['bad', 'b.json']);
       expect(container.querySelector('.iitc-settings-error .iitc-settings-message-text').textContent).to.equal('Not drawn items');
+    });
+
+    it('lets several files be chosen for onFiles, passes them at once, and nothing when none is picked', async () => {
+      const onFiles = sinon.stub().returns('Imported 2 files');
+      const files = [
+        { name: 'a.json', text: 'a' },
+        { name: 'b.json', text: 'b' },
+      ];
+      IITC.utils.importFile.resolves(files);
+      const id = page([{ type: 'import', title: 'Import', onData: sinon.spy(), onFiles, accept: '.json' }]);
+      settings._renderPage(id, container);
+
+      click(buttons(container)['Choose file']);
+      await read();
+      expect(IITC.utils.importFile.calledOnceWith({ accept: '.json', multiple: true })).to.be.true;
+      expect(onFiles.calledOnceWith(files)).to.be.true;
+      expect(container.querySelector('.iitc-settings-message .iitc-settings-message-text').textContent).to.equal('Imported 2 files');
+
+      IITC.utils.importFile.resolves([]);
+      click(buttons(container)['Choose file']);
+      await read();
+      expect(onFiles.calledOnce).to.be.true;
+      expect(container.querySelector('.iitc-settings-message')).to.be.null;
+    });
+
+    it('lets the file be chosen again after the choice is cancelled', async () => {
+      IITC.utils.importFile.returns(new Promise(() => {}));
+      const id = page([{ type: 'import', title: 'Import', onData: sinon.spy(), accept: '.json' }]);
+      settings._renderPage(id, container);
+
+      click(buttons(container)['Choose file']);
+      await settle();
+      click(buttons(container)['Choose file']);
+      await settle();
+
+      expect(IITC.utils.importFile.calledTwice).to.be.true;
+      expect(buttons(container)['Choose file'].hasAttribute('aria-disabled')).to.be.false;
     });
   });
 
