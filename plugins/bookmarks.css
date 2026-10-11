@@ -275,7 +275,11 @@
 	margin-top:0;
 }
 .portal-list-bookmark iitc-icon {
-	margin: -3px;
+	font-size:19px;
+	margin-top: -4px;
+	margin-bottom: -2px;
+	margin-left: -3px;
+	margin-right: -3px;
 	cursor:pointer;
 }
 #bkmrksTrigger {
@@ -289,9 +293,6 @@
 	justify-content:center;
 	min-width:var(--icon-target-size, 24px);
 	min-height:var(--icon-target-size, 24px);
-}
-.bkmrksStar iitc-icon, .portal-list-bookmark iitc-icon {
-	font-size:19px;
 }
 .bkmrksStar iitc-icon, .bkmrksStar.favorite:focus iitc-icon {
 	color:var(--color-none);
