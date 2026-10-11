@@ -80,6 +80,7 @@ describe('options window', () => {
   const forget = (...pageIds) => {
     for (const pageId of pageIds) {
       delete options._pages[pageId];
+      document.getElementById(`options-access-key-${pageId}`)?.remove();
       for (const key of Object.keys(options._definitions)) {
         if (options._definitions[key].pageId === pageId) delete options._definitions[key];
       }
@@ -361,6 +362,165 @@ describe('options window', () => {
       expect(view.root.querySelector('.iitc-options-page')).to.equal(drawn);
       await settle();
       expect(view.root.querySelector('.iitc-options-page')).to.not.equal(drawn);
+    });
+  });
+
+  describe('toolbox shortcuts', () => {
+    let replacedToolbox;
+
+    beforeEach(() => {
+      replacedToolbox = IITC.toolbox;
+      const buttons = {};
+      IITC.toolbox = {
+        buttons,
+        addButton: sinon.spy((button) => {
+          buttons[button.id] = button;
+        }),
+        removeButton: (id) => delete buttons[id],
+      };
+    });
+
+    afterEach(() => {
+      IITC.toolbox = replacedToolbox;
+      forget('window-shortcut', 'window-plain');
+    });
+
+    it('adds a button for a page that asks for one', () => {
+      options.register('window-shortcut', { title: 'Shortcut', shortcut: { label: 'Shortcut Opt' }, blocks: [] });
+      options.register('window-plain', { title: 'Plain', blocks: [] });
+
+      expect(Object.keys(IITC.toolbox.buttons)).to.deep.equal(['options-shortcut-window-shortcut']);
+      const button = IITC.toolbox.buttons['options-shortcut-window-shortcut'];
+      expect(button).to.include({ label: 'Shortcut Opt' });
+
+      button.action();
+      expect(view.root.querySelector('.iitc-options-page-heading').textContent).to.equal('Shortcut');
+    });
+
+    it('names the button after the page by default', () => {
+      options.register('window-shortcut', { title: 'Shortcut', shortcut: true, blocks: [] });
+
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut'].label).to.equal('Shortcut');
+    });
+
+    it('passes the other arguments of the button through', () => {
+      options.register('window-shortcut', { title: 'Shortcut', shortcut: { class: 'cursor_help', icon: 'info', title: 'More' }, blocks: [] });
+
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut']).to.include({ label: 'Shortcut', class: 'cursor_help', icon: 'info', title: 'More' });
+    });
+
+    it('updates a button that shows state on refresh, and only when it changes', () => {
+      let failed = false;
+      options.register('window-shortcut', { title: 'Shortcut', shortcut: () => ({ class: failed ? 'error' : '' }), blocks: [] });
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut'].class).to.equal('');
+
+      IITC.toolbox.addButton.resetHistory();
+      options.refresh('window-shortcut');
+      expect(IITC.toolbox.addButton.called).to.be.false;
+
+      failed = true;
+      options.refresh('window-shortcut');
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut'].class).to.equal('error');
+      expect(IITC.toolbox.addButton.calledOnce).to.be.true;
+    });
+
+    it('drops the arguments a shortcut function no longer returns', () => {
+      let titled = true;
+      options.register('window-shortcut', { title: 'Shortcut', shortcut: () => (titled ? { title: 'a' } : {}), blocks: [] });
+
+      titled = false;
+      options.refresh('window-shortcut');
+
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut']).to.not.have.property('title');
+    });
+
+    it('leaves out the button of a page whose shortcut fails', () => {
+      sinon.stub(globalThis.log, 'warn');
+      options.register('window-shortcut', {
+        title: 'Shortcut',
+        shortcut: () => {
+          throw new Error('not ready');
+        },
+        blocks: [],
+      });
+
+      expect(IITC.toolbox.buttons).to.not.have.property('options-shortcut-window-shortcut');
+    });
+
+    it('removes and adds back the buttons with the option', () => {
+      options.register('window-shortcut', { title: 'Shortcut', shortcut: true, blocks: [] });
+
+      options.set('iitc.toolboxShortcuts', false);
+      expect(IITC.toolbox.buttons).to.be.empty;
+
+      // pages of other specs in this process may come back too
+      options.set('iitc.toolboxShortcuts', true);
+      expect(IITC.toolbox.buttons).to.have.property('options-shortcut-window-shortcut');
+    });
+
+    it('puts the access key of the page on its button, and in the tooltip', () => {
+      options.register('window-shortcut', { title: 'Shortcut', accesskey: 's', shortcut: { title: 'More' }, blocks: [] });
+      options.register('window-plain', { title: 'Plain', accesskey: 'p', shortcut: true, blocks: [] });
+
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut']).to.include({ accesskey: 's', title: 'More [s]' });
+      expect(IITC.toolbox.buttons['options-shortcut-window-plain']).to.include({ accesskey: 'p', title: '[p]' });
+      expect(document.getElementById('options-access-key-window-shortcut')).to.be.null;
+    });
+
+    it('keeps the access key of a page working without its button', () => {
+      options.register('window-shortcut', { title: 'Shortcut', accesskey: 's', shortcut: true, blocks: [] });
+      options.register('window-plain', { title: 'Plain', accesskey: 'p', blocks: [] });
+
+      options.set('iitc.toolboxShortcuts', false);
+      const link = document.getElementById('options-access-key-window-shortcut');
+      expect(link.accessKey).to.equal('s');
+      expect(link.closest('.iitc-options-access-keys').getAttribute('aria-hidden')).to.equal('true');
+      expect(document.getElementById('options-access-key-window-plain').accessKey).to.equal('p');
+
+      click(link);
+      expect(view.root.querySelector('.iitc-options-page-heading').textContent).to.equal('Shortcut');
+
+      options.set('iitc.toolboxShortcuts', true);
+      expect(document.getElementById('options-access-key-window-shortcut')).to.be.null;
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut'].accesskey).to.equal('s');
+    });
+
+    it('tells the access key of a page in the list of pages', () => {
+      options.register('window-shortcut', { title: 'Shortcut', accesskey: 's', blocks: [] });
+      options.register('window-plain', { title: 'Plain', blocks: [] });
+
+      options.open('window-shortcut');
+
+      expect(navLink('window-shortcut').title).to.equal('Access key [s]');
+      expect(navLink('window-plain').hasAttribute('title')).to.be.false;
+    });
+
+    it('tells no access key on a touch screen', () => {
+      const replacedMatchMedia = window.matchMedia;
+      window.matchMedia = (query) => ({ matches: query === '(hover: none)' });
+      options.register('window-shortcut', { title: 'Shortcut', accesskey: 's', blocks: [] });
+
+      options.open('window-shortcut');
+
+      expect(navLink('window-shortcut').hasAttribute('title')).to.be.false;
+      expect(document.getElementById('options-access-key-window-shortcut').accessKey).to.equal('s');
+      window.matchMedia = replacedMatchMedia;
+    });
+
+    it('drops the hidden link when the page no longer has an access key', () => {
+      options.register('window-plain', { title: 'Plain', accesskey: 'p', blocks: [] });
+      options.register('window-plain', { title: 'Plain', blocks: [] });
+
+      expect(document.getElementById('options-access-key-window-plain')).to.be.null;
+    });
+
+    it('follows a new declaration of the page', () => {
+      options.register('window-shortcut', { title: 'Shortcut', shortcut: true, blocks: [] });
+      options.register('window-shortcut', { title: 'Renamed', shortcut: true, blocks: [] });
+      expect(IITC.toolbox.buttons['options-shortcut-window-shortcut'].label).to.equal('Renamed');
+
+      options.register('window-shortcut', { title: 'Renamed', blocks: [] });
+      expect(IITC.toolbox.buttons).to.be.empty;
     });
   });
 

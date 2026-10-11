@@ -28,6 +28,13 @@ IITC.options.register('iitc', {
       // whether this device takes part is the device's own choice
       sync: false,
     },
+    {
+      type: 'boolean',
+      key: 'toolboxShortcuts',
+      title: 'Shortcuts to options pages in the toolbox',
+      description: 'Buttons that open the pages of some plugins directly',
+      default: true,
+    },
   ],
 });
 
