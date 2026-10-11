@@ -585,4 +585,14 @@ const renderPage = (pageId, container) => {
   return true;
 };
 
+// for the options window: draws the page a container shows again after the current task, and after
+// the click when the pointer is down, as after a change made on the page
+const redrawLater = (container) => {
+  const pageId = states.get(container)?.pageId;
+  if (pageId) new PageView(pageId, container).scheduleRedraw();
+};
+
 IITC.options._renderPage = renderPage;
+IITC.options._redrawLater = redrawLater;
+// shared with the options window
+IITC.options._el = el;

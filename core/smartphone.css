@@ -355,3 +355,40 @@ body.show-controls #scrollwrapper {
 body.show-controls #chat {
   top: var(--top-controls-height) !important;
 }
+
+/* options window: buttons and page links large enough for a finger */
+.iitc-options .iitc-options-page button {
+  min-height: 34px;
+  padding: 5px 10px;
+}
+
+.iitc-options .iitc-options-buttons {
+  gap: 8px;
+}
+
+.iitc-options .iitc-options-page .iitc-options-icon-button {
+  min-width: 34px;
+
+  & iitc-icon {
+    font-size: 20px;
+  }
+}
+
+/* a radio as easy to hit as a button */
+.iitc-options input[type='radio'] {
+  width: 20px;
+  height: 20px;
+}
+
+.iitc-options .iitc-options-page-link {
+  padding: 8px;
+}
+
+.iitc-options .iitc-options-back {
+  min-width: 36px;
+  min-height: 36px;
+
+  & iitc-icon {
+    font-size: 24px;
+  }
+}
