@@ -262,25 +262,30 @@ class PageView {
         );
       }
       case 'import': {
-        const onData = handlerOf(block);
+        const onFiles = typeof block.onFiles === 'function' ? block.onFiles : undefined;
+        // a block that reads files with onFiles needs no onData, and has no Paste button without it
+        const onData = onFiles && typeof block.onData !== 'function' ? undefined : handlerOf(block);
         const title = asText(block.title);
+        // the text onData returns tells what was imported
+        const report = (text) => (typeof text === 'string' && text ? text : 'Imported');
         const paste = async () => {
           const text = await IITC.utils.importText({ title });
           if (text === undefined) return undefined;
-          await onData(text, undefined, item);
-          return 'Imported';
+          return report(await onData(text, undefined, item));
         };
-        const open = async () => {
-          const [file] = await IITC.utils.importFile({ accept: block.accept });
-          if (!file) return undefined;
-          await onData(file.text, file.name, item);
-          return 'Imported';
+        const read = async (files) => report(onFiles ? await onFiles(files, item) : await onData(files[0].text, files[0].name, item));
+        // the button waits only for reading the files: importFile never settles when no file is chosen.
+        // Read later, once the press that opened the file dialog is done
+        const open = () => {
+          IITC.utils.importFile({ accept: block.accept, multiple: Boolean(onFiles) }).then((files) => {
+            if (files.length) this.later(() => this.act(`${id}:open`, () => read(files)));
+          });
         };
         return el(
           'span',
           { className: 'iitc-settings-buttons' },
-          this.button(`${id}:paste`, 'Paste', enabled, onData && paste),
-          block.accept && this.button(`${id}:open`, 'Choose file', enabled, onData && open)
+          (onData || !onFiles) && this.button(`${id}:paste`, 'Paste', enabled, onData && paste),
+          block.accept && this.button(`${id}:open`, 'Choose file', enabled, (onFiles || onData) && open)
         );
       }
       default:

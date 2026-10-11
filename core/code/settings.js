@@ -15,19 +15,28 @@
  */
 
 /**
+ * A block of a settings page; its `type` tells what it draws and which properties it reads:
+ *
+ * | `type` | Draws | Reads |
+ * | --- | --- | --- |
+ * | `boolean`, `number`, `string`, `select`, `color` | a field holding the setting its `key` names | `key`, `title`, `description`, `default`, `value`, `validate`, `onChange`, `sync`; `min`, `max`, `step` for `number`; `options` for `select`; `alpha` for `color` |
+ * | `action` | a button that runs `action` | `title`, `description`, `button`, `icon`, `action` |
+ * | `export` | Copy, and Save file with a `filename` | `title`, `description`, `data`, `filename`, `dataType` |
+ * | `import` | Paste, and Choose file with `accept` | `title`, `description`, `onData`, `accept`, `onFiles` |
+ * | `choice` | a radio before the title of each item of a `repeat`, one choice per `repeat` | `selected`, `action` |
+ * | `heading`, `link` | a section title; a link | `title`, `url` |
+ * | `text`, `notice` | a paragraph; a framed message | `text`, `level` |
+ * | `list` | entries, nested ones folded | `items` |
+ * | `repeat` | a table with a row of `blocks` for every item of `over` | `over`, `blocks` |
+ *
+ * Every block reads `visible`, and fields, actions, exports, imports and choices also `enabled`. Display
+ * properties (`title`, `description`, `button`, `icon`, `text`, `url`, `level`, `items`, `visible`, `enabled`,
+ * `value`, `selected`) take a value or a function, called whenever the page is drawn; inside a `repeat` the
+ * function receives the item
+ *
  * @memberof IITC.settings
  * @typedef {Object} SettingBlock
- * @property {string} type - Block type:
- *   - fields, each holding the setting its `key` names: `boolean`, `number`, `string`, `select`, `color`;
- *   - actions: `action` runs `action`, `export` hands over the text `data` returns, `import` passes text
- *     the user enters to `onData`, `choice` marks the `selected` item of a `repeat` and runs `action` with
- *     the item the user chooses; it is drawn as a radio before the title of each item;
- *   - content: `heading`, `text`, `link`, `list`, `notice`;
- *   - `repeat` repeats its `blocks` for every item of `over`
- *
- *   Display properties (`title`, `description`, `button`, `icon`, `text`, `url`, `level`, `items`, `visible`,
- *   `enabled`, `value`, `selected`) take a value or a function, called whenever the page is drawn;
- *   inside a `repeat` the function receives the item
+ * @property {string} type - Block type, from the table above
  * @property {string|Function} [title] - Label of a field, an action, an `export` or an `import`, text of a `heading`
  *                                    or a `link`
  * @property {string|Function} [button] - Short text of the button of an `action`, such as 'Delete', next to the
@@ -60,9 +69,14 @@
  * @property {string} [filename] - Lets an `export` block also save `data` as a file of this name
  * @property {string} [dataType] - MIME type of that file
  * @property {Function} [onData] - Receives `(text, filename, item)` from an `import` block: the pasted text, or the
- *                                 file read; an error it throws is shown to the user, and a promise is waited for
+ *                                 file read; the text it returns is shown instead of 'Imported', an error it throws
+ *                                 is shown too, and a promise is waited for
  * @property {string} [accept] - Lets an `import` block also read files of these types, as in the `accept`
  *                               attribute of a file input
+ * @property {Function} [onFiles] - Receives `(files, item)` from an `import` block with `accept` instead of `onData`,
+ *                                  and lets the user choose several files: all of them, as `[{name, text}]`; what it
+ *                                  returns and throws is shown as for `onData`. With it, `onData` is needed only for
+ *                                  the Paste button
  * @property {string|Function} [text] - Text of a `text` or a `notice` block
  * @property {string|Function} [url] - Address a `link` opens
  * @property {'info'|'warning'|'error'|Function} [level='info'] - Kind of a `notice`
@@ -335,13 +349,28 @@ const collectDefinitions = (namespace, blocks, repeat = undefined) => {
  * @returns {boolean} True if the page was registered
  *
  * @example
- * IITC.settings.register('link-show-direction', {
- *   title: 'Link direction',
+ * IITC.settings.register('my-plugin', {
+ *   title: 'My plugin',
+ *   shortcut: true,
  *   blocks: [
- *     { type: 'boolean', key: 'drawtools', default: false, title: 'Apply to DrawTools',
- *       onChange: (value) => value ? animateLinks() : removeDrawToolsStyle() },
+ *     { type: 'boolean', key: 'show', title: 'Show on the map', default: true, onChange: (show) => (show ? draw() : clear()) },
+ *     { type: 'select', key: 'style', title: 'Style', options: ['Lines', 'Dots'], default: 'Lines', onChange: draw },
+ *     { type: 'heading', title: 'Data' },
+ *     { type: 'export', title: 'Marked portals', data: () => JSON.stringify(load()), filename: 'my-plugin.json' },
+ *     { type: 'import', title: 'Marked portals', onData: (text) => save(JSON.parse(text)), accept: '.json' },
+ *     {
+ *       type: 'action',
+ *       title: 'Forget marked portals',
+ *       button: 'Forget',
+ *       action: () => {
+ *         save({});
+ *         return 'Forgotten';
+ *       },
+ *     },
  *   ],
  * });
+ * // the values are read where they are needed
+ * if (IITC.settings.get('my-plugin.show')) draw();
  */
 const register = (pageId, page) => {
   if (typeof pageId !== 'string' || !pageId) {

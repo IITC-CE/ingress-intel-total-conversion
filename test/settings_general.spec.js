@@ -74,4 +74,43 @@ describe('IITC settings page', () => {
       expect(settings.set('iitc.intelUrlWarning', true, { source: 'remote' })).to.be.false;
     });
   });
+
+  describe('backup', () => {
+    const block = (type) => settings._pages.iitc.blocks.find((candidate) => candidate.type === type);
+
+    it('exports the stored values of all settings', () => {
+      settings.set('iitc.passcodeFormat', 'short');
+
+      expect(JSON.parse(block('export').data())).to.include({ 'iitc.passcodeFormat': 'short' });
+    });
+
+    it('imports a backup and tells what it left out', () => {
+      const report = block('import').onData(JSON.stringify({ 'iitc.passcodeFormat': 'short', 'iitc.intelUrlWarning': 'yes', 'no-such-plugin.option': 1 }));
+
+      expect(settings.get('iitc.passcodeFormat')).to.equal('short');
+      expect(report).to.equal(
+        'Imported 1 of 3 settings. Not declared by any plugin here: no-such-plugin.option. Not allowed or not stored: iitc.intelUrlWarning.'
+      );
+    });
+
+    it('refuses text that is not a backup', () => {
+      expect(() => block('import').onData('not json')).to.throw('This is not a settings backup');
+      expect(() => block('import').onData('[1, 2]')).to.throw('This is not a settings backup');
+    });
+  });
+
+  describe('sync of settings', () => {
+    it('is offered only with the Sync plugin installed', () => {
+      const toggle = settings._pages.iitc.blocks.find((candidate) => candidate.key === 'syncSettings');
+      const plugin = window.plugin;
+      try {
+        window.plugin = {};
+        expect(toggle.visible()).to.be.false;
+        window.plugin = { sync: {} };
+        expect(toggle.visible()).to.be.true;
+      } finally {
+        window.plugin = plugin;
+      }
+    });
+  });
 });
