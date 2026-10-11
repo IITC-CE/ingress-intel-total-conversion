@@ -16,6 +16,7 @@ L.Evented ??= {
 
 await import('../core/code/utils.js');
 await import('../core/code/utils_file.js');
+await import('../core/code/_deprecated.js');
 
 describe('IITC.utils export and import', () => {
   let dialog;
@@ -163,12 +164,40 @@ describe('IITC.utils export and import', () => {
   });
 
   describe('exportFile', () => {
-    it('saves through the saveFile the app may have replaced', () => {
-      window.saveFile = sinon.spy();
+    it('downloads the file in the browser', async () => {
+      const blobs = [];
+      sinon.stub(URL, 'createObjectURL').callsFake((blob) => {
+        blobs.push(blob);
+        return 'blob:items';
+      });
+      sinon.stub(URL, 'revokeObjectURL');
+      const clicked = [];
+      sinon.stub(document.defaultView.HTMLAnchorElement.prototype, 'click').callsFake(function () {
+        clicked.push({ href: this.href, download: this.download });
+      });
 
       IITC.utils.exportFile('data', 'items.json', 'application/json');
 
-      expect(window.saveFile.calledOnceWith('data', 'items.json', 'application/json')).to.be.true;
+      expect(clicked).to.deep.equal([{ href: 'blob:items', download: 'items.json' }]);
+      expect(blobs[0].type).to.equal('application/json');
+      expect(await blobs[0].text()).to.equal('data');
+      expect(URL.revokeObjectURL.calledOnceWith('blob:items')).to.be.true;
+    });
+
+    it('lets the app save the file, with defaults for what is not given', () => {
+      window.app = { saveFile: sinon.spy() };
+
+      IITC.utils.exportFile('data');
+
+      expect(window.app.saveFile.calledOnceWith('', '*/*', 'data')).to.be.true;
+    });
+
+    it('is what the deprecated window.saveFile calls', () => {
+      sinon.stub(IITC.utils, 'exportFile');
+
+      window.saveFile('data', 'items.json', 'application/json');
+
+      expect(IITC.utils.exportFile.calledOnceWith('data', 'items.json', 'application/json')).to.be.true;
     });
   });
 

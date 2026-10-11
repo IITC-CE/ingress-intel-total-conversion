@@ -36,18 +36,6 @@ function saveAs(data, filename, dataType) {
 } // alternative: https://github.com/eligrey/FileSaver.js/blob/master/src/FileSaver.js
 
 /**
- * Saves data to a file with the given filename. This function is an alias to the `saveAs` function.
- * or it can use the IITC Mobile file chooser (overwritten in app.js). The `dataType` parameter can be used to filter
- * file types in the IITCm file chooser.
- *
- * @function saveFile
- * @param {string|BlobPart|BlobPart[]} data - The data to be saved.
- * @param {string} [filename] - The name of the file to save.
- * @param {string} [dataType] - The MIME type of the file, used to specify the file format.
- */
-window.saveFile = saveAs;
-
-/**
  * Leaflet wrapper over [FileReader](https://w3c.github.io/FileAPI/#APIASynch) Web API,
  * making it compatible with the Leaflet event system.
  * This class extends `L.Evented`.
@@ -406,15 +394,20 @@ const importText = ({ title = 'Import', label = 'Paste the text here' } = {}) =>
   });
 
 /**
- * Saves data as a file: downloads it, or in the app lets the user pick where to save it
+ * Saves data as a file: downloads it, or in the app lets the user pick where to save it,
+ * with `dataType` filtering the file types the app offers
  *
  * @memberof IITC.utils
  * @param {string} data - The data to save; the app takes only strings
- * @param {string} filename - Suggested file name
+ * @param {string} [filename] - Suggested file name
  * @param {string} [dataType] - MIME type of the file
  */
 const exportFile = (data, filename, dataType) => {
-  window.saveFile(data, filename, dataType);
+  if (window.app?.saveFile) {
+    window.app.saveFile(filename || '', dataType || '*/*', data);
+  } else {
+    saveAs(data, filename, dataType);
+  }
 };
 
 /**
