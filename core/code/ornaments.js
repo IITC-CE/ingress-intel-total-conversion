@@ -128,7 +128,7 @@ window.ornaments = {
           title: 'Hide ornaments that start with',
           onChange: (text) => {
             const prefixes = window.ornaments.parsePrefixes(text);
-            // 'pe,' and 'pe' differ as text but hide the same ornaments
+            // a list save() stores from the one in use needs no reload
             if (prefixes.join(',') === window.ornaments.excludedOrnaments.join(',')) return;
             window.ornaments.excludedOrnaments = prefixes;
             window.ornaments.scheduleReload();

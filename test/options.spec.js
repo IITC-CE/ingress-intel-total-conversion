@@ -149,12 +149,66 @@ describe('IITC.options', () => {
       expect(options.get('test-free.state')).to.deep.equal({ folder: 'a' });
     });
 
-    it('overwrites an invalid stored value with one equal to the default', () => {
+    it('removes an invalid stored value when given the default', () => {
       const id = page([{ type: 'number', key: 'n', default: 30, max: 100 }]);
       localStorage.setItem(`iitc-option:${id}.n`, '500');
 
       expect(options.set(`${id}.n`, 30)).to.be.true;
-      expect(localStorage.getItem(`iitc-option:${id}.n`)).to.equal('30');
+      expect(localStorage.getItem(`iitc-option:${id}.n`)).to.be.null;
+    });
+
+    it('keeps no value equal to the default, as if the option was never changed', () => {
+      const id = page([
+        { type: 'number', key: 'n', default: 30 },
+        { type: 'string', key: 's' },
+        { type: 'select', key: 'sel', choices: ['a', 'b'] },
+      ]);
+      const changed = onHook('optionChanged');
+
+      options.set(`${id}.n`, 50);
+      expect(options.set(`${id}.n`, 30)).to.be.true;
+      options.set(`${id}.s`, '');
+      options.set(`${id}.sel`, 'a');
+
+      expect(localStorage.getItem(`iitc-option:${id}.n`)).to.be.null;
+      expect(localStorage.getItem(`iitc-option:${id}.s`)).to.be.null;
+      expect(localStorage.getItem(`iitc-option:${id}.sel`)).to.be.null;
+      expect(changed.args.map(([data]) => [data.key, data.value, data.oldValue])).to.deep.equal([
+        [`${id}.n`, 50, 30],
+        [`${id}.n`, 30, 50],
+      ]);
+    });
+
+    it('compares with the default in the stored form', () => {
+      const id = page([{ type: 'number', key: 'm', default: 0 }]);
+
+      options.set(`${id}.m`, -0);
+      expect(localStorage.getItem(`iitc-option:${id}.m`)).to.be.null;
+    });
+
+    it('removes a map that holds no entries, and keeps entries equal to the default of an entry', () => {
+      const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'boolean', key: 'on' }] }]);
+
+      options.set(`${id}.on`, { a: false });
+      expect(localStorage.getItem(`iitc-option:${id}.on`)).to.equal('{"a":false}');
+      options.set(`${id}.on`, {});
+      expect(localStorage.getItem(`iitc-option:${id}.on`)).to.be.null;
+    });
+
+    it('stores a value of a select whose choices cannot be read, having no default to compare with', () => {
+      const id = page([
+        {
+          type: 'select',
+          key: 'sel',
+          choices: () => {
+            throw new Error('no choices yet');
+          },
+        },
+      ]);
+      sinon.stub(globalThis.log, 'warn');
+
+      expect(options.set(`${id}.sel`, 'x')).to.be.true;
+      expect(localStorage.getItem(`iitc-option:${id}.sel`)).to.equal('"x"');
     });
 
     it('removes an undeclared value when given undefined', () => {
@@ -275,6 +329,49 @@ describe('IITC.options', () => {
     });
   });
 
+  describe('stored form', () => {
+    // JSON keeps -0 as 0, so the two are the same value
+    const number = () => page([{ type: 'number', key: 'v', default: 5 }]);
+
+    it('changes nothing for a value stored in the same form as the one already there', () => {
+      const id = number();
+      options.set(`${id}.v`, 0);
+      const changed = onHook('optionChanged');
+      const setItem = sinon.spy(document.defaultView.Storage.prototype, 'setItem');
+
+      expect(options.set(`${id}.v`, -0)).to.be.true;
+
+      expect(setItem.called).to.be.false;
+      expect(changed.called).to.be.false;
+    });
+
+    it('reports a change with the value as get returns it', () => {
+      const id = number();
+      const changed = onHook('optionChanged');
+
+      options.set(`${id}.v`, -0);
+
+      expect(Object.is(options.get(`${id}.v`), 0)).to.be.true;
+      expect(changed.calledOnce).to.be.true;
+      expect(Object.is(changed.firstCall.args[0].value, 0)).to.be.true;
+      expect(changed.firstCall.args[0].oldValue).to.equal(5);
+    });
+
+    it('compares imported and remote values in their stored form', () => {
+      const id = number();
+      options.set(`${id}.v`, 0);
+      const changed = onHook('optionChanged');
+
+      expect(options.importValues({ [`${id}.v`]: -0 }).applied).to.deep.equal([`${id}.v`]);
+      expect(options.set(`${id}.v`, -0, { source: 'remote' })).to.be.true;
+      expect(changed.called).to.be.false;
+
+      options.set(`${id}.v`, 7, { source: 'remote' });
+      expect(changed.calledOnce).to.be.true;
+      expect(changed.firstCall.args[0]).to.include({ value: 7, oldValue: 0, source: 'remote' });
+    });
+  });
+
   describe('reset', () => {
     it('removes the stored value so the default applies again', () => {
       const id = page([{ type: 'number', key: 'n', default: 30 }]);
@@ -381,7 +478,7 @@ describe('IITC.options', () => {
 
       expect(onChange.called).to.be.false;
       expect(hook.called).to.be.false;
-      expect(localStorage.getItem(`iitc-option:${id}.n`)).to.equal('30');
+      expect(localStorage.getItem(`iitc-option:${id}.n`)).to.be.null;
     });
 
     it('notifies a reset that returns the value to its default', () => {
