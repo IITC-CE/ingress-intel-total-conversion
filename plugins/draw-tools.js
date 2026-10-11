@@ -1277,14 +1277,4 @@ function loadExternals() {
     console.error('leaflet.draw-src.js loading failed');
     throw e;
   }
-
-  try {
-    // https://github.com/bgrins/spectrum
-    // eslint-disable-next-line
-    '@include_raw:external/spectrum.js@';
-    $('<style>').html('@include_string:external/spectrum.css@').appendTo('head');
-  } catch (e) {
-    console.error('spectrum.js loading failed');
-    throw e;
-  }
 }
