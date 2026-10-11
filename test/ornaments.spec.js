@@ -134,6 +134,53 @@ describe('window.ornaments settings', () => {
     });
   });
 
+  describe('settings page', () => {
+    const repeat = () => page.blocks.find((block) => block.type === 'repeat');
+    const hide = () => repeat().blocks[0];
+
+    it('shows an ornament a prefix hides as hidden, and does not let it be shown', () => {
+      ornaments.excludedOrnaments = ['ap'];
+
+      expect(hide().value({ id: 'ap1' })).to.be.true;
+      expect(hide().enabled({ id: 'ap1' })).to.be.false;
+      expect(hide().value({ id: 'sc5' })).to.be.undefined;
+      expect(hide().enabled({ id: 'sc5' })).to.be.true;
+    });
+
+    it('tells why the list is empty while no ornament was seen', () => {
+      const hint = page.blocks.find((block) => block.type === 'text');
+      ornaments.knownOrnaments = {};
+
+      expect(hint.visible()).to.be.true;
+
+      ornaments.knownOrnaments = { ap1: false };
+
+      expect(hint.visible()).to.be.false;
+    });
+
+    it('forgets the known ornaments', async () => {
+      settings.set('ornaments.hidden', { ap1: true });
+
+      page.blocks.find((block) => block.type === 'action').action();
+
+      expect(ornaments.knownOrnaments).to.deep.equal({});
+      expect(settings.get('ornaments.hidden')).to.deep.equal({});
+      expect(await redraws()).to.be.at.least(1);
+    });
+
+    it('opens in place of the dialog', () => {
+      const open = sinon.stub();
+      const replaced = settings.open;
+      settings.open = open;
+      try {
+        ornaments.ornamentsOpt();
+      } finally {
+        settings.open = replaced;
+      }
+      expect(open.calledOnceWith('ornaments')).to.be.true;
+    });
+  });
+
   describe('changes', () => {
     it('applies new prefixes and redraws the ornaments', async () => {
       settings.set('ornaments.excluded', 'ap,pe', { source: 'remote' });
@@ -217,7 +264,7 @@ describe('window.ornaments settings', () => {
     const repeat = page.blocks.find((block) => block.type === 'repeat');
 
     expect(repeat.over()).to.deep.equal([
-      { id: 'ap1', title: 'Anomaly' },
+      { id: 'ap1', title: 'Anomaly (ap1)' },
       { id: 'sc5', title: 'sc5' },
     ]);
   });
