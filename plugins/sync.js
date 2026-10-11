@@ -74,6 +74,18 @@ window.plugin.sync.updateMap = function (pluginName, fieldName, keyArray) {
 
 const pendingRegistrations = [];
 
+// Tells whether the synced map is loaded and good to use; false again after a sign-out
+window.plugin.sync.isInitialized = function (pluginName, fieldName) {
+  return window.plugin.sync.registeredPluginsFields?.get(pluginName, fieldName)?.initialized === true;
+};
+
+// A copy of the map as the file holds it after the last load or update, or undefined until it is loaded;
+// the plugin field may differ: it is replaced by the file only when another client wrote the file last
+window.plugin.sync.getFileMap = function (pluginName, fieldName) {
+  if (!window.plugin.sync.isInitialized(pluginName, fieldName)) return undefined;
+  return structuredClone(window.plugin.sync.registeredPluginsFields.get(pluginName, fieldName).map);
+};
+
 // Other plugin call this to register a field as CollaborativeMap to sync with Google Drive API
 // example: plugin.sync.registerMapForSync('keys', 'keysdata', plugin.keys.updateCallback, plugin.keys.initializedCallback)
 // which register plugin.keys.keysdata
@@ -86,12 +98,14 @@ const pendingRegistrations = [];
 // initializedCallback function format: function(pluginName, fieldName)
 // initializedCallback will be fired when the storage finished initialize and good to use
 //
+// mapOptions.holder: the object whose [fieldName] holds the map, for a map that does not live in plugin[pluginName]
+//
 // Callable from the moment plugin.sync exists: setup replays whatever registered before it ran.
 // Earlier than that there is nothing to call, so those plugins wait for the 'pluginSyncReady' hook
-window.plugin.sync.registerMapForSync = function (pluginName, fieldName, callback, initializedCallback) {
+window.plugin.sync.registerMapForSync = function (pluginName, fieldName, callback, initializedCallback, mapOptions) {
   // authorizer and uuid only exist from setup, so buffer the arguments and register from there
   if (!window.plugin.sync.registeredPluginsFields) {
-    pendingRegistrations.push([pluginName, fieldName, callback, initializedCallback]);
+    pendingRegistrations.push([pluginName, fieldName, callback, initializedCallback, mapOptions]);
     return;
   }
 
@@ -99,6 +113,7 @@ window.plugin.sync.registerMapForSync = function (pluginName, fieldName, callbac
   options = {
     pluginName: pluginName,
     fieldName: fieldName,
+    holder: mapOptions?.holder,
     callback: callback,
     initializedCallback: initializedCallback,
     authorizer: window.plugin.sync.authorizer,
@@ -116,6 +131,7 @@ window.plugin.sync.registerMapForSync = function (pluginName, fieldName, callbac
 window.plugin.sync.RegisteredMap = function (options) {
   this.pluginName = options['pluginName'];
   this.fieldName = options['fieldName'];
+  this.holder = options['holder'];
   this.callback = options['callback'];
   this.initializedCallback = options['initializedCallback'];
   this.authorizer = options['authorizer'];
@@ -135,13 +151,18 @@ window.plugin.sync.RegisteredMap = function (options) {
   this.loadDocument = this.loadDocument.bind(this);
 };
 
+// the object whose [fieldName] holds the map; plugin[pluginName] is looked up each time, as a plugin may replace it
+window.plugin.sync.RegisteredMap.prototype.getHolder = function () {
+  return this.holder ?? window.plugin[this.pluginName];
+};
+
 window.plugin.sync.RegisteredMap.prototype.updateMap = function (keyArray) {
   var _this = this;
   try {
     this.lastUpdateUUID = this.uuid;
 
     $.each(keyArray, function (ind, key) {
-      var value = window.plugin[_this.pluginName][_this.fieldName][key];
+      var value = _this.getHolder()[_this.fieldName][key];
       if (typeof value !== 'undefined') {
         _this.map[key] = value;
       } else {
@@ -203,7 +224,7 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function () {
     _this.map = {};
 
     // Init the map values if this map is first created
-    $.each(window.plugin[_this.pluginName][_this.fieldName], function (key, val) {
+    $.each(_this.getHolder()[_this.fieldName], function (key, val) {
       _this.map[key] = val;
     });
 
@@ -218,7 +239,8 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function () {
   // update local data if the document is updated by other
   // and adding a timer to further check for updates
   onFileLoaded = function (data) {
-    _this.map = data['map'];
+    // a file with something else in place of the map starts over from an empty one
+    _this.map = $.isPlainObject(data['map']) ? data['map'] : {};
     _this.lastUpdateUUID = data['last-update-uuid'];
 
     if (!_this.intervalID) {
@@ -230,9 +252,9 @@ window.plugin.sync.RegisteredMap.prototype.loadDocument = function () {
     // Replace local value if data is changed by others
     if (_this.isUpdatedByOthers()) {
       window.plugin.sync.logger.log(_this.getFileName(), 'Updated by others, replacing content');
-      window.plugin[_this.pluginName][_this.fieldName] = {};
+      var field = (_this.getHolder()[_this.fieldName] = {});
       $.each(_this.map, function (key) {
-        window.plugin[_this.pluginName][_this.fieldName][key] = _this.map[key];
+        field[key] = _this.map[key];
       });
       if (_this.callback) _this.callback(_this.pluginName, _this.fieldName, null, true);
     }
