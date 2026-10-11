@@ -7,6 +7,28 @@
  * @module options_general
  */
 
+// the text of a backup file: the stored values of all declared options
+const backup = () => JSON.stringify(IITC.options.exportValues(), null, 2);
+
+// stores the values of a backup, and tells what was left out
+const restore = (text) => {
+  let values;
+  try {
+    values = JSON.parse(text);
+  } catch {
+    values = undefined;
+  }
+  if (values === null || typeof values !== 'object' || Array.isArray(values)) throw new Error('This is not an options backup');
+
+  const { applied, rejected, skipped } = IITC.options.importValues(values);
+  const total = applied.length + rejected.length + skipped.length;
+  let report = `Imported ${applied.length} of ${total} options.`;
+  // options of plugins that are not installed here
+  if (skipped.length) report += ` Not declared by any plugin here: ${skipped.join(', ')}.`;
+  if (rejected.length) report += ` Not allowed or not stored: ${rejected.join(', ')}.`;
+  return report;
+};
+
 IITC.options.register('iitc', {
   title: 'General',
   blocks: [
@@ -27,6 +49,7 @@ IITC.options.register('iitc', {
       default: true,
       // whether this device takes part is the device's own choice
       sync: false,
+      visible: () => Boolean(window.plugin?.sync),
     },
     {
       type: 'boolean',
@@ -34,6 +57,22 @@ IITC.options.register('iitc', {
       title: 'Shortcuts to options pages in the toolbox',
       description: 'Buttons that open the pages of some plugins directly',
       default: true,
+    },
+    { type: 'heading', title: 'Backup' },
+    {
+      type: 'export',
+      title: 'Export options',
+      description: 'Options changed from their defaults, as text or a file',
+      data: backup,
+      filename: 'IITC-options.json',
+      dataType: 'application/json',
+    },
+    {
+      type: 'import',
+      title: 'Import options',
+      description: 'From text or a file; options in the backup replace the ones here, and options it lacks stay as they are',
+      onData: restore,
+      accept: '.json,application/json',
     },
   ],
 });
