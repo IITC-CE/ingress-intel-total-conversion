@@ -25,17 +25,21 @@
  *   - content: `heading`, `text`, `link`, `list`, `notice`;
  *   - `repeat` repeats its `blocks` for every item of `over`
  *
- *   Display properties (`title`, `description`, `icon`, `text`, `url`, `level`, `items`, `visible`, `enabled`,
- *   `value`, `selected`) take a value or a function, called whenever the page is drawn; inside a `repeat` the
- *   function receives the item
- * @property {string|Function} [title] - Label of a field or an action, text of a `heading` or a `link`
+ *   Display properties (`title`, `description`, `button`, `icon`, `text`, `url`, `level`, `items`, `visible`,
+ *   `enabled`, `value`, `selected`) take a value or a function, called whenever the page is drawn;
+ *   inside a `repeat` the function receives the item
+ * @property {string|Function} [title] - Label of a field, an action, an `export` or an `import`, text of a `heading`
+ *                                    or a `link`
+ * @property {string|Function} [button] - Short text of the button of an `action`, such as 'Delete', next to the
+ *                                     `title`. Without it the button carries the `title`
  * @property {string|Function} [icon] - Icon an `action` button shows instead of its text, a Material Symbols
  *                                      name such as 'delete'; the text becomes the tooltip
  * @property {string|Function} [description] - Explanation shown under the title
  * @property {boolean|Function} [visible=true] - False hides the block
  * @property {boolean|Function} [enabled=true] - False shows the block without letting the user change or run it
  * @property {string} [key] - Name of the setting a field holds, addressed as `<namespace>.<key>`; every field has one
- * @property {*} [default] - Value used while nothing valid is stored
+ * @property {*|Function} [default] - Value used while nothing valid is stored. Inside a `repeat` it may be a function
+ *                                    of the item, giving the default of the item's entry
  * @property {*|Function} [value] - Value a field shows instead of the stored one, when it is derived from other
  *                                  settings (a flag that a broader rule already sets)
  * @property {number} [min] - Lowest allowed `number`
@@ -48,20 +52,24 @@
  * @property {Function} [onChange] - Called with `(value, oldValue, source)` after the value has changed
  * @property {boolean} [sync=true] - False keeps the setting on this device: sync neither sends nor applies it,
  *                                   while a local backup still holds it
- * @property {Function} [action] - Runs when an `action` block is pressed, or a `choice` is made
+ * @property {Function} [action] - Runs when an `action` block is pressed, or a `choice` is made, with the item
+ *                                 inside a `repeat`; the text it returns and the error it throws are shown next to
+ *                                 the button, and a promise is waited for
  * @property {boolean|Function} [selected] - Whether the item is the chosen one, for a `choice`
- * @property {Function} [data] - Returns the text an `export` block hands over
+ * @property {Function} [data] - Returns the text an `export` block hands over; receives the item inside a `repeat`
  * @property {string} [filename] - Lets an `export` block also save `data` as a file of this name
  * @property {string} [dataType] - MIME type of that file
- * @property {Function} [onData] - Receives `(text, filename)` from an `import` block: the pasted text, or the
- *                                 file read; an error it throws is shown to the user
+ * @property {Function} [onData] - Receives `(text, filename, item)` from an `import` block: the pasted text, or the
+ *                                 file read; an error it throws is shown to the user, and a promise is waited for
  * @property {string} [accept] - Lets an `import` block also read files of these types, as in the `accept`
  *                               attribute of a file input
  * @property {string|Function} [text] - Text of a `text` or a `notice` block
  * @property {string|Function} [url] - Address a `link` opens
  * @property {'info'|'warning'|'error'|Function} [level='info'] - Kind of a `notice`
  * @property {Array<IITC.settings.SettingsListItem>|Function} [items] - Entries of a `list`
- * @property {Function} [over] - Items of a `repeat` block, returned as `[{id, title}]` with ids that stay the same between calls
+ * @property {Function} [over] - Items of a `repeat` block, returned as `[{id, title}]` with ids that stay the same between calls;
+ *                               `get` also calls it to give the items without a stored entry their default, so it
+ *                               must be able to list them whenever the settings are read
  * @property {Array<IITC.settings.SettingBlock>} [blocks] - Blocks of a `repeat` block; their settings hold a map of item id to value
  */
 
@@ -71,7 +79,7 @@
  * @property {string} title - Main text
  * @property {string} [sub] - Second line
  * @property {string} [badge] - Short text at the end of the line, such as a version
- * @property {string} [tooltip] - Text shown on hover
+ * @property {string} [tooltip] - Text shown on hover over the main line
  * @property {'muted'|'error'} [state] - Shows the entry as secondary, or as failed
  * @property {Array<IITC.settings.SettingsListItem>} [items] - Nested entries
  * @property {boolean} [collapsed=false] - Hides the nested entries until the entry is opened
@@ -106,14 +114,24 @@ const isPlainObject = (value) => value !== null && typeof value === 'object' && 
 
 const sameValue = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-const optionValues = (def) => {
+// the choices of a `select` as `{value, label}`
+const optionsOf = (def) => {
   const options = typeof def.options === 'function' ? def.options() : def.options;
-  return (options ?? []).map((option) => (isPlainObject(option) ? option.value : option));
+  return (options ?? []).map((option) => (isPlainObject(option) ? option : { value: option, label: option }));
 };
 
-const defaultOf = (def) => {
-  if (def.map) return {};
-  if (def.default !== undefined) return def.default;
+const optionValues = (def) => optionsOf(def).map((option) => option.value);
+
+// the default of one value: of the setting, or of the entry of a `repeat` map for an item, which a
+// function of the item may give
+const entryDefault = (def, item) => {
+  if (typeof def.default === 'function') {
+    try {
+      return def.default(item);
+    } catch (e) {
+      log.warn(`settings: default of "${def.fullKey}" failed: ${e}`);
+    }
+  } else if (def.default !== undefined) return def.default;
   if (def.type !== 'select') return TYPE_DEFAULTS[def.type];
   try {
     return optionValues(def)[0];
@@ -121,6 +139,24 @@ const defaultOf = (def) => {
     log.warn(`settings: options of "${def.fullKey}" failed: ${e}`);
     return undefined;
   }
+};
+
+const defaultOf = (def) => (def.map ? {} : entryDefault(def));
+
+// a map of a `repeat` with the default entry of each item of `over` that has none stored
+const withItemDefaults = (def, map) => {
+  let items;
+  try {
+    items = def.repeat.over?.() ?? [];
+  } catch (e) {
+    log.warn(`settings: items of the repeat of "${def.fullKey}" failed: ${e}`);
+    return map;
+  }
+  const result = { ...map };
+  for (const item of items) {
+    if (!Object.hasOwn(result, item.id)) result[item.id] = entryDefault(def, item);
+  }
+  return result;
 };
 
 /**
@@ -249,10 +285,10 @@ const notifyChange = (key, value, oldValue, source) => {
  * @private
  * @param {string} namespace - Prefix of the page's keys
  * @param {Array<IITC.settings.SettingBlock>} blocks - Blocks to scan
- * @param {boolean} [map=false] - Whether the blocks are repeated, so their settings hold maps
+ * @param {IITC.settings.SettingBlock} [repeat] - The `repeat` block the blocks are repeated in, so their settings hold maps
  * @returns {Array<Object>} Setting definitions
  */
-const collectDefinitions = (namespace, blocks, map = false) => {
+const collectDefinitions = (namespace, blocks, repeat = undefined) => {
   const result = [];
   for (const block of blocks ?? []) {
     if (!BLOCK_TYPES.includes(block?.type)) {
@@ -260,7 +296,7 @@ const collectDefinitions = (namespace, blocks, map = false) => {
       continue;
     }
     if (block.type === 'repeat') {
-      result.push(...collectDefinitions(namespace, block.blocks, true));
+      result.push(...collectDefinitions(namespace, block.blocks, block));
       continue;
     }
     if (block.key === undefined) continue;
@@ -270,7 +306,14 @@ const collectDefinitions = (namespace, blocks, map = false) => {
     }
 
     const fullKey = `${namespace}.${block.key}`;
-    result.push({ ...block, fullKey, map });
+    const map = repeat !== undefined;
+    // a function gives the default of an entry from its item, so it has no item to work from outside a repeat
+    if (!map && typeof block.default === 'function') {
+      log.warn(`settings: "${fullKey}" takes a default function only inside a repeat`);
+      result.push({ ...block, default: undefined, fullKey, map });
+      continue;
+    }
+    result.push({ ...block, fullKey, map, repeat });
   }
   return result;
 };
@@ -357,9 +400,17 @@ const resolve = (key, stored, quiet = false) => {
   return stored;
 };
 
+// the value `get` returns: of a `repeat` map also the default entries of the items that have none stored
+const effective = (key, stored, quiet = false) => {
+  const def = definitions[key];
+  const value = resolve(key, stored, quiet);
+  return def.map ? withItemDefaults(def, value) : value;
+};
+
 /**
  * Returns the value of a setting; a declared setting falls back to its default when nothing valid
- * is stored, and a map of a `repeat` keeps only its valid entries
+ * is stored. A map of a `repeat` holds its valid stored entries, and the default entry of each item
+ * `over` returns that has none stored; `over` must be able to list the items by then
  *
  * @memberof IITC.settings
  * @param {string} key - Setting key, `<namespace>.<key>`
@@ -372,7 +423,7 @@ const resolve = (key, stored, quiet = false) => {
 const get = (key, fallback) => {
   const stored = readStored(key);
   if (!definitions[key]) return stored === undefined ? fallback : stored;
-  return resolve(key, stored);
+  return effective(key, stored);
 };
 
 /**
@@ -399,6 +450,16 @@ const storedState = (key) => {
   const def = definitions[key];
   return !def || validate(def, stored) === true ? 'valid' : 'invalid';
 };
+
+/**
+ * Tells whether a setting may take a value, without storing it; an undeclared key takes any value
+ *
+ * @memberof IITC.settings
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @param {*} value - Value to check
+ * @returns {true|string} True, or the reason the value is not allowed
+ */
+const check = (key, value) => (definitions[key] ? validate(definitions[key], value) : true);
 
 // values from another device apply only to declared settings that do not belong to this device
 const refusesRemote = (key, source) => {
@@ -458,11 +519,11 @@ const set = (key, value, options) => {
   if (encoded === localStorage.getItem(storageKey)) return true;
 
   const stored = readStored(key);
-  const oldValue = def ? resolve(key, stored, true) : stored;
+  const oldValue = def ? effective(key, stored, true) : stored;
   if (!writeStored(storageKey, encoded)) return false;
 
   const current = readStored(key);
-  const newValue = current === undefined ? value : current;
+  const newValue = def ? effective(key, current, true) : current === undefined ? value : current;
   if (!sameValue(newValue, oldValue)) notifyChange(key, newValue, oldValue, source);
   return true;
 };
@@ -484,7 +545,7 @@ const reset = (key, options) => {
   if (refusesRemote(key, source)) return false;
   const def = definitions[key];
   const stored = readStored(key);
-  const oldValue = def ? resolve(key, stored, true) : stored;
+  const oldValue = def ? effective(key, stored, true) : stored;
   localStorage.removeItem(STORAGE_PREFIX + key);
 
   const value = get(key);
@@ -553,8 +614,22 @@ IITC.settings = {
   reset,
   exportValues,
   importValues,
+  check,
   _syncs: syncs,
   _storedState: storedState,
   _pages: pages,
   _definitions: definitions,
+  // for the page renderer: the default of a value or of the entry of an item, the valid stored entries of a map
+  // without the defaults, so a change of one entry stores only that one, and the choices of a select (none when
+  // they fail)
+  _entryDefault: (key, item) => (definitions[key] ? entryDefault(definitions[key], item) : undefined),
+  _entries: (key) => (definitions[key] ? resolve(key, readStored(key), true) : readStored(key)),
+  _options: (key) => {
+    try {
+      return definitions[key] ? optionsOf(definitions[key]) : [];
+    } catch (e) {
+      log.warn(`settings: options of "${key}" failed: ${e}`);
+      return [];
+    }
+  },
 };
