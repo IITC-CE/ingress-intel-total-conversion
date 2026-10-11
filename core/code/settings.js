@@ -91,6 +91,12 @@
  * @property {string} title - Page title
  * @property {string} [namespace] - Prefix of the page's setting keys. Defaults to the page id
  * @property {Array<IITC.settings.SettingBlock>} blocks - Page content
+ * @property {boolean|Object|Function} [shortcut] - Adds a toolbox button that opens the page, while the
+ *   `iitc.toolboxShortcuts` setting is on: `true`, or the arguments of `IITC.toolbox.addButton` but `id` and
+ *   `action` (`label` is the page title by default), or a function returning them, called again on
+ *   `IITC.settings.refresh(pageId)`, for a button that shows state
+ * @property {string} [accesskey] - Access key that opens the page, with the toolbox button or without it;
+ *   the button shows it in its tooltip
  */
 
 const FIELD_TYPES = ['boolean', 'number', 'string', 'select', 'color'];

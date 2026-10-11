@@ -414,3 +414,21 @@ input[type="search"].iitc-settings-search {
      border-radius: 0 0 5px 5px;
   }
 }
+
+/* links that hold the access keys of pages without a toolbox button: a link that is not drawn ignores its key.
+   Fixed in the viewport, so the focus a key gives the link does not scroll the page */
+.iitc-settings-access-keys {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+*/
+.iitc-settings-page[data-page='about'] {
+}

@@ -79,6 +79,12 @@ const navLink = (pageId) => [...view.root.querySelectorAll('.iitc-settings-page-
 
 const isHidden = (element) => element.ownerDocument.defaultView.getComputedStyle(element).display === 'none';
 
+// the tooltip of a page in the list, telling its access key
+const accessKeyHint = (pageId) => {
+  const accesskey = IITC.settings._pages[pageId]?.accesskey;
+  return accesskey ? `Access key [${accesskey}]` : undefined;
+};
+
 // draws the list again; the focus stays on the page it was on
 const drawNav = () => {
   const list = part('iitc-settings-pages');
@@ -96,6 +102,7 @@ const drawNav = () => {
             type: 'button',
             className: 'iitc-settings-page-link',
             dataset: { page: pageId },
+            title: accessKeyHint(pageId),
             'aria-current': pageId === view.pageId && 'page',
             onclick: () => choose(pageId),
           },
@@ -207,12 +214,19 @@ const openDialog = (showPage) => {
 /**
  * Opens the settings window, on a given page or on the page chosen last
  *
+ * A toolbox button to a settings page comes from the page's `shortcut`, which the user can turn off
+ * with the other shortcuts; `IITC.toolbox.addButton` is for a plugin's own dialogs that are not part
+ * of the settings, such as lists and other views of map data
+ *
  * @memberof IITC.settings
  * @param {string} [pageId] - Page to show
  * @returns {boolean} False when no such page is registered
  *
  * @example
- * IITC.toolbox.addButton({ label: 'Draw tools', action: () => IITC.settings.open('draw-tools') });
+ * // a toolbox button that opens the page
+ * IITC.settings.register('my-plugin', { title: 'My plugin', shortcut: true, blocks });
+ * // the page opened from the plugin's own code, such as a link in its dialog
+ * IITC.settings.open('my-plugin');
  */
 const open = (pageId) => {
   if (pageId !== undefined && !IITC.settings._pages[pageId]) {
@@ -236,13 +250,14 @@ const open = (pageId) => {
 
 /**
  * Draws the page shown in the settings window again, after the current task and after the click when
- * the pointer is down. Changes of the page's own settings redraw it already; a page that also shows
- * other state calls this when that state changes
+ * the pointer is down, and updates the toolbox shortcut of the page. Changes of the page's own settings
+ * redraw it already; a page that also shows other state calls this when that state changes
  *
  * @memberof IITC.settings
- * @param {string} [pageId] - Redraws only if this page is shown
+ * @param {string} [pageId] - Redraws only if this page is shown; all shortcuts are updated without it
  */
 const refresh = (pageId) => {
+  (pageId === undefined ? Object.keys(IITC.settings._pages) : [pageId]).forEach(updateShortcut);
   if (!isOpen() || (pageId !== undefined && pageId !== view.pageId)) return;
   IITC.settings._redrawLater(content());
 };
@@ -260,6 +275,74 @@ const onPageRegistered = ({ pageId }) => {
   if (pageId !== view.pageId) return;
   part('iitc-settings-page-heading').textContent = titleOf(pageId);
   IITC.settings._redrawLater(content());
+};
+
+const shortcutId = (pageId) => `settings-shortcut-${pageId}`;
+
+// the shortcut arguments each button was drawn with, so a refresh that changes nothing leaves the toolbox alone
+const drawnShortcuts = new Map();
+
+// the arguments of a page's toolbox button, or undefined when the page has none
+const shortcutOf = (pageId) => {
+  const page = IITC.settings._pages[pageId];
+  if (!page?.shortcut || IITC.settings.get('iitc.toolboxShortcuts') === false) return undefined;
+  let options = page.shortcut;
+  try {
+    if (typeof options === 'function') options = options();
+  } catch (e) {
+    log.warn(`settings: shortcut of page "${pageId}" failed`, e);
+    return undefined;
+  }
+  options = { label: titleOf(pageId), ...(typeof options === 'object' ? options : {}) };
+  if (!page.accesskey) return options;
+  const hint = `[${page.accesskey}]`;
+  return { ...options, accesskey: page.accesskey, title: options.title ? `${options.title} ${hint}` : hint };
+};
+
+// the access keys of pages without a toolbox button, on links that are not seen but still take the key
+const accessKeyLinks = () => {
+  let links = document.getElementById('iitc-settings-access-keys');
+  if (!links) {
+    links = el('div', { id: 'iitc-settings-access-keys', className: 'iitc-settings-access-keys', 'aria-hidden': 'true' });
+    document.body.append(links);
+  }
+  return links;
+};
+
+// keeps the access key of a page working while the page has no toolbox button
+const updateAccessKey = (pageId, hasButton) => {
+  const accesskey = IITC.settings._pages[pageId]?.accesskey;
+  const link = document.getElementById(`settings-access-key-${pageId}`);
+  if (hasButton || !accesskey) {
+    link?.remove();
+    return;
+  }
+  if (link) {
+    link.accessKey = accesskey;
+    return;
+  }
+  accessKeyLinks().append(el('a', { id: `settings-access-key-${pageId}`, accessKey: accesskey, tabIndex: -1, onclick: () => open(pageId) }));
+};
+
+// adds, updates or removes the toolbox button of a page, as its declaration and iitc.toolboxShortcuts say;
+// the access key of the page moves to a hidden link when there is no button
+const updateShortcut = (pageId) => {
+  const options = IITC.toolbox ? shortcutOf(pageId) : undefined;
+  updateAccessKey(pageId, Boolean(options));
+  if (!IITC.toolbox) return;
+  const id = shortcutId(pageId);
+  const exists = Boolean(IITC.toolbox.buttons[id]);
+  if (!options) {
+    if (exists) IITC.toolbox.removeButton(id);
+    drawnShortcuts.delete(id);
+    return;
+  }
+  const drawn = JSON.stringify(options);
+  if (exists && drawnShortcuts.get(id) === drawn) return;
+  drawnShortcuts.set(id, drawn);
+  // added anew, since updateButton keeps arguments that a shortcut function no longer returns
+  if (exists) IITC.toolbox.removeButton(id);
+  IITC.toolbox.addButton({ ...options, id, action: () => open(pageId) });
 };
 
 /**
@@ -281,7 +364,9 @@ Object.assign(IITC.settings, { open, refresh, _pageIds: pageIds, _setupWindow: s
 // handlers return nothing: a false would stop the remaining hook handlers
 window.addHook('settingChanged', (event) => {
   onSettingChanged(event);
+  if (event.key === 'iitc.toolboxShortcuts') Object.keys(IITC.settings._pages).forEach(updateShortcut);
 });
 window.addHook('settingsPageRegistered', (event) => {
   onPageRegistered(event);
+  updateShortcut(event.pageId);
 });
