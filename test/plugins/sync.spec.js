@@ -3,9 +3,11 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { readFile } from 'node:fs/promises';
 
+/* global IITC */
 /* eslint-disable no-unused-expressions */
 
 window.plugin = window.plugin || {};
+await import('../../core/code/settings.js');
 await import('../../plugins/sync.js');
 
 const sync = window.plugin.sync;
@@ -198,7 +200,7 @@ describe('sync of a registered map', () => {
       fresh.Logger = function () {};
       fresh.loadUUID = () => {};
       fresh.setupCSS = () => {};
-      fresh.setupDialog = () => {};
+      fresh.registerSettings = () => {};
       fresh.Authorizer = function () {};
       fresh.RegisteredPluginsFields = function () {
         return { add: (registered) => added.push(registered) };
@@ -208,6 +210,84 @@ describe('sync of a registered map', () => {
 
       expect(added).to.have.lengthOf(1);
       expect(added[0].getHolder()).to.equal(holder);
+    });
+  });
+
+  describe('settings page', () => {
+    let page;
+    let replaced;
+    const block = (button) => page.blocks.find((candidate) => candidate.button === button);
+
+    beforeEach(() => {
+      replaced = { gapi: window.gapi };
+      sinon.stub(IITC.settings, 'register').returns(true);
+      sync.authorizer = { isAuthed: () => false, isAuthorizing: () => false, authorize: sinon.spy() };
+      sync.logger = new sync.Logger({});
+      sync.registerSettings();
+      [, page] = IITC.settings.register.firstCall.args;
+    });
+
+    afterEach(() => {
+      window.gapi = replaced.gapi;
+    });
+
+    it('says who is signed in', () => {
+      expect(sync.accountText()).to.equal('Not signed in');
+      sync.authorizer.isAuthorizing = () => true;
+      expect(sync.accountText()).to.equal('Signing in…');
+
+      sync.authorizer.isAuthed = () => true;
+      window.gapi = {
+        auth2: { getAuthInstance: () => ({ currentUser: { get: () => ({ getBasicProfile: () => ({ getEmail: () => 'agent@example.com' }) }) } }) },
+      };
+      expect(sync.accountText()).to.equal('Signed in as agent@example.com');
+      window.gapi = undefined;
+      expect(sync.accountText()).to.equal('Signed in');
+    });
+
+    it('offers signing in while signed out, and signing out while signed in', () => {
+      expect(block('Sign in').visible()).to.be.true;
+      expect(block('Sign out').visible()).to.be.false;
+      block('Sign in').action();
+      expect(sync.authorizer.authorize.calledOnce).to.be.true;
+
+      sync.authorizer.isAuthorizing = () => true;
+      expect(block('Sign in').enabled()).to.be.false;
+
+      sync.authorizer.isAuthed = () => true;
+      expect(block('Sign in').visible()).to.be.false;
+      expect(block('Sign out').visible()).to.be.true;
+    });
+
+    it('lists the last status of each file, marking the failed ones', () => {
+      sync.registeredPluginsFields.pluginsfields = {
+        bookmarks: { bookmarks: { failed: true, getFileName: () => 'bookmarks[bookmarks]' } },
+        drawTools: { itemMap: { failed: false, getFileName: () => 'drawTools[itemMap]' } },
+      };
+      sync.logger.logs = {
+        'bookmarks[bookmarks]': { message: 'Could not create file', time: new Date(2026, 0, 1, 12, 0, 0) },
+        'drawTools[itemMap]': { message: 'Data loaded', time: new Date(2026, 0, 1, 12, 0, 0) },
+      };
+
+      const items = sync.fileItems();
+
+      expect(items.map((item) => [item.title, item.state])).to.deep.equal([
+        ['bookmarks[bookmarks]', 'error'],
+        ['drawTools[itemMap]', undefined],
+      ]);
+      expect(items[1].sub).to.match(/^Data loaded \(.+\)$/);
+      expect(page.blocks.find((candidate) => candidate.text === 'Nothing synced yet').visible()).to.be.false;
+    });
+
+    it('has a toolbox shortcut that is red while signed out or after a failure', () => {
+      expect(page.shortcut().class).to.equal('sync-show-dialog-error');
+
+      sync.authorizer.isAuthed = () => true;
+      sync.registeredPluginsFields.anyFail = false;
+      expect(page.shortcut().class).to.equal('');
+
+      sync.registeredPluginsFields.anyFail = true;
+      expect(page.shortcut().class).to.equal('sync-show-dialog-error');
     });
   });
 });

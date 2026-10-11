@@ -53,7 +53,6 @@ window.plugin.sync.KEY_UUID = { key: 'plugin-sync-data-uuid', field: 'uuid' };
 // Each client has an unique UUID, to identify remote data is updated by other clients or not
 window.plugin.sync.uuid = null;
 
-window.plugin.sync.dialogHTML = null;
 window.plugin.sync.authorizer = null;
 
 // Store registered CollaborativeMap
@@ -360,7 +359,7 @@ window.plugin.sync.RegisteredPluginsFields.prototype.initializeWorker = function
   var _this = this;
 
   this.cleanWaitingInitialize();
-  window.plugin.sync.toggleDialogLink();
+  window.plugin.sync.refreshPage();
   this.initializeRegistered();
 
   clearTimeout(this.timer);
@@ -770,41 +769,43 @@ window.plugin.sync.loadUUID = function () {
   }
 };
 
-window.plugin.sync.updateLog = function (messages) {
-  $('#sync-log').html(messages);
+// draws the Sync page of the settings window again, if it is open, and updates its toolbox shortcut
+window.plugin.sync.refreshPage = () => {
+  IITC.settings.refresh('sync');
 };
 
-window.plugin.sync.toggleAuthButton = function () {
-  var authed, authorizing;
-  authed = window.plugin.sync.authorizer.isAuthed();
-  authorizing = window.plugin.sync.authorizer.isAuthorizing();
-
-  $('#sync-authButton').html(authed ? 'Authorized' : 'Authorize');
-
-  $('#sync-authButton').prop('disabled', authed || authorizing);
-  $('#sync-authButton').toggleClass('sync-authButton-dimmed', authed || authorizing);
-
-  $('#sync-signOutButton').toggle(authed === true);
-};
-
-window.plugin.sync.updateAccountInfo = function () {
-  var accountDiv = $('#sync-account');
-  if (accountDiv.length === 0) return;
-
-  if (window.plugin.sync.authorizer.isAuthed()) {
-    try {
-      var profile = window.gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
-      accountDiv.text('Signed in as: ' + profile.getEmail());
-    } catch {
-      accountDiv.text('Signed in');
-    }
-  } else {
-    accountDiv.text('');
+// who is signed in, as the Sync page says it
+window.plugin.sync.accountText = () => {
+  const authorizer = window.plugin.sync.authorizer;
+  if (!authorizer.isAuthed()) return authorizer.isAuthorizing() ? 'Signing in…' : 'Not signed in';
+  try {
+    return 'Signed in as ' + window.gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
+  } catch {
+    return 'Signed in';
   }
 };
 
+/**
+ * The last status of each synced file, for the Sync page; files whose sync failed are marked
+ *
+ * @returns {Array<Object>} Entries of a `list` block
+ */
+window.plugin.sync.fileItems = () => {
+  const failed = new Set();
+  Object.values(window.plugin.sync.registeredPluginsFields?.pluginsfields ?? {}).forEach((fields) => {
+    Object.values(fields).forEach((registeredMap) => {
+      if (registeredMap.failed) failed.add(registeredMap.getFileName());
+    });
+  });
+  return Object.entries(window.plugin.sync.logger.logs).map(([file, entry]) => ({
+    title: file,
+    sub: `${entry.message} (${entry.time.toLocaleTimeString()})`,
+    state: failed.has(file) ? 'error' : undefined,
+  }));
+};
+
 window.plugin.sync.signOut = function () {
-  window.gapi.auth2
+  return window.gapi.auth2
     .getAuthInstance()
     .signOut()
     .then(function () {
@@ -816,12 +817,8 @@ window.plugin.sync.signOut = function () {
       window.plugin.sync.parentFolderID = null;
       window.plugin.sync.parentFolderIDrequested = false;
 
-      window.plugin.sync.toggleAuthButton();
-      window.plugin.sync.toggleDialogLink();
-      window.plugin.sync.updateAccountInfo();
-
       window.plugin.sync.logger.log('all', 'Signed out');
-      window.plugin.sync.updateLog(window.plugin.sync.logger.getLogs());
+      window.plugin.sync.refreshPage();
     });
 };
 
@@ -851,39 +848,35 @@ window.plugin.sync.stopAllIntervals = function () {
   fields.anyFail = false;
 };
 
-window.plugin.sync.toggleDialogLink = function () {
-  var authed, anyFail;
-  authed = window.plugin.sync.authorizer.isAuthed();
-  anyFail = window.plugin.sync.registeredPluginsFields.anyFail;
-
-  IITC.toolbox.updateButton('sync-show-dialog', {
-    class: !authed || anyFail ? 'sync-show-dialog-error' : '',
-  });
-};
-
-window.plugin.sync.showDialog = function () {
-  window.dialog({ html: window.plugin.sync.dialogHTML, title: 'Sync', modal: true, id: 'sync-setting' });
-  window.plugin.sync.toggleAuthButton();
-  window.plugin.sync.toggleDialogLink();
-  window.plugin.sync.updateAccountInfo();
-  window.plugin.sync.updateLog(window.plugin.sync.logger.getLogs());
-};
-
-window.plugin.sync.setupDialog = function () {
-  window.plugin.sync.dialogHTML =
-    '<div id="sync-dialog">' +
-    '<button id="sync-authButton" class="sync-authButton-dimmed" ' +
-    'onclick="setTimeout(function(){window.plugin.sync.authorizer.authorize(true)}, 1)" ' +
-    'disabled="disabled">Authorize</button>' +
-    '<button id="sync-signOutButton" style="display:none" ' +
-    'onclick="window.plugin.sync.signOut()">Sign Out</button>' +
-    '<div id="sync-account"></div>' +
-    '<div id="sync-log"></div>' +
-    '</div>';
-  IITC.toolbox.addButton({
-    id: 'sync-show-dialog',
-    label: 'Sync',
-    action: window.plugin.sync.showDialog,
+window.plugin.sync.registerSettings = () => {
+  IITC.settings.register('sync', {
+    title: 'Sync',
+    // red while signed out or after a failure
+    shortcut: () => ({
+      class: !window.plugin.sync.authorizer?.isAuthed() || window.plugin.sync.registeredPluginsFields?.anyFail ? 'sync-show-dialog-error' : '',
+    }),
+    blocks: [
+      {
+        type: 'action',
+        title: 'Google account',
+        description: () => (window.plugin.sync.authorizer.isAuthorizing() ? 'Signing in…' : 'Sync keeps plugin data in your Google Drive'),
+        button: 'Sign in',
+        visible: () => !window.plugin.sync.authorizer.isAuthed(),
+        enabled: () => !window.plugin.sync.authorizer.isAuthorizing(),
+        action: () => window.plugin.sync.authorizer.authorize(),
+      },
+      {
+        type: 'action',
+        title: 'Google account',
+        description: () => window.plugin.sync.accountText(),
+        button: 'Sign out',
+        visible: () => window.plugin.sync.authorizer.isAuthed(),
+        action: () => window.plugin.sync.signOut(),
+      },
+      { type: 'heading', title: 'Files' },
+      { type: 'text', text: 'Nothing synced yet', visible: () => !Object.keys(window.plugin.sync.logger.logs).length },
+      { type: 'list', items: () => window.plugin.sync.fileItems() },
+    ],
   });
 };
 
@@ -891,54 +884,22 @@ window.plugin.sync.setupCSS = function () {
   $('<style>')
     .prop('type', 'text/css')
     .html(
-      '.sync-authButton-dimmed {\
-            opacity: 0.5;\
-          }\
-          .sync-show-dialog-error {\
+      '.sync-show-dialog-error {\
             color: #FF2222;\
-          }\
-          #sync-log {\
-            height: 300px;\
-            white-space: pre-wrap;\
-            white-space: -moz-pre-wrap;\
-            white-space: -o-pre-wrap;\
-            word-wrap: break-word;\
-            overflow-y: auto;\
-          }\
-          .sync-log-block {\
-            background: #ffffff1a;\
-            padding: 5px;\
-            margin: 0.5em 0;\
-          }\
-          .sync-log-file {\
-            margin: 0;\
-          }\
-          .sync-log-message {\
-            margin: 0;\
-            text-align: right;\
-          }\
-          #sync-signOutButton {\
-            margin-left: 0.5em;\
-          }\
-          #sync-account {\
-            margin: 0.5em 0;\
-            font-size: 0.9em;\
-            color: #ccc;\
-            word-break: break-all;\
           }'
     )
     .appendTo('head');
 };
 
 var setup = function () {
-  window.plugin.sync.logger = new window.plugin.sync.Logger({ logLimit: 10, logUpdateCallback: window.plugin.sync.updateLog });
+  window.plugin.sync.logger = new window.plugin.sync.Logger({ logLimit: 10, logUpdateCallback: window.plugin.sync.refreshPage });
   window.plugin.sync.loadUUID();
   window.plugin.sync.setupCSS();
-  window.plugin.sync.setupDialog();
 
   window.plugin.sync.authorizer = new window.plugin.sync.Authorizer({
-    authCallback: [window.plugin.sync.toggleAuthButton, window.plugin.sync.toggleDialogLink, window.plugin.sync.updateAccountInfo],
+    authCallback: [window.plugin.sync.refreshPage],
   });
+  window.plugin.sync.registerSettings();
   window.plugin.sync.registeredPluginsFields = new window.plugin.sync.RegisteredPluginsFields({
     authorizer: window.plugin.sync.authorizer,
   });
