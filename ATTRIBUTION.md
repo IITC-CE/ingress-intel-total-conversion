@@ -7,7 +7,6 @@ Parts imported from other projects remain under their respective licenses:
 - [**jquery-qrcode**](https://github.com/jeromeetienne/jquery-qrcode) © [_Jerome Etienne_](http://jetienne.com/): [[MIT](https://github.com/jeromeetienne/jquery-qrcode/blob/master/MIT-LICENSE.txt)]
 - [**jquery-taphold**](https://github.com/IITC-CE/jquery-taphold) © [_Rich Adams_](https://richadams.me/): [[CC BY 3.0](https://github.com/richadams/jquery-taphold/blob/master/LICENSE)]
   (forked from https://github.com/richadams/jquery-taphold)
-- [**Spectrum** colorpicker](https://github.com/bgrins/spectrum) © [_Brian Grinstead_](https://briangrinstead.com/):  [[MIT](https://github.com/bgrins/spectrum/blob/master/LICENSE)]
 
 ### [Leaflet](https://leafletjs.com/)-related components:
 - [**Leaflet**](https://github.com/Leaflet/Leaflet) © [_Vladimir Agafonkin_](https://agafonkin.com/), [_CloudMade_](https://cloudmade.com/): [[BSD-2-Clause](https://github.com/Leaflet/Leaflet/blob/master/LICENSE)]
