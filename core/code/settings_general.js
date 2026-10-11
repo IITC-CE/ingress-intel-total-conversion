@@ -28,6 +28,14 @@ IITC.settings.register('iitc', {
       // the domain warning concerns this browser, not the user's other devices
       sync: false,
     },
+    {
+      type: 'boolean',
+      key: 'syncSettings',
+      title: 'Sync IITC settings',
+      default: true,
+      // whether this device takes part is the device's own choice
+      sync: false,
+    },
   ],
 });
 

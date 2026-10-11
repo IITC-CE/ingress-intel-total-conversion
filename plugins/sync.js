@@ -2,7 +2,7 @@
 // @name           Sync
 // @category       Misc
 // @version        0.6.1
-// @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques, Draw Tools). Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
+// @description    Sync data between clients via Google Drive API. Only syncs data from specific plugins (currently: Keys, Bookmarks, Uniques, Draw Tools) and IITC settings. Sign in via the 'Sync' link. Data is synchronized every 3 minutes.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
