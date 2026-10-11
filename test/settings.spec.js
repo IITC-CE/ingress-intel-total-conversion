@@ -549,6 +549,25 @@ describe('IITC.settings', () => {
       expect(settings.set(`${id}.hidden`, true)).to.be.false;
     });
 
+    it('reads the valid entries of a map that holds an invalid one', () => {
+      const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'select', key: 'mode', options: ['a', 'b'] }] }]);
+      localStorage.setItem(`iitc-setting:${id}.mode`, JSON.stringify({ x: 'a', y: 'removed', z: 'b' }));
+      const warn = sinon.spy(globalThis.log, 'warn');
+
+      expect(settings.get(`${id}.mode`)).to.deep.equal({ x: 'a', z: 'b' });
+      expect(warn.calledWithMatch(`stored entry "y" of "${id}.mode" is ignored`)).to.be.true;
+      expect(settings._storedState(`${id}.mode`)).to.equal('invalid');
+    });
+
+    it('keeps the valid entries when another entry is set', () => {
+      const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'select', key: 'mode', options: ['a', 'b'] }] }]);
+      localStorage.setItem(`iitc-setting:${id}.mode`, JSON.stringify({ x: 'a', y: 'removed' }));
+
+      expect(settings.set(`${id}.mode`, { ...settings.get(`${id}.mode`), z: 'b' })).to.be.true;
+
+      expect(settings.get(`${id}.mode`)).to.deep.equal({ x: 'a', z: 'b' });
+    });
+
     it('stores a map changed in place after get', () => {
       const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'boolean', key: 'hidden' }] }]);
       settings.set(`${id}.hidden`, { ap1: false });
