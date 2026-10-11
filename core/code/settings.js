@@ -167,21 +167,21 @@ const validateValue = (def, value) => {
   return true;
 };
 
-// like validateValue, entry by entry for `repeat` maps
-const validate = (def, value) => {
-  // a throwing check (validate, broken pattern) counts as an invalid value
-  const check = (entry) => {
-    try {
-      return validateValue(def, entry);
-    } catch (e) {
-      return `check failed: ${e}`;
-    }
-  };
+// like validateValue; a throwing validate counts as an invalid value
+const validateEntry = (def, value) => {
+  try {
+    return validateValue(def, value);
+  } catch (e) {
+    return `check failed: ${e}`;
+  }
+};
 
-  if (!def.map) return check(value);
+// like validateEntry, entry by entry for `repeat` maps
+const validate = (def, value) => {
+  if (!def.map) return validateEntry(def, value);
   if (!isPlainObject(value)) return 'not a map';
   for (const [id, entry] of Object.entries(value)) {
-    const result = check(entry);
+    const result = validateEntry(def, entry);
     if (result !== true) return `${id}: ${result}`;
   }
   return true;
@@ -333,11 +333,21 @@ const register = (pageId, page) => {
  * @param {string} key - Full setting key
  * @param {*} stored - Value read from localStorage, undefined when there is none
  * @param {boolean} [quiet=false] - Skips the invalid-value warning
- * @returns {*} The stored value if it is valid, otherwise the default
+ * @returns {*} The stored value if it is valid, otherwise the default; of a stored map, the valid entries
  */
 const resolve = (key, stored, quiet = false) => {
   const def = definitions[key];
   if (stored === undefined) return defaultOf(def);
+
+  // one entry that went bad (an option since removed) must not take the others with it
+  if (def.map && isPlainObject(stored)) {
+    const entries = Object.entries(stored).filter(([id, entry]) => {
+      const result = validateEntry(def, entry);
+      if (result !== true && !quiet) log.warn(`settings: stored entry "${id}" of "${key}" is ignored: ${result}`);
+      return result === true;
+    });
+    return Object.fromEntries(entries);
+  }
 
   const result = validate(def, stored);
   if (result !== true) {
@@ -349,7 +359,7 @@ const resolve = (key, stored, quiet = false) => {
 
 /**
  * Returns the value of a setting; a declared setting falls back to its default when nothing valid
- * is stored
+ * is stored, and a map of a `repeat` keeps only its valid entries
  *
  * @memberof IITC.settings
  * @param {string} key - Setting key, `<namespace>.<key>`
