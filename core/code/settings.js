@@ -4,8 +4,8 @@
  * Settings API
  *
  * Plugins declare their settings as blocks with a `key`; the core stores them, applies defaults
- * and validates every value. Keys that were never declared still work through `get`/`set`,
- * without validation
+ * and validates every value. Blocks without a key are the rest of the page: actions and content.
+ * Keys that were never declared still work through `get`/`set`, without validation
  *
  * Every value is kept under `iitc-setting:<key>`. Until its page is registered, a key is read and written
  * as undeclared, without validation
@@ -17,22 +17,64 @@
 /**
  * @memberof IITC.settings
  * @typedef {Object} SettingBlock
- * @property {string} type - Block type; `boolean`, `number`, `string`, `select` and `color` hold a setting, and `repeat`
- *                          repeats its `blocks` for every item of `over`
- * @property {string} [title] - Label of the block
- * @property {string} [key] - Turns the block into a setting, addressed as `<namespace>.<key>`
+ * @property {string} type - Block type:
+ *   - fields, each holding the setting its `key` names: `boolean`, `number`, `string`, `select`, `color`;
+ *   - actions: `action` runs `action`, `export` hands over the text `data` returns, `import` passes text
+ *     the user enters to `onData`, `choice` marks the `selected` item of a `repeat` and runs `action` with
+ *     the item the user chooses; it is drawn as a radio before the title of each item;
+ *   - content: `heading`, `text`, `link`, `list`, `notice`;
+ *   - `repeat` repeats its `blocks` for every item of `over`
+ *
+ *   Display properties (`title`, `description`, `icon`, `text`, `url`, `level`, `items`, `visible`, `enabled`,
+ *   `value`, `selected`) take a value or a function, called whenever the page is drawn; inside a `repeat` the
+ *   function receives the item
+ * @property {string|Function} [title] - Label of a field or an action, text of a `heading` or a `link`
+ * @property {string|Function} [icon] - Icon an `action` button shows instead of its text, a Material Symbols
+ *                                      name such as 'delete'; the text becomes the tooltip
+ * @property {string|Function} [description] - Explanation shown under the title
+ * @property {boolean|Function} [visible=true] - False hides the block
+ * @property {boolean|Function} [enabled=true] - False shows the block without letting the user change or run it
+ * @property {string} [key] - Name of the setting a field holds, addressed as `<namespace>.<key>`; every field has one
  * @property {*} [default] - Value used while nothing valid is stored
+ * @property {*|Function} [value] - Value a field shows instead of the stored one, when it is derived from other
+ *                                  settings (a flag that a broader rule already sets)
  * @property {number} [min] - Lowest allowed `number`
  * @property {number} [max] - Highest allowed `number`
  * @property {number} [step] - Allowed `number` increment, counted from `min` or 0
- * @property {Array|Function} [options] - `select` choices: values or `{value, label}` objects
+ * @property {Array|Function} [options] - `select` choices: values or `{value, label}` objects. A function must
+ *                                        return all choices at once: a value missing from them is not allowed
  * @property {boolean} [alpha] - Allows `color` values with an alpha channel (`#rrggbbaa`)
  * @property {Function} [validate] - Returns true, or an error message for a value that is not allowed
  * @property {Function} [onChange] - Called with `(value, oldValue, source)` after the value has changed
  * @property {boolean} [sync=true] - False keeps the setting on this device: sync neither sends nor applies it,
  *                                   while a local backup still holds it
+ * @property {Function} [action] - Runs when an `action` block is pressed, or a `choice` is made
+ * @property {boolean|Function} [selected] - Whether the item is the chosen one, for a `choice`
+ * @property {Function} [data] - Returns the text an `export` block hands over
+ * @property {string} [filename] - Lets an `export` block also save `data` as a file of this name
+ * @property {string} [dataType] - MIME type of that file
+ * @property {Function} [onData] - Receives `(text, filename)` from an `import` block: the pasted text, or the
+ *                                 file read; an error it throws is shown to the user
+ * @property {string} [accept] - Lets an `import` block also read files of these types, as in the `accept`
+ *                               attribute of a file input
+ * @property {string|Function} [text] - Text of a `text` or a `notice` block
+ * @property {string|Function} [url] - Address a `link` opens
+ * @property {'info'|'warning'|'error'|Function} [level='info'] - Kind of a `notice`
+ * @property {Array<IITC.settings.SettingsListItem>|Function} [items] - Entries of a `list`
  * @property {Function} [over] - Items of a `repeat` block, returned as `[{id, title}]` with ids that stay the same between calls
  * @property {Array<IITC.settings.SettingBlock>} [blocks] - Blocks of a `repeat` block; their settings hold a map of item id to value
+ */
+
+/**
+ * @memberof IITC.settings
+ * @typedef {Object} SettingsListItem
+ * @property {string} title - Main text
+ * @property {string} [sub] - Second line
+ * @property {string} [badge] - Short text at the end of the line, such as a version
+ * @property {string} [tooltip] - Text shown on hover
+ * @property {'muted'|'error'} [state] - Shows the entry as secondary, or as failed
+ * @property {Array<IITC.settings.SettingsListItem>} [items] - Nested entries
+ * @property {boolean} [collapsed=false] - Hides the nested entries until the entry is opened
  */
 
 /**
@@ -44,6 +86,8 @@
  */
 
 const FIELD_TYPES = ['boolean', 'number', 'string', 'select', 'color'];
+
+const BLOCK_TYPES = [...FIELD_TYPES, 'action', 'choice', 'export', 'import', 'heading', 'text', 'link', 'list', 'notice', 'repeat'];
 
 const TYPE_DEFAULTS = {
   boolean: false,
@@ -199,7 +243,8 @@ const notifyChange = (key, value, oldValue, source) => {
 };
 
 /**
- * Collects the settings declared by a page, including the ones inside `repeat` blocks
+ * Collects the settings declared by a page, including the ones inside `repeat` blocks, and skips
+ * blocks of unknown types with a warning
  *
  * @private
  * @param {string} namespace - Prefix of the page's keys
@@ -210,6 +255,10 @@ const notifyChange = (key, value, oldValue, source) => {
 const collectDefinitions = (namespace, blocks, map = false) => {
   const result = [];
   for (const block of blocks ?? []) {
+    if (!BLOCK_TYPES.includes(block?.type)) {
+      log.warn(`settings: unknown block type "${block?.type}" in "${namespace}"`);
+      continue;
+    }
     if (block.type === 'repeat') {
       result.push(...collectDefinitions(namespace, block.blocks, true));
       continue;

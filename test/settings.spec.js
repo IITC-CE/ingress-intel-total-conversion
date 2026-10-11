@@ -65,9 +65,55 @@ describe('IITC.settings', () => {
     it('ignores blocks without a key and blocks that cannot hold a value', () => {
       const id = page([
         { type: 'heading', title: 'Section' },
-        { type: 'action', key: 'run', label: 'Run', action: () => {} },
+        { type: 'action', key: 'run', title: 'Run', action: () => {} },
       ]);
       expect(Object.keys(settings._definitions).filter((key) => key.startsWith(`${id}.`))).to.be.empty;
+    });
+
+    it('accepts every block type without a warning', () => {
+      const warn = sinon.spy(globalThis.log, 'warn');
+      page([
+        { type: 'boolean', key: 'b' },
+        { type: 'number', key: 'n' },
+        { type: 'string', key: 's' },
+        { type: 'select', key: 'sel', options: ['a'] },
+        { type: 'color', key: 'c' },
+        { type: 'action', title: 'Run', action: () => {} },
+        { type: 'export', title: 'Export', data: () => '', filename: 'data.json' },
+        { type: 'import', title: 'Import', onData: () => {}, accept: '.json' },
+        { type: 'heading', title: 'Section' },
+        { type: 'text', text: 'About IITC' },
+        { type: 'link', title: 'Homepage', url: 'https://iitc.app' },
+        { type: 'list', items: [{ title: 'Plugin', badge: '1.0', state: 'muted' }] },
+        { type: 'notice', text: 'Storage is almost full', level: 'warning' },
+        {
+          type: 'repeat',
+          over: () => [],
+          blocks: [
+            { type: 'boolean', key: 'r' },
+            { type: 'choice', selected: false, action: () => {} },
+          ],
+        },
+      ]);
+      expect(warn.called).to.be.false;
+    });
+
+    it('skips a block of an unknown type with a warning, also inside a repeat', () => {
+      const warn = sinon.spy(globalThis.log, 'warn');
+      const id = page([
+        { type: 'toggle', key: 'a' },
+        {
+          type: 'repeat',
+          over: () => [],
+          blocks: [
+            { type: 'checkbox', key: 'b' },
+            { type: 'boolean', key: 'c' },
+          ],
+        },
+      ]);
+      expect(warn.calledWithMatch(`unknown block type "toggle" in "${id}"`)).to.be.true;
+      expect(warn.calledWithMatch(`unknown block type "checkbox" in "${id}"`)).to.be.true;
+      expect(Object.keys(settings._definitions).filter((key) => key.startsWith(`${id}.`))).to.deep.equal([`${id}.c`]);
     });
 
     it('replaces the declaration when the same page registers again', () => {
