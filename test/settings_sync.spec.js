@@ -151,6 +151,12 @@ describe('settings replication', () => {
         settings.reset('test-sync.shared');
         expect(sync.records(['test-sync.shared'])['test-sync.shared']).to.include({ deleted: true });
       });
+
+      it('holds a value set back to its default as a tombstone', () => {
+        settings.set('test-sync.shared', 'a');
+        settings.set('test-sync.shared', '');
+        expect(sync.records(['test-sync.shared'])['test-sync.shared']).to.include({ deleted: true });
+      });
     });
 
     describe('reconciling', () => {
@@ -212,6 +218,16 @@ describe('settings replication', () => {
         exchange();
 
         expect(localStorage.getItem('iitc-setting:test-sync.shared')).to.be.null;
+      });
+
+      it('keeps nothing for a shared value equal to the default, and sends nothing back', () => {
+        settings.set('test-sync.shared', 'mine');
+        // sent by a device that keeps values equal to the default
+        file = { 'test-sync.shared': { value: '', updated: later() } };
+
+        expect(exchange()).to.deep.equal([]);
+        expect(localStorage.getItem('iitc-setting:test-sync.shared')).to.be.null;
+        expect(exchange()).to.deep.equal([]);
       });
 
       it('keeps a reset made here over an older value', () => {
