@@ -167,13 +167,6 @@ function setupAddons() {
     mouseover: setPermaLink,
   });
 
-  IITC.toolbox.addButton({
-    id: 'about-iitc',
-    label: 'About IITC',
-    action: window.aboutIITC,
-    class: 'cursor_help',
-  });
-
   window.artifact.setup();
 
   window.RegionScoreboardSetup();
