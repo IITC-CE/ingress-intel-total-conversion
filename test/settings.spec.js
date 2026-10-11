@@ -375,6 +375,19 @@ describe('IITC.settings', () => {
     });
   });
 
+  describe('check', () => {
+    it('tells why a value is not allowed, without storing anything', () => {
+      const id = page([{ type: 'number', key: 'n', min: 15 }]);
+      expect(settings.check(`${id}.n`, 10)).to.equal('less than 15');
+      expect(settings.check(`${id}.n`, 20)).to.be.true;
+      expect(localStorage.getItem(`iitc-setting:${id}.n`)).to.be.null;
+    });
+
+    it('allows any value for an undeclared key', () => {
+      expect(settings.check('test-undeclared.anything', { a: 1 })).to.be.true;
+    });
+  });
+
   describe('stored form', () => {
     // JSON keeps -0 as 0, so the two are the same value
     const number = () => page([{ type: 'number', key: 'v', default: 5 }]);
@@ -578,6 +591,78 @@ describe('IITC.settings', () => {
 
       settings.set(`${id}.hidden`, hidden);
       expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: true });
+    });
+
+    describe('defaults of the items', () => {
+      const factions = () => [
+        { id: 'ENL', title: 'Enlightened' },
+        { id: 'RES', title: 'Resistance' },
+      ];
+      const colors = { ENL: '#03dc03', RES: '#0088ff' };
+
+      it('gives every item of over without a stored entry its default, from a function of the item', () => {
+        const id = page([{ type: 'repeat', over: factions, blocks: [{ type: 'color', key: 'color', default: (item) => colors[item.id] }] }]);
+        localStorage.setItem(`iitc-setting:${id}.color`, JSON.stringify({ RES: '#ffffff', gone: '#000000' }));
+
+        expect(settings.get(`${id}.color`)).to.deep.equal({ ENL: '#03dc03', RES: '#ffffff', gone: '#000000' });
+        expect(settings.export()[`${id}.color`]).to.deep.equal({ RES: '#ffffff', gone: '#000000' });
+      });
+
+      it('uses the default of the type when the function fails', () => {
+        const warn = sinon.spy(globalThis.log, 'warn');
+        const id = page([
+          {
+            type: 'repeat',
+            over: factions,
+            blocks: [
+              {
+                type: 'color',
+                key: 'color',
+                default: () => {
+                  throw new Error('no palette');
+                },
+              },
+            ],
+          },
+        ]);
+
+        expect(settings.get(`${id}.color`)).to.deep.equal({ ENL: '#000000', RES: '#000000' });
+        expect(warn.calledWithMatch(`default of "${id}.color" failed`)).to.be.true;
+      });
+
+      it('returns the stored entries only when over fails', () => {
+        const warn = sinon.spy(globalThis.log, 'warn');
+        const over = () => {
+          throw new Error('not loaded');
+        };
+        const id = page([{ type: 'repeat', over, blocks: [{ type: 'boolean', key: 'hidden', default: () => true }] }]);
+        settings.set(`${id}.hidden`, { ap1: false });
+
+        expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: false });
+        expect(warn.calledWithMatch(`items of the repeat of "${id}.hidden" failed`)).to.be.true;
+      });
+
+      it('takes a default function only inside a repeat', () => {
+        const warn = sinon.spy(globalThis.log, 'warn');
+        const id = page([{ type: 'number', key: 'n', default: () => 5 }]);
+
+        expect(warn.calledWithMatch(`"${id}.n" takes a default function only inside a repeat`)).to.be.true;
+        expect(settings.get(`${id}.n`)).to.equal(0);
+      });
+
+      it('announces no change when an entry is set to the default of its item', () => {
+        const onChange = sinon.spy();
+        const id = page([{ type: 'repeat', over: factions, blocks: [{ type: 'color', key: 'color', default: (item) => colors[item.id], onChange }] }]);
+
+        settings.set(`${id}.color`, { ENL: '#03dc03' });
+        expect(onChange.called).to.be.false;
+
+        settings.set(`${id}.color`, { ENL: '#ffffff' });
+        expect(onChange.lastCall.args.slice(0, 2)).to.deep.equal([
+          { ENL: '#ffffff', RES: '#0088ff' },
+          { ENL: '#03dc03', RES: '#0088ff' },
+        ]);
+      });
     });
   });
 
