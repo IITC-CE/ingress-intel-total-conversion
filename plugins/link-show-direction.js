@@ -116,73 +116,17 @@ window.plugin.linkShowDirection.removeDrawToolsStyle = function () {
   });
 };
 
-window.plugin.linkShowDirection.showDialog = function () {
-  var div = document.createElement('div');
-
-  $.each(window.plugin.linkShowDirection.styles, function (style) {
-    var label = div.appendChild(document.createElement('label'));
-    var input = label.appendChild(document.createElement('input'));
-    input.type = 'radio';
-    input.name = 'plugin-link-show-direction';
-    input.value = style;
-    if (style === window.plugin.linkShowDirection.mode) {
-      input.checked = true;
-    }
-
-    input.addEventListener(
-      'click',
-      function () {
-        IITC.settings.set('link-show-direction.mode', style);
-      },
-      false
-    );
-
-    label.appendChild(document.createTextNode(' ' + style));
-
-    div.appendChild(document.createElement('br'));
-  });
-
-  div.appendChild(
-    document.createTextNode(
-      " * Static: six segments will indicate each link's direction. " +
-        "Two long segments are on the origin's side, follow by four short segments on the destination's side."
-    )
-  );
-
-  if (window.plugin.drawTools) {
-    div.appendChild(document.createElement('br'));
-
-    var label = div.appendChild(document.createElement('label'));
-    var input = label.appendChild(document.createElement('input'));
-    input.type = 'checkbox';
-    input.checked = window.plugin.linkShowDirection.drawtools;
-
-    input.addEventListener(
-      'click',
-      function () {
-        IITC.settings.set('link-show-direction.drawtools', input.checked);
-      },
-      false
-    );
-
-    label.appendChild(document.createTextNode(' Apply to DrawTools'));
-  }
-
-  window.dialog({
-    id: 'plugin-link-show-direction',
-    html: div,
-    title: 'Show link direction',
-  });
-};
-
 window.plugin.linkShowDirection.registerSettings = () => {
   IITC.settings.register('link-show-direction', {
     title: 'Link direction',
+    shortcut: { label: 'LinkDirection Opt' },
     blocks: [
       {
         type: 'select',
         key: 'mode',
         title: 'Link direction style',
+        description:
+          "Static *: six segments show each link's direction, two long ones on the origin's side followed by four short ones on the destination's side",
         options: () => Object.keys(window.plugin.linkShowDirection.styles),
         default: 'Static near origin',
         onChange: (mode) => {
@@ -194,6 +138,7 @@ window.plugin.linkShowDirection.registerSettings = () => {
         type: 'boolean',
         key: 'drawtools',
         title: 'Apply to DrawTools',
+        visible: () => Boolean(window.plugin.drawTools),
         onChange: (apply) => {
           window.plugin.linkShowDirection.drawtools = apply;
           if (apply) window.plugin.linkShowDirection.restyle();
@@ -222,11 +167,6 @@ window.plugin.linkShowDirection.migrateSettings = () => {
 window.plugin.linkShowDirection.setup = function () {
   window.plugin.linkShowDirection.registerSettings();
   window.plugin.linkShowDirection.migrateSettings();
-
-  IITC.toolbox.addButton({
-    label: 'LinkDirection Opt',
-    action: window.plugin.linkShowDirection.showDialog,
-  });
 
   window.addHook('linkAdded', function (data) {
     window.plugin.linkShowDirection.addLinkStyle(data.link);

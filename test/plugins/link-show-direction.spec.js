@@ -93,6 +93,22 @@ describe('link-show-direction settings', () => {
     });
   });
 
+  describe('settings page', () => {
+    it('offers Apply to DrawTools only with Draw Tools installed', () => {
+      const visible = page.blocks.find((block) => block.key === 'drawtools').visible;
+      const drawTools = window.plugin.drawTools;
+      try {
+        delete window.plugin.drawTools;
+        expect(visible()).to.be.false;
+        window.plugin.drawTools = {};
+        expect(visible()).to.be.true;
+      } finally {
+        window.plugin.drawTools = drawTools;
+        if (drawTools === undefined) delete window.plugin.drawTools;
+      }
+    });
+  });
+
   describe('while the map moves', () => {
     it('restyles the links once the map stops', () => {
       linkShowDirection.moving = true;
