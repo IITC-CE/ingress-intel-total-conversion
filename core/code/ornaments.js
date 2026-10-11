@@ -18,8 +18,8 @@
  * (there are 7 different colors for each of them)
  *
  * Ornament IDs are dynamic. NIANTIC might change them at any time without prior notice.
- * New ornamnent IDs found on the map will be recorded and saved to knownOrnaments from
- * which the Ornaments dialog will be filled with checked checkboxes.
+ * New ornamnent IDs found on the map will be recorded and saved to knownOrnaments, which
+ * the Ornaments page of the settings window lists with a checkbox to hide each.
  * To exclude a set of ornaments, even if they have not yet shown up on the map, the user
  * can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
  * future IDs. example: "ap" to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)
@@ -45,7 +45,7 @@ window.ornaments = {
    * be filled from a plugin
    * ```
    * 'ornamentID' : {
-   *   name: 'meaningful name',     // shows up in dialog
+   *   name: 'meaningful name',     // shows up on the Ornaments settings page
    *   layer: 'name for the Layer', // shows up in layerchooser, optional, if not set
    *                                // ornament will be in "Ornaments"
    *   url: 'url',                  // from which the image will be taken, optional,
@@ -101,19 +101,11 @@ window.ornaments = {
 
     window.layerChooser.addOverlay(this.layers['Ornaments'], 'Ornaments');
     window.layerChooser.addOverlay(this.layers['Excluded ornaments'], 'Excluded ornaments', { default: false });
-
-    IITC.toolbox.addButton({
-      id: 'ornaments-toolbox-link',
-      label: 'Ornaments Opt',
-      title: 'Edit ornament exclusions',
-      accesskey: 'o',
-      action: window.ornaments.ornamentsOpt,
-    });
   },
 
   /**
    * Declares the `ornaments` settings page: `excluded` is the comma-separated list of ID prefixes to hide,
-   * and `hidden` maps each known ornament ID to whether it is hidden. A change from the dialog, a backup or (for
+   * and `hidden` maps each known ornament ID to whether it is hidden. A change from the page, a backup or (for
    * the prefixes) sync updates `excludedOrnaments` and `knownOrnaments` and schedules a redraw
    *
    * @memberof window.ornaments
@@ -121,11 +113,14 @@ window.ornaments = {
   registerSettings() {
     IITC.settings.register('ornaments', {
       title: 'Ornaments',
+      accesskey: 'o',
+      shortcut: { label: 'Ornaments Opt', title: 'Edit ornament exclusions' },
       blocks: [
         {
           type: 'string',
           key: 'excluded',
           title: 'Hide ornaments that start with',
+          description: 'Separated by spaces or commas',
           onChange: (text) => {
             const prefixes = window.ornaments.parsePrefixes(text);
             // a list save() stores from the one in use needs no reload
@@ -134,17 +129,26 @@ window.ornaments = {
             window.ornaments.scheduleReload();
           },
         },
+        { type: 'heading', title: 'Known ornaments' },
+        {
+          type: 'text',
+          text: 'None seen yet; ornaments are listed as they show up on the map',
+          visible: () => !Object.keys(window.ornaments.knownOrnaments).length,
+        },
         {
           type: 'repeat',
           over: () =>
             Object.keys(window.ornaments.knownOrnaments)
               .sort()
-              .map((id) => ({ id, title: window.ornaments.icon[id]?.name ?? id })),
+              .map((id) => ({ id, title: window.ornaments.icon[id]?.name ? `${window.ornaments.icon[id].name} (${id})` : id })),
           blocks: [
             {
               type: 'boolean',
               key: 'hidden',
               title: 'Hide',
+              // an ornament a prefix hides shows as hidden, and only the prefix can show it again
+              enabled: (item) => !window.ornaments.isExcluded(item.id),
+              value: (item) => (window.ornaments.isExcluded(item.id) ? true : undefined),
               // the map also lists the ornaments this device has seen, and a remote copy would replace it whole
               sync: false,
               onChange: (hidden) => {
@@ -155,6 +159,13 @@ window.ornaments = {
               },
             },
           ],
+        },
+        {
+          type: 'action',
+          title: 'Forget known ornaments',
+          description: 'Clears the list and its Hide marks; ornaments are listed again as they show up on the map',
+          button: 'Forget',
+          action: () => window.ornaments.initOrnaments(),
         },
       ],
     });
@@ -172,6 +183,17 @@ window.ornaments = {
       this._reloadQueued = false;
       this.reload();
     });
+  },
+
+  /**
+   * Tells whether a prefix of `excludedOrnaments` hides an ornament
+   *
+   * @memberof window.ornaments
+   * @param {string} id - Ornament ID
+   * @returns {boolean}
+   */
+  isExcluded(id) {
+    return this.excludedOrnaments.some((prefix) => id.startsWith(prefix));
   },
 
   /**
@@ -362,102 +384,10 @@ window.ornaments = {
   },
 
   /**
-   * Processes input data for managing ornaments.
+   * Opens the Ornaments page of the settings window, which replaces the options dialog
    *
-   * @function
+   * @deprecated use `IITC.settings.open('ornaments')` instead
    * @memberof window.ornaments
    */
-  processInput: function () {
-    window.ornaments.excludedOrnaments = window.ornaments.parsePrefixes($('#ornaments_E').val());
-    // process the input from the checkboxes
-    for (var ornamentCode in window.ornaments.knownOrnaments) {
-      var input = $('#chk_orn_' + ornamentCode);
-      window.ornaments.knownOrnaments[ornamentCode] = input.is(':checked');
-    }
-  },
-
-  /**
-   * Generates a list of ornaments for display in the options dialog.
-   *
-   * @function
-   * @memberof window.ornaments
-   * @returns {string} HTML string representing the list of ornaments.
-   */
-  ornamentsList: function () {
-    var text = '';
-    var sortedIDs = Object.keys(window.ornaments.knownOrnaments).sort();
-
-    sortedIDs.forEach(function (ornamentCode) {
-      var hidden = window.ornaments.excludedOrnaments.some(function (code) {
-        return ornamentCode.startsWith(code);
-      });
-
-      var name = window.ornaments.icon[ornamentCode] ? window.ornaments.icon[ornamentCode].name + ' (' + ornamentCode + ')' : ornamentCode;
-      var checked = window.ornaments.knownOrnaments[ornamentCode] || hidden ? 'checked ' : '';
-      text += '<label><input id="chk_orn_' + ornamentCode + '" type="checkbox" ' + checked;
-      text += ' onchange="window.ornaments.processInput();window.ornaments.save()"';
-      text += hidden ? 'disabled' : '';
-      text += '>' + name + '</label><br>';
-    });
-    return text;
-  },
-
-  /**
-   * Replaces the content of the ornaments list in the dialog.
-   *
-   * @function
-   * @memberof window.ornaments
-   */
-  replaceOL: function () {
-    document.getElementById('ornamentsList').innerHTML = window.ornaments.ornamentsList();
-  },
-
-  /**
-   * Handles changes in ornament options and updates the map accordingly.
-   *
-   * @function
-   * @memberof window.ornaments
-   */
-  onChangeHandler: function () {
-    window.ornaments.processInput();
-    window.ornaments.replaceOL();
-    window.ornaments.save();
-  },
-
-  /**
-   * Opens the dialog for ornament options, allowing users to manage ornament visibility.
-   *
-   * @function
-   * @memberof window.ornaments
-   */
-  ornamentsOpt: function () {
-    var excludedIDs = window.ornaments.excludedOrnaments.join(',');
-    var html =
-      '<div class="ornamentsOpts">' +
-      'Hide Ornaments from IITC that start with:<br>' +
-      `<input type="text" value="${excludedIDs}" id="ornaments_E"` +
-      ' onchange="window.ornaments.onChangeHandler()" /><br>' +
-      '(separator: space or comma allowed)<hr>' +
-      '<b>known Ornaments, check to hide:</b><br>' +
-      `<div id="ornamentsList"> ${window.ornaments.ornamentsList()}</div>` +
-      '</div>';
-
-    window.dialog({
-      html: html,
-      id: 'ornamentsOpt',
-      title: 'Ornament excludes',
-      buttons: {
-        RESET: function () {
-          window.ornaments.initOrnaments();
-          $(this).dialog('close');
-        },
-        OK: function () {
-          // process the input from the input
-          window.ornaments.processInput();
-          window.ornaments.save();
-          $(this).dialog('close');
-        },
-      },
-    });
-  },
+  ornamentsOpt: () => IITC.settings.open('ornaments'),
 };
