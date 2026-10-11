@@ -1,0 +1,7 @@
+.iitc-export-text,
+.iitc-import-text {
+  box-sizing: border-box;
+  width: 100%;
+  height: 150px;
+  resize: vertical;
+}
