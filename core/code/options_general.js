@@ -20,6 +20,14 @@ IITC.options.register('iitc', {
       ],
       default: 'long',
     },
+    {
+      type: 'boolean',
+      key: 'syncOptions',
+      title: 'Sync IITC options',
+      default: true,
+      // whether this device takes part is the device's own choice
+      sync: false,
+    },
   ],
 });
 
