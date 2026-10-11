@@ -73,10 +73,11 @@ window.plugin.drawTools.editing = false;
 // a redraw was needed while editing (fill changed or a layer was added); done when editing stops
 window.plugin.drawTools.fillPending = false;
 
-// the color, the fill and the reset before paste or import; onChange applies a change from the dialog or from sync
 window.plugin.drawTools.registerSettings = () => {
   IITC.settings.register('draw-tools', {
     title: 'Draw Tools',
+    accesskey: 'x',
+    shortcut: { label: 'DrawTools Opt' },
     blocks: [
       {
         type: 'color',
@@ -90,16 +91,8 @@ window.plugin.drawTools.registerSettings = () => {
       },
       {
         type: 'boolean',
-        key: 'resetBeforeImport',
-        title: 'Reset draws before paste or import',
-        onChange: (reset) => {
-          window.plugin.drawTools.merge.status = !reset;
-        },
-      },
-      {
-        type: 'boolean',
         key: 'fill',
-        title: 'Fill the polygon(s)',
+        title: 'Fill polygons',
         default: true,
         onChange: (fill) => {
           // reloading the shapes would drop the layers an edit or delete is working on
@@ -111,6 +104,69 @@ window.plugin.drawTools.registerSettings = () => {
           window.plugin.drawTools.toggleOpacityOpt();
           window.plugin.drawTools.clearAndDraw();
         },
+      },
+      {
+        type: 'action',
+        title: 'Snap to portals',
+        description: 'Moves the points in view onto the nearest portals',
+        button: 'Snap',
+        action: () => window.plugin.drawTools.snapToPortals(),
+      },
+      { type: 'heading', title: 'Export' },
+      {
+        type: 'export',
+        title: 'Drawn items',
+        description: 'Draw Tools data, as text or a file',
+        data: () => drawnData(),
+        filename: 'IITC-drawn-items.json',
+        dataType: 'application/json',
+      },
+      {
+        type: 'export',
+        title: 'Polygons as lines',
+        description: 'Drawn items with each polygon turned into a line, which is never filled',
+        data: () => {
+          requireDrawn();
+          return window.plugin.drawTools.getDrawAsLines();
+        },
+      },
+      {
+        type: 'export',
+        title: 'Link for the standard Intel map',
+        description: () => {
+          if (!window.plugin.drawTools.drawnItems || window.plugin.drawTools.isEmpty()) return 'For players without IITC';
+          return ['For players without IITC', ...window.plugin.drawTools.stockLink().warnings].join('. ');
+        },
+        data: () => {
+          requireDrawn();
+          return window.plugin.drawTools.stockLink().url;
+        },
+      },
+      { type: 'heading', title: 'Import' },
+      {
+        type: 'boolean',
+        key: 'resetBeforeImport',
+        title: 'Delete drawn items before importing',
+        description: 'Otherwise imported items are added to the ones already drawn',
+        onChange: (reset) => {
+          window.plugin.drawTools.merge.status = !reset;
+        },
+      },
+      {
+        type: 'import',
+        title: 'Drawn items',
+        description: 'Draw Tools data, as text or files; pasted text may also be a link of the standard Intel map with drawn lines',
+        onData: (text) => window.plugin.drawTools.promptImport(text),
+        accept: 'application/json',
+        onFiles: (files) => window.plugin.drawTools.importFiles(files),
+      },
+      { type: 'heading', title: 'Danger zone' },
+      {
+        type: 'action',
+        title: 'Delete all drawn items',
+        description: 'Asks before deleting; cannot be undone',
+        button: 'Delete',
+        action: () => window.plugin.drawTools.optReset(),
       },
     ],
   });
@@ -368,6 +424,8 @@ window.plugin.drawTools.save = function () {
   }
 
   console.log('draw-tools: saved to localStorage');
+  // the export warnings on the settings page depend on the drawn items
+  IITC.settings.refresh('draw-tools');
 };
 
 window.plugin.drawTools.load = function () {
@@ -379,6 +437,9 @@ window.plugin.drawTools.load = function () {
     window.plugin.drawTools.import(data);
   } catch (e) {
     console.warn('draw-tools: failed to load data from localStorage: ' + e);
+  } finally {
+    // drawn items loaded again, such as from sync, change the export warnings on the settings page
+    IITC.settings.refresh('draw-tools');
   }
 };
 
@@ -417,199 +478,91 @@ window.plugin.drawTools.import = function (data) {
   window.runHooks('pluginDrawTools', { event: 'import' });
 };
 
-// Draw Tools Options
-
-// Manual import, export and reset data
-window.plugin.drawTools.manualOpt = function () {
-  const mergeStatusCheck = IITC.settings.get('draw-tools.resetBeforeImport') ? 'checked' : '';
-  const edfStatusCheck = IITC.settings.get('draw-tools.fill') ? 'checked' : '';
-
-  var html =
-    '<div class="drawtoolsStyles">' +
-    '<input type="color" name="drawColor" id="drawtools_color" />' +
-    // TODO: add line style choosers: thickness, maybe dash styles?
-    '</div>' +
-    '<div class="drawtoolsSetbox">' +
-    '<a onclick="window.plugin.drawTools.optCopy();" tabindex="0">Copy Drawn Items</a>' +
-    '<a onclick="window.plugin.drawTools.optPaste();return false;" tabindex="0">Paste Drawn Items</a>' +
-    '<a onclick="window.plugin.drawTools.optImport();return false;" tabindex="0">Import Drawn Items</a>' +
-    '<a onclick="window.plugin.drawTools.optExport();return false;" tabindex="0">Export Drawn Items</a>' +
-    '<a onclick="window.plugin.drawTools.optReset();return false;" tabindex="0">Reset Drawn Items</a>' +
-    '<a onclick="window.plugin.drawTools.snapToPortals();return false;" tabindex="0">Snap to portals</a>' +
-    `<center><label id="MergeToggle"><input type="checkbox" ${mergeStatusCheck} name="merge" ` +
-    'onchange="window.plugin.drawTools.merge.toggle(this.checked);return false;" />Reset draws before paste or import</label></center>' +
-    `<center><label id="edfToggle"><input type="checkbox" ${edfStatusCheck} name="edf" ` +
-    'onchange="window.plugin.drawTools.edfStatusToggle(this.checked);return false;" />Fill the polygon(s)</label></center>' +
-    '</div>';
-
-  window.dialog({
-    html: html,
-    id: 'plugin-drawtools-options',
-    dialogClass: 'ui-dialog-drawtoolsSet',
-    title: 'Draw Tools Options',
-  });
-
-  // need to initialise the 'spectrum' colour picker
-  $('#drawtools_color').spectrum({
-    flat: false,
-    showInput: false,
-    showButtons: false,
-    showPalette: true,
-    showPaletteOnly: false,
-    showSelectionPalette: false,
-    palette: [
-      ['#a24ac3', '#514ac3', '#4aa8c3', '#51c34a'],
-      ['#c1c34a', '#c38a4a', '#c34a4a', '#c34a6f'],
-      ['#000000', '#666666', '#bbbbbb', '#ffffff'],
-    ],
-    change: function (color) {
-      IITC.settings.set('draw-tools.color', color.toHexString());
-    },
-    // move: function(color) { window.plugin.drawTools.setDrawColor(color.toHexString()); },
-    color: window.plugin.drawTools.currentColor,
-  });
+// whether nothing is drawn
+window.plugin.drawTools.isEmpty = () => {
+  const data = localStorage.getItem(window.plugin.drawTools.KEY_STORAGE);
+  return !data || data.length <= 2;
 };
 
-window.plugin.drawTools.optAlert = function (message) {
-  $('.ui-dialog-drawtoolsSet .ui-dialog-buttonset').prepend('<p class="drawtools-alert" style="float:left;margin-top:4px;">' + message + '</p>');
-  $('.drawtools-alert').delay(2500).fadeOut();
+// nothing to export is an error the settings page shows
+const requireDrawn = () => {
+  if (window.plugin.drawTools.isEmpty()) throw new Error('Nothing is drawn yet');
 };
 
-window.plugin.drawTools.isEmpty = function () {
-  var data = window.localStorage[window.plugin.drawTools.KEY_STORAGE];
-  if (!data || data.length <= 2) {
-    window.dialog({
-      html: 'Error! The storage is empty or not exist. Before you try copy/export you draw something.',
-      width: 250,
-      dialogClass: 'ui-dialog-drawtools-message',
-      title: 'Draw Tools Message',
-    });
-    return true;
-  }
+// the drawn items as stored, for an export
+const drawnData = () => {
+  requireDrawn();
+  return localStorage.getItem(window.plugin.drawTools.KEY_STORAGE);
 };
 
-window.plugin.drawTools.optCopy = function () {
-  if (window.plugin.drawTools.isEmpty()) {
-    return;
-  }
-
-  if (window.isApp && window.app.shareString) {
-    window.app.shareString(window.localStorage[window.plugin.drawTools.KEY_STORAGE]);
-  } else {
-    var stockWarnings = {};
-    var stockLinks = [];
-    window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
-      if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
-        stockWarnings.noCircle = true;
-        return; // .eachLayer 'continue'
-      } else if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
-        stockWarnings.polyAsLine = true;
-        // but we can export them
-      } else if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
-        // polylines are fine
-      } else if (layer instanceof L.Marker) {
-        stockWarnings.noMarker = true;
-        return; // .eachLayer 'continue'
-      } else {
-        stockWarnings.unknown = true; // should never happen
-        return; // .eachLayer 'continue'
-      }
-      // only polygons and polylines make it through to here
-      var latLngs = layer.getLatLngs();
-      // stock only handles one line segment at a time
-      for (var i = 0; i < latLngs.length - 1; i++) {
-        stockLinks.push([latLngs[i].lat, latLngs[i].lng, latLngs[i + 1].lat, latLngs[i + 1].lng]);
-      }
-      // for polygons, we also need a final link from last to first point
-      if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
-        stockLinks.push([latLngs[latLngs.length - 1].lat, latLngs[latLngs.length - 1].lng, latLngs[0].lat, latLngs[0].lng]);
-      }
-    });
-    var stockUrl =
-      IITC.portal.display.makePermalink(null, {
-        includeMapView: true,
-        fullURL: true,
-      }) +
-      '&pls=' +
-      stockLinks
-        .map(function (link) {
-          return link.join(',');
-        })
-        .join('_');
-    var stockWarnTexts = [];
-    if (stockWarnings.polyAsLine) stockWarnTexts.push('Note: polygons are exported as lines');
-    if (stockLinks.length > 40) stockWarnTexts.push('Warning: Stock intel may not work with more than 40 line segments - there are ' + stockLinks.length);
-    if (stockWarnings.noCircle) stockWarnTexts.push('Warning: Circles cannot be exported to stock intel');
-    if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
-    if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
-
-    // Export Normal draw
-    var html =
-      '<p style="margin:0 0 6px;">Normal export:</p>' +
-      '<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">Select all</a> and press CTRL+C to copy it.</p>' +
-      '<textarea id="copyNorm" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyNorm\').select();">' +
-      localStorage[window.plugin.drawTools.KEY_STORAGE] +
-      '</textarea>';
-
-    // Export draw (polygons as lines)
-    html +=
-      '<hr/>' +
-      '<p style="margin:0 0 6px;">or export with polygons as lines (not filled):</p>' +
-      '<p style="margin:0 0 6px;"><a onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">Select all</a> and press CTRL+C to copy it.</p>' +
-      '<textarea id="copyEDF" readonly onclick="$(\'.ui-dialog-drawtoolsSet-copy textarea#copyEDF\').select();">' +
-      window.plugin.drawTools.getDrawAsLines() +
-      '</textarea>';
-
-    // Export for intel stock URL (only lines)
-    html +=
-      '<hr/>' +
-      '<p style="margin:0 0 6px;">or export as a link for the standard intel map (for non IITC users):</p>' +
-      '<p style="margin:0 0 6px;"><a onclick="$(this).parent().next(\'input\').select();">Select all</a> and press CTRL+C to copy it.</p>' +
-      `<input onclick="event.target.select();" type="text" size="49" value="${stockUrl}"/>`;
-
-    if (stockWarnTexts.length > 0) {
-      html += '<ul><li>' + stockWarnTexts.join('</li><li>') + '</li></ul>';
+/**
+ * Builds a link of the standard Intel map that shows the drawn lines and polygons
+ *
+ * @returns {{url: string, warnings: string[]}} The link, and what it leaves out or may fail on
+ */
+window.plugin.drawTools.stockLink = function () {
+  var stockWarnings = {};
+  var stockLinks = [];
+  window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
+    if (layer instanceof L.GeodesicCircle || layer instanceof L.Circle) {
+      stockWarnings.noCircle = true;
+      return; // .eachLayer 'continue'
+    } else if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
+      stockWarnings.polyAsLine = true;
+      // but we can export them
+    } else if (layer instanceof L.GeodesicPolyline || layer instanceof L.Polyline) {
+      // polylines are fine
+    } else if (layer instanceof L.Marker) {
+      stockWarnings.noMarker = true;
+      return; // .eachLayer 'continue'
+    } else {
+      stockWarnings.unknown = true; // should never happen
+      return; // .eachLayer 'continue'
     }
-
-    window.dialog({
-      html: html,
-      width: 600,
-      dialogClass: 'ui-dialog-drawtoolsSet-copy',
-      id: 'plugin-drawtools-export',
-      title: 'Draw Tools Export',
-    });
-  }
-};
-
-window.plugin.drawTools.optExport = function () {
-  if (window.plugin.drawTools.isEmpty()) {
-    return;
-  }
-
-  var data = localStorage[window.plugin.drawTools.KEY_STORAGE];
-  window.saveFile(data, 'IITC-drawn-items.json', 'application/json');
-};
-
-window.plugin.drawTools.optPaste = function () {
-  const html = $('<div>').append(
-    $('<p>', { text: 'Press CTRL+V to paste (draw-tools data or stock intel URL).' }),
-    $('<input>', { id: 'drawtoolsimport', type: 'text', style: 'width:100%' })
-  );
-
-  window.dialog({
-    title: 'Import Draw-Tools data',
-    html,
-    closeCallback: () => {
-      let promptAction = $('#drawtoolsimport').val();
-      promptAction = promptAction && promptAction.trim();
-      if (promptAction) {
-        window.plugin.drawTools.promptImport(promptAction);
-      }
-    },
+    // only polygons and polylines make it through to here
+    var latLngs = layer.getLatLngs();
+    // stock only handles one line segment at a time
+    for (var i = 0; i < latLngs.length - 1; i++) {
+      stockLinks.push([latLngs[i].lat, latLngs[i].lng, latLngs[i + 1].lat, latLngs[i + 1].lng]);
+    }
+    // for polygons, we also need a final link from last to first point
+    if (layer instanceof L.GeodesicPolygon || layer instanceof L.Polygon) {
+      stockLinks.push([latLngs[latLngs.length - 1].lat, latLngs[latLngs.length - 1].lng, latLngs[0].lat, latLngs[0].lng]);
+    }
   });
+  var stockUrl =
+    IITC.portal.display.makePermalink(null, {
+      includeMapView: true,
+      fullURL: true,
+    }) +
+    '&pls=' +
+    stockLinks
+      .map(function (link) {
+        return link.join(',');
+      })
+      .join('_');
+  var stockWarnTexts = [];
+  if (stockWarnings.polyAsLine) stockWarnTexts.push('Note: polygons are exported as lines');
+  if (stockLinks.length > 40) stockWarnTexts.push('Warning: Stock intel may not work with more than 40 line segments - there are ' + stockLinks.length);
+  if (stockWarnings.noCircle) stockWarnTexts.push('Warning: Circles cannot be exported to stock intel');
+  if (stockWarnings.noMarker) stockWarnTexts.push('Warning: Markers cannot be exported to stock intel');
+  if (stockWarnings.unknown) stockWarnTexts.push('Warning: UNKNOWN ITEM TYPE');
+  return { url: stockUrl, warnings: stockWarnTexts };
 };
 
+window.plugin.drawTools.optExport = () => {
+  IITC.utils.exportFile(drawnData(), 'IITC-drawn-items.json', 'application/json');
+};
+
+/**
+ * Adds pasted drawn items, or the lines of a link of the standard Intel map
+ *
+ * @param {string} promptAction - Draw Tools data or a link
+ * @returns {string} What was imported
+ * @throws {Error} When the text is neither
+ */
 window.plugin.drawTools.promptImport = function (promptAction) {
+  let message;
   try {
     // first see if it looks like a URL-format stock intel link, and if so, try and parse out any stock drawn items
     // from the pls parameter
@@ -662,7 +615,7 @@ window.plugin.drawTools.promptImport = function (promptAction) {
       window.runHooks('pluginDrawTools', { event: 'import' });
 
       console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'pasted drawn items from stock URL');
-      window.plugin.drawTools.optAlert('Import Successful.');
+      message = `Imported ${newLines.length} lines from the link`;
     } else {
       if (window.plugin.drawTools.merge.status) {
         promptAction =
@@ -687,37 +640,59 @@ window.plugin.drawTools.promptImport = function (promptAction) {
       window.plugin.drawTools.drawnItems.clearLayers();
       window.plugin.drawTools.import(data);
       console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'pasted drawn items');
-      window.plugin.drawTools.optAlert('Import Successful.');
+      message = 'Imported drawn items';
     }
 
     // to write back the data to localStorage
     window.plugin.drawTools.save();
   } catch (e) {
     console.warn('DRAWTOOLS: failed to import data: ' + e);
-    window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
+    throw new Error('Neither drawn items nor a link with drawn lines');
   }
+  return message;
 };
 
-window.plugin.drawTools.optImport = function () {
+/**
+ * Lets the user pick files of drawn items and adds them
+ *
+ * @returns {Promise<string|undefined>} What was imported, undefined when no file was picked
+ * @throws {Error} When no file holds drawn items
+ */
+window.plugin.drawTools.optImport = async () => {
+  const files = await IITC.utils.importFile({ accept: 'application/json', multiple: true });
+  if (!files.length) return undefined;
+  return window.plugin.drawTools.importFiles(files);
+};
+
+/**
+ * Adds the drawn items of files read; with the reset before import on, the drawn items are deleted once, before
+ * the first file
+ *
+ * @param {Array<{name: string, text: string}>} files - Files read, as `IITC.utils.importFile` returns them
+ * @returns {string} What was imported
+ * @throws {Error} When no file holds drawn items
+ */
+window.plugin.drawTools.importFiles = (files) => {
   let firstRun = true;
-  L.FileListLoader.loadFiles({ accept: 'application/json', multiple: true }).on('load', function (e) {
+  const failed = [];
+  for (const file of files) {
     try {
-      var data = JSON.parse(e.reader.result);
+      const data = JSON.parse(file.text);
       if (firstRun && !window.plugin.drawTools.merge.status) {
         window.plugin.drawTools.drawnItems.clearLayers();
         firstRun = false;
       }
       window.plugin.drawTools.import(data);
       console.log('DRAWTOOLS: ' + (window.plugin.drawTools.merge.status ? '' : 'reset and ') + 'imported drawn items');
-      window.plugin.drawTools.optAlert('Import Successful.');
-
-      // to write back the data to localStorage
-      window.plugin.drawTools.save();
     } catch (e) {
       console.warn('DRAWTOOLS: failed to import data: ' + e);
-      window.plugin.drawTools.optAlert('<span style="color: #f88">Import failed</span>');
+      failed.push(file.name);
     }
-  });
+  }
+  // to write back the data to localStorage
+  window.plugin.drawTools.save();
+  if (failed.length === files.length) throw new Error(`No drawn items in ${failed.join(', ')}`);
+  return failed.length ? `Imported drawn items; no drawn items in ${failed.join(', ')}` : 'Imported drawn items';
 };
 
 window.plugin.drawTools.optReset = function () {
@@ -728,9 +703,10 @@ window.plugin.drawTools.optReset = function () {
     window.plugin.drawTools.load();
     window.plugin.drawTools.save(); // reconcile itemMap and push deletions through sync
     console.log('DRAWTOOLS: reset all drawn items');
-    window.plugin.drawTools.optAlert('Reset Successful. ');
     window.runHooks('pluginDrawTools', { event: 'clear' });
+    return 'Deleted all drawn items';
   }
+  return undefined;
 };
 
 window.plugin.drawTools.snapToPortals = function () {
@@ -759,8 +735,7 @@ window.plugin.drawTools.snapToPortals = function () {
   });
 
   if (!Object.keys(visiblePortals).length) {
-    alert('Error: No portals visible in this view - nothing to snap points to!');
-    return;
+    throw new Error('No portals visible in this view - nothing to snap points to');
   }
 
   var findClosestPortalLatLng = function (latlng) {
@@ -825,8 +800,8 @@ window.plugin.drawTools.snapToPortals = function () {
       event: 'layersSnappedToPortals',
     });
   }
-  alert('Tested ' + testCount + ' points, and moved ' + changedCount + ' onto portal coordinates');
   window.plugin.drawTools.save();
+  return 'Tested ' + testCount + ' points, and moved ' + changedCount + ' onto portal coordinates';
 };
 
 window.plugin.drawTools.boot = function () {
@@ -902,21 +877,6 @@ window.plugin.drawTools.boot = function () {
     window.plugin.drawTools.save();
     window.runHooks('pluginDrawTools', { event: 'layersEdited' });
   });
-
-  // add options menu
-  IITC.toolbox.addButton({
-    label: 'DrawTools Opt',
-    title: '[x]',
-    action: window.plugin.drawTools.manualOpt,
-    accesskey: 'x',
-  });
-
-  $('head').append(
-    '<style>' +
-      '.drawtoolsSetbox > a { display:block; color:#ffce00; border:1px solid #ffce00; padding:3px 0; margin:10px auto; width:80%; text-align:center; background:rgba(8,48,78,.9); }' +
-      '.ui-dialog-drawtoolsSet-copy textarea { width:96%; height:150px; resize:vertical; }' +
-      '</style>'
-  );
 };
 
 // ---------------------------------------------------------------------------------
