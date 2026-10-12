@@ -394,6 +394,11 @@ body.show-controls #chat {
 }
 
 /* 16px, so the browser of a phone does not zoom in on the field */
+.iitc-prompt-text {
+  font-size: 16px;
+}
+
+/* 16px, as above */
 .iitc-settings .iitc-settings-search {
   padding: 8px 10px;
   font-size: 16px;

@@ -109,6 +109,65 @@ describe('IITC.utils export and import', () => {
     });
   });
 
+  describe('promptText', () => {
+    const enter = (input) => input.dispatchEvent(new document.defaultView.KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+
+    it('starts with the given text and resolves with the text on OK', async () => {
+      $.fn.dialog = sinon.spy();
+      const text = IITC.utils.promptText({ title: 'New project', label: 'Name', value: 'Paris' });
+      const options = dialog.firstCall.args[0];
+      const input = options.html.querySelector('input');
+      expect(input.value).to.equal('Paris');
+      input.value = ' Rome ';
+
+      options.buttons.OK.call(document.createElement('div'));
+
+      expect(options.title).to.equal('New project');
+      expect(options.html.querySelector('p').textContent).to.equal('Name');
+      expect(await text).to.equal('Rome');
+      expect($.fn.dialog.calledOnceWith('close')).to.be.true;
+    });
+
+    it('applies the text on Enter', async () => {
+      $.fn.dialog = sinon.spy();
+      const text = IITC.utils.promptText();
+      const input = dialog.firstCall.args[0].html.querySelector('input');
+      input.value = 'Rome';
+
+      enter(input);
+
+      expect(await text).to.equal('Rome');
+      expect($.fn.dialog.calledOnceWith('close')).to.be.true;
+    });
+
+    it('stays open with the message validate returns', async () => {
+      $.fn.dialog = sinon.spy();
+      const text = IITC.utils.promptText({ validate: (name) => (name === 'Rome' ? true : `"${name}" is taken`) });
+      const options = dialog.firstCall.args[0];
+      const input = options.html.querySelector('input');
+      input.value = 'Paris';
+
+      enter(input);
+      expect($.fn.dialog.called).to.be.false;
+      expect(options.html.querySelector('.iitc-prompt-error').textContent).to.equal('"Paris" is taken');
+
+      input.value = 'Rome';
+      options.buttons.OK.call(document.createElement('div'));
+      expect(await text).to.equal('Rome');
+    });
+
+    it('resolves with undefined when nothing was entered or the dialog is closed', async () => {
+      $.fn.dialog = sinon.spy();
+      const empty = IITC.utils.promptText({ validate: () => 'never called' });
+      dialog.firstCall.args[0].buttons.OK.call(document.createElement('div'));
+      expect(await empty).to.be.undefined;
+
+      const closed = IITC.utils.promptText();
+      dialog.secondCall.args[0].closeCallback();
+      expect(await closed).to.be.undefined;
+    });
+  });
+
   describe('importText', () => {
     it('resolves with the text on OK', async () => {
       $.fn.dialog = sinon.spy();
