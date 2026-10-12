@@ -1178,8 +1178,8 @@ window.plugin.drawTools.syncInitialized = (pluginName, fieldName) => {
   }
 };
 
-// MPE has no delete event: a deletion surfaces as the implicit switch back to the default
-// project, so entries left pointing at a vanished prefix are what tells us it is gone
+// MPE reports a switch and a deletion through the same hook; entries left pointing at a vanished
+// prefix are what tells us a project is gone
 window.plugin.drawTools.reconcileAfterMpeChange = (data) => {
   if (data?.data?.namespace !== 'drawTools') return;
 
