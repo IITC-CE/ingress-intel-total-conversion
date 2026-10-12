@@ -5,3 +5,16 @@
   height: 150px;
   resize: vertical;
 }
+
+.iitc-prompt-text {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.iitc-prompt-error:empty {
+  display: none;
+}
+
+.iitc-prompt-error {
+  color: #ff8b7f;
+}
