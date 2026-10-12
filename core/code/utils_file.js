@@ -394,6 +394,72 @@ const importText = ({ title = 'Import', label = 'Paste the text here' } = {}) =>
   });
 
 /**
+ * Asks the user for a line of text, such as a name, in a dialog. OK or Enter applies it
+ *
+ * @memberof IITC.utils
+ * @param {Object} [options]
+ * @param {string} [options.title='Enter text'] - Title of the dialog
+ * @param {string} [options.label] - Explanation above the text field
+ * @param {string} [options.value=''] - Text the field starts with
+ * @param {Function} [options.validate] - Receives the text without surrounding white space and returns true,
+ *                                        or a message shown in the dialog, which then stays open
+ * @returns {Promise<string|undefined>} The text without surrounding white space, or undefined when
+ *                                      nothing was entered or the dialog is closed without OK
+ */
+const promptText = ({ title = 'Enter text', label, value = '', validate } = {}) =>
+  new Promise((resolve) => {
+    const content = document.createElement('div');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'iitc-prompt-text';
+    input.value = value;
+    const error = document.createElement('p');
+    error.className = 'iitc-prompt-error';
+    error.setAttribute('role', 'alert');
+    if (label) {
+      const text = document.createElement('p');
+      text.textContent = label;
+      content.append(text);
+    }
+    content.append(input, error);
+
+    const submit = (box) => {
+      const text = input.value.trim();
+      let check;
+      try {
+        check = text && validate ? validate(text) : true;
+      } catch (e) {
+        check = String(e?.message ?? e);
+      }
+      if (check !== true) {
+        error.textContent = check;
+        input.focus();
+        return;
+      }
+      resolve(text || undefined);
+      $(box).dialog('close');
+    };
+    const box = window.dialog({
+      title,
+      html: content,
+      // a second prompt closes the first, which then resolves with undefined
+      id: 'iitc-prompt-text',
+      buttons: {
+        OK: function () {
+          submit(this);
+        },
+      },
+      closeCallback: () => resolve(undefined),
+    });
+    input.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      submit(box);
+    });
+    input.focus();
+  });
+
+/**
  * Saves data as a file: downloads it, or in the app lets the user pick where to save it,
  * with `dataType` filtering the file types the app offers
  *
@@ -429,4 +495,4 @@ const importFile = ({ accept, multiple = false } = {}) =>
       .on('loaded', () => resolve(files));
   });
 
-Object.assign(IITC.utils, { exportText, importText, exportFile, importFile });
+Object.assign(IITC.utils, { exportText, importText, promptText, exportFile, importFile });

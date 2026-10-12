@@ -392,3 +392,8 @@ body.show-controls #chat {
     font-size: 24px;
   }
 }
+
+/* 16px, so the browser of a phone does not zoom in on the field */
+.iitc-prompt-text {
+  font-size: 16px;
+}
