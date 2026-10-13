@@ -873,26 +873,24 @@ window.plugin.bookmarks.folders = () =>
   );
 
 /**
- * Asks for a new name of a folder and renames it
+ * Asks for a new name of a folder in a dialog that shows the current one, and renames it
  *
  * @param {string} type - 'maps' or 'portals'
  * @param {string} idFold - Folder id
- * @returns {string|undefined} What was done, undefined when no name was given
+ * @returns {Promise<string|undefined>} What was done, undefined when no name was given
  */
-window.plugin.bookmarks.renameFolder = function (type, idFold) {
-  var promptAction = prompt('Insert a new name.', '');
-  if (promptAction !== null && promptAction !== '') {
-    var newName = window.plugin.bookmarks.escapeHtml(promptAction);
+window.plugin.bookmarks.renameFolder = async (type, idFold) => {
+  const folder = window.plugin.bookmarks.currentProject[type][idFold];
+  const name = await IITC.utils.promptText({ title: 'Rename folder', value: window.plugin.bookmarks.unescapeHtml(folder.label) });
+  if (name === undefined) return undefined;
 
-    window.plugin.bookmarks.currentProject[type][idFold].label = newName;
-    window.plugin.bookmarks.saveStorage();
-    window.plugin.bookmarks.refreshBkmrks();
-    window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'import' });
+  folder.label = window.plugin.bookmarks.escapeHtml(name);
+  window.plugin.bookmarks.saveStorage();
+  window.plugin.bookmarks.refreshBkmrks();
+  window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'import' });
 
-    console.log('BOOKMARKS: renamed bookmarks folder');
-    return 'Renamed';
-  }
-  return undefined;
+  console.log('BOOKMARKS: renamed bookmarks folder');
+  return 'Renamed';
 };
 
 window.plugin.bookmarks.registerSettings = () => {

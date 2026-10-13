@@ -29,7 +29,7 @@ describe('bookmarks settings page', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    replaced = { confirm: globalThis.confirm, prompt: globalThis.prompt, runHooks: window.runHooks, utils: IITC.utils, isApp: window.isApp };
+    replaced = { confirm: globalThis.confirm, runHooks: window.runHooks, utils: IITC.utils, isApp: window.isApp };
     window.runHooks = sinon.spy();
     window.isApp = false;
     bookmarks.KEY_STORAGE = 'plugin-bookmarks';
@@ -40,7 +40,6 @@ describe('bookmarks settings page', () => {
 
   afterEach(() => {
     globalThis.confirm = replaced.confirm;
-    globalThis.prompt = replaced.prompt;
     window.runHooks = replaced.runHooks;
     window.isApp = replaced.isApp;
     IITC.utils = replaced.utils;
@@ -139,14 +138,18 @@ describe('bookmarks settings page', () => {
       expect(refresh.calledOnceWith('bookmarks')).to.be.true;
     });
 
-    it('renames a folder to the name given', () => {
+    it('renames a folder to the name given in a dialog that shows the current name', async () => {
       const rename = page.blocks.find((candidate) => candidate.type === 'repeat').blocks[0];
+      bookmarks.currentProject.portals.f2.label = 'Tom &amp; Jerry';
+      const promptText = sinon.stub().resolves(undefined);
+      IITC.utils = { promptText };
 
-      globalThis.prompt = () => '';
-      expect(rename.action({ type: 'portals', folderId: 'f2' })).to.be.undefined;
+      expect(await rename.action({ type: 'portals', folderId: 'f2' })).to.be.undefined;
+      expect(promptText.firstCall.args[0]).to.deep.equal({ title: 'Rename folder', value: 'Tom & Jerry' });
+      expect(bookmarks.saveStorage.called).to.be.false;
 
-      globalThis.prompt = () => 'Farm <b>';
-      expect(rename.action({ type: 'portals', folderId: 'f2' })).to.equal('Renamed');
+      promptText.resolves('Farm <b>');
+      expect(await rename.action({ type: 'portals', folderId: 'f2' })).to.equal('Renamed');
       expect(bookmarks.currentProject.portals.f2.label).to.equal('Farm &lt;b&gt;');
       expect(bookmarks.saveStorage.calledOnce).to.be.true;
     });
