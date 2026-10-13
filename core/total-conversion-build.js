@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.42.3
+// @version        0.42.4
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -16,6 +16,10 @@ window.IITC = IITC;
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.42.4',
+    changes: ['Fix CartoDB base maps not loading'],
+  },
   {
     version: '0.42.2',
     changes: ['Fix LatLng instantiation in artifacts'],
