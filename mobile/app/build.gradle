@@ -28,8 +28,9 @@ android {
         applicationId "org.exarhteam.iitc_mobile"
         minSdk 21
         targetSdk 36
-        versionCode = getVersionCodeTimeStamps()
-        versionName "0.42.4"
+        // above the latest beta build already uploaded to Google Play
+        versionCode = 1791899877
+        versionName "0.42.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
