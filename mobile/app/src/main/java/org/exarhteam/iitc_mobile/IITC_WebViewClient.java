@@ -319,6 +319,10 @@ public class IITC_WebViewClient extends WebViewClient {
                 Log.d("Niantic login");
                 return false;
             }
+            if (uriHost.equals("appleid.apple.com")) {
+                Log.d("Apple login");
+                return false;
+            }
             if (mIitc.isInternalHostname(uriHost)) {
                 Log.d("internal host");
                 return false;
