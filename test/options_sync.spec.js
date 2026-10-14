@@ -708,6 +708,16 @@ describe('options replication', () => {
         expect(options.get('test-sync-later.x')).to.equal('theirs');
       });
 
+      it('applies values to a section added to a page, whether the page is registered or not', async () => {
+        load({ 'test-sync-section.x': { value: 'theirs', updated: later() } });
+
+        options.extend('test-sync-unregistered', 'test-sync-section', { blocks: [{ type: 'string', key: 'x' }] });
+        expect(options.get('test-sync-section.x')).to.equal('');
+
+        await flush();
+        expect(options.get('test-sync-section.x')).to.equal('theirs');
+      });
+
       it('does nothing while turned off', () => {
         options.set('iitc.syncOptions', false);
         load({ 'test-sync.shared': { value: 'theirs', updated: later() } });
