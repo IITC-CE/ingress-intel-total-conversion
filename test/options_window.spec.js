@@ -80,6 +80,7 @@ describe('options window', () => {
   const forget = (...pageIds) => {
     for (const pageId of pageIds) {
       delete options._pages[pageId];
+      delete options._extensions[pageId];
       document.getElementById(`options-access-key-${pageId}`)?.remove();
       for (const key of Object.keys(options._definitions)) {
         if (options._definitions[key].pageId === pageId) delete options._definitions[key];
@@ -261,6 +262,19 @@ describe('options window', () => {
       forget('window-hidden');
     });
 
+    it('finds the titles and texts of the sections extensions add', () => {
+      options.extend('window-zeta', 'window-ext-search', { title: 'Platypus import', blocks: [{ type: 'text', text: 'Echidnas too' }] });
+      options.open();
+
+      type('platypus');
+      expect(navTitles()).to.deep.equal(['Zeta']);
+      expect(navLink('window-zeta').querySelector('.iitc-options-found').textContent).to.equal('Platypus import');
+
+      type('echidnas');
+      expect(navTitles()).to.deep.equal(['Zeta']);
+      delete options._extensions['window-zeta'];
+    });
+
     it('keeps the page shown while searching', () => {
       options.open('window-zeta');
 
@@ -321,6 +335,29 @@ describe('options window', () => {
       expect(view.root.querySelector('.iitc-options-text').textContent).to.equal('Name is remote');
     });
 
+    it('draws the page again when an option of a section added to it changes elsewhere', async () => {
+      options.register('window-extended', { title: 'Extended', blocks: [] });
+      options.extend('window-extended', 'window-ext-remote', { title: 'Extra', blocks: [{ type: 'string', key: 'name', title: 'Name' }] });
+      options.open('window-extended');
+
+      options.set('window-ext-remote.name', 'remote', { source: 'remote' });
+      await settle();
+
+      expect(view.root.querySelector('.iitc-options-page input').value).to.equal('remote');
+      forget('window-extended');
+    });
+
+    it('draws a section added to the page shown', async () => {
+      options.register('window-extended-late', { title: 'Extended', blocks: [] });
+      options.open('window-extended-late');
+
+      options.extend('window-extended-late', 'window-ext-late', { title: 'Late section', blocks: [] });
+      await settle();
+
+      expect(view.root.querySelector('.iitc-options-page h3').textContent).to.equal('Late section');
+      forget('window-extended-late');
+    });
+
     it('lists a page registered while the window is open', () => {
       options.open();
 
@@ -348,6 +385,18 @@ describe('options window', () => {
       await settle();
 
       expect(view.root.querySelector('.iitc-options-page')).to.equal(drawn);
+    });
+
+    it('leaves the page alone when an option changes under a namespace that only starts like its own', async () => {
+      options.register('window-nested', { title: 'Nested', namespace: 'window-alpha.sub', blocks: [{ type: 'boolean', key: 'flag' }] });
+      options.open('window-alpha');
+      const drawn = view.root.querySelector('.iitc-options-page');
+
+      options.set('window-alpha.sub.flag', true, { source: 'remote' });
+      await settle();
+
+      expect(view.root.querySelector('.iitc-options-page')).to.equal(drawn);
+      forget('window-nested');
     });
 
     it('draws the shown page again on refresh after the current task, and only that page', async () => {

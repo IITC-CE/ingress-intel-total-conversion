@@ -75,7 +75,9 @@ const blockTexts = (blocks, inRepeat = false) =>
 const search = (pageId, query) => {
   const needle = query.trim().toLowerCase();
   if (!needle) return [];
-  const found = blockTexts(IITC.options._pages[pageId].blocks).filter((text) => text.toLowerCase().includes(needle));
+  // the sections of extensions are searched with their titles
+  const sections = IITC.options._sections(pageId).flatMap((section) => [section.title, ...blockTexts(section.blocks)]);
+  const found = [...blockTexts(IITC.options._pages[pageId].blocks), ...sections].filter((text) => text.toLowerCase().includes(needle));
   if (found.length) return found;
   return titleOf(pageId).toLowerCase().includes(needle) ? [] : null;
 };
@@ -265,8 +267,9 @@ const open = (pageId) => {
 
 /**
  * Draws the page shown in the options window again, after the current task and after the click when
- * the pointer is down, and updates the toolbox shortcut of the page. Changes of the page's own options
- * redraw it already; a page that also shows other state calls this when that state changes
+ * the pointer is down, and updates the toolbox shortcut of the page. Changes of the page's own options and
+ * of the sections extensions add to it redraw it already; a page that also shows other state calls this when
+ * that state changes
  *
  * @memberof IITC.options
  * @param {string} [pageId] - Redraws only if this page is shown; all shortcuts are updated without it
@@ -277,11 +280,11 @@ const refresh = (pageId) => {
   IITC.options._redrawLater(content());
 };
 
-// a change made on the page redraws it already; this follows changes made elsewhere, such as by sync.
-// Options of other pages are left to refresh, so an open select is not closed by unrelated changes
+// a change made on the page redraws it already; this follows changes made elsewhere, such as by sync, of the
+// options the page and the sections extensions add to it declare. Options of other pages are left to
+// refresh, so an open select is not closed by unrelated changes
 const onOptionChanged = ({ key }) => {
-  const page = IITC.options._pages[view.pageId];
-  if (isOpen() && page && key.startsWith(`${page.namespace}.`)) IITC.options._redrawLater(content());
+  if (isOpen() && IITC.options._pages[view.pageId] && IITC.options._definitions[key]?.pageId === view.pageId) IITC.options._redrawLater(content());
 };
 
 const onPageRegistered = ({ pageId }) => {
