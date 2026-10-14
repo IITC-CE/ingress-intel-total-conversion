@@ -179,6 +179,21 @@ const withItemDefaults = (def, map) => {
   return result;
 };
 
+// a map of a `repeat` without the entries equal to the default of their item; with a default function,
+// entries of ids `over` does not list stay, as do all entries while `over` fails
+const withoutItemDefaults = (def, map) => {
+  let items;
+  if (typeof def.default === 'function') {
+    try {
+      items = new Map((def.repeat.over?.() ?? []).map((item) => [item.id, item]));
+    } catch (e) {
+      log.warn(`settings: items of the repeat of "${def.fullKey}" failed: ${e}`);
+      return map;
+    }
+  }
+  return Object.fromEntries(Object.entries(map).filter(([id, entry]) => (items && !items.has(id)) || !sameValue(entry, entryDefault(def, items?.get(id)))));
+};
+
 /**
  * Checks one value against a setting's type and constraints
  *
@@ -507,7 +522,8 @@ const refusesRemote = (key, source) => {
 /**
  * Stores the value of a setting. Values of declared settings are validated first; a value stored in the same
  * form as the one already there changes nothing, and a value stored in the same form as the default is
- * removed, as `reset` does. The `settingChanged` hook and the block's `onChange` run when the value
+ * removed, as `reset` does. A map of a `repeat` keeps only the entries that differ from the default of their
+ * item, and is removed when none is left. The `settingChanged` hook and the block's `onChange` run when the value
  * actually changes, and receive the value as `get` returns it
  *
  * Storing `undefined` under an undeclared key removes the value, as `reset` does;
@@ -544,7 +560,7 @@ const set = (key, value, options) => {
   const storageKey = STORAGE_PREFIX + key;
   let encoded;
   try {
-    encoded = encodeStored(value);
+    encoded = encodeStored(def?.map ? withoutItemDefaults(def, value) : value);
   } catch (e) {
     log.error(`settings: cannot store "${storageKey}": ${e}`);
     return false;
