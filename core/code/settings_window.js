@@ -62,7 +62,9 @@ const blockTexts = (blocks) =>
 const search = (pageId, query) => {
   const needle = query.trim().toLowerCase();
   if (!needle) return [];
-  const found = blockTexts(IITC.settings._pages[pageId].blocks).filter((text) => text.toLowerCase().includes(needle));
+  // the sections of extensions are searched with their titles
+  const sections = IITC.settings._sections(pageId).flatMap((section) => [section.title, ...blockTexts(section.blocks)]);
+  const found = [...blockTexts(IITC.settings._pages[pageId].blocks), ...sections].filter((text) => text.toLowerCase().includes(needle));
   if (found.length) return found;
   return titleOf(pageId).toLowerCase().includes(needle) ? [] : null;
 };
@@ -250,8 +252,9 @@ const open = (pageId) => {
 
 /**
  * Draws the page shown in the settings window again, after the current task and after the click when
- * the pointer is down, and updates the toolbox shortcut of the page. Changes of the page's own settings
- * redraw it already; a page that also shows other state calls this when that state changes
+ * the pointer is down, and updates the toolbox shortcut of the page. Changes of the page's own settings and
+ * of the sections extensions add to it redraw it already; a page that also shows other state calls this when
+ * that state changes
  *
  * @memberof IITC.settings
  * @param {string} [pageId] - Redraws only if this page is shown; all shortcuts are updated without it
@@ -262,11 +265,11 @@ const refresh = (pageId) => {
   IITC.settings._redrawLater(content());
 };
 
-// a change made on the page redraws it already; this follows changes made elsewhere, such as by sync.
-// Settings of other pages are left to refresh, so an open select is not closed by unrelated changes
+// a change made on the page redraws it already; this follows changes made elsewhere, such as by sync, of the
+// settings the page and the sections extensions add to it declare. Settings of other pages are left to
+// refresh, so an open select is not closed by unrelated changes
 const onSettingChanged = ({ key }) => {
-  const page = IITC.settings._pages[view.pageId];
-  if (isOpen() && page && key.startsWith(`${page.namespace}.`)) IITC.settings._redrawLater(content());
+  if (isOpen() && IITC.settings._pages[view.pageId] && IITC.settings._definitions[key]?.pageId === view.pageId) IITC.settings._redrawLater(content());
 };
 
 const onPageRegistered = ({ pageId }) => {

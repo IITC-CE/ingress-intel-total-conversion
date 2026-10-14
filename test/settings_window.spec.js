@@ -80,6 +80,7 @@ describe('settings window', () => {
   const forget = (...pageIds) => {
     for (const pageId of pageIds) {
       delete settings._pages[pageId];
+      delete settings._extensions[pageId];
       document.getElementById(`settings-access-key-${pageId}`)?.remove();
       for (const key of Object.keys(settings._definitions)) {
         if (settings._definitions[key].pageId === pageId) delete settings._definitions[key];
@@ -244,6 +245,19 @@ describe('settings window', () => {
       expect(view.root.querySelector('.iitc-settings-nothing').textContent).to.equal('Nothing found');
     });
 
+    it('finds the titles and texts of the sections extensions add', () => {
+      settings.extend('window-zeta', 'window-ext-search', { title: 'Platypus import', blocks: [{ type: 'text', text: 'Echidnas too' }] });
+      settings.open();
+
+      type('platypus');
+      expect(navTitles()).to.deep.equal(['Zeta']);
+      expect(navLink('window-zeta').querySelector('.iitc-settings-found').textContent).to.equal('Platypus import');
+
+      type('echidnas');
+      expect(navTitles()).to.deep.equal(['Zeta']);
+      delete settings._extensions['window-zeta'];
+    });
+
     it('keeps the page shown while searching', () => {
       settings.open('window-zeta');
 
@@ -304,6 +318,29 @@ describe('settings window', () => {
       expect(view.root.querySelector('.iitc-settings-text').textContent).to.equal('Name is remote');
     });
 
+    it('draws the page again when a setting of a section added to it changes elsewhere', async () => {
+      settings.register('window-extended', { title: 'Extended', blocks: [] });
+      settings.extend('window-extended', 'window-ext-remote', { title: 'Extra', blocks: [{ type: 'string', key: 'name', title: 'Name' }] });
+      settings.open('window-extended');
+
+      settings.set('window-ext-remote.name', 'remote', { source: 'remote' });
+      await settle();
+
+      expect(view.root.querySelector('.iitc-settings-page input').value).to.equal('remote');
+      forget('window-extended');
+    });
+
+    it('draws a section added to the page shown', async () => {
+      settings.register('window-extended-late', { title: 'Extended', blocks: [] });
+      settings.open('window-extended-late');
+
+      settings.extend('window-extended-late', 'window-ext-late', { title: 'Late section', blocks: [] });
+      await settle();
+
+      expect(view.root.querySelector('.iitc-settings-page h3').textContent).to.equal('Late section');
+      forget('window-extended-late');
+    });
+
     it('lists a page registered while the window is open', () => {
       settings.open();
 
@@ -331,6 +368,18 @@ describe('settings window', () => {
       await settle();
 
       expect(view.root.querySelector('.iitc-settings-page')).to.equal(drawn);
+    });
+
+    it('leaves the page alone when a setting changes under a namespace that only starts like its own', async () => {
+      settings.register('window-nested', { title: 'Nested', namespace: 'window-alpha.sub', blocks: [{ type: 'boolean', key: 'flag' }] });
+      settings.open('window-alpha');
+      const drawn = view.root.querySelector('.iitc-settings-page');
+
+      settings.set('window-alpha.sub.flag', true, { source: 'remote' });
+      await settle();
+
+      expect(view.root.querySelector('.iitc-settings-page')).to.equal(drawn);
+      forget('window-nested');
     });
 
     it('draws the shown page again on refresh after the current task, and only that page', async () => {

@@ -112,16 +112,19 @@ const handlerOf = (block) => {
 };
 
 /**
- * One drawing of a page into a container
+ * One drawing of a page into a container, or of a section an extension adds to the page
  *
  * @private
  */
 class PageView {
-  constructor(pageId, container) {
+  constructor(pageId, container, section = undefined) {
     this.pageId = pageId;
     this.container = container;
     this.page = IITC.settings._pages[pageId];
     this.state = stateOf(container);
+    // a section has keys of its own, and control ids apart from the ones of the page's blocks
+    this.namespace = section ? section.namespace : this.page.namespace;
+    this.prefix = section ? `+${encodeURIComponent(section.id)}/` : '';
   }
 
   // whether the container still shows this page
@@ -193,7 +196,7 @@ class PageView {
 
   // full key and shown value of a field; inside a repeat the value is the item's entry of `map`
   field(block, item, map) {
-    const key = `${this.page.namespace}.${block.key}`;
+    const key = `${this.namespace}.${block.key}`;
     if (block.value !== undefined) return { key, value: block.value };
     if (!item) return { key, value: IITC.settings.get(key) };
     return { key, value: map?.[item.id] ?? IITC.settings._entryDefault(key, item) };
@@ -202,7 +205,7 @@ class PageView {
   // stores a value a field was changed to; a refused value stays in the field with the reason under its row
   change(block, item, value, input) {
     this.state.messages.clear();
-    const key = `${this.page.namespace}.${block.key}`;
+    const key = `${this.namespace}.${block.key}`;
     const next = item ? { ...IITC.settings._entries(key), [item.id]: value } : value;
     const check = IITC.settings.check(key, next);
     if (check !== true || !IITC.settings.set(key, next)) {
@@ -415,16 +418,16 @@ class PageView {
 
   // the block as a row of the page; undefined for a block that is not shown or fails to draw
   row(declared, index) {
+    const id = this.prefix + index;
     try {
-      return this.buildRow(declared, index);
+      return this.buildRow(declared, id);
     } catch (e) {
-      log.warn(`settings: block ${index} of page "${this.pageId}" failed to draw`, e);
+      log.warn(`settings: block ${id} of page "${this.pageId}" failed to draw`, e);
       return undefined;
     }
   }
 
-  buildRow(declared, index) {
-    const id = String(index);
+  buildRow(declared, id) {
     const block = evaluate(declared);
     if (block.visible === false) return undefined;
 
@@ -443,7 +446,7 @@ class PageView {
       case 'list':
         return this.list(block.items, 1);
       case 'repeat':
-        return this.repeat(declared, index);
+        return this.repeat(declared, id);
     }
 
     const control = this.control(block, undefined, id);
@@ -469,7 +472,7 @@ class PageView {
     );
     return el(
       'div',
-      { className: `iitc-settings-row iitc-settings-${block.type}`, dataset: block.key ? { key: block.key } : {} },
+      { className: `iitc-settings-row iitc-settings-${block.type}`, dataset: block.key ? { key: `${this.namespace}.${block.key}` } : {} },
       label,
       el('div', { className: 'iitc-settings-control' }, control),
       // under the label and the control, so they stay on one line
@@ -502,19 +505,19 @@ class PageView {
     }
   }
 
-  repeat(block, index) {
+  repeat(block, id) {
     const items = block.over?.() ?? [];
     // headers without rows tell nothing
     if (!items.length) return undefined;
     const blocks = block.blocks ?? [];
     // each map is read once for all items
-    const maps = new Map(blocks.filter((inner) => inner.key !== undefined).map((inner) => [inner, IITC.settings.get(`${this.page.namespace}.${inner.key}`)]));
+    const maps = new Map(blocks.filter((inner) => inner.key !== undefined).map((inner) => [inner, IITC.settings.get(`${this.namespace}.${inner.key}`)]));
     const choices = blocks.filter((inner) => inner.type === 'choice');
     for (const extra of choices.slice(1)) warnOnce(extra, `settings: a repeat on page "${this.pageId}" takes one choice; "${extra.title}" is left out`);
-    const choiceId = (item) => `${index}/${item.id}/${blocks.indexOf(choices[0])}`;
+    const choiceId = (item) => `${id}/${item.id}/${blocks.indexOf(choices[0])}`;
     const columns = blocks.map((inner, innerIndex) => [inner, innerIndex]).filter(([inner]) => inner.type !== 'choice');
     const rows = items.map((item) => {
-      const cells = columns.map(([inner, innerIndex]) => this.cell(inner, item, `${index}/${item.id}/${innerIndex}`, maps));
+      const cells = columns.map(([inner, innerIndex]) => this.cell(inner, item, `${id}/${item.id}/${innerIndex}`, maps));
       const title = String(item.title ?? item.id);
       // the radio of the choice stands before the title of its row, which is its label; the messages of its
       // action follow the title
@@ -529,7 +532,16 @@ class PageView {
   }
 
   draw() {
-    return el('div', { className: 'iitc-settings-page', dataset: { page: this.pageId } }, ...this.page.blocks.map((block, index) => this.row(block, index)));
+    const rows = this.page.blocks.map((block, index) => this.row(block, index));
+    // sections of extensions follow the page's own blocks, each under its title
+    for (const section of IITC.settings._sections(this.pageId)) {
+      const view = new PageView(this.pageId, this.container, section);
+      rows.push(
+        el('h3', { className: 'iitc-settings-heading', dataset: { extension: section.id } }, section.title),
+        ...section.blocks.map((block, index) => view.row(block, index))
+      );
+    }
+    return el('div', { className: 'iitc-settings-page', dataset: { page: this.pageId } }, ...rows);
   }
 }
 
