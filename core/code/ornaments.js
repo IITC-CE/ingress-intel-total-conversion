@@ -18,10 +18,10 @@
  * (there are 7 different colors for each of them)
  *
  * Ornament IDs are dynamic. NIANTIC might change them at any time without prior notice.
- * New ornamnent IDs found on the map will be recorded and saved to knownOrnaments, which
- * the Ornaments page of the settings window lists with a checkbox to hide each.
- * To exclude a set of ornaments, even if they have not yet shown up on the map, the user
- * can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
+ * New ornament IDs found on the map are recorded on this device, and the Ornaments page of the
+ * settings window lists them with a checkbox to hide each; the hidden ones are a setting, synced
+ * between devices. To exclude a set of ornaments, even if they have not yet shown up on the map,
+ * the user can add an entry to excludedOrnaments, which will compared (startsWith) to all known and
  * future IDs. example: "ap" to exclude all Ornaments for anomalies (ap1, ap2, ap2_v)
  */
 window.ornaments = {
@@ -70,13 +70,27 @@ window.ornaments = {
   excludedOrnaments: [],
 
   /**
-   * List of known ornaments.
+   * Known ornaments: the ones seen on this device and the hidden ones, each with whether it is hidden.
    * @property {object} knownOrnaments - Object tracking known ornaments.
    */
   knownOrnaments: {},
 
+  /**
+   * localStorage key of the IDs of the ornaments seen on this device, kept apart from the settings
+   * @constant
+   * @type {string}
+   */
+  KNOWN_KEY: 'iitc-ornaments-known',
+
+  // IDs of the ornaments seen on this device
+  _seen: new Set(),
+
   // set while a redraw waits in the microtask queue, so changes in one task redraw once
   _reloadQueued: false,
+
+  // set while storing the ornaments seen waits in the microtask queue, so new ones in one task are stored and
+  // shown once
+  _seenQueued: false,
 
   /**
    * Sets up the ornament layer and necessary event handlers.
@@ -105,8 +119,8 @@ window.ornaments = {
 
   /**
    * Declares the `ornaments` settings page: `excluded` is the comma-separated list of ID prefixes to hide,
-   * and `hidden` maps each known ornament ID to whether it is hidden. A change from the page, a backup or (for
-   * the prefixes) sync updates `excludedOrnaments` and `knownOrnaments` and schedules a redraw
+   * and `hidden` maps each hidden ornament ID to true. A change from the page, a backup or sync updates
+   * `excludedOrnaments` and `knownOrnaments` and schedules a redraw
    *
    * @memberof window.ornaments
    */
@@ -137,6 +151,7 @@ window.ornaments = {
         },
         {
           type: 'repeat',
+          // the ornaments seen here and the ones hidden on any device
           over: () =>
             Object.keys(window.ornaments.knownOrnaments)
               .sort()
@@ -149,12 +164,8 @@ window.ornaments = {
               // an ornament a prefix hides shows as hidden, and only the prefix can show it again
               enabled: (item) => !window.ornaments.isExcluded(item.id),
               value: (item) => (window.ornaments.isExcluded(item.id) ? true : undefined),
-              // the map also lists the ornaments this device has seen, and a remote copy would replace it whole
-              sync: false,
               onChange: (hidden) => {
-                // ornaments seen this session stay known, unhidden unless the new value says otherwise
-                const known = Object.keys(window.ornaments.knownOrnaments).map((id) => [id, false]);
-                window.ornaments.knownOrnaments = { ...Object.fromEntries(known), ...hidden };
+                window.ornaments.knownOrnaments = window.ornaments.knownFrom(hidden);
                 window.ornaments.scheduleReload();
               },
             },
@@ -163,7 +174,8 @@ window.ornaments = {
         {
           type: 'action',
           title: 'Forget known ornaments',
-          description: 'Clears the list and its Hide marks; ornaments are listed again as they show up on the map',
+          description:
+            'Clears the Hide marks on every device and forgets the ornaments seen; the ones on the map now are listed again at once, and the prefixes stay',
           button: 'Forget',
           action: () => window.ornaments.initOrnaments(),
         },
@@ -186,23 +198,58 @@ window.ornaments = {
   },
 
   /**
-   * Tells whether a prefix of `excludedOrnaments` hides an ornament
+   * Builds `knownOrnaments` from the ornaments seen on this device and the hidden flags
    *
    * @memberof window.ornaments
-   * @param {string} id - Ornament ID
-   * @returns {boolean}
+   * @param {Object<string, boolean>} hidden - Hidden flags by ornament ID, as the `hidden` setting holds them
+   * @returns {Object<string, boolean>} Whether each known ornament is hidden
    */
-  isExcluded(id) {
-    return this.excludedOrnaments.some((prefix) => id.startsWith(prefix));
+  knownFrom(hidden) {
+    const ids = new Set([...this._seen, ...Object.keys(hidden).filter((id) => hidden[id] === true)]);
+    return Object.fromEntries([...ids].map((id) => [id, hidden[id] === true]));
   },
 
   /**
-   * Moves the ornament settings of older builds to the settings, once: the prefixes from `excludedOrnaments`
-   * and the known ornaments from `knownOrnaments`. The legacy keys go, values left out as unreadable with them
+   * Reads the IDs of the ornaments seen on this device; none when the stored list cannot be read
+   *
+   * @memberof window.ornaments
+   * @returns {string[]}
+   */
+  readSeen() {
+    try {
+      const ids = JSON.parse(localStorage.getItem(this.KNOWN_KEY));
+      return Array.isArray(ids) ? ids.filter((id) => typeof id === 'string') : [];
+    } catch (e) {
+      log.warn(`ornaments: cannot read "${this.KNOWN_KEY}": ${e}`);
+      return [];
+    }
+  },
+
+  /**
+   * Stores the IDs of the ornaments seen on this device once the current task is done, and redraws the
+   * settings page of ornaments if it is shown, so it lists the new ones
+   *
+   * @memberof window.ornaments
+   */
+  scheduleSeenSave() {
+    if (this._seenQueued) return;
+    this._seenQueued = true;
+    queueMicrotask(() => {
+      this._seenQueued = false;
+      localStorage.setItem(this.KNOWN_KEY, JSON.stringify([...this._seen]));
+      IITC.settings.refresh('ornaments');
+    });
+  },
+
+  /**
+   * Moves the ornament settings of older builds to the settings, once: the prefixes from `excludedOrnaments`,
+   * and from `knownOrnaments` the hidden ornaments and the ornaments seen. The legacy keys go, values left out
+   * as unreadable with them; the list of ornaments seen marks the move as done
    *
    * @memberof window.ornaments
    */
   migrate() {
+    if (localStorage.getItem(this.KNOWN_KEY) !== null) return;
     const legacy = (key) => {
       try {
         return JSON.parse(localStorage.getItem(key));
@@ -218,14 +265,26 @@ window.ornaments = {
     else if (excluded !== null) log.warn('ornaments: the legacy "excludedOrnaments" is not a list and is left out');
 
     const known = legacy('knownOrnaments');
+    let seen = [];
     if (known !== null && typeof known === 'object' && !Array.isArray(known)) {
+      seen = Object.keys(known);
       // any truthy entry hid the ornament in older builds
-      IITC.settings.set('ornaments.hidden', Object.fromEntries(Object.entries(known).map(([id, hidden]) => [id, Boolean(hidden)])), {
-        source: 'legacy',
-      });
+      IITC.settings.set('ornaments.hidden', Object.fromEntries(seen.filter((id) => known[id]).map((id) => [id, true])), { source: 'legacy' });
     } else if (known !== null) log.warn('ornaments: the legacy "knownOrnaments" is not a map and is left out');
+    localStorage.setItem(this.KNOWN_KEY, JSON.stringify(seen));
     localStorage.removeItem('excludedOrnaments');
     localStorage.removeItem('knownOrnaments');
+  },
+
+  /**
+   * Tells whether a prefix of `excludedOrnaments` hides an ornament
+   *
+   * @memberof window.ornaments
+   * @param {string} id - Ornament ID
+   * @returns {boolean}
+   */
+  isExcluded(id) {
+    return this.excludedOrnaments.some((prefix) => id.startsWith(prefix));
   },
 
   /**
@@ -269,8 +328,10 @@ window.ornaments = {
         var anchor = [size / 2, size / 2];
         var iconUrl = '//commondatastorage.googleapis.com/ingress.com/img/map_icons/marker_images/' + ornament + '.png';
 
-        if (!this.knownOrnaments[ornament]) {
-          this.knownOrnaments[ornament] = false;
+        if (!(ornament in this.knownOrnaments)) this.knownOrnaments[ornament] = false;
+        if (!this._seen.has(ornament)) {
+          this._seen.add(ornament);
+          this.scheduleSeenSave();
         }
 
         if (ornament in this.icon) {
@@ -338,14 +399,19 @@ window.ornaments = {
   },
 
   /**
-   * Initializes known ornaments.
+   * Forgets the ornaments seen on this device and clears the hidden ones on every device; the redraw lists the
+   * ornaments on the map again at once, and the prefixes stay
    *
    * @function
    * @memberof window.ornaments
    */
   initOrnaments: function () {
+    this._seen = new Set();
+    // an empty list rather than none, which would move the legacy settings again
+    localStorage.setItem(this.KNOWN_KEY, '[]');
     this.knownOrnaments = {};
-    this.save();
+    IITC.settings.reset('ornaments.hidden');
+    this.scheduleReload();
   },
 
   /**
@@ -356,18 +422,24 @@ window.ornaments = {
    */
   load: function () {
     this.excludedOrnaments = this.parsePrefixes(IITC.settings.get('ornaments.excluded'));
-    this.knownOrnaments = IITC.settings.get('ornaments.hidden');
+    this._seen = new Set(this.readSeen());
+    this.knownOrnaments = this.knownFrom(IITC.settings.get('ornaments.hidden'));
   },
 
   /**
-   * Stores the ornament settings and redraws the ornaments
+   * Stores `excludedOrnaments` and `knownOrnaments`, as the prefixes, the hidden ornaments and the ornaments
+   * seen, and redraws the ornaments
    *
    * @function
    * @memberof window.ornaments
    */
   save: function () {
+    const known = Object.entries(this.knownOrnaments);
+    for (const [id] of known) this._seen.add(id);
+    this.scheduleSeenSave();
     IITC.settings.set('ornaments.excluded', this.excludedOrnaments.join(','));
-    IITC.settings.set('ornaments.hidden', this.knownOrnaments);
+    // any truthy entry hides, as for older builds
+    IITC.settings.set('ornaments.hidden', Object.fromEntries(known.filter(([, hidden]) => hidden).map(([id]) => [id, true])));
     this.scheduleReload();
   },
 
