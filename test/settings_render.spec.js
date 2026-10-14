@@ -825,6 +825,81 @@ describe('IITC.settings._renderPage', () => {
     });
   });
 
+  describe('sections of extensions', () => {
+    // every test adds sections of its own
+    let sectionCount = 0;
+    const section = (pageId, title, blocks) => {
+      const extensionId = `render-ext-${++sectionCount}`;
+      settings.extend(pageId, extensionId, { title, blocks });
+      return extensionId;
+    };
+
+    it('draws the sections after the blocks of the page, each under its title, by title', () => {
+      const pageId = `render-page-${++pageCount}`;
+      section(pageId, 'Zoom', [{ type: 'text', text: 'last' }]);
+      section(pageId, 'Area', [{ type: 'text', text: 'second' }]);
+      settings.register(pageId, { title: 'Test', blocks: [{ type: 'text', text: 'first' }] });
+
+      settings._renderPage(pageId, container);
+
+      const drawn = [...container.querySelector('.iitc-settings-page').children].map((element) => [element.tagName, element.textContent]);
+      expect(drawn).to.deep.equal([
+        ['P', 'first'],
+        ['H3', 'Area'],
+        ['P', 'second'],
+        ['H3', 'Zoom'],
+        ['P', 'last'],
+      ]);
+    });
+
+    it('shows and stores the fields of a section under its own namespace', async () => {
+      const pageId = page([{ type: 'boolean', key: 'b', title: 'Page flag' }]);
+      const over = () => [{ id: 'one', title: 'One' }];
+      const extensionId = section(pageId, 'Extra', [
+        { type: 'boolean', key: 'b', title: 'Section flag', default: true },
+        { type: 'repeat', over, blocks: [{ type: 'number', key: 'n', title: 'Count' }] },
+      ]);
+      settings._renderPage(pageId, container);
+      const [pageFlag, sectionFlag, count] = container.querySelectorAll('input');
+      expect([pageFlag.checked, sectionFlag.checked]).to.deep.equal([false, true]);
+      expect([...container.querySelectorAll('.iitc-settings-row')].map((row) => row.dataset.key)).to.deep.equal([`${pageId}.b`, `${extensionId}.b`]);
+
+      change(sectionFlag, false);
+      change(count, '5');
+      await settle();
+
+      expect(settings.get(`${pageId}.b`)).to.be.false;
+      expect(settings.get(`${extensionId}.b`)).to.be.false;
+      expect(settings.get(`${extensionId}.n`)).to.deep.equal({ one: 5 });
+      expect(container.querySelectorAll('input')[1].checked).to.be.false;
+    });
+
+    it('runs an action of a section apart from the action of the page in the same place', async () => {
+      let finish;
+      const pageAction = sinon.stub().returns('Page done');
+      const pageId = page([{ type: 'action', title: 'Run', action: pageAction }]);
+      const sectionAction = sinon.stub().returns(new Promise((resolve) => (finish = resolve)));
+      section(pageId, 'Extra', [{ type: 'action', title: 'Sign in', action: sectionAction }]);
+      settings._renderPage(pageId, container);
+
+      click(buttons(container)['Sign in']);
+      expect(buttons(container)['Sign in'].getAttribute('aria-disabled')).to.equal('true');
+      expect(buttons(container).Run.hasAttribute('aria-disabled')).to.be.false;
+      click(buttons(container)['Sign in']);
+      click(buttons(container).Run);
+      await settle();
+      expect(buttons(container)['Sign in'].getAttribute('aria-disabled')).to.equal('true');
+      finish('Signed in');
+      await settle();
+
+      expect(sectionAction.calledOnce).to.be.true;
+      expect(pageAction.calledOnce).to.be.true;
+      expect(buttons(container)['Sign in'].hasAttribute('aria-disabled')).to.be.false;
+      const rows = [...container.querySelectorAll('.iitc-settings-action')];
+      expect(rows.map((row) => row.querySelector('.iitc-settings-message-text')?.textContent)).to.deep.equal(['Page done', 'Signed in']);
+    });
+  });
+
   describe('redraw', () => {
     it('leaves the page in place until the current task is done, so a click after a change still lands', async () => {
       const action = sinon.spy();
