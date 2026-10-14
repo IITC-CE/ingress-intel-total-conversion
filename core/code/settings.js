@@ -7,8 +7,8 @@
  * and validates every value. Blocks without a key are the rest of the page: actions and content.
  * Keys that were never declared still work through `get`/`set`, without validation
  *
- * Every value is kept under `iitc-setting:<key>`. Until its page is registered, a key is read and written
- * as undeclared, without validation
+ * Every value is kept under `iitc-setting:<key>`. Until a page or an extension of one declares it, a key is
+ * read and written as undeclared, without validation
  *
  * @memberof IITC
  * @namespace settings
@@ -129,6 +129,9 @@ const STORAGE_PREFIX = 'iitc-setting:';
 // lookups take keys from plugins and imported files, so names like `constructor` must not hit Object.prototype
 const pages = Object.create(null);
 const definitions = Object.create(null);
+// sections plugins add to the pages of others, by page id and extension id; kept apart from the pages,
+// so a page registered again keeps them
+const extensions = Object.create(null);
 
 const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
@@ -353,6 +356,37 @@ const collectDefinitions = (namespace, blocks, repeat = undefined) => {
   return result;
 };
 
+// who declared a setting, for warnings
+const declarer = (def) => (def.extensionId === undefined ? `page "${def.pageId}"` : `extension "${def.extensionId}" of page "${def.pageId}"`);
+
+/**
+ * Declares the settings of a page or of an extension of it in place of the ones that declaration made
+ * before; a key declared elsewhere already stays with that declaration, with a warning
+ *
+ * @private
+ * @param {string} pageId - Page id
+ * @param {string|undefined} extensionId - Extension id, undefined for the page itself
+ * @param {string} namespace - Prefix of the keys
+ * @param {Array<IITC.settings.SettingBlock>} blocks - Blocks holding the settings
+ * @returns {string[]} The keys declared
+ */
+const declare = (pageId, extensionId, namespace, blocks) => {
+  for (const key of Object.keys(definitions)) {
+    if (definitions[key].pageId === pageId && definitions[key].extensionId === extensionId) delete definitions[key];
+  }
+  const keys = [];
+  for (const def of collectDefinitions(namespace, blocks)) {
+    const existing = definitions[def.fullKey];
+    if (existing) {
+      log.warn(`settings: "${def.fullKey}" is already declared by ${declarer(existing)}`);
+      continue;
+    }
+    definitions[def.fullKey] = { ...def, pageId, extensionId };
+    keys.push(def.fullKey);
+  }
+  return keys;
+};
+
 /**
  * Declares a settings page and the settings its blocks hold. Registering a page id again replaces the
  * earlier declaration and announces no change: a stored value the new declaration rejects reads as
@@ -397,27 +431,72 @@ const register = (pageId, page) => {
     return false;
   }
 
-  for (const key of Object.keys(definitions)) {
-    if (definitions[key].pageId === pageId) delete definitions[key];
-  }
-
   const namespace = page.namespace ?? pageId;
   pages[pageId] = { ...page, namespace };
-  const keys = [];
-  for (const def of collectDefinitions(namespace, page.blocks)) {
-    const existing = definitions[def.fullKey];
-    if (existing) {
-      log.warn(`settings: "${def.fullKey}" is already declared by page "${existing.pageId}"`);
-      continue;
-    }
-    definitions[def.fullKey] = { ...def, pageId };
-    keys.push(def.fullKey);
-  }
+  const keys = declare(pageId, undefined, namespace, page.blocks);
 
   // last, so settingsPageRegistered handlers (sync) see the page settled
   window.runHooks('settingsPageRegistered', { pageId, keys });
   return true;
 };
+
+/**
+ * Adds a section to the page of another plugin, such as options of an add-on on the page of the plugin it
+ * works with. The section follows the page's own blocks under a heading of its title; sections of several
+ * extensions follow by title, whatever order their plugins load in. Its settings are declared at once,
+ * whether the page is registered yet or not, and the section shows once it is. Extending the page again
+ * with the same extension id replaces the section and its settings, as `register` replaces a page
+ *
+ * @memberof IITC.settings
+ * @param {string} pageId - Id of the page to extend
+ * @param {string} extensionId - Unique id of the section, usually the id of the plugin adding it
+ * @param {Object} section - Section declaration
+ * @param {string} [section.title] - Heading of the section. Defaults to the extension id
+ * @param {string} [section.namespace] - Prefix of the section's setting keys. Defaults to the extension id, so
+ *                                       a plugin that also registers a page of its own under its id gives the
+ *                                       section a namespace of its own: a key declared twice stays with the
+ *                                       first declaration
+ * @param {Array<IITC.settings.SettingBlock>} section.blocks - Section content, of the same blocks as a page
+ * @returns {boolean} True if the section was added
+ *
+ * @example
+ * IITC.settings.extend('draw-tools', 'kml-import', {
+ *   title: 'KML import',
+ *   blocks: [
+ *     { type: 'boolean', key: 'fit', title: 'Zoom to the imported shapes', default: true },
+ *     { type: 'import', title: 'KML file', onData: (text) => importKml(text), accept: '.kml' },
+ *   ],
+ * });
+ * if (IITC.settings.get('kml-import.fit')) map.fitBounds(bounds);
+ */
+const extend = (pageId, extensionId, section) => {
+  if (typeof pageId !== 'string' || !pageId) {
+    log.warn('settings: page id is missing');
+    return false;
+  }
+  if (typeof extensionId !== 'string' || !extensionId) {
+    log.warn(`settings: extension id is missing for page "${pageId}"`);
+    return false;
+  }
+  if (!Array.isArray(section?.blocks)) {
+    log.warn(`settings: extension "${extensionId}" of page "${pageId}" has no blocks`);
+    return false;
+  }
+
+  const namespace = section.namespace ?? extensionId;
+  extensions[pageId] ??= Object.create(null);
+  extensions[pageId][extensionId] = { ...section, title: String(section.title ?? extensionId), namespace };
+  const keys = declare(pageId, extensionId, namespace, section.blocks);
+
+  window.runHooks('settingsPageRegistered', { pageId, extensionId, keys });
+  return true;
+};
+
+// the sections extensions add to a page, by title and then by extension id
+const sectionsOf = (pageId) =>
+  Object.entries(extensions[pageId] ?? {})
+    .map(([id, section]) => ({ ...section, id }))
+    .sort((a, b) => a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
 
 /**
  * Turns the stored value of a declared setting into its effective value
@@ -660,6 +739,7 @@ const importValues = (values, options) => {
 
 IITC.settings = {
   register,
+  extend,
   get,
   set,
   reset,
@@ -670,6 +750,8 @@ IITC.settings = {
   _storedState: storedState,
   _pages: pages,
   _definitions: definitions,
+  _extensions: extensions,
+  _sections: sectionsOf,
   // for the page renderer: the default of a value or of the entry of an item, the valid stored entries of a map
   // without the defaults, so a change of one entry stores only that one, and the choices of a select (none when
   // they fail)

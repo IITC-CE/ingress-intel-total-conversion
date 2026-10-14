@@ -135,6 +135,103 @@ describe('IITC.settings', () => {
     });
   });
 
+  describe('extend', () => {
+    // every test extends a page of its own
+    let extendCount = 0;
+    const pageIdOf = () => `test-extended-${++extendCount}`;
+
+    it('declares the settings of a section before the page is registered', () => {
+      const seen = onHook('settingsPageRegistered');
+      const pageId = pageIdOf();
+
+      expect(settings.extend(pageId, 'test-ext-early', { title: 'Early', blocks: [{ type: 'number', key: 'n', default: 3, max: 5 }] })).to.be.true;
+
+      expect(settings._pages[pageId]).to.be.undefined;
+      expect(settings.get('test-ext-early.n')).to.equal(3);
+      expect(settings.set('test-ext-early.n', 9)).to.be.false;
+      expect(seen.calledOnceWith({ pageId, extensionId: 'test-ext-early', keys: ['test-ext-early.n'] })).to.be.true;
+      expect(settings._sections(pageId).map((section) => section.id)).to.deep.equal(['test-ext-early']);
+      expect(settings.exportValues()).to.not.have.property('test-ext-early.n');
+      settings.set('test-ext-early.n', 4);
+      expect(settings.exportValues()).to.include({ 'test-ext-early.n': 4 });
+    });
+
+    it('extends a page registered already, under a namespace of its own when one is given', () => {
+      const id = page([{ type: 'boolean', key: 'flag' }]);
+
+      settings.extend(id, 'test-ext-late', { title: 'Late', namespace: 'test-ext-ns', blocks: [{ type: 'string', key: 's', default: 'x' }] });
+
+      expect(settings.get('test-ext-ns.s')).to.equal('x');
+      expect(settings._definitions['test-ext-late.s']).to.be.undefined;
+      expect(settings._sections(id).map(({ namespace, title }) => ({ namespace, title }))).to.deep.equal([{ namespace: 'test-ext-ns', title: 'Late' }]);
+    });
+
+    it('keeps the sections when the page registers again', () => {
+      const pageId = pageIdOf();
+      settings.extend(pageId, 'test-ext-kept', { title: 'Kept', blocks: [{ type: 'boolean', key: 'b', default: true }] });
+      settings.register(pageId, { title: 'Owner', blocks: [{ type: 'boolean', key: 'own' }] });
+
+      settings.register(pageId, { title: 'Owner', blocks: [{ type: 'boolean', key: 'other' }] });
+
+      expect(settings._definitions[`${pageId}.own`]).to.be.undefined;
+      expect(settings._definitions['test-ext-kept.b']).to.include({ pageId, extensionId: 'test-ext-kept' });
+      expect(settings._sections(pageId).map((section) => section.id)).to.deep.equal(['test-ext-kept']);
+    });
+
+    it('replaces the section and its settings when the same extension extends the page again', () => {
+      const pageId = pageIdOf();
+      settings.extend(pageId, 'test-ext-again', { title: 'Old', blocks: [{ type: 'boolean', key: 'old' }] });
+
+      settings.extend(pageId, 'test-ext-again', { title: 'New', blocks: [{ type: 'boolean', key: 'new' }] });
+
+      expect(settings._definitions['test-ext-again.old']).to.be.undefined;
+      expect(settings._definitions['test-ext-again.new']).to.exist;
+      expect(settings._sections(pageId).map((section) => section.title)).to.deep.equal(['New']);
+    });
+
+    it('orders the sections by title, whatever order they are added in', () => {
+      const pageId = pageIdOf();
+      settings.extend(pageId, 'test-ext-z', { title: 'Zoom', blocks: [] });
+      settings.extend(pageId, 'test-ext-b', { title: 'Area', blocks: [] });
+      settings.extend(pageId, 'test-ext-a', { title: 'Area', blocks: [] });
+      settings.extend(pageId, 'test-ext-untitled', { blocks: [] });
+
+      expect(settings._sections(pageId).map((section) => [section.id, section.title])).to.deep.equal([
+        ['test-ext-a', 'Area'],
+        ['test-ext-b', 'Area'],
+        ['test-ext-untitled', 'test-ext-untitled'],
+        ['test-ext-z', 'Zoom'],
+      ]);
+    });
+
+    it('keeps the first declaration of a key claimed by a page or another extension', () => {
+      const warn = sinon.spy(globalThis.log, 'warn');
+      const owner = page([{ type: 'number', key: 'n', default: 1 }], { namespace: 'test-ext-shared' });
+      settings.extend(owner, 'test-ext-first', {
+        namespace: 'test-ext-shared',
+        blocks: [
+          { type: 'number', key: 'n', default: 2 },
+          { type: 'number', key: 'm', default: 3 },
+        ],
+      });
+      settings.extend(pageIdOf(), 'test-ext-second', { namespace: 'test-ext-shared', blocks: [{ type: 'number', key: 'm', default: 4 }] });
+
+      expect(settings.get('test-ext-shared.n')).to.equal(1);
+      expect(settings.get('test-ext-shared.m')).to.equal(3);
+      expect(warn.calledWithMatch(`"test-ext-shared.n" is already declared by page "${owner}"`)).to.be.true;
+      expect(warn.calledWithMatch(`"test-ext-shared.m" is already declared by extension "test-ext-first" of page "${owner}"`)).to.be.true;
+    });
+
+    it('rejects a section without a page id, an extension id or blocks', () => {
+      const warn = sinon.spy(globalThis.log, 'warn');
+      expect(settings.extend('', 'test-ext-bad', { blocks: [] })).to.be.false;
+      expect(settings.extend('test-extended-bad', '', { blocks: [] })).to.be.false;
+      expect(settings.extend('test-extended-bad', 'test-ext-bad', { title: 'Empty' })).to.be.false;
+      expect(warn.callCount).to.equal(3);
+      expect(settings._sections('test-extended-bad')).to.be.empty;
+    });
+  });
+
   describe('get', () => {
     it('returns the declared default while nothing is stored', () => {
       const id = page([{ type: 'number', key: 'n', default: 30 }]);
