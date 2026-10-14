@@ -3,12 +3,16 @@
 /**
  * Options API
  *
- * Plugins declare their options as blocks with a `key`; the core stores them, applies defaults
- * and validates every value. Blocks without a key are the rest of the page: actions and content.
- * Keys that were never declared still work through `get`/`set`, without validation
+ * A plugin declares its options page with `register` in its setup, reads the values with `get` where it
+ * needs them and reacts to changes in `onChange`. The options are blocks with a `key`; the core validates
+ * every value, applies the defaults and stores only values that differ from the default. Blocks without
+ * a key are the rest of the page: actions and content. Options sync between devices by default, through
+ * the Sync plugin; `sync: false` keeps one on this device. A plugin without a page of its own adds a section
+ * to the page of another with `extend`
  *
- * Every value is kept under `iitc-option:<key>`. Until a page or an extension of one declares it, a key is
- * read and written as undeclared, without validation
+ * Every value is kept under `iitc-option:<key>`. Keys that were never declared still work through
+ * `get`/`set`, without validation; until a page or an extension of one declares it, a key is read and
+ * written as undeclared
  *
  * @memberof IITC
  * @namespace options
@@ -397,7 +401,7 @@ const declare = (pageId, extensionId, namespace, blocks) => {
  * @param {IITC.options.OptionsPage} page - Page declaration
  * @returns {boolean} True if the page was registered
  *
- * @example
+ * @example <caption>A page</caption>
  * IITC.options.register('my-plugin', {
  *   title: 'My plugin',
  *   shortcut: true,
@@ -411,8 +415,10 @@ const declare = (pageId, extensionId, namespace, blocks) => {
  *       type: 'action',
  *       title: 'Forget marked portals',
  *       button: 'Forget',
- *       action: () => {
- *         save({});
+ *       // a promise is waited for; the text returned or the error thrown shows next to the button
+ *       action: async () => {
+ *         if (!Object.keys(load()).length) throw new Error('Nothing is marked');
+ *         await save({});
  *         return 'Forgotten';
  *       },
  *     },
@@ -420,6 +426,23 @@ const declare = (pageId, extensionId, namespace, blocks) => {
  * });
  * // the values are read where they are needed
  * if (IITC.options.get('my-plugin.show')) draw();
+ *
+ * @example <caption>An option for each item of a list</caption>
+ * IITC.options.register('my-plugin', {
+ *   title: 'My plugin',
+ *   blocks: [
+ *     {
+ *       type: 'repeat',
+ *       over: () => [
+ *         { id: 'ENL', title: 'Enlightened' },
+ *         { id: 'RES', title: 'Resistance' },
+ *       ],
+ *       blocks: [{ type: 'color', key: 'color', title: 'Color', default: (item) => (item.id === 'ENL' ? '#03dc03' : '#0088ff') }],
+ *     },
+ *   ],
+ * });
+ * // a map of item id to value, with the default of every item that has nothing stored
+ * IITC.options.get('my-plugin.color'); // { ENL: '#03dc03', RES: '#0088ff' }
  */
 const register = (pageId, page) => {
   if (typeof pageId !== 'string' || !pageId) {
@@ -612,12 +635,27 @@ const refusesRemote = (key, source) => {
  * @param {string} key - Option key, `<namespace>.<key>`
  * @param {*} value - New value
  * @param {Object} [opts]
- * @param {string} [opts.source='local'] - Origin of the change, passed to the optionChanged hook; sync uses `remote`
+ * @param {string} [opts.source='local'] - Origin of the change, passed to the optionChanged hook; sync uses
+ *                                           `remote`, and `legacy` marks a value moved from an older build: it
+ *                                           gets no sync time, so the shared records win over it
  * @returns {boolean} False if the value is not allowed or could not be stored, or if a `remote` value
  *          targets an undeclared key or an option declared with `sync: false`
  *
  * @example
  * IITC.options.set('draw-tools.color', '#a24ac3');
+ *
+ * @example <caption>Moving an option from an older localStorage key</caption>
+ * IITC.options.register('my-plugin', {
+ *   title: 'My plugin',
+ *   blocks: [{ type: 'number', key: 'radius', title: 'Radius, m', min: 0, default: 40 }],
+ * });
+ * const legacy = localStorage.getItem('plugin-my-plugin-radius');
+ * if (legacy !== null) {
+ *   // a legacy value gets no sync time, so a value synced from other devices wins over it
+ *   IITC.options.set('my-plugin.radius', Number(legacy), { source: 'legacy' });
+ *   // the value moves once
+ *   localStorage.removeItem('plugin-my-plugin-radius');
+ * }
  */
 const set = (key, value, opts) => {
   const source = opts?.source ?? 'local';
