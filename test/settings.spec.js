@@ -232,12 +232,12 @@ describe('IITC.settings', () => {
       expect(localStorage.getItem(`iitc-setting:${id}.m`)).to.be.null;
     });
 
-    it('removes a map that holds no entries, and keeps entries equal to the default of an entry', () => {
+    it('keeps only the entries of a map that differ from the default of an entry, and removes a map left empty', () => {
       const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'boolean', key: 'on' }] }]);
 
+      settings.set(`${id}.on`, { a: true, b: false });
+      expect(localStorage.getItem(`iitc-setting:${id}.on`)).to.equal('{"a":true}');
       settings.set(`${id}.on`, { a: false });
-      expect(localStorage.getItem(`iitc-setting:${id}.on`)).to.equal('{"a":false}');
-      settings.set(`${id}.on`, {});
       expect(localStorage.getItem(`iitc-setting:${id}.on`)).to.be.null;
     });
 
@@ -557,7 +557,7 @@ describe('IITC.settings', () => {
       expect(settings.get(`${id}.hidden`)).to.deep.equal({});
 
       expect(settings.set(`${id}.hidden`, { ap1: true, sc5: false })).to.be.true;
-      expect(JSON.parse(localStorage.getItem(`iitc-setting:${id}.hidden`))).to.deep.equal({ ap1: true, sc5: false });
+      expect(JSON.parse(localStorage.getItem(`iitc-setting:${id}.hidden`))).to.deep.equal({ ap1: true });
       expect(settings.set(`${id}.hidden`, { ap1: 'yes' })).to.be.false;
       expect(settings.set(`${id}.hidden`, true)).to.be.false;
     });
@@ -574,23 +574,23 @@ describe('IITC.settings', () => {
 
     it('keeps the valid entries when another entry is set', () => {
       const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'select', key: 'mode', options: ['a', 'b'] }] }]);
-      localStorage.setItem(`iitc-setting:${id}.mode`, JSON.stringify({ x: 'a', y: 'removed' }));
+      localStorage.setItem(`iitc-setting:${id}.mode`, JSON.stringify({ x: 'b', y: 'removed' }));
 
       expect(settings.set(`${id}.mode`, { ...settings.get(`${id}.mode`), z: 'b' })).to.be.true;
 
-      expect(settings.get(`${id}.mode`)).to.deep.equal({ x: 'a', z: 'b' });
+      expect(settings.get(`${id}.mode`)).to.deep.equal({ x: 'b', z: 'b' });
     });
 
     it('stores a map changed in place after get', () => {
       const id = page([{ type: 'repeat', over: () => [], blocks: [{ type: 'boolean', key: 'hidden' }] }]);
-      settings.set(`${id}.hidden`, { ap1: false });
+      settings.set(`${id}.hidden`, { ap1: true });
 
       const hidden = settings.get(`${id}.hidden`);
-      hidden.ap1 = true;
-      expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: false });
+      hidden.sc5 = true;
+      expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: true });
 
       settings.set(`${id}.hidden`, hidden);
-      expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: true });
+      expect(settings.get(`${id}.hidden`)).to.deep.equal({ ap1: true, sc5: true });
     });
 
     describe('defaults of the items', () => {
@@ -648,6 +648,28 @@ describe('IITC.settings', () => {
 
         expect(warn.calledWithMatch(`"${id}.n" takes a default function only inside a repeat`)).to.be.true;
         expect(settings.get(`${id}.n`)).to.equal(0);
+      });
+
+      it('stores only the entries that differ from the default of their item, and the ones of ids over does not list', () => {
+        const id = page([{ type: 'repeat', over: factions, blocks: [{ type: 'color', key: 'color', default: (item) => colors[item.id] }] }]);
+
+        settings.set(`${id}.color`, { ENL: '#03dc03', RES: '#ffffff', gone: '#03dc03' });
+        expect(JSON.parse(localStorage.getItem(`iitc-setting:${id}.color`))).to.deep.equal({ RES: '#ffffff', gone: '#03dc03' });
+
+        settings.set(`${id}.color`, { ENL: '#03dc03', RES: '#0088ff' });
+        expect(localStorage.getItem(`iitc-setting:${id}.color`)).to.be.null;
+      });
+
+      it('keeps every entry while over fails', () => {
+        sinon.stub(globalThis.log, 'warn');
+        const over = () => {
+          throw new Error('not loaded');
+        };
+        const id = page([{ type: 'repeat', over, blocks: [{ type: 'boolean', key: 'hidden', default: () => false }] }]);
+
+        settings.set(`${id}.hidden`, { ap1: false });
+
+        expect(JSON.parse(localStorage.getItem(`iitc-setting:${id}.hidden`))).to.deep.equal({ ap1: false });
       });
 
       it('announces no change when an entry is set to the default of its item', () => {

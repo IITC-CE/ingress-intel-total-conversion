@@ -345,6 +345,14 @@ describe('window.ornaments settings', () => {
       expect(await redraws()).to.equal(1);
     });
 
+    it('removes the entry of an ornament that is shown again', () => {
+      settings.set('ornaments.hidden', { ap1: true, sc5: true });
+
+      settings.set('ornaments.hidden', { ...settings.get('ornaments.hidden'), ap1: false });
+
+      expect(JSON.parse(localStorage.getItem('iitc-setting:ornaments.hidden'))).to.deep.equal({ sc5: true });
+    });
+
     it('saves any truthy entry of knownOrnaments as hidden, as older builds read it', async () => {
       ornaments.knownOrnaments = { ap1: 1, sc5: 0 };
 

@@ -421,13 +421,13 @@ describe('IITC.settings._renderPage', () => {
           blocks: [{ type: 'select', key: 'mode', title: 'Mode', options: ['a', 'b'] }],
         },
       ]);
-      localStorage.setItem(`iitc-setting:${id}.mode`, JSON.stringify({ x: 'a', y: 'removed' }));
+      localStorage.setItem(`iitc-setting:${id}.mode`, JSON.stringify({ x: 'b', y: 'removed' }));
       settings._renderPage(id, container);
 
       change(container.querySelectorAll('select')[2], '1');
 
-      expect(JSON.parse(localStorage.getItem(`iitc-setting:${id}.mode`))).to.deep.equal({ x: 'a', z: 'b' });
-      expect(settings.get(`${id}.mode`)).to.deep.equal({ x: 'a', y: 'a', z: 'b' });
+      expect(JSON.parse(localStorage.getItem(`iitc-setting:${id}.mode`))).to.deep.equal({ x: 'b', z: 'b' });
+      expect(settings.get(`${id}.mode`)).to.deep.equal({ x: 'b', y: 'a', z: 'b' });
     });
 
     it('shows the default of its item in a cell with no stored entry', () => {
