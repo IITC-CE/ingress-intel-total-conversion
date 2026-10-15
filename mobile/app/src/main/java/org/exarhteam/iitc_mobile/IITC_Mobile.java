@@ -45,6 +45,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -325,13 +326,8 @@ public class IITC_Mobile extends AppCompatActivity
         mDesktopFilter = new IntentFilter();
         mDesktopFilter.addAction("UiModeManager.SEM_ACTION_ENTER_KNOX_DESKTOP_MODE");
         mDesktopFilter.addAction("UiModeManager.SEM_ACTION_EXIT_KNOX_DESKTOP_MODE");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
-            registerReceiver(mDesktopModeReceiver, mDesktopFilter, Context.RECEIVER_NOT_EXPORTED);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31-32
-            registerReceiver(mDesktopModeReceiver, mDesktopFilter, 0x00000001); // RECEIVER_NOT_EXPORTED
-        } else {
-            registerReceiver(mDesktopModeReceiver, mDesktopFilter);
-        }
+        ContextCompat.registerReceiver(this, mDesktopModeReceiver, mDesktopFilter,
+                ContextCompat.RECEIVER_NOT_EXPORTED);
 
         // Check for app updates
         if (BuildConfig.ENABLE_CHECK_APP_UPDATES) {
@@ -494,6 +490,7 @@ public class IITC_Mobile extends AppCompatActivity
 
     @Override
     protected void onNewIntent(final Intent intent) {
+        super.onNewIntent(intent);
         setIntent(intent);
         handleIntent(intent, false);
     }
@@ -1248,6 +1245,22 @@ public class IITC_Mobile extends AppCompatActivity
 
         mEditCommand.setText(text);
         setDebugCursorToEnd();
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugLeft, assigned in activity_main.xml
+     */
+    public void onDebugCursorMoveLeft(final View v)
+    {
+        mEditCommand.setSelection(debugCursorMove(false));
+    }
+
+    /**
+     * onClick handler for R.id.btnDebugRight, assigned in activity_main.xml
+     */
+    public void onDebugCursorMoveRight(final View v)
+    {
+        mEditCommand.setSelection(debugCursorMove(true));
     }
 
     private int debugCursorMove(boolean right) {
