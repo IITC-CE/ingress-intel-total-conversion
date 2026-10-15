@@ -41,11 +41,6 @@ public class DeepLinkPermissionPreference extends Preference {
         super.onAttachedToHierarchy(preferenceManager);
         mIsAttached = true;
         
-        // Find parent category
-        if (getParent() instanceof PreferenceCategory) {
-            mParentCategory = (PreferenceCategory) getParent();
-        }
-        
         // Update visibility after attachment
         updateVisibility();
     }
@@ -64,6 +59,14 @@ public class DeepLinkPermissionPreference extends Preference {
         updateVisibility();
     }
     
+    /**
+     * Sets the category that contains this preference (Preference.getParent() requires API 26)
+     */
+    public void setParentCategory(PreferenceCategory category) {
+        mParentCategory = category;
+        updateVisibility();
+    }
+
     /**
      * Call this method when returning from system settings to update visibility
      */
@@ -86,11 +89,6 @@ public class DeepLinkPermissionPreference extends Preference {
     private void updateVisibility() {
         if (!mIsAttached || mDeepLinkHandler == null) {
             return;
-        }
-        
-        // Try to find parent category if we don't have it yet
-        if (mParentCategory == null && getParent() instanceof PreferenceCategory) {
-            mParentCategory = (PreferenceCategory) getParent();
         }
         
         if (mParentCategory == null) {

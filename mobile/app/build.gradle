@@ -79,7 +79,8 @@ android {
     }
 
     lint {
-        abortOnError false
+        abortOnError true
+        checkOnly 'NewApi'
     }
     compileOptions {
         sourceCompatibility = '1.8'

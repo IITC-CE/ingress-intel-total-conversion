@@ -1,5 +1,6 @@
 package org.exarhteam.iitc_mobile;
 
+import android.os.Build;
 import android.webkit.WebResourceResponse;
 
 import java.io.BufferedInputStream;
@@ -31,7 +32,14 @@ public class LazyTileResponse extends WebResourceResponse {
 
     @Override
     public InputStream getData() {
-        Object lock = fileLocks.computeIfAbsent(cachePath, k -> new Object());
+        Object lock;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            lock = fileLocks.computeIfAbsent(cachePath, k -> new Object());
+        } else {
+            lock = new Object();
+            Object existing = fileLocks.putIfAbsent(cachePath, lock);
+            if (existing != null) lock = existing;
+        }
 
         try {
             synchronized (lock) {
