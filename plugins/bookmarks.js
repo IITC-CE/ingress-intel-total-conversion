@@ -32,7 +32,6 @@ var changelog = [
 
   HOOKS:
   - pluginBkmrksEdit: fired when a bookmarks/folder is removed, added or sorted, also when a folder is opened/closed;
-  - pluginBkmrksOpenOpt: fired when the "Bookmarks Options" panel is opened (you can add new options);
   - pluginBkmrksSyncEnd: fired when the sync is finished;
 
 ********************************************************************** */
@@ -99,6 +98,17 @@ window.plugin.bookmarks.escapeHtml = function (text) {
     .replace(/\\/g, '&#92;');
 };
 
+// the text escapeHtml was given, for labels shown as text rather than as HTML
+window.plugin.bookmarks.unescapeHtml = (html) =>
+  html
+    .replace(/&#92;/g, '\\')
+    .replace(/&#47;/g, '/')
+    .replace(/&#039;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&gt;/g, '>')
+    .replace(/&lt;/g, '<')
+    .replace(/&amp;/g, '&');
+
 window.plugin.bookmarks.escapeUnicode = function (str) {
   for (var result = '', index = 0, charCode; !isNaN((charCode = str.charCodeAt(index))); ) {
     if ((charCode & 127) === charCode) {
@@ -114,6 +124,8 @@ window.plugin.bookmarks.escapeUnicode = function (str) {
 // Update the localStorage
 window.plugin.bookmarks.saveStorage = function () {
   localStorage[window.plugin.bookmarks.KEY_STORAGE] = JSON.stringify(window.plugin.bookmarks.currentProject);
+  // the settings page lists the folders
+  IITC.settings.refresh('bookmarks');
 };
 
 // Load the localStorage
@@ -170,6 +182,8 @@ window.plugin.bookmarks.refreshBkmrks = function () {
 
   window.plugin.bookmarks.updateStarPortal();
   window.plugin.bookmarks.jquerySortableScript();
+  // the settings page lists the folders
+  IITC.settings.refresh('bookmarks');
 };
 
 /** *************************************************************************************************************************************************************/
@@ -730,75 +744,53 @@ window.plugin.bookmarks.jquerySortableScript = function () {
 /** ************************************************************************************************************************************************************/
 /** OPTIONS ****************************************************************************************************************************************************/
 /** ************************************************************************************************************************************************************/
-// Manual import, export and reset data
-window.plugin.bookmarks.manualOpt = function () {
-  window.dialog({
-    html: window.plugin.bookmarks.htmlSetbox,
-    dialogClass: 'ui-dialog-bkmrksSet',
-    id: 'plugin-bookmarks-options',
-    title: 'Bookmarks Options',
-  });
+/**
+ * Opens the plugin's page of the settings window, which replaces the options dialog
+ *
+ * @deprecated use `IITC.settings.open('bookmarks')` instead
+ */
+window.plugin.bookmarks.manualOpt = () => IITC.settings.open('bookmarks');
 
-  window.runHooks('pluginBkmrksOpenOpt');
-};
-
-window.plugin.bookmarks.optAlert = function (message) {
-  $('.ui-dialog-bkmrksSet .ui-dialog-buttonset').prepend('<p class="bkrmks-alert" style="float:left;margin-top:4px;">' + message + '</p>');
-  $('.bkrmks-alert').delay(2500).fadeOut();
-};
-
-window.plugin.bookmarks.optCopy = function () {
-  if (window.isApp && window.app.shareString) {
-    return window.app.shareString(window.plugin.bookmarks.escapeUnicode(localStorage[window.plugin.bookmarks.KEY_STORAGE]));
-  } else {
-    window.dialog({
-      html:
-        '<p><a onclick="$(\'.ui-dialog-bkmrksSet-copy textarea\').select();">Select all</a> and press CTRL+C to copy it.</p><textarea readonly>' +
-        window.plugin.bookmarks.escapeUnicode(localStorage[window.plugin.bookmarks.KEY_STORAGE]) +
-        '</textarea>',
-      dialogClass: 'ui-dialog-bkmrksSet-copy',
-      id: 'plugin-bookmarks-export',
-      title: 'Bookmarks Export',
-    });
-  }
-};
+// the stored bookmarks, with characters beyond ASCII escaped, for an export
+window.plugin.bookmarks.exportData = () => window.plugin.bookmarks.escapeUnicode(localStorage.getItem(window.plugin.bookmarks.KEY_STORAGE));
 
 window.plugin.bookmarks.optExport = function () {
-  var data = localStorage[window.plugin.bookmarks.KEY_STORAGE];
-  window.saveFile(data, 'IITC-bookmarks.json', 'application/json');
+  IITC.utils.exportFile(window.plugin.bookmarks.exportData(), 'IITC-bookmarks.json', 'application/json');
 };
 
-window.plugin.bookmarks.optPaste = function () {
-  var promptAction = prompt('Press CTRL+V to paste it.', '');
-  if (promptAction !== null && promptAction !== '') {
-    try {
-      JSON.parse(promptAction); // try to parse JSON first
-      localStorage[window.plugin.bookmarks.KEY_STORAGE] = promptAction;
-      window.plugin.bookmarks.refreshBkmrks();
-      window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'import' });
-      console.log('BOOKMARKS: reset and imported bookmarks');
-      window.plugin.bookmarks.optAlert('Successful. ');
-    } catch (e) {
-      console.warn('BOOKMARKS: failed to import data: ' + e);
-      window.plugin.bookmarks.optAlert('<span style="color: #f88">Import failed </span>');
-    }
+/**
+ * Replaces all bookmarks with exported ones
+ *
+ * @param {string} text - Bookmarks as exported
+ * @returns {string} What was imported
+ * @throws {Error} When the text is not bookmarks
+ */
+window.plugin.bookmarks.importData = (text) => {
+  let data;
+  try {
+    data = JSON.parse(text); // try to parse JSON first
+  } catch (e) {
+    console.warn('BOOKMARKS: failed to import data: ' + e);
+    throw new Error('These are not bookmarks');
   }
+  // stored as is, so anything else would break the plugin on the next load
+  const isList = (list) => list !== null && typeof list === 'object' && !Array.isArray(list);
+  if (!isList(data) || !isList(data.maps) || !isList(data.portals)) throw new Error('These are not bookmarks');
+  localStorage.setItem(window.plugin.bookmarks.KEY_STORAGE, text);
+  window.plugin.bookmarks.refreshBkmrks();
+  window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'import' });
+  console.log('BOOKMARKS: reset and imported bookmarks');
+  return 'Imported bookmarks';
 };
 
-window.plugin.bookmarks.optImport = function () {
-  L.FileListLoader.loadFiles({ accept: 'application/json' }).on('load', function (e) {
-    try {
-      JSON.parse(e.reader.result); // try to parse JSON first
-      localStorage[window.plugin.bookmarks.KEY_STORAGE] = e.reader.result;
-      window.plugin.bookmarks.refreshBkmrks();
-      window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'import' });
-      console.log('BOOKMARKS: reset and imported bookmarks');
-      window.plugin.bookmarks.optAlert('Successful. ');
-    } catch (e) {
-      console.warn('BOOKMARKS: failed to import data: ' + e);
-      window.plugin.bookmarks.optAlert('<span style="color: #f88">Import failed </span>');
-    }
-  });
+/**
+ * Lets the user pick a file of bookmarks, which replace all bookmarks
+ *
+ * @returns {Promise<string|undefined>} What was imported, undefined when no file was picked
+ */
+window.plugin.bookmarks.optImport = async () => {
+  const [file] = await IITC.utils.importFile({ accept: 'application/json' });
+  return file ? window.plugin.bookmarks.importData(file.text) : undefined;
 };
 
 window.plugin.bookmarks.optReset = function () {
@@ -810,10 +802,12 @@ window.plugin.bookmarks.optReset = function () {
     window.plugin.bookmarks.refreshBkmrks();
     window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'reset' });
     console.log('BOOKMARKS: reset all bookmarks');
-    window.plugin.bookmarks.optAlert('Successful. ');
+    return 'Deleted all bookmarks';
   }
+  return undefined;
 };
 
+// keeps or resets the position of the bookmarks box; the box is on the desktop only
 window.plugin.bookmarks.optBox = function (command) {
   if (!window.isApp) {
     switch (command) {
@@ -822,16 +816,16 @@ window.plugin.bookmarks.optBox = function (command) {
         var boxY = parseInt($('#bookmarksBox').css('left'));
         window.plugin.bookmarks.statusBox.pos = { x: boxX, y: boxY };
         window.plugin.bookmarks.saveStorageBox();
-        window.plugin.bookmarks.optAlert('Position acquired. ');
-        break;
+        return 'Position saved';
       case 'reset':
         $('#bookmarksBox').css({ top: 100, left: 100 });
         window.plugin.bookmarks.optBox('save');
-        break;
+        return 'Position reset';
     }
   } else {
-    window.plugin.bookmarks.optAlert('Only IITC desktop. ');
+    throw new Error('Only on IITC for desktop');
   }
+  return undefined;
 };
 
 window.plugin.bookmarks.dialogLoadListFolders = function (idBox, clickAction, showOthersF, scanType /* 0 = maps&portals; 1 = maps; 2 = portals*/) {
@@ -869,36 +863,93 @@ window.plugin.bookmarks.dialogLoadListFolders = function (idBox, clickAction, sh
   return r;
 };
 
-window.plugin.bookmarks.renameFolder = function (elem) {
-  var type = $(elem).data('type');
-  var idFold = $(elem).data('id');
+// the folders of both kinds of bookmarks, except the folder of the bookmarks outside any folder
+window.plugin.bookmarks.folders = () =>
+  ['maps', 'portals'].flatMap((type) =>
+    Object.entries(window.plugin.bookmarks.currentProject?.[type] ?? {})
+      .filter(([id]) => id !== window.plugin.bookmarks.KEY_OTHER_BKMRK)
+      // labels are stored escaped for the bookmarks box, which shows them as HTML
+      .map(([id, folder]) => ({ id: `${type}/${id}`, title: `${window.plugin.bookmarks.unescapeHtml(folder.label)} (${type})`, type, folderId: id }))
+  );
 
-  var promptAction = prompt('Insert a new name.', '');
-  if (promptAction !== null && promptAction !== '') {
-    try {
-      var newName = window.plugin.bookmarks.escapeHtml(promptAction);
+/**
+ * Asks for a new name of a folder in a dialog that shows the current one, and renames it
+ *
+ * @param {string} type - 'maps' or 'portals'
+ * @param {string} idFold - Folder id
+ * @returns {Promise<string|undefined>} What was done, undefined when no name was given
+ */
+window.plugin.bookmarks.renameFolder = async (type, idFold) => {
+  const folder = window.plugin.bookmarks.currentProject[type][idFold];
+  const name = await IITC.utils.promptText({ title: 'Rename folder', value: window.plugin.bookmarks.unescapeHtml(folder.label) });
+  if (name === undefined) return undefined;
 
-      window.plugin.bookmarks.currentProject[type][idFold].label = newName;
-      $('#bookmarksDialogRenameF #' + idFold).text(newName);
-      window.plugin.bookmarks.saveStorage();
-      window.plugin.bookmarks.refreshBkmrks();
-      window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'import' });
+  folder.label = window.plugin.bookmarks.escapeHtml(name);
+  window.plugin.bookmarks.saveStorage();
+  window.plugin.bookmarks.refreshBkmrks();
+  window.runHooks('pluginBkmrksEdit', { target: 'all', action: 'import' });
 
-      console.log('BOOKMARKS: renamed bookmarks folder');
-      window.plugin.bookmarks.optAlert('Successful. ');
-    } catch (e) {
-      console.warn('BOOKMARKS: failed to rename folder: ' + e);
-      window.plugin.bookmarks.optAlert('<span style="color: #f88">Rename failed </span>');
-    }
-  }
+  console.log('BOOKMARKS: renamed bookmarks folder');
+  return 'Renamed';
 };
 
-window.plugin.bookmarks.optRenameF = function () {
-  window.dialog({
-    html: window.plugin.bookmarks.dialogLoadListFolders('bookmarksDialogRenameF', 'window.plugin.bookmarks.renameFolder', false, 0),
-    dialogClass: 'ui-dialog-bkmrksSet-copy',
-    id: 'plugin-bookmarks-rename-folder',
-    title: 'Bookmarks Rename Folder',
+window.plugin.bookmarks.registerSettings = () => {
+  IITC.settings.register('bookmarks', {
+    title: 'Bookmarks',
+    shortcut: { label: 'Bookmarks Opt' },
+    blocks: [
+      {
+        type: 'export',
+        title: 'Export bookmarks',
+        description: 'Bookmarks and folders, as text or a file',
+        data: () => window.plugin.bookmarks.exportData(),
+        filename: 'IITC-bookmarks.json',
+        dataType: 'application/json',
+      },
+      {
+        type: 'import',
+        title: 'Import bookmarks',
+        description: 'From text or a file; replaces all bookmarks',
+        onData: (text) => window.plugin.bookmarks.importData(text),
+        accept: 'application/json',
+      },
+      { type: 'heading', title: 'Folders' },
+      {
+        type: 'text',
+        text: 'No folders yet. Add one with + Folder in the bookmarks',
+        visible: () => !window.plugin.bookmarks.folders().length,
+      },
+      {
+        type: 'repeat',
+        over: () => window.plugin.bookmarks.folders(),
+        blocks: [{ type: 'action', title: 'Rename', action: (folder) => window.plugin.bookmarks.renameFolder(folder.type, folder.folderId) }],
+      },
+      { type: 'heading', title: 'Bookmarks box', visible: () => !window.isApp },
+      {
+        type: 'action',
+        title: 'Box position',
+        description: 'Keeps the box where it is now',
+        button: 'Save',
+        visible: () => !window.isApp,
+        action: () => window.plugin.bookmarks.optBox('save'),
+      },
+      {
+        type: 'action',
+        title: 'Default box position',
+        description: 'Moves the box back to the top left corner',
+        button: 'Reset',
+        visible: () => !window.isApp,
+        action: () => window.plugin.bookmarks.optBox('reset'),
+      },
+      { type: 'heading', title: 'Danger zone' },
+      {
+        type: 'action',
+        title: 'Delete all bookmarks',
+        description: 'Bookmarks and folders; asks before deleting, cannot be undone',
+        button: 'Delete',
+        action: () => window.plugin.bookmarks.optReset(),
+      },
+    ],
   });
 };
 
@@ -1447,21 +1498,6 @@ window.plugin.bookmarks.setupContent = function () {
     '<a class="bkmrksStar" accesskey="b" onclick="window.plugin.bookmarks.switchStarPortal();return false;" title="Save this portal in your bookmarks [b]"><iitc-icon>star</iitc-icon></a>';
   window.plugin.bookmarks.htmlMoveBtn =
     '<a id="bookmarksMove" class="btn" onclick="window.plugin.bookmarks.moveMode();return false;">Show/Hide "Move" button</a>';
-
-  var actions = '';
-  actions += '<a onclick="window.plugin.bookmarks.optReset();return false;">Reset bookmarks</a>';
-  actions += '<a onclick="window.plugin.bookmarks.optCopy();return false;">Copy bookmarks</a>';
-  actions += '<a onclick="window.plugin.bookmarks.optPaste();return false;">Paste bookmarks</a>';
-
-  actions += '<a onclick="window.plugin.bookmarks.optImport();return false;">Import bookmarks</a>';
-  actions += '<a onclick="window.plugin.bookmarks.optExport();return false;">Export bookmarks</a>';
-
-  actions += '<a onclick="window.plugin.bookmarks.optRenameF();return false;">Rename Folder</a>';
-  if (!window.isApp) {
-    actions += '<a onclick="window.plugin.bookmarks.optBox(\'save\');return false;">Save box position</a>';
-    actions += '<a onclick="window.plugin.bookmarks.optBox(\'reset\');return false;">Reset box position</a>';
-  }
-  window.plugin.bookmarks.htmlSetbox = '<div id="bkmrksSetbox">' + actions + '</div>';
 };
 
 /** ************************************************************************************************************************************************************/
@@ -1510,12 +1546,11 @@ window.plugin.bookmarks.initMPE = function () {
 
 var setup = function () {
   window.plugin.bookmarks.isSmart = IITC.utils.isSmartphone();
+  window.plugin.bookmarks.registerSettings();
 
   // HOOKS:
   // - pluginBkmrksEdit:    fired when a bookmarks/folder is removed, added or sorted,
   //                        also when a folder is opened/closed.
-  // - pluginBkmrksOpenOpt: fired when the "Bookmarks Options" panel is opened
-  //                        (you can add new options);
   // - pluginBkmrksSyncEnd: fired when the sync is finished;
 
   // If the storage not exists or is a old version
@@ -1542,10 +1577,6 @@ var setup = function () {
     if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'star');
     window.addHook('paneChanged', window.plugin.bookmarks.onPaneChanged);
   }
-  IITC.toolbox.addButton({
-    label: 'Bookmarks Opt',
-    action: window.plugin.bookmarks.manualOpt,
-  });
   IITC.toolbox.addButton({
     label: 'Auto draw',
     title: 'Draw lines/triangles between bookmarked portals [q]',

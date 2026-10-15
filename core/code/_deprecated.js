@@ -306,3 +306,22 @@ window.setupStyles = function () {
 
   $('head').append('<style>' + styles + '</style>');
 };
+
+/**
+ * Saves data to a file with the given filename
+ *
+ * @deprecated use {@link IITC.utils.exportFile} instead
+ * @function saveFile
+ * @param {string|BlobPart|BlobPart[]} data - The data to be saved; the app takes only strings
+ * @param {string} [filename] - The name of the file to save
+ * @param {string} [dataType] - The MIME type of the file, used to filter file types in the app
+ */
+window.saveFile = (data, filename, dataType) => IITC.utils.exportFile(data, filename, dataType);
+
+/**
+ * Opens the settings window on the 'About IITC' page
+ *
+ * @deprecated use `IITC.settings.open('about')` instead
+ * @function aboutIITC
+ */
+window.aboutIITC = () => IITC.settings.open('about');

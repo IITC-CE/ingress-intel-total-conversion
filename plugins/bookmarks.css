@@ -660,31 +660,6 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 	color:#03dc03;
 }
 
-/*---- Options panel -----*/
-#bkmrksSetbox a{
-	display:block;
-	color:#ffce00;
-	border:1px solid #ffce00;
-	padding:3px 0;
-	margin:10px auto;
-	width:80%;
-	text-align:center;
-	background:rgba(8,48,78,.9);
-}
-#bkmrksSetbox a.disabled,
-#bkmrksSetbox a.disabled:hover{
-	color:#666;
-	border-color:#666;
-	text-decoration:none;
-}
-/*---- Opt panel - copy -----*/
-.ui-dialog-bkmrksSet-copy textarea{
-	width:96%;
-	height:120px;
-	resize:vertical;
-}
-
-
 /*--- Other Opt css ---*/
 #bookmarksBox.mobile a.bookmarksMoveIn{
 	display:none !important;
@@ -738,7 +713,4 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 }
 #bookmarksBox.mobile .btn#bookmarksMove{
 	background:#B42E2E;
-}
-#bkmrksSetbox{
-	text-align:center;
 }

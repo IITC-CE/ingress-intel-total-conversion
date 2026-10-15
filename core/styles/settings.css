@@ -1,0 +1,392 @@
+.iitc-settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.iitc-settings-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 3px 0;
+
+  & + & {
+    border-top: 1px solid rgb(255 255 255 / 6%);
+  }
+}
+
+.iitc-settings-label {
+  flex: 1 1 12em;
+  min-width: 0;
+}
+
+.iitc-settings-control {
+  /* on the right, with a label or without one */
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.iitc-settings-buttons {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* a little larger than the button style of dialog content */
+.iitc-settings .iitc-settings-page button {
+  padding: 3px 5px;
+}
+
+/* the icon in the middle of the line, as large as the text beside it */
+.iitc-settings-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  & iitc-icon {
+    font-size: 16px;
+  }
+}
+
+.iitc-settings-description,
+.iitc-settings-sub {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.iitc-settings-heading {
+  margin: 12px 0 4px;
+  padding-bottom: 2px;
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-bg-border);
+  font-size: 14px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.iitc-settings-text {
+  margin: 4px 0;
+}
+
+.iitc-settings-notice {
+  margin: 4px 0;
+  padding: 6px 8px;
+  border-left: 2px solid var(--color-bg-border);
+  background: rgb(32 168 177 / 10%);
+}
+
+.iitc-settings-notice-warning {
+  border-left-color: var(--color-primary);
+  background: rgb(255 206 0 / 10%);
+}
+
+.iitc-settings-notice-error {
+  border-left-color: #ff8b7f;
+  background: rgb(255 139 127 / 10%);
+}
+
+.iitc-settings-page button[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.iitc-settings-error {
+  flex-basis: 100%;
+  color: #ff8b7f;
+}
+
+/* a line of its own under the row, as small as a description, after its icon */
+.iitc-settings-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  flex-basis: 100%;
+  font-size: 11px;
+
+  & > iitc-icon {
+    flex: none;
+    font-size: 14px;
+  }
+}
+
+.iitc-settings-page input[type='number'] {
+  width: 6em;
+}
+
+.iitc-settings-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  & li {
+    padding: 2px 0;
+  }
+
+  & .iitc-settings-list {
+    margin-left: 16px;
+  }
+}
+
+.iitc-settings-list-head {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* an icon in place of the marker, on the same line as the head, which is a flex box itself */
+.iitc-settings-list summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  & > iitc-icon {
+    flex: none;
+  }
+}
+
+.iitc-settings-list details[open] > summary > iitc-icon {
+  transform: rotate(90deg);
+}
+
+.iitc-settings-badge {
+  flex: none;
+  opacity: 0.75;
+}
+
+.iitc-settings-item-muted {
+  opacity: 0.6;
+}
+
+.iitc-settings-item-error {
+  text-decoration: line-through;
+  color: #ff8b7f;
+}
+
+.iitc-settings-repeat {
+  width: 100%;
+  border-collapse: collapse;
+
+  & th,
+  & td {
+    padding: 2px 4px;
+    text-align: left;
+    font-weight: normal;
+  }
+
+  /* the outer cells stay level with the titles and buttons of the other rows */
+  & :is(th, td):first-child {
+    padding-left: 0;
+  }
+
+  & :is(th, td):last-child {
+    padding-right: 0;
+  }
+
+  & thead th {
+    font-size: 11px;
+    opacity: 0.75;
+  }
+
+  & tbody tr + tr {
+    border-top: 1px solid rgb(255 255 255 / 6%);
+  }
+
+  & .iitc-settings-cell-buttons {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+  }
+}
+
+.iitc-settings-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+
+  & input {
+    margin: 0;
+  }
+}
+
+/* the window */
+
+/* a dialog of fixed height that keeps its size from page to page; the list and the page scroll each on
+   their own, with the padding inside them, so the scrollbar is at the edge */
+#dialog-iitc-settings {
+  overflow: hidden;
+  padding: 0;
+}
+
+.iitc-settings {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+}
+
+.iitc-settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px 0 12px 12px;
+}
+
+.iitc-settings-search {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.iitc-settings-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  /* room for the focus ring, which the scrolling list would cut off */
+  padding: 2px;
+  list-style: none;
+}
+
+/* inside the window, so the button style of dialog content does not apply */
+.iitc-settings .iitc-settings-page-link {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-left: 2px solid transparent;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &[aria-current='page'] {
+    border-left-color: var(--color-bg-border);
+    color: var(--color-primary);
+    background: rgb(32 168 177 / 11%);
+  }
+}
+
+.iitc-settings-found {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.iitc-settings-nothing {
+  padding: 4px 6px;
+  opacity: 0.75;
+}
+
+.iitc-settings-detail {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* the head with the way back stays in place; the padding inside the scrolling page leaves room for the
+   focus ring of a field */
+.iitc-settings-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 12px 12px;
+}
+
+.iitc-settings-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 12px 0;
+  /* on the head, so the heading stays level with the way back */
+  margin-bottom: 6px;
+
+  /* without the padding and the help cursor of the h2 of the sidebar */
+  & h2 {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    color: var(--color-primary);
+    cursor: auto;
+  }
+}
+
+/* inside the window, as the page links */
+.iitc-settings .iitc-settings-back {
+  display: none;
+  /* the icon in the middle, however large the button */
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+
+  & iitc-icon {
+    font-size: 20px;
+  }
+}
+
+/* a narrow window shows the list or the page */
+@container (width < 30rem) {
+  .iitc-settings-nav,
+  .iitc-settings-detail {
+    grid-column: 1 / -1;
+  }
+
+  .iitc-settings .iitc-settings-back {
+    display: inline-flex;
+  }
+
+  /* the list takes the width of the window, its scrollbar at the edge too */
+  .iitc-settings-search {
+    width: calc(100% - 12px);
+  }
+
+  .iitc-settings-pages {
+    padding-right: 12px;
+  }
+
+  [data-view='page'] > .iitc-settings-nav,
+  [data-view='list'] > .iitc-settings-detail {
+    display: none;
+  }
+}
+
+/* links that hold the access keys of pages without a toolbox button: a link that is not drawn ignores its key.
+   Fixed in the viewport, so the focus a key gives the link does not scroll the page */
+.iitc-settings-access-keys {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

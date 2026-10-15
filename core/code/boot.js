@@ -148,7 +148,7 @@ function setupIngressMarkers() {
  * @function checkingIntelURL
  */
 function checkingIntelURL() {
-  if (window.location.hostname !== 'intel.ingress.com' && localStorage['pass-checking-intel-url'] !== 'true') {
+  if (window.location.hostname !== 'intel.ingress.com' && IITC.settings.get('iitc.intelUrlWarning')) {
     window.dialog({
       title: 'IITC Warning',
       html: '<p>You are running IITC on a non-standard Intel domain. Correct behavior is not guaranteed. It is recommended to use the IITC at <a href="https://intel.ingress.com">intel.ingress.com</a></p>',
@@ -156,7 +156,7 @@ function checkingIntelURL() {
       buttons: {
         "Don't remind me": function () {
           $(this).dialog('close');
-          localStorage['pass-checking-intel-url'] = true;
+          IITC.settings.set('iitc.intelUrlWarning', false);
         },
         Dismiss: function () {
           $(this).dialog('close');
@@ -341,6 +341,8 @@ function boot() {
   IITC.portal.details.setup();
   window.setupRedeem();
   window.setupSidebar();
+  IITC.settings._setupWindow();
+  IITC.about.setup();
   IITC.statusbar.init();
 
   loadPlugins();
