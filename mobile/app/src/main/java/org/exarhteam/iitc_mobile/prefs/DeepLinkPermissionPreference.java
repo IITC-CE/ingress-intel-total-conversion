@@ -97,8 +97,8 @@ public class DeepLinkPermissionPreference extends Preference {
         
         Boolean isDefaultHandler = mDeepLinkHandler.isDefaultDeepLinkHandler();
         
-        if (isDefaultHandler != null && isDefaultHandler) {
-            // Hide preference if app is already default handler
+        if (isDefaultHandler == null || isDefaultHandler) {
+            // Hide preference if app is already default handler or the check is unsupported
             mParentCategory.removePreference(this);
         } else {
             // Show preference if app is not default handler
