@@ -79,18 +79,8 @@ describe('IITC.portal.display.makePermalink', () => {
 
 describe('IITC.portal.display.makePrimeLink', () => {
   it('builds an Ingress Prime deep link for the portal', () => {
-    const link = IITC.portal.display.makePrimeLink('GUID123', 1, 2);
-    expect(link)
-      .to.be.a('string')
-      .and.to.match(/^https:\/\/link\.ingress\.com\//);
-    // portal guid is carried in the intel link parameter
-    expect(link).to.include('GUID123');
-    // fallback link carries the portal coordinates
-    expect(decodeURIComponent(link)).to.include('pll=1,2');
-    // full expected deep link
-    expect(link).to.equal(
-      'https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fportal%2FGUID123&apn=com.nianticproject.ingress&isi=576505181&ibi=com.google.ingress&ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181&ofl=https%3A%2F%2Fintel.ingress.com%2Fintel%3Fpll%3D1%2C2'
-    );
+    const link = IITC.portal.display.makePrimeLink('GUID123');
+    expect(link).to.equal('https://link.ingress.com/portal/GUID123');
   });
 });
 
@@ -296,10 +286,7 @@ describe('IITC.portal.display.renderUrl', () => {
 
     expect(document.querySelector('.linkdetails').innerHTML).to.equal(
       '<aside><a href="/intel?pll=1.5,2.5" title="Create a URL link to this portal">Portal link</a></aside>' +
-        '<aside><a href="https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fportal%2FGUID123' +
-        '&amp;apn=com.nianticproject.ingress&amp;isi=576505181&amp;ibi=com.google.ingress' +
-        '&amp;ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181' +
-        '&amp;ofl=https%3A%2F%2Fintel.ingress.com%2Fintel%3Fpll%3D1.5%2C2.5" ' +
+        '<aside><a href="https://link.ingress.com/portal/GUID123" ' +
         'title="Copy link to this portal for Ingress Prime">Copy scanner link</a></aside>' +
         '<aside><a title="Link to alternative maps (Google, etc)">Map links</a></aside>'
     );
