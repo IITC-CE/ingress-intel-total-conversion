@@ -209,7 +209,7 @@ public class MainSettings extends PreferenceFragment {
         DeepLinkPermissionPreference deepLinkPref =
             (DeepLinkPermissionPreference) findPreference("pref_deep_link_permission");
         if (deepLinkPref != null) {
-            deepLinkPref.onActivityResumed();
+            deepLinkPref.setParentCategory((PreferenceCategory) findPreference("pref_tweaks_cat"));
         }
     }
 

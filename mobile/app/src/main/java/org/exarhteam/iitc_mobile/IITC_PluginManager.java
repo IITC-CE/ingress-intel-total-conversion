@@ -176,7 +176,13 @@ public class IITC_PluginManager {
         }
 
         // Remove asset plugins not present in the channel
-        plugins.values().removeIf(p -> p.type == PluginType.ASSET);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            plugins.values().removeIf(p -> p.type == PluginType.ASSET);
+        } else {
+            for (java.util.Iterator<Plugin> it = plugins.values().iterator(); it.hasNext(); ) {
+                if (it.next().type == PluginType.ASSET) it.remove();
+            }
+        }
     }
 
     /**

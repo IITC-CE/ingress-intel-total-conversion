@@ -41,11 +41,6 @@ public class DeepLinkPermissionPreference extends Preference {
         super.onAttachedToHierarchy(preferenceManager);
         mIsAttached = true;
         
-        // Find parent category
-        if (getParent() instanceof PreferenceCategory) {
-            mParentCategory = (PreferenceCategory) getParent();
-        }
-        
         // Update visibility after attachment
         updateVisibility();
     }
@@ -64,6 +59,14 @@ public class DeepLinkPermissionPreference extends Preference {
         updateVisibility();
     }
     
+    /**
+     * Sets the category that contains this preference (Preference.getParent() requires API 26)
+     */
+    public void setParentCategory(PreferenceCategory category) {
+        mParentCategory = category;
+        updateVisibility();
+    }
+
     /**
      * Call this method when returning from system settings to update visibility
      */
@@ -88,19 +91,14 @@ public class DeepLinkPermissionPreference extends Preference {
             return;
         }
         
-        // Try to find parent category if we don't have it yet
-        if (mParentCategory == null && getParent() instanceof PreferenceCategory) {
-            mParentCategory = (PreferenceCategory) getParent();
-        }
-        
         if (mParentCategory == null) {
             return;
         }
         
         Boolean isDefaultHandler = mDeepLinkHandler.isDefaultDeepLinkHandler();
         
-        if (isDefaultHandler != null && isDefaultHandler) {
-            // Hide preference if app is already default handler
+        if (isDefaultHandler == null || isDefaultHandler) {
+            // Hide preference if app is already default handler or the check is unsupported
             mParentCategory.removePreference(this);
         } else {
             // Show preference if app is not default handler
