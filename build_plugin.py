@@ -159,6 +159,7 @@ def prepare_css(sources: Iterable[Path], deps_list=None):
     source_root = settings.build_source_dir
     css_files = {}
     include_pattern = re.compile(r'@include_css:([\w./-]+)@')
+    sources = tuple(sources)
     for source in sources:
         include_root = source.parent.parent if source.parent.name == 'code' else source.parent
         for include in include_pattern.findall(source.read_text(encoding='utf-8-sig')):
@@ -179,6 +180,13 @@ def prepare_css(sources: Iterable[Path], deps_list=None):
     basenames = [filename.name for filename in css_files]
     if len(basenames) != len(set(basenames)):
         raise UserWarning('Lightning CSS CLI output filenames must be unique')
+
+    if deps_list is not None:
+        deps_list.extend(sources)
+        for filename in css_files:
+            deps_list.append(filename)
+            deps_list.extend(css_imports(filename))
+        deps_list.append(source_root / 'package.json')
 
     _css_tempdir = tempfile.TemporaryDirectory(prefix='iitc-lightningcss-')
     output_dir = Path(_css_tempdir.name)
@@ -201,12 +209,6 @@ def prepare_css(sources: Iterable[Path], deps_list=None):
         raise UserWarning(f'Lightning CSS processing failed:\n{result.stderr.decode()}')
 
     _processed_css = {filename: output_dir / filename.name for filename in css_files}
-    for filename in css_files:
-        if deps_list is not None:
-            deps_list.append(filename)
-            deps_list.extend(css_imports(filename))
-    if deps_list is not None:
-        deps_list.append(source_root / 'package.json')
 
 
 def css_imports(filename):
