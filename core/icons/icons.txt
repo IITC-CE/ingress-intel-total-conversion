@@ -54,6 +54,7 @@ add_circle
 remove
 edit
 delete
+delete_sweep
 undo
 redo
 content_copy

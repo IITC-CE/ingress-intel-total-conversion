@@ -44,6 +44,25 @@ window.plugin.linkShowDirection.styles = {
 window.plugin.linkShowDirection.dashArray = null;
 window.plugin.linkShowDirection.frame = 0;
 window.plugin.linkShowDirection.moving = false;
+window.plugin.linkShowDirection.drawtools = false;
+// a setting changed while the map moved; animateLinks skips frames then, so moveend restyles
+window.plugin.linkShowDirection.restylePending = false;
+
+// applies a changed setting now, or once the map stops moving
+window.plugin.linkShowDirection.restyle = () => {
+  if (window.plugin.linkShowDirection.moving) {
+    window.plugin.linkShowDirection.restylePending = true;
+    return;
+  }
+  window.plugin.linkShowDirection.animateLinks();
+};
+
+window.plugin.linkShowDirection.onMoveEnd = () => {
+  window.plugin.linkShowDirection.moving = false;
+  if (!window.plugin.linkShowDirection.restylePending) return;
+  window.plugin.linkShowDirection.restylePending = false;
+  window.plugin.linkShowDirection.animateLinks();
+};
 
 window.plugin.linkShowDirection.animateLinks = function () {
   var frames = window.plugin.linkShowDirection.styles[window.plugin.linkShowDirection.mode];
@@ -78,7 +97,7 @@ window.plugin.linkShowDirection.addAllLinkStyles = function () {
     window.plugin.linkShowDirection.addLinkStyle(link);
   });
 
-  if (window.plugin.drawTools && localStorage['plugin-linkshowdirection-drawtools'] === 'true') {
+  if (window.plugin.drawTools && window.plugin.linkShowDirection.drawtools) {
     window.plugin.drawTools.drawnItems.eachLayer(function (layer) {
       if (layer instanceof L.GeodesicPolyline) window.plugin.linkShowDirection.addLinkStyle(layer);
     });
@@ -97,97 +116,71 @@ window.plugin.linkShowDirection.removeDrawToolsStyle = function () {
   });
 };
 
-window.plugin.linkShowDirection.showDialog = function () {
-  var div = document.createElement('div');
-
-  $.each(window.plugin.linkShowDirection.styles, function (style) {
-    var label = div.appendChild(document.createElement('label'));
-    var input = label.appendChild(document.createElement('input'));
-    input.type = 'radio';
-    input.name = 'plugin-link-show-direction';
-    input.value = style;
-    if (style === window.plugin.linkShowDirection.mode) {
-      input.checked = true;
-    }
-
-    input.addEventListener(
-      'click',
-      function () {
-        window.plugin.linkShowDirection.mode = style;
-        localStorage['plugin-linkshowdirection-mode'] = style;
-        window.plugin.linkShowDirection.animateLinks();
+window.plugin.linkShowDirection.registerSettings = () => {
+  IITC.settings.register('link-show-direction', {
+    title: 'Link direction',
+    shortcut: { label: 'LinkDirection Opt' },
+    blocks: [
+      {
+        type: 'select',
+        key: 'mode',
+        title: 'Link direction style',
+        description:
+          "Static *: six segments show each link's direction, two long ones on the origin's side followed by four short ones on the destination's side",
+        options: () => Object.keys(window.plugin.linkShowDirection.styles),
+        default: 'Static near origin',
+        onChange: (mode) => {
+          window.plugin.linkShowDirection.mode = mode;
+          window.plugin.linkShowDirection.restyle();
+        },
       },
-      false
-    );
-
-    label.appendChild(document.createTextNode(' ' + style));
-
-    div.appendChild(document.createElement('br'));
-  });
-
-  div.appendChild(
-    document.createTextNode(
-      " * Static: six segments will indicate each link's direction. " +
-        "Two long segments are on the origin's side, follow by four short segments on the destination's side."
-    )
-  );
-
-  if (window.plugin.drawTools) {
-    div.appendChild(document.createElement('br'));
-
-    var label = div.appendChild(document.createElement('label'));
-    var input = label.appendChild(document.createElement('input'));
-    input.type = 'checkbox';
-    input.checked = localStorage['plugin-linkshowdirection-drawtools'] === 'true';
-
-    input.addEventListener(
-      'click',
-      function () {
-        localStorage['plugin-linkshowdirection-drawtools'] = input.checked.toString();
-
-        if (input.checked) window.plugin.linkShowDirection.animateLinks();
-        else window.plugin.linkShowDirection.removeDrawToolsStyle();
+      {
+        type: 'boolean',
+        key: 'drawtools',
+        title: 'Apply to DrawTools',
+        visible: () => Boolean(window.plugin.drawTools),
+        onChange: (apply) => {
+          window.plugin.linkShowDirection.drawtools = apply;
+          if (apply) window.plugin.linkShowDirection.restyle();
+          else window.plugin.linkShowDirection.removeDrawToolsStyle();
+        },
       },
-      false
-    );
-
-    label.appendChild(document.createTextNode(' Apply to DrawTools'));
-  }
-
-  window.dialog({
-    id: 'plugin-link-show-direction',
-    html: div,
-    title: 'Show link direction',
+    ],
   });
 };
 
+// the settings of older builds, kept as plain strings under keys of their own; each moves once, as a value the
+// declaration accepts, and its key goes, so a value set back to the default later is not moved again
+window.plugin.linkShowDirection.migrateSettings = () => {
+  const legacy = [
+    ['plugin-linkshowdirection-mode', 'link-show-direction.mode', (mode) => mode],
+    ['plugin-linkshowdirection-drawtools', 'link-show-direction.drawtools', (apply) => apply === 'true'],
+  ];
+  for (const [legacyKey, key, convert] of legacy) {
+    const stored = localStorage.getItem(legacyKey);
+    if (stored === null) continue;
+    IITC.settings.set(key, convert(stored), { source: 'legacy' });
+    localStorage.removeItem(legacyKey);
+  }
+};
+
 window.plugin.linkShowDirection.setup = function () {
-  IITC.toolbox.addButton({
-    label: 'LinkDirection Opt',
-    action: window.plugin.linkShowDirection.showDialog,
-  });
+  window.plugin.linkShowDirection.registerSettings();
+  window.plugin.linkShowDirection.migrateSettings();
 
   window.addHook('linkAdded', function (data) {
     window.plugin.linkShowDirection.addLinkStyle(data.link);
   });
 
-  const default_mode = 'Static near origin';
-  try {
-    window.plugin.linkShowDirection.mode = localStorage['plugin-linkshowdirection-mode'] || default_mode;
-  } catch (e) {
-    console.warn(e);
-    window.plugin.linkShowDirection.mode = default_mode;
-  }
-
+  window.plugin.linkShowDirection.mode = IITC.settings.get('link-show-direction.mode');
+  window.plugin.linkShowDirection.drawtools = IITC.settings.get('link-show-direction.drawtools');
   window.plugin.linkShowDirection.animateLinks();
 
   // set up move start/end handlers to pause animations while moving
   window.map.on('movestart', function () {
     window.plugin.linkShowDirection.moving = true;
   });
-  window.map.on('moveend', function () {
-    window.plugin.linkShowDirection.moving = false;
-  });
+  window.map.on('moveend', window.plugin.linkShowDirection.onMoveEnd);
 };
 
 var setup = window.plugin.linkShowDirection.setup;

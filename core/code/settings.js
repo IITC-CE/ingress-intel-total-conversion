@@ -1,0 +1,806 @@
+/* global IITC, log -- eslint */
+
+/**
+ * Settings API
+ *
+ * A plugin declares its settings page with `register` in its setup, reads the values with `get` where it
+ * needs them and reacts to changes in `onChange`. The settings are blocks with a `key`; the core validates
+ * every value, applies the defaults and stores only values that differ from the default. Blocks without
+ * a key are the rest of the page: actions and content. Settings sync between devices by default, through
+ * the Sync plugin; `sync: false` keeps one on this device. A plugin without a page of its own adds a section
+ * to the page of another with `extend`
+ *
+ * Every value is kept under `iitc-setting:<key>`. Keys that were never declared still work through
+ * `get`/`set`, without validation; until a page or an extension of one declares it, a key is read and
+ * written as undeclared
+ *
+ * @memberof IITC
+ * @namespace settings
+ */
+
+/**
+ * A block of a settings page; its `type` tells what it draws and which properties it reads:
+ *
+ * | `type` | Draws | Reads |
+ * | --- | --- | --- |
+ * | `boolean`, `number`, `string`, `select`, `color` | a field holding the setting its `key` names | `key`, `title`, `description`, `default`, `value`, `validate`, `onChange`, `sync`; `min`, `max`, `step` for `number`; `options` for `select`; `alpha` for `color` |
+ * | `action` | a button that runs `action` | `title`, `description`, `button`, `icon`, `action` |
+ * | `export` | Copy, and Save file with a `filename` | `title`, `description`, `data`, `filename`, `dataType` |
+ * | `import` | Paste, and Choose file with `accept` | `title`, `description`, `onData`, `accept`, `onFiles` |
+ * | `choice` | a radio before the title of each item of a `repeat`, one choice per `repeat` | `selected`, `action` |
+ * | `heading`, `link` | a section title; a link | `title`, `url` |
+ * | `text`, `notice` | a paragraph; a framed message | `text`, `level` |
+ * | `list` | entries, nested ones folded | `items` |
+ * | `repeat` | a table with a row of `blocks` for every item of `over` | `over`, `blocks` |
+ *
+ * Every block reads `visible`, and fields, actions, exports, imports and choices also `enabled`. Display
+ * properties (`title`, `description`, `button`, `icon`, `text`, `url`, `level`, `items`, `visible`, `enabled`,
+ * `value`, `selected`) take a value or a function, called whenever the page is drawn; inside a `repeat` the
+ * function receives the item
+ *
+ * @memberof IITC.settings
+ * @typedef {Object} SettingBlock
+ * @property {string} type - Block type, from the table above
+ * @property {string|Function} [title] - Label of a field, an action, an `export` or an `import`, text of a `heading`
+ *                                    or a `link`
+ * @property {string|Function} [button] - Short text of the button of an `action`, such as 'Delete', next to the
+ *                                     `title`. Without it the button carries the `title`
+ * @property {string|Function} [icon] - Icon an `action` button shows instead of its text, a Material Symbols
+ *                                      name such as 'delete'; the text becomes the tooltip
+ * @property {string|Function} [description] - Explanation shown under the title
+ * @property {boolean|Function} [visible=true] - False hides the block
+ * @property {boolean|Function} [enabled=true] - False shows the block without letting the user change or run it
+ * @property {string} [key] - Name of the setting a field holds, addressed as `<namespace>.<key>`; every field has one
+ * @property {*|Function} [default] - Value used while nothing valid is stored. Inside a `repeat` it may be a function
+ *                                    of the item, giving the default of the item's entry
+ * @property {*|Function} [value] - Value a field shows instead of the stored one, when it is derived from other
+ *                                  settings (a flag that a broader rule already sets)
+ * @property {number} [min] - Lowest allowed `number`
+ * @property {number} [max] - Highest allowed `number`
+ * @property {number} [step] - Allowed `number` increment, counted from `min` or 0
+ * @property {Array|Function} [options] - `select` choices: values or `{value, label}` objects. A function must
+ *                                        return all choices at once: a value missing from them is not allowed
+ * @property {boolean} [alpha] - Allows `color` values with an alpha channel (`#rrggbbaa`)
+ * @property {Function} [validate] - Returns true, or an error message for a value that is not allowed
+ * @property {Function} [onChange] - Called with `(value, oldValue, source)` after the value has changed
+ * @property {boolean} [sync=true] - False keeps the setting on this device: sync neither sends nor applies it,
+ *                                   while a local backup still holds it
+ * @property {Function} [action] - Runs when an `action` block is pressed, or a `choice` is made, with the item
+ *                                 inside a `repeat`; the text it returns and the error it throws are shown next to
+ *                                 the button, and a promise is waited for
+ * @property {boolean|Function} [selected] - Whether the item is the chosen one, for a `choice`
+ * @property {Function} [data] - Returns the text an `export` block hands over; receives the item inside a `repeat`
+ * @property {string} [filename] - Lets an `export` block also save `data` as a file of this name
+ * @property {string} [dataType] - MIME type of that file
+ * @property {Function} [onData] - Receives `(text, filename, item)` from an `import` block: the pasted text, or the
+ *                                 file read; the text it returns is shown instead of 'Imported', an error it throws
+ *                                 is shown too, and a promise is waited for
+ * @property {string} [accept] - Lets an `import` block also read files of these types, as in the `accept`
+ *                               attribute of a file input
+ * @property {Function} [onFiles] - Receives `(files, item)` from an `import` block with `accept` instead of `onData`,
+ *                                  and lets the user choose several files: all of them, as `[{name, text}]`; what it
+ *                                  returns and throws is shown as for `onData`. With it, `onData` is needed only for
+ *                                  the Paste button
+ * @property {string|Function} [text] - Text of a `text` or a `notice` block
+ * @property {string|Function} [url] - Address a `link` opens
+ * @property {'info'|'warning'|'error'|Function} [level='info'] - Kind of a `notice`
+ * @property {Array<IITC.settings.SettingsListItem>|Function} [items] - Entries of a `list`
+ * @property {Function} [over] - Items of a `repeat` block, returned as `[{id, title}]` with ids that stay the same between calls;
+ *                               `get` also calls it to give the items without a stored entry their default, so it
+ *                               must be able to list them whenever the settings are read
+ * @property {Array<IITC.settings.SettingBlock>} [blocks] - Blocks of a `repeat` block; their settings hold a map of item id to value
+ */
+
+/**
+ * @memberof IITC.settings
+ * @typedef {Object} SettingsListItem
+ * @property {string} title - Main text
+ * @property {string} [sub] - Second line
+ * @property {string} [badge] - Short text at the end of the line, such as a version
+ * @property {string} [tooltip] - Text shown on hover over the main line
+ * @property {'muted'|'error'} [state] - Shows the entry as secondary, or as failed
+ * @property {Array<IITC.settings.SettingsListItem>} [items] - Nested entries
+ * @property {boolean} [collapsed=false] - Hides the nested entries until the entry is opened
+ */
+
+/**
+ * @memberof IITC.settings
+ * @typedef {Object} SettingsPage
+ * @property {string} title - Page title
+ * @property {string} [namespace] - Prefix of the page's setting keys. Defaults to the page id
+ * @property {Array<IITC.settings.SettingBlock>} blocks - Page content
+ * @property {boolean|Object|Function} [shortcut] - Adds a toolbox button that opens the page, while the
+ *   `iitc.toolboxShortcuts` setting is on: `true`, or the arguments of `IITC.toolbox.addButton` but `id` and
+ *   `action` (`label` is the page title by default), or a function returning them, called again on
+ *   `IITC.settings.refresh(pageId)`, for a button that shows state
+ * @property {string} [accesskey] - Access key that opens the page, with the toolbox button or without it;
+ *   the button shows it in its tooltip
+ */
+
+const FIELD_TYPES = ['boolean', 'number', 'string', 'select', 'color'];
+
+const BLOCK_TYPES = [...FIELD_TYPES, 'action', 'choice', 'export', 'import', 'heading', 'text', 'link', 'list', 'notice', 'repeat'];
+
+const TYPE_DEFAULTS = {
+  boolean: false,
+  number: 0,
+  string: '',
+  color: '#000000',
+};
+
+const STORAGE_PREFIX = 'iitc-setting:';
+
+// lookups take keys from plugins and imported files, so names like `constructor` must not hit Object.prototype
+const pages = Object.create(null);
+const definitions = Object.create(null);
+// sections plugins add to the pages of others, by page id and extension id; kept apart from the pages,
+// so a page registered again keeps them
+const extensions = Object.create(null);
+
+const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+
+const sameValue = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+// the choices of a `select` as `{value, label}`
+const optionsOf = (def) => {
+  const options = typeof def.options === 'function' ? def.options() : def.options;
+  return (options ?? []).map((option) => (isPlainObject(option) ? option : { value: option, label: option }));
+};
+
+const optionValues = (def) => optionsOf(def).map((option) => option.value);
+
+// the default of one value: of the setting, or of the entry of a `repeat` map for an item, which a
+// function of the item may give
+const entryDefault = (def, item) => {
+  if (typeof def.default === 'function') {
+    try {
+      return def.default(item);
+    } catch (e) {
+      log.warn(`settings: default of "${def.fullKey}" failed: ${e}`);
+    }
+  } else if (def.default !== undefined) return def.default;
+  if (def.type !== 'select') return TYPE_DEFAULTS[def.type];
+  try {
+    return optionValues(def)[0];
+  } catch (e) {
+    log.warn(`settings: options of "${def.fullKey}" failed: ${e}`);
+    return undefined;
+  }
+};
+
+const defaultOf = (def) => (def.map ? {} : entryDefault(def));
+
+// a map of a `repeat` with the default entry of each item of `over` that has none stored
+const withItemDefaults = (def, map) => {
+  let items;
+  try {
+    items = def.repeat.over?.() ?? [];
+  } catch (e) {
+    log.warn(`settings: items of the repeat of "${def.fullKey}" failed: ${e}`);
+    return map;
+  }
+  const result = { ...map };
+  for (const item of items) {
+    if (!Object.hasOwn(result, item.id)) result[item.id] = entryDefault(def, item);
+  }
+  return result;
+};
+
+// a map of a `repeat` without the entries equal to the default of their item; with a default function,
+// entries of ids `over` does not list stay, as do all entries while `over` fails
+const withoutItemDefaults = (def, map) => {
+  let items;
+  if (typeof def.default === 'function') {
+    try {
+      items = new Map((def.repeat.over?.() ?? []).map((item) => [item.id, item]));
+    } catch (e) {
+      log.warn(`settings: items of the repeat of "${def.fullKey}" failed: ${e}`);
+      return map;
+    }
+  }
+  return Object.fromEntries(Object.entries(map).filter(([id, entry]) => (items && !items.has(id)) || !sameValue(entry, entryDefault(def, items?.get(id)))));
+};
+
+/**
+ * Checks one value against a setting's type and constraints
+ *
+ * @private
+ * @returns {true|string} True, or the reason the value is not allowed
+ */
+const validateValue = (def, value) => {
+  switch (def.type) {
+    case 'boolean':
+      if (typeof value !== 'boolean') return 'not a boolean';
+      break;
+    case 'number':
+      if (typeof value !== 'number' || !Number.isFinite(value)) return 'not a number';
+      if (def.min !== undefined && value < def.min) return `less than ${def.min}`;
+      if (def.max !== undefined && value > def.max) return `greater than ${def.max}`;
+      if (def.step) {
+        const steps = (value - (def.min ?? 0)) / def.step;
+        if (Math.abs(steps - Math.round(steps)) > 1e-9) return `not a multiple of ${def.step}`;
+      }
+      break;
+    case 'string':
+      if (typeof value !== 'string') return 'not a string';
+      break;
+    case 'select':
+      try {
+        if (!optionValues(def).includes(value)) return 'not one of the options';
+      } catch (e) {
+        log.warn(`settings: options of "${def.fullKey}" failed: ${e}`);
+      }
+      break;
+    case 'color': {
+      const pattern = def.alpha ? /^#[0-9a-f]{6}([0-9a-f]{2})?$/i : /^#[0-9a-f]{6}$/i;
+      if (typeof value !== 'string' || !pattern.test(value)) return 'not a color';
+      break;
+    }
+  }
+
+  if (def.validate) {
+    const result = def.validate(value);
+    if (result !== true) return typeof result === 'string' ? result : 'rejected by validate';
+  }
+  return true;
+};
+
+// like validateValue; a throwing validate counts as an invalid value
+const validateEntry = (def, value) => {
+  try {
+    return validateValue(def, value);
+  } catch (e) {
+    return `check failed: ${e}`;
+  }
+};
+
+// like validateEntry, entry by entry for `repeat` maps
+const validate = (def, value) => {
+  if (!def.map) return validateEntry(def, value);
+  if (!isPlainObject(value)) return 'not a map';
+  for (const [id, entry] of Object.entries(value)) {
+    const result = validateEntry(def, entry);
+    if (result !== true) return `${id}: ${result}`;
+  }
+  return true;
+};
+
+// parsed stored value, read anew on every call so callers may change it; undefined when missing or
+// unreadable; no defaults or validation
+const readStored = (key, quiet = false) => {
+  const storageKey = STORAGE_PREFIX + key;
+  const stored = localStorage.getItem(storageKey);
+  if (stored === null) return undefined;
+
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    if (!quiet) log.warn(`settings: cannot read "${storageKey}": ${e}`);
+    return undefined;
+  }
+};
+
+// the string a value is kept as in localStorage; throws when it cannot be serialized
+const encodeStored = (value) => {
+  const stored = JSON.stringify(value);
+  if (stored === undefined) throw new TypeError('the value cannot be serialized');
+  return stored;
+};
+
+// the default of a declared setting in its stored form, undefined when it cannot be stored (a select
+// whose options are not loaded yet)
+const storedDefault = (key) => {
+  try {
+    return encodeStored(defaultOf(definitions[key]));
+  } catch {
+    return undefined;
+  }
+};
+
+// stores an encoded value; false when localStorage refuses it
+const writeStored = (storageKey, stored) => {
+  try {
+    localStorage.setItem(storageKey, stored);
+  } catch (e) {
+    log.error(`settings: cannot store "${storageKey}": ${e}`);
+    return false;
+  }
+  return true;
+};
+
+// runs the settingChanged hook, then the block's onChange
+const notifyChange = (key, value, oldValue, source) => {
+  window.runHooks('settingChanged', { key, value, oldValue, source });
+  const onChange = definitions[key]?.onChange;
+  if (!onChange) return;
+  try {
+    onChange(value, oldValue, source);
+  } catch (e) {
+    log.error(`settings: onChange of "${key}" failed: ${e}`);
+  }
+};
+
+/**
+ * Collects the settings declared by a page, including the ones inside `repeat` blocks, and skips
+ * blocks of unknown types with a warning
+ *
+ * @private
+ * @param {string} namespace - Prefix of the page's keys
+ * @param {Array<IITC.settings.SettingBlock>} blocks - Blocks to scan
+ * @param {IITC.settings.SettingBlock} [repeat] - The `repeat` block the blocks are repeated in, so their settings hold maps
+ * @returns {Array<Object>} Setting definitions
+ */
+const collectDefinitions = (namespace, blocks, repeat = undefined) => {
+  const result = [];
+  for (const block of blocks ?? []) {
+    if (!BLOCK_TYPES.includes(block?.type)) {
+      log.warn(`settings: unknown block type "${block?.type}" in "${namespace}"`);
+      continue;
+    }
+    if (block.type === 'repeat') {
+      result.push(...collectDefinitions(namespace, block.blocks, block));
+      continue;
+    }
+    if (block.key === undefined) continue;
+    if (!FIELD_TYPES.includes(block.type)) {
+      log.warn(`settings: block type "${block.type}" cannot hold a setting ("${block.key}")`);
+      continue;
+    }
+
+    const fullKey = `${namespace}.${block.key}`;
+    const map = repeat !== undefined;
+    // a function gives the default of an entry from its item, so it has no item to work from outside a repeat
+    if (!map && typeof block.default === 'function') {
+      log.warn(`settings: "${fullKey}" takes a default function only inside a repeat`);
+      result.push({ ...block, default: undefined, fullKey, map });
+      continue;
+    }
+    result.push({ ...block, fullKey, map, repeat });
+  }
+  return result;
+};
+
+// who declared a setting, for warnings
+const declarer = (def) => (def.extensionId === undefined ? `page "${def.pageId}"` : `extension "${def.extensionId}" of page "${def.pageId}"`);
+
+/**
+ * Declares the settings of a page or of an extension of it in place of the ones that declaration made
+ * before; a key declared elsewhere already stays with that declaration, with a warning
+ *
+ * @private
+ * @param {string} pageId - Page id
+ * @param {string|undefined} extensionId - Extension id, undefined for the page itself
+ * @param {string} namespace - Prefix of the keys
+ * @param {Array<IITC.settings.SettingBlock>} blocks - Blocks holding the settings
+ * @returns {string[]} The keys declared
+ */
+const declare = (pageId, extensionId, namespace, blocks) => {
+  for (const key of Object.keys(definitions)) {
+    if (definitions[key].pageId === pageId && definitions[key].extensionId === extensionId) delete definitions[key];
+  }
+  const keys = [];
+  for (const def of collectDefinitions(namespace, blocks)) {
+    const existing = definitions[def.fullKey];
+    if (existing) {
+      log.warn(`settings: "${def.fullKey}" is already declared by ${declarer(existing)}`);
+      continue;
+    }
+    definitions[def.fullKey] = { ...def, pageId, extensionId };
+    keys.push(def.fullKey);
+  }
+  return keys;
+};
+
+/**
+ * Declares a settings page and the settings its blocks hold. Registering a page id again replaces the
+ * earlier declaration and announces no change: a stored value the new declaration rejects reads as
+ * the default
+ *
+ * @memberof IITC.settings
+ * @param {string} pageId - Unique page id, usually the plugin id
+ * @param {IITC.settings.SettingsPage} page - Page declaration
+ * @returns {boolean} True if the page was registered
+ *
+ * @example <caption>A page</caption>
+ * IITC.settings.register('my-plugin', {
+ *   title: 'My plugin',
+ *   shortcut: true,
+ *   blocks: [
+ *     { type: 'boolean', key: 'show', title: 'Show on the map', default: true, onChange: (show) => (show ? draw() : clear()) },
+ *     { type: 'select', key: 'style', title: 'Style', options: ['Lines', 'Dots'], default: 'Lines', onChange: draw },
+ *     { type: 'heading', title: 'Data' },
+ *     { type: 'export', title: 'Marked portals', data: () => JSON.stringify(load()), filename: 'my-plugin.json' },
+ *     { type: 'import', title: 'Marked portals', onData: (text) => save(JSON.parse(text)), accept: '.json' },
+ *     {
+ *       type: 'action',
+ *       title: 'Forget marked portals',
+ *       button: 'Forget',
+ *       // a promise is waited for; the text returned or the error thrown shows next to the button
+ *       action: async () => {
+ *         if (!Object.keys(load()).length) throw new Error('Nothing is marked');
+ *         await save({});
+ *         return 'Forgotten';
+ *       },
+ *     },
+ *   ],
+ * });
+ * // the values are read where they are needed
+ * if (IITC.settings.get('my-plugin.show')) draw();
+ *
+ * @example <caption>A setting for each item of a list</caption>
+ * IITC.settings.register('my-plugin', {
+ *   title: 'My plugin',
+ *   blocks: [
+ *     {
+ *       type: 'repeat',
+ *       over: () => [
+ *         { id: 'ENL', title: 'Enlightened' },
+ *         { id: 'RES', title: 'Resistance' },
+ *       ],
+ *       blocks: [{ type: 'color', key: 'color', title: 'Color', default: (item) => (item.id === 'ENL' ? '#03dc03' : '#0088ff') }],
+ *     },
+ *   ],
+ * });
+ * // a map of item id to value, with the default of every item that has nothing stored
+ * IITC.settings.get('my-plugin.color'); // { ENL: '#03dc03', RES: '#0088ff' }
+ */
+const register = (pageId, page) => {
+  if (typeof pageId !== 'string' || !pageId) {
+    log.warn('settings: page id is missing');
+    return false;
+  }
+  if (!Array.isArray(page?.blocks)) {
+    log.warn(`settings: page "${pageId}" has no blocks`);
+    return false;
+  }
+
+  const namespace = page.namespace ?? pageId;
+  pages[pageId] = { ...page, namespace };
+  const keys = declare(pageId, undefined, namespace, page.blocks);
+
+  // last, so settingsPageRegistered handlers (sync) see the page settled
+  window.runHooks('settingsPageRegistered', { pageId, keys });
+  return true;
+};
+
+/**
+ * Adds a section to the page of another plugin, such as options of an add-on on the page of the plugin it
+ * works with. The section follows the page's own blocks under a heading of its title; sections of several
+ * extensions follow by title, whatever order their plugins load in. Its settings are declared at once,
+ * whether the page is registered yet or not, and the section shows once it is. Extending the page again
+ * with the same extension id replaces the section and its settings, as `register` replaces a page
+ *
+ * @memberof IITC.settings
+ * @param {string} pageId - Id of the page to extend
+ * @param {string} extensionId - Unique id of the section, usually the id of the plugin adding it
+ * @param {Object} section - Section declaration
+ * @param {string} [section.title] - Heading of the section. Defaults to the extension id
+ * @param {string} [section.namespace] - Prefix of the section's setting keys. Defaults to the extension id, so
+ *                                       a plugin that also registers a page of its own under its id gives the
+ *                                       section a namespace of its own: a key declared twice stays with the
+ *                                       first declaration
+ * @param {Array<IITC.settings.SettingBlock>} section.blocks - Section content, of the same blocks as a page
+ * @returns {boolean} True if the section was added
+ *
+ * @example
+ * IITC.settings.extend('draw-tools', 'kml-import', {
+ *   title: 'KML import',
+ *   blocks: [
+ *     { type: 'boolean', key: 'fit', title: 'Zoom to the imported shapes', default: true },
+ *     { type: 'import', title: 'KML file', onData: (text) => importKml(text), accept: '.kml' },
+ *   ],
+ * });
+ * if (IITC.settings.get('kml-import.fit')) map.fitBounds(bounds);
+ */
+const extend = (pageId, extensionId, section) => {
+  if (typeof pageId !== 'string' || !pageId) {
+    log.warn('settings: page id is missing');
+    return false;
+  }
+  if (typeof extensionId !== 'string' || !extensionId) {
+    log.warn(`settings: extension id is missing for page "${pageId}"`);
+    return false;
+  }
+  if (!Array.isArray(section?.blocks)) {
+    log.warn(`settings: extension "${extensionId}" of page "${pageId}" has no blocks`);
+    return false;
+  }
+
+  const namespace = section.namespace ?? extensionId;
+  extensions[pageId] ??= Object.create(null);
+  extensions[pageId][extensionId] = { ...section, title: String(section.title ?? extensionId), namespace };
+  const keys = declare(pageId, extensionId, namespace, section.blocks);
+
+  window.runHooks('settingsPageRegistered', { pageId, extensionId, keys });
+  return true;
+};
+
+// the sections extensions add to a page, by title and then by extension id
+const sectionsOf = (pageId) =>
+  Object.entries(extensions[pageId] ?? {})
+    .map(([id, section]) => ({ ...section, id }))
+    .sort((a, b) => a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
+
+/**
+ * Turns the stored value of a declared setting into its effective value
+ *
+ * @private
+ * @param {string} key - Full setting key
+ * @param {*} stored - Value read from localStorage, undefined when there is none
+ * @param {boolean} [quiet=false] - Skips the invalid-value warning
+ * @returns {*} The stored value if it is valid, otherwise the default; of a stored map, the valid entries
+ */
+const resolve = (key, stored, quiet = false) => {
+  const def = definitions[key];
+  if (stored === undefined) return defaultOf(def);
+
+  // one entry that went bad (an option since removed) must not take the others with it
+  if (def.map && isPlainObject(stored)) {
+    const entries = Object.entries(stored).filter(([id, entry]) => {
+      const result = validateEntry(def, entry);
+      if (result !== true && !quiet) log.warn(`settings: stored entry "${id}" of "${key}" is ignored: ${result}`);
+      return result === true;
+    });
+    return Object.fromEntries(entries);
+  }
+
+  const result = validate(def, stored);
+  if (result !== true) {
+    if (!quiet) log.warn(`settings: stored value of "${key}" is ignored: ${result}`);
+    return defaultOf(def);
+  }
+  return stored;
+};
+
+// the value `get` returns: of a `repeat` map also the default entries of the items that have none stored
+const effective = (key, stored, quiet = false) => {
+  const def = definitions[key];
+  const value = resolve(key, stored, quiet);
+  return def.map ? withItemDefaults(def, value) : value;
+};
+
+/**
+ * Returns the value of a setting; a declared setting falls back to its default when nothing valid
+ * is stored. A map of a `repeat` holds its valid stored entries, and the default entry of each item
+ * `over` returns that has none stored; `over` must be able to list the items by then
+ *
+ * @memberof IITC.settings
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @param {*} [fallback] - Value for an undeclared key with nothing stored
+ * @returns {*} The setting value
+ *
+ * @example
+ * const mode = IITC.settings.get('link-show-direction.mode');
+ */
+const get = (key, fallback) => {
+  const stored = readStored(key);
+  if (!definitions[key]) return stored === undefined ? fallback : stored;
+  return effective(key, stored);
+};
+
+/**
+ * Tells whether a setting may travel to other devices: it is declared, and not with `sync: false`
+ *
+ * @private
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @returns {boolean} True for a declared setting that syncs
+ */
+const syncs = (key) => definitions[key] !== undefined && definitions[key].sync !== false;
+
+/**
+ * Tells what localStorage holds for a key, without logging: nothing, a value that reads and passes
+ * the declaration, or one that cannot be read or fails it (an old range, options not loaded yet)
+ *
+ * @private
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @returns {'missing'|'valid'|'invalid'} The state of the stored value
+ */
+const storedState = (key) => {
+  if (localStorage.getItem(STORAGE_PREFIX + key) === null) return 'missing';
+  const stored = readStored(key, true);
+  if (stored === undefined) return 'invalid';
+  const def = definitions[key];
+  return !def || validate(def, stored) === true ? 'valid' : 'invalid';
+};
+
+/**
+ * Tells whether a setting may take a value, without storing it; an undeclared key takes any value
+ *
+ * @memberof IITC.settings
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @param {*} value - Value to check
+ * @returns {true|string} True, or the reason the value is not allowed
+ */
+const check = (key, value) => (definitions[key] ? validate(definitions[key], value) : true);
+
+// values from another device apply only to declared settings that do not belong to this device
+const refusesRemote = (key, source) => {
+  if (source !== 'remote') return false;
+  if (syncs(key)) return false;
+  log.warn(`settings: "${key}" ${definitions[key] ? 'belongs to this device' : 'is not declared'} and ignores remote values`);
+  return true;
+};
+
+/**
+ * Stores the value of a setting. Values of declared settings are validated first; a value stored in the same
+ * form as the one already there changes nothing, and a value stored in the same form as the default is
+ * removed, as `reset` does. A map of a `repeat` keeps only the entries that differ from the default of their
+ * item, and is removed when none is left. The `settingChanged` hook and the block's `onChange` run when the value
+ * actually changes, and receive the value as `get` returns it
+ *
+ * Storing `undefined` under an undeclared key removes the value, as `reset` does;
+ * a declared setting rejects it
+ *
+ * @memberof IITC.settings
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @param {*} value - New value
+ * @param {Object} [options]
+ * @param {string} [options.source='local'] - Origin of the change, passed to the settingChanged hook; sync uses
+ *                                           `remote`, and `legacy` marks a value moved from an older build: it
+ *                                           gets no sync time, so the shared records win over it
+ * @returns {boolean} False if the value is not allowed or could not be stored, or if a `remote` value
+ *          targets an undeclared key or a setting declared with `sync: false`
+ *
+ * @example
+ * IITC.settings.set('draw-tools.color', '#a24ac3');
+ *
+ * @example <caption>Moving a setting from an older localStorage key</caption>
+ * IITC.settings.register('my-plugin', {
+ *   title: 'My plugin',
+ *   blocks: [{ type: 'number', key: 'radius', title: 'Radius, m', min: 0, default: 40 }],
+ * });
+ * const legacy = localStorage.getItem('plugin-my-plugin-radius');
+ * if (legacy !== null) {
+ *   // a legacy value gets no sync time, so a value synced from other devices wins over it
+ *   IITC.settings.set('my-plugin.radius', Number(legacy), { source: 'legacy' });
+ *   // the value moves once
+ *   localStorage.removeItem('plugin-my-plugin-radius');
+ * }
+ */
+const set = (key, value, options) => {
+  const source = options?.source ?? 'local';
+  if (refusesRemote(key, source)) return false;
+  const def = definitions[key];
+  if (!def && value === undefined) {
+    reset(key, { source });
+    return true;
+  }
+
+  if (def) {
+    const result = validate(def, value);
+    if (result !== true) {
+      log.warn(`settings: value of "${key}" is rejected: ${result}`);
+      return false;
+    }
+  }
+
+  const storageKey = STORAGE_PREFIX + key;
+  let encoded;
+  try {
+    encoded = encodeStored(def?.map ? withoutItemDefaults(def, value) : value);
+  } catch (e) {
+    log.error(`settings: cannot store "${storageKey}": ${e}`);
+    return false;
+  }
+  // a value equal to the default is not kept, as if the setting was never changed
+  if (def && encoded === storedDefault(key)) return reset(key, { source });
+  if (encoded === localStorage.getItem(storageKey)) return true;
+
+  const stored = readStored(key);
+  const oldValue = def ? effective(key, stored, true) : stored;
+  if (!writeStored(storageKey, encoded)) return false;
+
+  const current = readStored(key);
+  const newValue = def ? effective(key, current, true) : current === undefined ? value : current;
+  if (!sameValue(newValue, oldValue)) notifyChange(key, newValue, oldValue, source);
+  return true;
+};
+
+/**
+ * Removes the stored value, so a declared setting returns to its default
+ *
+ * @memberof IITC.settings
+ * @param {string} key - Setting key, `<namespace>.<key>`
+ * @param {Object} [options]
+ * @param {string} [options.source='local'] - Origin of the change, passed to the settingChanged hook; sync uses `remote`
+ * @returns {boolean} False if a `remote` reset targets an undeclared key or a setting declared with `sync: false`
+ *
+ * @example
+ * IITC.settings.reset('draw-tools.color');
+ */
+const reset = (key, options) => {
+  const source = options?.source ?? 'local';
+  if (refusesRemote(key, source)) return false;
+  const def = definitions[key];
+  const stored = readStored(key);
+  const oldValue = def ? effective(key, stored, true) : stored;
+  localStorage.removeItem(STORAGE_PREFIX + key);
+
+  const value = get(key);
+  if (!sameValue(value, oldValue)) notifyChange(key, value, oldValue, source);
+  return true;
+};
+
+/**
+ * Collects the stored values of declared settings; defaults are left out, so an import on another
+ * device keeps that device's defaults. Values are not validated here: options may still be loading,
+ * and `import` checks every value anyway
+ *
+ * @alias IITC.settings.exportValues
+ * @param {Object} [options]
+ * @param {boolean} [options.sync=false] - Leaves out settings declared with `sync: false`, for sending to other devices
+ * @returns {Object<string, *>} Values by setting key
+ *
+ * @example
+ * const backup = JSON.stringify(IITC.settings.exportValues());
+ */
+const exportValues = (options) => {
+  const values = {};
+  for (const key of Object.keys(definitions)) {
+    if (options?.sync && !syncs(key)) continue;
+    const stored = readStored(key);
+    if (stored !== undefined) values[key] = stored;
+  }
+  return values;
+};
+
+/**
+ * Stores values produced by `export`. Each value goes through `set`, so it is validated
+ * and announced like any other change. Keys no registered page declares are skipped, and so are
+ * settings declared with `sync: false` when the values come from another device (source `remote`)
+ *
+ * @alias IITC.settings.importValues
+ * @param {Object<string, *>} values - Values by setting key
+ * @param {Object} [options]
+ * @param {string} [options.source='local'] - Origin of the values, passed to the settingChanged hook; sync uses `remote`
+ * @returns {{applied: string[], rejected: string[], skipped: string[]}} Keys stored, keys whose value
+ *          was not allowed or could not be stored, and keys left alone
+ *
+ * @example
+ * const { rejected } = IITC.settings.importValues(JSON.parse(backup));
+ */
+const importValues = (values, options) => {
+  const result = { applied: [], rejected: [], skipped: [] };
+  if (!isPlainObject(values)) {
+    log.warn('settings: import expects an object of values by key');
+    return result;
+  }
+
+  for (const [key, value] of Object.entries(values)) {
+    const def = definitions[key];
+    if (!def || (!syncs(key) && options?.source === 'remote')) result.skipped.push(key);
+    else if (set(key, value, options)) result.applied.push(key);
+    else result.rejected.push(key);
+  }
+  return result;
+};
+
+IITC.settings = {
+  register,
+  extend,
+  get,
+  set,
+  reset,
+  exportValues,
+  importValues,
+  check,
+  _syncs: syncs,
+  _storedState: storedState,
+  _pages: pages,
+  _definitions: definitions,
+  _extensions: extensions,
+  _sections: sectionsOf,
+  // for the page renderer: the default of a value or of the entry of an item, the valid stored entries of a map
+  // without the defaults, so a change of one entry stores only that one, and the choices of a select (none when
+  // they fail)
+  _entryDefault: (key, item) => (definitions[key] ? entryDefault(definitions[key], item) : undefined),
+  _entries: (key) => (definitions[key] ? resolve(key, readStored(key), true) : readStored(key)),
+  _options: (key) => {
+    try {
+      return definitions[key] ? optionsOf(definitions[key]) : [];
+    } catch (e) {
+      log.warn(`settings: options of "${key}" failed: ${e}`);
+      return [];
+    }
+  },
+};
