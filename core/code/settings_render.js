@@ -45,7 +45,7 @@ const states = new WeakMap();
 const stateOf = (container) => {
   let state = states.get(container);
   if (state) return state;
-  state = { pageId: undefined, messages: new Map(), pending: new Set(), scheduled: false, pointerDown: false };
+  state = { pageId: undefined, query: '', messages: new Map(), pending: new Set(), scheduled: false, pointerDown: false };
   states.set(container, state);
   // a redraw between the press and the release would take the pressed control away, and its click with it
   container.addEventListener('pointerdown', () => {
@@ -577,6 +577,19 @@ const restoreFocus = (container, state) => {
   }
 };
 
+// the elements whose text a search looks at
+const SEARCHED_ELEMENTS =
+  '.iitc-settings-label, .iitc-settings-text, .iitc-settings-notice, .iitc-settings-heading, .iitc-settings-link, .iitc-settings-action button';
+
+// marks what contains the query, ignoring case: the whole row of a control, otherwise the element itself
+const markMatches = (root, query) => {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return;
+  for (const element of root.querySelectorAll(SEARCHED_ELEMENTS)) {
+    if (element.textContent.toLowerCase().includes(needle)) (element.closest('.iitc-settings-row') ?? element).classList.add('iitc-settings-match');
+  }
+};
+
 /**
  * Draws a settings page into a container, replacing what the container holds. Changes made on the page
  * draw it again; a change made elsewhere needs another call
@@ -584,9 +597,11 @@ const restoreFocus = (container, state) => {
  * @private
  * @param {string} pageId - Id of a registered page
  * @param {HTMLElement} container - Element to draw into
+ * @param {string} [query] - Search whose matches on the page are marked; stays in force for the redraws
+ *                           until another is given
  * @returns {boolean} False when no such page is registered
  */
-const renderPage = (pageId, container) => {
+const renderPage = (pageId, container, query) => {
   if (!IITC.settings._pages[pageId]) {
     log.warn(`settings: no page "${pageId}" to draw`);
     return false;
@@ -594,10 +609,13 @@ const renderPage = (pageId, container) => {
   const state = stateOf(container);
   // the focus and the messages belong to the page drawn before
   const samePage = state.pageId === pageId;
+  if (query !== undefined) state.query = query;
+  else if (!samePage) state.query = '';
   if (!samePage) state.messages.clear();
   state.pageId = pageId;
   const focus = samePage ? saveFocus(container) : undefined;
   container.replaceChildren(new PageView(pageId, container).draw());
+  markMatches(container, state.query);
   restoreFocus(container, focus);
   return true;
 };

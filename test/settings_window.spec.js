@@ -265,6 +265,51 @@ describe('settings window', () => {
 
       expect(view.root.querySelector('.iitc-settings-page-heading').textContent).to.equal('Zeta');
     });
+
+    const marked = () => [...view.root.querySelectorAll('.iitc-settings-match')].map((element) => element.textContent);
+
+    it('marks what the search found on the page shown, and nothing once it is cleared', () => {
+      settings.open('window-alpha');
+
+      type('wombats');
+      expect(marked()).to.deep.equal(['Wombats: 42 seen']);
+
+      type('quokka');
+      expect(marked()).to.have.lengthOf(1);
+      expect(marked()[0]).to.include('Quokkas shown on the map');
+
+      type('');
+      expect(marked()).to.be.empty;
+    });
+
+    it('marks the matches on a page chosen from the list, and scrolls the first into view', () => {
+      settings.open();
+      type('wombats');
+      // jsdom does not scroll
+      const proto = document.defaultView.HTMLElement.prototype;
+      let scrolled;
+      proto.scrollIntoView = function scrollIntoView() {
+        scrolled = this;
+      };
+
+      try {
+        click(navLink('window-alpha'));
+      } finally {
+        delete proto.scrollIntoView;
+      }
+
+      expect(marked()).to.deep.equal(['Wombats: 42 seen']);
+      expect(scrolled.textContent).to.equal('Wombats: 42 seen');
+    });
+
+    it('clears the marks with Escape', () => {
+      settings.open('window-alpha');
+      type('wombats');
+
+      view.root.querySelector('.iitc-settings-search').dispatchEvent(new document.defaultView.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+      expect(marked()).to.be.empty;
+    });
   });
 
   describe('focus', () => {
