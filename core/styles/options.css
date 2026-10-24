@@ -433,7 +433,8 @@ input[type="search"].iitc-options-search {
   white-space: nowrap;
 }
 
-/*
-*/
-.iitc-options-page[data-page='about'] {
+/* what the search found on the page */
+.iitc-options-match {
+  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 22%, transparent);
 }

@@ -1007,4 +1007,86 @@ describe('IITC.options._renderPage', () => {
       expect(container.querySelector('input').value).to.equal('sc');
     });
   });
+  describe('marking a search', () => {
+    let firstPage;
+
+    beforeEach(() => {
+      firstPage = pageCount + 1;
+    });
+
+    // the pages this suite registered would turn up in a search of the options window spec
+    afterEach(() => {
+      for (let n = firstPage; n <= pageCount; n++) {
+        delete options._pages[`render-page-${n}`];
+        for (const key of Object.keys(options._definitions)) {
+          if (key.startsWith(`render-page-${n}.`)) delete options._definitions[key];
+        }
+      }
+    });
+
+    const marked = () => [...container.querySelectorAll('.iitc-options-match')].map((element) => element.textContent);
+
+    const searched = () =>
+      page([
+        { type: 'heading', title: 'Quokka heading' },
+        { type: 'text', text: 'Wombats and quokkas' },
+        { type: 'boolean', key: 'b', title: 'Show', description: 'Numbats on the map', default: false },
+        { type: 'select', key: 'sel', title: 'Mode', choices: [{ value: 1, label: 'Quokka choice' }], default: 1 },
+        { type: 'action', title: 'Feed the quokka', action: () => {} },
+        { type: 'notice', text: 'Beware of quokkas' },
+        { type: 'link', title: 'About quokkas', url: 'https://example.com' },
+      ]);
+
+    it('marks the rows and texts that contain the query, ignoring case', () => {
+      options._renderPage(searched(), container, '  QUOKKA ');
+
+      expect(marked()).to.deep.equal(['Quokka heading', 'Wombats and quokkas', 'Feed the quokka', 'Beware of quokkas', 'About quokkas']);
+    });
+
+    it('marks the whole row of a control when its description matches', () => {
+      options._renderPage(searched(), container, 'numbats');
+
+      const [row] = container.querySelectorAll('.iitc-options-match');
+      expect(row.classList.contains('iitc-options-row')).to.be.true;
+      expect(row.querySelector('input[type="checkbox"]')).to.not.be.null;
+    });
+
+    it('marks nothing for an empty query, or for text only in the choices of a select', () => {
+      const id = searched();
+
+      options._renderPage(id, container, '');
+      expect(marked()).to.be.empty;
+
+      options._renderPage(id, container, 'option');
+      expect(marked()).to.be.empty;
+    });
+
+    it('keeps the marks when the page is drawn again after a change', async () => {
+      const id = searched();
+      options._renderPage(id, container, 'wombats');
+
+      change(container.querySelector('input[type="checkbox"]'), true);
+      await settle();
+
+      expect(marked()).to.deep.equal(['Wombats and quokkas']);
+    });
+
+    it('does not carry a query over to another page', () => {
+      options._renderPage(searched(), container, 'quokka');
+
+      options._renderPage(searched(), container);
+
+      expect(marked()).to.be.empty;
+    });
+
+    it('marks the sections extensions add to the page', () => {
+      const id = page([{ type: 'text', text: 'Plain' }]);
+      options.extend(id, 'render-ext-search', { title: 'Quokka section', blocks: [{ type: 'text', text: 'Section quokka text' }] });
+
+      options._renderPage(id, container, 'quokka');
+
+      expect(marked()).to.deep.equal(['Quokka section', 'Section quokka text']);
+      delete options._extensions[id];
+    });
+  });
 });

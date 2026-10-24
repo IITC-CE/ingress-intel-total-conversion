@@ -136,7 +136,7 @@ const drawNav = () => {
 
 const drawPage = () => {
   part('iitc-options-page-heading').textContent = view.pageId ? titleOf(view.pageId) : '';
-  if (view.pageId) IITC.options._renderPage(view.pageId, content());
+  if (view.pageId) IITC.options._renderPage(view.pageId, content(), view.query);
   else content().replaceChildren();
 };
 
@@ -150,8 +150,11 @@ const choose = (pageId) => {
     else link.removeAttribute('aria-current');
   });
   drawPage();
-  // another page starts at its top
-  if (another) content().scrollTop = 0;
+  if (another) {
+    // another page starts at its top, or at what the search found on it
+    content().scrollTop = 0;
+    content().querySelector('.iitc-options-match')?.scrollIntoView?.({ block: 'center' });
+  }
   const nav = part('iitc-options-nav');
   if (nav.contains(document.activeElement) && isHidden(nav)) part('iitc-options-back').focus();
 };
@@ -165,9 +168,14 @@ const build = (showPage) => {
     value: view.query,
     'aria-label': 'Search options',
   });
+  // the list and the page show what the query finds
+  const searched = () => {
+    drawNav();
+    if (view.pageId) drawPage();
+  };
   searchInput.addEventListener('input', () => {
     view.query = searchInput.value;
-    drawNav();
+    searched();
   });
   // Escape clears the search first, and closes the window only from an empty field
   searchInput.addEventListener('keydown', (event) => {
@@ -175,7 +183,7 @@ const build = (showPage) => {
     event.stopPropagation();
     searchInput.value = '';
     view.query = '';
-    drawNav();
+    searched();
   });
 
   const back = el(
