@@ -120,6 +120,43 @@ window.plugin.regions.regionName = function (cell) {
   return name;
 };
 
+window.plugin.regions.getCellFromName = function (name) {
+  var regexp = new RegExp(
+    '^(' + window.plugin.regions.FACE_NAMES.join('|') + ')(1[0-6]|0[1-9])-(' + window.plugin.regions.CODE_WORDS.join('|') + ')-(1[0-5]|0[0-9])$',
+    'i'
+  );
+  var match = name.replace(/\s+/g, '').match(regexp);
+  if (!match) return;
+
+  match[1] = match[1].toUpperCase();
+  match[3] = match[3].toUpperCase();
+  return window.plugin.regions.getCellFromMatch(match);
+};
+
+window.plugin.regions.getCellFromMatch = function (match) {
+  var faceId = window.plugin.regions.FACE_NAMES.indexOf(match[1]);
+  var id1 = parseInt(match[2]) - 1;
+  var codeWordId = window.plugin.regions.CODE_WORDS.indexOf(match[3]);
+  var id2 = match[4] === undefined ? undefined : parseInt(match[4]);
+
+  if (faceId === -1 || id1 < 0 || id1 > 15 || codeWordId === -1 || id2 < 0 || id2 > 15) return;
+
+  if (faceId & 1) {
+    [id1, codeWordId] = [codeWordId, id1];
+  }
+
+  var cell = window.S2.S2Cell.FromFaceIJ(faceId, [id1, codeWordId], 4);
+  if (id2 === undefined) return cell;
+
+  var positions = cell.getFaceAndQuads()[1];
+  positions.push(Math.floor(id2 / 4), id2 % 4);
+  return window.S2.S2Cell.FromFacePosition(faceId, positions);
+};
+
+window.plugin.regions.getNameFromLatLng = function (latLng) {
+  return window.plugin.regions.regionName(window.S2.S2Cell.FromLatLng(latLng, 6));
+};
+
 window.plugin.regions.search = function (query) {
   var terms = query.term.replace(/\s+/g, '').split(/[,;]/);
   var matches = terms.map(function (string) {
@@ -148,35 +185,17 @@ window.plugin.regions.search = function (query) {
 };
 
 window.plugin.regions.getSearchResult = function (match) {
-  var faceId = window.plugin.regions.FACE_NAMES.indexOf(match[1]);
-  var id1 = parseInt(match[2]) - 1;
-  var codeWordId = window.plugin.regions.CODE_WORDS.indexOf(match[3]);
-  var id2 = match[4] === undefined ? undefined : parseInt(match[4]);
-
-  if (faceId === -1 || id1 < 0 || id1 > 15 || codeWordId === -1 || id2 < 0 || id2 > 15) return;
-
-  // for Odd faces Nia swaps id & codename
-  if (faceId & 1) {
-    [id1, codeWordId] = [codeWordId, id1];
-  }
-
-  // looks good. now we need the face/i/j values for this cell face is used as-is
-  // id1 is the region 'i' value (first 4 bits), codeword is the 'j' value (first 4 bits)
-  var cell = window.S2.S2Cell.FromFaceIJ(faceId, [id1, codeWordId], 4);
+  var cell = window.plugin.regions.getCellFromMatch(match);
+  if (!cell) return;
 
   var result = {};
 
-  if (id2 === undefined) {
+  if (match[4] === undefined) {
     result.description = 'Regional score cells (cluster of 16 cells)';
     result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
   } else {
     result.description = 'Regional score cell';
     result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@');
-
-    // eslint-disable-next-line no-unused-vars
-    const [_, positions] = cell.getFaceAndQuads();
-    positions.push(Math.floor(id2 / 4), id2 % 4);
-    cell = window.S2.S2Cell.FromFacePosition(faceId, positions);
   }
 
   var corners = cell.getCornerLatLngs();
