@@ -404,7 +404,7 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function formatCycleDateInput(cycleStart) {
-    var date = new Date(cycleStart.getTime() + regionScore.CYCLE_DURATION / 2);
+    var date = new Date(cycleStart.getTime());
     return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
   }
 
