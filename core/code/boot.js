@@ -348,8 +348,7 @@ function boot() {
   IITC.smartphone._runAfterBoot();
   window.runOnAppAfterBoot();
 
-  // workaround for #129. Not sure why this is required.
-  // setTimeout('window.map.invalidateSize(false);', 500);
+  IITC.map.initialize();
 
   window.iitcLoaded = true;
   window.runHooks('iitcLoaded');
