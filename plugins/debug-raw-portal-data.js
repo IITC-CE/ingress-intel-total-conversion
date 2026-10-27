@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Debug: Raw portal JSON data
 // @category       Portal Info
-// @version        0.2.7
+// @version        0.2.8
 // @description    Developer debugging aid: Add a link to the portal details to show the raw data of a portal.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.8',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.2.7',
     changes: ['Refactoring: fix eslint'],

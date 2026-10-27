@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Highlight high level portals
 // @category       Highlighter
-// @version        0.2.3
+// @version        0.2.4
 // @description    Use the portal fill color to denote high level portals: Purple L8, Red L7, Orange L6
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.2.3',
     changes: ['Refactoring: fix eslint'],

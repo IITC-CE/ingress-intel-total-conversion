@@ -15,6 +15,7 @@ const changelog = [
       'Dark layer is now the road map recolored, as Bing no longer serves its dark imagery set',
       'Zoom levels above the available imagery are upscaled instead of detected per location',
       'Request high density tiles on retina displays',
+      'Report the layers as light or dark for theme switching',
     ],
   },
   {

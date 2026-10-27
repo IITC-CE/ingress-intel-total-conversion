@@ -14,6 +14,7 @@ var changelog = [
       'Sync drawn items across devices via the Sync plugin (Multi-Projects-Extension aware)',
       'Register with the Sync plugin regardless of plugin load order',
       'Fix drawn area used by Tidy Links and Fly Links being misplaced after zooming',
+      'Re-sync drawn items when Multi Projects Extension loads late',
     ],
   },
   { version: '0.12.1', changes: ['Refactoring: update Leaflet API usage'] },

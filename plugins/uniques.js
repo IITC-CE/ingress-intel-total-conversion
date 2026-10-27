@@ -8,7 +8,10 @@
 /* global IITC -- eslint */
 
 var changelog = [
-  { version: '0.2.8', changes: ['Register with the Sync plugin regardless of plugin load order'] },
+  {
+    version: '0.2.8',
+    changes: ['Register with the Sync plugin regardless of plugin load order', 'Keep its own portal GUID cache, as the core one was removed'],
+  },
   {
     version: '0.2.7',
     changes: ['Refactoring: fix eslint'],

@@ -1,14 +1,22 @@
 // @author         jonatkins
 // @name           Missions
 // @category       Info
-// @version        0.3.7
+// @version        0.4.0
 // @description    View missions. Marking progress on waypoints/missions basis. Showing mission paths on the map.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
-  { version: '0.3.7', changes: ['Register with the Sync plugin regardless of plugin load order'] },
+  {
+    version: '0.4.0',
+    changes: [
+      'Register with the Sync plugin regardless of plugin load order',
+      'Sort mission titles naturally, taking numbers into account',
+      'Use a Material Symbols icon for the mobile pane',
+      'Refactoring: use IITC.portal and IITC.utils APIs instead of legacy globals',
+    ],
+  },
   { version: '0.3.6', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.5',

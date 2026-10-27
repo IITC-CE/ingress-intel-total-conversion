@@ -1,13 +1,17 @@
 // @author         breunigs
 // @name           Player level guess
 // @category       Info
-// @version        0.5.12
+// @version        0.5.13
 // @description    Try to determine player levels from the data available in the current view.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.5.13',
+    changes: ['Replace inline styles with CSS classes', 'Refactoring: use IITC.portal and IITC.utils APIs instead of legacy globals'],
+  },
   { version: '0.5.12', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.5.11',

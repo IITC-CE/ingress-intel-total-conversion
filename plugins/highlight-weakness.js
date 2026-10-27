@@ -1,13 +1,17 @@
 // @author         vita10gy
 // @name           Highlight portal weakness
 // @category       Highlighter
-// @version        0.8.3
+// @version        0.8.4
 // @description    Use the fill color of the portals to denote if the portal is weak. Stronger red indicates recharge required, missing resonators, or both.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.8.4',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.8.3',
     changes: ['Refactoring: fix eslint'],

@@ -1,13 +1,17 @@
 // @name           Machina Tools
 // @author         Perringaiden
 // @category       Misc
-// @version        0.9.3
+// @version        0.9.4
 // @description    Machina investigation tools - 2 new layers to see possible Machina spread and portal detail links to display Machina cluster information and to navigate to parent or seed Machina portal
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.9.4',
+    changes: ['Refactoring: use IITC.portal, IITC.map and IITC.utils APIs instead of legacy globals'],
+  },
   { version: '0.9.3', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.9.2',

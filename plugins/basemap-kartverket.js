@@ -1,13 +1,17 @@
 ﻿// @author         johnd0e
 // @name           Kartverket.no maps (Norway)
 // @category       Map Tiles
-// @version        0.3.1
+// @version        0.3.2
 // @description    Add Kartverket.no map layers.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.2',
+    changes: ['Report the layer as light or dark for theme switching'],
+  },
   {
     version: '0.3.1',
     changes: ['Refactoring: fix eslint'],

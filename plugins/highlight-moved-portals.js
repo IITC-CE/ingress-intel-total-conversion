@@ -1,13 +1,17 @@
 // @author         screach
 // @name           Highlight moved portals
 // @category       Highlighter
-// @version        0.1.2
+// @version        0.1.3
 // @description    Highlights portals with links with different location data
 
 /* exported setup, changelog --eslint */
 /* global IITC, L */
 
 var changelog = [
+  {
+    version: '0.1.3',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   { version: '0.1.2', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.1',

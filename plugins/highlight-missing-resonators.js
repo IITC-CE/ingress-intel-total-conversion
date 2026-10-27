@@ -1,13 +1,17 @@
 // @author         vita10gy
 // @name           Highlight portals missing resonators
 // @category       Highlighter
-// @version        0.2.4
+// @version        0.2.5
 // @description    Use the portal fill color to denote if the portal is missing resonators.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.5',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.2.4',
     changes: ['Refactoring: fix eslint'],

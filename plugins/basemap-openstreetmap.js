@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           OpenStreetMap.org map
 // @category       Map Tiles
-// @version        0.1.6
+// @version        0.1.7
 // @description    Add the native OpenStreetMap.org map tiles as an optional layer.
 
 /* exported setup, changelog --eslint */
@@ -12,6 +12,10 @@ var mapOpenStreetMap = {};
 window.plugin.mapOpenStreetMap = mapOpenStreetMap;
 
 var changelog = [
+  {
+    version: '0.1.7',
+    changes: ['Report the layer as light or dark for theme switching'],
+  },
   {
     version: '0.1.6',
     changes: ['Refactoring: fix eslint'],

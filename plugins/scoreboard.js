@@ -1,6 +1,6 @@
 // @author         Costaspap
 // @name           Localized scoreboard
-// @version        0.4.1
+// @version        0.4.2
 // @category       Info
 // @description    Display a scoreboard about all visible portals with statistics about both teams,like average portal level,link & field counts etc.
 
@@ -8,6 +8,10 @@
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.4.2',
+    changes: ['Use a Material Symbols icon for the mobile pane'],
+  },
   {
     version: '0.4.1',
     changes: ['Refactoring: fix eslint'],

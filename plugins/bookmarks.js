@@ -1,14 +1,22 @@
 // @author         ZasoGD
 // @name           Bookmarks for maps and portals
 // @category       Controls
-// @version        0.4.8
+// @version        0.5.0
 // @description    Save your favorite Maps and Portals and move the intel map with a click. Works with sync. Supports Multi-Project-Extension
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
-  { version: '0.4.8', changes: ['Register with the Sync plugin regardless of plugin load order'] },
+  {
+    version: '0.5.0',
+    changes: [
+      'Register with the Sync plugin regardless of plugin load order',
+      'Sync every Multi Projects Extension project, not just the default one',
+      'Let deleted projects propagate through sync',
+      'Draw icons from the bundled font',
+    ],
+  },
   { version: '0.4.7', changes: ['Fix data reset issue'] },
   {
     version: '0.4.6',

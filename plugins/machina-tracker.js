@@ -1,13 +1,17 @@
 // @name           Machina tracker
 // @author         McBen
 // @category       Layer
-// @version        1.1.2
+// @version        1.1.3
 // @description    Show locations of Machina activities
 
 /* exported setup, changelog --eslint */
 /* global IITC, L */
 
 var changelog = [
+  {
+    version: '1.1.3',
+    changes: ['Refactoring: use IITC.portal and IITC.chat APIs instead of legacy globals'],
+  },
   { version: '1.1.2', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '1.1.1',

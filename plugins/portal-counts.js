@@ -1,13 +1,17 @@
 // @author         yenky
 // @name           Portal count
 // @category       Info
-// @version        0.2.6
+// @version        0.2.7
 // @description    Display a list of all localized portals by level and faction.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.7',
+    changes: ['Use a Material Symbols icon for the mobile pane'],
+  },
   {
     version: '0.2.6',
     changes: ['Refactoring: fix eslint'],

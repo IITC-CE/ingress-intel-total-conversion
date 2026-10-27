@@ -7,7 +7,10 @@
 /* exported setup, changelog --eslint */
 
 var changelog = [
-  { version: '0.4.4', changes: ['Register with the Sync plugin regardless of plugin load order'] },
+  {
+    version: '0.4.4',
+    changes: ['Register with the Sync plugin regardless of plugin load order', 'Draw icons from the bundled font'],
+  },
   {
     version: '0.4.3',
     changes: ['Refactoring: fix eslint'],

@@ -1,13 +1,17 @@
 // @author         vita10gy
 // @name           Highlight portals by level color
 // @category       Highlighter
-// @version        0.2.3
+// @version        0.2.4
 // @description    Use the portal fill color to denote the portal level by using the game level colors.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.2.3',
     changes: ['Refactoring: fix eslint'],

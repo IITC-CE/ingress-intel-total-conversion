@@ -1,13 +1,17 @@
 // @author         949
 // @name           Find farms on map
 // @category       Layer
-// @version        1.4.5
+// @version        1.5.0
 // @description    Show farms by minimum level
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '1.5.0',
+    changes: ['Respect safe-area insets and the mobile top controls bar', 'Refactoring: use IITC.utils API instead of legacy globals'],
+  },
   {
     version: '1.4.5',
     changes: ['Refactoring: fix eslint'],

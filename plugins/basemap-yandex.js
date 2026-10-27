@@ -1,13 +1,17 @@
 // @author         johnd0e
 // @name           Yandex maps
 // @category       Map Tiles
-// @version        0.3.4
+// @version        0.3.5
 // @description    Add Yandex.com (Russian/Русский) map layers
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.5',
+    changes: ['Report the layer as light or dark for theme switching'],
+  },
   {
     version: '0.3.4',
     changes: ['Refactoring: fix eslint'],
