@@ -356,13 +356,6 @@ IITC.map.setup = function () {
 
   window.map = map;
 
-  map.on('moveend', function () {
-    const center = this.getCenter().wrap();
-    window.writeCookie('ingress.intelmap.lat', center.lat);
-    window.writeCookie('ingress.intelmap.lng', center.lng);
-    window.writeCookie('ingress.intelmap.zoom', this.getZoom());
-  });
-
   // map update status handling & update map hooks
   // ensures order of calls
   map.on('movestart', function () {
@@ -417,6 +410,14 @@ IITC.map.setup = function () {
 
     // Start map refresh (after Map location is set)
     IITC.map.request.start();
+
+    // Store the map position in cookies on moveend
+    map.on('moveend', function () {
+      const center = this.getCenter().wrap();
+      window.writeCookie('ingress.intelmap.lat', center.lat);
+      window.writeCookie('ingress.intelmap.lng', center.lng);
+      window.writeCookie('ingress.intelmap.zoom', this.getZoom());
+    });
   });
 };
 
