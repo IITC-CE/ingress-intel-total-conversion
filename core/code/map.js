@@ -388,9 +388,6 @@ IITC.map.setup = function () {
   // (the code originally called the request function directly, and triggered a normal delay for the next refresh.
   //  however, the moveend/zoomend gets triggered on map load, causing a duplicate refresh. this helps prevent that
   window.startRefreshTimeout(window.ON_MOVE_REFRESH * 1000);
-
-  // finally init setup map view
-  window.addHook('iitcLoaded', IITC.map.initialize);
 };
 
 IITC.map.initialize = function () {
