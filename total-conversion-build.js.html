@@ -50,7 +50,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>// @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.43.0
+// @version        0.43.1
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -97,6 +97,10 @@ IITC.registerLegacyAliases = function (namespace, mappings) {
 window.script_info = plugin_info;
 window.script_info.changelog = [
   {
+    version: '0.43.1',
+    changes: ['Fix Enlightened color missing in the mobile portal info'],
+  },
+  {
     version: '0.43.0',
     changes: [
       'Add antimeridian support: tiles load for the whole view, entities appear on the nearest world copy, portal selection and permalinks use the true longitude',
@@ -112,10 +116,13 @@ window.script_info.changelog = [
       'Fix the chat not following new messages and the channel container missing in some cases',
       'Fix leaving idle mode when the page becomes visible again',
       'Fix escapeHtml dropping the class attribute on allowed tags',
-      'Add API key to the CartoDB tile layer URL',
       'Shorten the portal deep link used by the scanner',
       'Remove the portal GUID position cache',
     ],
+  },
+  {
+    version: '0.42.4',
+    changes: ['Fix CartoDB base maps not loading'],
   },
   {
     version: '0.42.2',
