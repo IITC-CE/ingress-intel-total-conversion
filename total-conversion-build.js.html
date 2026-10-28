@@ -50,7 +50,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>// @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.42.2
+// @version        0.43.0
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -96,6 +96,27 @@ IITC.registerLegacyAliases = function (namespace, mappings) {
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.43.0',
+    changes: [
+      'Add antimeridian support: tiles load for the whole view, entities appear on the nearest world copy, portal selection and permalinks use the true longitude',
+      'Draw interface icons from a bundled Material Symbols font (&lt;iitc-icon>)',
+      'Add the baseLayerChanged hook reporting the active basemap and its light or dark theme',
+      'Update jQuery to 4.0 and jQuery UI to 1.14.2, with jquery-migrate for compatibility',
+      'Move chat, comm, map and portal code into the IITC.chat, IITC.comm, IITC.map and IITC.portal namespaces; the old window.* functions remain as aliases',
+      'Prefetch portal details when the mouse rests on a portal',
+      'Detect that the user was logged out and show a dialog',
+      'Add safe-area support for the desktop layout',
+      'Keep dialogs inside the main window and fix the dialog title width on mobile',
+      'Fix incorrect "resonator levels needed for next portal level"',
+      'Fix the chat not following new messages and the channel container missing in some cases',
+      'Fix leaving idle mode when the page becomes visible again',
+      'Fix escapeHtml dropping the class attribute on allowed tags',
+      'Add API key to the CartoDB tile layer URL',
+      'Shorten the portal deep link used by the scanner',
+      'Remove the portal GUID position cache',
+    ],
+  },
   {
     version: '0.42.2',
     changes: ['Fix LatLng instantiation in artifacts'],
