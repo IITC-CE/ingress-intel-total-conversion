@@ -1,292 +1,131 @@
-/* global L, log -- eslint */
+/* global IITC, log -- eslint */
 
 /**
- * @file This file contains functions related to the 'About IITC' dialog.
+ * @file The 'About IITC' page of the settings window: versions, links, the changelog and the list
+ *       of plugins with their changelogs. Plugins that failed to start are marked as such, and the
+ *       standard ones, built together with IITC, are shown as secondary
  * @module dialog_about
  */
 
 /**
- * Displays the 'About IITC' dialog.
- * This dialog includes the IITC version, a list of loaded plugins, and other relevant information.
+ * Plugin information as the page lists it
  *
- * @function
+ * @private
+ * @typedef {Object} PluginInfo
+ * @property {string} name - Name without the 'IITC plugin:' prefix
+ * @property {string} [version] - Version, without the build timestamp it shares with IITC
+ * @property {string} [details] - Build name and date, when they say more than the version
+ * @property {string} [description]
+ * @property {*} [error] - What stopped the plugin's setup
+ * @property {boolean} standard - Built together with this IITC
+ * @property {Array} [changelog] - Entries `{version, changes}`
  */
-window.aboutIITC = function () {
-  var html = createDialogContent();
 
-  window.dialog({
-    title: 'IITC ' + getIITCVersion(),
-    id: 'iitc-about',
-    html: html,
-    width: 'auto',
-    dialogClass: 'ui-dialog-aboutIITC',
-  });
+/**
+ * Retrieves the IITC version string
+ *
+ * @private
+ * @returns {string} The IITC version string
+ */
+const getIITCVersion = () => {
+  const iitc = window.script_info;
+  return `${iitc.script?.version || iitc.dateTimeVersion} [${iitc.buildName}]`;
 };
 
-/**
- * Creates the content for the 'About IITC' dialog.
- *
- * @function
- * @returns {string} HTML content for the about dialog.
- */
-function createDialogContent() {
-  var html = `<div><b>About IITC</b></div>
-              <div>Ingress Intel Total Conversion</div>
-              <hr>
-              <div>
-               <a href="${'@url_homepage@'}" target="_blank">IITC Homepage</a> |
-               <a href="${'@url_tg@'}" target="_blank">Telegram channel</a><br />
-               On the script’s homepage you can:
-               <ul>
-                 <li>Find Updates</li>
-                 <li>Get Plugins</li>
-                 <li>Report Bugs</li>
-                 <li>Contribute!</li>
-               </ul>
-              </div>
-              <hr>
-              <div>Version: ${getIITCVersion()} ${createChangelog(window.script_info)}</div>`;
-
-  if (isShortOnLocalStorage()) {
-    html += '<div class="warning">You are running low on LocalStorage memory.<br/>Please free some space to prevent data loss.</div>';
-  }
-
-  if (window.isApp && window.app.getVersionName) {
-    html += '<div>IITC Mobile ' + window.app.getVersionName() + '</div>';
-  }
-
-  var plugins = getPlugins();
-  if (plugins) {
-    html += '<div><p>Plugins:</p><ul>' + plugins + '</ul></div>';
-  }
-
-  return html;
-}
+// the build timestamp ending the IITC version ('.20240101.000000'), shared by the standard plugins
+const getIITCVersionAddition = () => window.script_info.script?.version.match(/^\d+\.\d+\.\d+(\..+)$/)?.[1];
 
 /**
- * Retrieves a list of plugins currently loaded in IITC. The list includes plugin names, versions, and descriptions.
+ * Turns the information a plugin was loaded with into what the page shows
  *
- * @function
- * @returns {string} Formatted list of plugins in HTML.
+ * @private
+ * @param {Object} info - Plugin information from boot
+ * @param {number} index - Position of the plugin in the boot order
+ * @returns {PluginInfo}
  */
-function getPlugins() {
-  var pluginsInfo = window.bootPlugins.info;
-
-  while (window.bootPlugins[0]) {
-    var plugin = window.bootPlugins.shift();
-    pluginsInfo.push(plugin.info || {});
-  }
-
-  var extra = getIITCVersionAddition();
-
-  var plugins = pluginsInfo
-    .map(convertPluginInfo)
-    .sort(function (a, b) {
-      return a.name > b.name ? 1 : -1;
-    })
-    .map(function (p) {
-      return pluginInfoToString(p, extra);
-    })
-    .join('\n');
-
-  return plugins;
-}
-
-/**
- * Converts plugin information into a structured object for easier processing.
- *
- * @function
- * @param {Object} info - The plugin information object.
- * @param {number} index - The index of the plugin in the array.
- * @returns {Object} Structured plugin information.
- */
-function convertPluginInfo(info, index) {
+const convertPluginInfo = (info, index) => {
   // Plugins metadata come from 2 sources:
   // - buildName, pluginId, dateTimeVersion: inserted in plugin body by build script
   //   (only standard plugins)
   // - script.name/version/description: from GM_info object, passed to wrapper
-  //   `script` may be not available if userscript manager does not provede GM_info
+  //   `script` may be not available if userscript manager does not provide GM_info
   //   (atm: IITC-Mobile for iOS)
-  var result = {
-    build: info.buildName,
-    changelog: info.changelog,
-    id: info.pluginId,
-    name: info.pluginId,
-    date: info.dateTimeVersion,
-    error: info.error,
-    version: undefined,
-    description: undefined,
-  };
-
-  var script = info.script;
-  if (script) {
-    if (typeof script.name === 'string') {
-      result.name = script.name.replace(/^IITC[\s-]+plugin:\s+/i, ''); // cut non-informative name part
-    }
-    result.version = script.version;
-    result.description = script.description;
-  }
-
-  if (!result.name) {
+  const script = info.script;
+  let name = typeof script?.name === 'string' ? script.name.replace(/^IITC[\s-]+plugin:\s+/i, '') : info.pluginId;
+  let description = script?.description;
+  if (!name) {
     if (window.script_info.script) {
-      // check if GM_info is available
-      result.name = '[unknown plugin: index ' + index + ']';
-      result.description = "this plugin does not have proper wrapper; report to it's author";
+      // GM_info is available, so the plugin lacks the wrapper
+      name = `[unknown plugin: index ${index}]`;
+      description = "this plugin does not have proper wrapper; report to it's author";
     } else {
       // userscript manager fault
-      result.name = '[3rd-party plugin: index ' + index + ']';
+      name = `[3rd-party plugin: index ${index}]`;
     }
   }
 
-  return result;
-}
+  let version = script?.version;
+  const extra = getIITCVersionAddition();
+  // the timestamp all standard plugins share with IITC says nothing
+  if (version && extra && version.endsWith(extra)) version = version.slice(0, -extra.length);
+  version = version || info.dateTimeVersion;
+  const details = [info.buildName && `[${info.buildName}]`, info.dateTimeVersion !== version && info.dateTimeVersion].filter(Boolean).join(' ');
 
-/**
- * Creates a changelog section for a given plugin.
- *
- * @function
- * @param {Object} plugin - The plugin for which to create the changelog.
- * @returns {string} HTML string representing the changelog.
- */
-function createChangelog(plugin) {
-  var id = 'plugin-changelog-' + plugin.id;
-  return (
-    `<a onclick="$('#${id}').toggle()">changelog</a>` +
-    `<ul id="${id}" style="display: none;">` +
-    plugin.changelog
-      .map(function (logEntry) {
-        return (
-          '<li>' +
-          logEntry.version +
-          '<ul>' +
-          logEntry.changes
-            .map(function (change) {
-              return `<li>${change}</li>`;
-            })
-            .join('') +
-          '</ul></li>'
-        );
-      })
-      .join('') +
-    '</ul>'
-  );
-}
-
-/**
- * Converts plugin information into a string format suitable for display in the 'About IITC' dialog.
- *
- * @function
- * @param {Object} p - The plugin information object.
- * @param {string} extra - Additional version information.
- * @returns {string} Formatted plugin information string.
- */
-function pluginInfoToString(p, extra) {
-  var info = {
-    changelog: '',
-    class: '',
-    description: p.description || '',
-    name: p.name,
-    verinfo: formatVerInfo(p, extra),
+  return {
+    name,
+    version,
+    details: details || undefined,
+    description,
+    error: info.error,
+    standard: info.buildName === window.script_info.buildName && info.dateTimeVersion === window.script_info.dateTimeVersion,
+    changelog: info.changelog,
   };
+};
 
-  if (isStandardPlugin(p)) {
-    info.class += 'plugin-is-standard';
-  }
-
-  if (p.error) {
-    info.class += ' plugin-error';
-    info.description = p.error;
-  }
-
-  if (p.changelog) {
-    info.changelog = createChangelog(p);
-  }
-
-  return L.Util.template('<li class="{class}" title="{description}">{name}{verinfo} {changelog}</li>', info);
-}
+// changelog entries as list entries, versions holding their changes
+const changelogItems = (changelog) =>
+  (changelog ?? []).map((entry) => ({ title: String(entry.version), items: (entry.changes ?? []).map((change) => ({ title: String(change) })) }));
 
 /**
- * Checks if a given plugin is a standard plugin based on the build name and date.
- * Standard plugins are those that match the build and date of the main IITC script.
+ * Lists the plugins loaded, by name
  *
- * @function
- * @param {Object} plugin - The plugin object to check.
- * @returns {boolean} True if the plugin is standard, false otherwise.
+ * @private
+ * @returns {Array<Object>} Entries of a `list` block
  */
-function isStandardPlugin(plugin) {
-  return plugin.build === window.script_info.buildName && plugin.date === window.script_info.dateTimeVersion;
-}
-
-/**
- * Retrieves the IITC version string.
- *
- * @function
- * @returns {string} The IITC version string.
- */
-function getIITCVersion() {
-  var iitc = window.script_info;
-  return ((iitc.script && iitc.script.version) || iitc.dateTimeVersion) + ' [' + iitc.buildName + ']';
-}
-
-/**
- * Extracts the additional version information from the IITC script version.
- *
- * @function
- * @returns {string} The additional version information, if any.
- */
-function getIITCVersionAddition() {
-  var extra = window.script_info.script && window.script_info.script.version.match(/^\d+\.\d+\.\d+(\..+)$/);
-  return extra && extra[1];
-}
-
-/**
- * Formats version information for plugins and the main script.
- * If an 'extra' parameter is provided and matches the end of the version string, it is removed.
- * This is used to cut off a common timestamp appended to versions.
- * The function also prepares a tooltip showing the build number and date, if available.
- *
- * @function formatVerInfo
- * @param {Object} p - The plugin or script object containing version information.
- * @param {string} [extra] - An optional extra string to be removed from the version information.
- * @returns {string} Formatted version string with optional HTML tooltip.
- */
-function formatVerInfo(p, extra) {
-  if (p.version && extra) {
-    var cutPos = p.version.length - extra.length;
-    // cut extra version component (timestamp) if it is equal to main script's one
-    if (p.version.substring(cutPos) === extra) {
-      p.version = p.version.substring(0, cutPos);
-    }
+const pluginItems = () => {
+  const pluginsInfo = window.bootPlugins.info;
+  // plugins that have not run their setup yet are listed as they are
+  while (window.bootPlugins[0]) {
+    pluginsInfo.push(window.bootPlugins.shift().info || {});
   }
 
-  p.version = p.version || p.date;
-  if (p.version) {
-    var tooltip = [];
-    if (p.build) {
-      tooltip.push('[' + p.build + ']');
-    }
-    if (p.date && p.date !== p.version) {
-      tooltip.push(p.date);
-    }
-    return L.Util.template(' - <code{title}>{version}</code>', {
-      title: tooltip[0] ? ' title="' + tooltip.join(' ') + '"' : '',
-      version: p.version,
+  return pluginsInfo
+    .map(convertPluginInfo)
+    .sort((a, b) => (a.name > b.name ? 1 : -1))
+    .map((plugin) => {
+      const state = plugin.error ? 'error' : plugin.standard ? 'muted' : undefined;
+      const tooltip = [plugin.error ? String(plugin.error) : plugin.description, plugin.details].filter(Boolean).join('\n');
+      return {
+        title: plugin.name,
+        badge: plugin.version,
+        tooltip: tooltip || undefined,
+        state,
+        items: plugin.changelog ? changelogItems(plugin.changelog) : undefined,
+        collapsed: true,
+      };
     });
-  }
-
-  return '';
-}
+};
 
 /**
  * Checks if the browser's local storage is running short on available space.
  * This function tries to write a specific amount of data to the local storage and captures any errors.
  * If an error occurs, it is an indication that the local storage has limited free space left.
  *
- * @function
+ * @private
  * @returns {boolean} Returns `true` if the local storage is running short on space, otherwise `false`.
  */
-function isShortOnLocalStorage() {
-  var MINIMUM_FREE_SPACE = 100000;
+const isShortOnLocalStorage = () => {
+  const MINIMUM_FREE_SPACE = 100000;
   try {
     localStorage.setItem('_MEM_CHECK_', '#'.repeat(MINIMUM_FREE_SPACE));
   } catch (e) {
@@ -296,4 +135,45 @@ function isShortOnLocalStorage() {
 
   localStorage.removeItem('_MEM_CHECK_');
   return false;
-}
+};
+
+/**
+ * Declares the `about` page of the settings window; called at boot
+ *
+ * @memberof IITC.about
+ */
+const setup = () => {
+  IITC.settings.register('about', {
+    title: 'About IITC',
+    shortcut: { class: 'cursor_help' },
+    blocks: [
+      { type: 'text', text: () => `Ingress Intel Total Conversion ${getIITCVersion()}` },
+      {
+        type: 'text',
+        // called also while the block is hidden
+        text: () => `IITC Mobile ${window.app?.getVersionName?.()}`,
+        visible: () => Boolean(window.isApp && window.app?.getVersionName),
+      },
+      {
+        type: 'notice',
+        level: 'warning',
+        text: 'You are running low on LocalStorage memory. Please free some space to prevent data loss.',
+        visible: isShortOnLocalStorage,
+      },
+      { type: 'link', title: 'IITC Homepage', url: '@url_homepage@' },
+      { type: 'link', title: 'Telegram channel', url: '@url_tg@' },
+      { type: 'text', text: 'On the homepage you can find updates, get plugins, report bugs and contribute.' },
+      { type: 'list', items: () => [{ title: 'Changelog', items: changelogItems(window.script_info.changelog), collapsed: true }] },
+      { type: 'heading', title: 'Plugins' },
+      { type: 'list', items: pluginItems },
+    ],
+  });
+};
+
+/**
+ * The 'About IITC' page
+ *
+ * @memberof IITC
+ * @namespace about
+ */
+IITC.about = { setup, _convertPluginInfo: convertPluginInfo };

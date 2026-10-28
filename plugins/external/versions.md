@@ -1,11 +1,3 @@
-### jQuery-related components:
-
-* https://github.com/bgrins/spectrum
-  1.8.1-4-g101b05c
-  spectrum.js: 8fd0a3a5f6a478f319763f999aaf5d8531c52b1d
-  used in: draw-tools
-
-
 ### Leaflet-related components:
 
 * https://github.com/Leaflet/Leaflet.draw
