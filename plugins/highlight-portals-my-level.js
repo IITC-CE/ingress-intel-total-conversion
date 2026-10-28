@@ -1,13 +1,17 @@
 // @author         vita10gy
 // @name           Highlight portals by my level
 // @category       Highlighter
-// @version        0.2.3
+// @version        0.2.4
 // @description    Use the portal fill color to denote if the portal is either at and above, or at and below your level.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.2.3',
     changes: ['Refactoring: fix eslint'],

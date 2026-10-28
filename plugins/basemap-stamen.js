@@ -16,6 +16,7 @@ const changelog = [
       'Add the Terrain and Toner Dark layers',
       'Request high density tiles on retina displays',
       'Fix the Watercolor zoom limit',
+      'Report the layers as light or dark for theme switching',
     ],
   },
   {

@@ -1,13 +1,17 @@
 // @author         teo96
 // @name           Portals list
 // @category       Info
-// @version        0.4.5
+// @version        0.4.6
 // @description    Display a sortable list of all visible portals with full details about the team, resonators, links, etc.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.4.6',
+    changes: ['Use a Material Symbols icon for the mobile pane'],
+  },
   {
     version: '0.4.5',
     changes: ['Refactoring: fix eslint'],

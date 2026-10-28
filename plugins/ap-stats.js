@@ -1,13 +1,17 @@
 // @author         Hollow011
 // @name           Available AP statistics
 // @category       Info
-// @version        0.4.6
+// @version        0.4.7
 // @description    Displays the per-team AP gains available in the current view.
 
 /* global IITC -- eslint */
 /* exported setup, changelog --eslint */
 
 var changelog = [
+  {
+    version: '0.4.7',
+    changes: ['Refactoring: use IITC.map API instead of legacy globals'],
+  },
   {
     version: '0.4.6',
     changes: ['Take Machina into account'],

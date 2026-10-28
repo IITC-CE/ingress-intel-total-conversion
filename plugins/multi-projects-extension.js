@@ -1,13 +1,22 @@
 // @author         ZasoGD
 // @name           Multi Projects Extension
 // @category       Controls
-// @version        0.1.5
+// @version        0.2.0
 // @description    Create separated projects in some plugins.
 
 /* exported setup, changelog --eslint */
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.0',
+    changes: [
+      'Register projects regardless of plugin load order',
+      'Keep the selected project across reloads',
+      'Ignore a scan for a project that is not registered',
+      'Draw icons from the bundled font',
+    ],
+  },
   {
     version: '0.1.5',
     changes: ['Refactoring: fix eslint'],

@@ -1,13 +1,17 @@
 ﻿// @author         johnd0e
 // @name           Gaode (高德地图) / AutoNavi map
 // @category       Map Tiles
-// @version        0.1.5
+// @version        0.1.6
 // @description    Map layers from AutoNavi / Gaode (高德地图)
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.1.6',
+    changes: ['Report the layer as light or dark for theme switching'],
+  },
   { version: '0.1.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.1.4',

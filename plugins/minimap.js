@@ -1,13 +1,17 @@
 // @author         johnd0e
 // @name           Mini map
 // @category       Controls
-// @version        0.4.5
+// @version        0.4.6
 // @description    Show a mini map on the corner of the map.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.4.6',
+    changes: ['Refactoring: use IITC.utils API instead of legacy globals'],
+  },
   { version: '0.4.5', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.4.4',

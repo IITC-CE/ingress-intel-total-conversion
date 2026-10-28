@@ -1,13 +1,17 @@
 // @author         Johtaja
 // @name           Highlight portals based on history
 // @category       Highlighter
-// @version        0.3.3
+// @version        0.3.4
 // @description    Use the portal fill color to denote the portal has been visited, captured, scout controlled
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.4',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.3.3',
     changes: ['Refactoring: fix eslint'],

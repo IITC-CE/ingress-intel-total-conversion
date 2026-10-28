@@ -1,7 +1,7 @@
 // @author         jonatkins
 // @name           Highlight portals with ornaments
 // @category       Highlighter
-// @version        0.2.4
+// @version        0.2.5
 // @description    Use the portal fill color to denote portals with additional 'ornament' markers.
 //                 e.g. Anomaly portals
 
@@ -9,6 +9,10 @@
 /* global IITC -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.5',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.2.4',
     changes: ['Refactoring: fix eslint'],

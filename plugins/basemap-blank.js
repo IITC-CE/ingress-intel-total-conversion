@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Blank map
 // @category       Map Tiles
-// @version        0.1.6
+// @version        0.1.7
 // @description    Add a blank map layer - no roads or other features.
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.1.7',
+    changes: ['Report the layer as light or dark for theme switching'],
+  },
   {
     version: '0.1.6',
     changes: ['Refactoring: fix eslint'],

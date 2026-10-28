@@ -1,13 +1,17 @@
 // @author         jonatkins
 // @name           Ingress scoring regions
 // @category       Layer
-// @version        0.3.4
+// @version        0.3.5
 // @description    Show the regional scoring cells grid on the map
 
 /* exported setup, changelog --eslint */
 /* global L -- eslint */
 
 var changelog = [
+  {
+    version: '0.3.5',
+    changes: ['Fix region cells near the antimeridian'],
+  },
   { version: '0.3.4', changes: ['Refactoring: update Leaflet API usage'] },
   {
     version: '0.3.3',

@@ -1,13 +1,17 @@
 // @author         breunigs
 // @name           Scale bar
 // @category       Controls
-// @version        0.1.4
+// @version        0.1.5
 // @description    Show scale bar on the map.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.1.5',
+    changes: ['Refactoring: use IITC.utils API instead of legacy globals'],
+  },
   {
     version: '0.1.4',
     changes: ['Refactoring: fix eslint'],

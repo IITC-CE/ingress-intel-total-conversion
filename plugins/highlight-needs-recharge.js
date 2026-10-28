@@ -1,7 +1,7 @@
 // @author         vita10gy
 // @name           Highlight portals that need recharging
 // @category       Highlighter
-// @version        0.2.3
+// @version        0.2.4
 // @description    Use the portal fill color to denote if the portal needs recharging and how much.
 //                 Yellow: above 85%. Orange: above 70%. Red: above 15%. Magenta: below 15%.
 
@@ -9,6 +9,10 @@
 /* global IITC, L -- eslint */
 
 var changelog = [
+  {
+    version: '0.2.4',
+    changes: ['Refactoring: use IITC.portal API instead of legacy globals'],
+  },
   {
     version: '0.2.3',
     changes: ['Refactoring: fix eslint'],
