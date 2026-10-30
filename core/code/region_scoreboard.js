@@ -213,7 +213,16 @@ window.RegionScoreboardSetup = (function () {
 
     stopTimer();
     mainDialog.html('Loading regional scores...');
-    window.postAjax('getRegionScoreDetails', { latE6: latE6, lngE6: lngE6 }, onRequestSuccess, onRequestFailure);
+    const region = requestedRegion;
+    // ignore responses for a closed dialog or a superseded request
+    // requestedRegion must be a new object for each request
+    const isCurrent = () => mainDialog && region === requestedRegion;
+    window.postAjax(
+      'getRegionScoreDetails',
+      { latE6: latE6, lngE6: lngE6 },
+      (data) => isCurrent() && onRequestSuccess(data),
+      () => isCurrent() && onRequestFailure()
+    );
   }
 
   function onRequestFailure() {
