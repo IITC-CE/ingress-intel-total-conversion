@@ -406,10 +406,15 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function getCycleStartForDate(dateValue) {
-    var dateParts = dateValue.split('-').map(Number);
-    var date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 12);
-    var cycleDuration = regionScore.CYCLE_DURATION;
-    return new Date(Math.floor(date.getTime() / cycleDuration) * cycleDuration);
+    const [year, month, day] = dateValue.split('-').map(Number);
+    const dayStart = new Date(year, month - 1, day).getTime();
+    const dayEnd = new Date(year, month - 1, day + 1).getTime();
+    const cycleDuration = regionScore.CYCLE_DURATION;
+
+    // prefer the cycle starting on that day, as the date input shows cycle start dates
+    // a cycle is longer than a day, so at most one starts on any day
+    const startingThatDay = Math.ceil(dayStart / cycleDuration) * cycleDuration;
+    return new Date(startingThatDay < dayEnd ? startingThatDay : Math.floor(dayStart / cycleDuration) * cycleDuration);
   }
 
   function formatCycleDateInput(cycleStart) {
