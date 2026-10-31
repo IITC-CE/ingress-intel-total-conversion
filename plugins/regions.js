@@ -120,16 +120,25 @@ window.plugin.regions.regionName = function (cell) {
   return name;
 };
 
-window.plugin.regions.getCellFromName = function (name) {
-  var regexp = new RegExp(
-    '^(' + window.plugin.regions.FACE_NAMES.join('|') + ')(1[0-6]|0[1-9])-(' + window.plugin.regions.CODE_WORDS.join('|') + ')-(1[0-5]|0[0-9])$',
-    'i'
-  );
-  var match = name.replace(/\s+/g, '').match(regexp);
-  if (!match) return;
+// Parses a region name by REGEXP; omitted face and number are taken from the region at the map center
+window.plugin.regions.parseName = (name) => {
+  const match = name.replace(/\s+/g, '').match(window.plugin.regions.REGEXP);
+  if (!match) return null;
 
+  if (!match[1] || !match[2]) {
+    const currentCell = window.plugin.regions.getNameFromLatLng(window.map.getCenter());
+    if (!match[1]) match[1] = currentCell.slice(0, 2);
+    if (!match[2]) match[2] = currentCell.slice(2, 4);
+  }
   match[1] = match[1].toUpperCase();
   match[3] = match[3].toUpperCase();
+  return match;
+};
+
+window.plugin.regions.getCellFromName = function (name) {
+  const match = window.plugin.regions.parseName(name);
+  // without the last number the name is a group of 16 scoring regions; its center would pick one of them arbitrarily
+  if (!match || match[4] === undefined) return;
   return window.plugin.regions.getCellFromMatch(match);
 };
 
@@ -158,10 +167,8 @@ window.plugin.regions.getNameFromLatLng = function (latLng) {
 };
 
 window.plugin.regions.search = function (query) {
-  var terms = query.term.replace(/\s+/g, '').split(/[,;]/);
-  var matches = terms.map(function (string) {
-    return string.match(window.plugin.regions.REGEXP);
-  });
+  var terms = query.term.split(/[,;]/);
+  var matches = terms.map(window.plugin.regions.parseName);
   if (
     !matches.every(function (match) {
       return match !== null;
@@ -169,16 +176,7 @@ window.plugin.regions.search = function (query) {
   )
     return;
 
-  var currentCell = window.plugin.regions.regionName(window.S2.S2Cell.FromLatLng(window.map.getCenter(), 6));
-
   matches.forEach(function (match) {
-    if (!match[1]) match[1] = currentCell.slice(0, 2);
-    else match[1] = match[1].toUpperCase();
-
-    if (!match[2]) match[2] = currentCell.slice(2, 4);
-
-    match[3] = match[3].toUpperCase();
-
     var result = window.plugin.regions.getSearchResult(match);
     if (result) query.addResult(result);
   });
