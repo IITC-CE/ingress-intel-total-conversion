@@ -134,7 +134,6 @@
   }
 
   .checkpoint-history {
-    overflow-x: auto;
     touch-action: pan-y;
   }
 
