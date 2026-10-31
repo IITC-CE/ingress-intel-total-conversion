@@ -124,34 +124,29 @@ window.plugin.regions.regionName = function (cell) {
   return name;
 };
 
-window.plugin.regions.search = function (query) {
-  var terms = query.term.replace(/\s+/g, '').split(/[,;]/);
-  var matches = terms.map(function (string) {
-    return string.match(window.plugin.regions.REGEXP);
-  });
-  if (
-    !matches.every(function (match) {
-      return match !== null;
-    })
-  )
-    return;
+// Parses a region name by REGEXP; omitted face and number are taken from the region at the map center
+window.plugin.regions.parseName = (name) => {
+  const match = name.replace(/\s+/g, '').match(window.plugin.regions.REGEXP);
+  if (!match) return null;
 
-  var currentCell = window.plugin.regions.regionName(window.S2.S2Cell.FromLatLng(window.map.getCenter(), 6));
-
-  matches.forEach(function (match) {
+  if (!match[1] || !match[2]) {
+    const currentCell = window.plugin.regions.getNameFromLatLng(window.map.getCenter());
     if (!match[1]) match[1] = currentCell.slice(0, 2);
-    else match[1] = match[1].toUpperCase();
-
     if (!match[2]) match[2] = currentCell.slice(2, 4);
-
-    match[3] = match[3].toUpperCase();
-
-    var result = window.plugin.regions.getSearchResult(match);
-    if (result) query.addResult(result);
-  });
+  }
+  match[1] = match[1].toUpperCase();
+  match[3] = match[3].toUpperCase();
+  return match;
 };
 
-window.plugin.regions.getSearchResult = function (match) {
+window.plugin.regions.getCellFromName = function (name) {
+  const match = window.plugin.regions.parseName(name);
+  // without the last number the name is a group of 16 scoring regions; its center would pick one of them arbitrarily
+  if (!match || match[4] === undefined) return;
+  return window.plugin.regions.getCellFromMatch(match);
+};
+
+window.plugin.regions.getCellFromMatch = function (match) {
   var faceId = window.plugin.regions.FACE_NAMES.indexOf(match[1]);
   var id1 = parseInt(match[2]) - 1;
   var codeWordId = window.plugin.regions.CODE_WORDS.indexOf(match[3]);
@@ -159,28 +154,50 @@ window.plugin.regions.getSearchResult = function (match) {
 
   if (faceId === -1 || id1 < 0 || id1 > 15 || codeWordId === -1 || id2 < 0 || id2 > 15) return;
 
-  // for Odd faces Nia swaps id & codename
   if (faceId & 1) {
     [id1, codeWordId] = [codeWordId, id1];
   }
 
-  // looks good. now we need the face/i/j values for this cell face is used as-is
-  // id1 is the region 'i' value (first 4 bits), codeword is the 'j' value (first 4 bits)
   var cell = window.S2.S2Cell.FromFaceIJ(faceId, [id1, codeWordId], 4);
+  if (id2 === undefined) return cell;
+
+  var positions = cell.getFaceAndQuads()[1];
+  positions.push(Math.floor(id2 / 4), id2 % 4);
+  return window.S2.S2Cell.FromFacePosition(faceId, positions);
+};
+
+window.plugin.regions.getNameFromLatLng = function (latLng) {
+  return window.plugin.regions.regionName(window.S2.S2Cell.FromLatLng(latLng, 6));
+};
+
+window.plugin.regions.search = function (query) {
+  var terms = query.term.split(/[,;]/);
+  var matches = terms.map(window.plugin.regions.parseName);
+  if (
+    !matches.every(function (match) {
+      return match !== null;
+    })
+  )
+    return;
+
+  matches.forEach(function (match) {
+    var result = window.plugin.regions.getSearchResult(match);
+    if (result) query.addResult(result);
+  });
+};
+
+window.plugin.regions.getSearchResult = function (match) {
+  var cell = window.plugin.regions.getCellFromMatch(match);
+  if (!cell) return;
 
   var result = {};
 
-  if (id2 === undefined) {
+  if (match[4] === undefined) {
     result.description = 'Regional score cells (cluster of 16 cells)';
     result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@'.replace(/orange/, 'gold'));
   } else {
     result.description = 'Regional score cell';
     result.icon = 'data:image/svg+xml;base64,' + btoa('@include_string:images/icon-cell.svg@');
-
-    // eslint-disable-next-line no-unused-vars
-    const [_, positions] = cell.getFaceAndQuads();
-    positions.push(Math.floor(id2 / 4), id2 % 4);
-    cell = window.S2.S2Cell.FromFacePosition(faceId, positions);
   }
 
   var corners = cell.getCornerLatLngs();
