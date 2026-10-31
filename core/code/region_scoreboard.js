@@ -18,6 +18,7 @@ window.RegionScoreboardSetup = (function () {
   var checkpointCycleStart;
   var timer;
   var requestedRegion;
+  let dialogState;
 
   /**
    * Interface to manage RegionScore data from server results.
@@ -194,6 +195,8 @@ window.RegionScoreboardSetup = (function () {
 
   function showRegion(latE6, lngE6) {
     requestedRegion = { latE6: latE6, lngE6: lngE6 };
+    // a reload keeps the state saved before an earlier load; a new dialog starts with defaults
+    dialogState = getDialogState() || (mainDialog ? dialogState : undefined);
 
     if (!mainDialog) {
       if (window.useAppPanes()) {
@@ -235,8 +238,23 @@ window.RegionScoreboardSetup = (function () {
     }
 
     regionScore = new RegionScore(data.result);
-    updateDialog();
+    updateDialog(dialogState?.logscale);
+    if (dialogState) {
+      $('details.scoreboard-section', mainDialog).each((i, section) => {
+        if (dialogState.open[i] !== undefined) section.open = dialogState.open[i];
+      });
+    }
     startTimer();
+  }
+
+  function getDialogState() {
+    if (!mainDialog || !$('.cellscore', mainDialog).length) return;
+    return {
+      logscale: $('input.logscale', mainDialog).prop('checked'),
+      open: $('details.scoreboard-section', mainDialog)
+        .map((i, section) => section.open)
+        .get(),
+    };
   }
 
   function updateDialog(logscale) {
