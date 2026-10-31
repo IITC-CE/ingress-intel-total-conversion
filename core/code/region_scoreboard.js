@@ -44,6 +44,7 @@ window.RegionScoreboardSetup = (function () {
       this.MAC_INTERVAL = 13; // Cycles
       this.checkpoints = [];
 
+      // sparse: checkpoints missing from scoreHistory stay holes
       for (var i = 0; i < serverResult.scoreHistory.length; i++) {
         var h = serverResult.scoreHistory[i];
         this.checkpoints[parseInt(h[0])] = [parseInt(h[1]), parseInt(h[2])];
@@ -69,21 +70,19 @@ window.RegionScoreboardSetup = (function () {
     }
 
     getScoreMax(min_value) {
-      var max = min_value || 0;
-      for (var i = 1; i < this.checkpoints.length; i++) {
-        var cp = this.checkpoints[i];
+      let max = min_value || 0;
+      this.checkpoints.forEach((cp) => {
         max = Math.max(max, cp[0], cp[1]);
-      }
+      });
       return max;
     }
 
     getCPSum() {
-      var sums = [0, 0];
-      for (var i = 1; i < this.checkpoints.length; i++) {
-        sums[0] += this.checkpoints[i][0];
-        sums[1] += this.checkpoints[i][1];
-      }
-
+      const sums = [0, 0];
+      this.checkpoints.forEach((cp) => {
+        sums[0] += cp[0];
+        sums[1] += cp[1];
+      });
       return sums;
     }
 
@@ -156,15 +155,6 @@ window.RegionScoreboardSetup = (function () {
     getLastCP() {
       if (this.checkpoints.length === 0) return 0;
       return this.checkpoints.length - 1;
-    }
-
-    getCycleStart(cycle) {
-      if (cycle === undefined) return this.cycleStartTime;
-      return new Date(cycle * this.CYCLE_DURATION);
-    }
-
-    getCurrentCycle() {
-      return Math.floor(Date.now() / this.CYCLE_DURATION);
     }
 
     getCycleEnd() {
@@ -460,14 +450,7 @@ window.RegionScoreboardSetup = (function () {
       `</tr>`;
 
     if (showScores) {
-      const total = [0, 0];
-      for (let totalCp = 1; totalCp <= regionScore.getLastCP(); totalCp++) {
-        const checkpointScore = regionScore.getCPScore(totalCp);
-        if (checkpointScore) {
-          total[0] += checkpointScore[0];
-          total[1] += checkpointScore[1];
-        }
-      }
+      const total = regionScore.getCPSum();
 
       table +=
         '<tr class="cp_total"><th></th><th></th>' +
