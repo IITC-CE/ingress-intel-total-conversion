@@ -19,6 +19,7 @@ window.RegionScoreboardSetup = (function () {
   var timer;
   var requestedRegion;
   let dialogState;
+  const LOADING_TEXT = 'Loading regional scores...';
 
   /**
    * Interface to manage RegionScore data from server results.
@@ -205,7 +206,7 @@ window.RegionScoreboardSetup = (function () {
       } else {
         mainDialog = window.dialog({
           title: 'Region scores',
-          html: '',
+          html: LOADING_TEXT,
           width: 520,
           height: 600,
           closeCallback: onDialogClose,
@@ -215,7 +216,7 @@ window.RegionScoreboardSetup = (function () {
     }
 
     stopTimer();
-    mainDialog.html('Loading regional scores...');
+    mainDialog.html(LOADING_TEXT);
     const region = requestedRegion;
     // ignore responses for a closed dialog or a superseded request
     // requestedRegion must be a new object for each request
