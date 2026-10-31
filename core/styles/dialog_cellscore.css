@@ -49,12 +49,6 @@
     margin-bottom: 8px;
   }
 
-  h2 {
-    color: var(--color-primary);
-    font-size: 1.1em;
-    margin: 0 0 8px;
-  }
-
   table {
     width: 80%;
     max-width: 100%;
