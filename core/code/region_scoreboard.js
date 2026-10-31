@@ -322,16 +322,7 @@ window.RegionScoreboardSetup = (function () {
       showRegion(Math.round(center.lat * 1e6), Math.round(center.lng * 1e6));
     });
 
-    $('.map-center', mainDialog).on('click', function () {
-      var center = window.map.getCenter();
-      if (!window.plugin || !window.plugin.regions || !window.plugin.regions.getNameFromLatLng) {
-        $('.region-error', mainDialog).text('Enable the Ingress scoring regions plugin to select a region ID.');
-        return;
-      }
-      $('input[name="region"]', mainDialog).val(window.plugin.regions.getNameFromLatLng(center));
-      $('.region-error', mainDialog).empty();
-      $('.region-select-form', mainDialog).trigger('submit');
-    });
+    $('.map-center', mainDialog).on('click', showDialog);
 
     $('.checkpoint-cycle-previous', mainDialog).on('click', function () {
       checkpointCycleStart = new Date(checkpointCycleStart.getTime() - regionScore.CYCLE_DURATION);
