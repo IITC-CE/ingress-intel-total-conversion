@@ -157,6 +157,12 @@ window.RegionScoreboardSetup = (function () {
       return this.checkpoints.length - 1;
     }
 
+    // Machina stops linking and decays once every MAC_INTERVAL cycles ("extinction event")
+    isMacPauseCycle(cycleStart) {
+      const index = Math.floor(cycleStart.getTime() / this.CYCLE_DURATION);
+      return (index + 1) % this.MAC_INTERVAL === 0;
+    }
+
     getCycleEnd() {
       return this.getCheckpointTime(this.CP_COUNT);
     }
@@ -434,7 +440,7 @@ window.RegionScoreboardSetup = (function () {
 
   function createCheckpointTable(cycleStart) {
     const showScores = cycleStart.getTime() === regionScore.cycleStartTime.getTime();
-    const isMacPause = Math.floor(cycleStart.getTime() / regionScore.CYCLE_DURATION + 1) % regionScore.MAC_INTERVAL === 0;
+    const isMacPause = regionScore.isMacPauseCycle(cycleStart);
     const _invert = window.PLAYER.team === 'RESISTANCE';
     function order(_1, _2) {
       return (_invert ? [_2, _1] : [_1, _2]).join('');
