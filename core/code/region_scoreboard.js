@@ -623,7 +623,7 @@ window.RegionScoreboardSetup = (function () {
   }
 
   function formatHours(time) {
-    return pad(time.getHours()) + ':' + pad(time.getMinutes());
+    return IITC.utils.unixTimeToHHmm(time.getTime());
   }
   function formatDay(time) {
     return pad(time.getDate()) + '.' + pad(time.getMonth() + 1);
