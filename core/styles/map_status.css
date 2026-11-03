@@ -17,6 +17,17 @@
   .map {
     margin-left: 8px;
   }
+
+  /* keeps the safe-area padding so plugin elements stay clear of the screen edge */
+  &.ghost {
+    background: transparent;
+    border: 0;
+    pointer-events: none;
+
+    > * {
+      pointer-events: auto;
+    }
+  }
 }
 
 #loadlevel {
