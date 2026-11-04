@@ -48,7 +48,9 @@ privacyView.toggle = () => {
   } else {
     $('#privacytoggle').text(privacyView.is_active ? 'Privacy active' : 'Privacy inactive');
     if (!privacyView.is_active) {
-      // refresh chat
+      // messages that arrived while the chat was hidden are not rendered yet
+      const tab = IITC.chat.getActive();
+      if (tab) IITC.chat.chooseTab(tab);
       window.startRefreshTimeout(0.1 * 1000);
     }
   }
