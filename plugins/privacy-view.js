@@ -57,16 +57,17 @@ privacyView.toggle = () => {
 };
 
 function setup() {
-  $('<style>')
-    .html(
-      '.privacy_active #playerstat,' +
-        '.privacy_active #chatinput,' +
-        '.privacy_active #chatcontrols > a:not(#privacytoggle),' +
-        '.privacy_active #chat { display: none; }' +
-        '.privacy_active #chatcontrols { bottom: 0; top: auto }' +
-        '.privacy_active .leaflet-left .leaflet-control {margin-left: 10px}'
-    )
-    .appendTo('head');
+  let css = '.privacy_active #playerstat { display: none; }';
+  // on mobile the chat stays out of sight in its own pane until it is opened
+  if (!IITC.utils.isSmartphone()) {
+    css +=
+      '.privacy_active #chatinput,' +
+      '.privacy_active #chatcontrols > a:not(#privacytoggle),' +
+      '.privacy_active #chat { display: none; }' +
+      '.privacy_active #chatcontrols { bottom: 0; top: auto }' +
+      '.privacy_active .leaflet-left .leaflet-control {margin-left: 10px}';
+  }
+  $('<style>').html(css).appendTo('head');
 
   if (IITC.utils.isSmartphone()) {
     IITC.toolbox.addButton({
