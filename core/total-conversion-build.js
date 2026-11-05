@@ -1,6 +1,6 @@
 // @author         jonatkins
 // @name           IITC: Ingress intel map total conversion
-// @version        0.43.1
+// @version        0.43.2
 // @description    Total conversion for the ingress intel map.
 // @run-at         document-end
 
@@ -46,6 +46,10 @@ IITC.registerLegacyAliases = function (namespace, mappings) {
 
 window.script_info = plugin_info;
 window.script_info.changelog = [
+  {
+    version: '0.43.2',
+    changes: ['Fix plugin elements in the status bar being hidden when the app shows the status'],
+  },
   {
     version: '0.43.1',
     changes: ['Fix Enlightened color missing in the mobile portal info'],
