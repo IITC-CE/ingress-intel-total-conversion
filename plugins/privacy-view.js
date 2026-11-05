@@ -48,23 +48,26 @@ privacyView.toggle = () => {
   } else {
     $('#privacytoggle').text(privacyView.is_active ? 'Privacy active' : 'Privacy inactive');
     if (!privacyView.is_active) {
-      // refresh chat
+      // messages that arrived while the chat was hidden are not rendered yet
+      const tab = IITC.chat.getActive();
+      if (tab) IITC.chat.chooseTab(tab);
       window.startRefreshTimeout(0.1 * 1000);
     }
   }
 };
 
 function setup() {
-  $('<style>')
-    .html(
-      '.privacy_active #playerstat,' +
-        '.privacy_active #chatinput,' +
-        '.privacy_active #chatcontrols > a:not(#privacytoggle),' +
-        '.privacy_active #chat { display: none; }' +
-        '.privacy_active #chatcontrols { bottom: 0; top: auto }' +
-        '.privacy_active .leaflet-left .leaflet-control {margin-left: 10px}'
-    )
-    .appendTo('head');
+  let css = '.privacy_active #playerstat { display: none; }';
+  // on mobile the chat stays out of sight in its own pane until it is opened
+  if (!IITC.utils.isSmartphone()) {
+    css +=
+      '.privacy_active #chatinput,' +
+      '.privacy_active #chatcontrols > a:not(#privacytoggle),' +
+      '.privacy_active #chat { display: none; }' +
+      '.privacy_active #chatcontrols { bottom: 0; top: auto }' +
+      '.privacy_active .leaflet-left .leaflet-control {margin-left: 10px}';
+  }
+  $('<style>').html(css).appendTo('head');
 
   if (IITC.utils.isSmartphone()) {
     IITC.toolbox.addButton({
