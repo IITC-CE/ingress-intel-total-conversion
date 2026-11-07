@@ -108,6 +108,7 @@ share
 refresh
 sync
 settings
+tune
 fullscreen
 fullscreen_exit
 login

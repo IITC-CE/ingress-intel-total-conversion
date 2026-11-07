@@ -438,7 +438,7 @@ const setMapButton = (wanted) => {
               open();
             },
           },
-          el('iitc-icon', { fallback: '⚙' }, 'settings')
+          el('iitc-icon', { fallback: '⚙' }, 'tune')
         )
       );
       L.DomEvent.disableClickPropagation(container);
