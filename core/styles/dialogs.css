@@ -1,7 +1,7 @@
 @import './dialog_redeem.css';
 @import './dialog_artifact.css';
 @import './dialog_cellscore.css';
-@import './dialog_about.css';
+@import './dialog_text.css';
 
 .ui-tooltip,
 .ui-dialog {
@@ -9,10 +9,15 @@
   z-index: 9500;
   background-color: var(--color-bg-trans);
   border: 1px solid var(--color-bg-border);
+  padding: 2px 4px;
+}
+
+.ui-tooltip,
+.ui-dialog,
+.iitc-options-pane {
   color: var(--color-secondary);
   font-size: 13px;
   line-height: 15px;
-  padding: 2px 4px;
 }
 
 .ui-tooltip {
@@ -159,7 +164,8 @@
 }
 
 .ui-dialog-buttonset button,
-.ui-dialog-content button {
+.ui-dialog-content button,
+.iitc-options-pane button {
   padding: 2px;
   min-width: 40px;
   color: var(--color-primary);

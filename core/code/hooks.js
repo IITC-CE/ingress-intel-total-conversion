@@ -53,6 +53,15 @@
  * - `nicknameClicked`: Event triggered when a player's nickname is clicked.
  * - `geoSearch`: Event triggered during a geographic search.
  * - `search`: Event triggered during a search operation.
+ * - `optionChanged`: Called after the value of an option has changed (see `IITC.options`), for declared
+ *                     options and for plugin state stored or removed through `IITC.options` alike;
+ *                     provides `{ key, value, oldValue, source }`. `source` is `local` unless the caller
+ *                     passes another one: sync uses `remote`, and `legacy` marks a value moved from an older build
+ * - `optionsPageRegistered`: Called after an options page is declared, once its values can be read;
+ *                             provides `{ pageId, keys }` with the keys this declaration owns. A section added
+ *                             to a page with `IITC.options.extend` is announced too, with `extensionId` and
+ *                             the id of the page it extends as `pageId`, registered or not. Declarations made
+ *                             before a handler was added are not announced again
  *
  * @module hooks
  */

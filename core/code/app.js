@@ -152,12 +152,6 @@ window.runOnAppBeforeBoot = function () {
     };
   }
 
-  if (window.app.saveFile) {
-    window.saveFile = function (data, filename, dataType) {
-      window.app.saveFile(filename || '', dataType || '*/*', data);
-    };
-  }
-
   if (window.app.intentPosLink) {
     IITC.portal.display.renderUrl = function (lat, lng, title, guid) {
       // one share link option - and the app provides an interface to share the URL,
