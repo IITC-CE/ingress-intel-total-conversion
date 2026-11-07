@@ -235,6 +235,11 @@ body {
   display: none !important;
 }
 
+/* leaflet.css moves the controls to 30px for #sidebartoggle, which is hidden here */
+.leaflet-right {
+  right: 10px;
+}
+
 #scrollwrapper {
   bottom: 0;
   max-height: none !important;

@@ -68,7 +68,9 @@
 }
 
 .leaflet-right {
-  right: 10px;
+  /* room for #sidebartoggle, which covers the controls at 10px. TODO: move the toggle, go back to 10px
+     and drop the override in smartphone.css */
+  right: 30px;
   margin-right: var(--safe-area-inset-right);
 }
 
