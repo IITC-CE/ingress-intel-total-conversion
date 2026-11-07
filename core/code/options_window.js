@@ -1,10 +1,10 @@
-/* global IITC, log -- eslint */
+/* global IITC, L, log -- eslint */
 
 /**
  * @file The options window: the list of options pages next to the page chosen, and a search over
  *       the titles and texts of all pages. A narrow window shows the list or the page, with a way back.
- *       The window is a dialog over the map, on a smartphone too, so a change shows on the map at once.
- *       The page shown follows changes of its own options made elsewhere, such as values arriving
+ *       The window is a dialog over the map, so a change shows on the map at once, or fills the pane
+ *       of an app. The page shown follows changes of its own options made elsewhere, such as values arriving
  *       through sync
  * @module options_window
  */
@@ -21,12 +21,17 @@ const FOUND_LENGTH = 80;
 // height of the dialog, in pixels; a lower screen gets a lower dialog
 const HEIGHT = 560;
 
+const PANE_ID = 'options';
+const LINK_ID = 'options-toolbox-link';
+
 // the window's element and its dialog while it is open; the page and the query stay between openings
 const view = {
   root: null,
   dialog: null,
   pageId: undefined,
   query: '',
+  pane: null,
+  paneAdded: false,
 };
 
 const el = (...args) => IITC.options._el(...args);
@@ -236,12 +241,52 @@ const openDialog = (showPage) => {
   if (IITC.utils.isSmartphone() && document.activeElement === search) search.blur();
 };
 
+// no close button: the app leaves the pane by showing another
+const openPane = (showPage) => {
+  view.pane = el('div', { id: 'iitc-options-pane', className: 'iitc-options-pane' }, build(showPage));
+  document.body.append(view.pane);
+};
+
+const closePane = () => {
+  view.pane?.remove();
+  view.pane = null;
+  view.root = null;
+};
+
+const display = (pageId) => {
+  const showPage = pageId !== undefined;
+
+  if (isOpen()) {
+    if (showPage) choose(pageId);
+    view.dialog?.dialog?.('moveToTop');
+  } else {
+    // a wide window always shows a page next to the list
+    view.pageId = pageId ?? currentPage();
+    if (window.currentPane === PANE_ID) {
+      openPane(showPage);
+      return;
+    }
+    // on a smartphone the dialog shows over the map pane
+    if (IITC.utils.isSmartphone() && window.currentPane !== 'map') window.show('map');
+    openDialog(showPage);
+  }
+};
+
+// the page open() asked for before it switched to the pane
+let paneRequest;
+
+const entry = () => {
+  if (!window.useAppPanes()) return 'button';
+  return IITC.options.get('iitc.optionsPane') ? 'pane' : 'toolbox';
+};
+
 /**
  * Opens the options window, on a given page or on the page chosen last
  *
  * A toolbox button to an options page comes from the page's `shortcut`, which the user can turn off
  * with the other shortcuts; `IITC.toolbox.addButton` is for a plugin's own dialogs that are not part
- * of the options, such as lists and other views of map data
+ * of the options, such as lists and other views of map data. In an app with panes the window is a pane
+ * of the app, unless `iitc.optionsPane` is off
  *
  * @memberof IITC.options
  * @param {string} [pageId] - Page to show
@@ -258,18 +303,13 @@ const open = (pageId) => {
     log.warn(`options: no page "${pageId}" to open`);
     return false;
   }
-  const showPage = pageId !== undefined;
-
-  if (isOpen()) {
-    if (showPage) choose(pageId);
-    view.dialog?.dialog?.('moveToTop');
-  } else {
-    // a wide window always shows a page next to the list
-    view.pageId = pageId ?? currentPage();
-    // on a smartphone the dialog shows over the map pane
-    if (IITC.utils.isSmartphone() && window.currentPane !== 'map') window.show('map');
-    openDialog(showPage);
+  if (entry() === 'pane' && window.currentPane !== PANE_ID) {
+    // the window opens when the pane is shown
+    paneRequest = { pageId };
+    window.show(PANE_ID);
+    return true;
   }
+  display(pageId);
   return true;
 };
 
@@ -371,26 +411,84 @@ const updateShortcut = (pageId) => {
   IITC.toolbox.addButton({ ...args, id, action: () => open(pageId) });
 };
 
+let mapButton = null;
+
+const setMapButton = (wanted) => {
+  if (!wanted) {
+    mapButton?.remove();
+    mapButton = null;
+    return;
+  }
+  if (mapButton || !window.map || !globalThis.L?.Control) return;
+  const Button = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: () => {
+      const container = el(
+        'div',
+        { className: 'iitc-control-button' },
+        el(
+          'a',
+          {
+            href: '#',
+            role: 'button',
+            title: 'IITC and plugin options',
+            'aria-label': 'Options',
+            onclick: (event) => {
+              event.preventDefault();
+              open();
+            },
+          },
+          el('iitc-icon', { fallback: '⚙' }, 'settings')
+        )
+      );
+      L.DomEvent.disableClickPropagation(container);
+      return container;
+    },
+  });
+  mapButton = new Button().addTo(window.map);
+};
+
 /**
- * Adds the way to the options window: a toolbox button
+ * Shows the way to the window that `entry` names. An app cannot remove a pane, so it stays until
+ * IITC is reloaded and still opens the window
  *
  * @private
  */
-const setupWindow = () => {
-  IITC.toolbox.addButton({
-    id: 'options-toolbox-link',
-    label: 'Options',
-    title: 'IITC and plugin options',
-    action: () => open(),
-  });
+const updateEntry = () => {
+  const mode = entry();
+  if (IITC.toolbox) {
+    const hasLink = Boolean(IITC.toolbox.buttons[LINK_ID]);
+    if (mode === 'toolbox' && !hasLink) {
+      IITC.toolbox.addButton({ id: LINK_ID, label: 'Options', title: 'IITC and plugin options', action: () => open() });
+    } else if (mode !== 'toolbox' && hasLink) {
+      IITC.toolbox.removeButton(LINK_ID);
+    }
+  }
+  setMapButton(mode === 'button');
+  if (mode === 'pane' && !view.paneAdded) {
+    window.app.addPane(PANE_ID, 'Options', 'tune');
+    view.paneAdded = true;
+  }
 };
 
-Object.assign(IITC.options, { open, refresh, _pageIds: pageIds, _setupWindow: setupWindow, _view: view });
+Object.assign(IITC.options, { open, refresh, _pageIds: pageIds, _setupWindow: updateEntry, _view: view });
 
 // handlers return nothing: a false would stop the remaining hook handlers
 window.addHook('optionChanged', (event) => {
   onOptionChanged(event);
   if (event.key === 'iitc.toolboxShortcuts') Object.keys(IITC.options._pages).forEach(updateShortcut);
+  if (event.key === 'iitc.optionsPane') updateEntry();
+});
+window.addHook('paneChanged', (pane) => {
+  if (pane === PANE_ID) {
+    const request = paneRequest;
+    paneRequest = undefined;
+    // a dialog left open from before the pane was chosen gives way to it
+    if (isOpen() && !view.pane) view.dialog?.dialog?.('close');
+    display(request?.pageId);
+  } else if (view.pane) {
+    closePane();
+  }
 });
 window.addHook('optionsPageRegistered', (event) => {
   onPageRegistered(event);

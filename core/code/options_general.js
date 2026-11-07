@@ -58,6 +58,14 @@ IITC.options.register('iitc', {
       description: 'Buttons that open the pages of some plugins directly',
       default: true,
     },
+    {
+      type: 'boolean',
+      key: 'optionsPane',
+      title: 'Options in a panel of the app',
+      description: 'Otherwise a link in the toolbox opens them in a window over the map. The panel stays in the app menu until reload',
+      default: true,
+      visible: () => window.useAppPanes(),
+    },
     { type: 'heading', title: 'Backup' },
     {
       type: 'export',

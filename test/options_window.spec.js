@@ -664,4 +664,217 @@ describe('options window', () => {
       expect(dialogs).to.have.lengthOf(1);
     });
   });
+
+  describe('the way in', () => {
+    let replacedToolbox;
+    let replacedGlobals;
+    let panes;
+    let controls;
+
+    const withPanes = (supported) => {
+      window.useAppPanes = () => supported;
+    };
+
+    beforeEach(() => {
+      replacedToolbox = IITC.toolbox;
+      replacedGlobals = { L: globalThis.L, useAppPanes: window.useAppPanes, app: window.app, currentPane: window.currentPane };
+      const buttons = {};
+      IITC.toolbox = {
+        buttons,
+        addButton: sinon.spy((button) => {
+          buttons[button.id] = button;
+        }),
+        removeButton: (id) => delete buttons[id],
+      };
+      // a Leaflet control that is only put into the page
+      controls = [];
+      globalThis.L = {
+        ...replacedGlobals.L,
+        DomEvent: { disableClickPropagation() {} },
+        Control: {
+          extend: (proto) =>
+            class {
+              addTo() {
+                this.container = proto.onAdd();
+                document.body.append(this.container);
+                controls.push(this);
+                return this;
+              }
+              remove() {
+                this.container.remove();
+                controls.splice(controls.indexOf(this), 1);
+              }
+            },
+        },
+      };
+      panes = sinon.spy();
+      window.app = { addPane: panes };
+      // a pane is current once it is shown, and the app is told through the hook
+      window.currentPane = 'map';
+      window.show = sinon.spy((id) => {
+        window.currentPane = id;
+        window.runHooks('paneChanged', id);
+      });
+      view.paneAdded = false;
+    });
+
+    afterEach(() => {
+      options.reset('iitc.optionsPane');
+      view.pane?.remove();
+      view.pane = null;
+      IITC.toolbox = replacedToolbox;
+      globalThis.L = replacedGlobals.L;
+      window.useAppPanes = replacedGlobals.useAppPanes;
+      window.app = replacedGlobals.app;
+      view.paneAdded = false;
+    });
+
+    it('is a link in the toolbox of an app, when asked for', () => {
+      withPanes(true);
+      options.set('iitc.optionsPane', false);
+      options._setupWindow();
+
+      expect(IITC.toolbox.buttons['options-toolbox-link']).to.include({ label: 'Options' });
+      expect(controls).to.have.lengthOf(0);
+      expect(panes.called).to.be.false;
+      IITC.toolbox.buttons['options-toolbox-link'].action();
+      expect(window.show.called).to.be.false;
+      expect(dialogs).to.have.lengthOf(1);
+    });
+
+    it('is a button under Layers where there are no panes, whatever the option', () => {
+      withPanes(false);
+      options.set('iitc.optionsPane', false);
+      options._setupWindow();
+
+      expect(IITC.toolbox.buttons).to.not.have.property('options-toolbox-link');
+      expect(controls).to.have.lengthOf(1);
+      expect(panes.called).to.be.false;
+      click(controls[0].container.querySelector('a'));
+      expect(dialogs).to.have.lengthOf(1);
+    });
+
+    it('is the panel of the app by default', () => {
+      withPanes(true);
+      options._setupWindow();
+
+      expect(panes.calledOnceWithExactly('options', 'Options', 'tune')).to.be.true;
+      expect(controls).to.have.lengthOf(0);
+    });
+
+    it('swaps the pane for the toolbox link as the option changes', () => {
+      withPanes(true);
+      options._setupWindow();
+      expect(IITC.toolbox.buttons).to.not.have.property('options-toolbox-link');
+
+      options.set('iitc.optionsPane', false);
+      expect(IITC.toolbox.buttons).to.have.property('options-toolbox-link');
+
+      options.reset('iitc.optionsPane');
+      expect(IITC.toolbox.buttons).to.not.have.property('options-toolbox-link');
+      expect(controls).to.have.lengthOf(0);
+    });
+
+    it('adds the pane to the app once, also when it is taken back and chosen again', () => {
+      withPanes(true);
+      options.set('iitc.optionsPane', false);
+      options._setupWindow();
+      expect(panes.called).to.be.false;
+
+      options.reset('iitc.optionsPane');
+      options.set('iitc.optionsPane', false);
+      options.reset('iitc.optionsPane');
+      expect(panes.calledOnce).to.be.true;
+    });
+
+    it('fills the pane with the window when the pane is shown, without a dialog or a trip to the map', () => {
+      withPanes(true);
+      IITC.utils.isSmartphone = () => true;
+
+      window.show('options');
+
+      expect(dialogs).to.have.lengthOf(0);
+      expect(view.pane.id).to.equal('iitc-options-pane');
+      expect(view.pane.isConnected).to.be.true;
+      expect(view.pane.contains(view.root)).to.be.true;
+      expect(window.show.calledOnceWithExactly('options')).to.be.true;
+    });
+
+    it('opens a page by showing the pane first', () => {
+      withPanes(true);
+
+      expect(options.open('window-alpha')).to.be.true;
+
+      expect(window.show.calledOnceWithExactly('options')).to.be.true;
+      expect(window.currentPane).to.equal('options');
+      expect(view.pageId).to.equal('window-alpha');
+      expect(view.root.dataset.view).to.equal('page');
+
+      // another page while it is open stays in the pane
+      options.open('window-zeta');
+      expect(window.show.calledOnce).to.be.true;
+      expect(view.pageId).to.equal('window-zeta');
+    });
+
+    it('takes the pane away when another pane is shown', () => {
+      withPanes(true);
+      options.open();
+      const pane = view.pane;
+
+      window.show('info');
+
+      expect(pane.isConnected).to.be.false;
+      expect(view.pane).to.be.null;
+      expect(view.root).to.be.null;
+    });
+
+    it('opens the pane again with the page chosen last', () => {
+      withPanes(true);
+      options.open('window-alpha');
+      window.show('map');
+
+      window.show('options');
+
+      expect(view.pageId).to.equal('window-alpha');
+      expect(view.pane.isConnected).to.be.true;
+    });
+
+    it('gives the pane the place of a dialog left open', () => {
+      withPanes(false);
+      options.open();
+      const dialog = view.dialog;
+      // closes as the dialog does
+      dialog.dialog = sinon.spy((action) => {
+        if (action !== 'close') return;
+        view.root.remove();
+        dialog.options.closeCallback();
+      });
+      withPanes(true);
+
+      window.show('options');
+
+      expect(dialog.dialog.calledWith('close')).to.be.true;
+      expect(view.pane.isConnected).to.be.true;
+    });
+
+    it('leaves a window over the map alone when a pane is shown', () => {
+      withPanes(false);
+      options.open();
+
+      window.show('info');
+
+      expect(view.dialog.dialog.calledWith('close')).to.be.false;
+      expect(view.pane).to.be.null;
+    });
+
+    it('opens the window over the map where there are no panes', () => {
+      withPanes(false);
+
+      expect(options.open()).to.be.true;
+
+      expect(window.show.called).to.be.false;
+      expect(dialogs).to.have.lengthOf(1);
+      expect(view.pane).to.be.null;
+    });
+  });
 });

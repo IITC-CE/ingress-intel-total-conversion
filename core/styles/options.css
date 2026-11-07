@@ -438,3 +438,12 @@ input[type="search"].iitc-options-search {
   background: color-mix(in srgb, var(--color-primary) 22%, transparent);
   outline: 3px solid color-mix(in srgb, var(--color-primary) 22%, transparent);
 }
+
+.iitc-options-pane {
+  position: fixed;
+  inset: 0;
+  z-index: 3001;
+  box-sizing: border-box;
+  padding: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+  background: var(--color-bg);
+}
