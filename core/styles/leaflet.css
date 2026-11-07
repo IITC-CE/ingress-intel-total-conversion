@@ -157,9 +157,10 @@ body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
   content: 'layers';
 }
 
-/* `iitc-control-button`: a control holding one icon link, drawn as the Layers toggle */
+/* `iitc-control-button`: a control holding one icon link, drawn as the Layers toggle, and maybe an
+   `iitc-control-menu` after it */
 .leaflet-control-layers-toggle,
-.iitc-control-button a {
+.iitc-control-button > a {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,6 +182,10 @@ body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
 }
 
 .iitc-control-button {
+  display: flex;
+  /* the menu opens to the left, away from the edge of the map */
+  flex-direction: row-reverse;
+  align-items: flex-start;
   background: #fff;
   border-radius: 5px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
@@ -192,12 +197,43 @@ body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
   background-clip: padding-box;
 }
 
-.iitc-control-button a {
+.iitc-control-button > a {
+  flex: none;
   width: 36px;
   height: 36px;
 }
 
-.leaflet-touch .iitc-control-button a {
+.leaflet-touch .iitc-control-button > a {
   width: 44px;
   height: 44px;
+}
+
+/* a column of links that scrolls when long, shown while a mouse is over the button */
+.iitc-control-menu {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px 0 4px 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .iitc-control-button:hover > .iitc-control-menu {
+    display: flex;
+  }
+}
+
+/* for the keyboard, apart: a browser without :has() drops the whole rule */
+.iitc-control-button:has(:focus-visible) > .iitc-control-menu {
+  display: flex;
+}
+
+/* outranks the link color of `.leaflet-container a` */
+.iitc-control-button .iitc-control-menu a {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #333;
+  font-size: 13px;
+  white-space: nowrap;
 }

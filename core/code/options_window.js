@@ -32,6 +32,7 @@ const view = {
   query: '',
   pane: null,
   paneAdded: false,
+  mapButton: null,
 };
 
 const el = (...args) => IITC.options._el(...args);
@@ -411,18 +412,39 @@ const updateShortcut = (pageId) => {
   IITC.toolbox.addButton({ ...args, id, action: () => open(pageId) });
 };
 
-let mapButton = null;
-
 const setMapButton = (wanted) => {
   if (!wanted) {
-    mapButton?.remove();
-    mapButton = null;
+    view.mapButton?.remove();
+    view.mapButton = null;
     return;
   }
-  if (mapButton || !window.map || !globalThis.L?.Control) return;
+  if (view.mapButton || !window.map || !globalThis.L?.Control) return;
   const Button = L.Control.extend({
     options: { position: 'topright' },
     onAdd: () => {
+      // the pages, shown beside the button under a mouse; filled on the way in, so it has the pages of plugins
+      const menu = el('div', { className: 'iitc-control-menu' });
+      const fillMenu = () => {
+        // drawn anew, the item in focus would lose it
+        if (menu.contains(document.activeElement)) return;
+        menu.replaceChildren(
+          ...pageIds().map((pageId) =>
+            el(
+              'a',
+              {
+                href: '#',
+                role: 'button',
+                title: accessKeyHint(pageId),
+                onclick: (event) => {
+                  event.preventDefault();
+                  open(pageId);
+                },
+              },
+              titleOf(pageId)
+            )
+          )
+        );
+      };
       const container = el(
         'div',
         { className: 'iitc-control-button' },
@@ -439,13 +461,15 @@ const setMapButton = (wanted) => {
             },
           },
           el('iitc-icon', { fallback: '⚙' }, 'tune')
-        )
+        ),
+        menu
       );
+      for (const type of ['pointerenter', 'focusin']) container.addEventListener(type, fillMenu);
       L.DomEvent.disableClickPropagation(container);
       return container;
     },
   });
-  mapButton = new Button().addTo(window.map);
+  view.mapButton = new Button().addTo(window.map);
 };
 
 /**

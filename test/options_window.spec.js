@@ -726,6 +726,8 @@ describe('options window', () => {
       globalThis.L = replacedGlobals.L;
       window.useAppPanes = replacedGlobals.useAppPanes;
       window.app = replacedGlobals.app;
+      view.mapButton?.remove();
+      view.mapButton = null;
       view.paneAdded = false;
     });
 
@@ -752,6 +754,36 @@ describe('options window', () => {
       expect(panes.called).to.be.false;
       click(controls[0].container.querySelector('a'));
       expect(dialogs).to.have.lengthOf(1);
+    });
+
+    it('lists the pages beside the button, with the pages of plugins loaded after it', () => {
+      withPanes(false);
+      options._setupWindow();
+      options.register('window-late', { title: 'Late', blocks: [] });
+      const container = controls[0].container;
+
+      container.dispatchEvent(new document.defaultView.Event('pointerenter'));
+      const items = [...container.querySelectorAll('.iitc-control-menu a')];
+      expect(items.map((item) => item.textContent)).to.deep.equal(options._pageIds().map((pageId) => String(options._pages[pageId].title ?? pageId)));
+      expect(items.map((item) => item.textContent)).to.include('Late');
+
+      click(items.find((item) => item.textContent === 'Zeta'));
+      expect(dialogs).to.have.lengthOf(1);
+      expect(view.pageId).to.equal('window-zeta');
+      forget('window-late');
+    });
+
+    it('keeps the menu item in focus when the focus moves into the menu', () => {
+      withPanes(false);
+      options._setupWindow();
+      const container = controls[0].container;
+
+      container.querySelector('a').focus();
+      const item = container.querySelector('.iitc-control-menu a');
+      item.focus();
+
+      expect(container.querySelector('.iitc-control-menu a')).to.equal(item);
+      expect(document.activeElement).to.equal(item);
     });
 
     it('is the panel of the app by default', () => {
