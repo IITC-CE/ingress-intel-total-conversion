@@ -497,6 +497,24 @@ const register = (pageId, page) => {
  *   ],
  * });
  * if (IITC.options.get('kml-import.fit')) map.fitBounds(bounds);
+ *
+ * @example <caption>A key on the API keys page</caption>
+ * // the section is titled after the service, and its key reads as `api-keys.<service>`
+ * IITC.options.extend('api-keys', 'my-plugin', {
+ *   title: 'Example Maps',
+ *   namespace: 'api-keys',
+ *   blocks: [
+ *     {
+ *       type: 'string',
+ *       key: 'example-maps',
+ *       title: 'API key',
+ *       description: 'Empty uses the key IITC comes with',
+ *       onChange: () => layer.setUrl(tileUrl()),
+ *     },
+ *     { type: 'link', title: 'Get a key', url: 'https://example.com/keys' },
+ *   ],
+ * });
+ * const tileUrl = () => `https://tiles.example.com/{z}/{x}/{y}.png?key=${IITC.options.get('api-keys.example-maps').trim() || SHARED_KEY}`;
  */
 const extend = (pageId, extensionId, section) => {
   if (typeof pageId !== 'string' || !pageId) {
