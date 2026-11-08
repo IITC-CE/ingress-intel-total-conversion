@@ -4,7 +4,6 @@
  * @file General options of IITC, declared as the `iitc` page for options of several core modules.
  *       This file sorts right after options.js in the bundle, so the page exists before boot(), where
  *       core modules and plugin setups first read its values
- * @module options_general
  */
 
 // the text of a backup file: the stored values of all declared options

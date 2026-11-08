@@ -204,6 +204,8 @@ const withoutItemDefaults = (def, map) => {
 /**
  * Checks one value against an option's type and constraints
  *
+ * @memberof IITC.options
+ * @inner
  * @private
  * @returns {true|string} True, or the reason the value is not allowed
  */
@@ -324,6 +326,8 @@ const notifyChange = (key, value, oldValue, source) => {
  * Collects the options declared by a page, including the ones inside `repeat` blocks, and skips
  * blocks of unknown types with a warning
  *
+ * @memberof IITC.options
+ * @inner
  * @private
  * @param {string} namespace - Prefix of the page's keys
  * @param {Array<IITC.options.OptionBlock>} blocks - Blocks to scan
@@ -367,6 +371,8 @@ const declarer = (def) => (def.extensionId === undefined ? `page "${def.pageId}"
  * Declares the options of a page or of an extension of it in place of the ones that declaration made
  * before; a key declared elsewhere already stays with that declaration, with a warning
  *
+ * @memberof IITC.options
+ * @inner
  * @private
  * @param {string} pageId - Page id
  * @param {string|undefined} extensionId - Extension id, undefined for the page itself
@@ -524,6 +530,8 @@ const sectionsOf = (pageId) =>
 /**
  * Turns the stored value of a declared option into its effective value
  *
+ * @memberof IITC.options
+ * @inner
  * @private
  * @param {string} key - Full option key
  * @param {*} stored - Value read from localStorage, undefined when there is none
@@ -581,6 +589,7 @@ const get = (key, fallback) => {
 /**
  * Tells whether an option may travel to other devices: it is declared, and not with `sync: false`
  *
+ * @alias IITC.options._syncs
  * @private
  * @param {string} key - Option key, `<namespace>.<key>`
  * @returns {boolean} True for a declared option that syncs
@@ -591,6 +600,7 @@ const syncs = (key) => definitions[key] !== undefined && definitions[key].sync !
  * Tells what localStorage holds for a key, without logging: nothing, a value that reads and passes
  * the declaration, or one that cannot be read or fails it (an old range, choices not loaded yet)
  *
+ * @alias IITC.options._storedState
  * @private
  * @param {string} key - Option key, `<namespace>.<key>`
  * @returns {'missing'|'valid'|'invalid'} The state of the stored value

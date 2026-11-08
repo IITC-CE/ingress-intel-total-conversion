@@ -6,7 +6,6 @@
  *       `{ deleted: true, updated }` once reset, so a reset reaches devices that were closed. The newer
  *       record of a key wins in both directions, and a value stored without a time gives way to any shared
  *       record. Changes are timed before the file is loaded too, and sent once it is
- * @module options_sync
  */
 
 // localStorage key of the times of the last change of each synced key on this device
