@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: code/options_window.js | IITC-CE</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="; height: 0">
+        
+            <a href="https://github.com/IITC-CE/ingress-intel-total-conversion" rel="noopener noreferrer" target="_blank">
+                <img src="img/toast-ui.png" width="100%" height="100%">
+            </a>
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">IITC-CE</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-_deprecated.html">_deprecated</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:_deprecated_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-_deprecated.html#~aboutIITC">aboutIITC</a></li><li><a href="module-_deprecated.html#~androidCopy">androidCopy</a></li><li><a href="module-_deprecated.html#~findPortalLatLng">findPortalLatLng</a></li><li><a href="module-_deprecated.html#~getPortalApGain">getPortalApGain</a></li><li><a href="module-_deprecated.html#~getTeam">getTeam</a></li><li><a href="module-_deprecated.html#~portalApGainMaths">portalApGainMaths</a></li><li><a href="module-_deprecated.html#~potentialPortalLevel">potentialPortalLevel</a></li><li><a href="module-_deprecated.html#~pushPortalGuidPositionCache">pushPortalGuidPositionCache</a></li><li><a href="module-_deprecated.html#~renderUpdateStatus">renderUpdateStatus</a></li><li><a href="module-_deprecated.html#~saveFile">saveFile</a></li><li><a href="module-_deprecated.html#~smartphoneInfo">smartphoneInfo</a></li></ul></div></li><li><a href="module-app.html">app</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:app_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-app.html#.isApp">isApp</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-app.html#~debounce">debounce</a></li><li><a href="module-app.html#~useAppPanes">useAppPanes</a></li></ul></div></li><li><a href="module-boot.html">boot</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:boot_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-boot.html#~boot">boot</a></li><li><a href="module-boot.html#~checkingIntelURL">checkingIntelURL</a></li><li><a href="module-boot.html#~prepPluginsToLoad">prepPluginsToLoad</a></li><li><a href="module-boot.html#~registerMarkerForOMS">registerMarkerForOMS</a></li><li><a href="module-boot.html#~setupIconFont">setupIconFont</a></li><li><a href="module-boot.html#~setupIngressMarkers">setupIngressMarkers</a></li><li><a href="module-boot.html#~setupOMS">setupOMS</a></li><li><a href="module-boot.html#~setupTooltips">setupTooltips</a></li><li><a href="module-boot.html#~updateControlBarZIndex">updateControlBarZIndex</a></li></ul></div></li><li><a href="module-dialog.html">dialog</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:dialog_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-dialog.html#.window.DIALOG_ID">window.DIALOG_ID</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-dialog.html#~alert">alert</a></li><li><a href="module-dialog.html#~dialog">dialog</a></li></ul></div></li><li><a href="module-dialog_about.html">dialog_about</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:dialog_about_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-dialog_about.html#~convertPluginInfo">convertPluginInfo</a></li><li><a href="module-dialog_about.html#~getIITCVersion">getIITCVersion</a></li><li><a href="module-dialog_about.html#~isShortOnLocalStorage">isShortOnLocalStorage</a></li><li><a href="module-dialog_about.html#~pluginItems">pluginItems</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="module-dialog_about.html#~PluginInfo">PluginInfo</a></li></ul></div></li><li><a href="module-entity_decode.html">entity_decode</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:entity_decode_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-entity_decode.html#~corePortalData">corePortalData</a></li><li><a href="module-entity_decode.html#~detailsPortalData">detailsPortalData</a></li><li><a href="module-entity_decode.html#~extendedPortalData">extendedPortalData</a></li><li><a href="module-entity_decode.html#~parseArtifactBrief">parseArtifactBrief</a></li><li><a href="module-entity_decode.html#~parseArtifactDetail">parseArtifactDetail</a></li><li><a href="module-entity_decode.html#~parseHistoryDetail">parseHistoryDetail</a></li><li><a href="module-entity_decode.html#~parseMod">parseMod</a></li><li><a href="module-entity_decode.html#~parseResonator">parseResonator</a></li><li><a href="module-entity_decode.html#~summaryPortalData">summaryPortalData</a></li></ul></div></li><li><a href="module-extract_niantic_parameters.html">extract_niantic_parameters</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:extract_niantic_parameters_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-extract_niantic_parameters.html#~extractFromStock">extractFromStock</a></li></ul></div></li><li><a href="module-game_status.html">game_status</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:game_status_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-game_status.html#~updateGameScore">updateGameScore</a></li></ul></div></li><li><a href="module-hooks.html">hooks</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:hooks_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-hooks.html#~addHook">addHook</a></li><li><a href="module-hooks.html#~removeHook">removeHook</a></li><li><a href="module-hooks.html#~runHooks">runHooks</a></li></ul></div></li><li><a href="module-icons.html">icons</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:icons_sub"></div></li><li><a href="module-idle.html">idle</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:idle_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-idle.html#~idleTime">idleTime</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-idle.html#~addResumeFunction">addResumeFunction</a></li><li><a href="module-idle.html#~idleReset">idleReset</a></li><li><a href="module-idle.html#~idleSet">idleSet</a></li><li><a href="module-idle.html#~isIdle">isIdle</a></li><li><a href="module-idle.html#~setupIdle">setupIdle</a></li></ul></div></li><li><a href="module-options_general.html">options_general</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:options_general_sub"></div></li><li><a href="module-options_render.html">options_render</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:options_render_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-options_render.html#~renderPage">renderPage</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="module-options_render.html#~ContainerState">ContainerState</a></li></ul></div></li><li><a href="module-options_sync.html">options_sync</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:options_sync_sub"></div></li><li><a href="module-options_window.html">options_window</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:options_window_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-options_window.html#~pageIds">pageIds</a></li><li><a href="module-options_window.html#~search">search</a></li><li><a href="module-options_window.html#~updateEntry">updateEntry</a></li></ul></div></li><li><a href="module-panes.html">panes</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:panes_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-panes.html#~currentPane">currentPane</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-panes.html#~_applyPane">_applyPane</a></li><li><a href="module-panes.html#~_setActiveTab">_setActiveTab</a></li><li><a href="module-panes.html#~hideall">hideall</a></li><li><a href="module-panes.html#~show">show</a></li></ul></div></li><li><a href="module-redeeming.html">redeeming</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:redeeming_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="module-redeeming.html#~REDEEM_SHORT_NAMES">REDEEM_SHORT_NAMES</a></li><li><a href="module-redeeming.html#~REDEEM_STATUSES">REDEEM_STATUSES</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="module-redeeming.html#~formatPasscodeLong">formatPasscodeLong</a></li><li><a href="module-redeeming.html#~formatPasscodeShort">formatPasscodeShort</a></li><li><a href="module-redeeming.html#~handleRedeemResponse">handleRedeemResponse</a></li><li><a href="module-redeeming.html#~setupRedeem">setupRedeem</a></li></ul></div></li><li><a href="module-region_scoreboard.html">region_scoreboard</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:region_scoreboard_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-region_scoreboard.html#~RegionScoreboardSetup">RegionScoreboardSetup</a></li></ul></div></li><li><a href="module-request_handling.html">request_handling</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:request_handling_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-request_handling.html#~startRefreshTimeout">startRefreshTimeout</a></li></ul></div></li><li><a href="module-send_request.html">send_request</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:send_request_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-send_request.html#~outOfDateUserPrompt">outOfDateUserPrompt</a></li><li><a href="module-send_request.html#~postAjax">postAjax</a></li><li><a href="module-send_request.html#~userLoggedOutPrompt">userLoggedOutPrompt</a></li></ul></div></li><li><a href="module-sidebar.html">sidebar</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:sidebar_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-sidebar.html#~setPermaLink">setPermaLink</a></li><li><a href="module-sidebar.html#~setupAddons">setupAddons</a></li><li><a href="module-sidebar.html#~setupLargeImagePreview">setupLargeImagePreview</a></li><li><a href="module-sidebar.html#~setupPlayerStat">setupPlayerStat</a></li><li><a href="module-sidebar.html#~setupSidebar">setupSidebar</a></li><li><a href="module-sidebar.html#~setupSidebarToggle">setupSidebarToggle</a></li><li><a href="module-sidebar.html#~sidebarOnPortalAdded">sidebarOnPortalAdded</a></li><li><a href="module-sidebar.html#~sidebarOnPortalDetailLoaded">sidebarOnPortalDetailLoaded</a></li></ul></div></li><li><a href="module-utils_file.html">utils_file</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:utils_file_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-utils_file.html#~saveAs">saveAs</a></li></ul></div></li><li><a href="module-utils_polyfills.html">utils_polyfills</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:utils_polyfills_sub"></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="IITC.filters.FilterLayer.html">FilterLayer</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.filters.FilterLayer_sub"></div></li><li><a href="IITC.map.Cache.html">Cache</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.map.Cache_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.map.Cache.html#get">get</a></li><li><a href="IITC.map.Cache.html#getTime">getTime</a></li><li><a href="IITC.map.Cache.html#isFresh">isFresh</a></li><li><a href="IITC.map.Cache.html#remove">remove</a></li><li><a href="IITC.map.Cache.html#runExpire">runExpire</a></li><li><a href="IITC.map.Cache.html#startExpireInterval">startExpireInterval</a></li><li><a href="IITC.map.Cache.html#stopExpireInterval">stopExpireInterval</a></li><li><a href="IITC.map.Cache.html#store">store</a></li></ul></div></li><li><a href="IITC.map.DebugTiles.html">DebugTiles</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.map.DebugTiles_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.map.DebugTiles.html#create">create</a></li><li><a href="IITC.map.DebugTiles.html#reset">reset</a></li><li><a href="IITC.map.DebugTiles.html#runClearPass">runClearPass</a></li><li><a href="IITC.map.DebugTiles.html#setColour">setColour</a></li><li><a href="IITC.map.DebugTiles.html#setState">setState</a></li><li><a href="IITC.map.DebugTiles.html#startTimer">startTimer</a></li></ul></div></li><li><a href="IITC.map.Renderer.html">Renderer</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.map.Renderer_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.map.Renderer.html#.FIELD_STYLE">FIELD_STYLE</a></li><li><a href="IITC.map.Renderer.html#.LINK_STYLE">LINK_STYLE</a></li><li><a href="IITC.map.Renderer.html#.WORLD_ANCHOR_MARGIN">WORLD_ANCHOR_MARGIN</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.map.Renderer.html#addPortalToMapLayer">addPortalToMapLayer</a></li><li><a href="IITC.map.Renderer.html#bringPortalsToFront">bringPortalsToFront</a></li><li><a href="IITC.map.Renderer.html#clearFieldsOutsideBounds">clearFieldsOutsideBounds</a></li><li><a href="IITC.map.Renderer.html#clearLinksOutsideBounds">clearLinksOutsideBounds</a></li><li><a href="IITC.map.Renderer.html#clearPortalsOutsideBounds">clearPortalsOutsideBounds</a></li><li><a href="IITC.map.Renderer.html#createFieldEntity">createFieldEntity</a></li><li><a href="IITC.map.Renderer.html#createLinkEntity">createLinkEntity</a></li><li><a href="IITC.map.Renderer.html#createPlaceholderPortalEntity">createPlaceholderPortalEntity</a></li><li><a href="IITC.map.Renderer.html#createPortalEntity">createPortalEntity</a></li><li><a href="IITC.map.Renderer.html#deleteEntity">deleteEntity</a></li><li><a href="IITC.map.Renderer.html#deleteFieldEntity">deleteFieldEntity</a></li><li><a href="IITC.map.Renderer.html#deleteLinkEntity">deleteLinkEntity</a></li><li><a href="IITC.map.Renderer.html#deletePortalEntity">deletePortalEntity</a></li><li><a href="IITC.map.Renderer.html#endRenderPass">endRenderPass</a></li><li><a href="IITC.map.Renderer.html#placeOnWorldCopy">placeOnWorldCopy</a></li><li><a href="IITC.map.Renderer.html#processDeletedGameEntityGuids">processDeletedGameEntityGuids</a></li><li><a href="IITC.map.Renderer.html#processGameEntities">processGameEntities</a></li><li><a href="IITC.map.Renderer.html#processTileData">processTileData</a></li><li><a href="IITC.map.Renderer.html#removePortalFromMapLayer">removePortalFromMapLayer</a></li><li><a href="IITC.map.Renderer.html#rescalePortalMarkers">rescalePortalMarkers</a></li><li><a href="IITC.map.Renderer.html#startRenderPass">startRenderPass</a></li></ul></div></li><li><a href="IITC.map.Request.html">Request</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.map.Request_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.map.Request.html#clearTimeout">clearTimeout</a></li><li><a href="IITC.map.Request.html#delayProcessRequestQueue">delayProcessRequestQueue</a></li><li><a href="IITC.map.Request.html#getStatus">getStatus</a></li><li><a href="IITC.map.Request.html#handleResponse">handleResponse</a></li><li><a href="IITC.map.Request.html#idleResume">idleResume</a></li><li><a href="IITC.map.Request.html#mapMoveEnd">mapMoveEnd</a></li><li><a href="IITC.map.Request.html#mapMoveStart">mapMoveStart</a></li><li><a href="IITC.map.Request.html#pauseRenderQueue">pauseRenderQueue</a></li><li><a href="IITC.map.Request.html#processRenderQueue">processRenderQueue</a></li><li><a href="IITC.map.Request.html#processRequestQueue">processRequestQueue</a></li><li><a href="IITC.map.Request.html#pushRenderQueue">pushRenderQueue</a></li><li><a href="IITC.map.Request.html#refresh">refresh</a></li><li><a href="IITC.map.Request.html#refreshOnTimeout">refreshOnTimeout</a></li><li><a href="IITC.map.Request.html#requeueTile">requeueTile</a></li><li><a href="IITC.map.Request.html#resetRenderQueue">resetRenderQueue</a></li><li><a href="IITC.map.Request.html#sendTileRequest">sendTileRequest</a></li><li><a href="IITC.map.Request.html#setStatus">setStatus</a></li><li><a href="IITC.map.Request.html#start">start</a></li><li><a href="IITC.map.Request.html#startQueueTimer">startQueueTimer</a></li></ul></div></li><li><a href="IITC.search.Query.html">Query</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.search.Query_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.search.Query.html#.addPortalResult">addPortalResult</a></li><li><a href="IITC.search.Query.html#.addResult">addResult</a></li><li><a href="IITC.search.Query.html#.handleKeyPress">handleKeyPress</a></li><li><a href="IITC.search.Query.html#.handleResultInteraction">handleResultInteraction</a></li><li><a href="IITC.search.Query.html#.onResultHoverEnd">onResultHoverEnd</a></li><li><a href="IITC.search.Query.html#.onResultHoverStart">onResultHoverStart</a></li><li><a href="IITC.search.Query.html#.onResultSelected">onResultSelected</a></li><li><a href="IITC.search.Query.html#.removeHoverResult">removeHoverResult</a></li><li><a href="IITC.search.Query.html#.removeSelectedResult">removeSelectedResult</a></li><li><a href="IITC.search.Query.html#.renderResults">renderResults</a></li><li><a href="IITC.search.Query.html#.resultLayer">resultLayer</a></li><li><a href="IITC.search.Query.html#.show">show</a></li><li><a href="IITC.search.Query.html#.show">show</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="IITC.search.Query.html#.SearchResult">SearchResult</a></li><li><a href="IITC.search.Query.html#.onRemoveCallback">onRemoveCallback</a></li><li><a href="IITC.search.Query.html#.onSelectedCallback">onSelectedCallback</a></li></ul></div></li><li><a href="IITC.search.QueryResultsView.html">QueryResultsView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.search.QueryResultsView_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.search.QueryResultsView.html#.clearList">clearList</a></li><li><a href="IITC.search.QueryResultsView.html#.createContainer">createContainer</a></li><li><a href="IITC.search.QueryResultsView.html#.createHeader">createHeader</a></li><li><a href="IITC.search.QueryResultsView.html#.createList">createList</a></li><li><a href="IITC.search.QueryResultsView.html#.createListItem">createListItem</a></li><li><a href="IITC.search.QueryResultsView.html#.remove">remove</a></li><li><a href="IITC.search.QueryResultsView.html#.renderIn">renderIn</a></li><li><a href="IITC.search.QueryResultsView.html#.renderResults">renderResults</a></li><li><a href="IITC.search.QueryResultsView.html#.setupAccordion">setupAccordion</a></li></ul></div></li><li><a href="L.html">L</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="L.html#.fileListLoader">fileListLoader</a></li><li><a href="L.html#.fileReader">fileReader</a></li></ul></div></li><li><a href="L.FileListLoader.html">FileListLoader</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L.FileListLoader_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="L.FileListLoader.html#.loadFiles">loadFiles</a></li></ul></div></li><li><a href="L.FileReader.html">FileReader</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L.FileReader_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="L.FileReader.html#.loadFile">loadFile</a></li><li><a href="L.FileReader.html#.read">read</a></li></ul></div></li><li><a href="L.LayerChooser.html">LayerChooser</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="L.LayerChooser_sub"></div></li><li><a href="module-icons-MaterialSymbolIcon.html">MaterialSymbolIcon</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:icons~MaterialSymbolIcon_sub"></div></li><li><a href="module-options_render-PageView.html">PageView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:options_render~PageView_sub"></div></li><li><a href="module-region_scoreboard-HistoryChart.html">HistoryChart</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:region_scoreboard~HistoryChart_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-region_scoreboard-HistoryChart.html#update">update</a></li></ul></div></li><li><a href="module-region_scoreboard-RegionScore.html">RegionScore</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:region_scoreboard~RegionScore_sub"></div></li></ul></div><div class="lnb-api hidden"><h3>Namespaces</h3><ul><li><a href="IITC.html">IITC</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.html#.registerLegacyAliases">registerLegacyAliases</a></li></ul></div></li><li><a href="IITC.about.html">IITC.about</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.about_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.about.html#.setup">setup</a></li></ul></div></li><li><a href="IITC.chat.html">IITC.chat</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.chat_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.chat.html#.chat.channelContainerTemplate">chat.channelContainerTemplate</a></li><li><a href="IITC.chat.html#.chat.channelTabTemplate">chat.channelTabTemplate</a></li><li><a href="IITC.chat.html#.chat.channels">chat.channels</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.chat.html#.chat.addChannel">chat.addChannel</a></li><li><a href="IITC.chat.html#.chat.addNickname">chat.addNickname</a></li><li><a href="IITC.chat.html#.chat.backgroundChannelData">chat.backgroundChannelData</a></li><li><a href="IITC.chat.html#.chat.channelState">chat.channelState</a></li><li><a href="IITC.chat.html#.chat.chooseTab">chat.chooseTab</a></li><li><a href="IITC.chat.html#.chat.chooser">chat.chooser</a></li><li><a href="IITC.chat.html#.chat.getActive">chat.getActive</a></li><li><a href="IITC.chat.html#.chat.getChannelDesc">chat.getChannelDesc</a></li><li><a href="IITC.chat.html#.chat.handleTabCompletion">chat.handleTabCompletion</a></li><li><a href="IITC.chat.html#.chat.keepScrollPosition">chat.keepScrollPosition</a></li><li><a href="IITC.chat.html#.chat.needMoreMessages">chat.needMoreMessages</a></li><li><a href="IITC.chat.html#.chat.nicknameClicked">chat.nicknameClicked</a></li><li><a href="IITC.chat.html#.chat.postMsg">chat.postMsg</a></li><li><a href="IITC.chat.html#.chat.renderAlerts">chat.renderAlerts</a></li><li><a href="IITC.chat.html#.chat.renderFaction">chat.renderFaction</a></li><li><a href="IITC.chat.html#.chat.renderMsg">chat.renderMsg</a></li><li><a href="IITC.chat.html#.chat.renderPublic">chat.renderPublic</a></li><li><a href="IITC.chat.html#.chat.request">chat.request</a></li><li><a href="IITC.chat.html#.chat.requestAlerts">chat.requestAlerts</a></li><li><a href="IITC.chat.html#.chat.requestFaction">chat.requestFaction</a></li><li><a href="IITC.chat.html#.chat.requestPublic">chat.requestPublic</a></li><li><a href="IITC.chat.html#.chat.setup">chat.setup</a></li><li><a href="IITC.chat.html#.chat.setupPosting">chat.setupPosting</a></li><li><a href="IITC.chat.html#.chat.setupTabs">chat.setupTabs</a></li><li><a href="IITC.chat.html#.chat.setupTime">chat.setupTime</a></li><li><a href="IITC.chat.html#.chat.show">chat.show</a></li><li><a href="IITC.chat.html#.chat.tabToChannel">chat.tabToChannel</a></li><li><a href="IITC.chat.html#.chat.toggle">chat.toggle</a></li></ul></div></li><li><a href="IITC.comm.html">IITC.comm</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.comm_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.comm.html#._channels">_channels</a></li><li><a href="IITC.comm.html#._channelsData">_channelsData</a></li><li><a href="IITC.comm.html#.dividerTemplate">dividerTemplate</a></li><li><a href="IITC.comm.html#.messageTransformFunctions">messageTransformFunctions</a></li><li><a href="IITC.comm.html#.msgCellTemplate">msgCellTemplate</a></li><li><a href="IITC.comm.html#.msgRowTemplate">msgRowTemplate</a></li><li><a href="IITC.comm.html#.nickCellTemplate">nickCellTemplate</a></li><li><a href="IITC.comm.html#.portalNameTransformations">portalNameTransformations</a></li><li><a href="IITC.comm.html#.portalTemplate">portalTemplate</a></li><li><a href="IITC.comm.html#.timeCellTemplate">timeCellTemplate</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.comm.html#._genPostData">_genPostData</a></li><li><a href="IITC.comm.html#._handleChannel">_handleChannel</a></li><li><a href="IITC.comm.html#._initChannelData">_initChannelData</a></li><li><a href="IITC.comm.html#._updateOldNewHash">_updateOldNewHash</a></li><li><a href="IITC.comm.html#._writeDataToHash">_writeDataToHash</a></li><li><a href="IITC.comm.html#.getChatPortalName">getChatPortalName</a></li><li><a href="IITC.comm.html#.getLatLngForSendingMessage">getLatLngForSendingMessage</a></li><li><a href="IITC.comm.html#.parseMsgData">parseMsgData</a></li><li><a href="IITC.comm.html#.renderChannel">renderChannel</a></li><li><a href="IITC.comm.html#.renderData">renderData</a></li><li><a href="IITC.comm.html#.renderDivider">renderDivider</a></li><li><a href="IITC.comm.html#.renderFactionEnt">renderFactionEnt</a></li><li><a href="IITC.comm.html#.renderMarkup">renderMarkup</a></li><li><a href="IITC.comm.html#.renderMarkupEntity">renderMarkupEntity</a></li><li><a href="IITC.comm.html#.renderMsgCell">renderMsgCell</a></li><li><a href="IITC.comm.html#.renderMsgRow">renderMsgRow</a></li><li><a href="IITC.comm.html#.renderNickCell">renderNickCell</a></li><li><a href="IITC.comm.html#.renderPlayer">renderPlayer</a></li><li><a href="IITC.comm.html#.renderPortal">renderPortal</a></li><li><a href="IITC.comm.html#.renderText">renderText</a></li><li><a href="IITC.comm.html#.renderTimeCell">renderTimeCell</a></li><li><a href="IITC.comm.html#.requestChannel">requestChannel</a></li><li><a href="IITC.comm.html#.sendChatMessage">sendChatMessage</a></li><li><a href="IITC.comm.html#.transformMessage">transformMessage</a></li></ul></div></li><li><a href="IITC.comm.declarativeMessageFilter.html">IITC.comm.declarativeMessageFilter</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.comm.declarativeMessageFilter_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.comm.declarativeMessageFilter.html#.addRule">addRule</a></li><li><a href="IITC.comm.declarativeMessageFilter.html#.filterMessage">filterMessage</a></li><li><a href="IITC.comm.declarativeMessageFilter.html#.getAllRules">getAllRules</a></li><li><a href="IITC.comm.declarativeMessageFilter.html#.getMessageValueByPath">getMessageValueByPath</a></li><li><a href="IITC.comm.declarativeMessageFilter.html#.getRuleById">getRuleById</a></li><li><a href="IITC.comm.declarativeMessageFilter.html#.matchesRule">matchesRule</a></li><li><a href="IITC.comm.declarativeMessageFilter.html#.removeRule">removeRule</a></li></ul></div></li><li><a href="IITC.filters.html">IITC.filters</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.filters_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.filters.html#._filters">_filters</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.filters.html#.filterEntities">filterEntities</a></li><li><a href="IITC.filters.html#.filterField">filterField</a></li><li><a href="IITC.filters.html#.filterLink">filterLink</a></li><li><a href="IITC.filters.html#.filterPortal">filterPortal</a></li><li><a href="IITC.filters.html#.has">has</a></li><li><a href="IITC.filters.html#.remove">remove</a></li><li><a href="IITC.filters.html#.set">set</a></li><li><a href="IITC.filters.html#.testFilter">testFilter</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="IITC.filters.html#.FilterDesc">FilterDesc</a></li><li><a href="IITC.filters.html#.FilterPredicate">FilterPredicate</a></li></ul></div></li><li><a href="IITC.map.html">IITC.map</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.map_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.map.html#.layerOffWarningTemplate">layerOffWarningTemplate</a></li><li><a href="IITC.map.html#.osmAttributionTemplate">osmAttributionTemplate</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.map.html#.setup">setup</a></li></ul></div></li><li><a href="IITC.map.tiles.html">IITC.map.tiles</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.map.tiles_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.map.tiles.html#.tileParamsWarningTemplate">tileParamsWarningTemplate</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.map.tiles.html#.getDataZoomForMapZoom">getDataZoomForMapZoom</a></li><li><a href="IITC.map.tiles.html#.getMapZoomParameters">getMapZoomParameters</a></li><li><a href="IITC.map.tiles.html#.setupParams">setupParams</a></li></ul></div></li><li><a href="IITC.options.html">IITC.options</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.options_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.options.html#.check">check</a></li><li><a href="IITC.options.html#.exportValues">exportValues</a></li><li><a href="IITC.options.html#.extend">extend</a></li><li><a href="IITC.options.html#.get">get</a></li><li><a href="IITC.options.html#.importValues">importValues</a></li><li><a href="IITC.options.html#.open">open</a></li><li><a href="IITC.options.html#.refresh">refresh</a></li><li><a href="IITC.options.html#.register">register</a></li><li><a href="IITC.options.html#.reset">reset</a></li><li><a href="IITC.options.html#.set">set</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="IITC.options.html#.OptionBlock">OptionBlock</a></li><li><a href="IITC.options.html#.OptionsListItem">OptionsListItem</a></li><li><a href="IITC.options.html#.OptionsPage">OptionsPage</a></li></ul></div></li><li><a href="IITC.portal.html">IITC.portal</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.portal_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.portal.html#.findGuidByPositionE6">findGuidByPositionE6</a></li><li><a href="IITC.portal.html#.fixImageUrl">fixImageUrl</a></li><li><a href="IITC.portal.html#.getAttackApGain">getAttackApGain</a></li><li><a href="IITC.portal.html#.getAttackValues">getAttackValues</a></li><li><a href="IITC.portal.html#.getCurrentEnergy">getCurrentEnergy</a></li><li><a href="IITC.portal.html#.getFields">getFields</a></li><li><a href="IITC.portal.html#.getFieldsCount">getFieldsCount</a></li><li><a href="IITC.portal.html#.getHackDetails">getHackDetails</a></li><li><a href="IITC.portal.html#.getHealth">getHealth</a></li><li><a href="IITC.portal.html#.getLatLng">getLatLng</a></li><li><a href="IITC.portal.html#.getLevel">getLevel</a></li><li><a href="IITC.portal.html#.getLinkAmpRangeBoost">getLinkAmpRangeBoost</a></li><li><a href="IITC.portal.html#.getLinkDefenseBoost">getLinkDefenseBoost</a></li><li><a href="IITC.portal.html#.getLinks">getLinks</a></li><li><a href="IITC.portal.html#.getLinksCount">getLinksCount</a></li><li><a href="IITC.portal.html#.getLinksMitigation">getLinksMitigation</a></li><li><a href="IITC.portal.html#.getMaxOutgoingLinks">getMaxOutgoingLinks</a></li><li><a href="IITC.portal.html#.getMitigationDetails">getMitigationDetails</a></li><li><a href="IITC.portal.html#.getModsByType">getModsByType</a></li><li><a href="IITC.portal.html#.getRange">getRange</a></li><li><a href="IITC.portal.html#.getShieldMitigation">getShieldMitigation</a></li><li><a href="IITC.portal.html#.getSummaryData">getSummaryData</a></li><li><a href="IITC.portal.html#.getTotalEnergy">getTotalEnergy</a></li><li><a href="IITC.portal.html#.selectByLatLng">selectByLatLng</a></li><li><a href="IITC.portal.html#.selectWhenLoadedByGuid">selectWhenLoadedByGuid</a></li><li><a href="IITC.portal.html#.selectWhenLoadedByLatLng">selectWhenLoadedByLatLng</a></li><li><a href="IITC.portal.html#.zoomToAndShow">zoomToAndShow</a></li></ul></div></li><li><a href="IITC.portal.details.html">IITC.portal.details</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.portal.details_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.portal.details.html#.get">get</a></li><li><a href="IITC.portal.details.html#.isFresh">isFresh</a></li><li><a href="IITC.portal.details.html#.request">request</a></li><li><a href="IITC.portal.details.html#.setup">setup</a></li><li><a href="IITC.portal.details.html#.store">store</a></li></ul></div></li><li><a href="IITC.portal.display.html">IITC.portal.display</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.portal.display_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.portal.display.html#.artifactFragmentsTemplate">artifactFragmentsTemplate</a></li><li><a href="IITC.portal.display.html#.artifactTargetTemplate">artifactTargetTemplate</a></li><li><a href="IITC.portal.display.html#.ellipsisLabelTemplate">ellipsisLabelTemplate</a></li><li><a href="IITC.portal.display.html#.linkDetailsTemplate">linkDetailsTemplate</a></li><li><a href="IITC.portal.display.html#.loadingStatusTemplate">loadingStatusTemplate</a></li><li><a href="IITC.portal.display.html#.modsWrapperTemplate">modsWrapperTemplate</a></li><li><a href="IITC.portal.display.html#.moveToPortalIconTemplate">moveToPortalIconTemplate</a></li><li><a href="IITC.portal.display.html#.randDetailsTemplate">randDetailsTemplate</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.portal.display.html#._renderMobileFullImage">_renderMobileFullImage</a></li><li><a href="IITC.portal.display.html#.getMiscDetails">getMiscDetails</a></li><li><a href="IITC.portal.display.html#.makePermalink">makePermalink</a></li><li><a href="IITC.portal.display.html#.makePrimeLink">makePrimeLink</a></li><li><a href="IITC.portal.display.html#.rangeLinkClick">rangeLinkClick</a></li><li><a href="IITC.portal.display.html#.renderDetails">renderDetails</a></li><li><a href="IITC.portal.display.html#.renderToSidebar">renderToSidebar</a></li><li><a href="IITC.portal.display.html#.renderUrl">renderUrl</a></li><li><a href="IITC.portal.display.html#.resetScroll">resetScroll</a></li><li><a href="IITC.portal.display.html#.select">select</a></li><li><a href="IITC.portal.display.html#.setIndicators">setIndicators</a></li></ul></div></li><li><a href="IITC.portal.display.tools.html">IITC.portal.display.tools</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.portal.display.tools_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.portal.display.tools.html#.historyMissingTemplate">historyMissingTemplate</a></li><li><a href="IITC.portal.display.tools.html#.historyTemplate">historyTemplate</a></li><li><a href="IITC.portal.display.tools.html#.modEmptyTemplate">modEmptyTemplate</a></li><li><a href="IITC.portal.display.tools.html#.modTemplate">modTemplate</a></li><li><a href="IITC.portal.display.tools.html#.nicknameTemplate">nicknameTemplate</a></li><li><a href="IITC.portal.display.tools.html#.posLinksTemplate">posLinksTemplate</a></li><li><a href="IITC.portal.display.tools.html#.rangeLinkTemplate">rangeLinkTemplate</a></li><li><a href="IITC.portal.display.tools.html#.resoDetailsTemplate">resoDetailsTemplate</a></li><li><a href="IITC.portal.display.tools.html#.resonatorFillTemplate">resonatorFillTemplate</a></li><li><a href="IITC.portal.display.tools.html#.resonatorLevelTemplate">resonatorLevelTemplate</a></li><li><a href="IITC.portal.display.tools.html#.resonatorMeterTemplate">resonatorMeterTemplate</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.portal.display.tools.html#.getAttackApGainText">getAttackApGainText</a></li><li><a href="IITC.portal.display.tools.html#.getEnergyText">getEnergyText</a></li><li><a href="IITC.portal.display.tools.html#.getHackDetailsText">getHackDetailsText</a></li><li><a href="IITC.portal.display.tools.html#.getHistoryDetails">getHistoryDetails</a></li><li><a href="IITC.portal.display.tools.html#.getMitigationText">getMitigationText</a></li><li><a href="IITC.portal.display.tools.html#.getModDetails">getModDetails</a></li><li><a href="IITC.portal.display.tools.html#.getRangeText">getRangeText</a></li><li><a href="IITC.portal.display.tools.html#.getResonatorDetails">getResonatorDetails</a></li><li><a href="IITC.portal.display.tools.html#.renderResonatorDetails">renderResonatorDetails</a></li><li><a href="IITC.portal.display.tools.html#.showPosLinks">showPosLinks</a></li></ul></div></li><li><a href="IITC.portal.highlighter.html">IITC.portal.highlighter</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.portal.highlighter_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.portal.highlighter.html#.add">add</a></li><li><a href="IITC.portal.highlighter.html#.change">change</a></li><li><a href="IITC.portal.highlighter.html#.highlight">highlight</a></li><li><a href="IITC.portal.highlighter.html#.resetAll">resetAll</a></li><li><a href="IITC.portal.highlighter.html#.updateControl">updateControl</a></li></ul></div></li><li><a href="IITC.portal.marker.html">IITC.portal.marker</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.portal.marker_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.portal.marker.html#.scaleSteps">scaleSteps</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.portal.marker.html#.create">create</a></li><li><a href="IITC.portal.marker.html#.getStyleOptions">getStyleOptions</a></li><li><a href="IITC.portal.marker.html#.scale">scale</a></li><li><a href="IITC.portal.marker.html#.setStyle">setStyle</a></li></ul></div></li><li><a href="IITC.search.html">IITC.search</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.search_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.search.html#.doSearch">doSearch</a></li><li><a href="IITC.search.html#.setup">setup</a></li></ul><div class="member-type">Typedef</div><ul class="inner"><li><a href="IITC.search.html#.SearchQuery">SearchQuery</a></li></ul></div></li><li><a href="IITC.search.hooks.html">IITC.search.hooks</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.search.hooks_sub"></div></li><li><a href="IITC.smartphone.html">IITC.smartphone</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.smartphone_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.smartphone.html#._runAfterBoot">_runAfterBoot</a></li><li><a href="IITC.smartphone.html#._runBeforeBoot">_runBeforeBoot</a></li></ul></div></li><li><a href="IITC.statusbar.html">IITC.statusbar</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.statusbar_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.statusbar.html#.mapTemplates">mapTemplates</a></li><li><a href="IITC.statusbar.html#.portalTemplates">portalTemplates</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.statusbar.html#.hide">hide</a></li><li><a href="IITC.statusbar.html#.init">init</a></li><li><a href="IITC.statusbar.html#.renderTemplate">renderTemplate</a></li><li><a href="IITC.statusbar.html#.show">show</a></li></ul></div></li><li><a href="IITC.statusbar.map.html">IITC.statusbar.map</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.statusbar.map_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.statusbar.map.html#.getData">getData</a></li><li><a href="IITC.statusbar.map.html#.render">render</a></li><li><a href="IITC.statusbar.map.html#.update">update</a></li></ul></div></li><li><a href="IITC.statusbar.portal.html">IITC.statusbar.portal</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.statusbar.portal_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.statusbar.portal.html#.getData">getData</a></li><li><a href="IITC.statusbar.portal.html#.render">render</a></li><li><a href="IITC.statusbar.portal.html#.update">update</a></li></ul></div></li><li><a href="IITC.toolbox.html">IITC.toolbox</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.toolbox_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.toolbox.html#._applySort">_applySort</a></li><li><a href="IITC.toolbox.html#._renderButton">_renderButton</a></li><li><a href="IITC.toolbox.html#._syncWithLegacyToolbox">_syncWithLegacyToolbox</a></li><li><a href="IITC.toolbox.html#.addButton">addButton</a></li><li><a href="IITC.toolbox.html#.removeButton">removeButton</a></li><li><a href="IITC.toolbox.html#.setSortMethod">setSortMethod</a></li><li><a href="IITC.toolbox.html#.updateButton">updateButton</a></li></ul></div></li><li><a href="IITC.utils.html">IITC.utils</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="IITC.utils_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="IITC.utils.html#.MAX_LATITUDE">MAX_LATITUDE</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="IITC.utils.html#._isVisible">_isVisible</a></li><li><a href="IITC.utils.html#.clamp">clamp</a></li><li><a href="IITC.utils.html#.clampLatLng">clampLatLng</a></li><li><a href="IITC.utils.html#.clampLatLngBounds">clampLatLngBounds</a></li><li><a href="IITC.utils.html#.deleteCookie">deleteCookie</a></li><li><a href="IITC.utils.html#.escapeHtml">escapeHtml</a></li><li><a href="IITC.utils.html#.escapeJS">escapeJS</a></li><li><a href="IITC.utils.html#.exportFile">exportFile</a></li><li><a href="IITC.utils.html#.exportText">exportText</a></li><li><a href="IITC.utils.html#.formatAgo">formatAgo</a></li><li><a href="IITC.utils.html#.formatDistance">formatDistance</a></li><li><a href="IITC.utils.html#.formatInterval">formatInterval</a></li><li><a href="IITC.utils.html#.formatNumber">formatNumber</a></li><li><a href="IITC.utils.html#.genFourColumnTable">genFourColumnTable</a></li><li><a href="IITC.utils.html#.getCookie">getCookie</a></li><li><a href="IITC.utils.html#.getTeamId">getTeamId</a></li><li><a href="IITC.utils.html#.getURLParam">getURLParam</a></li><li><a href="IITC.utils.html#.importFile">importFile</a></li><li><a href="IITC.utils.html#.importText">importText</a></li><li><a href="IITC.utils.html#.isPointInPolygon">isPointInPolygon</a></li><li><a href="IITC.utils.html#.isSmartphone">isSmartphone</a></li><li><a href="IITC.utils.html#.isSystemPlayer">isSystemPlayer</a></li><li><a href="IITC.utils.html#.isTouchDevice">isTouchDevice</a></li><li><a href="IITC.utils.html#.prettyEnergy">prettyEnergy</a></li><li><a href="IITC.utils.html#.promptText">promptText</a></li><li><a href="IITC.utils.html#.scrollBottom">scrollBottom</a></li><li><a href="IITC.utils.html#.setCookie">setCookie</a></li><li><a href="IITC.utils.html#.textToTable">textToTable</a></li><li><a href="IITC.utils.html#.uniqueArray">uniqueArray</a></li><li><a href="IITC.utils.html#.unixTimeToDateTimeString">unixTimeToDateTimeString</a></li><li><a href="IITC.utils.html#.unixTimeToHHmm">unixTimeToHHmm</a></li><li><a href="IITC.utils.html#.unixTimeToString">unixTimeToString</a></li><li><a href="IITC.utils.html#.zeroPad">zeroPad</a></li></ul></div></li><li><a href="config_options.html">config_options</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="config_options_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="config_options.html#.window.ACCESS_INDICATOR_COLOR">window.ACCESS_INDICATOR_COLOR</a></li><li><a href="config_options.html#.window.CHAT_REQUEST_SCROLL_TOP">window.CHAT_REQUEST_SCROLL_TOP</a></li><li><a href="config_options.html#.window.COLORS">window.COLORS</a></li><li><a href="config_options.html#.window.COLORS_LVL">window.COLORS_LVL</a></li><li><a href="config_options.html#.window.COLORS_MOD">window.COLORS_MOD</a></li><li><a href="config_options.html#.window.COLOR_SELECTED_PORTAL">window.COLOR_SELECTED_PORTAL</a></li><li><a href="config_options.html#.window.DEFAULT_PORTAL_IMG">window.DEFAULT_PORTAL_IMG</a></li><li><a href="config_options.html#.window.DEFAULT_ZOOM">window.DEFAULT_ZOOM</a></li><li><a href="config_options.html#.window.MAX_IDLE_TIME">window.MAX_IDLE_TIME</a></li><li><a href="config_options.html#.window.MINIMUM_OVERRIDE_REFRESH">window.MINIMUM_OVERRIDE_REFRESH</a></li><li><a href="config_options.html#.window.MIN_ZOOM">window.MIN_ZOOM</a></li><li><a href="config_options.html#.window.NOMINATIM">window.NOMINATIM</a></li><li><a href="config_options.html#.window.ON_MOVE_REFRESH">window.ON_MOVE_REFRESH</a></li><li><a href="config_options.html#.window.RANGE_INDICATOR_COLOR">window.RANGE_INDICATOR_COLOR</a></li><li><a href="config_options.html#.window.REFRESH">window.REFRESH</a></li><li><a href="config_options.html#.window.REFRESH_GAME_SCORE">window.REFRESH_GAME_SCORE</a></li><li><a href="config_options.html#.window.ZOOM_LEVEL_ADJ">window.ZOOM_LEVEL_ADJ</a></li></ul></div></li><li><a href="ingress_constants.html">ingress_constants</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="ingress_constants_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="ingress_constants.html#.window.APPLY_PORTAL_MOD">window.APPLY_PORTAL_MOD</a></li><li><a href="ingress_constants.html#.window.BASE_HACK_COOLDOWN">window.BASE_HACK_COOLDOWN</a></li><li><a href="ingress_constants.html#.window.BASE_HACK_COUNT">window.BASE_HACK_COUNT</a></li><li><a href="ingress_constants.html#.window.CAPTURE_PORTAL">window.CAPTURE_PORTAL</a></li><li><a href="ingress_constants.html#.window.COMPLETION_BONUS">window.COMPLETION_BONUS</a></li><li><a href="ingress_constants.html#.window.CREATE_CONTROL_FIELD">window.CREATE_CONTROL_FIELD</a></li><li><a href="ingress_constants.html#.window.CREATE_LINK">window.CREATE_LINK</a></li><li><a href="ingress_constants.html#.window.DEPLOY_RESONATOR">window.DEPLOY_RESONATOR</a></li><li><a href="ingress_constants.html#.window.DESTROY_FIELD">window.DESTROY_FIELD</a></li><li><a href="ingress_constants.html#.window.DESTROY_LINK">window.DESTROY_LINK</a></li><li><a href="ingress_constants.html#.window.DESTROY_PORTAL_MOD">window.DESTROY_PORTAL_MOD</a></li><li><a href="ingress_constants.html#.window.DESTROY_RESONATOR">window.DESTROY_RESONATOR</a></li><li><a href="ingress_constants.html#.window.HACK_RANGE">window.HACK_RANGE</a></li><li><a href="ingress_constants.html#.window.LINK_RANGE_MAC">window.LINK_RANGE_MAC</a></li><li><a href="ingress_constants.html#.window.MAX_PORTAL_LEVEL">window.MAX_PORTAL_LEVEL</a></li><li><a href="ingress_constants.html#.window.MAX_RESO_PER_PLAYER">window.MAX_RESO_PER_PLAYER</a></li><li><a href="ingress_constants.html#.window.OCTANTS">window.OCTANTS</a></li><li><a href="ingress_constants.html#.window.OCTANTS_ARROW">window.OCTANTS_ARROW</a></li><li><a href="ingress_constants.html#.window.RECLAIM_PORTAL_FROM_MACHINA">window.RECLAIM_PORTAL_FROM_MACHINA</a></li><li><a href="ingress_constants.html#.window.RESO_NRG">window.RESO_NRG</a></li><li><a href="ingress_constants.html#.window.UPGRADE_ANOTHERS_RESONATOR">window.UPGRADE_ANOTHERS_RESONATOR</a></li></ul></div></li><li><a href="other_constants.html">other_constants</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="other_constants_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="other_constants.html#.window.TEAM_CODENAMES">window.TEAM_CODENAMES</a></li><li><a href="other_constants.html#.window.TEAM_CODES">window.TEAM_CODES</a></li><li><a href="other_constants.html#.window.TEAM_CODE_ENL">window.TEAM_CODE_ENL</a></li><li><a href="other_constants.html#.window.TEAM_CODE_MAC">window.TEAM_CODE_MAC</a></li><li><a href="other_constants.html#.window.TEAM_CODE_NONE">window.TEAM_CODE_NONE</a></li><li><a href="other_constants.html#.window.TEAM_CODE_RES">window.TEAM_CODE_RES</a></li><li><a href="other_constants.html#.window.TEAM_ENL">window.TEAM_ENL</a></li><li><a href="other_constants.html#.window.TEAM_MAC">window.TEAM_MAC</a></li><li><a href="other_constants.html#.window.TEAM_NAMES">window.TEAM_NAMES</a></li><li><a href="other_constants.html#.window.TEAM_NAME_ENL">window.TEAM_NAME_ENL</a></li><li><a href="other_constants.html#.window.TEAM_NAME_MAC">window.TEAM_NAME_MAC</a></li><li><a href="other_constants.html#.window.TEAM_NAME_NONE">window.TEAM_NAME_NONE</a></li><li><a href="other_constants.html#.window.TEAM_NAME_RES">window.TEAM_NAME_RES</a></li><li><a href="other_constants.html#.window.TEAM_NONE">window.TEAM_NONE</a></li><li><a href="other_constants.html#.window.TEAM_RES">window.TEAM_RES</a></li><li><a href="other_constants.html#.window.TEAM_TO_CSS">window.TEAM_TO_CSS</a></li></ul></div></li><li><a href="player.html">player</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="player_sub"><div class="member-type">Typedef</div><ul class="inner"><li><a href="player.html#.PLAYER">PLAYER</a></li></ul></div></li><li><a href="storage_variables.html">storage_variables</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="storage_variables_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="storage_variables.html#.window.fields">window.fields</a></li><li><a href="storage_variables.html#.window.links">window.links</a></li><li><a href="storage_variables.html#.window.portalAccessIndicator">window.portalAccessIndicator</a></li><li><a href="storage_variables.html#.window.portalRangeIndicator">window.portalRangeIndicator</a></li><li><a href="storage_variables.html#.window.portals">window.portals</a></li><li><a href="storage_variables.html#.window.refreshTimeout">window.refreshTimeout</a></li><li><a href="storage_variables.html#.window.selectedPortal">window.selectedPortal</a></li><li><a href="storage_variables.html#.window.urlPortal">window.urlPortal</a></li><li><a href="storage_variables.html#.window.urlPortalLL">window.urlPortalLL</a></li></ul></div></li><li><a href="window.artifact.html">window.artifact</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.artifact_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.artifact.html#.clearData">clearData</a></li><li><a href="window.artifact.html#.entityInject">entityInject</a></li><li><a href="window.artifact.html#.getArtifactEntities">getArtifactEntities</a></li><li><a href="window.artifact.html#.getArtifactTypes">getArtifactTypes</a></li><li><a href="window.artifact.html#.getInterestingPortals">getInterestingPortals</a></li><li><a href="window.artifact.html#.getPortalData">getPortalData</a></li><li><a href="window.artifact.html#.handleFailure">handleFailure</a></li><li><a href="window.artifact.html#.handleSuccess">handleSuccess</a></li><li><a href="window.artifact.html#.idleResume">idleResume</a></li><li><a href="window.artifact.html#.isArtifact">isArtifact</a></li><li><a href="window.artifact.html#.isInterestingPortal">isInterestingPortal</a></li><li><a href="window.artifact.html#.processData">processData</a></li><li><a href="window.artifact.html#.processResult">processResult</a></li><li><a href="window.artifact.html#.requestData">requestData</a></li><li><a href="window.artifact.html#.setup">setup</a></li><li><a href="window.artifact.html#.showArtifactList">showArtifactList</a></li><li><a href="window.artifact.html#.updateLayer">updateLayer</a></li></ul></div></li><li><a href="window.decodeArray.html">window.decodeArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.decodeArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.decodeArray.html#.portal">portal</a></li></ul></div></li><li><a href="window.ornaments.html">window.ornaments</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.ornaments_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="window.ornaments.html#.KNOWN_KEY">KNOWN_KEY</a></li><li><a href="window.ornaments.html#.OVERLAY_OPACITY">OVERLAY_OPACITY</a></li><li><a href="window.ornaments.html#.OVERLAY_SIZE">OVERLAY_SIZE</a></li><li><a href="window.ornaments.html#.excludedOrnaments">excludedOrnaments</a></li><li><a href="window.ornaments.html#.icon">icon</a></li><li><a href="window.ornaments.html#.knownOrnaments">knownOrnaments</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="window.ornaments.html#.addPortal">addPortal</a></li><li><a href="window.ornaments.html#.createLayer">createLayer</a></li><li><a href="window.ornaments.html#.initOrnaments">initOrnaments</a></li><li><a href="window.ornaments.html#.isExcluded">isExcluded</a></li><li><a href="window.ornaments.html#.knownFrom">knownFrom</a></li><li><a href="window.ornaments.html#.load">load</a></li><li><a href="window.ornaments.html#.migrate">migrate</a></li><li><a href="window.ornaments.html#.ornamentsOpt">ornamentsOpt</a></li><li><a href="window.ornaments.html#.parsePrefixes">parsePrefixes</a></li><li><a href="window.ornaments.html#.readSeen">readSeen</a></li><li><a href="window.ornaments.html#.registerOptions">registerOptions</a></li><li><a href="window.ornaments.html#.reload">reload</a></li><li><a href="window.ornaments.html#.removePortal">removePortal</a></li><li><a href="window.ornaments.html#.save">save</a></li><li><a href="window.ornaments.html#.scheduleReload">scheduleReload</a></li><li><a href="window.ornaments.html#.scheduleSeenSave">scheduleSeenSave</a></li><li><a href="window.ornaments.html#.setup">setup</a></li></ul></div></li><li><a href="window.requests.html">window.requests</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="window.requests_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="window.requests.html#._callOnRefreshFunctions">_callOnRefreshFunctions</a></li><li><a href="window.requests.html#.abort">abort</a></li><li><a href="window.requests.html#.add">add</a></li><li><a href="window.requests.html#.addRefreshFunction">addRefreshFunction</a></li><li><a href="window.requests.html#.remove">remove</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Global</h3><ul><li class="hidden"><a href="global.html#ButtonArgs">ButtonArgs</a></li><li class="hidden"><a href="global.html#ChannelDescription">ChannelDescription</a></li><li class="hidden"><a href="global.html#ChannelRenderFn">ChannelRenderFn</a></li><li class="hidden"><a href="global.html#ChannelRequestFn">ChannelRequestFn</a></li><li class="hidden"><a href="global.html#ChannelSendMessageFn">ChannelSendMessageFn</a></li><li><a href="global.html#DEFAULT_MAP">DEFAULT_MAP</a></li><li><a href="global.html#collectDefinitions">collectDefinitions</a></li><li><a href="global.html#createChannelContainer">createChannelContainer</a></li><li><a href="global.html#createChannelTab">createChannelTab</a></li><li><a href="global.html#createDefaultBaseMapLayers">createDefaultBaseMapLayers</a></li><li><a href="global.html#createDefaultOverlays">createDefaultOverlays</a></li><li><a href="global.html#createPaneButton">createPaneButton</a></li><li><a href="global.html#declare">declare</a></li><li><a href="global.html#fillTemplate">fillTemplate</a></li><li><a href="global.html#getPosition">getPosition</a></li><li><a href="global.html#normLL">normLL</a></li><li><a href="global.html#resolve">resolve</a></li><li><a href="global.html#storedState">storedState</a></li><li><a href="global.html#syncs">syncs</a></li><li><a href="global.html#validateValue">validateValue</a></li><li><a href="global.html#withJQueryCallbacks">withJQueryCallbacks</a></li></ul></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global IITC, L, log -- eslint */
+
+/**
+ * @file The options window: the list of options pages next to the page chosen, and a search over
+ *       the titles and texts of all pages. A narrow window shows the list or the page, with a way back.
+ *       The window is a dialog over the map, so a change shows on the map at once, or fills the pane
+ *       of an app. The page shown follows changes of its own options made elsewhere, such as values arriving
+ *       through sync
+ * @module options_window
+ */
+
+// pages of IITC itself come first, the rest follow by title
+const FIRST_PAGES = ['iitc', 'about'];
+
+// texts of a block searched for a query; titles computed when drawn are left out
+const SEARCHED = ['title', 'description', 'text'];
+
+// longest text the search shows under a page
+const FOUND_LENGTH = 80;
+
+// height of the dialog, in pixels; a lower screen gets a lower dialog
+const HEIGHT = 560;
+
+const PANE_ID = 'options';
+const LINK_ID = 'options-toolbox-link';
+
+// the window's element and its dialog while it is open; the page and the query stay between openings
+const view = {
+  root: null,
+  dialog: null,
+  pageId: undefined,
+  query: '',
+  pane: null,
+  paneAdded: false,
+  mapButton: null,
+};
+
+const el = (...args) => IITC.options._el(...args);
+
+/**
+ * Ids of the registered pages in the order the window lists them
+ *
+ * @private
+ * @returns {string[]}
+ */
+const pageIds = () => {
+  const pages = IITC.options._pages;
+  const rank = (id) => (FIRST_PAGES.includes(id) ? FIRST_PAGES.indexOf(id) : FIRST_PAGES.length);
+  return Object.keys(pages).sort((a, b) => rank(a) - rank(b) || String(pages[a].title ?? a).localeCompare(String(pages[b].title ?? b)));
+};
+
+const titleOf = (pageId) => String(IITC.options._pages[pageId]?.title ?? pageId);
+
+// a block the page does not show; inside a repeat, `visible` as a function of the item counts as shown
+const hidden = (block, inRepeat) => {
+  if (typeof block?.visible !== 'function') return block?.visible === false;
+  if (inRepeat) return false;
+  try {
+    return block.visible() === false;
+  } catch {
+    // drawing the page reports the error
+    return false;
+  }
+};
+
+// texts of the blocks shown, the ones inside a repeat too
+const blockTexts = (blocks, inRepeat = false) =>
+  (blocks ?? []).flatMap((block) => {
+    if (hidden(block, inRepeat)) return [];
+    const own = SEARCHED.filter((name) => typeof block?.[name] === 'string').map((name) => block[name]);
+    return block?.type === 'repeat' ? [...own, ...blockTexts(block.blocks, true)] : own;
+  });
+
+/**
+ * Finds the texts of a page that contain the query, ignoring case
+ *
+ * @private
+ * @returns {string[]|null} Texts of the page's blocks that match, empty when only the page title does;
+ *                          null when nothing on the page matches
+ */
+const search = (pageId, query) => {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return [];
+  // the sections of extensions are searched with their titles
+  const sections = IITC.options._sections(pageId).flatMap((section) => [section.title, ...blockTexts(section.blocks)]);
+  const found = [...blockTexts(IITC.options._pages[pageId].blocks), ...sections].filter((text) => text.toLowerCase().includes(needle));
+  if (found.length) return found;
+  return titleOf(pageId).toLowerCase().includes(needle) ? [] : null;
+};
+
+const shorten = (text) => (text.length > FOUND_LENGTH ? `${text.slice(0, FOUND_LENGTH - 1)}…` : text);
+
+const isOpen = () => view.root !== null &amp;&amp; view.root.isConnected;
+
+const part = (className) => view.root.querySelector(`.${className}`);
+
+const content = () => part('iitc-options-content');
+
+const navLink = (pageId) => [...view.root.querySelectorAll('.iitc-options-page-link')].find((link) => link.dataset.page === pageId);
+
+const isHidden = (element) => element.ownerDocument.defaultView.getComputedStyle(element).display === 'none';
+
+// the tooltip of a page in the list, telling its access key; none on a touch screen, where a tap that opens
+// the page would show it
+const accessKeyHint = (pageId) => {
+  const accesskey = IITC.options._pages[pageId]?.accesskey;
+  if (!accesskey || window.matchMedia?.('(hover: none)').matches) return undefined;
+  return `Access key [${accesskey}]`;
+};
+
+// draws the list again; the focus stays on the page it was on
+const drawNav = () => {
+  const list = part('iitc-options-pages');
+  const focused = list.contains(document.activeElement) ? document.activeElement.dataset.page : undefined;
+  const entries = pageIds()
+    .map((pageId) => [pageId, search(pageId, view.query)])
+    .filter(([, found]) => found !== null)
+    .map(([pageId, found]) =>
+      el(
+        'li',
+        {},
+        el(
+          'button',
+          {
+            type: 'button',
+            className: 'iitc-options-page-link',
+            dataset: { page: pageId },
+            title: accessKeyHint(pageId),
+            'aria-current': pageId === view.pageId &amp;&amp; 'page',
+            onclick: () => choose(pageId),
+          },
+          el('span', { className: 'iitc-options-page-title' }, titleOf(pageId)),
+          // what the search found on the page
+          found.length > 0 &amp;&amp; el('span', { className: 'iitc-options-found' }, found.slice(0, 3).map(shorten).join(' · '))
+        )
+      )
+    );
+  list.replaceChildren(...entries);
+  if (!entries.length) list.append(el('li', { className: 'iitc-options-nothing' }, 'Nothing found'));
+  if (focused !== undefined) navLink(focused)?.focus();
+};
+
+const drawPage = () => {
+  part('iitc-options-page-heading').textContent = view.pageId ? titleOf(view.pageId) : '';
+  if (view.pageId) IITC.options._renderPage(view.pageId, content(), view.query);
+  else content().replaceChildren();
+};
+
+// shows a page; in a narrow window it takes the place of the list, and the focus moves to the way back
+const choose = (pageId) => {
+  const another = pageId !== view.pageId;
+  view.pageId = pageId;
+  view.root.dataset.view = 'page';
+  view.root.querySelectorAll('.iitc-options-page-link').forEach((link) => {
+    if (link.dataset.page === pageId) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+  drawPage();
+  if (another) {
+    // another page starts at its top, or at what the search found on it
+    content().scrollTop = 0;
+    content().querySelector('.iitc-options-match')?.scrollIntoView?.({ block: 'center' });
+  }
+  const nav = part('iitc-options-nav');
+  if (nav.contains(document.activeElement) &amp;&amp; isHidden(nav)) part('iitc-options-back').focus();
+};
+
+// the window, showing the page in a narrow window too when `showPage` is set
+const build = (showPage) => {
+  const searchInput = el('input', {
+    type: 'search',
+    className: 'iitc-options-search',
+    placeholder: 'Search',
+    value: view.query,
+    'aria-label': 'Search options',
+  });
+  // the list and the page show what the query finds
+  const searched = () => {
+    drawNav();
+    if (view.pageId) drawPage();
+  };
+  searchInput.addEventListener('input', () => {
+    view.query = searchInput.value;
+    searched();
+  });
+  // Escape clears the search first, and closes the window only from an empty field
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !searchInput.value) return;
+    event.stopPropagation();
+    searchInput.value = '';
+    view.query = '';
+    searched();
+  });
+
+  const back = el(
+    'button',
+    {
+      type: 'button',
+      className: 'iitc-options-back',
+      'aria-label': 'Back to the list of pages',
+      onclick: () => {
+        view.root.dataset.view = 'list';
+        (navLink(view.pageId) ?? searchInput).focus();
+      },
+    },
+    el('iitc-icon', {}, 'arrow_back')
+  );
+
+  view.root = el(
+    'div',
+    { className: 'iitc-options', dataset: { view: showPage ? 'page' : 'list' } },
+    el('nav', { className: 'iitc-options-nav' }, searchInput, el('ul', { className: 'iitc-options-pages' })),
+    el(
+      'section',
+      { className: 'iitc-options-detail' },
+      el('div', { className: 'iitc-options-detail-head' }, back, el('h2', { className: 'iitc-options-page-heading' })),
+      el('div', { className: 'iitc-options-content' })
+    )
+  );
+  drawNav();
+  drawPage();
+  return view.root;
+};
+
+// a page to show: the one chosen last while it is still registered, or the first
+const currentPage = () => (IITC.options._pages[view.pageId] ? view.pageId : pageIds()[0]);
+
+const openDialog = (showPage) => {
+  view.dialog = window.dialog({
+    id: 'iitc-options',
+    title: 'Options',
+    html: build(showPage),
+    width: 700,
+    height: Math.min(HEIGHT, window.innerHeight - 16),
+    closeCallback: () => {
+      view.root = null;
+      view.dialog = null;
+    },
+  });
+  // the dialog focuses the search as its first field; on a smartphone that would open the keyboard over the window
+  const search = part('iitc-options-search');
+  if (IITC.utils.isSmartphone() &amp;&amp; document.activeElement === search) search.blur();
+};
+
+// no close button: the app leaves the pane by showing another
+const openPane = (showPage) => {
+  view.pane = el('div', { id: 'iitc-options-pane', className: 'iitc-options-pane' }, build(showPage));
+  document.body.append(view.pane);
+};
+
+const closePane = () => {
+  view.pane?.remove();
+  view.pane = null;
+  view.root = null;
+};
+
+const display = (pageId) => {
+  const showPage = pageId !== undefined;
+
+  if (isOpen()) {
+    if (showPage) choose(pageId);
+    view.dialog?.dialog?.('moveToTop');
+  } else {
+    // a wide window always shows a page next to the list
+    view.pageId = pageId ?? currentPage();
+    if (window.currentPane === PANE_ID) {
+      openPane(showPage);
+      return;
+    }
+    // on a smartphone the dialog shows over the map pane
+    if (IITC.utils.isSmartphone() &amp;&amp; window.currentPane !== 'map') window.show('map');
+    openDialog(showPage);
+  }
+};
+
+// the page open() asked for before it switched to the pane
+let paneRequest;
+
+const entry = () => {
+  if (!window.useAppPanes()) return 'button';
+  return IITC.options.get('iitc.optionsPane') ? 'pane' : 'toolbox';
+};
+
+/**
+ * Opens the options window, on a given page or on the page chosen last
+ *
+ * A toolbox button to an options page comes from the page's `shortcut`, which the user can turn off
+ * with the other shortcuts; `IITC.toolbox.addButton` is for a plugin's own dialogs that are not part
+ * of the options, such as lists and other views of map data. In an app with panes the window is a pane
+ * of the app, unless `iitc.optionsPane` is off
+ *
+ * @memberof IITC.options
+ * @param {string} [pageId] - Page to show
+ * @returns {boolean} False when no such page is registered
+ *
+ * @example
+ * // a toolbox button that opens the page
+ * IITC.options.register('my-plugin', { title: 'My plugin', shortcut: true, blocks });
+ * // the page opened from the plugin's own code, such as a link in its dialog
+ * IITC.options.open('my-plugin');
+ */
+const open = (pageId) => {
+  if (pageId !== undefined &amp;&amp; !IITC.options._pages[pageId]) {
+    log.warn(`options: no page "${pageId}" to open`);
+    return false;
+  }
+  if (entry() === 'pane' &amp;&amp; window.currentPane !== PANE_ID) {
+    // the window opens when the pane is shown
+    paneRequest = { pageId };
+    window.show(PANE_ID);
+    return true;
+  }
+  display(pageId);
+  return true;
+};
+
+/**
+ * Draws the page shown in the options window again, after the current task and after the click when
+ * the pointer is down, and updates the toolbox shortcut of the page. Changes of the page's own options and
+ * of the sections extensions add to it redraw it already; a page that also shows other state calls this when
+ * that state changes
+ *
+ * @memberof IITC.options
+ * @param {string} [pageId] - Redraws only if this page is shown; all shortcuts are updated without it
+ */
+const refresh = (pageId) => {
+  (pageId === undefined ? Object.keys(IITC.options._pages) : [pageId]).forEach(updateShortcut);
+  if (!isOpen() || (pageId !== undefined &amp;&amp; pageId !== view.pageId)) return;
+  IITC.options._redrawLater(content());
+};
+
+// a change made on the page redraws it already; this follows changes made elsewhere, such as by sync, of the
+// options the page and the sections extensions add to it declare. Options of other pages are left to
+// refresh, so an open select is not closed by unrelated changes
+const onOptionChanged = ({ key }) => {
+  if (isOpen() &amp;&amp; IITC.options._pages[view.pageId] &amp;&amp; IITC.options._definitions[key]?.pageId === view.pageId) IITC.options._redrawLater(content());
+};
+
+const onPageRegistered = ({ pageId }) => {
+  if (!isOpen()) return;
+  drawNav();
+  if (pageId !== view.pageId) return;
+  part('iitc-options-page-heading').textContent = titleOf(pageId);
+  IITC.options._redrawLater(content());
+};
+
+const shortcutId = (pageId) => `options-shortcut-${pageId}`;
+
+// the shortcut arguments each button was drawn with, so a refresh that changes nothing leaves the toolbox alone
+const drawnShortcuts = new Map();
+
+// the arguments of a page's toolbox button, or undefined when the page has none
+const shortcutOf = (pageId) => {
+  const page = IITC.options._pages[pageId];
+  if (!page?.shortcut || IITC.options.get('iitc.toolboxShortcuts') === false) return undefined;
+  let args = page.shortcut;
+  try {
+    if (typeof args === 'function') args = args();
+  } catch (e) {
+    log.warn(`options: shortcut of page "${pageId}" failed`, e);
+    return undefined;
+  }
+  args = { label: titleOf(pageId), ...(typeof args === 'object' ? args : {}) };
+  if (!page.accesskey) return args;
+  const hint = `[${page.accesskey}]`;
+  return { ...args, accesskey: page.accesskey, title: args.title ? `${args.title} ${hint}` : hint };
+};
+
+// the access keys of pages without a toolbox button, on links that are not seen but still take the key
+const accessKeyLinks = () => {
+  let links = document.getElementById('iitc-options-access-keys');
+  if (!links) {
+    links = el('div', { id: 'iitc-options-access-keys', className: 'iitc-options-access-keys', 'aria-hidden': 'true' });
+    document.body.append(links);
+  }
+  return links;
+};
+
+// keeps the access key of a page working while the page has no toolbox button
+const updateAccessKey = (pageId, hasButton) => {
+  const accesskey = IITC.options._pages[pageId]?.accesskey;
+  const link = document.getElementById(`options-access-key-${pageId}`);
+  if (hasButton || !accesskey) {
+    link?.remove();
+    return;
+  }
+  if (link) {
+    link.accessKey = accesskey;
+    return;
+  }
+  accessKeyLinks().append(el('a', { id: `options-access-key-${pageId}`, accessKey: accesskey, tabIndex: -1, onclick: () => open(pageId) }));
+};
+
+// adds, updates or removes the toolbox button of a page, as its declaration and iitc.toolboxShortcuts say;
+// the access key of the page moves to a hidden link when there is no button
+const updateShortcut = (pageId) => {
+  const args = IITC.toolbox ? shortcutOf(pageId) : undefined;
+  updateAccessKey(pageId, Boolean(args));
+  if (!IITC.toolbox) return;
+  const id = shortcutId(pageId);
+  const exists = Boolean(IITC.toolbox.buttons[id]);
+  if (!args) {
+    if (exists) IITC.toolbox.removeButton(id);
+    drawnShortcuts.delete(id);
+    return;
+  }
+  const drawn = JSON.stringify(args);
+  if (exists &amp;&amp; drawnShortcuts.get(id) === drawn) return;
+  drawnShortcuts.set(id, drawn);
+  // added anew, since updateButton keeps arguments that a shortcut function no longer returns
+  if (exists) IITC.toolbox.removeButton(id);
+  IITC.toolbox.addButton({ ...args, id, action: () => open(pageId) });
+};
+
+const setMapButton = (wanted) => {
+  if (!wanted) {
+    view.mapButton?.remove();
+    view.mapButton = null;
+    return;
+  }
+  if (view.mapButton || !window.map || !globalThis.L?.Control) return;
+  const Button = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: () => {
+      // the pages, shown beside the button under a mouse; filled on the way in, so it has the pages of plugins
+      const menu = el('div', { className: 'iitc-control-menu' });
+      const fillMenu = () => {
+        // drawn anew, the item in focus would lose it
+        if (menu.contains(document.activeElement)) return;
+        menu.replaceChildren(
+          ...pageIds().map((pageId) =>
+            el(
+              'a',
+              {
+                href: '#',
+                role: 'button',
+                title: accessKeyHint(pageId),
+                onclick: (event) => {
+                  event.preventDefault();
+                  open(pageId);
+                },
+              },
+              titleOf(pageId)
+            )
+          )
+        );
+      };
+      const container = el(
+        'div',
+        { className: 'iitc-control-button' },
+        el(
+          'a',
+          {
+            href: '#',
+            role: 'button',
+            title: 'IITC and plugin options',
+            'aria-label': 'Options',
+            onclick: (event) => {
+              event.preventDefault();
+              open();
+            },
+          },
+          el('iitc-icon', { fallback: '⚙' }, 'tune')
+        ),
+        menu
+      );
+      for (const type of ['pointerenter', 'focusin']) container.addEventListener(type, fillMenu);
+      L.DomEvent.disableClickPropagation(container);
+      return container;
+    },
+  });
+  view.mapButton = new Button().addTo(window.map);
+};
+
+/**
+ * Shows the way to the window that `entry` names. An app cannot remove a pane, so it stays until
+ * IITC is reloaded and still opens the window
+ *
+ * @private
+ */
+const updateEntry = () => {
+  const mode = entry();
+  if (IITC.toolbox) {
+    const hasLink = Boolean(IITC.toolbox.buttons[LINK_ID]);
+    if (mode === 'toolbox' &amp;&amp; !hasLink) {
+      IITC.toolbox.addButton({ id: LINK_ID, label: 'Options', title: 'IITC and plugin options', action: () => open() });
+    } else if (mode !== 'toolbox' &amp;&amp; hasLink) {
+      IITC.toolbox.removeButton(LINK_ID);
+    }
+  }
+  setMapButton(mode === 'button');
+  if (mode === 'pane' &amp;&amp; !view.paneAdded) {
+    window.app.addPane(PANE_ID, 'Options', 'tune');
+    view.paneAdded = true;
+  }
+};
+
+Object.assign(IITC.options, { open, refresh, _pageIds: pageIds, _setupWindow: updateEntry, _view: view });
+
+// handlers return nothing: a false would stop the remaining hook handlers
+window.addHook('optionChanged', (event) => {
+  onOptionChanged(event);
+  if (event.key === 'iitc.toolboxShortcuts') Object.keys(IITC.options._pages).forEach(updateShortcut);
+  if (event.key === 'iitc.optionsPane') updateEntry();
+});
+window.addHook('paneChanged', (pane) => {
+  if (pane === PANE_ID) {
+    const request = paneRequest;
+    paneRequest = undefined;
+    // a dialog left open from before the pane was chosen gives way to it
+    if (isOpen() &amp;&amp; !view.pane) view.dialog?.dialog?.('close');
+    display(request?.pageId);
+  } else if (view.pane) {
+    closePane();
+  }
+});
+window.addHook('optionsPageRegistered', (event) => {
+  onPageRegistered(event);
+  updateShortcut(event.pageId);
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="; height: 0">
+    <div class="footer-text">Ingress Intel Total Conversion (Community Edition)</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>
