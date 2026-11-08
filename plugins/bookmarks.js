@@ -208,16 +208,50 @@ window.plugin.bookmarks.switchStatusBkmrksBox = function (status) {
     }
   }
 
-  if (newStatus === 1) {
-    $('#bookmarksBox').css('height', 'auto');
-    $('#bkmrksTrigger').css('height', '0');
-  } else {
-    $('#bkmrksTrigger').css('height', '64px');
-    $('#bookmarksBox').css('height', '0');
-  }
+  $('#bookmarksBox').css('height', newStatus === 1 ? 'auto' : '0');
+  window.plugin.bookmarks.updateBoxButton(newStatus === 1);
 
   window.plugin.bookmarks.statusBox['show'] = newStatus;
   window.plugin.bookmarks.saveStorageBox();
+};
+
+window.plugin.bookmarks.addBoxButton = function () {
+  const BoxButton = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: () => {
+      const container = L.DomUtil.create('div', 'iitc-control-button iitc-bookmarks-button');
+      const button = L.DomUtil.create('a', '', container);
+      button.href = '#';
+      button.title = 'Show the bookmarks [v]';
+      button.setAttribute('role', 'button');
+      button.setAttribute('aria-label', 'Bookmarks');
+      const icon = L.DomUtil.create('iitc-icon', '', button);
+      icon.setAttribute('fallback', '★');
+      icon.textContent = 'bookmark';
+      L.DomEvent.on(button, 'click', (event) => {
+        L.DomEvent.preventDefault(event);
+        window.plugin.bookmarks.switchStatusBkmrksBox(1);
+      });
+      L.DomEvent.disableClickPropagation(container);
+      window.plugin.bookmarks.boxButton = container;
+      window.plugin.bookmarks.updateBoxButton(window.plugin.bookmarks.statusBox.show === 1);
+      return container;
+    },
+  });
+  new BoxButton().addTo(window.map);
+};
+
+// A hidden link ignores its access key, so the minimize button holds it while the box is open
+window.plugin.bookmarks.updateBoxButton = function (boxShown) {
+  const container = window.plugin.bookmarks.boxButton;
+  if (!container) return;
+  container.style.display = boxShown ? 'none' : '';
+  container.querySelector('a').accessKey = boxShown ? '' : 'v';
+  const minimize = document.getElementById('bookmarksMin');
+  if (minimize) {
+    minimize.accessKey = boxShown ? 'v' : '';
+    minimize.title = 'Minimize [v]';
+  }
 };
 
 window.plugin.bookmarks.onPaneChanged = function (pane) {
@@ -1471,8 +1505,6 @@ window.plugin.bookmarks.setupPortalsList = function () {
 };
 
 window.plugin.bookmarks.setupContent = function () {
-  window.plugin.bookmarks.htmlBoxTrigger =
-    '<a id="bkmrksTrigger" class="open" onclick="window.plugin.bookmarks.switchStatusBkmrksBox(\'switch\');return false;" accesskey="v" title="[v]">[-] Bookmarks</a>';
   window.plugin.bookmarks.htmlBkmrksBox =
     '<div id="bookmarksBox">' +
     ' <div id="topBar">' +
@@ -1572,7 +1604,8 @@ var setup = function () {
   window.plugin.bookmarks.setupCSS();
 
   if (!window.plugin.bookmarks.isSmart) {
-    $('body').append(window.plugin.bookmarks.htmlBoxTrigger + window.plugin.bookmarks.htmlBkmrksBox);
+    $('body').append(window.plugin.bookmarks.htmlBkmrksBox);
+    window.plugin.bookmarks.addBoxButton();
     $('#bookmarksBox').draggable({ handle: '.handle', containment: 'window' });
     $(
       '#bookmarksBox #bookmarksMin , #bookmarksBox ul li, #bookmarksBox ul li a, #bookmarksBox ul li a span, #bookmarksBox h5, #bookmarksBox .addForm a'
@@ -1582,7 +1615,7 @@ var setup = function () {
     $('body').append(window.plugin.bookmarks.htmlBkmrksBox);
     $('#bookmarksBox').css('display', 'none').addClass('mobile');
 
-    if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'star');
+    if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'bookmark');
     window.addHook('paneChanged', window.plugin.bookmarks.onPaneChanged);
   }
   IITC.toolbox.addButton({

@@ -175,3 +175,79 @@ describe('bookmarks options page', () => {
     expect(open.calledOnceWith('bookmarks')).to.be.true;
   });
 });
+
+describe('bookmarks map button', () => {
+  let replaced;
+
+  beforeEach(() => {
+    replaced = { L: globalThis.L, map: window.map, statusBox: bookmarks.statusBox };
+    globalThis.L = {
+      ...replaced.L,
+      DomUtil: {
+        create: (tag, className, parent) => {
+          const element = document.createElement(tag);
+          if (className) element.className = className;
+          parent?.append(element);
+          return element;
+        },
+      },
+      DomEvent: {
+        on: (element, type, handler) => element.addEventListener(type, handler),
+        preventDefault: (event) => event.preventDefault(),
+        disableClickPropagation() {},
+      },
+      Control: {
+        extend: (proto) =>
+          class {
+            addTo() {
+              document.body.append(proto.onAdd());
+              return this;
+            }
+          },
+      },
+    };
+    document.body.innerHTML = '<div id="bookmarksBox"><a id="bookmarksMin"></a></div>';
+    bookmarks.statusBox = { show: 1, page: 0, pos: { x: 100, y: 100 } };
+    sinon.stub(bookmarks, 'saveStorageBox');
+  });
+
+  afterEach(() => {
+    globalThis.L = replaced.L;
+    window.map = replaced.map;
+    bookmarks.statusBox = replaced.statusBox;
+    delete bookmarks.boxButton;
+    sinon.restore();
+  });
+
+  it('opens the box and hides while it is open', () => {
+    bookmarks.statusBox.show = 0;
+    bookmarks.addBoxButton();
+    const container = document.querySelector('.iitc-bookmarks-button');
+    const button = container.querySelector('a');
+    const minimize = document.getElementById('bookmarksMin');
+    expect(container.style.display).to.equal('');
+    expect(button.accessKey).to.equal('v');
+
+    button.click();
+    expect(document.getElementById('bookmarksBox').style.height).to.equal('auto');
+    expect(bookmarks.statusBox.show).to.equal(1);
+    expect(container.style.display).to.equal('none');
+    expect(button.accessKey).to.equal('');
+    expect(minimize.accessKey).to.equal('v');
+
+    bookmarks.switchStatusBkmrksBox(0);
+    expect(document.getElementById('bookmarksBox').style.height).to.equal('0px');
+    expect(bookmarks.statusBox.show).to.equal(0);
+    expect(container.style.display).to.equal('');
+    expect(button.accessKey).to.equal('v');
+    expect(minimize.accessKey).to.equal('');
+  });
+
+  it('starts hidden when the box was left open', () => {
+    bookmarks.addBoxButton();
+    const container = document.querySelector('.iitc-bookmarks-button');
+    expect(container.style.display).to.equal('none');
+    expect(container.querySelector('a').accessKey).to.equal('');
+    expect(document.getElementById('bookmarksMin').accessKey).to.equal('v');
+  });
+});
