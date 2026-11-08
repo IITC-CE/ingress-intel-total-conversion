@@ -25,7 +25,7 @@ describe('window.show', () => {
     document.body.innerHTML = [
       '<div id="chatcontrols"><a data-channel="map">map</a><a data-channel="info">info</a><a data-channel="all">all</a></div>',
       '<div id="map"></div>',
-      '<div id="chat"></div><div id="chatinput"></div><div id="sidebartoggle"></div>',
+      '<div id="chat"></div><div id="chatinput"></div>',
       '<div id="scrollwrapper"></div>',
       '<div id="portal_highlight_select"></div><div id="farm_level_select"></div>',
     ].join('');

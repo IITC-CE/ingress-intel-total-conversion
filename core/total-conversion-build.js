@@ -273,7 +273,6 @@ document.body.innerHTML =
   '  <td><mark>tell faction:</mark></td>' +
   '  <td><input id="chattext" type="text" maxlength="256" accesskey="c" title="[c]" /></td>' +
   '</tr></table></form>' +
-  '<a id="sidebartoggle" accesskey="i" title="Toggle sidebar [i]"><span class="toggle close"></span></a>' +
   '<div id="scrollwrapper">' + // enable scrolling for small screens
   '  <div id="sidebar" style="display: none">' +
   '    <div id="playerstat">t</div>' +

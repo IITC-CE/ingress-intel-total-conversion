@@ -1,4 +1,4 @@
-import { describe, it, before, beforeEach, afterEach } from 'mocha';
+import { describe, it, before, after, beforeEach, afterEach } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -9,7 +9,45 @@ await import('../core/code/utils.js');
 await import('../core/code/_deprecated.js');
 await import('../core/code/sidebar.js');
 
+// a Leaflet control stub and the DOM helpers the sidebar toggle uses
+const withLeafletControls = () => {
+  let replaced;
+  before(() => {
+    replaced = globalThis.L;
+    globalThis.L = {
+      ...replaced,
+      DomUtil: {
+        create: (tag, className, parent) => {
+          const element = document.createElement(tag);
+          if (className) element.className = className;
+          parent?.append(element);
+          return element;
+        },
+      },
+      DomEvent: {
+        on: (element, type, handler) => element.addEventListener(type, handler),
+        preventDefault: (event) => event.preventDefault(),
+        disableClickPropagation() {},
+      },
+      Control: {
+        extend: (proto) =>
+          class {
+            addTo() {
+              document.body.append(proto.onAdd());
+              return this;
+            }
+          },
+      },
+    };
+  });
+  after(() => {
+    globalThis.L = replaced;
+  });
+};
+
 describe('portal image click', () => {
+  withLeafletControls();
+
   before(() => {
     // collaborators setupSidebar pulls in on its way to the image handler
     window.addHook = window.addHook || (() => {});
@@ -94,5 +132,55 @@ describe('portal image click', () => {
 
     expect(() => $('.imgpreview').trigger('click')).to.not.throw();
     expect(scrollTo.called).to.be.false;
+  });
+});
+
+describe('sidebar toggle', () => {
+  withLeafletControls();
+
+  beforeEach(() => {
+    document.body.className = '';
+    document.body.innerHTML = '<div id="scrollwrapper"><div id="sidebar"><div id="portaldetails"></div></div></div>';
+  });
+
+  afterEach(() => sinon.restore());
+
+  const icon = () => document.querySelector('#sidebartoggle iitc-icon');
+
+  it('hides and shows the sidebar', () => {
+    const resetScroll = sinon.spy(IITC.portal.display, 'resetScroll');
+    window.setupSidebar();
+    const sidebar = document.getElementById('scrollwrapper');
+    // jsdom lays nothing out, so the sidebar counts as visible by its client rects
+    sinon.stub(sidebar, 'getClientRects').callsFake(() => (sidebar.style.display === 'none' ? [] : [{}]));
+    expect(document.body.classList.contains('sidebar-open')).to.be.true;
+    expect(icon().textContent).to.equal('chevron_right');
+
+    document.getElementById('sidebartoggle').click();
+    expect(sidebar.style.display).to.equal('none');
+    expect(document.body.classList.contains('sidebar-open')).to.be.false;
+    expect(icon().textContent).to.equal('chevron_left');
+    expect(icon().getAttribute('fallback')).to.equal('◀');
+
+    document.getElementById('sidebartoggle').click();
+    expect(sidebar.style.display).to.equal('');
+    expect(document.body.classList.contains('sidebar-open')).to.be.true;
+    expect(icon().textContent).to.equal('chevron_right');
+    expect(resetScroll.calledOnce).to.be.true;
+  });
+
+  it('answers the jQuery click of a plugin', () => {
+    window.setupSidebar();
+    sinon.stub(document.getElementById('scrollwrapper'), 'getClientRects').returns([{}]);
+
+    $('#sidebartoggle').click();
+    expect(document.body.classList.contains('sidebar-open')).to.be.false;
+  });
+
+  it('adds no toggle on a smartphone', () => {
+    sinon.stub(IITC.utils, 'isSmartphone').returns(true);
+    window.setupSidebar();
+    expect(document.getElementById('sidebartoggle')).to.be.null;
+    expect(document.body.classList.contains('sidebar-open')).to.be.true;
   });
 });

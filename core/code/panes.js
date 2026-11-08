@@ -76,7 +76,7 @@ window.show = function (id) {
  * @function hideall
  */
 window.hideall = function () {
-  $('#chatcontrols, #chat, #chatinput, #sidebartoggle, #scrollwrapper, #portal_highlight_select').hide();
+  $('#chatcontrols, #chat, #chatinput, #scrollwrapper, #portal_highlight_select').hide();
   IITC.statusbar.hide();
   $('#farm_level_select').hide();
   $('#map').css({ visibility: 'hidden', opacity: '0' });

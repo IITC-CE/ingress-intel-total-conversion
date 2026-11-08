@@ -15,14 +15,6 @@ body.icons-unavailable {
     content: '×';
   }
 
-  #sidebartoggle .open::before {
-    content: '◀';
-  }
-
-  #sidebartoggle .close::before {
-    content: '▶';
-  }
-
   .leaflet-control-layers-toggle::before {
     content: '';
   }

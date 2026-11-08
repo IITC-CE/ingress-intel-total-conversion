@@ -26,42 +26,59 @@
   pointer-events: auto;
 }
 
-#sidebartoggle {
-  display: block;
-  padding: 20px 0px;
-  margin-top: -31px; /* -(toggle height / 2) */
-  width: 20px;
-  line-height: 10px;
-  position: absolute;
-  top: calc(var(--safe-area-inset-top) + 103px);
-  z-index: 3002;
-  background-color: var(--color-bg-trans);
-  color: var(--color-primary);
-  border: 1px solid var(--color-bg-border);
-  border-right: none;
-  border-radius: 5px 0 0 5px;
-  text-decoration: none;
-  right: var(--safe-area-inset-right);
-
-  .toggle {
-    font-size: 20px;
-  }
-
-  .open::before {
-    content: 'chevron_left';
-  }
-
-  .close::before {
-    content: 'chevron_right';
-  }
-}
-
 body.sidebar-open .leaflet-right {
   margin-right: calc(var(--sidebar-width) + 1px + var(--safe-area-inset-right));
 }
 
-body.sidebar-open #sidebartoggle {
-  right: calc(var(--sidebar-width) + 1px + var(--safe-area-inset-right));
+/* a tab in line with the other controls, reaching over the gap to the sidebar or the screen edge */
+.leaflet-right .leaflet-control.iitc-sidebar-toggle {
+  --toggle-reach: 10px;
+  order: -100;
+  display: flex;
+  box-sizing: border-box;
+  width: calc(36px + var(--toggle-reach)); /* a control of 36px */
+  height: 28px;
+  margin-right: calc(-1 * var(--toggle-reach));
+  background-color: var(--color-bg-trans);
+  border: 1px solid var(--color-bg-border);
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+body:not(.sidebar-open) .leaflet-right .leaflet-control.iitc-sidebar-toggle {
+  --toggle-reach: calc(10px + var(--safe-area-inset-right));
+}
+
+.leaflet-touch .leaflet-right .leaflet-control.iitc-sidebar-toggle {
+  width: calc(48px + var(--toggle-reach)); /* a control of 44px and its 2px borders */
+  height: 38px;
+}
+
+.iitc-sidebar-toggle button {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  /* centres the icon on the line of the other icons */
+  padding: 0 var(--toggle-reach) 0 0;
+  border: none;
+  border-radius: inherit;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(var(--color-bg-border) 25%, transparent);
+  }
+}
+
+.iitc-sidebar-toggle iitc-icon {
+  font-size: 24px;
+}
+
+.leaflet-touch .iitc-sidebar-toggle iitc-icon {
+  font-size: 28px;
 }
 
 #sidebar > * {
