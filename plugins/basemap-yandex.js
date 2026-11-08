@@ -5,7 +5,7 @@
 // @description    Add Yandex.com (Russian/Русский) map layers
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   {
@@ -44,16 +44,29 @@ mapYandex.types = {
   },
 };
 
-mapYandex.options = {
-  // set this to your API key
-  apiParams: '<your API-key>',
-};
-
 function setup() {
+  IITC.options.extend('api-keys', 'basemap-yandex', {
+    title: 'Yandex Maps',
+    namespace: 'api-keys',
+    blocks: [
+      {
+        type: 'string',
+        key: 'yandex',
+        title: 'API key',
+        description:
+          'For the Yandex layers, a key of the JavaScript API. The layers load without it, though the terms of Yandex ask for one. A new key applies after IITC reloads',
+      },
+      { type: 'link', title: 'Get a key', url: 'https://developer.tech.yandex.ru/services' },
+    ],
+  });
   setupYandexLeaflet();
 
+  // the API script loads once, with the parameters of the first layer: the key of the user when there is one,
+  // as the API loads without a key too
+  const apikey = IITC.options.get('api-keys.yandex').trim();
+  const apiParams = apikey ? { apikey } : {};
   for (var name in mapYandex.types) {
-    var options = L.extend({}, mapYandex.options, mapYandex.types[name]);
+    var options = L.extend({ apiParams }, mapYandex.types[name]);
     window.layerChooser.addBaseLayer(L.yandex(options), 'Yandex ' + name, { isDark: options.isDark });
   }
 }
