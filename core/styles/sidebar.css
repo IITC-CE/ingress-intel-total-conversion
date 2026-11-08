@@ -33,7 +33,6 @@ body.sidebar-open .leaflet-right {
 /* a tab in line with the other controls, reaching over the gap to the sidebar or the screen edge */
 .leaflet-right .leaflet-control.iitc-sidebar-toggle {
   --toggle-reach: 10px;
-  order: -100;
   display: flex;
   box-sizing: border-box;
   width: calc(36px + var(--toggle-reach)); /* a control of 36px */

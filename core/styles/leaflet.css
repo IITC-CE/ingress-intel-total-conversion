@@ -86,6 +86,23 @@
   order: -90;
 }
 
+/* a fixed order of the top right controls, whatever the load order; other plugins follow */
+.leaflet-right .iitc-sidebar-toggle {
+  order: -10;
+}
+
+.leaflet-right .leaflet-control-layers {
+  order: -9;
+}
+
+.leaflet-right .iitc-options-button {
+  order: -8;
+}
+
+.leaflet-right .iitc-bookmarks-button {
+  order: -7;
+}
+
 .leaflet-bar {
   border: 2px solid rgba(0, 0, 0, 0.2);
   box-shadow: none;
