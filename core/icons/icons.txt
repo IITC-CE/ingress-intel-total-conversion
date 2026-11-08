@@ -54,6 +54,7 @@ add_circle
 remove
 edit
 delete
+delete_sweep
 undo
 redo
 content_copy
@@ -107,6 +108,7 @@ share
 refresh
 sync
 settings
+tune
 fullscreen
 fullscreen_exit
 login

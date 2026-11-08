@@ -68,7 +68,9 @@
 }
 
 .leaflet-right {
-  right: 10px;
+  /* room for #sidebartoggle, which covers the controls at 10px. TODO: move the toggle, go back to 10px
+     and drop the override in smartphone.css */
+  right: 30px;
   margin-right: var(--safe-area-inset-right);
 }
 
@@ -152,15 +154,88 @@ body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
   background-image: none;
 }
 
-.leaflet-control-layers-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .leaflet-control-layers-toggle::before {
   font-family: 'IITC Material Symbols';
   content: 'layers';
+}
+
+/* `iitc-control-button`: a control holding one icon link, drawn as the Layers toggle, and maybe an
+   `iitc-control-menu` after it */
+.leaflet-control-layers-toggle,
+.iitc-control-button > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* keeps the hover shade inside the rounded corners */
+  border-radius: inherit;
+}
+
+.leaflet-control-layers-toggle:hover,
+.iitc-control-button a:hover {
+  background-color: #f4f4f4;
+  text-decoration: none;
+}
+
+/* on the icon: `.leaflet-container a` outranks a color on the link */
+.leaflet-control-layers-toggle::before,
+.iitc-control-button iitc-icon {
   font-size: 28px;
   color: #454545;
+}
+
+.iitc-control-button {
+  display: flex;
+  /* the menu opens to the left, away from the edge of the map */
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.leaflet-touch .iitc-control-button {
+  box-shadow: none;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  background-clip: padding-box;
+}
+
+.iitc-control-button > a {
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+
+.leaflet-touch .iitc-control-button > a {
+  width: 44px;
+  height: 44px;
+}
+
+/* a column of links that scrolls when long, shown while a mouse is over the button */
+.iitc-control-menu {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px 0 4px 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .iitc-control-button:hover > .iitc-control-menu {
+    display: flex;
+  }
+}
+
+/* for the keyboard, apart: a browser without :has() drops the whole rule */
+.iitc-control-button:has(:focus-visible) > .iitc-control-menu {
+  display: flex;
+}
+
+/* outranks the link color of `.leaflet-container a` */
+.iitc-control-button .iitc-control-menu a {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #333;
+  font-size: 13px;
+  white-space: nowrap;
 }
