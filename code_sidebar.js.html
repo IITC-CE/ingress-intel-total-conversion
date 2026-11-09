@@ -48,7 +48,7 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* global IITC -- eslint */
+            <pre class="prettyprint source linenums"><code>/* global IITC, L -- eslint */
 
 /**
  * @file This file provides functions for working with the sidebar.
@@ -125,27 +125,45 @@ window.setupPlayerStat = function () {
 };
 
 /**
- * Initializes the sidebar toggle functionality.
- *
- * @function setupSidebarToggle
+ * Adds the sidebar toggle to the map controls; a smartphone shows the sidebar as a pane instead
  */
 function setupSidebarToggle() {
-  $('body').addClass('sidebar-open');
-  $('#sidebartoggle').on('click', function () {
-    var toggle = $('#sidebartoggle');
-    var sidebar = $('#scrollwrapper');
-    if (sidebar.is(':visible')) {
-      sidebar.hide();
-      $('body').removeClass('sidebar-open');
-      toggle.html('&lt;span class="toggle open">&lt;/span>');
-    } else {
-      sidebar.show();
-      IITC.portal.display.resetScroll();
-      $('body').addClass('sidebar-open');
-      toggle.html('&lt;span class="toggle close">&lt;/span>');
-    }
-    $('.ui-tooltip').remove();
+  document.body.classList.add('sidebar-open');
+  if (IITC.utils.isSmartphone()) return;
+
+  const SidebarToggle = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: () => {
+      const container = L.DomUtil.create('div', 'iitc-sidebar-toggle');
+      // a button: plugins call jQuery click() on it, which skips the listener of a link
+      const button = L.DomUtil.create('button', '', container);
+      button.id = 'sidebartoggle';
+      button.type = 'button';
+      button.accessKey = 'i';
+      button.title = 'Toggle sidebar [i]';
+      button.setAttribute('aria-label', 'Toggle sidebar');
+      const icon = L.DomUtil.create('iitc-icon', '', button);
+      const showState = (open) => {
+        icon.textContent = open ? 'chevron_right' : 'chevron_left';
+        icon.setAttribute('fallback', open ? '▶' : '◀');
+        button.setAttribute('aria-expanded', String(open));
+      };
+      showState(true);
+
+      L.DomEvent.on(button, 'click', () => {
+        const sidebar = document.getElementById('scrollwrapper');
+        const open = !IITC.utils._isVisible(sidebar);
+        sidebar.style.display = open ? '' : 'none';
+        if (open) IITC.portal.display.resetScroll();
+        document.body.classList.toggle('sidebar-open', open);
+        showState(open);
+        document.querySelectorAll('.ui-tooltip').forEach((tooltip) => tooltip.remove());
+      });
+      L.DomEvent.disableClickPropagation(container);
+      return container;
+    },
   });
+  new SidebarToggle().addTo(window.map);
 }
 
 /**
