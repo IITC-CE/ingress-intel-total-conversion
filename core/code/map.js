@@ -116,6 +116,45 @@ function getPosition() {
   }
 }
 
+// key of the CARTO basemaps that IITC comes with; a key of the user's own on the API keys page replaces it
+const CARTO_API_KEY = 'cb1_2d98_1_8c4c1ddaeb0a769373718043';
+
+/**
+ * Creates the CARTO layers and declares their key on the API keys page; a change of the key reloads their tiles
+ *
+ * @memberof IITC.map
+ * @inner
+ * @private
+ * @returns {Object.<String, L.TileLayer>} The layers by name
+ */
+function createCartoLayers() {
+  const layers = {};
+  const url = () => {
+    const key = IITC.options.get('api-keys.carto').trim() || CARTO_API_KEY;
+    return `https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png?key=${encodeURIComponent(key)}`;
+  };
+
+  IITC.options.extend('api-keys', 'carto', {
+    title: 'CARTO',
+    namespace: 'api-keys',
+    blocks: [
+      {
+        type: 'string',
+        key: 'carto',
+        title: 'API key',
+        description: 'For the CartoDB layers. Empty uses the key IITC comes with',
+        onChange: () => Object.values(layers).forEach((layer) => layer.setUrl(url())),
+      },
+      { type: 'link', title: 'Get a key', url: 'https://carto.com/basemaps/apikey/' },
+    ],
+  });
+
+  const attribution = IITC.map.osmAttributionTemplate;
+  layers[DEFAULT_MAP /* 'CartoDB Dark Matter' */] = L.tileLayer(url(), { attribution, theme: 'dark_all', isDark: true });
+  layers['CartoDB Positron'] = L.tileLayer(url(), { attribution, theme: 'light_all', isDark: false });
+  return layers;
+}
+
 /**
  * Initializes and returns a collection of default basemap layers. The function creates a set of base layers
  * including CartoDB (both dark and light themes), and various Google Maps layers (Default Ingress Map, Roads,
@@ -141,11 +180,7 @@ function createDefaultBaseMapLayers() {
 
   // cartodb has some nice tiles too - both dark and light subtle maps - http://cartodb.com/basemaps/
   // (not available over https though - not on the right domain name anyway)
-  const cartoAttr = IITC.map.osmAttributionTemplate;
-  const cartoAPIKey = 'cb1_2d98_1_8c4c1ddaeb0a769373718043';
-  const cartoUrl = `https://{s}.basemaps.cartocdn.com/{theme}/{z}/{x}/{y}.png?key=${cartoAPIKey}`;
-  baseLayers[DEFAULT_MAP /* 'CartoDB Dark Matter' */] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'dark_all', isDark: true });
-  baseLayers['CartoDB Positron'] = L.tileLayer(cartoUrl, { attribution: cartoAttr, theme: 'light_all', isDark: false });
+  Object.assign(baseLayers, createCartoLayers());
 
   // Google Maps - including ingress default (using the stock-intel API-key)
   baseLayers['Google Default Ingress Map'] = new L.GridLayer.GoogleMutant({

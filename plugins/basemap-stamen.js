@@ -5,7 +5,7 @@
 // @description    Add the Stamen map layers, hosted by Stadia Maps.
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 const changelog = [
   {
@@ -38,6 +38,7 @@ const mapStamen = {};
 
 // Stadia Maps hosts the Stamen styles and serves them to registered accounts only
 // https://docs.stadiamaps.com/authentication
+// this is the key IITC comes with; a key of the user's own on the API keys page replaces it
 mapStamen.apiKey = '51a526b0-a035-4b6b-9c35-778bdff3095d';
 
 // `{r}` is filled with `@2x` on retina displays, where Stadia renders the tile at double resolution
@@ -86,11 +87,33 @@ mapStamen.sets = {
 };
 
 function setup() {
-  const url = mapStamen.apiKey ? `${mapStamen.tileServer}?api_key=${mapStamen.apiKey}` : mapStamen.tileServer;
+  const layers = [];
+  // address of the tiles, with the key of the user or else the one IITC comes with
+  const url = () => {
+    const key = IITC.options.get('api-keys.stadia').trim() || mapStamen.apiKey;
+    return key ? `${mapStamen.tileServer}?api_key=${encodeURIComponent(key)}` : mapStamen.tileServer;
+  };
+
+  IITC.options.extend('api-keys', 'basemap-stamen', {
+    title: 'Stadia Maps',
+    namespace: 'api-keys',
+    blocks: [
+      {
+        type: 'string',
+        key: 'stadia',
+        title: 'API key',
+        description: 'For the Stamen layers. Empty uses the key IITC comes with',
+        onChange: () => layers.forEach((layer) => layer.setUrl(url())),
+      },
+      { type: 'link', title: 'Get a key', url: 'https://client.stadiamaps.com/signup/' },
+    ],
+  });
 
   for (const [name, set] of Object.entries(mapStamen.sets)) {
     const layer = `stamen_${name.replace(/ /g, '_').toLowerCase()}`;
     const options = { ...mapStamen.options, ...set, layer };
-    window.layerChooser.addBaseLayer(L.tileLayer(url, options), `Stamen ${name}`, { isDark: options.isDark });
+    const tileLayer = L.tileLayer(url(), options);
+    layers.push(tileLayer);
+    window.layerChooser.addBaseLayer(tileLayer, `Stamen ${name}`, { isDark: options.isDark });
   }
 }

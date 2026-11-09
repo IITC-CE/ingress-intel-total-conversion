@@ -4,7 +4,6 @@
  * @file Draws an options page from its blocks. The page is drawn again as a whole after every change made
  *       on it, so a block whose title, visibility or value depends on other options follows them without
  *       any binding. Focus, the text cursor and text typed but not applied yet survive the redraw
- * @module options_render
  */
 
 // the lists of About and the changelogs nest no deeper
@@ -31,6 +30,8 @@ const choiceGroups = new WeakMap();
 /**
  * What a container remembers between drawings
  *
+ * @memberof IITC.options
+ * @inner
  * @private
  * @typedef {Object} ContainerState
  * @property {string} pageId - Page drawn last
@@ -114,6 +115,8 @@ const handlerOf = (block) => {
 /**
  * One drawing of a page into a container, or of a section an extension adds to the page
  *
+ * @memberof IITC.options
+ * @inner
  * @private
  */
 class PageView {
@@ -594,6 +597,7 @@ const markMatches = (root, query) => {
  * Draws an options page into a container, replacing what the container holds. Changes made on the page
  * draw it again; a change made elsewhere needs another call
  *
+ * @alias IITC.options._renderPage
  * @private
  * @param {string} pageId - Id of a registered page
  * @param {HTMLElement} container - Element to draw into

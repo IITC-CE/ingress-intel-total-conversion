@@ -6,7 +6,6 @@
  *       The window is a dialog over the map, so a change shows on the map at once, or fills the pane
  *       of an app. The page shown follows changes of its own options made elsewhere, such as values arriving
  *       through sync
- * @module options_window
  */
 
 // pages of IITC itself come first, the rest follow by title
@@ -40,6 +39,7 @@ const el = (...args) => IITC.options._el(...args);
 /**
  * Ids of the registered pages in the order the window lists them
  *
+ * @alias IITC.options._pageIds
  * @private
  * @returns {string[]}
  */
@@ -74,6 +74,8 @@ const blockTexts = (blocks, inRepeat = false) =>
 /**
  * Finds the texts of a page that contain the query, ignoring case
  *
+ * @memberof IITC.options
+ * @inner
  * @private
  * @returns {string[]|null} Texts of the page's blocks that match, empty when only the page title does;
  *                          null when nothing on the page matches
@@ -476,6 +478,7 @@ const setMapButton = (wanted) => {
  * Shows the way to the window that `entry` names. An app cannot remove a pane, so it stays until
  * IITC is reloaded and still opens the window
  *
+ * @alias IITC.options._setupWindow
  * @private
  */
 const updateEntry = () => {
