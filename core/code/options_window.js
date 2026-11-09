@@ -447,7 +447,7 @@ const setMapButton = (wanted) => {
       };
       const container = el(
         'div',
-        { className: 'iitc-control-button' },
+        { className: 'iitc-control-button iitc-options-button' },
         el(
           'a',
           {
