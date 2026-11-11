@@ -141,10 +141,20 @@ h2 {
   box-sizing: border-box;
 
   &.res {
-    background: color-mix(var(--color-res) 60%, black);
+    background: color-mix(in oklab, var(--color-res) 60%, black);
   }
   &.enl {
-    background: color-mix(var(--color-enl) 60%, black);
+    background: color-mix(in oklab, var(--color-enl) 60%, black);
+  }
+
+  /* Android System WebView before 111 has no color-mix() */
+  @supports not (color: color-mix(in srgb, red, red)) {
+    &.res {
+      background: #006180;
+    }
+    &.enl {
+      background: #018001;
+    }
   }
 }
 

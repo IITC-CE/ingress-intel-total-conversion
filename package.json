@@ -31,6 +31,11 @@
     "docs": "jsdoc -c jsdoc-conf.json -R README.md -d ./docs",
     "test": "mocha -r test/_mocks.js --exit"
   },
+  "browserslist": [
+    "defaults",
+    "chrome >= 85",
+    "android >= 85"
+  ],
   "allowScripts": {
     "lightningcss-cli@1.33.0": true
   }
