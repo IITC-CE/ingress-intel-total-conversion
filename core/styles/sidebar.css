@@ -68,7 +68,12 @@ body:not(.sidebar-open) .leaflet-right .leaflet-control.iitc-sidebar-toggle {
   cursor: pointer;
 
   &:hover {
-    background-color: color-mix(var(--color-bg-border) 25%, transparent);
+    background-color: color-mix(in srgb, var(--color-bg-border) 25%, transparent);
+
+    /* Android System WebView before 111 has no color-mix() */
+    @supports not (color: color-mix(in srgb, red, red)) {
+      background-color: rgb(32 168 177 / 0.25);
+    }
   }
 }
 
@@ -157,10 +162,20 @@ h2 {
   box-sizing: border-box;
 
   &.res {
-    background: color-mix(var(--color-res) 60%, black);
+    background: color-mix(in oklab, var(--color-res) 60%, black);
   }
   &.enl {
-    background: color-mix(var(--color-enl) 60%, black);
+    background: color-mix(in oklab, var(--color-enl) 60%, black);
+  }
+
+  /* Android System WebView before 111 has no color-mix() */
+  @supports not (color: color-mix(in srgb, red, red)) {
+    &.res {
+      background: #006180;
+    }
+    &.enl {
+      background: #018001;
+    }
   }
 }
 

@@ -49,7 +49,7 @@
     }
   }
   .loading {
-    background-color: color-mix(RED 33%, transparent);
+    background-color: color-mix(in srgb, RED 33%, transparent);
     animation: chatloading 1.2s infinite linear;
   }
 }
@@ -60,13 +60,13 @@
 
 @keyframes chatloading {
   0% {
-    background-color: color-mix(RED 40%, transparent);
+    background-color: color-mix(in srgb, RED 40%, transparent);
   }
   50% {
-    background-color: color-mix(RED 10%, transparent);
+    background-color: color-mix(in srgb, RED 10%, transparent);
   }
   100% {
-    background-color: color-mix(RED 40%, transparent);
+    background-color: color-mix(in srgb, RED 40%, transparent);
   }
 }
 
