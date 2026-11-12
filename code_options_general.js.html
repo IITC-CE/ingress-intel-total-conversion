@@ -93,6 +93,14 @@ IITC.options.register('iitc', {
     },
     {
       type: 'boolean',
+      key: 'machinaAtLevel1',
+      title: 'Machina portals at the size of level 1',
+      description: 'Clusters of high-level Machina portals stay apart and easy to click',
+      default: false,
+      onChange: () => IITC.portal.highlighter.resetAll(),
+    },
+    {
+      type: 'boolean',
       key: 'syncOptions',
       title: 'Sync IITC options',
       default: true,
