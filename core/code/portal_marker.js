@@ -51,6 +51,9 @@ function do_prefetch(e) {
   }
 }
 
+// the level whose size a marker takes: Machina portals may take the size of level 1, so their clusters do not overlap
+const sizeLevel = (team, level) => (team === window.TEAM_MAC && level > 0 && IITC.options.get('iitc.machinaAtLevel1') ? 1 : level);
+
 L.PortalMarker = L.CircleMarker.extend({
   options: {},
 
@@ -276,7 +279,7 @@ L.PortalMarker = L.CircleMarker.extend({
   _scale: function () {
     const scale = IITC.portal.marker.scale();
 
-    const level = Math.floor(this._level || 0);
+    const level = sizeLevel(this._team, Math.floor(this._level || 0));
 
     let lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
     const lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
@@ -362,9 +365,10 @@ const getStyleOptions = function (details) {
   const scale = IITC.portal.marker.scale();
 
   const level = Math.floor(details.level || 0);
+  const size = sizeLevel(details.team, level);
 
-  let lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[level] * Math.sqrt(scale);
-  const lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[level] * scale;
+  let lvlWeight = L.PortalMarker.LEVEL_TO_WEIGHT[size] * Math.sqrt(scale);
+  const lvlRadius = L.PortalMarker.LEVEL_TO_RADIUS[size] * scale;
 
   let dashArray = null;
   // thinner and dashed outline for placeholder portals

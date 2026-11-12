@@ -1,4 +1,4 @@
-import { describe, it, before } from 'mocha';
+import { describe, it, before, afterEach } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -8,6 +8,9 @@ import sinon from 'sinon';
 before(async () => {
   await import('../core/code/portal.js');
   await import('../core/code/portal_marker.js');
+  await import('../core/code/portal_highlighter.js');
+  await import('../core/code/options.js');
+  await import('../core/code/options_general.js');
 });
 
 describe('IITC.portal.marker namespace', () => {
@@ -68,6 +71,11 @@ describe('IITC.portal.marker.getStyleOptions', () => {
     window.map.getZoom = () => 14; // scale = 1
   });
 
+  afterEach(() => {
+    IITC.options.reset('iitc.machinaAtLevel1');
+    sinon.restore();
+  });
+
   it('computes radius/weight/color for a full portal', () => {
     const options = IITC.portal.marker.getStyleOptions({ team: window.TEAM_ENL, level: 8 });
     expect(options.radius).to.equal(11); // LEVEL_TO_RADIUS[8]
@@ -80,6 +88,18 @@ describe('IITC.portal.marker.getStyleOptions', () => {
     const options = IITC.portal.marker.getStyleOptions({ team: window.TEAM_ENL, level: 0 });
     expect(options.weight).to.equal(1); // placeholderStyle.weight
     expect(options.dashArray).to.equal('1,2'); // placeholderStyle.dashArray
+  });
+
+  it('draws Machina portals at the size of level 1 while the option is on, and restyles the portals on change', () => {
+    const resetAll = sinon.stub(IITC.portal.highlighter, 'resetAll');
+    const machina = { team: window.TEAM_MAC, level: 8 };
+    expect(IITC.portal.marker.getStyleOptions(machina)).to.include({ radius: 11, weight: 4 });
+
+    IITC.options.set('iitc.machinaAtLevel1', true);
+    expect(resetAll.calledOnce).to.be.true;
+    expect(IITC.portal.marker.getStyleOptions(machina)).to.include({ radius: 7, weight: 2 }); // level 1
+    expect(IITC.portal.marker.getStyleOptions({ team: window.TEAM_ENL, level: 8 })).to.include({ radius: 11, weight: 4 });
+    expect(IITC.portal.marker.getStyleOptions({ team: window.TEAM_MAC, level: 0 })).to.include({ weight: 1, dashArray: '1,2' });
   });
 });
 
