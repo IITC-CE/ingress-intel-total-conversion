@@ -139,7 +139,9 @@ var log = ulog('{.stem}');
 
 def bundle_code(_, path=None):
     files = (path / 'code').glob('*.js')
-    return '\n'.join(map(wrap_iife, sorted(files)))
+    # polyfills go first: other files may call what they provide while loading
+    files = sorted(files, key=lambda file: (file.name != 'utils_polyfills.js', file))
+    return '\n'.join(map(wrap_iife, files))
 
 
 def imgrepl(match, path=None):

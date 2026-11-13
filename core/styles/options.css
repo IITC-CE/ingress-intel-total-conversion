@@ -437,6 +437,12 @@ input[type="search"].iitc-options-search {
 .iitc-options-match {
   background: color-mix(in srgb, var(--color-primary) 22%, transparent);
   outline: 3px solid color-mix(in srgb, var(--color-primary) 22%, transparent);
+
+  /* Android System WebView before 111 has no color-mix() */
+  @supports not (color: color-mix(in srgb, red, red)) {
+    background: rgb(255 206 0 / 0.22);
+    outline: 3px solid rgb(255 206 0 / 0.22);
+  }
 }
 
 .iitc-options-pane {

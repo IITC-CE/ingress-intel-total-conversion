@@ -117,3 +117,74 @@ if (!String.prototype.padStart) {
     return pad + String(this).slice(0);
   };
 }
+
+// Android System WebView before 93
+if (!Object.hasOwn) {
+  Object.defineProperty(Object, 'hasOwn', {
+    value: (object, key) => Object.prototype.hasOwnProperty.call(object, key),
+    configurable: true,
+    writable: true,
+  });
+}
+
+// Android System WebView before 85
+if (!String.prototype.replaceAll) {
+  Object.defineProperty(String.prototype, 'replaceAll', {
+    value: function (search, replacement) {
+      if (search instanceof RegExp) {
+        if (!search.global) throw new TypeError('replaceAll must be called with a global RegExp');
+        return this.replace(search, replacement);
+      }
+      const escaped = String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return this.replace(new RegExp(escaped, 'g'), replacement);
+    },
+    configurable: true,
+    writable: true,
+  });
+}
+
+// Android System WebView before 86
+[Element, Document, DocumentFragment].forEach((type) => {
+  if (type.prototype.replaceChildren) return;
+  Object.defineProperty(type.prototype, 'replaceChildren', {
+    value: function (...nodes) {
+      while (this.lastChild) this.removeChild(this.lastChild);
+      this.append(...nodes);
+    },
+    configurable: true,
+    writable: true,
+  });
+});
+
+// Android System WebView before 98
+// Copies plain data: primitives, plain objects, arrays, Date, RegExp, Map and Set, keeping shared and
+// circular references; any other object comes back as a plain object of its own enumerable properties
+if (typeof window.structuredClone !== 'function') {
+  window.structuredClone = (value) => {
+    const copies = new Map();
+    const clone = (item) => {
+      if (typeof item === 'function' || typeof item === 'symbol') {
+        throw new DOMException(`${String(item)} could not be cloned.`, 'DataCloneError');
+      }
+      if (item === null || typeof item !== 'object') return item;
+      if (copies.has(item)) return copies.get(item);
+
+      let copy;
+      if (item instanceof Date) copy = new Date(item.getTime());
+      else if (item instanceof RegExp) copy = new RegExp(item.source, item.flags);
+      else if (item instanceof Map) copy = new Map();
+      else if (item instanceof Set) copy = new Set();
+      else if (Array.isArray(item)) copy = new Array(item.length);
+      else copy = {};
+      copies.set(item, copy);
+
+      if (item instanceof Map) item.forEach((entry, key) => copy.set(clone(key), clone(entry)));
+      else if (item instanceof Set) item.forEach((entry) => copy.add(clone(entry)));
+      else if (!(item instanceof Date || item instanceof RegExp)) {
+        Object.keys(item).forEach((key) => (copy[key] = clone(item[key])));
+      }
+      return copy;
+    };
+    return clone(value);
+  };
+}

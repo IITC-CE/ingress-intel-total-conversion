@@ -28,9 +28,17 @@
   --color-primary: #ffce00; /* rgb(255 206 0) */
   --color-secondary: #eee; /* rgb(238 238 238) */
   --color-bg: rgb(8 48 78);
-  --color-bg-trans: color-mix(var(--color-bg) 90%, transparent);
-  --color-bg-trans-50: color-mix(var(--color-bg) 50%, transparent);
+  --color-bg-trans: color-mix(in srgb, var(--color-bg) 90%, transparent);
+  --color-bg-trans-50: color-mix(in srgb, var(--color-bg) 50%, transparent);
   --color-bg-border: #20a8b1; /* rgb(32 168 177) */
+}
+
+/* Android System WebView before 111 has no color-mix(); its fallbacks hold the mix of the default colors */
+@supports not (color: color-mix(in srgb, red, red)) {
+  :root {
+    --color-bg-trans: rgb(8 48 78 / 0.9);
+    --color-bg-trans-50: rgb(8 48 78 / 0.5);
+  }
 }
 
 .text-overflow-ellipsis {
