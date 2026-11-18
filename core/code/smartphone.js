@@ -49,6 +49,8 @@ const _runBeforeBoot = function () {
   if (!IITC.utils.isSmartphone()) return;
   log.debug('running smartphone pre boot stuff');
 
+  document.body.classList.add('smartphone');
+
   // add smartphone stylesheet
   const style = document.createElement('style');
   style.textContent = '@include_css:smartphone.css@';
