@@ -475,9 +475,6 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 	line-height:24px;
 	overflow:hidden;
 }
-#bookmarksBox.mobile .bookmarkList ul li.bookmarkFolder ul{
-	margin-left:0 !important;
-}
 #bookmarksBox.mobile .bookmarkList > ul{
 	border-bottom:1px solid #20a8b1 !important;
 }
@@ -677,9 +674,6 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 #bookmarksBox.mobile .btn{
 	width:50% !important;
 	background:#222;
-}
-#bookmarksBox.mobile .btn.left{
-	border-right:1px solid #20a8b1 !important;
 }
 #bookmarksBox.mobile .btn#bookmarksMove{
 	background:#B42E2E;

@@ -59,9 +59,6 @@ body {
   color: #fff;
 }
 
-#mobileinfo .resonators-container {
-}
-
 #mobileinfo .resonator {
   position: absolute;
   width: 12%;
@@ -167,9 +164,6 @@ body {
   margin-left: 4px;
 }
 
-#searchwrapper .ui-accordion-header {
-  padding: 0.3em 0;
-}
 #searchwrapper li {
   line-height: 1.3em;
 }
@@ -221,16 +215,6 @@ body {
   width: 77px;
 }
 
-#chatcontrols a.active {
-  border-color: var(--color-primary);
-  border-bottom-width: 0px;
-  font-weight: bold;
-}
-
-#chatcontrols a.active + a {
-  border-left-color: var(--color-primary);
-}
-
 #scrollwrapper {
   bottom: 0;
   max-height: none !important;
@@ -256,14 +240,6 @@ body {
 
 .fullimg {
   width: 100%;
-}
-
-/*
- * for some reason leaflet popups on mobile are colored white on white
- * so force the popup msg color to black
- */
-.leaflet-popup-content {
-  color: black;
 }
 
 /* add extra padding, and a button effect, to sidebar link areas */
