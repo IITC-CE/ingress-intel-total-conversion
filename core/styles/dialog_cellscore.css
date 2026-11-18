@@ -30,7 +30,6 @@
 
   .scoreboard-section > summary {
     color: var(--color-primary);
-    cursor: pointer;
     font-weight: bold;
     margin: 0;
   }
