@@ -12,6 +12,24 @@
   pointer-events: none;
 }
 
+body.smartphone #scrollwrapper {
+  box-sizing: border-box;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100% !important;
+  max-height: none !important;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+}
+
+body.smartphone.show-controls #scrollwrapper {
+  margin-top: var(--top-controls-height);
+}
+
 #sidebar {
   background-color: var(--color-bg-trans);
   border-left: 1px solid var(--color-bg-border);
@@ -26,8 +44,18 @@
   pointer-events: auto;
 }
 
+body.smartphone #sidebar {
+  width: 100% !important;
+  min-height: 100%;
+  border: 0;
+}
+
 body.sidebar-open .leaflet-right {
   margin-right: calc(var(--sidebar-width) + 1px + var(--safe-area-inset-right));
+}
+
+body.sidebar-open.smartphone .leaflet-right {
+  margin-right: var(--safe-area-inset-right);
 }
 
 /* a tab in line with the other controls, reaching over the gap to the sidebar or the screen edge */
@@ -91,9 +119,17 @@ body:not(.sidebar-open) .leaflet-right .leaflet-control.iitc-sidebar-toggle {
   width: calc(var(--sidebar-width) + 1px);
 }
 
+body.smartphone #sidebar > * {
+  width: 100%;
+}
+
 /* player stats */
 #playerstat {
   height: 30px;
+}
+
+body.smartphone #playerstat {
+  height: initial;
 }
 
 /* Agent stats row */
@@ -144,6 +180,28 @@ h2 {
   }
 }
 
+body.smartphone #playerstat h2 {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 5px;
+}
+
+body.smartphone #playerstat h2 #name {
+  display: flex;
+  align-items: center;
+}
+
+body.smartphone #playerstat h2 #name .playername,
+body.smartphone #playerstat h2 #name:hover .playername {
+  max-width: 60vw;
+}
+
+body.smartphone #playerstat h2 #stats {
+  white-space: nowrap;
+  overflow: initial;
+}
+
 #signout {
   font-size: 12px;
   font-weight: normal;
@@ -151,6 +209,13 @@ h2 {
   background-color: var(--color-bg-trans-50);
   display: none; /* starts hidden */
   vertical-align: text-top;
+}
+
+body.smartphone #name #signout {
+  /* no hover, always show signout button */
+  display: inline-block;
+  position: initial;
+  margin-left: 4px;
 }
 
 /* gamestats */
@@ -227,6 +292,11 @@ input[type='url'] {
   font-weight: normal;
 }
 
+body.smartphone #portaldetails .close {
+  border: 1px outset var(--color-bg-border);
+  font-size: 22px;
+}
+
 /* portal image */
 .imgpreview {
   height: 190px;
@@ -243,6 +313,10 @@ input[type='url'] {
 
 .imgpreview .portalDetails {
   display: none;
+}
+
+.fullimg {
+  width: 100%;
 }
 
 #level {
@@ -429,6 +503,14 @@ input[type='url'] {
   margin-right: 5px;
 }
 
+/* add extra padding, and a button effect, to sidebar link areas */
+body.smartphone .linkdetails aside {
+  padding: 5px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  border: 2px outset var(--color-bg-border);
+}
+
 #toolbox {
   display: none !important;
 }
@@ -446,6 +528,14 @@ input[type='url'] {
   display: inline-block;
 }
 
+body.smartphone #toolbox > a,
+body.smartphone #toolbox_component > a {
+  padding: 5px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  border: 2px outset var(--color-bg-border);
+}
+
 #toolbox_component > a > iitc-icon {
   margin-top: -2px;
   margin-right: 2px;
@@ -457,6 +547,10 @@ input[type='url'] {
 
 #portaldetails {
   min-height: 63px;
+}
+
+body.smartphone #portaldetails {
+  min-height: 0;
 }
 
 /* history details */

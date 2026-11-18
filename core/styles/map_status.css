@@ -30,6 +30,26 @@
   }
 }
 
+body.smartphone #updatestatus {
+  width: 100%;
+  color: #d4d5d6;
+  padding: 0;
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+  right: 0;
+}
+
+/* a ghosted bar stays transparent */
+body.smartphone #updatestatus:not(.ghost) {
+  background: #262c32;
+  border: 0;
+}
+
+body.smartphone #updatestatus .map {
+  margin-left: 4px;
+}
+
 #loadlevel {
   background: #fff;
   color: #000000;
@@ -41,6 +61,115 @@
   padding: 4px 0.2em;
 }
 
+body.smartphone #loadlevel {
+  border-width: 0;
+  background: transparent;
+  color: #fff;
+}
+
 #innerstatus .failed-request {
   color: #f66;
+}
+
+body.smartphone #innerstatus {
+  padding: 4px;
+  float: right;
+  width: 50%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#mobileinfo {
+  float: left;
+  width: 50%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  padding: 4px 0;
+  box-sizing: border-box;
+  transition: opacity 0.2s ease;
+}
+
+#mobileinfo.loading {
+  opacity: 0.6;
+}
+
+#mobileinfo .portallevel {
+  padding: 0 0.25em;
+  color: #fff;
+}
+
+#mobileinfo .resonator {
+  position: absolute;
+  width: 12%;
+  height: 100%;
+  top: 0;
+  border-top: 3px solid var(--resonator-color, #ccc);
+  box-sizing: border-box;
+}
+
+/* Position resonators based on their data-slot value */
+#mobileinfo .resonator[data-slot='0'] {
+  left: 0%;
+}
+#mobileinfo .resonator[data-slot='1'] {
+  left: 12.5%;
+}
+#mobileinfo .resonator[data-slot='2'] {
+  left: 25%;
+}
+#mobileinfo .resonator[data-slot='3'] {
+  left: 37.5%;
+}
+#mobileinfo .resonator[data-slot='4'] {
+  left: 50%;
+}
+#mobileinfo .resonator[data-slot='5'] {
+  left: 62.5%;
+}
+#mobileinfo .resonator[data-slot='6'] {
+  left: 75%;
+}
+#mobileinfo .resonator[data-slot='7'] {
+  left: 87.5%;
+}
+
+#mobileinfo .resonator.empty {
+  border-top-color: transparent;
+}
+
+/* Keep the north indicator (the dot above north resonators) */
+#mobileinfo .resonator.north:before {
+  content: '';
+  background-color: var(--resonator-color, red);
+  border-radius: 100%;
+  display: block;
+  height: 6px;
+  width: 6px;
+  left: 50%;
+  top: -3px;
+  margin-left: -3px;
+  position: absolute;
+  z-index: 1;
+}
+
+#mobileinfo .filllevel {
+  position: absolute;
+  bottom: 0;
+  height: 3px;
+}
+
+#mobileinfo .enl .filllevel {
+  background-color: var(--color-enl) !important;
+}
+
+#mobileinfo .res .filllevel {
+  background-color: var(--color-res) !important;
+}
+
+#mobileinfo .mac .filllevel {
+  background-color: var(--color-mac) !important;
 }

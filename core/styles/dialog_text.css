@@ -11,6 +11,11 @@
   width: 100%;
 }
 
+/* 16px, so the browser of a phone does not zoom in on the field */
+body.smartphone .iitc-prompt-text {
+  font-size: 16px;
+}
+
 .iitc-prompt-error:empty {
   display: none;
 }

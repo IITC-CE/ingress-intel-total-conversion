@@ -38,7 +38,8 @@ function createPaneButton(pane) {
 
 /**
  * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
- * Adds the smartphone stylesheet and the map/info pane buttons the mobile layout switches between.
+ * Marks the body with the `smartphone` class, which the stylesheets key on, and adds the map/info pane
+ * buttons the mobile layout switches between.
  *
  * Called once from `boot`.
  *
@@ -50,11 +51,6 @@ const _runBeforeBoot = function () {
   log.debug('running smartphone pre boot stuff');
 
   document.body.classList.add('smartphone');
-
-  // add smartphone stylesheet
-  const style = document.createElement('style');
-  style.textContent = '@include_css:smartphone.css@';
-  document.head.append(style);
 
   window.smartphone.mapButton = createPaneButton('map');
   window.smartphone.sideButton = createPaneButton('info');

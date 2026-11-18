@@ -74,16 +74,6 @@ describe('smartphone boot hooks', () => {
   });
 
   describe('_runBeforeBoot', () => {
-    it('injects the smartphone stylesheet', () => {
-      const before = document.head.querySelectorAll('style').length;
-
-      IITC.smartphone._runBeforeBoot();
-
-      const styles = document.head.querySelectorAll('style');
-      expect(styles).to.have.length(before + 1);
-      expect(styles[styles.length - 1].textContent).to.not.be.empty;
-    });
-
     it('marks the body as a smartphone, for the stylesheets', () => {
       IITC.smartphone._runBeforeBoot();
 
