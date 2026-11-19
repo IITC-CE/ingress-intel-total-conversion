@@ -18,8 +18,7 @@ body.smartphone #scrollwrapper {
   bottom: 0;
   left: 0;
   right: 0;
-  width: 100% !important;
-  max-height: none !important;
+  width: 100%;
   padding-top: var(--safe-area-inset-top);
   padding-bottom: var(--safe-area-inset-bottom);
   padding-left: var(--safe-area-inset-left);
@@ -45,7 +44,7 @@ body.smartphone.show-controls #scrollwrapper {
 }
 
 body.smartphone #sidebar {
-  width: 100% !important;
+  width: 100%;
   min-height: 100%;
   border: 0;
 }

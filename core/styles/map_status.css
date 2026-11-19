@@ -163,13 +163,13 @@ body.smartphone #innerstatus {
 }
 
 #mobileinfo .enl .filllevel {
-  background-color: var(--color-enl) !important;
+  background-color: var(--color-enl);
 }
 
 #mobileinfo .res .filllevel {
-  background-color: var(--color-res) !important;
+  background-color: var(--color-res);
 }
 
 #mobileinfo .mac .filllevel {
-  background-color: var(--color-mac) !important;
+  background-color: var(--color-mac);
 }

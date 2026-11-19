@@ -282,13 +282,13 @@ window.plugin.farmFind.setupCSS = function () {
         ' color:#ffce00;' +
         '}\n' +
         'body.smartphone #farm_level_select {' +
-        ' top: var(--safe-area-inset-top) !important;' +
+        ' top: var(--safe-area-inset-top);' +
         ' right: var(--safe-area-inset-right);' +
-        ' left: auto !important;' +
+        ' left: auto;' +
         ' margin-right: 0;' +
         '}\n' +
         'body.smartphone.show-controls #farm_level_select {' +
-        ' top: calc(var(--safe-area-inset-top) + var(--top-controls-height) + 10px) !important;' +
+        ' top: calc(var(--safe-area-inset-top) + var(--top-controls-height) + 10px);' +
         ' right: calc(var(--safe-area-inset-right) + 60px);' +
         '}\n'
     )
