@@ -750,7 +750,6 @@ machinaTools.refreshLinkLengths = function () {
     }
 
     if (IITC.utils.isSmartphone()) {
-      html.addClass('mobile');
       var LinksView = L.Control.extend({
         options: { position: 'topright' },
         onAdd: () => html[0],

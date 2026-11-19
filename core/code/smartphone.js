@@ -6,6 +6,10 @@
  * It holds no public API: the boot hooks below are internal, and are only reachable across modules
  * because the bundle wraps every file in its own scope.
  *
+ * The layout is switched on by the `smartphone` class on `body`, which plugins can style against too.
+ * It marks any smartphone, so it is not the same as `window.useAppPanes()`, where the app shows a plugin in a pane
+ * of its own instead of a dialog.
+ *
  * @memberof IITC
  * @namespace smartphone
  */

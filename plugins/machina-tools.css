@@ -88,17 +88,14 @@ div[aria-describedby="dialog-machina-conflict-area-info"] button:first-of-type {
     font-size: 10px;
 }
 
-#machina-links-overlay-drag-handle.mobile {
+body.smartphone #machina-links-overlay-drag-handle {
     position: relative !important;
     z-index: auto;
     margin-right: 10px;
-}
-
-.machina-link-lengths.mobile {
     flex-direction: column;
 }
 
-#machina-links-overlay-drag-handle.mobile .warning {
+body.smartphone #machina-links-overlay-drag-handle .warning {
     left: -0.5em;
     right: auto;
 }

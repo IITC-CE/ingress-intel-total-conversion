@@ -115,7 +115,6 @@ function applyFilters(container) {
 function buildFilterBar(container) {
   var bar = document.createElement('div');
   bar.className = 'debug-filters';
-  if (IITC.utils.isSmartphone()) bar.classList.add('mobile');
 
   FILTERS.forEach(function (filter) {
     var button = document.createElement('button');

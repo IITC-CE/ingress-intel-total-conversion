@@ -280,23 +280,14 @@ window.plugin.farmFind.setupCSS = function () {
         ' font-family: "coda",arial,helvetica,sans-serif;' +
         ' background-color:#0E3C46;' +
         ' color:#ffce00;' +
-        '}\n'
-    )
-    .appendTo('head');
-};
-
-window.plugin.farmFind.setupSmartCSS = function () {
-  $('<style>')
-    .prop('type', 'text/css')
-    .html(
-      '' +
-        '#farm_level_select {' +
+        '}\n' +
+        'body.smartphone #farm_level_select {' +
         ' top: var(--safe-area-inset-top) !important;' +
         ' right: var(--safe-area-inset-right);' +
         ' left: auto !important;' +
         ' margin-right: 0;' +
         '}\n' +
-        'body.show-controls #farm_level_select {' +
+        'body.smartphone.show-controls #farm_level_select {' +
         ' top: calc(var(--safe-area-inset-top) + var(--top-controls-height) + 10px) !important;' +
         ' right: calc(var(--safe-area-inset-right) + 60px);' +
         '}\n'
@@ -319,9 +310,6 @@ var setup = function () {
   window.plugin.farmFind.minLevel = 7;
   window.plugin.farmFind.minNearby = 5;
   window.plugin.farmFind.setupCSS();
-  if (IITC.utils.isSmartphone()) {
-    window.plugin.farmFind.setupSmartCSS();
-  }
   window.plugin.farmFind.Radius = 500;
   IITC.toolbox.addButton({
     id: 'findFarmClick',
