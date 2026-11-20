@@ -65,7 +65,6 @@ body:not(.sidebar-open) .leaflet-right .leaflet-control.iitc-sidebar-toggle {
   border-radius: inherit;
   background: none;
   color: var(--color-primary);
-  cursor: pointer;
 
   &:hover {
     background-color: color-mix(in srgb, var(--color-bg-border) 25%, transparent);

@@ -123,6 +123,23 @@ a:hover {
   text-decoration: underline;
 }
 
+button,
+select,
+summary,
+label,
+input[type='checkbox'],
+input[type='radio'],
+input[type='color'],
+input[type='range'] {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+input:disabled {
+  cursor: not-allowed;
+}
+
 .help {
   cursor: help;
 }

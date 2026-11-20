@@ -147,7 +147,6 @@
   align-items: center;
   gap: 4px;
   list-style: none;
-  cursor: pointer;
 
   &::-webkit-details-marker {
     display: none;
@@ -216,7 +215,6 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
 
   & input {
     margin: 0;
@@ -282,7 +280,6 @@ input[type="search"].iitc-options-search {
   color: inherit;
   font: inherit;
   text-align: left;
-  cursor: pointer;
   transition: all 0.2s;
 
   &[aria-current='page'] {
@@ -355,7 +352,6 @@ input[type="search"].iitc-options-search {
   border: 0;
   background: none;
   color: inherit;
-  cursor: pointer;
 
   & iitc-icon {
     font-size: 20px;
