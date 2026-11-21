@@ -61,7 +61,10 @@
             
                 <div class="description"><p>Namespace for the smartphone layout of IITC.</p>
 <p>It holds no public API: the boot hooks below are internal, and are only reachable across modules
-because the bundle wraps every file in its own scope.</p></div>
+because the bundle wraps every file in its own scope.</p>
+<p>The layout is switched on by the <code>smartphone</code> class on <code>body</code>, which plugins can style against too.
+It marks any smartphone, so it is not the same as <code>window.useAppPanes()</code>, where the app shows a plugin in a pane
+of its own instead of a dialog.</p></div>
             
 
             
@@ -135,7 +138,7 @@ because the bundle wraps every file in its own scope.</p></div>
             
             <div class="container-source members">
                 <code><a href="code_smartphone.js.html">code/smartphone.js</a></code>,
-                <code><a href="code_smartphone.js.html#line75">line 75</a></code>
+                <code><a href="code_smartphone.js.html#line77">line 77</a></code>
             </div>
             
         </h4>
@@ -226,7 +229,7 @@ Opens the map pane, which is the view the mobile layout starts on.</p>
             
             <div class="container-source members">
                 <code><a href="code_smartphone.js.html">code/smartphone.js</a></code>,
-                <code><a href="code_smartphone.js.html#line48">line 48</a></code>
+                <code><a href="code_smartphone.js.html#line53">line 53</a></code>
             </div>
             
         </h4>
@@ -239,7 +242,8 @@ Opens the map pane, which is the view the mobile layout starts on.</p>
     
     <div class="description">
         <p>Performs initial setup tasks for IITC on smartphones before the IITC boot process.
-Adds the smartphone stylesheet and the map/info pane buttons the mobile layout switches between.</p>
+Marks the body with the <code>smartphone</code> class, which the stylesheets key on, and adds the map/info pane
+buttons the mobile layout switches between.</p>
 <p>Called once from <code>boot</code>.</p>
     </div>
     
