@@ -1613,7 +1613,7 @@ var setup = function () {
     $('#bookmarksBox').css({ top: window.plugin.bookmarks.statusBox.pos.x, left: window.plugin.bookmarks.statusBox.pos.y });
   } else {
     $('body').append(window.plugin.bookmarks.htmlBkmrksBox);
-    $('#bookmarksBox').css('display', 'none').addClass('mobile');
+    $('#bookmarksBox').css('display', 'none');
 
     if (window.useAppPanes()) window.app.addPane('plugin-bookmarks', 'Bookmarks', 'bookmark');
     window.addHook('paneChanged', window.plugin.bookmarks.onPaneChanged);
@@ -1626,8 +1626,8 @@ var setup = function () {
   });
 
   if (window.plugin.bookmarks.isSmart) {
-    // $('#bookmarksBox.mobile #topBar').prepend(window.plugin.bookmarks.htmlCallSetBox+window.plugin.bookmarks.htmlCalldrawBox); // wonk in progress
-    $('#bookmarksBox.mobile #topBar').append(window.plugin.bookmarks.htmlMoveBtn);
+    // $('#bookmarksBox #topBar').prepend(window.plugin.bookmarks.htmlCallSetBox+window.plugin.bookmarks.htmlCalldrawBox); // work in progress
+    $('#bookmarksBox #topBar').append(window.plugin.bookmarks.htmlMoveBtn);
   }
 
   window.plugin.bookmarks.loadList('maps');

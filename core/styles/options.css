@@ -37,9 +37,19 @@
   gap: 4px;
 }
 
+body.smartphone .iitc-options .iitc-options-buttons {
+  gap: 8px;
+}
+
 /* a little larger than the button style of dialog content */
 .iitc-options .iitc-options-page button {
   padding: 3px 5px;
+}
+
+/* options window: buttons and page links large enough for a finger */
+body.smartphone .iitc-options .iitc-options-page button {
+  min-height: 34px;
+  padding: 5px 10px;
 }
 
 /* the icon in the middle of the line, as large as the text beside it */
@@ -50,6 +60,14 @@
 
   & iitc-icon {
     font-size: 16px;
+  }
+}
+
+body.smartphone .iitc-options .iitc-options-page .iitc-options-icon-button {
+  min-width: 34px;
+
+  & iitc-icon {
+    font-size: 20px;
   }
 }
 
@@ -118,6 +136,12 @@
 
 .iitc-options-page input[type='number'] {
   width: 6em;
+}
+
+/* a radio as easy to hit as a button */
+body.smartphone .iitc-options input[type='radio'] {
+  width: 20px;
+  height: 20px;
 }
 
 .iitc-options-list {
@@ -289,6 +313,10 @@ input[type="search"].iitc-options-search {
   }
 }
 
+body.smartphone .iitc-options .iitc-options-page-link {
+  padding: 8px;
+}
+
 .iitc-options-found {
   display: -webkit-box;
   overflow: hidden;
@@ -355,6 +383,15 @@ input[type="search"].iitc-options-search {
 
   & iitc-icon {
     font-size: 20px;
+  }
+}
+
+body.smartphone .iitc-options .iitc-options-back {
+  min-width: 36px;
+  min-height: 36px;
+
+  & iitc-icon {
+    font-size: 24px;
   }
 }
 

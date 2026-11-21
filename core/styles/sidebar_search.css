@@ -106,6 +106,10 @@
 #searchwrapper li {
   cursor: pointer;
 }
+
+body.smartphone #searchwrapper li {
+  line-height: 1.3em;
+}
 #searchwrapper .searchquery.collapsed ul {
   max-height: 0;
 }

@@ -61,16 +61,14 @@ privacyView.toggle = () => {
 };
 
 function setup() {
-  let css = '.privacy_active #playerstat { display: none; }';
   // on mobile the chat stays out of sight in its own pane until it is opened
-  if (!IITC.utils.isSmartphone()) {
-    css +=
-      '.privacy_active #chatinput,' +
-      '.privacy_active #chatcontrols > a:not(#privacytoggle),' +
-      '.privacy_active #chat { display: none; }' +
-      '.privacy_active #chatcontrols { bottom: 0; top: auto }' +
-      '.privacy_active .leaflet-left .leaflet-control {margin-left: 10px}';
-  }
+  const css =
+    '.privacy_active #playerstat { display: none; }' +
+    'body:not(.smartphone).privacy_active #chatinput,' +
+    'body:not(.smartphone).privacy_active #chatcontrols > a:not(#privacytoggle),' +
+    'body:not(.smartphone).privacy_active #chat { display: none; }' +
+    'body:not(.smartphone).privacy_active #chatcontrols { bottom: 0; top: auto }' +
+    'body:not(.smartphone).privacy_active .leaflet-left .leaflet-control {margin-left: 10px}';
   $('<style>').html(css).appendTo('head');
 
   if (IITC.utils.isSmartphone()) {

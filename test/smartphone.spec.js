@@ -16,7 +16,7 @@ function buildDom() {
     '<div id="scrollwrapper"></div>',
     '<div id="portaldetails"></div>',
   ].join('');
-  document.body.classList.remove('show-controls');
+  document.body.classList.remove('show-controls', 'smartphone');
 }
 
 describe('smartphone boot hooks', () => {
@@ -36,7 +36,7 @@ describe('smartphone boot hooks', () => {
   afterEach(() => {
     sinon.restore();
     document.body.innerHTML = '';
-    document.body.classList.remove('show-controls');
+    document.body.classList.remove('show-controls', 'smartphone');
   });
 
   it('publishes no API of its own', () => {
@@ -58,6 +58,7 @@ describe('smartphone boot hooks', () => {
 
     expect(document.querySelectorAll('#chatcontrols a')).to.have.length(0);
     expect(document.body.classList.contains('show-controls')).to.be.false;
+    expect(document.body.classList.contains('smartphone')).to.be.false;
     expect(show.called).to.be.false;
   });
 
@@ -73,14 +74,10 @@ describe('smartphone boot hooks', () => {
   });
 
   describe('_runBeforeBoot', () => {
-    it('injects the smartphone stylesheet', () => {
-      const before = document.head.querySelectorAll('style').length;
-
+    it('marks the body as a smartphone, for the stylesheets', () => {
       IITC.smartphone._runBeforeBoot();
 
-      const styles = document.head.querySelectorAll('style');
-      expect(styles).to.have.length(before + 1);
-      expect(styles[styles.length - 1].textContent).to.not.be.empty;
+      expect(document.body.classList.contains('smartphone')).to.be.true;
     });
 
     it('adds the map and info pane buttons to the chat controls', () => {

@@ -18,6 +18,7 @@
   --hidden-scrollbar-width: 20px; /* How much space to leave for scrollbars, in pixels */
   --chat-shrinked: 60px; /* Height of chat when chat is collapsed, in pixels */
   --icon-target-size: 24px; /* Smallest tap target an icon may occupy, in pixels */
+  --top-controls-height: 38px; /* Height of the pane tabs on a smartphone, in pixels */
 
   /* colors */
   --color-enl: #03fe03; /* rgb(3 254 3) */
@@ -64,10 +65,19 @@ body {
   width: 100%;
 }
 
+body.smartphone.show-controls #map {
+  height: calc(100vh - var(--top-controls-height) - 25px);
+  margin-top: var(--top-controls-height);
+}
+
 body {
   font-size: 14px;
   font-family: Roboto, 'Helvetica Neue', Helvetica, sans-serif;
   margin: 0;
+}
+
+body.smartphone {
+  color: #fff;
 }
 
 /* the text size scales the glyph but not the box, so a floor in pixels keeps the target hittable */

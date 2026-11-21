@@ -77,6 +77,15 @@
   margin-bottom: calc(22px + var(--safe-area-inset-bottom));
 }
 
+/* FIX ME
+   Quick and dirty hack to fix scale-bar position
+   Permanent solution should include fixes for attribution control too
+   https://github.com/IITC-CE/ingress-intel-total-conversion/issues/89
+*/
+body.smartphone .leaflet-bottom {
+  bottom: 5px;
+}
+
 .leaflet-left {
   left: 10px;
   margin-left: var(--safe-area-inset-left);

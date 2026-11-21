@@ -6,6 +6,10 @@
  * It holds no public API: the boot hooks below are internal, and are only reachable across modules
  * because the bundle wraps every file in its own scope.
  *
+ * The layout is switched on by the `smartphone` class on `body`, which plugins can style against too.
+ * It marks any smartphone, so it is not the same as `window.useAppPanes()`, where the app shows a plugin in a pane
+ * of its own instead of a dialog.
+ *
  * @memberof IITC
  * @namespace smartphone
  */
@@ -38,7 +42,8 @@ function createPaneButton(pane) {
 
 /**
  * Performs initial setup tasks for IITC on smartphones before the IITC boot process.
- * Adds the smartphone stylesheet and the map/info pane buttons the mobile layout switches between.
+ * Marks the body with the `smartphone` class, which the stylesheets key on, and adds the map/info pane
+ * buttons the mobile layout switches between.
  *
  * Called once from `boot`.
  *
@@ -49,10 +54,7 @@ const _runBeforeBoot = function () {
   if (!IITC.utils.isSmartphone()) return;
   log.debug('running smartphone pre boot stuff');
 
-  // add smartphone stylesheet
-  const style = document.createElement('style');
-  style.textContent = '@include_css:smartphone.css@';
-  document.head.append(style);
+  document.body.classList.add('smartphone');
 
   window.smartphone.mapButton = createPaneButton('map');
   window.smartphone.sideButton = createPaneButton('info');

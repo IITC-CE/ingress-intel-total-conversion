@@ -100,7 +100,7 @@
 }
 
 /* touch targets take the full width, and there is no pointer to reveal them on hover */
-.debug-filters.mobile button {
+body.smartphone .debug-filters button {
     flex: 1;
     opacity: 1;
     padding: 4px 0;

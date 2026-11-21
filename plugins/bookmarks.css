@@ -402,39 +402,39 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 /**********************************************
 	MOBILE
 **********************************************/
-#bookmarksBox.mobile {
-  position: absolute !important;
-  width: 100% !important;
+body.smartphone #bookmarksBox {
+  position: absolute;
+  width: 100%;
   height: 100% !important;
   top: 0 !important;
   left: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  overflow: auto !important;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  overflow: auto;
   box-sizing: border-box;
   padding-top: var(--safe-area-inset-top);
   padding-bottom: var(--safe-area-inset-bottom);
   padding-left: var(--safe-area-inset-left);
   padding-right: var(--safe-area-inset-right);
 }
-#bookmarksBox.mobile .bookmarkList ul,
-#bookmarksBox.mobile .bookmarkList ul li,
-#bookmarksBox.mobile .bookmarkList.current,
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder.open ul{
+body.smartphone #bookmarksBox .bookmarkList ul,
+body.smartphone #bookmarksBox .bookmarkList ul li,
+body.smartphone #bookmarksBox .bookmarkList.current,
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder.open ul{
 	width:100% !important;
 	display:block !important;
 }
-#bookmarksBox.mobile *{
+body.smartphone #bookmarksBox *{
 	box-shadow:none !important;
 	border-width:0 !important;
 }
-#bookmarksBox.mobile #topBar #bookmarksMin,
-#bookmarksBox.mobile #topBar .handle{
-	display:none !important;
+body.smartphone #bookmarksBox #topBar #bookmarksMin,
+body.smartphone #bookmarksBox #topBar .handle{
+	display:none;
 }
 
-#bookmarksBox.mobile #bookmarksTypeBar h5{
+body.smartphone #bookmarksBox #bookmarksTypeBar h5{
 	cursor:pointer;
 	text-align:center;
 	float:left;
@@ -442,100 +442,97 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 	height:auto !important;
 	padding:7px 0;
 }
-#bookmarksBox.mobile #bookmarksTypeBar h5.current{
+body.smartphone #bookmarksBox #bookmarksTypeBar h5.current{
 	cursor:default;
 	color:#fff;
 }
-#bookmarksBox.mobile #bookmarksTypeBar,
-#bookmarksBox.mobile .bookmarkList .addForm{
+body.smartphone #bookmarksBox #bookmarksTypeBar,
+body.smartphone #bookmarksBox .bookmarkList .addForm{
 	border-bottom:1px solid #20a8b1 !important;
 }
-#bookmarksBox.mobile .bookmarkList ul li ul li.bkmrk,
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder .folderLabel{
+body.smartphone #bookmarksBox .bookmarkList ul li ul li.bkmrk,
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder .folderLabel{
 	height:36px !important;
 	clear:both;
 }
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder .folderLabel a,
-#bookmarksBox.mobile .bookmarkList ul li ul li.bkmrk a{
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder .folderLabel a,
+body.smartphone #bookmarksBox .bookmarkList ul li ul li.bkmrk a{
 	background:none;
 	padding:7px 0;
 	height:auto;
 	box-shadow:inset 0 1px 0 #20a8b1 !important;
 }
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder a.bookmarksRemoveFrom,
-#bookmarksBox.mobile .bookmarkList li.bkmrk a.bookmarksRemoveFrom{
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder a.bookmarksRemoveFrom,
+body.smartphone #bookmarksBox .bookmarkList li.bkmrk a.bookmarksRemoveFrom{
 	box-shadow:inset 0 1px 0 #20a8b1,inset -1px 0 0 #20a8b1 !important;
 	width:10%;
 	background:none !important;
 }
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder a.bookmarksAnchor,
-#bookmarksBox.mobile .bookmarkList li.bkmrk a.bookmarksLink{
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder a.bookmarksAnchor,
+body.smartphone #bookmarksBox .bookmarkList li.bkmrk a.bookmarksLink{
 	text-indent:10px;
 	height:36px;
 	line-height:24px;
 	overflow:hidden;
 }
-#bookmarksBox.mobile .bookmarkList ul li.bookmarkFolder ul{
-	margin-left:0 !important;
-}
-#bookmarksBox.mobile .bookmarkList > ul{
+body.smartphone #bookmarksBox .bookmarkList > ul{
 	border-bottom:1px solid #20a8b1 !important;
 }
 
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder.othersBookmarks  ul{
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder.othersBookmarks  ul{
 	border-top:5px solid #20a8b1 !important;
 }
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder,
-#bookmarksBox.mobile .bookmarkList li.bkmrk{
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder,
+body.smartphone #bookmarksBox .bookmarkList li.bkmrk{
 	box-shadow:inset 0 1px 0 #20a8b1, 1px 0 0 #20a8b1, -1px 1px 0 #20a8b1 !important;
 }
-#bookmarksBox.mobile .bookmarkList > ul{
+body.smartphone #bookmarksBox .bookmarkList > ul{
 	max-height:none;
 /*	width:85% !important;*/
 }
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder .folderLabel{
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder .folderLabel{
 	box-shadow:0 1px 0 #20a8b1 !important;
 }
-#bookmarksBox.mobile .bookmarkList ul li.bookmarkFolder ul{
+body.smartphone #bookmarksBox .bookmarkList ul li.bookmarkFolder ul{
 	width:90% !important;
 	margin-left:10% !important;
 }
-#bookmarksBox.mobile .bookmarkList ul li.bookmarkFolder.othersBookmarks ul{
-	width:100% !important;
+body.smartphone #bookmarksBox .bookmarkList ul li.bookmarkFolder.othersBookmarks ul{
+	width:100%;
 	margin-left:0% !important;
 }
-#bookmarksBox.mobile{
+body.smartphone #bookmarksBox{
 	margin-bottom:5px !important;
 }
-#bookmarksBox.mobile #bookmarksTypeBar{
+body.smartphone #bookmarksBox #bookmarksTypeBar{
 	height:auto;
 }
-#bookmarksBox.mobile .addForm,
-#bookmarksBox.mobile .addForm *{
+body.smartphone #bookmarksBox .addForm,
+body.smartphone #bookmarksBox .addForm *{
 	height:35px !important;
 	padding:0;
 }
-#bookmarksBox.mobile .addForm a{
+body.smartphone #bookmarksBox .addForm a{
 	line-height:37px;
 }
 
-#bookmarksBox.mobile .addForm a{
+body.smartphone #bookmarksBox .addForm a{
 /*	width:25% !important;*/
 }
-#bookmarksBox.mobile .addForm input{
+body.smartphone #bookmarksBox .addForm input{
 /*	width:50% !important;*/
 	text-indent:10px;
 }
-#bookmarksBox.mobile #bkmrk_portals .addForm input{
+body.smartphone #bookmarksBox #bkmrk_portals .addForm input{
 /*	width:75% !important;*/
 }
-#bookmarksBox.mobile #bookmarksTypeBar h5,
-#bookmarksBox.mobile .bookmarkList .addForm a{
+body.smartphone #bookmarksBox #bookmarksTypeBar h5,
+body.smartphone #bookmarksBox .bookmarkList .addForm a{
 	box-shadow:-1px 0 0 #20a8b1 !important;
 }
-#bookmarksBox.mobile .bookmarkList li.bookmarkFolder ul{
+body.smartphone #bookmarksBox .bookmarkList li.bookmarkFolder ul{
 	display:none !important;
-	min-height:37px !important;
+	min-height:37px;
 }
 #updatestatus .bkmrksStar{
 	float:left;
@@ -543,42 +540,42 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 	padding:0 3px 1px 4px;
 	background:#262c32;
 }
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel .bookmarksAnchor span,
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel > span,
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel > span > span,
-#bookmarksBox.mobile .bookmarkList .triangle{
-	width:0 !important;
-	height:0 !important;
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder .folderLabel .bookmarksAnchor span,
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder .folderLabel > span,
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder .folderLabel > span > span,
+body.smartphone #bookmarksBox .bookmarkList .triangle{
+	width:0;
+	height:0;
 }
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel .bookmarksAnchor span{
-	float:left !important;
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder .folderLabel .bookmarksAnchor span{
+	float:left;
 	border-width:5px 0 5px 7px !important;
-	border-color:transparent transparent transparent white !important;
-	margin:7px 3px 0 13px !important;
+	border-color:transparent transparent transparent white;
+	margin:7px 3px 0 13px;
 }
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder.open .folderLabel .bookmarksAnchor span{
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder.open .folderLabel .bookmarksAnchor span{
 	margin:9px 1px 0 12px !important;
 	border-width:7px 5px 0 5px !important;
 	border-color:white transparent transparent transparent !important;
 }
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel > span,
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel > span > span{
-	display:none !important;
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder .folderLabel > span,
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder .folderLabel > span > span{
+	display:none;
 	border-width:0 12px 10px 0 !important;
-	border-color:transparent #20a8b1 transparent transparent !important;
-	margin:-20px 0 0 100% !important;
-	position:relative !important;
-	top:21px !important;
-	left:-10px !important;
+	border-color:transparent #20a8b1 transparent transparent;
+	margin:-20px 0 0 100%;
+	position:relative;
+	top:21px;
+	left:-10px;
 }
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder .folderLabel > span > span{
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder .folderLabel > span > span{
 	top:18px !important;
 	left:0 !important;
 	border-width:0 10px 9px 0 !important;
 	border-color:transparent #069 transparent transparent !important;
 }
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder.open .folderLabel > span,
-#bookmarksBox.mobile .bookmarkList .bookmarkFolder.open .folderLabel > span > span{
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder.open .folderLabel > span,
+body.smartphone #bookmarksBox .bookmarkList .bookmarkFolder.open .folderLabel > span > span{
 	display:block !important;
 }
 
@@ -631,19 +628,19 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 }
 
 /*--- Other Opt css ---*/
-#bookmarksBox.mobile a.bookmarksMoveIn{
-	display:none !important;
+body.smartphone #bookmarksBox a.bookmarksMoveIn{
+	display:none;
 }
 
-#bookmarksBox.mobile .bookmarkList ul li ul li.bkmrk a.bookmarksMoveIn{
-	background:none !important;
+body.smartphone #bookmarksBox .bookmarkList ul li ul li.bkmrk a.bookmarksMoveIn{
+	background:none;
 	text-align:center;
 	color:#fff;
 	box-shadow: inset 0 1px 0 #20A8B1,inset -1px 0 0 #20A8B1 !important;
 	width:10%;
 }
 
-#bookmarksBox.mobile.moveMode a.bookmarksMoveIn{
+body.smartphone #bookmarksBox.moveMode a.bookmarksMoveIn{
 	display:block !important;
 }
 
@@ -666,7 +663,7 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 	text-decoration:underline;
 }
 
-#bookmarksBox.mobile #topBar .btn{
+body.smartphone #bookmarksBox #topBar .btn{
 	width:100%;height:45px !important;
 	font-size:13px;
 	color:#fff;
@@ -674,13 +671,10 @@ body.icons-unavailable .bkmrksStar.favorite iitc-icon::before, body.icons-unavai
 	padding-top:17px;
 	text-indent:0 !important;
 }
-#bookmarksBox.mobile .btn{
+body.smartphone #bookmarksBox .btn{
 	width:50% !important;
 	background:#222;
 }
-#bookmarksBox.mobile .btn.left{
-	border-right:1px solid #20a8b1 !important;
-}
-#bookmarksBox.mobile .btn#bookmarksMove{
+body.smartphone #bookmarksBox .btn#bookmarksMove{
 	background:#B42E2E;
 }

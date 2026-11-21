@@ -58,6 +58,46 @@
   border-left-color: var(--color-primary);
 }
 
+body.smartphone #chatcontrols {
+  height: 38px;
+  width: 100%;
+  left: 0;
+  display: none;
+}
+
+/* hide shrink button */
+body.smartphone #chatcontrols a:first-child {
+  display: none;
+}
+
+body.smartphone #chatcontrols a {
+  width: 50px;
+  height: 36px;
+  overflow: hidden;
+  vertical-align: middle;
+  line-height: 36px;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+body.smartphone.show-controls #chatcontrols {
+  box-sizing: border-box;
+  display: flex !important;
+  top: 0;
+  padding-top: var(--safe-area-inset-top);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+  overflow-x: auto;
+  width: calc(100% - 1px);
+  height: calc(var(--top-controls-height) + var(--safe-area-inset-top));
+}
+
+body.smartphone.show-controls #chatcontrols a {
+  flex: 1;
+  min-width: fit-content;
+  padding: 0 5px;
+}
+
 @keyframes chatloading {
   0% {
     background-color: color-mix(in srgb, RED 40%, transparent);
@@ -98,6 +138,22 @@
       text-align: center;
     }
   }
+}
+
+body.smartphone #chat {
+  left: 0;
+  right: 0;
+  top: 1px;
+  bottom: 30px;
+  width: auto;
+  height: auto;
+  margin-top: var(--safe-area-inset-top);
+  margin-bottom: var(--safe-area-inset-bottom);
+  padding-right: var(--safe-area-inset-right);
+}
+
+body.smartphone.show-controls #chat {
+  top: var(--top-controls-height);
 }
 
 em {
@@ -173,6 +229,11 @@ em {
   white-space: nowrap;
 }
 
+body.smartphone #chat td:nth-child(2),
+body.smartphone #chatinput td:nth-child(2) {
+  width: 77px;
+}
+
 #chat td.system_narrowcast {
   color: #f66;
 }
@@ -219,6 +280,12 @@ mark {
   box-sizing: border-box;
   padding-bottom: var(--safe-area-inset-bottom);
   padding-left: var(--safe-area-inset-left);
+}
+
+body.smartphone #chatinput {
+  width: 100%;
+  height: calc(var(--safe-area-inset-bottom) + 30px);
+  padding-right: var(--safe-area-inset-right);
 }
 
 #chatinput td {
