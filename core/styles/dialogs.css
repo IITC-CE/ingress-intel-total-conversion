@@ -3,7 +3,6 @@
 @import './dialog_cellscore.css';
 @import './dialog_text.css';
 
-.ui-tooltip,
 .ui-dialog {
   position: absolute;
   z-index: 9500;
@@ -12,16 +11,11 @@
   padding: 2px 4px;
 }
 
-.ui-tooltip,
 .ui-dialog,
 .iitc-options-pane {
   color: var(--color-secondary);
   font-size: 13px;
   line-height: 15px;
-}
-
-.ui-tooltip {
-  max-width: 300px;
 }
 
 .ui-widget-overlay {
@@ -39,11 +33,6 @@
   z-index: 10001 !important;
 }
 
-.ui-tooltip {
-  z-index: 10002 !important;
-}
-
-.ui-tooltip,
 .ui-dialog a {
   color: var(--color-primary);
 }
