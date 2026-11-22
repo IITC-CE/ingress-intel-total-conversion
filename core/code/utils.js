@@ -407,17 +407,22 @@ const genFourColumnTable = function (blocks) {
   return isOdd ? rows + '<td></td><td></td></tr>' : rows;
 };
 
+const TEXT_TO_TABLE_TAGS = ['hr', 'br', 'b', 'i', 'strong', 'em', 'span', 'mark'];
+
 /**
- * Converts text with newlines (`\n`) and tabs (`\t`) into an HTML table.
+ * Converts text with newlines (`\n`) and tabs (`\t`) into HTML: line breaks, or a table when the text has tabs.
+ * The text is escaped, except for the allowed tags.
  *
  * @memberof IITC.utils
  * @function textToTable
  * @param {string} text - The text to convert.
- * @returns {string} The resulting HTML table.
+ * @param {string[]} [allowedTags] - tags kept as HTML; by default `hr`, `br`, `b`, `i`, `strong`, `em`, `span` and
+ *   `mark`, and an empty list for plain text
+ * @returns {string} The resulting HTML.
  */
-const textToTable = function (text) {
+const textToTable = function (text, allowedTags = TEXT_TO_TABLE_TAGS) {
   // If no tabs are present, replace newlines with <br> and return
-  if (!text.includes('\t')) return text.replace(/\n/g, '<br>');
+  if (!text.includes('\t')) return IITC.utils.escapeHtml(text, allowedTags).replace(/\n/g, '<br>');
 
   // Split text into rows and columns, tracking the max column count
   const rows = text.split('\n').map((row) => row.split('\t'));
@@ -428,7 +433,7 @@ const textToTable = function (text) {
   for (const row of rows) {
     let rowHtml = '<tr>';
     for (let k = 0; k < row.length; k++) {
-      const cell = IITC.utils.escapeHtml(row[k], ['hr', 'br', 'b', 'i', 'strong', 'em', 'span', 'mark']);
+      const cell = IITC.utils.escapeHtml(row[k], allowedTags);
       const colspan = k === 0 && row.length < columnCount ? ` colspan="${columnCount - row.length + 1}"` : '';
       rowHtml += `<td${colspan}>${cell}</td>`;
     }

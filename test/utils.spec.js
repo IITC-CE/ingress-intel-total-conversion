@@ -657,6 +657,17 @@ describe('IITC.utils.textToTable', () => {
     expect(result).to.equal(check);
   });
 
+  it('should escape HTML without tabs too, except for the allowed tags', () => {
+    const result = IITC.utils.textToTable('<b>bold</b>\n<img src=x onerror=alert(1)>');
+    expect(result).to.equal('<b>bold</b><br>&lt;img src=x onerror=alert(1)&gt;');
+  });
+
+  it('should keep only the given tags, and none for an empty list', () => {
+    expect(IITC.utils.textToTable('<b>bold</b> <i>it</i>', ['i'])).to.equal('&lt;b&gt;bold&lt;/b&gt; <i>it</i>');
+    const check = '<table><tr><td>&lt;b&gt;bold&lt;/b&gt;</td><td>&lt;i&gt;it&lt;/i&gt;</td></tr></table>';
+    expect(IITC.utils.textToTable('<b>bold</b>\t<i>it</i>', [])).to.equal(check);
+  });
+
   it('should handle empty input text as is', () => {
     const text = '';
     const result = IITC.utils.textToTable(text);
