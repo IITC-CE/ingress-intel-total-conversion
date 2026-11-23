@@ -7,6 +7,7 @@ import sinon from 'sinon';
 
 await import('../core/code/utils.js');
 await import('../core/code/_deprecated.js');
+await import('../core/code/popover.js');
 await import('../core/code/sidebar.js');
 
 // a Leaflet control stub and the DOM helpers the sidebar toggle uses

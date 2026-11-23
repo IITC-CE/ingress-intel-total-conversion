@@ -297,9 +297,8 @@ window.RegionScoreboardSetup = (function () {
     setupToolTips();
 
     var tooltip = createResultTooltip();
-    $('#overview', mainDialog).tooltip({
-      content: window.convertTextToTableMagic(tooltip),
-    });
+    const overview = mainDialog[0].querySelector('#overview');
+    if (overview) IITC.popover.bind(overview, { html: IITC.utils.textToTable(tooltip) });
 
     $('.region-select-form', mainDialog).on('submit', function (event) {
       event.preventDefault();
@@ -397,12 +396,7 @@ window.RegionScoreboardSetup = (function () {
         tooltip = 'CP:\t' + cp + '\t-\t' + formatDayHours(regionScore.getCheckpointTime(cp)) + '\n<hr>' + enl_str + res_str;
       }
 
-      elem.tooltip({
-        content: window.convertTextToTableMagic(tooltip),
-        position: { my: 'center bottom', at: 'center top-10' },
-        tooltipClass: 'checkpointtooltip',
-        show: 100,
-      });
+      IITC.popover.bind(elem[0], { html: IITC.utils.textToTable(tooltip), className: 'checkpointtooltip' });
     });
   }
 
@@ -510,7 +504,7 @@ window.RegionScoreboardSetup = (function () {
     var maxAverage = regionScore.getAvgScoreMax();
     var order = window.PLAYER.team === 'RESISTANCE' ? [window.TEAM_RES, window.TEAM_ENL] : [window.TEAM_ENL, window.TEAM_RES];
 
-    var result = '<table id="overview" title="">';
+    var result = '<table id="overview">';
     for (var t = 0; t < 2; t++) {
       var faction = order[t];
       var team = window.TEAM_NAMES[faction];
@@ -716,8 +710,7 @@ class HistoryChart {
     for (var cp = 1; cp <= this.regionScore.CP_COUNT; cp++) {
       var scores = this.regionScore.getCPScore(cp);
 
-      markers +=
-        `<g title="dummy" class="checkpoint" data-cp="${cp}">` + `<rect x="${cp * 10 + 35}" y="10" width="10" height="100" fill="black" fill-opacity="0" />`;
+      markers += `<g class="checkpoint" data-cp="${cp}">` + `<rect x="${cp * 10 + 35}" y="10" width="10" height="100" fill="black" fill-opacity="0" />`;
 
       if (scores) {
         markers +=

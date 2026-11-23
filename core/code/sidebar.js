@@ -107,7 +107,7 @@ function setupSidebarToggle() {
         if (open) IITC.portal.display.resetScroll();
         document.body.classList.toggle('sidebar-open', open);
         showState(open);
-        document.querySelectorAll('.ui-tooltip').forEach((tooltip) => tooltip.remove());
+        IITC.popover.close();
       });
       L.DomEvent.disableClickPropagation(container);
       return container;
@@ -129,7 +129,7 @@ function setupLargeImagePreview() {
     if (IITC.utils.isSmartphone()) {
       if (event.currentTarget !== event.target) return; // do not fire on #level
 
-      document.querySelectorAll('.ui-tooltip').forEach((tooltip) => tooltip.remove());
+      IITC.popover.close();
 
       const fullImage = document.querySelector('#sidebar > .fullimg');
       if (!fullImage) return;
