@@ -121,7 +121,7 @@ function buildFilterBar(container) {
     button.type = 'button';
     button.className = filter.type;
     button.textContent = filter.label;
-    button.title = 'Toggle ' + filter.label;
+    button.dataset.popover = 'Toggle ' + filter.label;
     button.classList.toggle('off', !!hidden[filter.type]);
     button.addEventListener('click', function () {
       hidden[filter.type] = !hidden[filter.type];
@@ -192,7 +192,7 @@ debugTab.renderLine = function (errorType, args) {
   var time = document.createElement('time');
   var d = new Date();
   time.textContent = d.toLocaleTimeString();
-  time.title = IITC.utils.unixTimeToDateTimeString(d.getTime(), true);
+  time.dataset.popover = IITC.utils.unixTimeToDateTimeString(d.getTime(), true);
   time.dataset.timestamp = d.getTime();
 
   // Type element creation (for log type)

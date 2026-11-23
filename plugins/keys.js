@@ -181,18 +181,18 @@ window.plugin.keys.setupCSS = function () {
 window.plugin.keys.setupContent = function () {
   window.plugin.keys.contentHTML =
     '<div id="keys-content-outer">' +
-    ' <div id="keys-label" title="Problem? Point to the question mark!">Key(s):</div>' +
+    ' <div id="keys-label" data-popover="Problem? Point to the question mark!">Key(s):</div>' +
     ' <div id="keys-subtract" class="keys-button" onclick="window.plugin.keys.addKey(-1);">' +
     '  <iitc-icon label="Remove" fallback="−">remove</iitc-icon>' +
     ' </div>' +
-    ' <div id="keys-count" title="Problem? Point to the question mark!"></div>' +
+    ' <div id="keys-count" data-popover="Problem? Point to the question mark!"></div>' +
     ' <div id="keys-add" class="keys-button" onclick="window.plugin.keys.addKey(1);">' +
     '  <iitc-icon label="Add" fallback="+">add</iitc-icon>' +
     ' </div>' +
-    ' <div id="keys-help" title="You MUST manually input your count of keys!\n' +
+    ' <div id="keys-help" data-popover="You MUST manually input your count of keys!\n' +
     'This plugin CANNOT automatically get the keys from Ingress!"><iitc-icon fallback="?">help</iitc-icon></div>' +
     '</div>';
-  window.plugin.keys.disabledMessage = '<div id="keys-content-outer" title="Your browser do not support localStorage">Plugin Keys disabled</div>';
+  window.plugin.keys.disabledMessage = '<div id="keys-content-outer" data-popover="Your browser do not support localStorage">Plugin Keys disabled</div>';
 };
 
 window.plugin.keys.setupPortalsList = function () {

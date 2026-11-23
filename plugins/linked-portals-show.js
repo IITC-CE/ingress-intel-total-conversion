@@ -93,7 +93,7 @@ showLinkedPortal.makePortalLinkInfo = function ($div, info, data) {
     $div.addClass('outOfRange');
   }
   showLinkedPortal.makePortalLinkContent.apply(this, arguments);
-  $div.attr('title', showLinkedPortal.getPortalLinkTooltip.apply(this, arguments));
+  IITC.popover.bind($div[0], { html: showLinkedPortal.getPortalLinkTooltip.apply(this, arguments) });
 };
 
 showLinkedPortal.portalDetail = function (data) {
@@ -193,7 +193,7 @@ showLinkedPortal.requestPortalData = function () {
     // update tooltip
     var tooltipId = $element.attr('aria-describedby');
     if (tooltipId) {
-      $('#' + tooltipId).html($element.attr('title'));
+      $('#' + tooltipId).html(showLinkedPortal.getPortalLinkTooltip($element, info, data));
     }
   });
 };

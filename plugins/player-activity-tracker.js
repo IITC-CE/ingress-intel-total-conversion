@@ -131,11 +131,11 @@ window.plugin.playerTracker.zoomListener = function () {
     if (!window.isTouchDevice()) window.plugin.playerTracker.closeIconTooltips();
     window.plugin.playerTracker.drawnTracesEnl.clearLayers();
     window.plugin.playerTracker.drawnTracesRes.clearLayers();
-    ctrl.addClass('disabled').attr('title', 'Zoom in to show those.');
+    ctrl.addClass('disabled').attr('data-popover', 'Zoom in to show those.');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
     IITC.chat.backgroundChannelData('plugin.playerTracker', 'all', false); // disable this plugin's interest in 'all' COMM
   } else {
-    ctrl.removeClass('disabled').attr('title', '');
+    ctrl.removeClass('disabled').removeAttr('data-popover');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
     IITC.chat.backgroundChannelData('plugin.playerTracker', 'all', true); // enable this plugin's interest in 'all' COMM
   }

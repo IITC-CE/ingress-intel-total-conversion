@@ -593,7 +593,7 @@ window.plugin.missions = {
 
         var infoLength = container.appendChild(document.createElement('span'));
         infoLength.className = 'plugin-mission-info length help';
-        infoLength.title = 'Length of this mission.\n\nNOTE: The actual distance required to cover may vary depending on several factors!';
+        infoLength.dataset.popover = 'Length of this mission.\n\nNOTE: The actual distance required to cover may vary depending on several factors!';
         infoLength.textContent = len;
         img = infoLength.insertBefore(document.createElement('img'), infoLength.firstChild);
         img.src = '@include_img:images/mission-length.png@';
@@ -602,7 +602,7 @@ window.plugin.missions = {
       if (window.plugin.distanceToPortal && window.plugin.distanceToPortal.currentLoc) {
         var infoDistance = container.appendChild(document.createElement('span'));
         infoDistance.className = 'plugin-mission-info distance help';
-        infoDistance.title = 'Distance to this mission. Click to update.';
+        infoDistance.dataset.popover = 'Distance to this mission. Click to update.';
         infoDistance.addEventListener(
           'click',
           function () {
@@ -618,14 +618,14 @@ window.plugin.missions = {
 
     var infoTime = container.appendChild(document.createElement('span'));
     infoTime.className = 'plugin-mission-info time help';
-    infoTime.title = 'Typical duration';
+    infoTime.dataset.popover = 'Typical duration';
     infoTime.textContent = timeToRemaining((mission.medianCompletionTimeMs / 1000) | 0) + ' ';
     img = infoTime.insertBefore(document.createElement('img'), infoTime.firstChild);
     img.src = 'https://commondatastorage.googleapis.com/ingress.com/img/tm_icons/time.png';
 
     var infoRating = container.appendChild(document.createElement('span'));
     infoRating.className = 'plugin-mission-info rating help';
-    infoRating.title = 'Average rating';
+    infoRating.dataset.popover = 'Average rating';
     infoRating.textContent = ((mission.ratingE6 / 100) | 0) / 100 + '%' + ' ';
     img = infoRating.insertBefore(document.createElement('img'), infoRating.firstChild);
     img.src = 'https://commondatastorage.googleapis.com/ingress.com/img/tm_icons/like.png';
@@ -633,7 +633,7 @@ window.plugin.missions = {
     if (cachedMission) {
       var infoPlayers = container.appendChild(document.createElement('span'));
       infoPlayers.className = 'plugin-mission-info players help';
-      infoPlayers.title = 'Unique players who have completed this mission';
+      infoPlayers.dataset.popover = 'Unique players who have completed this mission';
       infoPlayers.textContent = cachedMission.numUniqueCompletedPlayers + ' ';
       img = infoPlayers.insertBefore(document.createElement('img'), infoPlayers.firstChild);
       img.src = 'https://commondatastorage.googleapis.com/ingress.com/img/tm_icons/players.png';
@@ -796,7 +796,7 @@ window.plugin.missions = {
     var container = document.createElement('div');
     container.className = 'plugin-mission-portal-indicator help ' + team;
     container.textContent = level;
-    container.title = 'Level:\t' + level + '\nResonators:\t' + resCount + '\nHealth:\t' + portal.health + '%';
+    container.dataset.popover = 'Level:\t' + level + '\nResonators:\t' + resCount + '\nHealth:\t' + portal.health + '%';
 
     for (var i = 0; i < resCount; i++) {
       var resonator = container.appendChild(document.createElement('div'));
