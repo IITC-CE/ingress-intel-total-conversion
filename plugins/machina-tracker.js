@@ -53,6 +53,7 @@ machinaTracker.setup = () => {
     iconUrl: iconImage,
     iconSize: [26, 32],
     iconAnchor: [12, 32],
+    tooltipAnchor: IITC.map.tooltipAnchors.pinTip,
   });
 
   machinaTracker.popup = new L.Popup({ offset: new L.Point([1, -34]) });
@@ -208,7 +209,8 @@ machinaTracker.drawData = function () {
         .appendTo(linkList);
     });
 
-    var m = new L.Marker(position, { icon: icon, opacity: opacity, desc: popup[0], title: title });
+    var m = new L.Marker(position, { icon: icon, opacity: opacity, desc: popup[0] });
+    if (title) m.bindTooltip(title, { className: 'plugin-machina-tracker-label' });
     m.addEventListener('spiderfiedclick', machinaTracker.onClickListener);
 
     window.registerMarkerForOMS(m);

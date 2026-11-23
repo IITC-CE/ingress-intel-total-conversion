@@ -31,3 +31,9 @@ ul.plugin-machina-tracker-link-list li::before {
     position: absolute;
     left: -1em;
 }
+
+.leaflet-tooltip.plugin-machina-tracker-label {
+    padding: 0 3px;
+    font-size: 11px;
+    line-height: 13px;
+}
