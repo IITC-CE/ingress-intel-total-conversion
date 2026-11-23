@@ -244,6 +244,47 @@ describe('IITC.utils.unixTimeToDateTimeString', () => {
   });
 });
 
+describe('IITC.utils.formatTimestamp', () => {
+  it('should return only the time for a timestamp on the same day as now', () => {
+    const time = new Date(2023, 9, 15, 0, 5).getTime();
+    const now = new Date(2023, 9, 15, 23, 59).getTime();
+    expect(IITC.utils.formatTimestamp(time, { now })).to.equal('00:05');
+  });
+
+  it('should put the date before the time for a timestamp on another day, even a minute before midnight', () => {
+    const time = new Date(2023, 9, 14, 23, 59).getTime();
+    const now = new Date(2023, 9, 15, 0, 0).getTime();
+    expect(IITC.utils.formatTimestamp(time, { now })).to.equal('2023-10-14 23:59');
+  });
+
+  it('should take the timestamp and now as strings', () => {
+    const time = new Date(2023, 9, 14, 8, 15).getTime();
+    expect(IITC.utils.formatTimestamp(String(time), { now: String(time) })).to.equal('08:15');
+    expect(IITC.utils.formatTimestamp(String(time), { now: String(time + 86400000) })).to.equal('2023-10-14 08:15');
+  });
+
+  it('should return the date alone with days precision', () => {
+    const time = new Date(2023, 9, 14, 8, 15).getTime();
+    expect(IITC.utils.formatTimestamp(time, { date: 'always', precision: 'days' })).to.equal('2023-10-14');
+  });
+
+  it('should separate zero-padded milliseconds with a dot', () => {
+    const time = new Date(2023, 9, 14, 8, 15, 7, 12).getTime();
+    expect(IITC.utils.formatTimestamp(time, { date: 'never', precision: 'milliseconds' })).to.equal('08:15:07.012');
+  });
+
+  it('should return null for a missing or invalid timestamp', () => {
+    expect(IITC.utils.formatTimestamp(undefined)).to.be.null;
+    expect(IITC.utils.formatTimestamp(0)).to.be.null;
+    expect(IITC.utils.formatTimestamp('abc')).to.be.null;
+  });
+
+  it('should throw on an unknown option value and on days precision without the date', () => {
+    expect(() => IITC.utils.formatTimestamp(Date.now(), { precision: 'days' })).to.throw(RangeError);
+    expect(() => IITC.utils.formatTimestamp(Date.now(), { precision: 'hours' })).to.throw(RangeError);
+  });
+});
+
 describe('IITC.utils.unixTimeToHHmm', () => {
   it('should return null if time is undefined', () => {
     const result = IITC.utils.unixTimeToHHmm(undefined);
