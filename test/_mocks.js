@@ -146,6 +146,9 @@ globalThis.L = {
   layerGroup: () => new L.LayerGroup(),
   Marker: class {
     addTo() {}
+    bindTooltip() {
+      return this;
+    }
   },
   marker: () => new L.Marker(),
   circle: () => ({ addTo() {} }),
