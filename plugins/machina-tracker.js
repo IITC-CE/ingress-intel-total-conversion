@@ -64,12 +64,95 @@ machinaTracker.setup = () => {
 
   window.map.on('zoomend', machinaTracker.zoomListener);
   machinaTracker.zoomListener();
+  // last, as a change of the options redraws what is set up above
+  machinaTracker.registerOptions();
+  setInterval(machinaTracker.refreshTimes, 60 * 1000);
+};
+
+machinaTracker.registerOptions = () => {
+  IITC.options.register('machina-tracker', {
+    title: 'Machina tracker',
+    blocks: [
+      {
+        type: 'boolean',
+        key: 'alwaysShowLabels',
+        title: 'Always show time labels',
+        description: 'Otherwise on hover. Touch screens show labels only when they are always shown',
+        default: false,
+        onChange: () => machinaTracker.redraw(),
+      },
+      {
+        type: 'select',
+        key: 'timeFormat',
+        title: 'Time in labels and popups',
+        description: 'Clock time has the date when it is not today',
+        choices: [
+          { value: 'relative', label: 'Time ago' },
+          { value: 'absolute', label: 'Clock time' },
+        ],
+        default: 'relative',
+        onChange: () => {
+          machinaTracker.redraw();
+          machinaTracker.refreshTimes();
+        },
+      },
+    ],
+  });
+};
+
+/**
+ * Formats the time of an event in the chosen format
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @param {number} now - Current time in milliseconds
+ * @returns {string} Time ago, or the clock time with the date when it is not today
+ */
+machinaTracker.formatTime = (time, now) => {
+  if (IITC.options.get('machina-tracker.timeFormat') === 'relative') return `${IITC.utils.formatAgo(time, now)} ago`;
+  return IITC.utils.formatTimestamp(time, { now });
+};
+
+/**
+ * Creates an element showing the time of an event in a popup, written again by `writeTimes`
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @returns {jQuery} The element
+ */
+machinaTracker.timeElement = (time) => $('<span>').attr('data-time', time).text(machinaTracker.formatTime(time, Date.now()));
+
+// writes the times in a popup again, so they are current and in the chosen format
+machinaTracker.writeTimes = (container) => {
+  const now = Date.now();
+  for (const element of container.querySelectorAll('[data-time]')) element.textContent = machinaTracker.formatTime(Number(element.dataset.time), now);
+};
+
+// writes the times in open labels and popups again, so they stay current
+machinaTracker.refreshTimes = () => {
+  machinaTracker.drawnTraces.eachLayer((layer) => {
+    const tooltip = layer.getTooltip();
+    if (tooltip?.isOpen()) tooltip.update();
+  });
+  if (machinaTracker.popup.isOpen()) {
+    machinaTracker.writeTimes(machinaTracker.popup.getContent());
+    // a layout for the new width of the times, without panning back to a popup the map was moved away from
+    const { autoPan } = machinaTracker.popup.options;
+    machinaTracker.popup.options.autoPan = false;
+    machinaTracker.popup.update();
+    machinaTracker.popup.options.autoPan = autoPan;
+  }
+};
+
+machinaTracker.redraw = () => {
+  if (window.map.getZoom() < machinaTracker.MACHINA_TRACKER_MIN_ZOOM) return;
+  machinaTracker.drawnTraces.clearLayers();
+  machinaTracker.drawData();
 };
 
 machinaTracker.onClickListener = (event) => {
   var marker = event.target;
 
   if (marker.options.desc) {
+    machinaTracker.writeTimes(marker.options.desc);
     machinaTracker.popup.setContent(marker.options.desc);
     machinaTracker.popup.setLatLng(marker.getLatLng());
     window.map.openPopup(machinaTracker.popup);
@@ -183,6 +266,7 @@ machinaTracker.createPortalLink = function (portal) {
 
 machinaTracker.drawData = function () {
   var isTouchDev = window.isTouchDevice();
+  const showAlways = IITC.options.get('machina-tracker.alwaysShowLabels');
 
   var split = machinaTracker.MACHINA_TRACKER_MAX_TIME / 4;
   var now = new Date().getTime();
@@ -191,7 +275,8 @@ machinaTracker.drawData = function () {
     var ageBucket = Math.min((now - event.time) / split, 3);
     var position = event.from.latLng;
 
-    var title = isTouchDev ? '' : IITC.utils.formatAgo(event.time, now) + ' ago';
+    // written whenever the label is shown, so the time in it stays current
+    const title = () => machinaTracker.formatTime(event.time, Date.now());
     var icon = machinaTracker.icon;
     var opacity = 1 - 0.2 * ageBucket;
 
@@ -202,15 +287,13 @@ machinaTracker.drawData = function () {
     linkList.appendTo(popup);
 
     event.to.forEach((to) => {
-      $('<li>')
-        .append(machinaTracker.createPortalLink(to))
-        .append(' ')
-        .append(IITC.utils.formatAgo(to.time, now) + ' ago')
-        .appendTo(linkList);
+      $('<li>').append(machinaTracker.createPortalLink(to)).append(' ').append(machinaTracker.timeElement(to.time)).appendTo(linkList);
     });
 
     var m = new L.Marker(position, { icon: icon, opacity: opacity, desc: popup[0] });
-    if (title) m.bindTooltip(title, { className: 'plugin-machina-tracker-label' });
+    // a label on hover needs a mouse, an ever shown one fades with the marker and keeps to one side
+    if (showAlways) m.bindTooltip(title, { permanent: true, direction: 'right', opacity, className: 'plugin-machina-tracker-label' });
+    else if (!isTouchDev) m.bindTooltip(title, { className: 'plugin-machina-tracker-label' });
     m.addEventListener('spiderfiedclick', machinaTracker.onClickListener);
 
     window.registerMarkerForOMS(m);

@@ -91,6 +91,100 @@ window.plugin.playerTracker.setup = function () {
   window.plugin.playerTracker.zoomListener();
 
   window.plugin.playerTracker.setupUserSearch();
+  // last, as a change of the options redraws what is set up above
+  window.plugin.playerTracker.registerOptions();
+  setInterval(window.plugin.playerTracker.refreshTimes, 60 * 1000);
+};
+
+window.plugin.playerTracker.registerOptions = () => {
+  IITC.options.register('player-activity-tracker', {
+    title: 'Player tracker',
+    blocks: [
+      {
+        type: 'select',
+        key: 'timeFormat',
+        title: 'Time in labels and popups',
+        description: 'Clock time has the date when it is not today',
+        choices: [
+          { value: 'relative', label: 'Time ago' },
+          { value: 'absolute', label: 'Clock time' },
+        ],
+        default: 'relative',
+        onChange: () => {
+          window.plugin.playerTracker.redraw();
+          window.plugin.playerTracker.refreshTimes();
+        },
+      },
+      { type: 'heading', title: 'Labels' },
+      {
+        type: 'boolean',
+        key: 'alwaysShowLabels',
+        title: 'Always show',
+        description: 'Otherwise on hover. Touch screens show labels only when they are always shown',
+        default: false,
+        onChange: () => window.plugin.playerTracker.redraw(),
+      },
+      {
+        type: 'boolean',
+        key: 'labelTime',
+        title: 'Time of the last action',
+        default: true,
+        onChange: () => window.plugin.playerTracker.redraw(),
+      },
+    ],
+  });
+};
+
+/**
+ * Formats the time of an event in the chosen format
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @param {number} now - Current time in milliseconds
+ * @returns {string} Time ago, or the clock time with the date when it is not today
+ */
+window.plugin.playerTracker.formatTime = (time, now) => {
+  if (IITC.options.get('player-activity-tracker.timeFormat') === 'relative') return `${IITC.utils.formatAgo(time, now)} ago`;
+  return IITC.utils.formatTimestamp(time, { now });
+};
+
+/**
+ * Creates an element showing the time of an event in a popup, written again by `writeTimes`
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @returns {jQuery} The element
+ */
+window.plugin.playerTracker.timeElement = (time) => $('<span>').attr('data-time', time).text(window.plugin.playerTracker.formatTime(time, Date.now()));
+
+// writes the times in a popup again, so they are current and in the chosen format
+window.plugin.playerTracker.writeTimes = (container) => {
+  const now = Date.now();
+  for (const element of container.querySelectorAll('[data-time]'))
+    element.textContent = window.plugin.playerTracker.formatTime(Number(element.dataset.time), now);
+};
+
+// writes the times in open labels and popups again, so they stay current
+window.plugin.playerTracker.refreshTimes = () => {
+  for (const group of [window.plugin.playerTracker.drawnTracesEnl, window.plugin.playerTracker.drawnTracesRes]) {
+    group.eachLayer((layer) => {
+      const tooltip = layer.getTooltip();
+      if (tooltip?.isOpen()) tooltip.update();
+    });
+  }
+  if (window.plugin.playerTracker.playerPopup.isOpen()) {
+    window.plugin.playerTracker.writeTimes(window.plugin.playerTracker.playerPopup.getContent());
+    // a layout for the new width of the times, without panning back to a popup the map was moved away from
+    const { autoPan } = window.plugin.playerTracker.playerPopup.options;
+    window.plugin.playerTracker.playerPopup.options.autoPan = false;
+    window.plugin.playerTracker.playerPopup.update();
+    window.plugin.playerTracker.playerPopup.options.autoPan = autoPan;
+  }
+};
+
+window.plugin.playerTracker.redraw = () => {
+  if (window.map.getZoom() < window.PLAYER_TRACKER_MIN_ZOOM) return;
+  window.plugin.playerTracker.drawnTracesEnl.clearLayers();
+  window.plugin.playerTracker.drawnTracesRes.clearLayers();
+  window.plugin.playerTracker.drawData();
 };
 
 window.plugin.playerTracker.stored = {};
@@ -99,6 +193,7 @@ window.plugin.playerTracker.onClickListener = function (event) {
   var marker = event.target;
 
   if (marker.options.desc) {
+    window.plugin.playerTracker.writeTimes(marker.options.desc);
     window.plugin.playerTracker.playerPopup.setContent(marker.options.desc);
     window.plugin.playerTracker.playerPopup.setLatLng(marker.getLatLng());
     window.map.openPopup(window.plugin.playerTracker.playerPopup);
@@ -272,6 +367,8 @@ window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
 
 window.plugin.playerTracker.drawData = function () {
   var isTouchDev = window.isTouchDevice();
+  const showAlways = IITC.options.get('player-activity-tracker.alwaysShowLabels');
+  const showTime = IITC.options.get('player-activity-tracker.labelTime');
 
   var gllfe = window.plugin.playerTracker.getLatLngFromEvent;
 
@@ -300,10 +397,9 @@ window.plugin.playerTracker.drawData = function () {
 
     var evtsLength = playerData.events.length;
     var last = playerData.events[evtsLength - 1];
-    const ago = IITC.utils.formatAgo;
 
-    // tooltip for marker - no HTML - and not shown on touchscreen devices
-    var tooltip = isTouchDev ? '' : plrname + ', ' + ago(last.time, now) + ' ago';
+    // label for marker - no HTML - written whenever it is shown, so the time in it stays current
+    const tooltip = () => (showTime ? `${plrname}, ${window.plugin.playerTracker.formatTime(last.time, Date.now())}` : plrname);
 
     // popup for marker
     var popup = $('<div>').addClass('plugin-player-tracker-popup');
@@ -333,11 +429,7 @@ window.plugin.playerTracker.drawData = function () {
       }
     }
 
-    popup
-      .append('<br>')
-      .append(document.createTextNode(ago(last.time, now)))
-      .append('<br>')
-      .append(window.plugin.playerTracker.getPortalLink(last));
+    popup.append('<br>').append(window.plugin.playerTracker.timeElement(last.time)).append('<br>').append(window.plugin.playerTracker.getPortalLink(last));
 
     // show previous data in popup
     if (evtsLength >= 2) {
@@ -347,7 +439,7 @@ window.plugin.playerTracker.drawData = function () {
       for (let i = evtsLength - 2; i >= 0 && i >= evtsLength - window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS; i--) {
         var ev = playerData.events[i];
         $('<tr>')
-          .append($('<td>').text(ago(ev.time, now) + ' ago'))
+          .append($('<td>').append(window.plugin.playerTracker.timeElement(ev.time)))
           .append($('<td>').append(window.plugin.playerTracker.getPortalLink(ev)))
           .appendTo(table);
       }
@@ -363,7 +455,9 @@ window.plugin.playerTracker.drawData = function () {
     // marker click events. so store the popup text in the options, then display it in the oms click handler
     const markerPos = gllfe(last);
     var m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0] });
-    if (tooltip) m.bindTooltip(tooltip, { className: 'plugin-player-tracker-label' });
+    // a label on hover needs a mouse, an ever shown one fades with the marker and keeps to one side
+    if (showAlways) m.bindTooltip(tooltip, { permanent: true, direction: 'right', opacity: absOpacity, className: 'plugin-player-tracker-label' });
+    else if (!isTouchDev) m.bindTooltip(tooltip, { className: 'plugin-player-tracker-label' });
     m.addEventListener('spiderfiedclick', window.plugin.playerTracker.onClickListener);
 
     // m.bindPopup(title);
@@ -480,10 +574,6 @@ window.plugin.playerTracker.onSearchResultSelected = function (result, event) {
   return true;
 };
 
-window.plugin.playerTracker.locale = navigator.languages;
-
-window.plugin.playerTracker.dateTimeFormat = {};
-
 window.plugin.playerTracker.onSearch = function (query) {
   var term = query.term.toLowerCase();
 
@@ -497,10 +587,7 @@ window.plugin.playerTracker.onSearch = function (query) {
     query.addResult({
       title: `<mark class="nickname help ${window.TEAM_TO_CSS[window.getTeam(data)]}">${nick}</mark>`,
       nickname: nick,
-      description:
-        data.team.slice(0, 3) +
-        ', last seen ' +
-        new Date(event.time).toLocaleString(window.plugin.playerTracker.locale, window.plugin.playerTracker.dateTimeFormat),
+      description: `${data.team.slice(0, 3)}, last seen ${IITC.utils.formatTimestamp(event.time)}`,
       position: window.plugin.playerTracker.getLatLngFromEvent(event),
       onSelected: window.plugin.playerTracker.onSearchResultSelected,
     });
