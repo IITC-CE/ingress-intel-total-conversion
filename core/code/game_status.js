@@ -43,7 +43,7 @@ window.updateGameScore = function (data) {
     // help cursor via “#gamestat span”
     var resMu = 'Resistance:\t' + r + ' MindUnits';
     var enlMu = 'Enlightened:\t' + e + ' MindUnits';
-    gamestatElement.attr('title', teamId === window.TEAM_RES ? resMu + '\n' + enlMu : enlMu + '\n' + resMu);
+    gamestatElement.attr('data-popover', teamId === window.TEAM_RES ? resMu + '\n' + enlMu : enlMu + '\n' + resMu);
   } else if (data && data.error) {
     log.warn('game score failed to load: ' + data.error);
   } else {

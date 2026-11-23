@@ -127,7 +127,7 @@ const drawNav = () => {
             type: 'button',
             className: 'iitc-options-page-link',
             dataset: { page: pageId },
-            title: accessKeyHint(pageId),
+            'data-popover': accessKeyHint(pageId),
             'aria-current': pageId === view.pageId && 'page',
             onclick: () => choose(pageId),
           },
@@ -436,7 +436,7 @@ const setMapButton = (wanted) => {
               {
                 href: '#',
                 role: 'button',
-                title: accessKeyHint(pageId),
+                'data-popover': accessKeyHint(pageId),
                 onclick: (event) => {
                   event.preventDefault();
                   open(pageId);

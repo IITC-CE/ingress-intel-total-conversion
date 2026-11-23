@@ -392,9 +392,9 @@ describe('IITC.options._renderPage', () => {
       const [bookmarks, broken] = container.querySelector('.iitc-options-list').children;
       expect(bookmarks.className).to.equal('iitc-options-item-muted');
       // on the entry's own line only, so its nested entries do not show it
-      expect(bookmarks.querySelector('.iitc-options-list-head').title).to.equal('Save portals');
-      expect(bookmarks.title).to.equal('');
-      expect(bookmarks.querySelector('details li').title).to.equal('');
+      expect(bookmarks.querySelector('.iitc-options-list-head').dataset.popover).to.equal('Save portals');
+      expect(bookmarks.hasAttribute('data-popover')).to.be.false;
+      expect(bookmarks.querySelector('details li').hasAttribute('data-popover')).to.be.false;
       expect(bookmarks.querySelector('summary .iitc-options-list-head').textContent).to.equal('Bookmarks0.4');
       expect(bookmarks.querySelector('summary iitc-icon').getAttribute('fallback')).to.equal('▸');
       expect(bookmarks.querySelector('details li').textContent).to.equal('0.4: fixes');
@@ -635,7 +635,7 @@ describe('IITC.options._renderPage', () => {
 
       const button = container.querySelector('button');
       expect(button.className).to.equal('iitc-options-icon-button');
-      expect(button.title).to.equal('Delete');
+      expect(button.dataset.popover).to.equal('Delete');
       expect(button.getAttribute('aria-label')).to.equal('Delete');
       const icon = button.querySelector('iitc-icon');
       expect(icon.textContent).to.equal('delete');

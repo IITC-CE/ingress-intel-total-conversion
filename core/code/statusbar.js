@@ -74,7 +74,7 @@ IITC.statusbar.mapTemplates = {
   main: '{{ portalLevels }} {{ mapStatus }}{{ requestsStatus }}',
 
   // Portal levels information
-  portalLevels: '<span class="help portallevel" title="Indicates portal levels/link lengths displayed. Zoom in to display more;">{{ content }}</span>',
+  portalLevels: '<span class="help portallevel" data-popover="Indicates portal levels/link lengths displayed. Zoom in to display more;">{{ content }}</span>',
 
   // Map status information
   mapStatus: '<span class="map"><b>map</b>: {{ content }}</span>',
@@ -83,7 +83,7 @@ IITC.statusbar.mapTemplates = {
   linksPrefix: '<b>links</b>: ',
 
   // Help container with tooltip
-  helpContainer: '<span class="help" title="{{ tooltip }}">{{ content }}</span>',
+  helpContainer: '<span class="help" data-popover="{{ tooltip }}">{{ content }}</span>',
 
   // Progress indicator
   progressInfo: ' {{ progress }}%',

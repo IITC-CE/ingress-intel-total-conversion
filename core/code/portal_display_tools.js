@@ -34,7 +34,7 @@ let historyTemplate =
 let rangeLinkTemplate = '<a onclick="IITC.portal.display.rangeLinkClick()"{strike}>{distance}</a>';
 
 /**
- * Template of a single portal mod entry ({titleAttr} is a pre-built ` title="..."` attribute or empty)
+ * Template of a single portal mod entry ({titleAttr} is a pre-built ` data-popover="..."` attribute or empty)
  * @type {String}
  * @memberof IITC.portal.display.tools
  */
@@ -52,7 +52,7 @@ let modEmptyTemplate = '<span style="color:#000"></span>';
  * @type {String}
  * @memberof IITC.portal.display.tools
  */
-let resonatorMeterTemplate = '<span class="{className}" title="{inf}">{fill}{lbar}</span>';
+let resonatorMeterTemplate = '<span class="{className}" data-popover="{inf}">{fill}{lbar}</span>';
 
 /**
  * Template of the resonator fill bar
@@ -212,7 +212,7 @@ const getModDetails = function (d) {
   let t = '';
   for (let i = 0; i < mods.length; i++) {
     t += L.Util.template(IITC.portal.display.tools.modTemplate, {
-      titleAttr: modsTitle[i].length ? ' title="' + modsTitle[i] + '"' : '',
+      titleAttr: modsTitle[i].length ? ' data-popover="' + modsTitle[i] + '"' : '',
       color: modsColor[i],
       name: mods[i],
     });

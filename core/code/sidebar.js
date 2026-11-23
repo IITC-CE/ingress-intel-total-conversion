@@ -60,7 +60,7 @@ window.setupPlayerStat = function () {
     `\n\nNote: your player stats can only be updated by a full reload (F5)`;
 
   $('#playerstat').html(
-    `<h2 title="${t}">
+    `<h2 data-popover="${t}">
       ${level}
       <div id="name">
         <span class="playername ${cls}">${window.PLAYER.nickname}</span>
@@ -90,7 +90,7 @@ function setupSidebarToggle() {
       button.id = 'sidebartoggle';
       button.type = 'button';
       button.accessKey = 'i';
-      button.title = 'Toggle sidebar [i]';
+      button.dataset.popover = 'Toggle sidebar [i]';
       button.setAttribute('aria-label', 'Toggle sidebar');
       const icon = L.DomUtil.create('iitc-icon', '', button);
       const showState = (open) => {

@@ -383,21 +383,23 @@ const uniqueArray = function (arr) {
  * Generates a four-column HTML table from an array of data blocks.
  *
  * @memberof IITC.utils
- * @param {Array} blocks - Array of data blocks, where each block is an array with details for one row.
+ * @param {Array} blocks - Array of data blocks, each one `[header, data, details]`.
  * @returns {string} HTML string representing the constructed table.
  */
 const genFourColumnTable = function (blocks) {
   const rows = blocks
     .map((detail, index) => {
       if (!detail) return '';
-      const title = detail[2] ? ` title="${IITC.utils.escapeHtml(detail[2])}"` : '';
+      // the details of a block open in a popover; the header takes the keyboard focus
+      const popover = detail[2] ? ` data-popover="${IITC.utils.escapeHtml(detail[2])}"` : '';
+      const header = popover ? `${popover} tabindex="0"` : '';
 
       if (index % 2 === 0) {
         // If index is even, start a new row and add <td> for data and <th> for header
-        return `<tr><td${title}>${detail[1]}</td><th${title}>${detail[0]}</th>`;
+        return `<tr><td${popover}>${detail[1]}</td><th${header}>${detail[0]}</th>`;
       } else {
         // If index is odd, complete the row with <th> for header and <td> for data, then close </tr>
-        return `<th${title}>${detail[0]}</th><td${title}>${detail[1]}</td></tr>`;
+        return `<th${header}>${detail[0]}</th><td${popover}>${detail[1]}</td></tr>`;
       }
     })
     .join('');

@@ -123,7 +123,7 @@ IITC.toolbox = {
     buttonElement.textContent = buttonData.label;
     buttonElement.onclick = buttonData.action;
 
-    if (typeof buttonData.title === 'string') buttonElement.title = buttonData.title;
+    if (typeof buttonData.title === 'string') buttonElement.dataset.popover = buttonData.title;
     if (typeof buttonData.class === 'string') buttonElement.className = buttonData.class;
     if (typeof buttonData.access_key === 'string') buttonElement.accessKey = buttonData.access_key;
     if (typeof buttonData.accesskey === 'string') buttonElement.accessKey = buttonData.accesskey;

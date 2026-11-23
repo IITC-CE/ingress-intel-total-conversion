@@ -119,10 +119,10 @@ describe('IITC.portal.display.getMiscDetails', () => {
     expect(IITC.portal.display.getMiscDetails('G1', d)).to.equal(
       '<table id="randdetails">' +
         `<tr><td><span class="nickname">me</span></td><th>owner</th>` +
-        `<th title="${rangeTitle}">range</th><td title="${rangeTitle}"><a onclick="IITC.portal.display.rangeLinkClick()">655km</a></td></tr>` +
-        `<tr><td title="${linksTitle}">0 out / 0 in</td><th title="${linksTitle}">links</th><th>fields</th><td>0</td></tr>` +
-        `<tr><td title="${shieldTitle}">0</td><th title="${shieldTitle}">shielding</th><th title="${energyTitle}">energy</th><td title="${energyTitle}">48k / 48k</td></tr>` +
-        `<tr><td title="${apTitle}">0</td><th title="${apTitle}">AP Gain</th><th title="${hackTitle}">hacks</th><td title="${hackTitle}">4 @ 3m</td></tr>` +
+        `<th data-popover="${rangeTitle}" tabindex="0">range</th><td data-popover="${rangeTitle}"><a onclick="IITC.portal.display.rangeLinkClick()">655km</a></td></tr>` +
+        `<tr><td data-popover="${linksTitle}">0 out / 0 in</td><th data-popover="${linksTitle}" tabindex="0">links</th><th>fields</th><td>0</td></tr>` +
+        `<tr><td data-popover="${shieldTitle}">0</td><th data-popover="${shieldTitle}" tabindex="0">shielding</th><th data-popover="${energyTitle}" tabindex="0">energy</th><td data-popover="${energyTitle}">48k / 48k</td></tr>` +
+        `<tr><td data-popover="${apTitle}">0</td><th data-popover="${apTitle}" tabindex="0">AP Gain</th><th data-popover="${hackTitle}" tabindex="0">hacks</th><td data-popover="${hackTitle}">4 @ 3m</td></tr>` +
         '</table>'
     );
   });
@@ -285,10 +285,10 @@ describe('IITC.portal.display.renderUrl', () => {
     IITC.portal.display.renderUrl(1.5, 2.5, 'My Portal', 'GUID123');
 
     expect(document.querySelector('.linkdetails').innerHTML).to.equal(
-      '<aside><a href="/intel?pll=1.5,2.5" title="Create a URL link to this portal">Portal link</a></aside>' +
+      '<aside><a href="/intel?pll=1.5,2.5" data-popover="Create a URL link to this portal">Portal link</a></aside>' +
         '<aside><a href="https://link.ingress.com/portal/GUID123" ' +
-        'title="Copy link to this portal for Ingress Prime">Copy scanner link</a></aside>' +
-        '<aside><a title="Link to alternative maps (Google, etc)">Map links</a></aside>'
+        'data-popover="Copy link to this portal for Ingress Prime">Copy scanner link</a></aside>' +
+        '<aside><a data-popover="Link to alternative maps (Google, etc)">Map links</a></aside>'
     );
   });
 });
@@ -370,10 +370,10 @@ describe('IITC.portal.display.renderToSidebar', () => {
     IITC.portal.display.renderToSidebar(makePortal());
 
     expect(document.getElementById('portaldetails').innerHTML).to.equal(
-      '<h3 id="portaltitle" class="title"><iitc-icon filled="" class="icon-button" title="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>' +
-        '<span class="value">My Portal</span><iitc-icon class="close icon-button" title="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
-        '<div class="imgpreview" title="My Portal\n\nClick to show full image." style="background-image: url(&quot;img.png&quot;)">' +
-        '<span id="level" title="Level 8\nfully upgraded">8</span><img class="hide" src="img.png"></div>' +
+      '<h3 id="portaltitle" class="title"><iitc-icon filled="" class="icon-button" data-popover="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>' +
+        '<span class="value">My Portal</span><iitc-icon class="close icon-button" data-popover="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
+        '<div class="imgpreview" data-popover="My Portal\n\nClick to show full image." style="background-image: url(&quot;img.png&quot;)">' +
+        '<span id="level" data-popover="Level 8\nfully upgraded">8</span><img class="hide" src="img.png"></div>' +
         '<div class="mods">MODS</div>' +
         '<table id="randdetails"></table>' +
         '<table id="resodetails"></table>' +
@@ -420,10 +420,10 @@ describe('IITC.portal.display.renderToSidebar', () => {
     IITC.portal.display.renderToSidebar(portal);
 
     expect(document.getElementById('portaldetails').innerHTML).to.equal(
-      '<h3 id="portaltitle" class="title"><iitc-icon filled="" class="icon-button" title="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>' +
-        '<span class="value">P</span><iitc-icon class="close icon-button" title="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
-        '<div class="imgpreview" title="P\n\nClick to show full image." style="background-image: url(&quot;default.png&quot;)">' +
-        '<span id="level" title="Level 0">0</span><img class="hide" src="default.png"></div>' +
+      '<h3 id="portaltitle" class="title"><iitc-icon filled="" class="icon-button" data-popover="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>' +
+        '<span class="value">P</span><iitc-icon class="close icon-button" data-popover="Close [w]" accesskey="w" label="Close" fallback="X">close</iitc-icon></h3>' +
+        '<div class="imgpreview" data-popover="P\n\nClick to show full image." style="background-image: url(&quot;default.png&quot;)">' +
+        '<span id="level" data-popover="Level 0">0</span><img class="hide" src="default.png"></div>' +
         '<div id="portalStatus">Loading details...</div>' +
         '<div class="linkdetails"></div>' +
         '<div id="historydetails"></div>'
