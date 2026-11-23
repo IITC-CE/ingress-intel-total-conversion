@@ -12,7 +12,7 @@ IITC.map = {};
  * Default map layer
  *  used when no or an invalid base layer is stored in settings
  */
-const DEFAULT_MAP = 'CartoDB Dark Matter';
+const DEFAULT_MAP = 'Google Default Ingress Map';
 
 /**
  * Warning shown in the portal details panel when some standard layers are turned off
@@ -150,7 +150,7 @@ function createCartoLayers() {
   });
 
   const attribution = IITC.map.osmAttributionTemplate;
-  layers[DEFAULT_MAP /* 'CartoDB Dark Matter' */] = L.tileLayer(url(), { attribution, theme: 'dark_all', isDark: true });
+  layers['CartoDB Dark Matter'] = L.tileLayer(url(), { attribution, theme: 'dark_all', isDark: true });
   layers['CartoDB Positron'] = L.tileLayer(url(), { attribution, theme: 'light_all', isDark: false });
   return layers;
 }
