@@ -162,6 +162,21 @@ describe('IITC.popover', () => {
       expect(isShown()).to.be.false;
     });
 
+    it('closes when the element is taken off the page, not when it is moved or something else changes', async () => {
+      const holder = addElement('<div><div data-popover="Hello">x</div></div>');
+      const cell = holder.firstElementChild;
+      hover(cell);
+
+      addElement('<p>other</p>');
+      document.body.append(holder);
+      await settle();
+      expect(isShown()).to.be.true;
+
+      holder.remove();
+      await settle();
+      expect(isShown()).to.be.false;
+    });
+
     it('close(element) closes only the popover of that element', () => {
       const cell = addElement('<div data-popover="Hello">x</div>');
       const other = addElement('<p>other</p>');

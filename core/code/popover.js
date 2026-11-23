@@ -115,8 +115,14 @@ const create = (trigger) => {
 
   trigger.removeAttribute('title');
   const next = { trigger, kind: 'hover', shown: false, timer: null, text, html: null, observer: null, ancestors: new Map() };
-  next.observer = new MutationObserver(() => state === next && takeTitle(next));
+  next.observer = new MutationObserver(() => {
+    if (state !== next) return;
+    // an element taken off the page, as a marker cleared from the map, leaves no pointerout behind
+    if (trigger.isConnected) takeTitle(next);
+    else dispose();
+  });
   next.observer.observe(trigger, { attributes: true, attributeFilter: ['title'] });
+  next.observer.observe(document.body, { childList: true, subtree: true });
 
   // the browser shows the title of an element around in place of the one it does not find
   for (let node = trigger.parentElement; node; node = node.parentElement) {
