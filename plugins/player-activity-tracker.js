@@ -91,7 +91,7 @@ window.plugin.playerTracker.setup = function () {
     window.layerChooser.addOverlay(window.plugin.playerTracker.drawnTracesEnl, 'Player Tracker Enlightened');
     window.layerChooser.addOverlay(window.plugin.playerTracker.drawnTracesRes, 'Player Tracker Resistance');
   }
-  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]), className: 'plugin-player-tracker-leaflet-popup' });
+  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]), maxWidth: 400, className: 'plugin-player-tracker-leaflet-popup' });
 
   window.addHook('publicChatDataAvailable', window.plugin.playerTracker.handleData);
 
@@ -175,6 +175,15 @@ window.plugin.playerTracker.registerOptions = () => {
         key: 'labelTime',
         title: 'Time of the last action',
         default: true,
+        onChange: () => window.plugin.playerTracker.redraw(),
+      },
+      { type: 'heading', title: 'Popup' },
+      {
+        type: 'boolean',
+        key: 'detailedPopup',
+        title: 'Detailed view',
+        description: 'What the agent did at each portal',
+        default: false,
         onChange: () => window.plugin.playerTracker.redraw(),
       },
     ],
@@ -385,11 +394,13 @@ window.plugin.playerTracker.processNewData = function (data) {
       return true;
     }
 
+    const action = { guid: json[0], time: json[1], markup: json[2].plext.markup };
     var newEvent = {
       latlngs: [[lat, lng]],
       time: json[1],
       name: name,
       address: address,
+      actions: [action],
     };
 
     var playerData = window.plugin.playerTracker.stored[plrname];
@@ -416,6 +427,7 @@ window.plugin.playerTracker.processNewData = function (data) {
     // this is multiple resos destroyed at the same time.
     if (evts[cmp].time === json[1]) {
       evts[cmp].latlngs.push([lat, lng]);
+      window.plugin.playerTracker.addAction(evts[cmp], action);
       return true;
     }
 
@@ -425,7 +437,10 @@ window.plugin.playerTracker.processNewData = function (data) {
     // to look at the next item in the event list. If this event is the
     // newest one, there may not be a newer event so check for that. If
     // it really is an older event at the same location, then skip it.
-    if (evts[cmp + 1] && window.plugin.playerTracker.eventHasLatLng(evts[cmp + 1], lat, lng)) return true;
+    if (evts[cmp + 1] && window.plugin.playerTracker.eventHasLatLng(evts[cmp + 1], lat, lng)) {
+      window.plugin.playerTracker.addAction(evts[cmp + 1], action);
+      return true;
+    }
 
     // if this event is newer, need to look at the previous one
     var sameLocation = window.plugin.playerTracker.eventHasLatLng(evts[cmp], lat, lng);
@@ -434,10 +449,24 @@ window.plugin.playerTracker.processNewData = function (data) {
     // push as new event.
     if (sameLocation) {
       evts[cmp].time = json[1];
+      window.plugin.playerTracker.addAction(evts[cmp], action);
     } else {
       evts.splice(i, 0, newEvent);
     }
   });
+};
+
+/**
+ * Adds a message to the actions of an event unless it is there already, keeping them in time order
+ *
+ * @param {Object} ev - The event
+ * @param {Object} action - The message, with its guid, time and markup
+ */
+window.plugin.playerTracker.addAction = (ev, action) => {
+  ev.actions ??= [];
+  if (ev.actions.some((known) => known.guid === action.guid)) return;
+  ev.actions.push(action);
+  ev.actions.sort((a, b) => a.time - b.time);
 };
 
 window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
@@ -456,6 +485,7 @@ window.plugin.playerTracker.drawData = function () {
   var isTouchDev = window.isTouchDevice();
   const showAlways = IITC.options.get('player-activity-tracker.alwaysShowLabels');
   const showTime = IITC.options.get('player-activity-tracker.labelTime');
+  const detailed = IITC.options.get('player-activity-tracker.detailedPopup');
 
   var gllfe = window.plugin.playerTracker.getLatLngFromEvent;
 
@@ -483,14 +513,15 @@ window.plugin.playerTracker.drawData = function () {
       polyLineByPlayerAndAge[plrname][ageBucket].push(line);
     }
 
-    var evtsLength = playerData.events.length;
-    var last = playerData.events[evtsLength - 1];
+    const last = playerData.events.at(-1);
 
     // label for marker - no HTML - written whenever it is shown, so the time in it stays current
     const tooltip = () => (showTime ? `${plrname}, ${window.plugin.playerTracker.formatTime(last.time, Date.now())}` : plrname);
 
     // popup for marker
-    var popup = $('<div>').addClass('plugin-player-tracker-popup plugin-player-tracker-popup-' + (playerData.team === 'RESISTANCE' ? 'res' : 'enl'));
+    const popup = $('<div>')
+      .addClass(`plugin-player-tracker-popup plugin-player-tracker-popup-${playerData.team === 'RESISTANCE' ? 'res' : 'enl'}`)
+      .toggleClass('plugin-player-tracker-popup-detailed', detailed);
     // keeps clear of the close button
     const header = $('<div>').addClass('plugin-player-tracker-popup-header').appendTo(popup);
     $('<span>')
@@ -527,22 +558,22 @@ window.plugin.playerTracker.drawData = function () {
       .append(document.createTextNode('at '), window.plugin.playerTracker.portalLink(last))
       .appendTo(popup);
 
-    // the latest locations, the newest first
-    if (evtsLength >= 2) {
+    // the latest locations, or in the detailed view the latest actions, the newest first; an event an extension
+    // of the plugin stored without its messages shows as its portal
+    const rows = detailed
+      ? playerData.events.flatMap((ev) => (ev.actions?.length ? ev.actions : [{ time: ev.time, event: ev }])).sort((a, b) => b.time - a.time)
+      : playerData.events.map((ev) => ({ time: ev.time, event: ev })).reverse();
+    if (rows.length >= (detailed ? 1 : 2)) {
       const table = $('<table>').addClass('plugin-player-tracker-events').appendTo(popup);
-      playerData.events
-        .slice(-window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS)
-        .reverse()
-        .forEach((ev) => {
-          $('<tr>')
-            .append($('<td>').addClass('time').append(window.plugin.playerTracker.timeElement(ev.time)))
-            .append(
-              $('<td>')
-                .addClass('entry')
-                .append($('<div>').addClass('plugin-player-tracker-popup-line').append(window.plugin.playerTracker.portalLink(ev)))
-            )
-            .appendTo(table);
-        });
+      rows.slice(0, window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS).forEach((row) => {
+        const what = row.markup
+          ? window.plugin.playerTracker.actionElement(row.markup)
+          : $('<div>').addClass('plugin-player-tracker-popup-line').append(window.plugin.playerTracker.portalLink(row.event));
+        $('<tr>')
+          .append($('<td>').addClass('time').append(window.plugin.playerTracker.timeElement(row.time)))
+          .append($('<td>').addClass('entry').append(what))
+          .appendTo(table);
+      });
     }
 
     // marker opacity
@@ -620,6 +651,30 @@ window.plugin.playerTracker.portalLink = (data) => {
       event.preventDefault();
       return false;
     });
+};
+
+/**
+ * Writes a message as the chat shows it, on one line and without the player it is about, its portals in the
+ * colour of their faction then
+ *
+ * @param {Array} markup - The markup of the message
+ * @returns {jQuery} The line
+ */
+window.plugin.playerTracker.actionElement = (markup) => {
+  const shown = IITC.comm.transformMessage({ markup });
+  if (shown[0]?.[0] === 'PLAYER') shown.shift();
+
+  const line = $('<div>').addClass('plugin-player-tracker-popup-line plugin-player-tracker-popup-action');
+  for (const [type, data] of shown) {
+    if (type === 'PORTAL') {
+      const portal = { latlngs: [[data.latE6 / 1e6, data.lngE6 / 1e6]], name: data.name, address: data.address };
+      line.append(window.plugin.playerTracker.portalLink(portal).addClass(window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)]));
+    } else {
+      // in a span, as the line would drop the spaces at the ends of a bare text
+      line.append($('<span>').text(data.plain ?? ''));
+    }
+  }
+  return line;
 };
 
 window.plugin.playerTracker.handleData = function (data) {
