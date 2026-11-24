@@ -213,12 +213,14 @@ window.plugin.playerTracker.formatTime = (time, now) => {
  * second on hover
  *
  * @param {number} time - Time of the event in milliseconds
- * @returns {jQuery} The element
+ * @returns {HTMLElement} The element
  */
 window.plugin.playerTracker.timeElement = (time) =>
-  $('<span>')
-    .attr({ 'data-time': time, 'data-popover': IITC.utils.formatTimestamp(time, { precision: 'seconds' }) })
-    .text(window.plugin.playerTracker.formatTime(time, Date.now()));
+  IITC.utils.createElement(
+    'span',
+    { dataset: { time, popover: IITC.utils.formatTimestamp(time, { precision: 'seconds' }) } },
+    window.plugin.playerTracker.formatTime(time, Date.now())
+  );
 
 // writes the times in a popup again, so they are current and in the chosen format
 window.plugin.playerTracker.writeTimes = (container) => {
@@ -540,44 +542,30 @@ window.plugin.playerTracker.drawData = function () {
     const tooltip = () => (showTime ? `${plrname}, ${window.plugin.playerTracker.formatTime(last.time, Date.now())}` : plrname);
 
     // popup for marker
-    const popup = $('<div>')
-      .addClass(`plugin-player-tracker-popup plugin-player-tracker-popup-${playerData.team === 'RESISTANCE' ? 'res' : 'enl'}`)
-      .toggleClass('plugin-player-tracker-popup-detailed', detailed);
+    const el = IITC.utils.createElement;
+    const team = playerData.team === 'RESISTANCE' ? 'res' : 'enl';
+    const popup = el('div', { className: `plugin-player-tracker-popup plugin-player-tracker-popup-${team}` });
+    popup.classList.toggle('plugin-player-tracker-popup-detailed', detailed);
     // keeps clear of the close button
-    const header = $('<div>').addClass('plugin-player-tracker-popup-header').appendTo(popup);
-    $('<span>')
-      .addClass('nickname ' + (playerData.team === 'RESISTANCE' ? 'res' : 'enl'))
-      .css('font-weight', 'bold')
-      .text(plrname)
-      .appendTo(header);
+    const header = el(
+      'div',
+      { className: 'plugin-player-tracker-popup-header' },
+      el('span', { className: `nickname ${team}`, style: 'font-weight: bold' }, plrname)
+    );
+    popup.append(header);
 
-    if (window.plugin.guessPlayerLevels !== undefined && window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer !== undefined) {
-      function getLevel(lvl) {
-        return $('<span>')
-          .css({
-            padding: '4px',
-            color: 'white',
-            backgroundColor: window.COLORS_LVL[lvl],
-          })
-          .text(lvl);
-      }
-
-      var level = $('<span>').css({ 'font-weight': 'bold', 'margin-left': '10px' }).appendTo(header);
-
-      var playerLevelDetails = window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer(plrname);
-      level.text('Min level ').append(getLevel(playerLevelDetails.min));
-      if (playerLevelDetails.min !== playerLevelDetails.guessed) {
-        level.append(document.createTextNode(', guessed level: ')).append(getLevel(playerLevelDetails.guessed));
-      }
+    if (window.plugin.guessPlayerLevels?.fetchLevelDetailsByPlayer !== undefined) {
+      const getLevel = (lvl) => el('span', { style: `padding: 4px; color: white; background-color: ${window.COLORS_LVL[lvl]}` }, String(lvl));
+      const { min, guessed } = window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer(plrname);
+      const level = el('span', { style: 'font-weight: bold; margin-left: 10px' }, 'Min level ', getLevel(min));
+      if (min !== guessed) level.append(', guessed level: ', getLevel(guessed));
+      header.append(level);
     }
 
-    $('<div>')
-      .append(document.createTextNode('Last seen '), $('<b>').append(window.plugin.playerTracker.timeElement(last.time)))
-      .appendTo(popup);
-    $('<div>')
-      .addClass('plugin-player-tracker-popup-line')
-      .append(document.createTextNode('at '), window.plugin.playerTracker.portalLink(last))
-      .appendTo(popup);
+    popup.append(
+      el('div', {}, 'Last seen ', el('b', {}, window.plugin.playerTracker.timeElement(last.time))),
+      el('div', { className: 'plugin-player-tracker-popup-line' }, 'at ', window.plugin.playerTracker.portalLink(last))
+    );
 
     // the latest locations, or in the detailed view the latest actions, the newest first; an event an extension
     // of the plugin stored without its messages shows as its portal
@@ -585,16 +573,14 @@ window.plugin.playerTracker.drawData = function () {
       ? playerData.events.flatMap((ev) => (ev.actions?.length ? ev.actions : [{ time: ev.time, event: ev }])).sort((a, b) => b.time - a.time)
       : playerData.events.map((ev) => ({ time: ev.time, event: ev })).reverse();
     if (rows.length >= (detailed ? 1 : 2)) {
-      const table = $('<table>').addClass('plugin-player-tracker-events').appendTo(popup);
-      rows.slice(0, window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS).forEach((row) => {
+      const table = el('table', { className: 'plugin-player-tracker-events' });
+      for (const row of rows.slice(0, window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS)) {
         const what = row.markup
           ? window.plugin.playerTracker.actionElement(row.markup)
-          : $('<div>').addClass('plugin-player-tracker-popup-line').append(window.plugin.playerTracker.portalLink(row.event));
-        $('<tr>')
-          .append($('<td>').addClass('time').append(window.plugin.playerTracker.timeElement(row.time)))
-          .append($('<td>').addClass('entry').append(what))
-          .appendTo(table);
-      });
+          : el('div', { className: 'plugin-player-tracker-popup-line' }, window.plugin.playerTracker.portalLink(row.event));
+        table.append(el('tr', {}, el('td', { className: 'time' }, window.plugin.playerTracker.timeElement(row.time)), el('td', { className: 'entry' }, what)));
+      }
+      popup.append(table);
     }
 
     // marker opacity
@@ -606,7 +592,7 @@ window.plugin.playerTracker.drawData = function () {
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
     const markerPos = gllfe(last);
-    const m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], player: plrname });
+    const m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup, player: plrname });
     // a label on hover needs a mouse, an ever shown one fades with the marker and keeps to one side
     if (showAlways) m.bindTooltip(tooltip, { permanent: true, direction: 'right', opacity: absOpacity, className: 'plugin-player-tracker-label' });
     else if (!isTouchDev) m.bindTooltip(tooltip, { className: 'plugin-player-tracker-label' });
@@ -651,27 +637,30 @@ window.plugin.playerTracker.getDrawnTracesByTeam = function (team) {
  * Creates a link that selects the portal of an event, and zooms to it on a double click
  *
  * @param {Object} data - The event, or anything with its latlngs, name and address
- * @returns {jQuery} The link
+ * @returns {HTMLElement} The link
  */
 window.plugin.playerTracker.portalLink = (data) => {
   const position = data.latlngs[0];
-  return $('<a>')
-    .text(IITC.comm.getChatPortalName(data))
-    .prop({
-      title: IITC.comm.getChatPortalName(data),
+  const name = IITC.comm.getChatPortalName(data);
+  return IITC.utils.createElement(
+    'a',
+    {
+      title: name,
       href: IITC.portal.display.makePermalink(position),
-    })
-    .on('click', (event) => {
-      IITC.portal.selectByLatLng(position);
-      event.preventDefault();
-      return false;
-    })
-    .on('dblclick', (event) => {
-      window.map.setView(position, window.DEFAULT_ZOOM);
-      IITC.portal.selectByLatLng(position);
-      event.preventDefault();
-      return false;
-    });
+      onclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        IITC.portal.selectByLatLng(position);
+      },
+      ondblclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.map.setView(position, window.DEFAULT_ZOOM);
+        IITC.portal.selectByLatLng(position);
+      },
+    },
+    name
+  );
 };
 
 /**
@@ -679,20 +668,23 @@ window.plugin.playerTracker.portalLink = (data) => {
  * colour of their faction then
  *
  * @param {Array} markup - The markup of the message
- * @returns {jQuery} The line
+ * @returns {HTMLElement} The line
  */
 window.plugin.playerTracker.actionElement = (markup) => {
   const shown = IITC.comm.transformMessage({ markup });
   if (shown[0]?.[0] === 'PLAYER') shown.shift();
 
-  const line = $('<div>').addClass('plugin-player-tracker-popup-line plugin-player-tracker-popup-action');
+  const el = IITC.utils.createElement;
+  const line = el('div', { className: 'plugin-player-tracker-popup-line plugin-player-tracker-popup-action' });
   for (const [type, data] of shown) {
     if (type === 'PORTAL') {
       const portal = { latlngs: [[data.latE6 / 1e6, data.lngE6 / 1e6]], name: data.name, address: data.address };
-      line.append(window.plugin.playerTracker.portalLink(portal).addClass(window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)]));
+      const link = window.plugin.playerTracker.portalLink(portal);
+      link.classList.add(window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)]);
+      line.append(link);
     } else {
       // in a span, as the line would drop the spaces at the ends of a bare text
-      line.append($('<span>').text(data.plain ?? ''));
+      line.append(el('span', {}, data.plain ?? ''));
     }
   }
   return line;

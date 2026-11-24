@@ -146,9 +146,9 @@ machinaTracker.formatTime = (time, now) => {
  * Creates an element showing the time of an event in a popup, written again by `writeTimes`
  *
  * @param {number} time - Time of the event in milliseconds
- * @returns {jQuery} The element
+ * @returns {HTMLElement} The element
  */
-machinaTracker.timeElement = (time) => $('<span>').attr('data-time', time).text(machinaTracker.formatTime(time, Date.now()));
+machinaTracker.timeElement = (time) => IITC.utils.createElement('span', { dataset: { time } }, machinaTracker.formatTime(time, Date.now()));
 
 // writes the times in a popup again, so they are current and in the chosen format
 machinaTracker.writeTimes = (container) => {
@@ -273,26 +273,27 @@ machinaTracker.processNewData = function (data) {
   });
 };
 
-machinaTracker.createPortalLink = function (portal) {
-  return $('<a>')
-    .addClass('text-overflow-ellipsis')
-    .text(portal.name)
-    .prop({
+machinaTracker.createPortalLink = (portal) =>
+  IITC.utils.createElement(
+    'a',
+    {
+      className: 'text-overflow-ellipsis',
       title: portal.name,
       href: IITC.portal.display.makePermalink(portal.latLng),
-    })
-    .on('click', (event) => {
-      IITC.portal.selectByLatLng(portal.latLng);
-      event.preventDefault();
-      return false;
-    })
-    .on('dblclick', (event) => {
-      window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
-      IITC.portal.selectByLatLng(portal.latLng);
-      event.preventDefault();
-      return false;
-    });
-};
+      onclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        IITC.portal.selectByLatLng(portal.latLng);
+      },
+      ondblclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
+        IITC.portal.selectByLatLng(portal.latLng);
+      },
+    },
+    portal.name
+  );
 
 machinaTracker.drawData = function () {
   var isTouchDev = window.isTouchDevice();
@@ -310,17 +311,19 @@ machinaTracker.drawData = function () {
     var icon = machinaTracker.icon;
     var opacity = 1 - 0.2 * ageBucket;
 
-    var popup = $('<div>').addClass('plugin-machina-tracker-popup');
-    $('<div>').addClass('plugin-machina-tracker-popup-header').append(machinaTracker.createPortalLink(event.from)).appendTo(popup);
+    const el = IITC.utils.createElement;
+    const popup = el(
+      'div',
+      { className: 'plugin-machina-tracker-popup' },
+      el('div', { className: 'plugin-machina-tracker-popup-header' }, machinaTracker.createPortalLink(event.from)),
+      el(
+        'ul',
+        { className: 'plugin-machina-tracker-link-list' },
+        ...event.to.map((to) => el('li', {}, machinaTracker.createPortalLink(to), ' ', machinaTracker.timeElement(to.time)))
+      )
+    );
 
-    var linkList = $('<ul>').addClass('plugin-machina-tracker-link-list');
-    linkList.appendTo(popup);
-
-    event.to.forEach((to) => {
-      $('<li>').append(machinaTracker.createPortalLink(to)).append(' ').append(machinaTracker.timeElement(to.time)).appendTo(linkList);
-    });
-
-    var m = new L.Marker(position, { icon: icon, opacity: opacity, desc: popup[0] });
+    const m = new L.Marker(position, { icon, opacity, desc: popup });
     // a label on hover needs a mouse, an ever shown one fades with the marker and keeps to one side
     if (showAlways) m.bindTooltip(title, { permanent: true, direction: 'right', opacity, className: 'plugin-machina-tracker-label' });
     else if (!isTouchDev) m.bindTooltip(title, { className: 'plugin-machina-tracker-label' });
