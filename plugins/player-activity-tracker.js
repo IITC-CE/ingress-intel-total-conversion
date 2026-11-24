@@ -91,7 +91,7 @@ window.plugin.playerTracker.setup = function () {
     window.layerChooser.addOverlay(window.plugin.playerTracker.drawnTracesEnl, 'Player Tracker Enlightened');
     window.layerChooser.addOverlay(window.plugin.playerTracker.drawnTracesRes, 'Player Tracker Resistance');
   }
-  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]) });
+  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]), className: 'plugin-player-tracker-leaflet-popup' });
 
   window.addHook('publicChatDataAvailable', window.plugin.playerTracker.handleData);
 
@@ -201,12 +201,16 @@ window.plugin.playerTracker.formatTime = (time, now) => {
 };
 
 /**
- * Creates an element showing the time of an event in a popup, written again by `writeTimes`
+ * Creates an element showing the time of an event in a popup, written again by `writeTimes`, with the time to the
+ * second on hover
  *
  * @param {number} time - Time of the event in milliseconds
  * @returns {jQuery} The element
  */
-window.plugin.playerTracker.timeElement = (time) => $('<span>').attr('data-time', time).text(window.plugin.playerTracker.formatTime(time, Date.now()));
+window.plugin.playerTracker.timeElement = (time) =>
+  $('<span>')
+    .attr({ 'data-time': time, 'data-popover': IITC.utils.formatTimestamp(time, { precision: 'seconds' }) })
+    .text(window.plugin.playerTracker.formatTime(time, Date.now()));
 
 // writes the times in a popup again, so they are current and in the chosen format
 window.plugin.playerTracker.writeTimes = (container) => {
@@ -486,12 +490,14 @@ window.plugin.playerTracker.drawData = function () {
     const tooltip = () => (showTime ? `${plrname}, ${window.plugin.playerTracker.formatTime(last.time, Date.now())}` : plrname);
 
     // popup for marker
-    var popup = $('<div>').addClass('plugin-player-tracker-popup');
+    var popup = $('<div>').addClass('plugin-player-tracker-popup plugin-player-tracker-popup-' + (playerData.team === 'RESISTANCE' ? 'res' : 'enl'));
+    // keeps clear of the close button
+    const header = $('<div>').addClass('plugin-player-tracker-popup-header').appendTo(popup);
     $('<span>')
       .addClass('nickname ' + (playerData.team === 'RESISTANCE' ? 'res' : 'enl'))
       .css('font-weight', 'bold')
       .text(plrname)
-      .appendTo(popup);
+      .appendTo(header);
 
     if (window.plugin.guessPlayerLevels !== undefined && window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer !== undefined) {
       function getLevel(lvl) {
@@ -504,7 +510,7 @@ window.plugin.playerTracker.drawData = function () {
           .text(lvl);
       }
 
-      var level = $('<span>').css({ 'font-weight': 'bold', 'margin-left': '10px' }).appendTo(popup);
+      var level = $('<span>').css({ 'font-weight': 'bold', 'margin-left': '10px' }).appendTo(header);
 
       var playerLevelDetails = window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer(plrname);
       level.text('Min level ').append(getLevel(playerLevelDetails.min));
@@ -513,20 +519,30 @@ window.plugin.playerTracker.drawData = function () {
       }
     }
 
-    popup.append('<br>').append(window.plugin.playerTracker.timeElement(last.time)).append('<br>').append(window.plugin.playerTracker.getPortalLink(last));
+    $('<div>')
+      .append(document.createTextNode('Last seen '), $('<b>').append(window.plugin.playerTracker.timeElement(last.time)))
+      .appendTo(popup);
+    $('<div>')
+      .addClass('plugin-player-tracker-popup-line')
+      .append(document.createTextNode('at '), window.plugin.playerTracker.portalLink(last))
+      .appendTo(popup);
 
-    // show previous data in popup
+    // the latest locations, the newest first
     if (evtsLength >= 2) {
-      popup.append('<br>').append('<br>').append(document.createTextNode('previous locations:')).append('<br>');
-
-      var table = $('<table>').appendTo(popup).css('border-spacing', '0');
-      for (let i = evtsLength - 2; i >= 0 && i >= evtsLength - window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS; i--) {
-        var ev = playerData.events[i];
-        $('<tr>')
-          .append($('<td>').append(window.plugin.playerTracker.timeElement(ev.time)))
-          .append($('<td>').append(window.plugin.playerTracker.getPortalLink(ev)))
-          .appendTo(table);
-      }
+      const table = $('<table>').addClass('plugin-player-tracker-events').appendTo(popup);
+      playerData.events
+        .slice(-window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS)
+        .reverse()
+        .forEach((ev) => {
+          $('<tr>')
+            .append($('<td>').addClass('time').append(window.plugin.playerTracker.timeElement(ev.time)))
+            .append(
+              $('<td>')
+                .addClass('entry')
+                .append($('<div>').addClass('plugin-player-tracker-popup-line').append(window.plugin.playerTracker.portalLink(ev)))
+            )
+            .appendTo(table);
+        });
     }
 
     // marker opacity
@@ -579,22 +595,26 @@ window.plugin.playerTracker.getDrawnTracesByTeam = function (team) {
   return team === 'RESISTANCE' ? window.plugin.playerTracker.drawnTracesRes : window.plugin.playerTracker.drawnTracesEnl;
 };
 
-window.plugin.playerTracker.getPortalLink = function (data) {
-  var position = data.latlngs[0];
+/**
+ * Creates a link that selects the portal of an event, and zooms to it on a double click
+ *
+ * @param {Object} data - The event, or anything with its latlngs, name and address
+ * @returns {jQuery} The link
+ */
+window.plugin.playerTracker.portalLink = (data) => {
+  const position = data.latlngs[0];
   return $('<a>')
-    .addClass('text-overflow-ellipsis')
-    .css('max-width', '15em')
     .text(IITC.comm.getChatPortalName(data))
     .prop({
       title: IITC.comm.getChatPortalName(data),
       href: IITC.portal.display.makePermalink(position),
     })
-    .on('click', function (event) {
+    .on('click', (event) => {
       IITC.portal.selectByLatLng(position);
       event.preventDefault();
       return false;
     })
-    .on('dblclick', function (event) {
+    .on('dblclick', (event) => {
       window.map.setView(position, window.DEFAULT_ZOOM);
       IITC.portal.selectByLatLng(position);
       event.preventDefault();
