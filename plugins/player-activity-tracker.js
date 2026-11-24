@@ -2,7 +2,7 @@
 // @name           Player activity tracker
 // @category       Layer
 // @version        0.14.2
-// @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
+// @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Keeps three hours of data by default. Does not request chat data on its own, even if that would be useful.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
@@ -93,6 +93,7 @@ window.plugin.playerTracker.setup = function () {
   window.plugin.playerTracker.setupUserSearch();
   // last, as a change of the options redraws what is set up above
   window.plugin.playerTracker.registerOptions();
+  window.plugin.playerTracker.applyHistoryLength();
   setInterval(window.plugin.playerTracker.refreshTimes, 60 * 1000);
 };
 
@@ -115,6 +116,29 @@ window.plugin.playerTracker.registerOptions = () => {
           window.plugin.playerTracker.refreshTimes();
         },
       },
+      {
+        type: 'select',
+        key: 'historyHours',
+        title: 'History length',
+        description: 'Older actions are dropped. A longer history builds up while IITC stays open',
+        choices: [
+          { value: 0.5, label: '30 minutes' },
+          { value: 1, label: '1 hour' },
+          { value: 2, label: '2 hours' },
+          { value: 3, label: '3 hours' },
+          { value: 6, label: '6 hours' },
+          { value: 12, label: '12 hours' },
+          { value: 24, label: '1 day' },
+          { value: 72, label: '3 days' },
+          { value: 168, label: '1 week' },
+        ],
+        default: 3,
+        onChange: () => {
+          window.plugin.playerTracker.applyHistoryLength();
+          window.plugin.playerTracker.discardOldData();
+          window.plugin.playerTracker.redraw();
+        },
+      },
       { type: 'heading', title: 'Labels' },
       {
         type: 'boolean',
@@ -133,6 +157,13 @@ window.plugin.playerTracker.registerOptions = () => {
       },
     ],
   });
+};
+
+/**
+ * Sets how long actions are kept from the History length option
+ */
+window.plugin.playerTracker.applyHistoryLength = () => {
+  window.PLAYER_TRACKER_MAX_TIME = IITC.options.get('player-activity-tracker.historyHours') * 60 * 60 * 1000;
 };
 
 /**

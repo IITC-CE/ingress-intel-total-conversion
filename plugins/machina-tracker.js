@@ -66,6 +66,7 @@ machinaTracker.setup = () => {
   machinaTracker.zoomListener();
   // last, as a change of the options redraws what is set up above
   machinaTracker.registerOptions();
+  machinaTracker.applyHistoryLength();
   setInterval(machinaTracker.refreshTimes, 60 * 1000);
 };
 
@@ -96,8 +97,37 @@ machinaTracker.registerOptions = () => {
           machinaTracker.refreshTimes();
         },
       },
+      {
+        type: 'select',
+        key: 'historyHours',
+        title: 'History length',
+        description: 'Older actions are dropped. A longer history builds up while IITC stays open',
+        choices: [
+          { value: 1, label: '1 hour' },
+          { value: 2, label: '2 hours' },
+          { value: 4, label: '4 hours' },
+          { value: 8, label: '8 hours' },
+          { value: 12, label: '12 hours' },
+          { value: 24, label: '1 day' },
+          { value: 72, label: '3 days' },
+          { value: 168, label: '1 week' },
+        ],
+        default: 8,
+        onChange: () => {
+          machinaTracker.applyHistoryLength();
+          machinaTracker.discardOldData();
+          machinaTracker.redraw();
+        },
+      },
     ],
   });
+};
+
+/**
+ * Sets how long actions are kept from the History length option
+ */
+machinaTracker.applyHistoryLength = () => {
+  machinaTracker.MACHINA_TRACKER_MAX_TIME = IITC.options.get('machina-tracker.historyHours') * 60 * 60 * 1000;
 };
 
 /**
