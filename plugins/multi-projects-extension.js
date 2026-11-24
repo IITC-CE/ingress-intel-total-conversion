@@ -229,8 +229,8 @@ window.plugin.mpe.getHTML.project = function (PJ) {
 
   listElem += `<div class="mpe manager ${PJ} list-group-item" data-mpe="${PJ}">`;
   listElem += `<h4>${PROJ.title}</h4>`;
-  listElem += `<a class="left" onclick="window.plugin.mpe.action.deleteProject('${PJ}');return false;" title="Delete Current">${txtDel}</a>`;
-  listElem += `<a class="right" onclick="window.plugin.mpe.action.createNewProject('${PJ}');return false;" title="Create New">${txtNew}</a>`;
+  listElem += `<a class="left" onclick="window.plugin.mpe.action.deleteProject('${PJ}');return false;" data-popover="Delete Current" aria-label="Delete Current">${txtDel}</a>`;
+  listElem += `<a class="right" onclick="window.plugin.mpe.action.createNewProject('${PJ}');return false;" data-popover="Create New" aria-label="Create New">${txtNew}</a>`;
   listElem += `<select class="left" onchange="window.plugin.mpe.action.switchProject('${PJ}', $(this).val());return false;">`;
 
   listElem += window.plugin.mpe.getHTML.projectOptions(PJ);
@@ -297,17 +297,17 @@ function getProjectIcon(PJ) {
 
   var icon = window.plugin.mpe.data.getIcon(PJ);
   if (icon.length !== 0) {
-    return '<iitc-icon class="left" title="' + title + '">' + icon + '</iitc-icon>';
+    return '<iitc-icon class="left" data-popover="' + title + '">' + icon + '</iitc-icon>';
   }
 
   if (window.plugin.faIcon) {
     var fa = window.plugin.mpe.data.getFaClass(PJ);
     fa = fa.length !== 0 ? fa : 'nofa';
-    return '<i class="left fa ' + fa + '" title="' + title + '"></i>';
+    return '<i class="left fa ' + fa + '" data-popover="' + title + '"></i>';
   }
 
   var short = title ? title.substr(0, 3) : 'n/a';
-  return '<i class="left fa" title="' + title + '">' + short + '</i>';
+  return '<i class="left fa" data-popover="' + title + '">' + short + '</i>';
 }
 
 // ------------------------------------------------------

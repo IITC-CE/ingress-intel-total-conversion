@@ -106,7 +106,8 @@ function setup() {
         },
         false
       );
-      button.title = 'Count nested fields';
+      button.dataset.popover = 'Count nested fields';
+      button.setAttribute('aria-label', 'Count nested fields');
 
       tooltip = document.createElement('div');
       tooltip.className = 'leaflet-control-layer-count-tooltip';

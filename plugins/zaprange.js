@@ -86,21 +86,27 @@ window.plugin.zaprange.showOrHide = function () {
     // show the layer
     if (!window.plugin.zaprange.zapLayerEnlHolderGroup.hasLayer(window.plugin.zaprange.zapCircleEnlHolderGroup)) {
       window.plugin.zaprange.zapLayerEnlHolderGroup.addLayer(window.plugin.zaprange.zapCircleEnlHolderGroup);
-      $('.leaflet-control-layers-list span:contains("Zaprange Enlightened")').parent('label').removeClass('disabled').attr('title', '');
+      $('.leaflet-control-layers-list span:contains("Zaprange Enlightened")').parent('label').removeClass('disabled').removeAttr('data-popover');
     }
     if (!window.plugin.zaprange.zapLayerResHolderGroup.hasLayer(window.plugin.zaprange.zapCircleResHolderGroup)) {
       window.plugin.zaprange.zapLayerResHolderGroup.addLayer(window.plugin.zaprange.zapCircleResHolderGroup);
-      $('.leaflet-control-layers-list span:contains("Zaprange Resistance")').parent('label').removeClass('disabled').attr('title', '');
+      $('.leaflet-control-layers-list span:contains("Zaprange Resistance")').parent('label').removeClass('disabled').removeAttr('data-popover');
     }
   } else {
     // hide the layer
     if (window.plugin.zaprange.zapLayerEnlHolderGroup.hasLayer(window.plugin.zaprange.zapCircleEnlHolderGroup)) {
       window.plugin.zaprange.zapLayerEnlHolderGroup.removeLayer(window.plugin.zaprange.zapCircleEnlHolderGroup);
-      $('.leaflet-control-layers-list span:contains("Zaprange Enlightened")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+      $('.leaflet-control-layers-list span:contains("Zaprange Enlightened")')
+        .parent('label')
+        .addClass('disabled')
+        .attr('data-popover', 'Zoom in to show those.');
     }
     if (window.plugin.zaprange.zapLayerResHolderGroup.hasLayer(window.plugin.zaprange.zapCircleResHolderGroup)) {
       window.plugin.zaprange.zapLayerResHolderGroup.removeLayer(window.plugin.zaprange.zapCircleResHolderGroup);
-      $('.leaflet-control-layers-list span:contains("Zaprange Resistance")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+      $('.leaflet-control-layers-list span:contains("Zaprange Resistance")')
+        .parent('label')
+        .addClass('disabled')
+        .attr('data-popover', 'Zoom in to show those.');
     }
   }
 };

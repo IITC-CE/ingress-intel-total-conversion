@@ -447,7 +447,7 @@ window.plugin.uniques.setupContent = function () {
     '<label><input type="checkbox" id="captured" onclick="window.plugin.uniques.updateCaptured($(this).prop(\'checked\'))"> Captured</label>' +
     '</div>';
   window.plugin.uniques.disabledMessage =
-    '<div id="uniques-container" class="help" title="Your browser does not support localStorage">Plugin Uniques disabled</div>';
+    '<div id="uniques-container" class="help" data-popover="Your browser does not support localStorage">Plugin Uniques disabled</div>';
 };
 
 window.plugin.uniques.setupPortalsList = function () {

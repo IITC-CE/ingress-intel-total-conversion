@@ -47,7 +47,7 @@ const fullPortal = () => ({ team: 'ENLIGHTENED', level: 8, resCount: 8, resonato
 
 // The meter markup for a level-8 resonator in a given octant (or a blank slot when octant is null)
 const meter = (className, octant, arrow) =>
-  `<span class="${className}" title="energy:\t6000 / 6000 (100%)\nlevel:\t8\nowner:\tme\noctant:\t${octant} ${arrow}">` +
+  `<span class="${className}" data-popover="energy:\t6000 / 6000 (100%)\nlevel:\t8\nowner:\tme\noctant:\t${octant} ${arrow}">` +
   '<span style="width:100%; background:#9627F4;"></span><span class="meter-level" style="color: #FFFFFF;"> L 8 </span></span>';
 const nick = '<span class="nickname">me</span>';
 
@@ -87,7 +87,7 @@ describe('IITC.portal.display.tools.getModDetails', () => {
       mods: [{ name: 'Portal Shield', rarity: 'RARE', owner: 'me', stats: { MITIGATION: 30, REMOVAL_STICKINESS: 0 } }, null],
     });
     expect(html).to.equal(
-      '<span title="Rare Portal Shield\nInstalled by: me\nStats:\n+30 Mitigation\n+0 Removal stickiness" style="color:#B68BFF">Rare Portal Shield</span>' +
+      '<span data-popover="Rare Portal Shield\nInstalled by: me\nStats:\n+30 Mitigation\n+0 Removal stickiness" style="color:#B68BFF">Rare Portal Shield</span>' +
         '<span style="color:#000"></span><span style="color:#000"></span><span style="color:#000"></span>'
     );
   });
@@ -121,9 +121,9 @@ describe('IITC.portal.display.tools.getResonatorDetails', () => {
   it('renders partially-deployed portals without octant assignment', () => {
     const html = IITC.portal.display.tools.getResonatorDetails({ resonators: resonators([8, 7]) });
     // first two slots carry data (no octant line), the remaining six are empty meters
-    expect(html).to.include('title="energy:\t6000 / 6000 (100%)\nlevel:\t8\nowner:\tme\n"');
-    expect(html).to.include('title="energy:\t5000 / 5000 (100%)\nlevel:\t7\nowner:\tme\n"');
-    expect(html.match(/<span class="meter" title=""><span style=""><\/span><\/span>/g)).to.have.length(6);
+    expect(html).to.include('data-popover="energy:\t6000 / 6000 (100%)\nlevel:\t8\nowner:\tme\n"');
+    expect(html).to.include('data-popover="energy:\t5000 / 5000 (100%)\nlevel:\t7\nowner:\tme\n"');
+    expect(html.match(/<span class="meter" data-popover=""><span style=""><\/span><\/span>/g)).to.have.length(6);
   });
 });
 
@@ -134,7 +134,7 @@ describe('IITC.portal.display.tools.renderResonatorDetails', () => {
 
   it('renders an empty slot as a blank meter with no nickname', () => {
     expect(IITC.portal.display.tools.renderResonatorDetails(null, 0, 0, null)).to.deep.equal([
-      '<span class="meter" title=""><span style=""></span></span>',
+      '<span class="meter" data-popover=""><span style=""></span></span>',
       '',
     ]);
   });

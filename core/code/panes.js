@@ -80,5 +80,5 @@ window.hideall = function () {
   IITC.statusbar.hide();
   $('#farm_level_select').hide();
   $('#map').css({ visibility: 'hidden', opacity: '0' });
-  $('.ui-tooltip').remove();
+  IITC.popover.close();
 };

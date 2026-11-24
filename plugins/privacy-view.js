@@ -84,7 +84,7 @@ function setup() {
       .on('click', function () {
         window.plugin.privacyView.toggle();
       })
-      .attr('title', '[9]')
+      .attr('data-popover', '[9]')
       .prependTo('#chatcontrols');
   }
 

@@ -35,7 +35,7 @@ window.plugin.rawdata.setupCallback = function () {
 
 window.plugin.rawdata.addLink = function () {
   $('.linkdetails').append(
-    `<aside><a onclick="window.plugin.rawdata.showPortalData('${window.selectedPortal}')" title="Display raw data of the portal">Raw Data</a></aside>`
+    `<aside><a onclick="window.plugin.rawdata.showPortalData('${window.selectedPortal}')" data-popover="Display raw data of the portal">Raw Data</a></aside>`
   );
 };
 

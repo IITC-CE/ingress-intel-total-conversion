@@ -60,7 +60,7 @@ window.setupPlayerStat = function () {
     `\n\nNote: your player stats can only be updated by a full reload (F5)`;
 
   $('#playerstat').html(
-    `<h2 title="${t}">
+    `<h2 data-popover="${t}">
       ${level}
       <div id="name">
         <span class="playername ${cls}">${window.PLAYER.nickname}</span>
@@ -90,7 +90,7 @@ function setupSidebarToggle() {
       button.id = 'sidebartoggle';
       button.type = 'button';
       button.accessKey = 'i';
-      button.title = 'Toggle sidebar [i]';
+      button.dataset.popover = 'Toggle sidebar [i]';
       button.setAttribute('aria-label', 'Toggle sidebar');
       const icon = L.DomUtil.create('iitc-icon', '', button);
       const showState = (open) => {
@@ -107,7 +107,7 @@ function setupSidebarToggle() {
         if (open) IITC.portal.display.resetScroll();
         document.body.classList.toggle('sidebar-open', open);
         showState(open);
-        document.querySelectorAll('.ui-tooltip').forEach((tooltip) => tooltip.remove());
+        IITC.popover.close();
       });
       L.DomEvent.disableClickPropagation(container);
       return container;
@@ -129,7 +129,7 @@ function setupLargeImagePreview() {
     if (IITC.utils.isSmartphone()) {
       if (event.currentTarget !== event.target) return; // do not fire on #level
 
-      document.querySelectorAll('.ui-tooltip').forEach((tooltip) => tooltip.remove());
+      IITC.popover.close();
 
       const fullImage = document.querySelector('#sidebar > .fullimg');
       if (!fullImage) return;

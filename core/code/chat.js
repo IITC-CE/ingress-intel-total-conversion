@@ -18,7 +18,7 @@ const chat = IITC.chat;
  * @type {string}
  * @memberof IITC.chat
  */
-chat.channelTabTemplate = '<a data-channel="{id}" accesskey="{index}" title="[{index}]">{name}</a>';
+chat.channelTabTemplate = '<a data-channel="{id}" accesskey="{index}" data-popover="[{index}]">{name}</a>';
 
 /**
  * Template of a channel message container appended to the chat panel.

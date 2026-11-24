@@ -1,0 +1,32 @@
+.iitc-popover {
+  position: fixed;
+  /* in place of the browser styles of [popover] */
+  inset: auto;
+  margin: 0;
+  overflow: visible;
+  max-width: 300px;
+  z-index: 10002;
+  padding: 2px 4px;
+  background-color: var(--color-bg-trans);
+  border: 1px solid var(--color-bg-border);
+  color: var(--color-primary);
+  font-size: 13px;
+  line-height: 15px;
+  animation: iitc-popover-in 100ms ease-out;
+}
+
+@keyframes iitc-popover-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iitc-popover {
+    animation: none;
+  }
+}
+
+[data-popover]:not([data-popover='']) {
+  cursor: help;
+}

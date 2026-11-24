@@ -110,7 +110,7 @@ describe('IITC.comm rendering primitives', () => {
   it('renderPortal builds a portal link', () => {
     const portal = { latE6: 37000000, lngE6: -122000000, address: '123 St', name: 'My Portal' };
     expect(IITC.comm.renderPortal(portal)).to.equal(
-      '<a onclick="IITC.portal.selectByLatLng(37, -122);return false" title="123 St" href="/intel?pll=37,-122" class="bidi-isolate help">My Portal</a>'
+      '<a onclick="IITC.portal.selectByLatLng(37, -122);return false" data-popover="123 St" href="/intel?pll=37,-122" class="bidi-isolate help">My Portal</a>'
     );
   });
 

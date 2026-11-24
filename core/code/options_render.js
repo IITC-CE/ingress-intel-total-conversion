@@ -229,7 +229,7 @@ class PageView {
       {
         type: 'button',
         className: icon && 'iitc-options-icon-button',
-        title: icon && text,
+        'data-popover': icon && text,
         'aria-label': icon && text,
         dataset: { focusId: id },
         disabled: !enabled || !handler,
@@ -403,7 +403,7 @@ class PageView {
         // the tooltip belongs to the entry's own line, not to its nested entries
         const head = el(
           'div',
-          { className: 'iitc-options-list-head', title: entry.tooltip },
+          { className: 'iitc-options-list-head', 'data-popover': entry.tooltip },
           el('span', { className: 'iitc-options-list-title' }, String(entry.title ?? '')),
           entry.badge !== undefined && el('span', { className: 'iitc-options-badge' }, String(entry.badge))
         );

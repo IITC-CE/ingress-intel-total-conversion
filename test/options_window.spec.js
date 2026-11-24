@@ -585,8 +585,8 @@ describe('options window', () => {
 
       options.open('window-shortcut');
 
-      expect(navLink('window-shortcut').title).to.equal('Access key [s]');
-      expect(navLink('window-plain').hasAttribute('title')).to.be.false;
+      expect(navLink('window-shortcut').dataset.popover).to.equal('Access key [s]');
+      expect(navLink('window-plain').hasAttribute('data-popover')).to.be.false;
     });
 
     it('tells no access key on a touch screen', () => {
@@ -596,7 +596,7 @@ describe('options window', () => {
 
       options.open('window-shortcut');
 
-      expect(navLink('window-shortcut').hasAttribute('title')).to.be.false;
+      expect(navLink('window-shortcut').hasAttribute('data-popover')).to.be.false;
       expect(document.getElementById('options-access-key-window-shortcut').accessKey).to.equal('s');
       window.matchMedia = replacedMatchMedia;
     });

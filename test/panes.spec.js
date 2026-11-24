@@ -6,6 +6,7 @@ import sinon from 'sinon';
 /* eslint-disable no-unused-expressions */
 
 await import('../core/code/utils.js');
+await import('../core/code/popover.js');
 await import('../core/code/panes.js');
 
 describe('window.show', () => {

@@ -290,9 +290,9 @@ function renderLinkLen(len, i, offset) {
   var maxRange = window.LINK_RANGE_MAC[index];
   if (len > maxRange) {
     lenElement.addClass('exceeded');
-    lenElement.prop('title', 'Link length exceeded expected range - ' + window.formatDistance(maxRange));
+    lenElement.attr('data-popover', 'Link length exceeded expected range - ' + window.formatDistance(maxRange));
   } else {
-    lenElement.prop('title', window.formatDistance(maxRange));
+    lenElement.attr('data-popover', window.formatDistance(maxRange));
   }
   return lenElement;
 }
@@ -360,7 +360,7 @@ machinaTools.displayCluster = function (portalGuid) {
 
 function createInfoLink(text, title, clickCallback) {
   var aside = $('<aside>');
-  $('<a>', { title: title, click: clickCallback, html: text }).appendTo(aside);
+  $('<a>', { 'data-popover': title, click: clickCallback, html: text }).appendTo(aside);
   return aside;
 }
 
@@ -473,9 +473,9 @@ machinaTools.portalRemoved = function (data) {
 
 function toggleLayerChooser(name, enable) {
   if (enable) {
-    $(`.leaflet-control-layers-list span:contains("${name}")`).parent('label').removeClass('disabled').attr('title', '');
+    $(`.leaflet-control-layers-list span:contains("${name}")`).parent('label').removeClass('disabled').removeAttr('data-popover');
   } else {
-    $(`.leaflet-control-layers-list span:contains("${name}")`).parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+    $(`.leaflet-control-layers-list span:contains("${name}")`).parent('label').addClass('disabled').attr('data-popover', 'Zoom in to show those.');
   }
 }
 
@@ -746,7 +746,7 @@ machinaTools.refreshLinkLengths = function () {
     var html = machinaTools.linkMaxLengthsHtml(machinaTools._maxLinks.slice(1), 1);
     html.prop('id', 'machina-links-overlay-drag-handle');
     if (machinaTools._maxLinks[0] > 0) {
-      $('<div>', { class: 'warning', title: 'Data incomplete - some origin portals not loaded' }).text('🔴').appendTo(html);
+      $('<div>', { class: 'warning', 'data-popover': 'Data incomplete - some origin portals not loaded' }).text('🔴').appendTo(html);
     }
 
     if (IITC.utils.isSmartphone()) {
@@ -862,7 +862,8 @@ function setupControlButtons() {
         },
         false
       );
-      button.title = 'Record Machina Conflict Zones';
+      button.dataset.popover = 'Record Machina Conflict Zones';
+      button.setAttribute('aria-label', 'Record Machina Conflict Zones');
 
       var container = document.createElement('div');
       container.className = 'leaflet-control-machina-record leaflet-bar';

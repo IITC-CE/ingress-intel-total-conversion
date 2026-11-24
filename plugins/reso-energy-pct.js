@@ -35,7 +35,7 @@ window.plugin.resoEnergyPctInPortalDetail.updateMeter = function () {
     .each(function () {
       var matchResult = $(this)
         .parent()
-        .attr('title')
+        .attr('data-popover')
         .match(/\((\d*%)\)/);
       if (matchResult) {
         var html = $(this).html() + '<div style="position:absolute;right:0;top:0">' + matchResult[1] + '</div>';

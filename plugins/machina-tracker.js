@@ -79,11 +79,11 @@ machinaTracker.zoomListener = function () {
   var ctrl = $('.leaflet-control-layers-list span:contains("Machina Tracker")').parent('label');
   if (window.map.getZoom() < machinaTracker.MACHINA_TRACKER_MIN_ZOOM) {
     machinaTracker.drawnTraces.clearLayers();
-    ctrl.addClass('disabled').attr('title', 'Zoom in to show those.');
+    ctrl.addClass('disabled').attr('data-popover', 'Zoom in to show those.');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
     IITC.chat.backgroundChannelData('plugin.machinaTracker', 'all', false); // disable this plugin's interest in 'all' COMM
   } else {
-    ctrl.removeClass('disabled').attr('title', '');
+    ctrl.removeClass('disabled').removeAttr('data-popover');
     // note: zoomListener is also called at init time to set up things, so we only need to do this in here
     IITC.chat.backgroundChannelData('plugin.machinaTracker', 'all', true); // enable this plugin's interest in 'all' COMM
   }

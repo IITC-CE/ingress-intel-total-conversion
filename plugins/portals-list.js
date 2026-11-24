@@ -132,7 +132,7 @@ window.plugin.portalslist.fields = [
       $(cell)
         .addClass('alignR')
         .addClass('help')
-        .attr('title', 'In:\t' + value.in.length + '\nOut:\t' + value.out.length)
+        .attr('data-popover', 'In:\t' + value.in.length + '\nOut:\t' + value.out.length)
         .text(value.in.length + value.out.length);
     },
     defaultOrder: -1,
@@ -164,7 +164,7 @@ window.plugin.portalslist.fields = [
       }
       title += `Enemy AP:\t${value.enemyAp}\n- Destroy AP:\t${value.destroyAp}\n- Capture AP:\t${value.captureAp}`;
 
-      $(cell).addClass('alignR').addClass('help').prop('title', title).html(window.digits(value.enemyAp));
+      $(cell).addClass('alignR').addClass('help').attr('data-popover', title).html(window.digits(value.enemyAp));
     },
     defaultOrder: -1,
   },
@@ -350,7 +350,7 @@ window.plugin.portalslist.portalTable = function (sortBy, sortOrder, filter, rev
     var filterName = 'filter' + abbreviate(label);
     cell.className = 'name ' + filterName;
     cell.textContent = label + ':';
-    cell.title = `Show only ${label} portals`;
+    cell.dataset.popover = `Show only ${label} portals`;
     $(cell).on('click', function () {
       if (this.classList.contains('active')) {
         $('#portalslist')
@@ -373,7 +373,7 @@ window.plugin.portalslist.portalTable = function (sortBy, sortOrder, filter, rev
     if (i === 0) {
       cell.textContent = length;
     } else {
-      cell.title = `Hide ${label} portals `;
+      cell.dataset.popover = `Hide ${label} portals `;
       $(cell).on('click', function () {
         if (this.classList.contains('active')) {
           $('#portalslist')

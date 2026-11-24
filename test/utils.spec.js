@@ -568,7 +568,7 @@ describe('IITC.utils.genFourColumnTable', () => {
   it('should generate a single row with two data cells for one block', () => {
     const blocks = [['Header1', 'Data1', 'Tooltip1']];
     const result = IITC.utils.genFourColumnTable(blocks);
-    const check = `<tr><td title="Tooltip1">Data1</td><th title="Tooltip1">Header1</th><td></td><td></td></tr>`;
+    const check = `<tr><td data-popover="Tooltip1">Data1</td><th data-popover="Tooltip1" tabindex="0">Header1</th><td></td><td></td></tr>`;
     expect(result).to.equal(check);
   });
 
@@ -581,10 +581,10 @@ describe('IITC.utils.genFourColumnTable', () => {
     const check =
       `` +
       `<tr>` +
-      `<td title="Tooltip1">Data1</td>` +
-      `<th title="Tooltip1">Header1</th>` +
-      `<th title="Tooltip2">Header2</th>` +
-      `<td title="Tooltip2">Data2</td>` +
+      `<td data-popover="Tooltip1">Data1</td>` +
+      `<th data-popover="Tooltip1" tabindex="0">Header1</th>` +
+      `<th data-popover="Tooltip2" tabindex="0">Header2</th>` +
+      `<td data-popover="Tooltip2">Data2</td>` +
       `</tr>`;
     expect(result).to.equal(check);
   });
@@ -599,14 +599,14 @@ describe('IITC.utils.genFourColumnTable', () => {
     const check =
       `` +
       `<tr>` +
-      `<td title="Tooltip1">Data1</td>` +
-      `<th title="Tooltip1">Header1</th>` +
-      `<th title="Tooltip2">Header2</th>` +
-      `<td title="Tooltip2">Data2</td>` +
+      `<td data-popover="Tooltip1">Data1</td>` +
+      `<th data-popover="Tooltip1" tabindex="0">Header1</th>` +
+      `<th data-popover="Tooltip2" tabindex="0">Header2</th>` +
+      `<td data-popover="Tooltip2">Data2</td>` +
       `</tr>` +
       `<tr>` +
-      `<td title="Tooltip3">Data3</td>` +
-      `<th title="Tooltip3">Header3</th>` +
+      `<td data-popover="Tooltip3">Data3</td>` +
+      `<th data-popover="Tooltip3" tabindex="0">Header3</th>` +
       `<td></td>` +
       `<td></td>` +
       `</tr>`;
@@ -655,6 +655,17 @@ describe('IITC.utils.textToTable', () => {
       `<tr><td colspan="3">R3C1</td></tr>` +
       `</table>`;
     expect(result).to.equal(check);
+  });
+
+  it('should escape HTML without tabs too, except for the allowed tags', () => {
+    const result = IITC.utils.textToTable('<b>bold</b>\n<img src=x onerror=alert(1)>');
+    expect(result).to.equal('<b>bold</b><br>&lt;img src=x onerror=alert(1)&gt;');
+  });
+
+  it('should keep only the given tags, and none for an empty list', () => {
+    expect(IITC.utils.textToTable('<b>bold</b> <i>it</i>', ['i'])).to.equal('&lt;b&gt;bold&lt;/b&gt; <i>it</i>');
+    const check = '<table><tr><td>&lt;b&gt;bold&lt;/b&gt;</td><td>&lt;i&gt;it&lt;/i&gt;</td></tr></table>';
+    expect(IITC.utils.textToTable('<b>bold</b>\t<i>it</i>', [])).to.equal(check);
   });
 
   it('should handle empty input text as is', () => {

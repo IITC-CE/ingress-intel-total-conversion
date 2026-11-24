@@ -78,7 +78,7 @@ function _initChannelData(id) {
  * @memberof IITC.comm
  */
 let portalTemplate =
-  '<a onclick="IITC.portal.selectByLatLng({lat}, {lng});return false" title="{title}" href="{url}" class="bidi-isolate help">{portal_name}</a>';
+  '<a onclick="IITC.portal.selectByLatLng({lat}, {lng});return false" data-popover="{title}" href="{url}" class="bidi-isolate help">{portal_name}</a>';
 /**
  * Template for time cell.
  * @type {String}

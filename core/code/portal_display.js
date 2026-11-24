@@ -13,7 +13,7 @@
  * @memberof IITC.portal.display
  */
 let moveToPortalIconTemplate =
-  '<iitc-icon filled class="icon-button" title="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>';
+  '<iitc-icon filled class="icon-button" data-popover="Click to move to portal" label="Move to portal" fallback="📍">location_on</iitc-icon>';
 
 /**
  * Template wrapping the #randdetails table (owner, range, links, fields, shielding, energy, AP, hacks)
@@ -62,7 +62,7 @@ let linkDetailsTemplate = '<div class="linkdetails"></div>';
  * @type {String}
  * @memberof IITC.portal.display
  */
-let ellipsisLabelTemplate = '<span title="{label}" class="text-overflow-ellipsis">{label}</span>';
+let ellipsisLabelTemplate = '<span data-popover="{label}" class="text-overflow-ellipsis">{label}</span>';
 
 /**
  * Resets the scroll position of the sidebar when a new portal is selected.
@@ -121,13 +121,13 @@ const renderUrl = function (lat, lng, title, guid) {
   // a permalink for the portal
   const permaLink = document.createElement('a');
   permaLink.setAttribute('href', IITC.portal.display.makePermalink([lat, lng]));
-  permaLink.setAttribute('title', 'Create a URL link to this portal');
+  permaLink.setAttribute('data-popover', 'Create a URL link to this portal');
   permaLink.textContent = 'Portal link';
   appendAside(permaLink);
 
   const scannerLink = document.createElement('a');
   scannerLink.setAttribute('href', IITC.portal.display.makePrimeLink(guid));
-  scannerLink.setAttribute('title', 'Copy link to this portal for Ingress Prime');
+  scannerLink.setAttribute('data-popover', 'Copy link to this portal for Ingress Prime');
   scannerLink.textContent = 'Copy scanner link';
   scannerLink.addEventListener('click', function (event) {
     navigator.clipboard.writeText(event.target.href).then();
@@ -138,7 +138,7 @@ const renderUrl = function (lat, lng, title, guid) {
 
   // and a map link popup dialog
   const mapLink = document.createElement('a');
-  mapLink.setAttribute('title', 'Link to alternative maps (Google, etc)');
+  mapLink.setAttribute('data-popover', 'Link to alternative maps (Google, etc)');
   mapLink.textContent = 'Map links';
   mapLink.addEventListener('click', () => IITC.portal.display.tools.showPosLinks(lat, lng, title));
   appendAside(mapLink);
@@ -243,7 +243,7 @@ const renderToSidebar = function (portal) {
 
   const closeButton = document.createElement('iitc-icon');
   closeButton.setAttribute('class', 'close icon-button');
-  closeButton.setAttribute('title', 'Close [w]');
+  closeButton.setAttribute('data-popover', 'Close [w]');
   closeButton.setAttribute('accesskey', 'w');
   closeButton.setAttribute('label', 'Close');
   closeButton.setAttribute('fallback', 'X');
@@ -256,12 +256,12 @@ const renderToSidebar = function (portal) {
   // help cursor via ".imgpreview img"
   const imgPreview = document.createElement('div');
   imgPreview.setAttribute('class', 'imgpreview');
-  imgPreview.setAttribute('title', imgTitle);
+  imgPreview.setAttribute('data-popover', imgTitle);
   imgPreview.setAttribute('style', 'background-image: url("' + img + '")');
 
   const levelSpan = document.createElement('span');
   levelSpan.setAttribute('id', 'level');
-  levelSpan.setAttribute('title', levelDetails);
+  levelSpan.setAttribute('data-popover', levelDetails);
   levelSpan.textContent = levelInt;
 
   imgPreview.append(levelSpan);

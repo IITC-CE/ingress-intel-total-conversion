@@ -356,7 +356,7 @@ body.smartphone #portaldetails .close {
   border: 1px solid #666;
 }
 
-.mods span:not([title]) {
+.mods span:not([data-popover]) {
   cursor: auto;
 }
 

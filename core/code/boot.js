@@ -7,48 +7,6 @@
  */
 
 /**
- * Initializes tooltips for a specified element or the entire document if no element is provided.
- * This function sets up jQuery UI tooltips with customized behavior. It ensures that only one tooltip
- * is visible at a time by closing others when a new one opens. The content of the tooltip is derived
- * from the 'title' attribute of the HTML element and is processed by the `convertTextToTableMagic` function.
- *
- * Additionally, this function sets up a one-time event handler (if not already set) on the document
- * to remove tooltips when clicked. This is controlled by the `tooltipClearerHasBeenSetup` flag to prevent
- * multiple bindings of the event handler.
- *
- * @function setupTooltips
- * @param {jQuery|HTMLElement} [element=document] - The jQuery or DOM element to which the tooltips will be attached.
- *                                                  If not provided, the document itself is used.
- */
-window.setupTooltips = function (element) {
-  element = element || $(document);
-  element.tooltip({
-    // disable show/hide animation
-    show: { effect: 'none', duration: 0, delay: 350 },
-    hide: false,
-    open: function (event, ui) {
-      // ensure all other tooltips are closed
-      $('.ui-tooltip').not(ui.tooltip).remove();
-    },
-    close: function () {
-      $('.ui-helper-hidden-accessible > *:not(:last)').remove();
-    },
-    content: function () {
-      var title = $(this).attr('title');
-      return window.convertTextToTableMagic(title);
-    },
-  });
-
-  if (!window.tooltipClearerHasBeenSetup) {
-    window.tooltipClearerHasBeenSetup = true;
-    $(document).on('click', '.ui-tooltip', function () {
-      $(this).remove();
-      $('.ui-helper-hidden-accessible > *:not(:last)').remove();
-    });
-  }
-};
-
-/**
  * Marks the body on browsers that refuse the bundled icon font, so its stylesheet can fall back to the accessible labels
  *
  * @function setupIconFont
@@ -335,7 +293,7 @@ function boot() {
   window.setupOMS();
   window.ornaments.setup();
   window.layerChooser._lastPriority = 1000; // plugins overlays have priority >1000
-  window.setupTooltips();
+  IITC.popover.setup();
   IITC.chat.setup();
   window.updateGameScore();
   window.search.setup();

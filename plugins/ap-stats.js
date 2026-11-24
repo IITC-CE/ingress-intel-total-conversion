@@ -85,7 +85,7 @@ window.plugin.compAPStats.update = function (hasFinished) {
       `Capture ${data.capturePortals} neutral portals, complete ${data.finishPortals} portals\n` +
       `Reclaim ${data.reclaimPortals} machina portals\n` +
       `(unknown additional AP for links/fields)`;
-    return `<tr><td>${team}</td><td style="text-align:right" title="${title}">${window.digits(data.AP)}</td></tr>`;
+    return `<tr><td>${team}</td><td style="text-align:right" data-popover="${title}">${window.digits(data.AP)}</td></tr>`;
   };
 
   $('#available_ap_display').html(

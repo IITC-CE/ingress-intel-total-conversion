@@ -65,7 +65,7 @@ IITC.search.doSearch = function (term, confirmed) {
 
   if (window.useAppPanes()) window.show('info');
 
-  document.querySelectorAll('.ui-tooltip').forEach((tooltip) => tooltip.remove());
+  IITC.popover.close();
 
   IITC.search.lastSearch = new IITC.search.Query(searchTerm, confirmed);
   IITC.search.lastSearch.show();

@@ -110,13 +110,13 @@ window.plugin.wayfarerrange.showOrHide = function () {
     // show the layer
     if (!window.plugin.wayfarerrange.wayfarerLayerHolderGroup.hasLayer(window.plugin.wayfarerrange.wayfarerCircleHolderGroup)) {
       window.plugin.wayfarerrange.wayfarerLayerHolderGroup.addLayer(window.plugin.wayfarerrange.wayfarerCircleHolderGroup);
-      $('.leaflet-control-layers-list span:contains("Wayfarer range")').parent('label').removeClass('disabled').attr('title', '');
+      $('.leaflet-control-layers-list span:contains("Wayfarer range")').parent('label').removeClass('disabled').removeAttr('data-popover');
     }
   } else {
     // hide the layer
     if (window.plugin.wayfarerrange.wayfarerLayerHolderGroup.hasLayer(window.plugin.wayfarerrange.wayfarerCircleHolderGroup)) {
       window.plugin.wayfarerrange.wayfarerLayerHolderGroup.removeLayer(window.plugin.wayfarerrange.wayfarerCircleHolderGroup);
-      $('.leaflet-control-layers-list span:contains("Wayfarer range")').parent('label').addClass('disabled').attr('title', 'Zoom in to show those.');
+      $('.leaflet-control-layers-list span:contains("Wayfarer range")').parent('label').addClass('disabled').attr('data-popover', 'Zoom in to show those.');
     }
   }
 };
