@@ -1414,13 +1414,15 @@ window.plugin.bookmarks.resetAllStars = function () {
 
 window.plugin.bookmarks.addStar = function (guid, latlng, lbl) {
   var star = new L.Marker(latlng, {
-    title: lbl,
     icon: new L.Icon({
       iconUrl: '@include_img:images/marker-star.png@',
       iconAnchor: [15, 40],
       iconSize: [30, 40],
+      tooltipAnchor: IITC.map.tooltipAnchors.pinHead,
     }),
   });
+  // a portal loaded without its details has no title
+  if (lbl && !IITC.utils.isTouchDevice()) star.bindTooltip(IITC.utils.escapeHtml(lbl));
   window.registerMarkerForOMS(star);
   star.on('spiderfiedclick', function () {
     IITC.portal.display.renderDetails(guid);

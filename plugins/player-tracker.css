@@ -5,3 +5,9 @@
 	-moz-text-decoration-style: dashed;
 	-webkit-text-decoration-style: dashed;
 }
+
+.leaflet-tooltip.plugin-player-tracker-label {
+	padding: 0 3px;
+	font-size: 11px;
+	line-height: 13px;
+}
