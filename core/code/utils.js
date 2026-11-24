@@ -341,6 +341,34 @@ const scrollBottom = (elm) => {
 };
 
 /**
+ * Creates an element with the given properties and children
+ *
+ * @memberof IITC.utils
+ * @param {string} tag - The tag name
+ * @param {Object} [props] - `className`, `dataset` as an object, any property of the element such as `textContent`
+ *   or `onclick`, and other names as attributes. A value of null, undefined or false is skipped, true makes an
+ *   empty attribute
+ * @param {...(Node|string|null|undefined|false)} children - Nodes and texts to append; null, undefined and false
+ *   are skipped
+ * @returns {HTMLElement} The element
+ * @example
+ * IITC.utils.createElement('a', { className: 'link', href: url, onclick: select }, name);
+ * IITC.utils.createElement('span', { dataset: { time }, 'aria-hidden': true });
+ */
+const createElement = (tag, props = {}, ...children) => {
+  const element = document.createElement(tag);
+  for (const [name, value] of Object.entries(props)) {
+    if (value === undefined || value === null || value === false) continue;
+    if (name === 'className') element.className = value;
+    else if (name === 'dataset') Object.assign(element.dataset, value);
+    else if (name in element) element[name] = value;
+    else element.setAttribute(name, value === true ? '' : value);
+  }
+  element.append(...children.filter((child) => child !== undefined && child !== null && child !== false));
+  return element;
+};
+
+/**
  * Escapes special characters in a string for use in JavaScript.
  * (for strings passed as parameters to html onclick="..." for example)
  *
@@ -622,6 +650,7 @@ IITC.utils = {
   isTouchDevice,
   isSmartphone,
   scrollBottom,
+  createElement,
   escapeJS,
   escapeHtml,
   prettyEnergy,

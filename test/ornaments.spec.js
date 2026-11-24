@@ -6,6 +6,7 @@ import sinon from 'sinon';
 /* eslint-disable no-unused-expressions */
 
 await import('../core/code/hooks.js');
+await import('../core/code/utils.js');
 await import('../core/code/options.js');
 await import('../core/code/options_render.js');
 await import('../core/code/options_window.js');

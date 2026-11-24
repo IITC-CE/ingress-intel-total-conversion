@@ -34,7 +34,7 @@ const view = {
   mapButton: null,
 };
 
-const el = (...args) => IITC.options._el(...args);
+const el = (...args) => IITC.utils.createElement(...args);
 
 /**
  * Ids of the registered pages in the order the window lists them
