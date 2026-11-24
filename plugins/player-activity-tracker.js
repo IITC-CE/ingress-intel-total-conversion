@@ -44,6 +44,7 @@ window.PLAYER_TRACKER_MIN_ZOOM = 9;
 window.PLAYER_TRACKER_MIN_OPACITY = 0.3;
 window.PLAYER_TRACKER_LINE_COLOUR = '#FF00FD';
 window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS = 10; // Maximum number of events in a popup
+window.PLAYER_TRACKER_ANIMATE_STEP_TIME = 150; // in milliseconds, for each step of the animated path
 
 // use own namespace for plugin
 window.plugin.playerTracker = function () {};
@@ -71,6 +72,15 @@ window.plugin.playerTracker.setup = function () {
     },
   });
 
+  // the animated path repaints only this canvas, not the shared one with all portals, links and fields;
+  // the paths take no clicks, so the pane lets them through to the layers below
+  const pathPane = window.map.createPane('plugin-player-tracker-paths');
+  pathPane.style.pointerEvents = 'none';
+  pathPane.style.zIndex = 400;
+  window.plugin.playerTracker.pathRenderer = window.map.options.preferCanvas ? L.canvas({ pane: pathPane }) : L.svg({ pane: pathPane });
+  window.map.on('movestart', () => (window.plugin.playerTracker.mapMoving = true));
+  window.map.on('moveend', () => (window.plugin.playerTracker.mapMoving = false));
+
   window.plugin.playerTracker.drawnTracesEnl = new L.LayerGroup();
   window.plugin.playerTracker.drawnTracesRes = new L.LayerGroup();
   // to avoid any favouritism, we'll put the player's own faction layer first
@@ -94,6 +104,7 @@ window.plugin.playerTracker.setup = function () {
   // last, as a change of the options redraws what is set up above
   window.plugin.playerTracker.registerOptions();
   window.plugin.playerTracker.applyHistoryLength();
+  window.plugin.playerTracker.animatePaths();
   setInterval(window.plugin.playerTracker.refreshTimes, 60 * 1000);
 };
 
@@ -114,6 +125,17 @@ window.plugin.playerTracker.registerOptions = () => {
         onChange: () => {
           window.plugin.playerTracker.redraw();
           window.plugin.playerTracker.refreshTimes();
+        },
+      },
+      {
+        type: 'boolean',
+        key: 'animatePath',
+        title: 'Animated path',
+        description: 'Dashes run along the path the way the agent went',
+        default: false,
+        onChange: () => {
+          window.plugin.playerTracker.redraw();
+          window.plugin.playerTracker.animatePaths();
         },
       },
       {
@@ -216,6 +238,36 @@ window.plugin.playerTracker.redraw = () => {
   window.plugin.playerTracker.drawnTracesEnl.clearLayers();
   window.plugin.playerTracker.drawnTracesRes.clearLayers();
   window.plugin.playerTracker.drawData();
+};
+
+// a dash of 7 and a gap of 6 with flat ends look like the static 5,8 with round ones; each step moves the dashes
+// one unit further along a path, a zero-length dash at the start stands for a path that begins in a gap
+window.plugin.playerTracker.PATH_FRAMES = Array.from({ length: 13 }, (_, shift) => {
+  if (shift === 0) return '7,6';
+  if (shift <= 6) return `0,${shift},7,${6 - shift}`;
+  return `${shift - 6},6,${13 - shift},0`;
+});
+window.plugin.playerTracker.pathFrame = 0;
+
+/**
+ * Moves the dashes of the paths one step along, and plans the next step while the animated path is on
+ */
+window.plugin.playerTracker.animatePaths = () => {
+  const playerTracker = window.plugin.playerTracker;
+  clearTimeout(playerTracker.animationTimer);
+  if (!IITC.options.get('player-activity-tracker.animatePath')) return;
+  playerTracker.animationTimer = setTimeout(playerTracker.animatePaths, window.PLAYER_TRACKER_ANIMATE_STEP_TIME);
+  // the map redraws everything once it stops
+  if (playerTracker.mapMoving) return;
+
+  playerTracker.pathFrame = (playerTracker.pathFrame + 1) % playerTracker.PATH_FRAMES.length;
+  const dashArray = playerTracker.PATH_FRAMES[playerTracker.pathFrame];
+  for (const group of [playerTracker.drawnTracesEnl, playerTracker.drawnTracesRes]) {
+    if (!window.map.hasLayer(group)) continue;
+    group.eachLayer((layer) => {
+      if (layer instanceof L.Polyline) layer.setStyle({ dashArray });
+    });
+  }
 };
 
 window.plugin.playerTracker.stored = {};
@@ -418,7 +470,8 @@ window.plugin.playerTracker.drawData = function () {
     for (let i = 1; i < playerData.events.length; i++) {
       var p = playerData.events[i];
       var ageBucket = Math.min(Math.trunc((now - p.time) / split), 4 - 1);
-      var line = [gllfe(p), gllfe(playerData.events[i - 1])];
+      // from the older event to the newer one, so the dashes of the animated path run the way the agent went
+      const line = [gllfe(playerData.events[i - 1]), gllfe(p)];
 
       if (!polyLineByPlayerAndAge[plrname]) {
         polyLineByPlayerAndAge[plrname] = [[], [], [], []];
@@ -500,6 +553,7 @@ window.plugin.playerTracker.drawData = function () {
   });
 
   // draw the poly lines to the map
+  const animate = IITC.options.get('player-activity-tracker.animatePath');
   for (const [playerName, polyLineByAge] of Object.entries(polyLineByPlayerAndAge)) {
     polyLineByAge.forEach((polyLine, i) => {
       if (polyLine.length === 0) return;
@@ -509,7 +563,9 @@ window.plugin.playerTracker.drawData = function () {
         color: window.PLAYER_TRACKER_LINE_COLOUR,
         interactive: false,
         opacity: 1 - 0.2 * i,
-        dashArray: '5,8',
+        dashArray: animate ? window.plugin.playerTracker.PATH_FRAMES[window.plugin.playerTracker.pathFrame] : '5,8',
+        lineCap: animate ? 'butt' : 'round',
+        renderer: window.plugin.playerTracker.pathRenderer,
       };
 
       polyLine.forEach((poly) => {
