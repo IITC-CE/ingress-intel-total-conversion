@@ -124,7 +124,6 @@ window.plugin.playerTracker.registerOptions = () => {
         default: 'relative',
         onChange: () => {
           window.plugin.playerTracker.redraw();
-          window.plugin.playerTracker.refreshTimes();
         },
       },
       {
@@ -238,12 +237,19 @@ window.plugin.playerTracker.refreshTimes = () => {
   }
   if (window.plugin.playerTracker.playerPopup.isOpen()) {
     window.plugin.playerTracker.writeTimes(window.plugin.playerTracker.playerPopup.getContent());
-    // a layout for the new width of the times, without panning back to a popup the map was moved away from
-    const { autoPan } = window.plugin.playerTracker.playerPopup.options;
-    window.plugin.playerTracker.playerPopup.options.autoPan = false;
-    window.plugin.playerTracker.playerPopup.update();
-    window.plugin.playerTracker.playerPopup.options.autoPan = autoPan;
+    // a layout for the new width of the times
+    window.plugin.playerTracker.withoutPopupPan((popup) => popup.update());
   }
+};
+
+// runs a change to the open popup, which lays it out again, without panning back to it, as the map may have been
+// moved away from it on purpose
+window.plugin.playerTracker.withoutPopupPan = (change) => {
+  const popup = window.plugin.playerTracker.playerPopup;
+  const { autoPan } = popup.options;
+  popup.options.autoPan = false;
+  change(popup);
+  popup.options.autoPan = autoPan;
 };
 
 window.plugin.playerTracker.redraw = () => {
@@ -251,6 +257,7 @@ window.plugin.playerTracker.redraw = () => {
   window.plugin.playerTracker.drawnTracesEnl.clearLayers();
   window.plugin.playerTracker.drawnTracesRes.clearLayers();
   window.plugin.playerTracker.drawData();
+  window.plugin.playerTracker.refreshPopup();
 };
 
 // a dash of 7 and a gap of 6 with flat ends look like the static 5,8 with round ones; each step moves the dashes
@@ -285,10 +292,24 @@ window.plugin.playerTracker.animatePaths = () => {
 
 window.plugin.playerTracker.stored = {};
 
+// after a redraw an open popup takes the content of the new marker of its player, or closes when the player is gone
+window.plugin.playerTracker.refreshPopup = () => {
+  const playerTracker = window.plugin.playerTracker;
+  if (!playerTracker.playerPopup.isOpen()) return;
+  const marker = playerTracker.stored[playerTracker.popupPlayer]?.marker;
+  if (!marker) {
+    window.map.closePopup(playerTracker.playerPopup);
+    return;
+  }
+  playerTracker.writeTimes(marker.options.desc);
+  playerTracker.withoutPopupPan((popup) => popup.setContent(marker.options.desc));
+};
+
 window.plugin.playerTracker.onClickListener = function (event) {
   var marker = event.target;
 
   if (marker.options.desc) {
+    window.plugin.playerTracker.popupPlayer = marker.options.player;
     window.plugin.playerTracker.writeTimes(marker.options.desc);
     window.plugin.playerTracker.playerPopup.setContent(marker.options.desc);
     window.plugin.playerTracker.playerPopup.setLatLng(marker.getLatLng());
@@ -585,7 +606,7 @@ window.plugin.playerTracker.drawData = function () {
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
     const markerPos = gllfe(last);
-    var m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0] });
+    const m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], player: plrname });
     // a label on hover needs a mouse, an ever shown one fades with the marker and keeps to one side
     if (showAlways) m.bindTooltip(tooltip, { permanent: true, direction: 'right', opacity: absOpacity, className: 'plugin-player-tracker-label' });
     else if (!isTouchDev) m.bindTooltip(tooltip, { className: 'plugin-player-tracker-label' });
@@ -686,6 +707,7 @@ window.plugin.playerTracker.handleData = function (data) {
   window.plugin.playerTracker.drawnTracesEnl.clearLayers();
   window.plugin.playerTracker.drawnTracesRes.clearLayers();
   window.plugin.playerTracker.drawData();
+  window.plugin.playerTracker.refreshPopup();
 };
 
 window.plugin.playerTracker.findUser = function (nick) {
