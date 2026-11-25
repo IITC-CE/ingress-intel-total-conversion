@@ -152,8 +152,7 @@ window.addHook('search', async (query) => {
             pointToLayer: (featureData, latLng) =>
               new L.Marker(latLng, {
                 icon: new L.DivIcon.ColoredSvg('red'),
-                title: item.display_name,
-              }),
+              }).bindTooltip(item.display_name),
           });
         }
 

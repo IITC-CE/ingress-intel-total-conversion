@@ -8,6 +8,7 @@ import sinon from 'sinon';
 await import('../core/code/hooks.js');
 // taken before any test runs, so no spy another spec leaves on window.runHooks gets in the way
 const realRunHooks = window.runHooks;
+await import('../core/code/utils.js');
 await import('../core/code/options.js');
 await import('../core/code/options_general.js');
 await import('../core/code/options_render.js');

@@ -202,8 +202,9 @@ class Query {
       if (result.position) {
         new L.Marker(result.position, {
           icon: new L.DivIcon.ColoredSvg('red'),
-          title: result.title,
-        }).addTo(result.layer);
+        })
+          .bindTooltip(result.title)
+          .addTo(result.layer);
       }
 
       if (result.bounds) {

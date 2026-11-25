@@ -263,3 +263,10 @@ body:not(.icons-unavailable) .leaflet-retina .leaflet-control-layers-toggle {
   font-size: 13px;
   white-space: nowrap;
 }
+
+/* the pane holding map tooltips has no width, so long text wraps only at a width of its own */
+.leaflet-tooltip {
+  width: max-content;
+  max-width: 300px;
+  white-space: normal;
+}

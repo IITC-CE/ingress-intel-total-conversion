@@ -5,7 +5,7 @@
 // @description    Allows your current location to be set manually, then shows the distance to the selected portal. Useful when managing portal keys.
 
 /* exported setup, changelog --eslint */
-/* global L -- eslint */
+/* global IITC, L -- eslint */
 
 var changelog = [
   { version: '0.2.4', changes: ['Refactoring: update Leaflet API usage'] },
@@ -96,8 +96,8 @@ window.plugin.distanceToPortal.setLocation = function () {
   window.plugin.distanceToPortal.currentLocMarker = new L.Marker(window.plugin.distanceToPortal.currentLoc, {
     icon: new L.DivIcon.ColoredSvg('#444'),
     draggable: true,
-    title: 'Drag to change current location',
   });
+  if (!IITC.utils.isTouchDevice()) window.plugin.distanceToPortal.currentLocMarker.bindTooltip('Drag to change current location');
 
   window.plugin.distanceToPortal.currentLocMarker.on('drag', function () {
     window.plugin.distanceToPortal.currentLoc = window.plugin.distanceToPortal.currentLocMarker.getLatLng();

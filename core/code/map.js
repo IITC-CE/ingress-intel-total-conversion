@@ -33,6 +33,22 @@ IITC.map.layerOffWarningTemplate =
 IITC.map.osmAttributionTemplate =
   '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
 
+/**
+ * Values for the `tooltipAnchor` option of a marker pin about 25×41 px anchored at its tip, as
+ * `L.Icon.Default` and `L.DivIcon.ColoredSvg`: `pinHead` puts the tooltip beside the head of the pin,
+ * `pinTip` beside the place the pin points at
+ *
+ * @type {{pinHead: number[], pinTip: number[]}}
+ * @memberof IITC.map
+ *
+ * @example
+ * new L.Icon({ iconUrl, iconSize: [25, 41], iconAnchor: [12, 41], tooltipAnchor: IITC.map.tooltipAnchors.pinTip });
+ */
+IITC.map.tooltipAnchors = Object.freeze({
+  pinHead: Object.freeze([16, -28]),
+  pinTip: Object.freeze([4, 0]),
+});
+
 function setupCRS() {
   // use the earth radius value from s2 geometry library
   // https://github.com/google/s2-geometry-library-java/blob/c28f287b996c0cedc5516a0426fbd49f6c9611ec/src/com/google/common/geometry/S2LatLng.java#L31

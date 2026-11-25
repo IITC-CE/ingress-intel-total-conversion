@@ -53,6 +53,7 @@ machinaTracker.setup = () => {
     iconUrl: iconImage,
     iconSize: [26, 32],
     iconAnchor: [12, 32],
+    tooltipAnchor: IITC.map.tooltipAnchors.pinTip,
   });
 
   machinaTracker.popup = new L.Popup({ offset: new L.Point([1, -34]) });
@@ -63,12 +64,125 @@ machinaTracker.setup = () => {
 
   window.map.on('zoomend', machinaTracker.zoomListener);
   machinaTracker.zoomListener();
+  // last, as a change of the options redraws what is set up above
+  machinaTracker.registerOptions();
+  machinaTracker.applyHistoryLength();
+  setInterval(machinaTracker.refreshTimes, 60 * 1000);
+};
+
+machinaTracker.registerOptions = () => {
+  IITC.options.register('machina-tracker', {
+    title: 'Machina tracker',
+    blocks: [
+      {
+        type: 'boolean',
+        key: 'alwaysShowLabels',
+        title: 'Always show time labels',
+        description: 'Otherwise on hover. Touch screens show labels only when they are always shown',
+        default: false,
+        onChange: () => machinaTracker.redraw(),
+      },
+      {
+        type: 'select',
+        key: 'timeFormat',
+        title: 'Time in labels and popups',
+        description: 'Clock time has the date when it is not today',
+        choices: [
+          { value: 'relative', label: 'Time ago' },
+          { value: 'absolute', label: 'Clock time' },
+        ],
+        default: 'relative',
+        onChange: () => {
+          machinaTracker.redraw();
+          machinaTracker.refreshTimes();
+        },
+      },
+      {
+        type: 'select',
+        key: 'historyHours',
+        title: 'History length',
+        description: 'Older actions are dropped. A longer history builds up while IITC stays open',
+        choices: [
+          { value: 1, label: '1 hour' },
+          { value: 2, label: '2 hours' },
+          { value: 4, label: '4 hours' },
+          { value: 8, label: '8 hours' },
+          { value: 12, label: '12 hours' },
+          { value: 24, label: '1 day' },
+          { value: 72, label: '3 days' },
+          { value: 168, label: '1 week' },
+        ],
+        default: 8,
+        onChange: () => {
+          machinaTracker.applyHistoryLength();
+          machinaTracker.discardOldData();
+          machinaTracker.redraw();
+        },
+      },
+    ],
+  });
+};
+
+/**
+ * Sets how long actions are kept from the History length option
+ */
+machinaTracker.applyHistoryLength = () => {
+  machinaTracker.MACHINA_TRACKER_MAX_TIME = IITC.options.get('machina-tracker.historyHours') * 60 * 60 * 1000;
+};
+
+/**
+ * Formats the time of an event in the chosen format
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @param {number} now - Current time in milliseconds
+ * @returns {string} Time ago, or the clock time with the date when it is not today
+ */
+machinaTracker.formatTime = (time, now) => {
+  if (IITC.options.get('machina-tracker.timeFormat') === 'relative') return `${IITC.utils.formatAgo(time, now)} ago`;
+  return IITC.utils.formatTimestamp(time, { now });
+};
+
+/**
+ * Creates an element showing the time of an event in a popup, written again by `writeTimes`
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @returns {HTMLElement} The element
+ */
+machinaTracker.timeElement = (time) => IITC.utils.createElement('span', { dataset: { time } }, machinaTracker.formatTime(time, Date.now()));
+
+// writes the times in a popup again, so they are current and in the chosen format
+machinaTracker.writeTimes = (container) => {
+  const now = Date.now();
+  for (const element of container.querySelectorAll('[data-time]')) element.textContent = machinaTracker.formatTime(Number(element.dataset.time), now);
+};
+
+// writes the times in open labels and popups again, so they stay current
+machinaTracker.refreshTimes = () => {
+  machinaTracker.drawnTraces.eachLayer((layer) => {
+    const tooltip = layer.getTooltip();
+    if (tooltip?.isOpen()) tooltip.update();
+  });
+  if (machinaTracker.popup.isOpen()) {
+    machinaTracker.writeTimes(machinaTracker.popup.getContent());
+    // a layout for the new width of the times, without panning back to a popup the map was moved away from
+    const { autoPan } = machinaTracker.popup.options;
+    machinaTracker.popup.options.autoPan = false;
+    machinaTracker.popup.update();
+    machinaTracker.popup.options.autoPan = autoPan;
+  }
+};
+
+machinaTracker.redraw = () => {
+  if (window.map.getZoom() < machinaTracker.MACHINA_TRACKER_MIN_ZOOM) return;
+  machinaTracker.drawnTraces.clearLayers();
+  machinaTracker.drawData();
 };
 
 machinaTracker.onClickListener = (event) => {
   var marker = event.target;
 
   if (marker.options.desc) {
+    machinaTracker.writeTimes(marker.options.desc);
     machinaTracker.popup.setContent(marker.options.desc);
     machinaTracker.popup.setLatLng(marker.getLatLng());
     window.map.openPopup(machinaTracker.popup);
@@ -159,29 +273,31 @@ machinaTracker.processNewData = function (data) {
   });
 };
 
-machinaTracker.createPortalLink = function (portal) {
-  return $('<a>')
-    .addClass('text-overflow-ellipsis')
-    .text(portal.name)
-    .prop({
+machinaTracker.createPortalLink = (portal) =>
+  IITC.utils.createElement(
+    'a',
+    {
+      className: 'text-overflow-ellipsis',
       title: portal.name,
       href: IITC.portal.display.makePermalink(portal.latLng),
-    })
-    .on('click', (event) => {
-      IITC.portal.selectByLatLng(portal.latLng);
-      event.preventDefault();
-      return false;
-    })
-    .on('dblclick', (event) => {
-      window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
-      IITC.portal.selectByLatLng(portal.latLng);
-      event.preventDefault();
-      return false;
-    });
-};
+      onclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        IITC.portal.selectByLatLng(portal.latLng);
+      },
+      ondblclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.map.setView(portal.latLng, window.DEFAULT_ZOOM);
+        IITC.portal.selectByLatLng(portal.latLng);
+      },
+    },
+    portal.name
+  );
 
 machinaTracker.drawData = function () {
   var isTouchDev = window.isTouchDevice();
+  const showAlways = IITC.options.get('machina-tracker.alwaysShowLabels');
 
   var split = machinaTracker.MACHINA_TRACKER_MAX_TIME / 4;
   var now = new Date().getTime();
@@ -190,25 +306,27 @@ machinaTracker.drawData = function () {
     var ageBucket = Math.min((now - event.time) / split, 3);
     var position = event.from.latLng;
 
-    var title = isTouchDev ? '' : IITC.utils.formatAgo(event.time, now) + ' ago';
+    // written whenever the label is shown, so the time in it stays current
+    const title = () => machinaTracker.formatTime(event.time, Date.now());
     var icon = machinaTracker.icon;
     var opacity = 1 - 0.2 * ageBucket;
 
-    var popup = $('<div>').addClass('plugin-machina-tracker-popup');
-    $('<div>').addClass('plugin-machina-tracker-popup-header').append(machinaTracker.createPortalLink(event.from)).appendTo(popup);
+    const el = IITC.utils.createElement;
+    const popup = el(
+      'div',
+      { className: 'plugin-machina-tracker-popup' },
+      el('div', { className: 'plugin-machina-tracker-popup-header' }, machinaTracker.createPortalLink(event.from)),
+      el(
+        'ul',
+        { className: 'plugin-machina-tracker-link-list' },
+        ...event.to.map((to) => el('li', {}, machinaTracker.createPortalLink(to), ' ', machinaTracker.timeElement(to.time)))
+      )
+    );
 
-    var linkList = $('<ul>').addClass('plugin-machina-tracker-link-list');
-    linkList.appendTo(popup);
-
-    event.to.forEach((to) => {
-      $('<li>')
-        .append(machinaTracker.createPortalLink(to))
-        .append(' ')
-        .append(IITC.utils.formatAgo(to.time, now) + ' ago')
-        .appendTo(linkList);
-    });
-
-    var m = new L.Marker(position, { icon: icon, opacity: opacity, desc: popup[0], title: title });
+    const m = new L.Marker(position, { icon, opacity, desc: popup });
+    // a label on hover needs a mouse, an ever shown one fades with the marker and keeps to one side
+    if (showAlways) m.bindTooltip(title, { permanent: true, direction: 'right', opacity, className: 'plugin-machina-tracker-label' });
+    else if (!isTouchDev) m.bindTooltip(title, { className: 'plugin-machina-tracker-label' });
     m.addEventListener('spiderfiedclick', machinaTracker.onClickListener);
 
     window.registerMarkerForOMS(m);

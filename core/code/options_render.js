@@ -72,18 +72,7 @@ const warnOnce = (block, message) => {
   log.warn(message);
 };
 
-const el = (tag, props = {}, ...children) => {
-  const element = document.createElement(tag);
-  for (const [name, value] of Object.entries(props)) {
-    if (value === undefined || value === null || value === false) continue;
-    if (name === 'className') element.className = value;
-    else if (name === 'dataset') Object.assign(element.dataset, value);
-    else if (name in element) element[name] = value;
-    else element.setAttribute(name, value === true ? '' : value);
-  }
-  element.append(...children.filter((child) => child !== undefined && child !== null && child !== false));
-  return element;
-};
+const el = (...args) => IITC.utils.createElement(...args);
 
 // a line telling how an action or a change went, with an icon of success or of failure
 const note = (text, error, role = 'status') =>
@@ -633,5 +622,3 @@ const redrawLater = (container) => {
 
 IITC.options._renderPage = renderPage;
 IITC.options._redrawLater = redrawLater;
-// shared with the options window
-IITC.options._el = el;

@@ -1,7 +1,115 @@
-.plugin-player-tracker-popup a {
-	color: inherit;
-	text-decoration: underline;
-	text-decoration-style: dashed;
-	-moz-text-decoration-style: dashed;
-	-webkit-text-decoration-style: dashed;
+.plugin-player-tracker-popup {
+	/* the width of the content within these bounds, which narrower screens make narrower */
+	width: max-content;
+	min-width: min(200px, calc(100vw - 60px));
+	max-width: min(250px, calc(100vw - 60px));
+	color: var(--color-secondary);
+	font-size: 12px;
+}
+
+/* wider, as the list says what the player did on each portal */
+.plugin-player-tracker-popup-detailed {
+	min-width: min(300px, calc(100vw - 60px));
+	max-width: min(360px, calc(100vw - 60px));
+}
+
+/* a line cut short where it does not fit, so a long portal name widens the popup no further than its bounds */
+.plugin-player-tracker-popup-line {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* an action: the portal names give way, so the words and the MUs after them stay whole */
+.plugin-player-tracker-popup-action {
+	display: flex;
+}
+
+.plugin-player-tracker-popup-action > span {
+	flex: none;
+	white-space: pre;
+}
+
+.plugin-player-tracker-popup-action > a {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.plugin-player-tracker-popup-header {
+	padding-right: 18px;
+}
+
+#map .plugin-player-tracker-leaflet-popup .leaflet-popup-close-button {
+	top: 5px;
+	right: 6px;
+	width: 16px;
+	height: 16px;
+	padding: 0;
+	font-size: 16px;
+	line-height: 16px;
+	color: var(--color-secondary);
+	opacity: 0.6;
+}
+
+#map .plugin-player-tracker-leaflet-popup .leaflet-popup-close-button:hover {
+	opacity: 1;
+}
+
+.plugin-player-tracker-popup-enl a {
+	color: var(--color-enl);
+}
+
+.plugin-player-tracker-popup-res a {
+	color: var(--color-res);
+}
+
+/* the portals of the actions, in the colour of the faction that held them then */
+.plugin-player-tracker-popup a.none {
+	color: var(--color-none);
+}
+
+.plugin-player-tracker-popup a.res {
+	color: var(--color-res);
+}
+
+.plugin-player-tracker-popup a.enl {
+	color: var(--color-enl);
+}
+
+.plugin-player-tracker-popup a.mac {
+	color: var(--color-mac);
+}
+
+/* the times in the first column, and the portals or actions in the width they leave */
+.plugin-player-tracker-events {
+	display: grid;
+	grid-template-columns: max-content minmax(0, auto);
+	margin-top: 4px;
+	padding-top: 2px;
+	border-top: 1px solid var(--color-bg-border);
+}
+
+.plugin-player-tracker-events tr {
+	display: contents;
+}
+
+.plugin-player-tracker-events td {
+	padding: 1px 6px 1px 0;
+	vertical-align: top;
+}
+
+.plugin-player-tracker-events .entry {
+	padding-right: 0;
+}
+
+.plugin-player-tracker-events .time {
+	opacity: 0.6;
+	white-space: nowrap;
+}
+
+.leaflet-tooltip.plugin-player-tracker-label {
+	padding: 0 3px;
+	font-size: 11px;
+	line-height: 13px;
 }

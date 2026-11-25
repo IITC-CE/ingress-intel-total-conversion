@@ -5,6 +5,7 @@ import sinon from 'sinon';
 /* global IITC */
 /* eslint-disable no-unused-expressions */
 
+await import('../core/code/utils.js');
 await import('../core/code/options.js');
 await import('../core/code/options_render.js');
 
@@ -46,7 +47,7 @@ describe('IITC.options._renderPage', () => {
     container = document.createElement('div');
     document.body.append(container);
     replacedUtils = IITC.utils;
-    IITC.utils = { exportText: sinon.spy(), exportFile: sinon.spy(), importText: sinon.stub(), importFile: sinon.stub() };
+    IITC.utils = { ...replacedUtils, exportText: sinon.spy(), exportFile: sinon.spy(), importText: sinon.stub(), importFile: sinon.stub() };
   });
 
   afterEach(() => {

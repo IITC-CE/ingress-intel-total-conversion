@@ -108,29 +108,75 @@ const formatNumber = (num) => {
 const zeroPad = (number, length) => number.toString().padStart(length, '0');
 
 /**
+ * Checks whether two dates fall on the same day in the local timezone
+ *
+ * @memberof IITC.utils
+ * @inner
+ * @private
+ * @param {Date} a
+ * @param {Date} b
+ * @returns {boolean}
+ */
+const isSameDay = (a, b) => a.toDateString() === b.toDateString();
+
+const TIMESTAMP_DATES = ['always', 'other-day', 'never'];
+const TIMESTAMP_PRECISIONS = ['days', 'minutes', 'seconds', 'milliseconds'];
+
+/**
+ * Formats a UNIX timestamp as an ISO-like date and time in the local timezone,
+ * such as "2023-10-15 13:05", "13:05:07" or "2023-10-15 13:05:07.123"
+ *
+ * @memberof IITC.utils
+ * @param {number|string|Date} timestamp - The UNIX timestamp in milliseconds
+ * @param {Object} [options]
+ * @param {'always'|'other-day'|'never'} [options.date='other-day'] - When to put the date YYYY-MM-DD
+ *   before the time: always, only when the timestamp falls on another day than `now`, or never
+ * @param {'days'|'minutes'|'seconds'|'milliseconds'} [options.precision='minutes'] - The smallest unit shown,
+ *   `days` gives the date alone and needs `date: 'always'`
+ * @param {number|string|Date} [options.now=Date.now()] - The current UNIX timestamp in milliseconds
+ * @returns {string|null} The formatted timestamp, or null when the timestamp is not given or not valid
+ * @throws {RangeError} On an unknown option value, or `precision: 'days'` without `date: 'always'`
+ * @example
+ * IITC.utils.formatTimestamp(time); // "13:05" today, "2023-10-14 13:05" on another day
+ * IITC.utils.formatTimestamp(time, { date: 'never' }); // "13:05"
+ * IITC.utils.formatTimestamp(time, { date: 'always', precision: 'days' }); // "2023-10-14"
+ * IITC.utils.formatTimestamp(time, { date: 'always', precision: 'milliseconds' }); // "2023-10-14 13:05:07.123"
+ */
+const formatTimestamp = (timestamp, { date = 'other-day', precision = 'minutes', now = Date.now() } = {}) => {
+  if (!TIMESTAMP_DATES.includes(date)) throw new RangeError(`Unknown date option: ${date}`);
+  if (!TIMESTAMP_PRECISIONS.includes(precision)) throw new RangeError(`Unknown precision option: ${precision}`);
+  if (precision === 'days' && date !== 'always') throw new RangeError(`Precision 'days' needs date 'always', not '${date}'`);
+
+  if (!timestamp) return null;
+  const dateObj = new Date(Number(timestamp));
+  if (Number.isNaN(dateObj.getTime())) return null;
+
+  const dateString = dateFormatter.format(dateObj);
+  if (precision === 'days') return dateString;
+
+  let timeString = (precision === 'minutes' ? timeFormatter : timeWithSecondsFormatter).format(dateObj);
+  // sv-SE separates fractions of a second with a comma, while toISOString and RFC 3339 use a dot
+  if (precision === 'milliseconds') timeString += `.${zeroPad(dateObj.getMilliseconds(), 3)}`;
+
+  const showDate = date === 'always' || (date === 'other-day' && !isSameDay(dateObj, new Date(Number(now))));
+  return showDate ? `${dateString} ${timeString}` : timeString;
+};
+
+/**
  * Converts a UNIX timestamp to a human-readable string.
  * If the timestamp is from today, returns the time (HH:mm:ss format); otherwise, returns the date (YYYY-MM-DD).
  *
  * @memberof IITC.utils
  * @function unixTimeToString
+ * @deprecated Use {@link IITC.utils.formatTimestamp}
  * @param {number|string} timestamp - The UNIX timestamp in milliseconds to convert.
  * @param {boolean} [full=false] - If true, returns both date and time in "YYYY-MM-DD <locale time>" format.
  * @returns {string|null} The formatted date and/or time string, or null if no timestamp provided.
  */
 const unixTimeToString = (timestamp, full = false) => {
-  if (!timestamp) return null;
-
-  const dateObj = new Date(Number(timestamp));
-  const today = new Date();
-
-  // Check if the date is today
-  const isToday = dateObj.getFullYear() === today.getFullYear() && dateObj.getMonth() === today.getMonth() && dateObj.getDate() === today.getDate();
-
-  const time = timeWithSecondsFormatter.format(dateObj);
-  const date = dateFormatter.format(dateObj);
-
-  if (full) return `${date} ${time}`;
-  return isToday ? time : date;
+  if (full) return formatTimestamp(timestamp, { date: 'always', precision: 'seconds' });
+  const isToday = isSameDay(new Date(Number(timestamp)), new Date());
+  return formatTimestamp(timestamp, isToday ? { date: 'never', precision: 'seconds' } : { date: 'always', precision: 'days' });
 };
 
 /**
@@ -139,33 +185,23 @@ const unixTimeToString = (timestamp, full = false) => {
  *
  * @memberof IITC.utils
  * @function unixTimeToDateTimeString
+ * @deprecated Use {@link IITC.utils.formatTimestamp} with `{ date: 'always', precision: 'seconds' }` or `'milliseconds'`
  * @param {number} time - The UNIX timestamp to convert.
  * @param {boolean} [millisecond] - Whether to include millisecond precision.
  * @returns {string|null} The formatted date and time string.
  */
-const unixTimeToDateTimeString = (time, millisecond) => {
-  if (!time) return null;
-  const date = new Date(Number(time));
-  const pad = (num) => IITC.utils.zeroPad(num, 2);
-
-  const dateString = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  const timeString = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-  const dateTimeString = `${dateString} ${timeString}`;
-  return millisecond ? `${dateTimeString}.${IITC.utils.zeroPad(date.getMilliseconds(), 3)}` : dateTimeString;
-};
+const unixTimeToDateTimeString = (time, millisecond) => formatTimestamp(time, { date: 'always', precision: millisecond ? 'milliseconds' : 'seconds' });
 
 /**
  * Converts a UNIX timestamp to a time string formatted as HH:mm.
  *
  * @memberof IITC.utils
  * @function unixTimeToHHmm
+ * @deprecated Use {@link IITC.utils.formatTimestamp} with `{ date: 'never' }`
  * @param {number|string} time - The UNIX timestamp to convert.
  * @returns {string|null} Formatted time as HH:mm.
  */
-const unixTimeToHHmm = (time) => {
-  if (!time) return null;
-  return timeFormatter.format(new Date(Number(time)));
-};
+const unixTimeToHHmm = (time) => formatTimestamp(time, { date: 'never' });
 
 /**
  * Formats an interval of time given in seconds into a human-readable string.
@@ -302,6 +338,34 @@ const scrollBottom = (elm) => {
   // Ensure elm is an HTMLElement: resolve selector strings or extract DOM element from jQuery object
   const element = typeof elm === 'string' ? document.querySelector(elm) : elm instanceof jQuery ? elm[0] : elm;
   return element.scrollHeight - element.clientHeight - element.scrollTop;
+};
+
+/**
+ * Creates an element with the given properties and children
+ *
+ * @memberof IITC.utils
+ * @param {string} tag - The tag name
+ * @param {Object} [props] - `className`, `dataset` as an object, any property of the element such as `textContent`
+ *   or `onclick`, and other names as attributes. A value of null, undefined or false is skipped, true makes an
+ *   empty attribute
+ * @param {...(Node|string|null|undefined|false)} children - Nodes and texts to append; null, undefined and false
+ *   are skipped
+ * @returns {HTMLElement} The element
+ * @example
+ * IITC.utils.createElement('a', { className: 'link', href: url, onclick: select }, name);
+ * IITC.utils.createElement('span', { dataset: { time }, 'aria-hidden': true });
+ */
+const createElement = (tag, props = {}, ...children) => {
+  const element = document.createElement(tag);
+  for (const [name, value] of Object.entries(props)) {
+    if (value === undefined || value === null || value === false) continue;
+    if (name === 'className') element.className = value;
+    else if (name === 'dataset') Object.assign(element.dataset, value);
+    else if (name in element) element[name] = value;
+    else element.setAttribute(name, value === true ? '' : value);
+  }
+  element.append(...children.filter((child) => child !== undefined && child !== null && child !== false));
+  return element;
 };
 
 /**
@@ -576,6 +640,7 @@ IITC.utils = {
   deleteCookie,
   formatNumber,
   zeroPad,
+  formatTimestamp,
   unixTimeToString,
   unixTimeToDateTimeString,
   unixTimeToHHmm,
@@ -585,6 +650,7 @@ IITC.utils = {
   isTouchDevice,
   isSmartphone,
   scrollBottom,
+  createElement,
   escapeJS,
   escapeHtml,
   prettyEnergy,

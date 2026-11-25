@@ -5,6 +5,7 @@ import sinon from 'sinon';
 /* global IITC */
 /* eslint-disable no-unused-expressions */
 
+await import('../core/code/utils.js');
 await import('../core/code/options.js');
 await import('../core/code/options_render.js');
 await import('../core/code/dialog_about.js');

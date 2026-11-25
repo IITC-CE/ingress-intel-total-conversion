@@ -2,7 +2,7 @@
 // @name           Player activity tracker
 // @category       Layer
 // @version        0.14.2
-// @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Uses up to three hours of data. Does not request chat data on its own, even if that would be useful.
+// @description    Draw trails for the path a user took onto the map based on status messages in COMMs. Keeps three hours of data by default. Does not request chat data on its own, even if that would be useful.
 
 /* exported setup, changelog --eslint */
 /* global IITC, L -- eslint */
@@ -44,6 +44,7 @@ window.PLAYER_TRACKER_MIN_ZOOM = 9;
 window.PLAYER_TRACKER_MIN_OPACITY = 0.3;
 window.PLAYER_TRACKER_LINE_COLOUR = '#FF00FD';
 window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS = 10; // Maximum number of events in a popup
+window.PLAYER_TRACKER_ANIMATE_STEP_TIME = 150; // in milliseconds, for each step of the animated path
 
 // use own namespace for plugin
 window.plugin.playerTracker = function () {};
@@ -60,14 +61,25 @@ window.plugin.playerTracker.setup = function () {
     options: {
       iconUrl: iconEnlImage,
       iconRetinaUrl: iconEnlRetImage,
+      tooltipAnchor: IITC.map.tooltipAnchors.pinTip,
     },
   });
   window.plugin.playerTracker.iconRes = L.Icon.Default.extend({
     options: {
       iconUrl: iconResImage,
       iconRetinaUrl: iconResRetImage,
+      tooltipAnchor: IITC.map.tooltipAnchors.pinTip,
     },
   });
+
+  // the animated path repaints only this canvas, not the shared one with all portals, links and fields;
+  // the paths take no clicks, so the pane lets them through to the layers below
+  const pathPane = window.map.createPane('plugin-player-tracker-paths');
+  pathPane.style.pointerEvents = 'none';
+  pathPane.style.zIndex = 400;
+  window.plugin.playerTracker.pathRenderer = window.map.options.preferCanvas ? L.canvas({ pane: pathPane }) : L.svg({ pane: pathPane });
+  window.map.on('movestart', () => (window.plugin.playerTracker.mapMoving = true));
+  window.map.on('moveend', () => (window.plugin.playerTracker.mapMoving = false));
 
   window.plugin.playerTracker.drawnTracesEnl = new L.LayerGroup();
   window.plugin.playerTracker.drawnTracesRes = new L.LayerGroup();
@@ -79,7 +91,7 @@ window.plugin.playerTracker.setup = function () {
     window.layerChooser.addOverlay(window.plugin.playerTracker.drawnTracesEnl, 'Player Tracker Enlightened');
     window.layerChooser.addOverlay(window.plugin.playerTracker.drawnTracesRes, 'Player Tracker Resistance');
   }
-  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]) });
+  window.plugin.playerTracker.playerPopup = new L.Popup({ offset: new L.Point([1, -34]), maxWidth: 400, className: 'plugin-player-tracker-leaflet-popup' });
 
   window.addHook('publicChatDataAvailable', window.plugin.playerTracker.handleData);
 
@@ -89,14 +101,218 @@ window.plugin.playerTracker.setup = function () {
   window.plugin.playerTracker.zoomListener();
 
   window.plugin.playerTracker.setupUserSearch();
+  // last, as a change of the options redraws what is set up above
+  window.plugin.playerTracker.registerOptions();
+  window.plugin.playerTracker.applyHistoryLength();
+  window.plugin.playerTracker.animatePaths();
+  setInterval(window.plugin.playerTracker.refreshTimes, 60 * 1000);
+};
+
+window.plugin.playerTracker.registerOptions = () => {
+  IITC.options.register('player-activity-tracker', {
+    title: 'Player tracker',
+    blocks: [
+      {
+        type: 'select',
+        key: 'timeFormat',
+        title: 'Time in labels and popups',
+        description: 'Clock time has the date when it is not today',
+        choices: [
+          { value: 'relative', label: 'Time ago' },
+          { value: 'absolute', label: 'Clock time' },
+        ],
+        default: 'relative',
+        onChange: () => {
+          window.plugin.playerTracker.redraw();
+        },
+      },
+      {
+        type: 'boolean',
+        key: 'animatePath',
+        title: 'Animated path',
+        description: 'Dashes run along the path the way the agent went',
+        default: false,
+        onChange: () => {
+          window.plugin.playerTracker.redraw();
+          window.plugin.playerTracker.animatePaths();
+        },
+      },
+      {
+        type: 'select',
+        key: 'historyHours',
+        title: 'History length',
+        description: 'Older actions are dropped. A longer history builds up while IITC stays open',
+        choices: [
+          { value: 0.5, label: '30 minutes' },
+          { value: 1, label: '1 hour' },
+          { value: 2, label: '2 hours' },
+          { value: 3, label: '3 hours' },
+          { value: 6, label: '6 hours' },
+          { value: 12, label: '12 hours' },
+          { value: 24, label: '1 day' },
+          { value: 72, label: '3 days' },
+          { value: 168, label: '1 week' },
+        ],
+        default: 3,
+        onChange: () => {
+          window.plugin.playerTracker.applyHistoryLength();
+          window.plugin.playerTracker.discardOldData();
+          window.plugin.playerTracker.redraw();
+        },
+      },
+      { type: 'heading', title: 'Labels' },
+      {
+        type: 'boolean',
+        key: 'alwaysShowLabels',
+        title: 'Always show',
+        description: 'Otherwise on hover. Touch screens show labels only when they are always shown',
+        default: false,
+        onChange: () => window.plugin.playerTracker.redraw(),
+      },
+      {
+        type: 'boolean',
+        key: 'labelTime',
+        title: 'Time of the last action',
+        default: true,
+        onChange: () => window.plugin.playerTracker.redraw(),
+      },
+      { type: 'heading', title: 'Popup' },
+      {
+        type: 'boolean',
+        key: 'detailedPopup',
+        title: 'Detailed view',
+        description: 'What the agent did at each portal',
+        default: false,
+        onChange: () => window.plugin.playerTracker.redraw(),
+      },
+    ],
+  });
+};
+
+/**
+ * Sets how long actions are kept from the History length option
+ */
+window.plugin.playerTracker.applyHistoryLength = () => {
+  window.PLAYER_TRACKER_MAX_TIME = IITC.options.get('player-activity-tracker.historyHours') * 60 * 60 * 1000;
+};
+
+/**
+ * Formats the time of an event in the chosen format
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @param {number} now - Current time in milliseconds
+ * @returns {string} Time ago, or the clock time with the date when it is not today
+ */
+window.plugin.playerTracker.formatTime = (time, now) => {
+  if (IITC.options.get('player-activity-tracker.timeFormat') === 'relative') return `${IITC.utils.formatAgo(time, now)} ago`;
+  return IITC.utils.formatTimestamp(time, { now });
+};
+
+/**
+ * Creates an element showing the time of an event in a popup, written again by `writeTimes`, with the time to the
+ * second on hover
+ *
+ * @param {number} time - Time of the event in milliseconds
+ * @returns {HTMLElement} The element
+ */
+window.plugin.playerTracker.timeElement = (time) =>
+  IITC.utils.createElement(
+    'span',
+    { dataset: { time, popover: IITC.utils.formatTimestamp(time, { precision: 'seconds' }) } },
+    window.plugin.playerTracker.formatTime(time, Date.now())
+  );
+
+// writes the times in a popup again, so they are current and in the chosen format
+window.plugin.playerTracker.writeTimes = (container) => {
+  const now = Date.now();
+  for (const element of container.querySelectorAll('[data-time]'))
+    element.textContent = window.plugin.playerTracker.formatTime(Number(element.dataset.time), now);
+};
+
+// writes the times in open labels and popups again, so they stay current
+window.plugin.playerTracker.refreshTimes = () => {
+  for (const group of [window.plugin.playerTracker.drawnTracesEnl, window.plugin.playerTracker.drawnTracesRes]) {
+    group.eachLayer((layer) => {
+      const tooltip = layer.getTooltip();
+      if (tooltip?.isOpen()) tooltip.update();
+    });
+  }
+  if (window.plugin.playerTracker.playerPopup.isOpen()) {
+    window.plugin.playerTracker.writeTimes(window.plugin.playerTracker.playerPopup.getContent());
+    // a layout for the new width of the times
+    window.plugin.playerTracker.withoutPopupPan((popup) => popup.update());
+  }
+};
+
+// runs a change to the open popup, which lays it out again, without panning back to it, as the map may have been
+// moved away from it on purpose
+window.plugin.playerTracker.withoutPopupPan = (change) => {
+  const popup = window.plugin.playerTracker.playerPopup;
+  const { autoPan } = popup.options;
+  popup.options.autoPan = false;
+  change(popup);
+  popup.options.autoPan = autoPan;
+};
+
+window.plugin.playerTracker.redraw = () => {
+  if (window.map.getZoom() < window.PLAYER_TRACKER_MIN_ZOOM) return;
+  window.plugin.playerTracker.drawnTracesEnl.clearLayers();
+  window.plugin.playerTracker.drawnTracesRes.clearLayers();
+  window.plugin.playerTracker.drawData();
+  window.plugin.playerTracker.refreshPopup();
+};
+
+// a dash of 7 and a gap of 6 with flat ends look like the static 5,8 with round ones; each step moves the dashes
+// one unit further along a path, a zero-length dash at the start stands for a path that begins in a gap
+window.plugin.playerTracker.PATH_FRAMES = Array.from({ length: 13 }, (_, shift) => {
+  if (shift === 0) return '7,6';
+  if (shift <= 6) return `0,${shift},7,${6 - shift}`;
+  return `${shift - 6},6,${13 - shift},0`;
+});
+window.plugin.playerTracker.pathFrame = 0;
+
+/**
+ * Moves the dashes of the paths one step along, and plans the next step while the animated path is on
+ */
+window.plugin.playerTracker.animatePaths = () => {
+  const playerTracker = window.plugin.playerTracker;
+  clearTimeout(playerTracker.animationTimer);
+  if (!IITC.options.get('player-activity-tracker.animatePath')) return;
+  playerTracker.animationTimer = setTimeout(playerTracker.animatePaths, window.PLAYER_TRACKER_ANIMATE_STEP_TIME);
+  // the map redraws everything once it stops
+  if (playerTracker.mapMoving) return;
+
+  playerTracker.pathFrame = (playerTracker.pathFrame + 1) % playerTracker.PATH_FRAMES.length;
+  const dashArray = playerTracker.PATH_FRAMES[playerTracker.pathFrame];
+  for (const group of [playerTracker.drawnTracesEnl, playerTracker.drawnTracesRes]) {
+    if (!window.map.hasLayer(group)) continue;
+    group.eachLayer((layer) => {
+      if (layer instanceof L.Polyline) layer.setStyle({ dashArray });
+    });
+  }
 };
 
 window.plugin.playerTracker.stored = {};
+
+// after a redraw an open popup takes the content of the new marker of its player, or closes when the player is gone
+window.plugin.playerTracker.refreshPopup = () => {
+  const playerTracker = window.plugin.playerTracker;
+  if (!playerTracker.playerPopup.isOpen()) return;
+  const marker = playerTracker.stored[playerTracker.popupPlayer]?.marker;
+  if (!marker) {
+    window.map.closePopup(playerTracker.playerPopup);
+    return;
+  }
+  playerTracker.writeTimes(marker.options.desc);
+  playerTracker.withoutPopupPan((popup) => popup.setContent(marker.options.desc));
+};
 
 window.plugin.playerTracker.onClickListener = function (event) {
   var marker = event.target;
 
   if (marker.options.desc) {
+    window.plugin.playerTracker.popupPlayer = marker.options.player;
+    window.plugin.playerTracker.writeTimes(marker.options.desc);
     window.plugin.playerTracker.playerPopup.setContent(marker.options.desc);
     window.plugin.playerTracker.playerPopup.setLatLng(marker.getLatLng());
     window.map.openPopup(window.plugin.playerTracker.playerPopup);
@@ -104,7 +320,7 @@ window.plugin.playerTracker.onClickListener = function (event) {
 };
 
 /**
- * Does nothing: the popover of a marker closes by itself when the marker is cleared
+ * Does nothing: the tooltip of a marker closes by itself when the marker is cleared
  *
  * @deprecated
  */
@@ -201,11 +417,13 @@ window.plugin.playerTracker.processNewData = function (data) {
       return true;
     }
 
+    const action = { guid: json[0], time: json[1], markup: json[2].plext.markup };
     var newEvent = {
       latlngs: [[lat, lng]],
       time: json[1],
       name: name,
       address: address,
+      actions: [action],
     };
 
     var playerData = window.plugin.playerTracker.stored[plrname];
@@ -232,6 +450,7 @@ window.plugin.playerTracker.processNewData = function (data) {
     // this is multiple resos destroyed at the same time.
     if (evts[cmp].time === json[1]) {
       evts[cmp].latlngs.push([lat, lng]);
+      window.plugin.playerTracker.addAction(evts[cmp], action);
       return true;
     }
 
@@ -241,7 +460,10 @@ window.plugin.playerTracker.processNewData = function (data) {
     // to look at the next item in the event list. If this event is the
     // newest one, there may not be a newer event so check for that. If
     // it really is an older event at the same location, then skip it.
-    if (evts[cmp + 1] && window.plugin.playerTracker.eventHasLatLng(evts[cmp + 1], lat, lng)) return true;
+    if (evts[cmp + 1] && window.plugin.playerTracker.eventHasLatLng(evts[cmp + 1], lat, lng)) {
+      window.plugin.playerTracker.addAction(evts[cmp + 1], action);
+      return true;
+    }
 
     // if this event is newer, need to look at the previous one
     var sameLocation = window.plugin.playerTracker.eventHasLatLng(evts[cmp], lat, lng);
@@ -250,10 +472,24 @@ window.plugin.playerTracker.processNewData = function (data) {
     // push as new event.
     if (sameLocation) {
       evts[cmp].time = json[1];
+      window.plugin.playerTracker.addAction(evts[cmp], action);
     } else {
       evts.splice(i, 0, newEvent);
     }
   });
+};
+
+/**
+ * Adds a message to the actions of an event unless it is there already, keeping them in time order
+ *
+ * @param {Object} ev - The event
+ * @param {Object} action - The message, with its guid, time and markup
+ */
+window.plugin.playerTracker.addAction = (ev, action) => {
+  ev.actions ??= [];
+  if (ev.actions.some((known) => known.guid === action.guid)) return;
+  ev.actions.push(action);
+  ev.actions.sort((a, b) => a.time - b.time);
 };
 
 window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
@@ -270,6 +506,9 @@ window.plugin.playerTracker.getLatLngFromEvent = function (ev) {
 
 window.plugin.playerTracker.drawData = function () {
   var isTouchDev = window.isTouchDevice();
+  const showAlways = IITC.options.get('player-activity-tracker.alwaysShowLabels');
+  const showTime = IITC.options.get('player-activity-tracker.labelTime');
+  const detailed = IITC.options.get('player-activity-tracker.detailedPopup');
 
   var gllfe = window.plugin.playerTracker.getLatLngFromEvent;
 
@@ -288,7 +527,8 @@ window.plugin.playerTracker.drawData = function () {
     for (let i = 1; i < playerData.events.length; i++) {
       var p = playerData.events[i];
       var ageBucket = Math.min(Math.trunc((now - p.time) / split), 4 - 1);
-      var line = [gllfe(p), gllfe(playerData.events[i - 1])];
+      // from the older event to the newer one, so the dashes of the animated path run the way the agent went
+      const line = [gllfe(playerData.events[i - 1]), gllfe(p)];
 
       if (!polyLineByPlayerAndAge[plrname]) {
         polyLineByPlayerAndAge[plrname] = [[], [], [], []];
@@ -296,59 +536,51 @@ window.plugin.playerTracker.drawData = function () {
       polyLineByPlayerAndAge[plrname][ageBucket].push(line);
     }
 
-    var evtsLength = playerData.events.length;
-    var last = playerData.events[evtsLength - 1];
-    const ago = IITC.utils.formatAgo;
+    const last = playerData.events.at(-1);
 
-    // tooltip for marker - no HTML - and not shown on touchscreen devices
-    var tooltip = isTouchDev ? '' : plrname + ', ' + ago(last.time, now) + ' ago';
+    // label for marker - no HTML - written whenever it is shown, so the time in it stays current
+    const tooltip = () => (showTime ? `${plrname}, ${window.plugin.playerTracker.formatTime(last.time, Date.now())}` : plrname);
 
     // popup for marker
-    var popup = $('<div>').addClass('plugin-player-tracker-popup');
-    $('<span>')
-      .addClass('nickname ' + (playerData.team === 'RESISTANCE' ? 'res' : 'enl'))
-      .css('font-weight', 'bold')
-      .text(plrname)
-      .appendTo(popup);
+    const el = IITC.utils.createElement;
+    const team = playerData.team === 'RESISTANCE' ? 'res' : 'enl';
+    const popup = el('div', { className: `plugin-player-tracker-popup plugin-player-tracker-popup-${team}` });
+    popup.classList.toggle('plugin-player-tracker-popup-detailed', detailed);
+    // keeps clear of the close button
+    const header = el(
+      'div',
+      { className: 'plugin-player-tracker-popup-header' },
+      el('span', { className: `nickname ${team}`, style: 'font-weight: bold' }, plrname)
+    );
+    popup.append(header);
 
-    if (window.plugin.guessPlayerLevels !== undefined && window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer !== undefined) {
-      function getLevel(lvl) {
-        return $('<span>')
-          .css({
-            padding: '4px',
-            color: 'white',
-            backgroundColor: window.COLORS_LVL[lvl],
-          })
-          .text(lvl);
-      }
-
-      var level = $('<span>').css({ 'font-weight': 'bold', 'margin-left': '10px' }).appendTo(popup);
-
-      var playerLevelDetails = window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer(plrname);
-      level.text('Min level ').append(getLevel(playerLevelDetails.min));
-      if (playerLevelDetails.min !== playerLevelDetails.guessed) {
-        level.append(document.createTextNode(', guessed level: ')).append(getLevel(playerLevelDetails.guessed));
-      }
+    if (window.plugin.guessPlayerLevels?.fetchLevelDetailsByPlayer !== undefined) {
+      const getLevel = (lvl) => el('span', { style: `padding: 4px; color: white; background-color: ${window.COLORS_LVL[lvl]}` }, String(lvl));
+      const { min, guessed } = window.plugin.guessPlayerLevels.fetchLevelDetailsByPlayer(plrname);
+      const level = el('span', { style: 'font-weight: bold; margin-left: 10px' }, 'Min level ', getLevel(min));
+      if (min !== guessed) level.append(', guessed level: ', getLevel(guessed));
+      header.append(level);
     }
 
-    popup
-      .append('<br>')
-      .append(document.createTextNode(ago(last.time, now)))
-      .append('<br>')
-      .append(window.plugin.playerTracker.getPortalLink(last));
+    popup.append(
+      el('div', {}, 'Last seen ', el('b', {}, window.plugin.playerTracker.timeElement(last.time))),
+      el('div', { className: 'plugin-player-tracker-popup-line' }, 'at ', window.plugin.playerTracker.portalLink(last))
+    );
 
-    // show previous data in popup
-    if (evtsLength >= 2) {
-      popup.append('<br>').append('<br>').append(document.createTextNode('previous locations:')).append('<br>');
-
-      var table = $('<table>').appendTo(popup).css('border-spacing', '0');
-      for (let i = evtsLength - 2; i >= 0 && i >= evtsLength - window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS; i--) {
-        var ev = playerData.events[i];
-        $('<tr>')
-          .append($('<td>').text(ago(ev.time, now) + ' ago'))
-          .append($('<td>').append(window.plugin.playerTracker.getPortalLink(ev)))
-          .appendTo(table);
+    // the latest locations, or in the detailed view the latest actions, the newest first; an event an extension
+    // of the plugin stored without its messages shows as its portal
+    const rows = detailed
+      ? playerData.events.flatMap((ev) => (ev.actions?.length ? ev.actions : [{ time: ev.time, event: ev }])).sort((a, b) => b.time - a.time)
+      : playerData.events.map((ev) => ({ time: ev.time, event: ev })).reverse();
+    if (rows.length >= (detailed ? 1 : 2)) {
+      const table = el('table', { className: 'plugin-player-tracker-events' });
+      for (const row of rows.slice(0, window.PLAYER_TRACKER_MAX_DISPLAY_EVENTS)) {
+        const what = row.markup
+          ? window.plugin.playerTracker.actionElement(row.markup)
+          : el('div', { className: 'plugin-player-tracker-popup-line' }, window.plugin.playerTracker.portalLink(row.event));
+        table.append(el('tr', {}, el('td', { className: 'time' }, window.plugin.playerTracker.timeElement(row.time)), el('td', { className: 'entry' }, what)));
       }
+      popup.append(table);
     }
 
     // marker opacity
@@ -360,7 +592,10 @@ window.plugin.playerTracker.drawData = function () {
     // as per OverlappingMarkerSpiderfier docs, click events (popups, etc) must be handled via it rather than the standard
     // marker click events. so store the popup text in the options, then display it in the oms click handler
     const markerPos = gllfe(last);
-    var m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup[0], title: tooltip });
+    const m = new L.Marker(markerPos, { icon: icon, opacity: absOpacity, desc: popup, player: plrname });
+    // a label on hover needs a mouse, an ever shown one fades with the marker and keeps to one side
+    if (showAlways) m.bindTooltip(tooltip, { permanent: true, direction: 'right', opacity: absOpacity, className: 'plugin-player-tracker-label' });
+    else if (!isTouchDev) m.bindTooltip(tooltip, { className: 'plugin-player-tracker-label' });
     m.addEventListener('spiderfiedclick', window.plugin.playerTracker.onClickListener);
 
     // m.bindPopup(title);
@@ -372,6 +607,7 @@ window.plugin.playerTracker.drawData = function () {
   });
 
   // draw the poly lines to the map
+  const animate = IITC.options.get('player-activity-tracker.animatePath');
   for (const [playerName, polyLineByAge] of Object.entries(polyLineByPlayerAndAge)) {
     polyLineByAge.forEach((polyLine, i) => {
       if (polyLine.length === 0) return;
@@ -381,7 +617,9 @@ window.plugin.playerTracker.drawData = function () {
         color: window.PLAYER_TRACKER_LINE_COLOUR,
         interactive: false,
         opacity: 1 - 0.2 * i,
-        dashArray: '5,8',
+        dashArray: animate ? window.plugin.playerTracker.PATH_FRAMES[window.plugin.playerTracker.pathFrame] : '5,8',
+        lineCap: animate ? 'butt' : 'round',
+        renderer: window.plugin.playerTracker.pathRenderer,
       };
 
       polyLine.forEach((poly) => {
@@ -395,27 +633,61 @@ window.plugin.playerTracker.getDrawnTracesByTeam = function (team) {
   return team === 'RESISTANCE' ? window.plugin.playerTracker.drawnTracesRes : window.plugin.playerTracker.drawnTracesEnl;
 };
 
-window.plugin.playerTracker.getPortalLink = function (data) {
-  var position = data.latlngs[0];
-  return $('<a>')
-    .addClass('text-overflow-ellipsis')
-    .css('max-width', '15em')
-    .text(IITC.comm.getChatPortalName(data))
-    .prop({
-      title: IITC.comm.getChatPortalName(data),
+/**
+ * Creates a link that selects the portal of an event, and zooms to it on a double click
+ *
+ * @param {Object} data - The event, or anything with its latlngs, name and address
+ * @returns {HTMLElement} The link
+ */
+window.plugin.playerTracker.portalLink = (data) => {
+  const position = data.latlngs[0];
+  const name = IITC.comm.getChatPortalName(data);
+  return IITC.utils.createElement(
+    'a',
+    {
+      title: name,
       href: IITC.portal.display.makePermalink(position),
-    })
-    .on('click', function (event) {
-      IITC.portal.selectByLatLng(position);
-      event.preventDefault();
-      return false;
-    })
-    .on('dblclick', function (event) {
-      window.map.setView(position, window.DEFAULT_ZOOM);
-      IITC.portal.selectByLatLng(position);
-      event.preventDefault();
-      return false;
-    });
+      onclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        IITC.portal.selectByLatLng(position);
+      },
+      ondblclick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.map.setView(position, window.DEFAULT_ZOOM);
+        IITC.portal.selectByLatLng(position);
+      },
+    },
+    name
+  );
+};
+
+/**
+ * Writes a message as the chat shows it, on one line and without the player it is about, its portals in the
+ * colour of their faction then
+ *
+ * @param {Array} markup - The markup of the message
+ * @returns {HTMLElement} The line
+ */
+window.plugin.playerTracker.actionElement = (markup) => {
+  const shown = IITC.comm.transformMessage({ markup });
+  if (shown[0]?.[0] === 'PLAYER') shown.shift();
+
+  const el = IITC.utils.createElement;
+  const line = el('div', { className: 'plugin-player-tracker-popup-line plugin-player-tracker-popup-action' });
+  for (const [type, data] of shown) {
+    if (type === 'PORTAL') {
+      const portal = { latlngs: [[data.latE6 / 1e6, data.lngE6 / 1e6]], name: data.name, address: data.address };
+      const link = window.plugin.playerTracker.portalLink(portal);
+      link.classList.add(window.TEAM_TO_CSS[IITC.utils.getTeamId(data.team)]);
+      line.append(link);
+    } else {
+      // in a span, as the line would drop the spaces at the ends of a bare text
+      line.append(el('span', {}, data.plain ?? ''));
+    }
+  }
+  return line;
 };
 
 window.plugin.playerTracker.handleData = function (data) {
@@ -427,6 +699,7 @@ window.plugin.playerTracker.handleData = function (data) {
   window.plugin.playerTracker.drawnTracesEnl.clearLayers();
   window.plugin.playerTracker.drawnTracesRes.clearLayers();
   window.plugin.playerTracker.drawData();
+  window.plugin.playerTracker.refreshPopup();
 };
 
 window.plugin.playerTracker.findUser = function (nick) {
@@ -477,10 +750,6 @@ window.plugin.playerTracker.onSearchResultSelected = function (result, event) {
   return true;
 };
 
-window.plugin.playerTracker.locale = navigator.languages;
-
-window.plugin.playerTracker.dateTimeFormat = {};
-
 window.plugin.playerTracker.onSearch = function (query) {
   var term = query.term.toLowerCase();
 
@@ -494,10 +763,7 @@ window.plugin.playerTracker.onSearch = function (query) {
     query.addResult({
       title: `<mark class="nickname help ${window.TEAM_TO_CSS[window.getTeam(data)]}">${nick}</mark>`,
       nickname: nick,
-      description:
-        data.team.slice(0, 3) +
-        ', last seen ' +
-        new Date(event.time).toLocaleString(window.plugin.playerTracker.locale, window.plugin.playerTracker.dateTimeFormat),
+      description: `${data.team.slice(0, 3)}, last seen ${IITC.utils.formatTimestamp(event.time)}`,
       position: window.plugin.playerTracker.getLatLngFromEvent(event),
       onSelected: window.plugin.playerTracker.onSearchResultSelected,
     });

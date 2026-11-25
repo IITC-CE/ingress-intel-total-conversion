@@ -72,6 +72,7 @@ function setupIngressMarkers() {
     options: {
       iconSize: [25, 41],
       iconAnchor: [12, 41],
+      tooltipAnchor: IITC.map.tooltipAnchors.pinHead,
       className: 'leaflet-div-icon-iitc-generic-marker',
       // ^ actually any name, just to prevent default
       // ^ (as it's inappropriately styled)
